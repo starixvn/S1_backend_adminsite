@@ -77,6 +77,44 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int CategoryId { get; set; }
             public int BaseCurrencyId { get; set; }
         }
+        
+        public class GetListRequest : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public string UserName { get; set; }
+            public int RebateType { get; set; }
+        }
+        
+        public class ExportListRequest : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public string UserName { get; set; }
+            public int RebateType { get; set; }
+        }
 
         #endregion
 
@@ -153,6 +191,49 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             
             var stream = _excelBll.Export(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "RebateReportForVip");
+        }
+        
+        /// <summary>
+        /// RebateReport/GetList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Marketing > Rebate Info Report> [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        public ApiListResult<RebateInfo> GetList(GetListRequest request)
+        {
+            var apiListResult = new ApiListResult<RebateInfo>();
+            var pageSize = 10;
+            var pageNumber = request.PageNumber;
+            
+            apiListResult.Data = _paymentBll.GetRebateInfoList(request.SiteIds, request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.DateTime,
+                pageSize, ref pageNumber, out var totalPages, out var rowCount);
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.RowCount = rowCount;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.ErrorCode = 0;
+
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// RebateReport/ExportList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Marketing > Rebate Info Report> [Submit] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public IActionResult ExportList(ExportListRequest request)
+        {
+            var exportData = _paymentBll.GetRebateInfoExport(JsonConvert.SerializeObject(request.SiteIds), request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.LocalDateTime);
+            var stream = _excelBll.Export(exportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
     }

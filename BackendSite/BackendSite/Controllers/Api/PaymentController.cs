@@ -416,10 +416,11 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiListResult<RebateInfo>();
             var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
-            apiListResult.Data = _paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, StartDate, EndDate,
-                PageSize, ref PageNumber, out TotalPages, out RowCount);
+            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
+            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
+            
+            apiListResult.Data = _paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
+                PageSize, ref PageNumber, out var TotalPages, out var RowCount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
@@ -432,8 +433,15 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportRebateInfo(string SelectSite, string UserName, int RebateType, long StartDate,
             long EndDate)
         {
-            var ExportData = _paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, StartDate, EndDate);
-            var stream = _excelBLL.Export(ExportData);
+            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
+            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
+            
+            var exportData = _paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime);
+            foreach (var data in exportData)
+            {
+                data.ClaimTime = new DateTimeOffset(data.ClaimTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            var stream = _excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

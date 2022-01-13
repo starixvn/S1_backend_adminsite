@@ -167,28 +167,24 @@ namespace BackendSite.Service.DAL
             var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get_V2", new { CustId }, commandType: CommandType.StoredProcedure);
             return rebateInfoList;
         }
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            var abc= JsonConvert.SerializeObject(selectSite);
-
-            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize) });
+            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoList_Get", p, commandType: CommandType.StoredProcedure);
+            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoList_Get_V2", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateInfoList;
         }
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string SelectSite, string userName, int rebateType, long startDate, long endDate)
+        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate)
         {
-            var p = new DynamicParameters(new { SelectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoListExport_Get", p, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters(new {SelectSite = selectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
+            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoListExport_Get_V2", p);
             return rebateInfoList;
         }
 
