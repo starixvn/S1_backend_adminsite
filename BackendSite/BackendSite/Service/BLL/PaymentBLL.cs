@@ -79,14 +79,14 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
-            long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+            DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
         }
 
         public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType,
-            long startDate, long endDate)
+            DateTime startDate, DateTime endDate)
         {
             return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
