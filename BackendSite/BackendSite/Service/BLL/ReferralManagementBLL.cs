@@ -28,9 +28,14 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferralStatus(SiteId, CurrencyId);
         }
-        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        
+        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        {
+            return referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
             DateTime? StartDate,
@@ -38,7 +43,8 @@ namespace BackendSite.Service.BLL
             int PageSize,
             int PageNumber,
             out int TotalPages,
-            out int RowCount)
+            out int RowCount,
+            bool byRewardTime)
         {
             return referralManagementService.GetRefFriendList(custId,
                 StartDate,
@@ -46,7 +52,8 @@ namespace BackendSite.Service.BLL
                 Math.Abs(PageSize),
                 (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
                 out TotalPages,
-                out RowCount);
+                out RowCount,
+                byRewardTime);
         }
     }
 }
