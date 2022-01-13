@@ -78,6 +78,14 @@ namespace BackendSite.Controllers.Api
 
         }
 
+        public class SendMessageBatchRequest
+        {
+            public int optSite { get; set; }
+            public int accountStatus { get; set; }
+            public int currency { get; set; }
+            public IFormFile excelUpload { get; set; }
+            public string personalMsg { get; set; }
+        }
         #endregion
 
         #region Action
@@ -496,34 +504,26 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD > Personal Message Batch > Add New > [Submit]
         /// 
         /// </remarks>
-        /// <param name="optSite"></param>
-        /// <param name="accountStatus"></param>
-        /// <param name="currency"></param>
-        /// <param name="excelUpload"></param>
-        /// <param name="personalMsg"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<int> SendMessageBatch([FromForm] int optSite,
-            [FromForm] int accountStatus,
-            [FromForm] int currency,
-            [FromForm] IFormFile excelUpload,
-            [FromForm] string personalMsg)
+        public ApiResult<int> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = authorizeBLL.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            messageBLL.NewBatchMessage(optSite, authData.UserName, personalMsg, ref batchId);
+            messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
-            if (excelUpload != null)
+            if (req.excelUpload != null)
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                if (req.excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         StringComparison.OrdinalIgnoreCase)
-                    || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
-                    || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                    || req.excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
+                    || req.excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
@@ -542,7 +542,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, optSite);
+                            var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, req.optSite);
                             excelList.Add(new ExcelData
                             {
                                 CustId = custId,
@@ -557,7 +557,7 @@ namespace BackendSite.Controllers.Api
 
                     foreach (var data in excelList)
                     {
-                        PreSendBatchMessage(data, personalMsg, authData, optSite, batchId);
+                        PreSendBatchMessage(data, req.personalMsg, authData, req.optSite, batchId);
                     }
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
@@ -580,23 +580,23 @@ namespace BackendSite.Controllers.Api
 
                 foreach (var lang in langList)
                 {
-                    var msg = JObject.Parse(personalMsg)[lang];
+                    var msg = JObject.Parse(req.personalMsg)[lang];
                     if (msg != null)
                     {
                         var title = msg.Value<string>("Title");
                         var content = msg.Value<string>("Content");
-                        var req = new BatchPersonalMsg()
+                        var batchPersonalMsg = new BatchPersonalMsg()
                         {
                             BatchId = batchId,
-                            SiteId = optSite,
+                            SiteId = req.optSite,
                             LangId = lang,
                             Operator = authData.UserName,
-                            CurrencyId = currency,
-                            AccountStatus = accountStatus,
+                            CurrencyId = req.currency,
+                            AccountStatus = req.accountStatus,
                             Content = content,
                             Title = title
                         };
-                        custInfoBLL.SendMessageBatch(req);
+                        custInfoBLL.SendMessageBatch(batchPersonalMsg);
                     }
                 }
                 _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
@@ -956,19 +956,6 @@ namespace BackendSite.Controllers.Api
             {
                 switch (data.CustInfoDetail.Status)
                 {
-                    case (int)CustomerStatusEnum.Running:
-                        SendBatchMessage(personalMsg,
-                            data.CustInfoDetail.CustId,
-                            optSite,
-                            authData.UserName,
-                            batchId,
-                            data.CustUserName,
-                            data.SabaId,
-                            (CustomerStatusEnum)data.CustInfoDetail.Status,
-                            out errorCode,
-                            out resultMessage);
-                        break;
-
                     case (int)CustomerStatusEnum.Suspend:
                         resultMessage =
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
@@ -979,6 +966,7 @@ namespace BackendSite.Controllers.Api
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                         break;
 
+                    case (int)CustomerStatusEnum.Running:
                     case (int)CustomerStatusEnum.Lock:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
