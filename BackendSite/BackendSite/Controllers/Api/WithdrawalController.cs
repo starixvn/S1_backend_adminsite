@@ -538,8 +538,11 @@ namespace BackendSite.Controllers.Api
             WithdrawalLimit withdrawalLimit)
         {
             var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>();
+            var siteIds = new List<int>(); siteIds.Add(withdrawalLimit.SiteId);
+            var currencyIds = new List<int>(); currencyIds.Add(withdrawalLimit.CurrencyId);
+
             var withdrawalLimitInfoManages =
-                withdrawalBLL.GetWithdrawalLimitInfos(withdrawalLimit.SiteId, withdrawalLimit.CurrencyId);
+                withdrawalBLL.GetWithdrawalLimitInfos(siteIds, currencyIds,1,100,out _,out _);
             apiResult.Data = withdrawalLimitInfoManages;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -958,8 +961,15 @@ namespace BackendSite.Controllers.Api
             USDTWithdrawalLimit USDTwithdrawalLimit)
         {
             var apiResult = new ApiResult<IEnumerable<USDTWithdrawalLimitInfoManage>>();
+            var siteIdList = new List<int>(); siteIdList.Add(USDTwithdrawalLimit.SiteId);
+            var currencyIdList = new List<int>(); currencyIdList.Add(USDTwithdrawalLimit.CurrencyId);
+
+
             var USDTwithdrawalLimitInfoManages =
-                withdrawalBLL.GetUSDTWithdrawalLimitInfos(USDTwithdrawalLimit.SiteId, USDTwithdrawalLimit.CurrencyId, Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimit.NetworkType));
+                withdrawalBLL.GetUSDTWithdrawalLimitInfos(siteIdList,
+                currencyIdList,
+                Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimit.NetworkType),
+                1,100,out _,out _);
             apiResult.Data = USDTwithdrawalLimitInfoManages;
             apiResult.ErrorCode = 0;
             return apiResult;

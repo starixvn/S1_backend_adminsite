@@ -245,12 +245,12 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(IEnumerable<int> siteId, IEnumerable<int> depositType, IEnumerable<int> currencyId,int PageNumber,int PageSize,out int totalPages,out int rowCount) 
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(IEnumerable<int> siteId, IEnumerable<int> depositType, IEnumerable<int> currencyId,int pageNumber,int pageSize,out int totalPages,out int rowCount) 
             => depositService.GetDepositLimitInfos(JsonConvert.SerializeObject(siteId),
                 JsonConvert.SerializeObject(depositType),
                 JsonConvert.SerializeObject(currencyId),
-                (Math.Abs(PageNumber)-1)*Math.Abs(PageSize),
-                Math.Abs(PageSize),
+                (Math.Abs(pageNumber)-1)*Math.Abs(pageSize),
+                Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
 

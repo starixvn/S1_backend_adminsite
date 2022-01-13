@@ -128,7 +128,11 @@ const dataColumnDefs = ()=>{
             body:{
                 format:boolFormat
             }
-        }        
+        },
+        {
+            dataColumn:'operator',
+            columnTitle:'Operator'
+        }      
     ]
 }
 

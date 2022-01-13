@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
@@ -36,18 +38,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 
         #region API Model
 
-        public class GetAdjustmentRequest
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
 
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
 
-        public class AddAdjustmentLimitRequest
+        public class SetRequest
         {
             public int SiteId { get; set; }
-
             public int CurrencyId { get; set; }
             public decimal AdjustmentMax { get; set; }
         }
@@ -68,12 +69,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
         [HttpPost]
-        public ApiResult<AdjustmentLimitData> GetList(GetAdjustmentRequest request)
+        public ApiListResult<AdjustmentLimitData> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<AdjustmentLimitData>
+            var result = _paymentBll.GetAdjustmentData(request.SiteIds, request.CurrencyIds, request.PageNumber, request.PageSize,
+                out int totalPages, out int rowCount);
+
+            var apiResult = new ApiListResult<AdjustmentLimitData>
             {
-                Data = _paymentBll.GetAdjustmentData(request.SiteId, request.CurrencyId),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount
             };
             return apiResult;
         }
@@ -90,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
         [HttpPost]
-        public ApiResult Set(AddAdjustmentLimitRequest request)
+        public ApiResult Set(SetRequest request)
         {
             var result =
                 _paymentBll.AddAdjustmentLimitInfo(request.SiteId, request.CurrencyId, request.AdjustmentMax,
