@@ -182,6 +182,7 @@ const App = () => {
                     RollOver: result.data.rollOver,
                     ProductCategory: result.data.name,
                     WalletType: result.data.walletType,
+                    Amount: 1
                   });
                 }
                 alert("BonusCode " + result.data.bonusCode + " exist");
@@ -210,6 +211,10 @@ const App = () => {
   };
 
   const SubmitBonusPayout = () => {
+    if(!bonusData.Amount || parseInt(bonusData.Amount) === 0){
+      alert('Please Enter Amount(cannot be 0)');
+      return;
+    }
     if (bonusData.Amount > adjustmentLimitMAX && adjustmentLimitMAX !== 0 && !hasCheckPassword) {
       setneedCheckPassword(true);
       return;
