@@ -168,19 +168,19 @@ namespace BackendSite.Service.BLL
             return Regex.Replace(input, "<.*?>", String.Empty);
         }
 
-        public async Task PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
+        public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
         {
             string resultMessage;
             var errorCode = 0;
             var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
             
-            if (data.CustInfoDetail == null)
+            if (customer == null)
             {
                 resultMessage = $"Not found. {dataMessage}";
             }
             else
             {
-                var customerStatus = (CustomerStatusEnum)data.CustInfoDetail.Status;
+                var customerStatus = (CustomerStatusEnum)customer.Status;
                 switch (customerStatus)
                 {
                     case CustomerStatusEnum.Suspend:
@@ -191,7 +191,7 @@ namespace BackendSite.Service.BLL
                     case CustomerStatusEnum.Lock:
                         try
                         {
-                            errorCode = await messageService.SendMessageBatch(personalMsg, data.CustInfoDetail.CustId, optSite, authData.UserName, batchId, isPopup);
+                            errorCode = await messageService.SendMessageBatch(personalMsg, customer.CustId, optSite, authData.UserName, batchId, isPopup);
                             resultMessage = errorCode == 1
                                 ? $"Success. {dataMessage} Status: {customerStatus.GetDescription()}."
                                 : $"Fail. {dataMessage} Status: {customerStatus.GetDescription()}. Insert done but affect count != 1 ";
@@ -210,7 +210,7 @@ namespace BackendSite.Service.BLL
             }
 
             var status= (errorCode == 1) ? 3 : 4;
-            var custId = data.CustInfoDetail?.CustId ?? 0;
+            var custId = customer?.CustId ?? 0;
             if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
             {
                 _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +

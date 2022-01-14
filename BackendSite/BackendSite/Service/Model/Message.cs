@@ -115,4 +115,12 @@ namespace BackendSite.Service.Model
         public string SabaId { get; set; }
         public CustInfoDetail CustInfoDetail { get; set; }
     }
+
+    public class CustomerWhoWaitToSend
+    {
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public string UserLang { get; set; }
+        public int Status { get; set; }
+    }
 }

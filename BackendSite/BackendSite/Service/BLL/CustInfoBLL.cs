@@ -717,5 +717,10 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
+
+        public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
+        {
+            return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
+        }
     }
 }

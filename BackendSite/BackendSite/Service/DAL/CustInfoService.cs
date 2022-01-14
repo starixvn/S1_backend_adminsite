@@ -212,7 +212,7 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId }));
         }
-        
+
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins", 
@@ -703,6 +703,15 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_UserName", userName);
+            p.Add("_SiteId", siteId);
+            return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
         }
     }
 }
