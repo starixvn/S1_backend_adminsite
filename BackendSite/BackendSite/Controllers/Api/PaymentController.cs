@@ -358,18 +358,18 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
             var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
-            var CurrencyAmount = new List<string>();
-            apiListResult.Data = _paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, StartDate, EndDate,
+            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
+            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
+            var currencyAmount = new List<string>();
+            apiListResult.Data = _paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
                 PageSize,
-                CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out TotalPages, out RowCount,
-                ref CurrencyAmount);
+                CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out var TotalPages, out var RowCount,
+                ref currencyAmount);
             apiListResult.PageNumber = PageNumber;
             apiListResult.RowCount = RowCount;
             apiListResult.TotalPages = TotalPages;
             apiListResult.ErrorCode = 0;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            apiListResult.CurrencyAmount = currencyAmount;
 
             return apiListResult;
         }
@@ -403,9 +403,18 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate,
             long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var ExportData = _paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, StartDate, EndDate,
+            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
+            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
+            
+            var exportData = _paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
                 CurrencyId, BaseCurrencyId, RebateCategoriesId);
-            var stream = _excelBLL.Export(ExportData);
+            
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
+            var stream = _excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

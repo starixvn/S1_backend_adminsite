@@ -97,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int RebateType { get; set; }
         }
         
-        public class ExportListRequest : ApiRequestPageModel
+        public class ExportListRequest 
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -113,6 +113,50 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
             public string UserName { get; set; }
+            public int RebateType { get; set; }
+        }
+        
+        public class GetLogRequest : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public int BaseCurrencyId { get; set; }
+            public int RebateCategoriesId { get; set; }
+            public int RebateType { get; set; }
+        }
+        
+        public class ExportRebateLogRequest 
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public int BaseCurrencyId { get; set; }
+            public int RebateCategoriesId { get; set; }
             public int RebateType { get; set; }
         }
 
@@ -236,5 +280,68 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        /// <summary>
+        /// RebateReport/GetRebateLog 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Marketing > Rebate Log Report > [Submit] 
+        /// </remarks>
+        /// <param name="request"></param>
+        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog(GetLogRequest request)
+        {
+            var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
+            var pageSize = 10;
+            var pageNumber = request.PageNumber;
+            var currencyAmount = new List<string>();
+            apiListResult.Data = _paymentBll.GetRebateLog(
+                request.SiteIds, 
+                request.UserName,
+                request.RebateType,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                pageSize,
+                request.CurrencyId, 
+                request.BaseCurrencyId, 
+                request.RebateCategoriesId,
+                ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
+            
+            apiListResult.PageNumber = pageNumber;
+            apiListResult.RowCount = rowCount;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.ErrorCode = 0;
+            apiListResult.CurrencyAmount = currencyAmount;
+
+            return apiListResult;
+        }
+        
+        /// <summary>
+        /// RebateReport/ExportRebateLog 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Marketing > Rebate Log Report > [Submit] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public IActionResult ExportRebateLog(ExportRebateLogRequest request)
+        {
+            var exportData = _paymentBll.GetRebateLogExport(
+                JsonConvert.SerializeObject(request.SiteIds), 
+                request.UserName, 
+                request.RebateType,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.CurrencyId,
+                request.BaseCurrencyId, 
+                request.RebateCategoriesId);
+            
+            var stream = _excelBll.Export(exportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+        
     }
 }
