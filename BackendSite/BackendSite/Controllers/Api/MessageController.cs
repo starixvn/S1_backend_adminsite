@@ -68,16 +68,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
 
-        public class ExcelData
-        {
-            public int RowId { get; set; }
-            public int? CustId { get; set; }
-            public string CustUserName { get; set; }
-            public string SabaId { get; set; }
-            public CustInfoDetail CustInfoDetail { get; set; }
-
-        }
-
         public class SendMessageBatchRequest
         {
             public int optSite { get; set; }
@@ -538,6 +528,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
+                            custUsername = string.IsNullOrEmpty(custUsername) ? null : custUsername;
                             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, custUsername, req.optSite);
                             excelList.Add(new ExcelData
                             {
@@ -553,7 +544,7 @@ namespace BackendSite.Controllers.Api
 
                     foreach (var data in excelList)
                     {
-                        await PreSendBatchMessage(data, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
+                        await messageBLL.PreSendBatchMessage(data, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 

@@ -107,4 +107,12 @@ namespace BackendSite.Service.Model
         public DateTimeOffset UpdateTime { get; set; }
         public DateTimeOffset CreateTime { get; set; }
     }
+    public class ExcelData
+    {
+        public int RowId { get; set; }
+        public int? CustId { get; set; }
+        public string CustUserName { get; set; }
+        public string SabaId { get; set; }
+        public CustInfoDetail CustInfoDetail { get; set; }
+    }
 }

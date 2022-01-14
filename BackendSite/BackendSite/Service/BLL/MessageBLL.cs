@@ -5,8 +5,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -15,11 +18,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly MessageService messageService;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly ILogger<MessageBLL> _logger;
 
-        public MessageBLL(MessageService messageService, CustInfoBLL custInfoBLL)
+        public MessageBLL(MessageService messageService, CustInfoBLL custInfoBLL, ILogger<MessageBLL> logger)
         {
             this.messageService = messageService;
             this.custInfoBLL = custInfoBLL;
+            _logger = logger;
         }
 
         public int SendMessageToPlayer(string sender, string title, string content, int custId)
@@ -161,6 +166,57 @@ namespace BackendSite.Service.BLL
         private string StripHTML(string input)
         {
             return Regex.Replace(input, "<.*?>", String.Empty);
+        }
+
+        public async Task PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
+        {
+            string resultMessage;
+            var errorCode = 0;
+            var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
+            
+            if (data.CustInfoDetail == null)
+            {
+                resultMessage = $"Not found. {dataMessage}";
+            }
+            else
+            {
+                var customerStatus = (CustomerStatusEnum)data.CustInfoDetail.Status;
+                switch (customerStatus)
+                {
+                    case CustomerStatusEnum.Suspend:
+                    case CustomerStatusEnum.Closed:
+                        resultMessage = $"Fail. {dataMessage} Status={customerStatus.GetDescription()}";
+                        break;
+                    case CustomerStatusEnum.Running:
+                    case CustomerStatusEnum.Lock:
+                        try
+                        {
+                            errorCode = await messageService.SendMessageBatch(personalMsg, data.CustInfoDetail.CustId, optSite, authData.UserName, batchId, isPopup);
+                            resultMessage = errorCode == 1
+                                ? $"Success. {dataMessage} Status: {customerStatus.GetDescription()}."
+                                : $"Fail. {dataMessage} Status: {customerStatus.GetDescription()}. Insert done but affect count != 1 ";
+                        }
+                        catch (Exception ex)
+                        {
+                            resultMessage = ex.ToString();
+                            errorCode = -1;
+                        }
+                        break;
+                    default:
+                        resultMessage =
+                            $"Fail. {dataMessage} Status=non status";
+                        break;
+                }
+            }
+
+            var status= (errorCode == 1) ? 3 : 4;
+            var custId = data.CustInfoDetail?.CustId ?? 0;
+            if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
+            {
+                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
+                                 $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
+                                 $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
+            }
         }
     }
 }
