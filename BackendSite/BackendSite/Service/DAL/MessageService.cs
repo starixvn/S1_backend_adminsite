@@ -185,6 +185,19 @@ namespace BackendSite.Service.DAL
             }
 
         }
+
+        public async Task<int> SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId, bool isPopup)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Sender", sender);
+            p.Add("_CustId", custId);
+            p.Add("_SiteId", siteId);
+            p.Add("PersonalMsg", personalMsg);
+            p.Add("_BatchId", batchId);
+            p.Add("_IsPopup", isPopup);
+            return await _mainDbClient.ExecuteAsync("Admin_Msg_Batch_Ins_V3", p);
+        }
+
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

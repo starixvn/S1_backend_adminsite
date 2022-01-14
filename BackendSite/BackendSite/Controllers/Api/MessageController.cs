@@ -83,6 +83,7 @@ namespace BackendSite.Controllers.Api
             public int optSite { get; set; }
             public int accountStatus { get; set; }
             public int currency { get; set; }
+            public bool IsPopup { get; set; }
             public IFormFile excelUpload { get; set; }
             public string personalMsg { get; set; }
         }
@@ -508,7 +509,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<int> SendMessageBatch([FromForm] SendMessageBatchRequest req)
+        public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = authorizeBLL.GetAuthData();
             var batchId = 0;
@@ -527,11 +528,9 @@ namespace BackendSite.Controllers.Api
 
                     do // 讀取資料，直到讀到空白列為止
                     {
-                        var custUsername = string.IsNullOrEmpty(sheet.Cells[rowId, 1].Text)
-                            ? null
-                            : sheet.Cells[rowId, 1].Text.Trim();
+                        var custUsername = sheet.Cells[rowId, 1].Text.Trim();
                         var sabaId = sheet.Cells[rowId, 2].Text.Trim();
-                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : common.TpIdToCustId(sabaId);
+                        var custId = common.TpIdToCustId(sabaId); 
 
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
@@ -554,7 +553,7 @@ namespace BackendSite.Controllers.Api
 
                     foreach (var data in excelList)
                     {
-                        PreSendBatchMessage(data, req.personalMsg, authData, req.optSite, batchId);
+                        await PreSendBatchMessage(data, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
@@ -940,55 +939,55 @@ namespace BackendSite.Controllers.Api
 
         #region Private Methods
 
-        private void PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId)
+        private async Task PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
         {
-            var resultMessage = string.Empty;
+            string resultMessage;
             var errorCode = 0;
+            var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
+            
             if (data.CustInfoDetail == null)
             {
-                resultMessage =
-                    $"Not found. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
+                resultMessage = $"Not found. {dataMessage}";
             }
             else
             {
-                switch (data.CustInfoDetail.Status)
+                var customerStatus = (CustomerStatusEnum)data.CustInfoDetail.Status;
+                switch (customerStatus)
                 {
-                    case (int)CustomerStatusEnum.Suspend:
-                        resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
+                    case CustomerStatusEnum.Suspend:
+                    case CustomerStatusEnum.Closed:
+                        resultMessage = $"Fail. {dataMessage} Status={customerStatus.GetDescription()}";
                         break;
-
-                    case (int)CustomerStatusEnum.Closed:
-                        resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
+                    case CustomerStatusEnum.Running:
+                    case CustomerStatusEnum.Lock:
+                        try
+                        {
+                            errorCode = await messageBLL.SendMessageBatch(personalMsg, data.CustInfoDetail.CustId, optSite, authData.UserName, batchId, isPopup);
+                            resultMessage = errorCode == 1
+                                ? $"Success. {dataMessage} Status: {customerStatus.GetDescription()}."
+                                : $"Fail. {dataMessage} Status: {customerStatus.GetDescription()}. Insert done but affect count != 1 ";
+                        }
+                        catch (Exception ex)
+                        {
+                            resultMessage = ex.ToString();
+                            errorCode = -1;
+                        }
                         break;
-
-                    case (int)CustomerStatusEnum.Running:
-                    case (int)CustomerStatusEnum.Lock:
-                        SendBatchMessage(personalMsg,
-                            data.CustInfoDetail.CustId,
-                            optSite,
-                            authData.UserName,
-                            batchId,
-                            data.CustUserName,
-                            data.SabaId,
-                            (CustomerStatusEnum)data.CustInfoDetail.Status,
-                            out errorCode,
-                            out resultMessage);
+                    default:
+                        resultMessage =
+                            $"Fail. {dataMessage} Status=non status";
                         break;
                 }
             }
 
-            int status = (errorCode == 1) ? 3 : 4;
-
-            InsertBatchMessageSendLog(batchId,
-                data.RowId,
-                data.CustInfoDetail?.CustId ?? 0,
-                data.CustUserName,
-                data.SabaId,
-                resultMessage,
-                authData.UserName,
-                status);
+            var status= (errorCode == 1) ? 3 : 4;
+            var custId = data.CustInfoDetail?.CustId ?? 0;
+            if (!messageBLL.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
+            {
+                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
+                                 $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
+                                 $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
+            }
         }
 
         private void SendBatchMessage(string personalMsg,

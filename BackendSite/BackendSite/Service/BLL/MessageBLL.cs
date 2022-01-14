@@ -96,6 +96,10 @@ namespace BackendSite.Service.BLL
         {
             return messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId);
         }
+        public async Task<int> SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId, bool isPopup)
+        {
+            return await messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId, isPopup);
+        }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
