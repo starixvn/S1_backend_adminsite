@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
-            if (selectTag.Any() )
+            if (selectTag != null && selectTag.Any() )
             {
                 jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
             }
