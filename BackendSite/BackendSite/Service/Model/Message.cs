@@ -119,6 +119,7 @@ namespace BackendSite.Service.Model
     public class CustomerWhoWaitToSend
     {
         public int CustId { get; set; }
+        public string UserName { get; set; }
         public int SiteId { get; set; }
         public string UserLang { get; set; }
         public int Status { get; set; }
