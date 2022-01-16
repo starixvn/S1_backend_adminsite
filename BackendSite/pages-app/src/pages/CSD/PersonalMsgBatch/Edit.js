@@ -5,6 +5,7 @@ import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
+import Checkbox from "./Checkbox";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 
 const AccountStatus = {
@@ -54,6 +55,7 @@ const EditPanel = (props) => {
     accountstatus:0,
     currency:0,
     file: "",
+    popupMessage: {},
     subject: {},
     content: {},
     batchId: "",
@@ -61,9 +63,11 @@ const EditPanel = (props) => {
   if (props.DetailDatas !== null && props.DetailDatas.message !== null) {
     let detailDatas = JSON.parse(props.DetailDatas.message);
     let Title = {},
-      Content = {};
+      Content = {},
+      PopupMessage = {};
     Object.keys(detailDatas).forEach((lang) => {
       if (detailDatas[lang]) {
+        PopupMessage[lang] = detailDatas[lang].PopupMessage;
         Title[lang] = detailDatas[lang].Title;
         Content[lang] = detailDatas[lang].Content;
       }
@@ -87,6 +91,7 @@ const EditPanel = (props) => {
       ? props.SiteList[props.DetailDatas.siteId - 1].iLangList
       : null
   );
+  const [popupState, setPopupState] = useState(false);
   const isMountedRef = useRef(null);
   
   useEffect(() => {
@@ -115,6 +120,7 @@ const EditPanel = (props) => {
       });
       //console.log('2v = '+v,'datacolumn = '+datacolumn, 'subDatas = '+subDatas);
       if (datacolumn === "optSite") {
+        
         let getSiteItem = props.SiteList.find((x) => x.siteId === v);
         setlangDatas(getSiteItem.iLangList);
       }
@@ -141,11 +147,16 @@ const EditPanel = (props) => {
       else if (!stateData.subject || !stateData.subject.en) {
         check = false;
         msg = "Please input en subject.";
-      } else if (!stateData.content || !stateData.content.en) {
+      } 
+      else if (!stateData.content || !stateData.content.en) {
         check = false;
         msg = "Please input en content.";
       }
-      
+      else if (popupState &&  (!stateData.popupMessage || !stateData.popupMessage.en)) {
+        check = false;
+        msg = "Please input en pop up message.";
+      }
+
       if (
         check &&
         window.confirm(
@@ -158,6 +169,18 @@ const EditPanel = (props) => {
         defaultData.accountstatus = props.filterInfo.AccountStatus;
         defaultData.currency = props.filterInfo.Currency;
         
+        Object.keys(stateData.popupMessage).forEach((sKey) => {
+          if (stateData.popupMessage[sKey]) {
+            if (msg[sKey]) {
+              msg[sKey].PopupMessage = stateData.popupMessage[sKey];
+            } else {
+              msg[sKey] = {
+                PopupMessage: stateData.popupMessage[sKey],
+              };
+            }
+          }
+        });
+
         Object.keys(stateData.subject).forEach((sKey) => {
           if (stateData.subject[sKey]) {
             if (msg[sKey]) {
@@ -183,19 +206,21 @@ const EditPanel = (props) => {
             }
           }
         });
-
+        
         let settings = { headers: { "content-type": "multipart/form-data" } };
         let file = document.getElementById("uploadfile").files[0];
         let formData = new FormData();
         formData.append("optSite", parseInt(stateData.optSite));
         formData.append("accountStatus", parseInt(defaultData.accountstatus));
         formData.append("currency", parseInt(defaultData.currency));
+        formData.append("IsPopup", popupState);
         if (file != null){
           formData.append("excelUpload", file, file.name);
           if (langDatas != null) {
             langDatas.forEach((lang) => {
               if(msg[lang] == null){
                 msg[lang] = {
+                  PopupMessage: stateData.popupMessage.en,
                   Title: stateData.subject.en,
                   Content: stateData.content.en,
                 };
@@ -224,6 +249,7 @@ const EditPanel = (props) => {
                 updateData({
                   optSite: "",
                   file: "",
+                  popupMessage: {},
                   subject: {},
                   content: {},
                   batchId: "",
@@ -263,6 +289,9 @@ const EditPanel = (props) => {
       } else if (!stateData.content || !stateData.content.en) {
         check = false;
         msg = "Please input en content.";
+      } else if (popupState &&  (!stateData.popupMessage || !stateData.popupMessage.en)) {
+        check = false;
+        msg = "Please input en pop up message.";
       }
 
       if (
@@ -325,6 +354,7 @@ const EditPanel = (props) => {
                 updateData({
                   optSite: "",
                   file: "",
+                  popupMessage: {},
                   subject: {},
                   content: {},
                   batchId: "",
@@ -423,6 +453,12 @@ const EditPanel = (props) => {
               }
               Content={
                 <SettingContent
+                  popupState={popupState}
+                  popupMessage={
+                    stateData.popupMessage[lang] === undefined
+                      ? ""
+                      : stateData.popupMessage[lang]
+                  }
                   subject={
                     stateData.subject[lang] === undefined
                       ? ""
@@ -507,6 +543,12 @@ const EditPanel = (props) => {
           </div>
         </>
       ) : null}
+      {langDatas != null ? <Checkbox
+          title="Pop Up"
+          value="popup"
+          checked={popupState}
+          toggle = {setPopupState}
+       /> : null}
       {langPanels}
       {props.DetailDatas === null ? (
         <button
@@ -574,6 +616,18 @@ const SettingContent = (props) => {
   }
   return (
     <div className="panel-body">
+      {props.popupState ? 
+      <div className="form-group">
+        <label>Pop up Message</label>
+        <input
+          type="text"
+          className="form-control"
+          value={props.popupMessage}
+          onChange={(e) => {
+            props.EditFiled(e.target.value, "popupMessage", { lang: props.lang });
+          }}
+        />
+      </div> : null }
       <div className="form-group">
         <label>Subject</label>
         <input
