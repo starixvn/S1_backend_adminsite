@@ -203,11 +203,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
-        public bool NewBatchMessage(int siteId, string author, string personalMsg, ref int batchId)
+        public bool NewBatchMessage(int siteId, string author, string personalMsg, bool isPopup, ref int batchId)
         {
-            var p = new DynamicParameters(new { SiteId = siteId, Author = author, Message = personalMsg });
+            var p = new DynamicParameters(new {_SiteId = siteId, _Author = author, _IsPopup = isPopup, _Message = personalMsg});
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Admin_BatchMessage_Ins", p);
+            var result = _mainDbClient.Execute("Admin_BatchMessage_Ins_V2", p);
             batchId = p.Get<int>("BatchId");
             return result > 0;
         }

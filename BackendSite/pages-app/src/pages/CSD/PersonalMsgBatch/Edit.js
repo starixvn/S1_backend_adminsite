@@ -74,6 +74,7 @@ const EditPanel = (props) => {
     });
     defaultData.batchId = props.DetailDatas.batchId;
     defaultData.optSite = props.DetailDatas.siteId;
+    defaultData.popupMessage = PopupMessage;
     defaultData.subject = Title;
     defaultData.content = Content;
     // console.log('props.DetailDatas.siteId = '+props.DetailDatas.siteId,'iLangList = '+props.SiteList[props.DetailDatas.siteId-1].iLangList);
@@ -95,6 +96,7 @@ const EditPanel = (props) => {
   const isMountedRef = useRef(null);
   
   useEffect(() => {
+    setPopupState(props.DetailDatas.isPopup)
     isMountedRef.current = true;
     return () => (isMountedRef.current = false);
   });

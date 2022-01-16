@@ -109,9 +109,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
         }
-        public bool NewBatchMessage(int siteId, string author, string personalMsg, ref int batchId)
+        public bool NewBatchMessage(int siteId, string author, bool isPopup, string personalMsg,  ref int batchId)
         {
-            return messageService.NewBatchMessage(siteId, author, personalMsg, ref batchId);
+            return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
         }
         public bool DeleteBatchMessage(int batchId)
         {

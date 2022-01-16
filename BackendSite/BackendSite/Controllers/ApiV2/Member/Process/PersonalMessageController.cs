@@ -135,7 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var authData = _authorizeBll.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            _messageBll.NewBatchMessage(siteId, authData.UserName, personalMsg, ref batchId);
+            _messageBll.NewBatchMessage(siteId, authData.UserName, false, personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
             
             if (excelUpload != null)

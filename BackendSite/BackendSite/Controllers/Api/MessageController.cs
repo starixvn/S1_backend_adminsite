@@ -504,7 +504,7 @@ namespace BackendSite.Controllers.Api
             var authData = authorizeBLL.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.personalMsg, ref batchId);
+            messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)

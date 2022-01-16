@@ -101,6 +101,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int BatchId { get; set; }
         public string Author { get; set; }
+        public bool IsPopup { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string Message { get; set; }
