@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,18 +15,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class DrawPrizeReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly PrizeBLL _prizeBll;
         private readonly ExcelBLL _excelBll;
-        
+
         #endregion
-        
+
         #region Constructor
-        
+
         public DrawPrizeReportController(IServiceProvider provider)
         {
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
@@ -36,54 +36,68 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
         #region API Model
 
-        public class PrizeSelectReq
+        public class GetListRequest : ApiRequestPageModel
         {
-            public PrizeSelect SelectPrizePara { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
+            public IEnumerable<string> EventNameList { get; set; }
             public int TimeZone { get; set; }
         }
-        
-        public class GetPrizeLogReq
+
+        public class GetLogRequest : ApiRequestPageModel
         {
-            public PrizeLogPara PrizeLogPara { get; set; }
+            public int EventId { get; set; }
+            public int PrizeId { get; set; }
+            public string EventTime { get; set; }
+            public string PrizeName { get; set; }
             public int TimeZone { get; set; }
         }
-        
-        public class ExportPrizeDataReq
+
+        public class ExportRequest
         {
-            public ExportPrize ExportPrizePara { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<string> EventNameList { get; set; }
             public int TimeZone { get; set; }
         }
-        
-        public class ExportPrize
-        {
-            public IEnumerable<int> SelectSite{ get; set; } 
-            public string StartDate{ get; set; } 
-            public string EndDate{ get; set; } 
-            public int CurrencyId{ get; set; }
-            public string EventName{ get; set; }
-        }
+
         #endregion
-        
+
         /// <summary>
-        /// DrawPrizeReport/PrizeSearch 
+        /// DrawPrizeReport/GetList 取得抽獎資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing  > Draw Prize Report > [Search] 
+        /// Func Path：Marketing  > Draw Prize Report > [Submit] 
         /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
-        public ApiListResultCurrencyAmount<DrawPrize> PrizeSearch(PrizeSelectReq req)
+        [HttpPost]
+        public ApiListResultCurrencyAmount<DrawPrize> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResultCurrencyAmount<DrawPrize>();
-            
-            if (req.TimeZone <= 14 && req.TimeZone >= -12)
+
+            if (request.TimeZone <= 14 && request.TimeZone >= -12)
             {
                 try
                 {
-                    var prizeSearchResult = _prizeBll.PrizeSearch(req.SelectPrizePara, req.TimeZone);
+                    var param = new PrizeSelect()
+                    {
+                        SelectSite = request.SiteIds,
+                        CurrencyId = request.CurrencyIds,
+                        StartDate = request.StartDate,
+                        EndDate = request.EndDate,
+                        EventName = request.EventNameList,
+                        PageNumber = request.PageNumber,
+                        PageSize = request.PageSize,
+                    };
+
+                    var prizeSearchResult = _prizeBll.PrizeSearch(param, request.TimeZone);
                     apiResult.Data = prizeSearchResult.DrawPrize;
                     apiResult.PageNumber = prizeSearchResult.PageNumber;
                     apiResult.TotalPages = prizeSearchResult.TotalPages;
@@ -99,33 +113,79 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
                 return apiResult;
             }
-            
+
             return new ApiListResultCurrencyAmount<DrawPrize>
             {
-                Message ="Invalid TimeZone",
+                Message = "Invalid TimeZone",
                 ErrorCode = (int)ErrorCodeEnum.Fail,
             };
         }
-        
+
         /// <summary>
-        /// DrawPrizeReport/GetPrizeLog 
+        /// DrawPrizeReport/Export 匯出抽獎報告清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing  > Draw Prize Report > [Detail] 
+        /// Func Path：Marketing  > Draw Prize Report > [Submit] > [Export Excel] 
         /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
-        public ApiListResult<PrizeLogData> GetPrizeLog(GetPrizeLogReq req)
+        [HttpPost]
+        public IActionResult Export(ExportRequest request)
+        {
+            if (request.TimeZone <= 14 && request.TimeZone >= -12)
+            {
+                var exportData = _prizeBll.GetExportData(
+                    JsonConvert.SerializeObject(request.SiteIds),
+                    request.StartDate,
+                    request.EndDate,
+                    JsonConvert.SerializeObject(request.CurrencyIds),
+                    JsonConvert.SerializeObject(request.EventNameList),
+                    request.TimeZone);
+
+                var stream = _excelBll.Export(exportData);
+                return _excelBll.ExcelFile(stream, "DrawPrizeReport");
+            }
+
+            var error = new ApiListResult<PrizeLogData>
+            {
+                Message = "Invalid TimeZone",
+                ErrorCode = (int)ErrorCodeEnum.Fail,
+            };
+
+            return new ObjectResult(error);
+        }
+
+        /// <summary>
+        /// DrawPrizeReport/GetLog 取得抽獎紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Draw Prize Report > [Submit] > [Detail] 
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        [HttpPost]
+        public ApiListResult<PrizeLogData> GetLog(GetLogRequest request)
         {
             var apiResult = new ApiListResult<PrizeLogData>();
-            if (req.TimeZone <= 14 && req.TimeZone >= -12)
+            if (request.TimeZone <= 14 && request.TimeZone >= -12)
             {
                 try
                 {
-                    var logResult = _prizeBll.GetPrizeLog(req.PrizeLogPara, req.TimeZone);
+                    var param = new PrizeLogPara()
+                    {
+                        EventId = request.EventId,
+                        PrizeId = request.PrizeId,
+                        EventTime = request.EventTime,
+                        PrizeName = request.PrizeName,
+                        PageNumber = request.PageNumber,
+                        PageSize = request.PageSize,
+                    };
+
+                    var logResult = _prizeBll.GetPrizeLog(param, request.TimeZone);
                     foreach (var data in logResult.PrizeLogData)
                     {
                         data.DrawTime = new DateTimeOffset(data.DrawTime.DateTime, TimeSpan.Zero);
@@ -147,67 +207,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             }
             return new ApiListResult<PrizeLogData>
             {
-                Message ="Invalid TimeZone",
+                Message = "Invalid TimeZone",
                 ErrorCode = (int)ErrorCodeEnum.Fail,
             };
-        }
-        
-        /// <summary>
-        /// DrawPrizeReport/GetEventName 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing  > Draw Prize Report 
-        /// </remarks>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
-        public ApiResult<IEnumerable<EventDraw>> GetEventName()
-        {
-            var apiResult = new ApiResult<IEnumerable<EventDraw>>
-            {
-                Data = _prizeBll.GetEventName(),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// DrawPrizeReport/ExportPrizeData 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing  > Draw Prize Report > [Search] > [Export] 
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Marketing/DrawPrizeReport"})]
-        public IActionResult ExportPrizeData(ExportPrizeDataReq req)
-        {
-            if (req.TimeZone <= 14 && req.TimeZone >= -12)
-            {
-                var exportData = _prizeBll.GetExportData(
-                    JsonConvert.SerializeObject(req.ExportPrizePara.SelectSite), 
-                    req.ExportPrizePara.StartDate,
-                    req.ExportPrizePara.EndDate, 
-                    req.ExportPrizePara.CurrencyId, 
-                    req.ExportPrizePara.EventName,
-                    req.TimeZone);
-                
-                var stream = _excelBll.Export(exportData);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    $"DrawPrize_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-            }
-            
-            var error =  new ApiListResult<PrizeLogData>
-            {
-                Message ="Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
-            };
-            
-            return new ObjectResult(error);
         }
     }
 }

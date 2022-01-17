@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -14,9 +15,11 @@ namespace BackendSite.Service.BLL
             this.newsServices = newsServices;
         }
 
-        public NewsData GetNewsList(IEnumerable<int> selectSite, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, int status)
+        public NewsData GetNewsList(IEnumerable<int> selectSite, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, IEnumerable<int> status)
         {
-            return newsServices.GetNewsList(selectSite, startDate, endDate, pageSize, pageNumber, status);
+            return newsServices.GetNewsList(JsonConvert.SerializeObject(selectSite), startDate,
+                endDate, JsonConvert.SerializeObject(status),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize));
         }
 
         public News GetNewsById(int newsId)
@@ -26,6 +29,11 @@ namespace BackendSite.Service.BLL
 
         public int? SetNews(bool isAdd, News newsDatas)
         {
+            if (newsDatas.PostTime != null)
+            {
+                newsDatas.UnixPostTime = DateTimeOffset.Parse(newsDatas.PostTime.ToString()).ToUnixTimeSeconds();
+            }
+
             return newsServices.SetNews(isAdd, newsDatas);
         }
 
