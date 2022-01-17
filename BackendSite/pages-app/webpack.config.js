@@ -248,6 +248,14 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
+    // "Marketing/VerificationReward.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/VerificationReward/index.js",
+    // ],
+    "Marketing/VerificationRewardReport.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VerificationRewardReport/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

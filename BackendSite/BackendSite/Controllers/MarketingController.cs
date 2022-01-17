@@ -137,6 +137,18 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
+        public IActionResult VerificationReward()
+        {
+            return View();
+        }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
+        public IActionResult VerificationRewardReport()
+        {
+            return View();
+        }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/AppLinkManagement" })]
         public IActionResult AppLinkManagement()
