@@ -25,25 +25,26 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public NewsData GetNewsList(IEnumerable<int> selectSite, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, int Status)
+        public NewsData GetNewsList(string selectSite,
+            DateTime startDate, DateTime endDate,
+            string status, int startIndex,
+            int pageSize)
         {
             var searchData = new NewsData();
             var props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("PageSize", Math.Abs(pageSize));
-            props.Add("Status", Status);
-            props.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<News>("Admin_News_Get_V3", props).ToList();
+            props.Add("_SiteIds", selectSite);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_Status", status);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _reportDbClient.Query<News>("Admin_News_Get_V4", props).ToList();
 
             searchData.NewsList = result;
-            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return searchData;
         }

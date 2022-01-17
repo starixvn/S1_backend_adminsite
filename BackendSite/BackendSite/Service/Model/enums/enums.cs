@@ -389,17 +389,21 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
-    public enum VipTypeEnum
+    #region Vip Setting
+
+    public enum VipSettingStatusEnum
     {
         Upgrade = 1,
         Downgrade = 2
     }
 
-    public enum VipPreviousDateRangeType
+    public enum PreviousDateRangeTypeEnum
     {
         LastMonth = 1,
         LastThreeMonth = 2
     }
+
+    #endregion
 
     public enum VipStatus
     {
@@ -642,5 +646,14 @@ namespace BackendSite.Service.Model.enums
         Maintenance = 4  //frontend red
     }
 
+    #region News
+
+    public enum NewsStatusEnum
+    {
+        InActive = 0,
+        Active = 1
+    }
+
     #endregion
+
 }
