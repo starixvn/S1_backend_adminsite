@@ -782,6 +782,8 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<LeaderboardExtraPointList> GetLeaderboardExtraPointList(LeaderboardExtraPointReq leaderboardExtraPointReq)
         {
             var apiResult = new ApiListResult<LeaderboardExtraPointList>();
+            var startTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.EndDate);
             int totalPages = 0, rowCount = 0;
 
             var pageNumber = leaderboardExtraPointReq.PageNumber;
@@ -789,8 +791,15 @@ namespace BackendSite.Controllers.Api
             if (leaderboardExtraPointReq.PageSize > 0)
                 pageSize = leaderboardExtraPointReq.PageSize;
             apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
-                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, leaderboardExtraPointReq.StartDate,
-                leaderboardExtraPointReq.EndDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, startTime,
+                endTime, pageSize, ref pageNumber, out totalPages, out rowCount);
+
+            foreach (var data in apiResult.Data)
+            {
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;

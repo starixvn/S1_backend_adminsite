@@ -210,7 +210,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new { SpecialCode = specialCode }));
         }
-        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             string SelectSite = null;
             if (selectSite != null && selectSite.Any())
@@ -219,16 +219,15 @@ namespace BackendSite.Service.DAL
             }
             totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, CategoryType = categoryType, CurrencyId = currencyId, PageSize = pageSize });
+            var p = new DynamicParameters(new { SelectSite, CategoryType = categoryType, CurrencyId = currencyId, PageSize = Math.Abs(pageSize) });
             p.Add("StartDate", startDate);
-            p.Add("EndDate", endDate);
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("EndDate", endDate.AddDays(1).AddSeconds(-1));
+            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32,ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get", p, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get_V2", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -237,16 +236,12 @@ namespace BackendSite.Service.DAL
 
         public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
-
-            var Rtn = -1;
-
             var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
             p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_LeaderboardExtraPoint_Set", p, commandType: CommandType.StoredProcedure);
-            Rtn = p.Get<int?>("RTN") ?? -1;
-            return Rtn;
+            _mainDbClient.Execute("Admin_LeaderboardExtraPoint_Set", p);
+            var rtn = p.Get<int?>("RTN") ?? -1;
+            
+            return rtn;
         }
 
         #region Public Method
