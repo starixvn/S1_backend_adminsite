@@ -18,12 +18,12 @@ const defPromotionType = {
   1: "First Deposit",
   2: "Re-Deposit",
   3: "FreeBet",
-  4: "Special",
+  //4: "Special",
   5: "Wallet Bonus",
   6: "Rebate",
   7: "CashBack",
-  8: "Advertising",
-  9: "Retention free bet"
+  8: "Manual Bonus(Static Page)",
+  9: "Retention Bonus",
 };
 const defDateType = {
   0: "",

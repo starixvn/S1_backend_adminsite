@@ -658,4 +658,15 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region RebatePeriod
+
+    public enum RebatePeriodPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    #endregion
+
 }
