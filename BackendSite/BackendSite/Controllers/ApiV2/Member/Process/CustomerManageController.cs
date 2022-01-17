@@ -263,7 +263,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
@@ -303,7 +303,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string? AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
         }
@@ -548,7 +548,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 tagStartDate,
                 tagEndDate,
                 request.PageSize,
-                request.AffId,
+                request.AffCode,
                 request.CurrencyIds,
                 request.BankAccountNumber?.Trim(),
                 request.Statuses,
@@ -603,7 +603,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    request.AffId,
+                                                                    request.AffCode,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
                                                                     request.Statuses);
