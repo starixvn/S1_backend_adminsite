@@ -40,7 +40,7 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
     // ],
-    "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+    //"CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
