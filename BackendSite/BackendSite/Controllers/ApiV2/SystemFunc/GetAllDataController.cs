@@ -34,6 +34,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BonusManageBLL _bonusManageBll;
         private readonly RebateManageBLL _rebateManageBll;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly PrizeBLL _prizeBll;
 
         #endregion
 
@@ -51,6 +52,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _prizeBll = provider.GetRequiredService<PrizeBLL>();
         }
 
         #endregion
@@ -302,6 +304,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
         }
 
+        /// <summary>
+        /// AllData/GetEventNameList 取得活動名稱清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Draw Prize Report > EventName
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<EventDraw>> GetEventName()
+        {
+            var apiResult = new ApiResult<IEnumerable<EventDraw>>
+            {
+                Data = _prizeBll.GetEventName(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
 
         #endregion
 

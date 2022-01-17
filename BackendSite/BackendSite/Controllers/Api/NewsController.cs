@@ -66,8 +66,20 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
-                var searchResult = newsBLL.GetNewsList(para.SelectSite, startTime, endTime, para.PageSize, para.PageNumber, para.Status);
-                
+
+                var statusList = new List<int>();
+
+                if (para.Status == 0)
+                {
+                    statusList.Add(0); statusList.Add(1);
+                }
+                else
+                {
+                    statusList.Add(para.Status);
+                }
+
+                var searchResult = newsBLL.GetNewsList(para.SelectSite, startTime, endTime, para.PageSize, para.PageNumber, statusList);
+
                 apiResult.Data = searchResult.NewsList;
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;
