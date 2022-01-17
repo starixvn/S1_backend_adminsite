@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -100,15 +101,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
-
-        public class ExcelData
-        {
-            public int RowId { get; set; }
-            public int? CustId { get; set; }
-            public string CustUserName { get; set; }
-            public string SabaId { get; set; }
-            public CustInfoDetail CustInfoDetail { get; set; }
-        }
         #endregion
 
         #region Action
@@ -131,33 +123,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<int> SendMessageBatch([FromForm] int siteId, [FromForm] int accountStatus, [FromForm] int currency, [FromForm] IFormFile excelUpload, [FromForm] bool isPopup, [FromForm] string personalMsg)
+        public async Task<ApiResult<int>> SendMessageBatch(SendMessageBatchRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            _messageBll.NewBatchMessage(siteId, authData.UserName, isPopup, personalMsg, ref batchId);
+            _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
-            
-            if (excelUpload != null)
+
+            if (req.excelUpload != null)
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        StringComparison.OrdinalIgnoreCase)
-                    || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
-                    || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                if (_excelBll.IsValidFile(req.excelUpload.ContentType))
                 {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
-                    
+
                     do // 讀取資料，直到讀到空白列為止
                     {
-                        var custUsername = string.IsNullOrEmpty(sheet.Cells[rowId, 1].Text)
-                            ? null
-                            : sheet.Cells[rowId, 1].Text.Trim();
+                        var custUsername = sheet.Cells[rowId, 1].Text.Trim();
                         var sabaId = sheet.Cells[rowId, 2].Text.Trim();
-                        var custId = (string.IsNullOrEmpty(sabaId)) ? null : _common.TpIdToCustId(sabaId);
+                        var custId = _common.TpIdToCustId(sabaId); 
 
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
@@ -165,22 +152,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         }
                         else
                         {
-                            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, siteId);
                             excelList.Add(new ExcelData
                             {
                                 CustId = custId,
-                                CustUserName = custUsername,
+                                CustUserName = string.IsNullOrEmpty(custUsername) ? null : custUsername,
                                 SabaId = sabaId,
-                                RowId = rowId ,
-                                CustInfoDetail =custInfosDetail
+                                RowId = rowId,
                             });
                             rowId += 1;
                         }
                     } while (!isLastRow);
-                    
+
                     foreach (var data in excelList)
                     {
-                        PreSendBatchMessage(data, personalMsg, authData, siteId, batchId);
+                        var custInfosDetail = await _custInfoBll.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
+                        await _messageBll.PreSendBatchMessage(data, custInfosDetail, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
@@ -200,26 +186,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
                 };
-
+                
                 foreach (var lang in langList)
                 {
-                    var msg = JObject.Parse(personalMsg)[lang] ;
+                    var msg = JObject.Parse(req.personalMsg)[lang];
                     if (msg != null)
                     {
+                        var popupMessage = msg.Value<string>("PopupMessage");
                         var title = msg.Value<string>("Title");
                         var content = msg.Value<string>("Content");
-                        var req = new BatchPersonalMsg()
+                        var batchPersonalMsg = new BatchPersonalMsg()
                         {
                             BatchId = batchId,
-                            SiteId = siteId,
+                            SiteId = req.optSite,
                             LangId = lang,
                             Operator = authData.UserName,
-                            CurrencyId = currency,
-                            AccountStatus = accountStatus,
+                            CurrencyId = req.currency,
+                            AccountStatus = req.accountStatus,
+                            IsPopup = req.IsPopup,
+                            PopupMessage = popupMessage,
                             Content = content,
                             Title = title
                         };
-                        _custInfoBll.SendMessageBatch(req);
+                        _custInfoBll.SendMessageBatch(batchPersonalMsg);
                     }
                 }
                 _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
