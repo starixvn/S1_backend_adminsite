@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.BLL
 {
