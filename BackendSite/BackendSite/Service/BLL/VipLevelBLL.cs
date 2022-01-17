@@ -97,7 +97,7 @@ namespace BackendSite.Service.BLL
 
             var details = data.Select(p => new VipUpgradeReviewDetailModel(p)).ToList();
 
-            if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Upgrade))
+            if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Upgrade))
             {
                 details = details.Select(c =>
                 {
@@ -131,7 +131,7 @@ namespace BackendSite.Service.BLL
 
         public bool UpdateVipUpgradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
         {
-            return CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Upgrade) && UpdateVipUpgradeReview(custIdList, calculateYearMonth, newStatus, updater);
+            return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Upgrade) && UpdateVipUpgradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
         public GetVipDowngradeReviewListModel GetVipDowngradeReviewList(int siteId,
@@ -152,7 +152,7 @@ namespace BackendSite.Service.BLL
 
             var details = data.Select(p => new VipDowngradeReviewDetailModel(p)).ToList();
 
-            if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Downgrade))
+            if (CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade))
             {
                 details = details.Select(c =>
                 {
@@ -186,7 +186,7 @@ namespace BackendSite.Service.BLL
 
         public bool UpdateVipDowngradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
         {
-            return CheckCanUpdateStatus(calculateYearMonth, siteId, VipTypeEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
+            return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
         #endregion
@@ -200,7 +200,7 @@ namespace BackendSite.Service.BLL
         /// <param name="siteId"></param>
         /// <param name="vipType"></param>
         /// <returns></returns>
-        private bool CheckCanUpdateStatus(string calculateYearMonth, int siteId, VipTypeEnum vipType)
+        private bool CheckCanUpdateStatus(string calculateYearMonth, int siteId, VipSettingStatusEnum vipType)
         {
             var siteVipSetting = GetVipSettings(vipType).FirstOrDefault(x => x.SiteId == siteId);
             if (siteVipSetting == null)
@@ -214,13 +214,13 @@ namespace BackendSite.Service.BLL
 
             switch (siteVipSetting.PreviousDateRangeType)
             {
-                case (int)VipPreviousDateRangeType.LastMonth:
+                case (int)PreviousDateRangeTypeEnum.LastMonth:
 
                     canUpdateYearMonth = new DateTime(previousDateTime.Year, previousDateTime.Month, 1).Date.ToString("yyyyMM");
 
                     return canUpdateYearMonth == calculateYearMonth && currentDay <= siteVipSetting.AssignSettleDate;
 
-                case (int)VipPreviousDateRangeType.LastThreeMonth:
+                case (int)PreviousDateRangeTypeEnum.LastThreeMonth:
 
                     canUpdateYearMonth = new DateTime(previousThreeMonthDateTime.Year, previousThreeMonthDateTime.Month, 1).Date.ToString("yyyyMM")
                                          + new DateTime(previousDateTime.Year, previousDateTime.Month, 1).Date.ToString("yyyyMM");
@@ -236,7 +236,7 @@ namespace BackendSite.Service.BLL
         /// </summary>
         /// <param name="vipType"></param>
         /// <returns></returns>
-        private IEnumerable<VipSettingModel> GetVipSettings(VipTypeEnum vipType)
+        private IEnumerable<VipSettingModel> GetVipSettings(VipSettingStatusEnum vipType)
         {
             return _vipLevelService.GetVipSetting((int)vipType);
         }

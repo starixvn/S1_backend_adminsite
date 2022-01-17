@@ -27,10 +27,9 @@ namespace BackendSite.Service.BLL
             return _prizeService.GetEventName();
         }
 
-        public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, int currencyId, string eventName, int timeZone)
+        public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, string currencyId, string eventName, int timeZone)
         {
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
-            return _prizeService.GetExportData(siteList, startDate, endDate, currencyId, eventName , timeZone);
+            return _prizeService.GetExportData(selectSite, startDate, endDate, currencyId, eventName , timeZone);
         }
     }
 }
