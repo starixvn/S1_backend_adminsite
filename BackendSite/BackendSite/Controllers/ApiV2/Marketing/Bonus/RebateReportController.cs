@@ -78,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int BaseCurrencyId { get; set; }
         }
         
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListForBonusRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -97,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int RebateType { get; set; }
         }
         
-        public class ExportListRequest 
+        public class ExportForBonusRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -163,7 +163,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #endregion
 
         /// <summary>
-        /// RebateReport/GetListForVip 取得VIP返水資料請單
+        /// RebateReport/GetListForVip 取得VIP返水資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -171,7 +171,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Vip Rebate Report > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateInfoReport" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetListForVip(GetListForVipRequest request)
         {
@@ -216,7 +216,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Vip Rebate Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateInfoReport" })]
         [HttpPost]
         public IActionResult ExportForVip(ExportForVipRequest request)
         {
@@ -236,17 +236,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var stream = _excelBll.Export(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "RebateReportForVip");
         }
-        
+
         /// <summary>
-        /// RebateReport/GetList 
+        /// RebateReport/GetListForBonus 取得獎金返水資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path： Marketing > Rebate Info Report> [Submit]
+        /// Func Path： Marketing > Rebate Info Report > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        public ApiListResult<RebateInfo> GetList(GetListRequest request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
+        [HttpPost]
+        public ApiListResult<RebateInfo> GetListForBonus(GetListForBonusRequest request)
         {
             var apiListResult = new ApiListResult<RebateInfo>();
             var pageSize = 10;
@@ -263,25 +265,25 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         }
 
         /// <summary>
-        /// RebateReport/ExportList 
+        /// RebateReport/ExportForBonus 匯出獎金返水資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path： Marketing > Rebate Info Report> [Submit] > [Export Excel]
+        /// Func Path： Marketing > Rebate Info Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
         [HttpPost]
-        public IActionResult ExportList(ExportListRequest request)
+        public IActionResult ExportForBonus(ExportForBonusRequest request)
         {
             var exportData = _paymentBll.GetRebateInfoExport(JsonConvert.SerializeObject(request.SiteIds), request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.LocalDateTime);
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream,"BonusRebateReport");
         }
 
         /// <summary>
-        /// RebateReport/GetRebateLog 
+        /// RebateReport/GetLogForBonus 取得獎金返水紀錄
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -289,7 +291,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Rebate Log Report > [Submit] 
         /// </remarks>
         /// <param name="request"></param>
-        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog(GetLogRequest request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
+        [HttpPost]
+        public ApiListResultCurrencyAmount<RebateLog> GetLogForBonus(GetLogRequest request)
         {
             var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
             var pageSize = 10;
@@ -315,9 +319,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiListResult;
         }
-        
+
         /// <summary>
-        /// RebateReport/ExportRebateLog 
+        /// RebateReport/ExportLogForBonus 匯出獎金返水紀錄
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -325,8 +329,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path： Marketing > Rebate Log Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
         [HttpPost]
-        public IActionResult ExportRebateLog(ExportRebateLogRequest request)
+        public IActionResult ExportLogForBonus(ExportRebateLogRequest request)
         {
             var exportData = _paymentBll.GetRebateLogExport(
                 JsonConvert.SerializeObject(request.SiteIds), 
@@ -339,8 +344,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 request.RebateCategoriesId);
             
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "BonusRebateLog"); ;
         }
         
     }

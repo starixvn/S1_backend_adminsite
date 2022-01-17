@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -92,6 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
         [HttpPost]
         public ApiListResult<VipUpgradeReviewDetailModel> GetUpgradeList(VipUpgradeReviewReq req)
         {
@@ -126,6 +128,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
         [HttpPost]
         public IActionResult ExportUpgradeList(ExportVipUpgradeReviewListReq req)
         {
@@ -166,6 +169,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_update" })]
         [HttpPost]
         public ApiResult UpdateUpgrade(UpdateVipUpgradeReviewReq req)
         {
@@ -199,6 +203,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
         [HttpPost]
         public ApiListResult<VipDowngradeReviewDetailModel> GetDowngradeList(VipDowngradeReviewReq req)
         {
@@ -232,6 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
         [HttpPost]
         public IActionResult ExportDowngradeList(ExportVipDowngradeReviewListReq req)
         {
@@ -275,6 +281,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_update" })]
         [HttpPost]
         public ApiResult UpdateDowngrade(UpdateVipUpgradeReviewReq req)
         {
