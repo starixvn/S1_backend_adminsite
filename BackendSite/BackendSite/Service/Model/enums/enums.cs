@@ -646,6 +646,8 @@ namespace BackendSite.Service.Model.enums
         Maintenance = 4  //frontend red
     }
 
+    #endregion
+
     #region News
 
     public enum NewsStatusEnum
@@ -655,7 +657,16 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
+    #region RebatePeriod
+
+    public enum RebatePeriodPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
     #endregion
 
 }

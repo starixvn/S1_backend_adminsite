@@ -269,24 +269,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         //}
 
         /// <summary>
-        /// GetAllData/GetTPCategoryList 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<TPCategory>> GetTPCategoryList()
-        {
-            var apiResult = new ApiResult<IEnumerable<TPCategory>>
-            {
-                ErrorCode = 0,
-                Data = _rebateManageBll.GetTPCategoryList()
-            };
-            return apiResult;
-        }
-
-        /// <summary>
         /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
         /// </summary>
         /// <remarks>
