@@ -67,16 +67,6 @@ namespace BackendSite.Controllers.Api
             public long EndDate { get; set; }
             public int PageNumber { get; set; }
         }
-
-        public class SendMessageBatchRequest
-        {
-            public int optSite { get; set; }
-            public int accountStatus { get; set; }
-            public int currency { get; set; }
-            public bool IsPopup { get; set; }
-            public IFormFile excelUpload { get; set; }
-            public string personalMsg { get; set; }
-        }
         #endregion
 
         #region Action

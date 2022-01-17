@@ -63,6 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class UpdateBatchMessageReq
         {
             public int BatchId { get; set; }
+            public bool IsPopup { get; set; }
             public List<LanguageDataModel> LanguageDatas { get; set; }
         }
 
@@ -130,12 +131,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult<int> SendMessageBatch([FromForm] int siteId, [FromForm] int accountStatus, [FromForm] int currency, [FromForm] IFormFile excelUpload, [FromForm] string personalMsg)
+        public ApiResult<int> SendMessageBatch([FromForm] int siteId, [FromForm] int accountStatus, [FromForm] int currency, [FromForm] IFormFile excelUpload, [FromForm] bool isPopup, [FromForm] string personalMsg)
         {
             var authData = _authorizeBll.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            _messageBll.NewBatchMessage(siteId, authData.UserName, false, personalMsg, ref batchId);
+            _messageBll.NewBatchMessage(siteId, authData.UserName, isPopup, personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
             
             if (excelUpload != null)
@@ -309,7 +310,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var messageString = JsonConvert.SerializeObject(message);
 
-            if (!_messageBll.UpdateBatchMessage(req.BatchId, false, messageString))
+            if (!_messageBll.UpdateBatchMessage(req.BatchId, req.IsPopup, messageString))
             {
                 return new ApiResult
                 {

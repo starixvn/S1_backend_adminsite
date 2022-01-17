@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
 {
@@ -125,7 +126,17 @@ namespace BackendSite.Service.Model
         public string UserLang { get; set; }
         public int Status { get; set; }
     }
-
+    
+    public class SendMessageBatchRequest
+    {
+        public int optSite { get; set; }
+        public int accountStatus { get; set; }
+        public int currency { get; set; }
+        public bool IsPopup { get; set; }
+        public IFormFile excelUpload { get; set; }
+        public string personalMsg { get; set; }
+    }
+    
     public class UpdateBatchMessageRequest
     {
         public int batchId { get; set; }
