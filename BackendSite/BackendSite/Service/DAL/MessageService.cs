@@ -92,8 +92,9 @@ namespace BackendSite.Service.DAL
             param.Add("@Creator", creator);
             param.Add("@CreatorId", creatorId);
             param.Add("@IsTest", data.IsTest);
+            param.Add("@Seq", data.Seq);
 
-            _mainDbClient.Execute("Admin_Announcement_Ins_V2", param);
+            _mainDbClient.Execute("Admin_Announcement_Ins_V3", param);
 
             var id = param.Get<int?>("@Id");
             if (id != null)
@@ -116,8 +117,9 @@ namespace BackendSite.Service.DAL
             param.Add("@LastUpdater", lastUpdater);
             param.Add("@LastUpdaterId", lastUpdaterId);
             param.Add("@IsTest", data.IsTest);
+            param.Add("@Seq", data.Seq);
 
-            _mainDbClient.Execute("Admin_Announcement_Upd_V2", param);
+            _mainDbClient.Execute("Admin_Announcement_Upd_V3", param);
             var result = _mainDbClient.QueryFirst<Announcement>("Admin_Announcement_GetById_V2", new DynamicParameters(new { data.Id }));
 
             return result;

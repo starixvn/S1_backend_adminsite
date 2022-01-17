@@ -616,5 +616,31 @@ namespace BackendSite.Service.Model.enums
         Saba = 1,
         PT = 27
     }
+    public enum BalanceAdjustmentType
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBouns = 5,
+        ManualBonus = 6
+    }
+    public enum VerificationType
+    {
+        SMS = 0,
+        Email = 1
+    }
 
+    #region BankDetailOff
+
+    public enum BankDetailOffStatusEnum
+    {
+        Initial = 0,     //Front-End Hidden
+        Open = 1,        //Front-End green
+        Suspend = 2,
+        Closed = 3,      //Never Open
+        Maintenance = 4  //frontend red
+    }
+
+    #endregion
 }
