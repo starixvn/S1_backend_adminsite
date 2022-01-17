@@ -6,7 +6,7 @@
 @inject PermissionBLL permissionBLL
 @{
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
-    ViewData["Title"] = "VipLevelReview";
+    ViewData["Title"] = "VerificationReward";
 }
 
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
@@ -17,9 +17,6 @@
 @{
     var authData = authorizeBLL.GetAuthData();
     var loginUser = adminUserService.GetUser(authData.UserId);
-
-    var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipLevelReview");
-    subFuncKeys = subFuncKeys ?? new List<string>();
 
     var i18n = new Dictionary<string, string>();
 
@@ -46,6 +43,5 @@
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
-        window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
 }

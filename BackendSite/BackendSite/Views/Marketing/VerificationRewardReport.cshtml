@@ -1,0 +1,49 @@
+﻿@using BackendSite.Service.BLL
+@using BackendSite.Service.DAL
+@inject SelLangBLL selLangBLL
+@inject AuthorizeBLL authorizeBLL
+@inject ServerInfoBLL serverInfoBLL
+@inject AdminUserService adminUserService
+@inject PermissionBLL permissionBLL
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-multiselect/bootstrap-multiselect-modify.css" rel="stylesheet" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+}
+@{
+    Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
+    ViewData["Title"] = "VerificationRewardReport";
+}
+
+@{
+    var authData = authorizeBLL.GetAuthData();
+    var loginUser = adminUserService.GetUser(authData.UserId);
+    var currencyList = serverInfoBLL.GetCurrencyList();
+    var i18n = new Dictionary<string, string>();
+
+    for (var currency = 1; currency <= 61; currency++)
+    {
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    }
+
+    var lbl_Txts = new string[] {"lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error"};
+    foreach (var lbl_Txt in lbl_Txts)
+    {
+        if (!i18n.ContainsKey(lbl_Txt))
+            i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
+    }
+}
+<div id="content">
+</div>
+
+@section Scripts {
+    <script>
+            window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+            window.RootUrl = '@Url.Content("~/api")';
+            window.LangCode = 'en'
+            window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
+        </script>
+    <script src="~/js/component/Marketing/VerificationRewardReport.min.js" asp-append-version="true"></script>
+}

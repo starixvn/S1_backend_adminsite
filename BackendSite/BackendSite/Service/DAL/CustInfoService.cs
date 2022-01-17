@@ -45,13 +45,16 @@ namespace BackendSite.Service.DAL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
             int? affId,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount,
@@ -61,8 +64,7 @@ namespace BackendSite.Service.DAL
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -84,17 +86,16 @@ namespace BackendSite.Service.DAL
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
+            if (selectTag != null && selectTag.Any() )
+            {
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
+            }
+            else
+            {
+                jsonSelectTagList = null;
+            }
             totalPages = 0;
-
-            if (startDate != null)
-            {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
-            }
-
-            if (endDate != null)
-            {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
-            }
+            
 
             var p = new DynamicParameters(new
             {
@@ -109,21 +110,24 @@ namespace BackendSite.Service.DAL
                 TpUserName = tpUserName,
                 Email = email,
                 PhoneNo = phoneNo,
-                StartDate = startDateParam,
-                EndDate = endDateParam,
+                StartDate = startDate,
+                EndDate = endDate,
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
                 AffId = affId,
                 CurrncyList = currencyList,
                 BankAccountNumber = bankAccountNumber,
-                SelectStatus = jsonSelectStatus
+                SelectStatus = jsonSelectStatus,
+                SelectTagList = jsonSelectTagList
             });
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V7", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -596,7 +600,7 @@ namespace BackendSite.Service.DAL
             props.Add("CustId", custid);
             props.Add("TagList", selectTag);
 
-            return _mainDbClient.Execute("Admin_CustInofoTagList_Set", props);
+            return _reportDbClient.Execute("Admin_CustInofoTagList_Set", props);
         }
         #endregion
 

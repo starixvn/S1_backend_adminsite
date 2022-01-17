@@ -604,6 +604,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "VerificationRewardReport",
+        "Title": "Verification Reward Report",
+        "FuncKey": "Marketing/VerificationRewardReport",
+        "Controller": "Marketing",
+        "Action": "VerificationRewardReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
