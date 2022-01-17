@@ -93,6 +93,8 @@ namespace BackendSite.Service.Model
     
     public class PersonalMsgBase
     {
+        public bool IsPopup { get; set; }
+        public string PopupMessage { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
     }

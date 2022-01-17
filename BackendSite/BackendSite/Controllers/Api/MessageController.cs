@@ -548,48 +548,35 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var custInfosDetail = await custInfoBLL.GetCustInfoBySite(req.optSite, req.currency, req.accountStatus);
-                var rowId = 0;
-                
-                foreach (var custInfo in custInfosDetail)
+                var langList = new List<string>
                 {
-                    var data = new ExcelData
+                    "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
+                };
+                
+                foreach (var lang in langList)
+                {
+                    var msg = JObject.Parse(req.personalMsg)[lang];
+                    if (msg != null)
                     {
-                        CustId = custInfo.CustId,
-                        CustUserName = custInfo.UserName,
-                        RowId = rowId,
-                    };
-                    var msg = JObject.Parse(req.personalMsg)[custInfo.UserLang];
-                    if (msg == null) continue;
-                    await messageBLL.PreSendBatchMessage(data, custInfo, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
-                    rowId += 1;
+                        var popupMessage = msg.Value<string>("PopupMessage");
+                        var title = msg.Value<string>("Title");
+                        var content = msg.Value<string>("Content");
+                        var batchPersonalMsg = new BatchPersonalMsg()
+                        {
+                            BatchId = batchId,
+                            SiteId = req.optSite,
+                            LangId = lang,
+                            Operator = authData.UserName,
+                            CurrencyId = req.currency,
+                            AccountStatus = req.accountStatus,
+                            IsPopup = req.IsPopup,
+                            PopupMessage = popupMessage,
+                            Content = content,
+                            Title = title
+                        };
+                        custInfoBLL.SendMessageBatch(batchPersonalMsg);
+                    }
                 }
-                // var langList = new List<string>
-                // {
-                //     "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
-                // };
-                //
-                // foreach (var lang in langList)
-                // {
-                //     var msg = JObject.Parse(req.personalMsg)[lang];
-                //     if (msg != null)
-                //     {
-                //         var title = msg.Value<string>("Title");
-                //         var content = msg.Value<string>("Content");
-                //         var batchPersonalMsg = new BatchPersonalMsg()
-                //         {
-                //             BatchId = batchId,
-                //             SiteId = req.optSite,
-                //             LangId = lang,
-                //             Operator = authData.UserName,
-                //             CurrencyId = req.currency,
-                //             AccountStatus = req.accountStatus,
-                //             Content = content,
-                //             Title = title
-                //         };
-                //         custInfoBLL.SendMessageBatch(batchPersonalMsg);
-                //     }
-                // }
                 _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
             }
 
