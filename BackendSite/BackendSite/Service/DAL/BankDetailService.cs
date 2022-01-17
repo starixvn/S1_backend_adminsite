@@ -26,13 +26,30 @@ namespace BackendSite.Service.DAL
             _connectionString = configuration.GetConnectionString("ConnectionString");
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(int siteId)
+        public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
+            string currencyIdList,
+            string statusList, 
+            int startIndex,int pageSize,
+            out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<BankDetail>("LoaclBankList_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteIds);
+            props.Add("_CurrencyId", currencyIdList);
+            props.Add("_Status", statusList);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<BankDetail>("LoaclBankList_Get_V2", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
-        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort,string Operator)
+        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -62,7 +79,7 @@ namespace BackendSite.Service.DAL
                 list.Add(paraName, value);
             }
             propsLog.Add("Menu", "BankCardManagement");
-            propsLog.Add("ActionType",1);
+            propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
             propsLog.Add("Operator", Operator);
             #endregion

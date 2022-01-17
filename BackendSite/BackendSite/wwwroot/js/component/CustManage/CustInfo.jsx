@@ -958,42 +958,103 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         onPhoneVerifiedChange(e) {
-            if (confirm('Are you sure change PhoneVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
-        }
+      if (confirm("Are you sure change PhoneVerified ?")) {
+        let data = this.props.CustInfoData;
+        axios
+          .post("/api/CustManage/SetCustStatusSwitch", {
+            CustId: data.custId,
+            OP: 3,
+          })
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                this.props.onGetCustInfoDetail();
+              } else {
+                alert(result.message);
+              }
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
 
-        onEmailVerifiedChange(e) {
-            if (confirm('Are you sure change EmailVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
+    onEmailVerifiedChange(e) {
+      if (confirm("Are you sure change EmailVerified ?")) {
+        let data = this.props.CustInfoData;
+        axios
+          .post("/api/CustManage/SetCustStatusSwitch", {
+            CustId: data.custId,
+            OP: 4,
+          })
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                this.props.onGetCustInfoDetail();
+              } else {
+                alert(result.message);
+              }
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
+    onPayoutVerifitionReward(_OTPType) {
+      let data = this.props.CustInfoData;
+      let text = "";
+      axios
+        .post("/api/CustManage/CheckRewardCondination", {
+          CustId: data.custId,
+          OTPType: _OTPType,
+        })
+        .then(
+          function (response) {
+            let result = response.data;
+            if (result.errorCode == 0) {
+              text =
+                result.message +
+                "\r\nVerification Reward will payout immediately. \r\n";
+              if (confirm(text)) {
+                axios
+                  .post("/api/CustManage/PayoutVerificationReward", {
+                    CustId: data.custId,
+                    OTPType: _OTPType,
+                  })
+                  .then(
+                    function (response) {
+                      let result = response.data;
+                      if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                      } else {
+                        alert(result.message);
+                      }
+                    }.bind(this)
+                  )
+                  .catch(
+                    function (error) {
+                      alert(error);
+                    }.bind(this)
+                  );
+              }
+            } else {
             }
-        }
+          }.bind(this)
+        )
+        .catch(function (error) {}.bind(this));
+    }
 
         onAskReupload() {
             if (confirm('Are you sure delete Photo ?')) {
@@ -1592,7 +1653,17 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">PhoneVerified</th>
+                                        <th scope="row">
+                    PhoneVerified
+                    {this.props.isShowRewardBotton.SMS ? (
+                      <button
+                        className="btn btn-copy float-right"
+                        onClick={this.onPayoutVerifitionReward.bind(this, 0)}
+                      >
+                        Reward
+                      </button>
+                    ) : null}
+                  </th>
                                         <td>
                                             {data.phoneVerified ? "Yes" : "No"}
                                             {
@@ -1606,7 +1677,17 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">EmailVerified</th>
+                                        <th scope="row">
+                    EmailVerified
+                    {this.props.isShowRewardBotton.EMAIL ? (
+                      <button 
+                      className="btn btn-copy float-right"
+                      onClick={this.onPayoutVerifitionReward.bind(this, 1)}
+                      >
+                        Reward
+                      </button>
+                    ) : null}
+                  </th>
                                         <td>
                                             {data.emailVerified ? "Yes" : "No"}
                                             {
@@ -1618,6 +1699,10 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                                 ) : null
                                             }
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">VerifiedReward</th>
+                                        <td>{data.verificationReward}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Iovation</th>
@@ -1803,9 +1888,10 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
+        _isShowRewardBotton = { SMS: false, EMAIL: false };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{} };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton), };
         }
 
         onTab(idx, tabName) {
@@ -2190,6 +2276,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             });
                             this.GetBonusWalletLog();
                             this.GetRebateInfoLog();
+                            this.onGetRewardBottonStatus();
                         } else {
                             alert(result.message);
                         }
@@ -2199,7 +2286,61 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     }.bind(this));
             }
         }
-
+    onGetRewardBottonStatus() {
+      let CustId = getUrlParameter("custId");
+      if (!isNaN(CustId)) {
+        let iCustId = parseInt(CustId);
+        let obj = this.state.isShowRewardBotton;
+        obj["SMS"] = false;
+        obj["EMAIL"] = false;
+        axios
+          .post("/api/CustManage/CheckRewardCondination", {
+            CustId: iCustId,
+            OTPType: 0,
+          }) //SMS
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                obj["SMS"] = true;
+              } else {
+                //alert(result.message);
+              }
+              this.setState(obj);
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+        axios
+          .post("/api/CustManage/CheckRewardCondination", {
+            CustId: iCustId,
+            OTPType: 1,
+          }) //EMAIL
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                obj["EMAIL"] = true;
+              } else {
+                //alert(result.message);
+              }
+              this.setState(obj);
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
         onChange(e, TabName) {
             let Obj = this.state[TabName];
             Obj[event.target.name] = event.target.value;
@@ -2419,7 +2560,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList}/>;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList} isShowRewardBotton={this.state.isShowRewardBotton}/>;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {

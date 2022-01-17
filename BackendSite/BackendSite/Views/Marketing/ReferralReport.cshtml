@@ -4,7 +4,11 @@
     Layout = "~/Views/Shared/_LayoutReactJs.cshtml";
     ViewData["Title"] = "Referral  Manegement";
 }
-<link href="~/css/main.css" rel="stylesheet" />
+@section Style {
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/vendor/DateTimePicker/DateTimePicker.css" rel="stylesheet" />
+}
 @*<link href="~/css/page/Marketing.css" rel="stylesheet" asp-append-version="true" />*@
 @{
     var i18n = new Dictionary<string, string>();
@@ -29,5 +33,6 @@
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.RootUrl = '@Url.Content("~/api")';
     </script>
 }
