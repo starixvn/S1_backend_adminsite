@@ -92,11 +92,14 @@ const EditPanel = (props) => {
       ? props.SiteList[props.DetailDatas.siteId - 1].iLangList
       : null
   );
-  const [popupState, setPopupState] = useState(false);
+  const [popupState, setPopupState] = useState(
+    props.DetailDatas !== null
+      ? props.DetailDatas.isPopup
+      : false
+  );
   const isMountedRef = useRef(null);
   
   useEffect(() => {
-    setPopupState(props.DetailDatas.isPopup)
     isMountedRef.current = true;
     return () => (isMountedRef.current = false);
   });
@@ -306,11 +309,27 @@ const EditPanel = (props) => {
         if (langDatas != null) {
           langDatas.forEach((lang) => {
             msg[lang] = {
+              PopupMessage: stateData.popupMessage.en,
               Title: stateData.subject.en,
               Content: stateData.content.en,
             };
           });
         }
+        
+        Object.keys(stateData.popupMessage).forEach((sKey) => {
+          if (popupState && stateData.popupMessage[sKey]) {
+            if (msg[sKey]) {
+              msg[sKey].PopupMessage = stateData.popupMessage[sKey];
+            } else {
+              msg[sKey] = {
+                PopupMessage: stateData.popupMessage[sKey],
+              };
+            }
+          }
+          else {
+            msg[sKey].PopupMessage = '';
+          }
+        });
 
         Object.keys(stateData.subject).forEach((sKey) => {
           if (stateData.subject[sKey]) {
@@ -340,6 +359,7 @@ const EditPanel = (props) => {
         // let settings = { headers: { 'content-type': 'multipart/form-data' } }
         let formData = new FormData();
         formData.append("batchId", parseInt(stateData.batchId));
+        formData.append("IsPopup", popupState);
         formData.append("personalMsg", JSON.stringify(msg));
         api
           .post("/api/Message/UpdateBatchMessage", formData)

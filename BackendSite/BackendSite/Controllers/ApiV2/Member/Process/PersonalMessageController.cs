@@ -309,7 +309,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var messageString = JsonConvert.SerializeObject(message);
 
-            if (!_messageBll.UpdateBatchMessage(req.BatchId, messageString))
+            if (!_messageBll.UpdateBatchMessage(req.BatchId, false, messageString))
             {
                 return new ApiResult
                 {

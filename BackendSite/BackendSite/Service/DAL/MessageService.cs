@@ -254,12 +254,13 @@ namespace BackendSite.Service.DAL
             _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
             return true;
         }
-        public bool UpdateBatchMessage(int batchId, string message)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message)
         {
             var props = new DynamicParameters();
-            props.Add("BatchId", batchId);
-            props.Add("Message", message);
-            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set", props) > 0;
+            props.Add("_BatchId", batchId);
+            props.Add("_IsPopup", isPopup);
+            props.Add("_Message", message);
+            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V2", props) > 0;
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

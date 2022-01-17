@@ -693,17 +693,16 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > Edit > [Update]
         /// 
         /// </remarks>
-        /// <param name="batchId"></param>
-        /// <param name="personalMsg"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public ApiResult UpdateBatchMessage([FromForm] int batchId, [FromForm] string personalMsg)
+        public ApiResult UpdateBatchMessage([FromForm] UpdateBatchMessageRequest req)
         {
             var result = new ApiResult();
             try
             {
-                if (messageBLL.UpdateBatchMessage(batchId, personalMsg))
+                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg))
                     result.ErrorCode = 0;
             }
             catch (Exception ex)

@@ -117,9 +117,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.DeleteBatchMessage(batchId);
         }
-        public bool UpdateBatchMessage(int batchId, string message)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message)
         {
-            return messageService.UpdateBatchMessage(batchId, message);
+            return messageService.UpdateBatchMessage(batchId, isPopup, message);
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

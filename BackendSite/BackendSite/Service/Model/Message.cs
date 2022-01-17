@@ -125,4 +125,11 @@ namespace BackendSite.Service.Model
         public string UserLang { get; set; }
         public int Status { get; set; }
     }
+
+    public class UpdateBatchMessageRequest
+    {
+        public int batchId { get; set; }
+        public bool IsPopup { get; set; }
+        public string personalMsg { get; set; }
+    }
 }
