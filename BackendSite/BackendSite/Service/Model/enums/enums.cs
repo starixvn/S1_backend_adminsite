@@ -655,5 +655,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+    
+    #endregion
 
 }
