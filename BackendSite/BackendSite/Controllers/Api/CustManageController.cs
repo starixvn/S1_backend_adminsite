@@ -88,7 +88,7 @@ namespace BackendSite.Controllers.Api
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public IEnumerable<int> SelectCurrency { get; set; }
@@ -375,7 +375,7 @@ namespace BackendSite.Controllers.Api
                                                    tagStartDate,
                                                    tagEndDate,
                                                    req.PageSize,
-                                                   req.AffId,
+                                                   req.AffCode,
                                                    req.SelectCurrency,
                                                    req.BankAccountNumber?.Trim(),
                                                    req.SelectStatus,
@@ -464,7 +464,7 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffId,
+                                                                    custInfoReq.AffCode,
                                                                     custInfoReq.SelectCurrency,
                                                                     custInfoReq.BankAccountNumber,
                                                                     custInfoReq.SelectStatus);
