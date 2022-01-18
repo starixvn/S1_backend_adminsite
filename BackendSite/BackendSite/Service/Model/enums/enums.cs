@@ -511,6 +511,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
+
     public enum VerificationType
     {
         SMS = 0,

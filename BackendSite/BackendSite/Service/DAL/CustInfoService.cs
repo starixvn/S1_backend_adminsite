@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
             DateTime? tagStartDate,
             DateTime? tagEndDate,
             int pageSize,
-            int? affId,
+            string affCode,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
@@ -118,7 +118,7 @@ namespace BackendSite.Service.DAL
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
-                AffId = affId,
+                AffCode = affCode,
                 CurrncyList = currencyList,
                 BankAccountNumber = bankAccountNumber,
                 SelectStatus = jsonSelectStatus,
@@ -149,7 +149,7 @@ namespace BackendSite.Service.DAL
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
             string siteList,
-            int? AffId,
+            string AffCode,
             IEnumerable<int> selectCurrency,
             string BankAccountNumber,
             string currncyList,
@@ -192,10 +192,10 @@ namespace BackendSite.Service.DAL
                 endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
             }
 
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffCode = AffCode, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V5", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V6", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
