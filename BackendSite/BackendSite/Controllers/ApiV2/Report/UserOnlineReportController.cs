@@ -70,7 +70,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
-        public ApiResult GetList(GetListRequest request)
+        public ApiResult<IEnumerable<UserOnlineReportModel>> GetList(GetListRequest request)
         {
             if (request.TimeZone > 14 || request.TimeZone < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");

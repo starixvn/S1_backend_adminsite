@@ -59,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult GetData(GetDataRequest request)
+        public ApiResult<DashBoardData> GetData(GetDataRequest request)
         {
             var canSearchSite = new List<int>();
 
