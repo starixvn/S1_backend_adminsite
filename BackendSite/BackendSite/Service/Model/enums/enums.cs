@@ -489,6 +489,22 @@ namespace BackendSite.Service.Model.enums
         TRC20 = 2
     }
 
+    public enum NetworkTypeEnum
+    {
+        ERC20 = 1,
+        TRC20 = 2,
+        ETH = 3,
+        BTC = 4
+    }
+
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
+    }
+
     public enum SendMessageStatus
     {
         Pending = 0,
