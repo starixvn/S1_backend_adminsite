@@ -133,6 +133,10 @@ const dataColumnDefs = () => {
         format: boolFormat,
       },
     },
+    {
+        dataColumn: 'operator',
+        columnTitle: 'Operator'
+    }   
   ];
 };
 

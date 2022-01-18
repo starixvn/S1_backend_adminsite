@@ -440,6 +440,10 @@ import DateTimePicker from 'react-datetime';
                                 <td>{moment(data.createTime).format('l LTS')}</td>
                             </tr>
                             <tr>
+                                <th scope="row">ChannelName</th>
+                                <td>{data.channelName}</td>
+                            </tr>
+                            <tr>
                                 <th scope="row">Name of Bank</th>
                                 <td>{data.bankName}</td>
                             </tr>
