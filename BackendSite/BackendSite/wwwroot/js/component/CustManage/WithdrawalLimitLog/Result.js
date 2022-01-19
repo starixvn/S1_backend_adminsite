@@ -15,7 +15,7 @@ const Result = (props) => {
               <td>{number_format(d.afterWithdrawalLimit)}</td>
               <td>{d.memo}</td>
               <td>{d.refTransId}</td>
-              <td>{moment(d.createTime).format("l LTS")}</td>
+              <td>{moment.utc(d.createTime).add(8,'hour').format("l LTS")}</td>
             </tr>
           );
         });
@@ -32,7 +32,7 @@ const Result = (props) => {
               <th scope="col">AfterWithdrawalLimit</th>
               <th scope="col">Memo</th>
               <th scope="col">RefTransId</th>
-              <th scope="col">CreateTime</th>
+              <th scope="col">CreateTime (Adjusted to GMT+8)</th>
             </tr>
           </thead>
           {rows}
