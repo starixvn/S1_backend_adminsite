@@ -109,7 +109,9 @@ const EditPanel = (props) => {
 
   const EditFiled = (v, datacolumn, subDatas) => {
     if (subDatas && subDatas.lang) {
-      // let aa = { ...stateData[datacolumn], [subDatas.lang]: v };
+      if(datacolumn === "popupMessage" && v.length > 22) {
+        return;
+      }
       updateData({
         ...stateData,
         [datacolumn]: {
