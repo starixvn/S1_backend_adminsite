@@ -14,13 +14,13 @@ namespace BackendSite.Service.BLL
             this.sportsService = sportsService;
         }
 
-        public IEnumerable<SportLeagues> GetSportLeaguesList(int SportCategoryId)
+        public IEnumerable<SportLeagues> GetSportLeaguesList(int sportCategoryId)
         {
-            return sportsService.GetSportLeaguesList(SportCategoryId);
+            return sportsService.GetSportLeaguesList(sportCategoryId);
         }
-        public IEnumerable<SportTeams> GetSportTeamsList(int SportLeaguesId)
+        public IEnumerable<SportTeams> GetSportTeamsList(int sportLeaguesId)
         {
-            return sportsService.GetSportTeamsList(SportLeaguesId);
+            return sportsService.GetSportTeamsList(sportLeaguesId);
         }
 
     }

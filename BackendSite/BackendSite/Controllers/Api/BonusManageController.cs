@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -37,6 +40,8 @@ namespace BackendSite.Controllers.Api
         private readonly ExcelBLL _excelBLL;
         private readonly CustInfoBLL _custInfoBLL;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly CourierAdapter courierAdapter;
+        private readonly string _bonusApiUrl;
         #endregion
 
         #region Constructors
@@ -49,7 +54,9 @@ namespace BackendSite.Controllers.Api
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
-            IServiceProvider provider)
+            IServiceProvider provider,
+            CourierAdapter courierAdapter,
+            IConfiguration configuration)
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
@@ -60,6 +67,8 @@ namespace BackendSite.Controllers.Api
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            this.courierAdapter = courierAdapter;
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         #endregion
@@ -158,6 +167,15 @@ namespace BackendSite.Controllers.Api
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
+        public class BonusPayoutReq 
+        {
+            public int CustId { get; set; }
+            public decimal Amount { get; set; }
+            public string Memo { set; get; }
+            public string BounsCode { get; set; }
+            public int RollOver { get; set; }
+            public int PromotionType { get; set; }
+        }
         #endregion
 
         #region Action
@@ -166,7 +184,6 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionInfo>> GetPromotionList([FromForm] GetPromotionListReq request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
-
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
@@ -176,7 +193,11 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1,
+                    1000,
+                    out _,
+                    out _);
 
                 apiResult.ErrorCode = 0;
             }
@@ -241,13 +262,45 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<PromotionInfo>> SetPromotion([FromForm] bool isAdd,
             [FromForm] PromotionInfo promotion,
             [FromForm] GetPromotionListReq request,
-            [FromForm] DisplayConditionAbountVipLevel vipLevelCondition)
+            [FromForm] DisplayConditionAboutVipLevel vipLevelCondition)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
+
+            var req = new PromotionInfoReq
+            {
+                BonusCode = promotion.BonusCode,
+                Description = promotion.Description,
+                PromotionType = promotion.PromotionType,
+                CategoryId = promotion.CategoryId,
+                ExpiryDays = promotion.ExpiryDays,
+                Sort = promotion.Sort,
+                Status = promotion.Status,
+                SiteId = promotion.SiteId,
+                WalletType = promotion.WalletType,
+                TpId = promotion.TpId,
+                RedeemHours = promotion.RedeemHours,
+                PeriodType = promotion.PeriodType,
+                PeriodDay = promotion.PeriodDay,
+                SpecialCode = promotion.SpecialCode,
+                IsSpecial = promotion.IsSpecial,
+                OnlyRegistered = promotion.OnlyRegistered,
+                PromotionDeviceType = promotion.PromotionDeviceType,
+                PromotionAction = promotion.PromotionAction,
+                AutoExtend = promotion.AutoExtend,
+                Specific = promotion.Specific
+            };
+
+            if (promotion.UnixPeriodFrom != null)
+            {
+                req.PeriodFromTime = DateTimeExtensions.UnixToDateTimeOffset(promotion.UnixPeriodFrom.Value);
+            }
+            if (promotion.UnixPeriodTo != null)
+            {
+                req.PeriodToTime = DateTimeExtensions.UnixToDateTimeOffset(promotion.UnixPeriodTo.Value);
+            }
+
             try
             {
-                //var errorCode = _bonusManageBLL.SetPromotion(IsAdd, Promotion);
-
                 //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
                 if (isAdd && promotion.IsSpecial)
                 {
@@ -259,7 +312,7 @@ namespace BackendSite.Controllers.Api
                     }
                 }
 
-                var errorCode = _bonusManageBLL.SetPromotion(isAdd, promotion, vipLevelCondition, User.Identity.Name) ? 0 : 1;
+                var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
                     request.PromotionTypes,
@@ -268,7 +321,8 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1, 1000, out _, out _);
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
@@ -306,13 +360,17 @@ namespace BackendSite.Controllers.Api
                     if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
                     {
                         apiResult.ErrorCode = 99;
-                        apiResult.Message = "Duplicate datas abount Special Code.";
+                        apiResult.Message = "Duplicate datas about Special Code.";
                         return apiResult;
                     }
                 }
-                apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(duplicateRequest.BonusCode,
+                apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(
+                    duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
-                    duplicateRequest.NewBonusCode, User.Identity.Name, duplicateRequest.NewSpecialCode, duplicateRequest.IsSpecial) ? 0 : 1;
+                    duplicateRequest.NewBonusCode,
+                    User.Identity.Name,
+                    duplicateRequest.NewSpecialCode,
+                    duplicateRequest.IsSpecial) ? 0 : 1;
                 apiResult.Message = apiResult.ErrorCode == 1
                     ? "Duplicate fail.The bonus setting already exists which with same promotion-type & product-category."
                     : string.Empty;
@@ -339,14 +397,14 @@ namespace BackendSite.Controllers.Api
                     request.EndDate,
                     request.Device,
                     request.BonusCode,
-                    request.IsSpecial);
+                    request.IsSpecial,
+                    1, 1000, out _, out _);
 
             return apiResult;
         }
 
         [HttpPost]
-        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId,
-            [FromForm] int Status)
+        public ApiResult<dynamic> UpdatePromotionStatus([FromForm] string BonusCode, [FromForm] int SiteId, [FromForm] int Status)
         {
             var apiResult = new ApiResult<dynamic>();
             try
@@ -518,6 +576,7 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = _referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
+                int status = 1;
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
@@ -525,7 +584,12 @@ namespace BackendSite.Controllers.Api
                     return apiResult;
                 }
 
-                _referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+                if (referral.Status)
+                {
+                    status = 0;
+                }
+
+                _referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
             }
             catch (Exception ex)
             {
@@ -573,9 +637,9 @@ namespace BackendSite.Controllers.Api
             };
 
             var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.StartDate);
             var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
+                : DateTimeExtensions.UnixToDateTime((long)refFriendListReq.EndDate);
 
             var PageSize = 10;
             if (refFriendListReq.PageSize > 0)
@@ -606,9 +670,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<dynamic>();
             try
             {
-                apiResult.ErrorCode = _bonusManageBLL.GenScratchCardCode(genScratchCardCodeReq.SpecialCode,
-                    genScratchCardCodeReq.Num, _authorizeBLL.GetAuthData().UserName);
-                //  apiResult.Data = new { promotion.LastUpdateUser, promotion.LastUpdateTime };
+                apiResult.ErrorCode = _bonusManageBLL.GenScratchCardCode(genScratchCardCodeReq.SpecialCode, genScratchCardCodeReq.Num, _authorizeBLL.GetAuthData().UserName);
             }
             catch (Exception ex)
             {
@@ -621,15 +683,20 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-
-
         [HttpPost]
         public ApiResult<IEnumerable<ScratchCard>> GetScratchCardList(GetScratchCardListReq getScratchCardListReq)
         {
             var apiResult = new ApiResult<IEnumerable<ScratchCard>>();
             try
             {
-                apiResult.Data = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType);
+                var result = _bonusManageBLL.GetScratchCardList(getScratchCardListReq.SpecialCode, getScratchCardListReq.FilterType, 1, 10000,
+                    out _, out _);
+                foreach (var data in result)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                apiResult.Data = result;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -646,6 +713,11 @@ namespace BackendSite.Controllers.Api
         public IActionResult GetScratchCardListExport(string SpecialCode, int FilterType)
         {
             var exportData = _bonusManageBLL.GetScratchCardListExport(SpecialCode, FilterType);
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = _excelBLL.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
@@ -728,6 +800,8 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<LeaderboardExtraPointList> GetLeaderboardExtraPointList(LeaderboardExtraPointReq leaderboardExtraPointReq)
         {
             var apiResult = new ApiListResult<LeaderboardExtraPointList>();
+            var startTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.EndDate);
             int totalPages = 0, rowCount = 0;
 
             var pageNumber = leaderboardExtraPointReq.PageNumber;
@@ -735,8 +809,15 @@ namespace BackendSite.Controllers.Api
             if (leaderboardExtraPointReq.PageSize > 0)
                 pageSize = leaderboardExtraPointReq.PageSize;
             apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
-                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, leaderboardExtraPointReq.StartDate,
-                leaderboardExtraPointReq.EndDate, pageSize, ref pageNumber, out totalPages, out rowCount);
+                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, startTime,
+                endTime, pageSize, ref pageNumber, out totalPages, out rowCount);
+
+            foreach (var data in apiResult.Data)
+            {
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -780,6 +861,46 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         #endregion
+
+        [HttpPost]
+        public async Task<ApiResult> BonusPayout(BonusPayoutReq bonusPayoutReq)
+        {
+            var apiResult = new ApiResult();
+            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
+            try
+            {
+                var authData = _authorizeBLL.GetAuthData();
+                var custInfo = _custInfoBLL.GetCustInfoWithCache(bonusPayoutReq.CustId);
+
+                var setAdjustBonusReq = new SetAdjustBonusReq()
+                {
+                    CustId = custInfo.CustId,
+                    BonusCode = bonusPayoutReq.BounsCode,
+                    Memo = bonusPayoutReq.Memo,
+                    Operator = authData.UserName,
+                    Amount = bonusPayoutReq.Amount,
+                    PromotionType = bonusPayoutReq.PromotionType
+                };
+                var apiOnlineResult =
+                    await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+                if (apiOnlineResult.ErrorCode == 0)
+                {
+                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.Message = $"Success.";
+                }
+                else
+                {
+                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.Message = apiOnlineResult.Message;
+                }
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.ToString();
+            }
+            return apiResult;
+        }
         #endregion
     }
 }

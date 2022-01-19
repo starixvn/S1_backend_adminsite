@@ -1,62 +1,58 @@
-﻿using BackendSite.Service.Model.TpMaintain;
+﻿using System;
+using BackendSite.Service.Model.TpMaintain;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
+using TpCategory = BackendSite.Service.Model.TpMaintain.TpCategory;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Service.DAL
 {
     public class TpMaintainService
     {
-        private readonly IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
 
-        public TpMaintainService(IConfiguration configuration)
+        public TpMaintainService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<CommonTpInfo>("Common_TpList_Get", commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<CommonTpInfo>("Common_TpList_Get");
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpMaintain>("Admin_TpMaintain_Get", commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<TpMaintain>("Admin_TpMaintain_Get");
         }
 
         public bool InsertTpMaintain(TpMaintain input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirst<int>("Admin_TpMaintainV2_Ins", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.QueryFirst<int>("Admin_TpMaintainV2_Ins", new DynamicParameters(input)) > 0;
         }
 
         public bool UpdateTpMaintain(TpMaintain input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_TpMaintain_Set", new DynamicParameters(input), commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_TpMaintain_Set", new DynamicParameters(input)) > 0;
         }
 
         public bool DeleteTpMaintain(int sn)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_TpMaintain_Del", new { sn }, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_TpMaintain_Del", new DynamicParameters(new { sn })) > 0;
         }
 
         public IEnumerable<TpGameType> GetTpGameTypeList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpGameType>("Admin_TpGameType_Get", commandType: CommandType.Text);
+            return _mainDbClient.Query<TpGameType>("Admin_TpGameType_Get");
         }
 
         public IEnumerable<TpCategory> GetTPCategoryList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpCategory>("Admin_TPCategory_Get", commandType: CommandType.Text);
+            return _mainDbClient.Query<TpCategory>("Admin_TPCategory_Get");
         }
     }
 }

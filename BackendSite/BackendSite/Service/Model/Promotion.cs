@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
-        public PromotionType PromotionType { get; set; }
+        public PromotionTypeEnum PromotionType { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public int ExpiryDays { get; set; }
@@ -45,6 +45,9 @@ namespace BackendSite.Service.Model
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public int AtPage { get; set; }
+
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
     }
     public class PromotionListData
     {

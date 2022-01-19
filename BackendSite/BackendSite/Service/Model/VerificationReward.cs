@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -114,7 +114,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;
