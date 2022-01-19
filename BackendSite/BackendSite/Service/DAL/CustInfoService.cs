@@ -602,7 +602,7 @@ namespace BackendSite.Service.DAL
             props.Add("CustId", custid);
             props.Add("TagList", selectTag);
 
-            return _reportDbClient.Execute("Admin_CustInofoTagList_Set", props);
+            return _mainDbClient.Execute("Admin_CustInofoTagList_Set", props);
         }
         #endregion
 
