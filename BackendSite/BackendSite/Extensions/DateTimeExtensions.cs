@@ -15,7 +15,7 @@ namespace BackendSite.Extensions
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime);
         }
-        
+
         public static DateTimeOffset UnixToDateTimeOffset(long unixTime)
         {
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;

@@ -16,6 +16,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
+
         public DateTimeOffset ExpiryTime
         {
             get => _expiryTime;
