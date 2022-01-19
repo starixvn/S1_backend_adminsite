@@ -251,6 +251,15 @@ namespace BackendSite.Controllers.Api
         }
         #endregion
 
+        public class GetWithdrawalLimitLogReq
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
         public class SetEnableDisableBonusPara
         {
             public int CustId { get; set; }
@@ -2293,6 +2302,26 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        #endregion
+
+        #region CSD > Withdrawal Limit Log
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/WithhdrawalLimitLog" })]
+        [HttpPost]
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(GetWithdrawalLimitLogReq withdrawalLimitLogReq)
+        {
+            ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalLimitLogReq.StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalLimitLogReq.EndDate);
+
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(withdrawalLimitLogReq.CustId, startTime, endTime, withdrawalLimitLogReq.PageNumber, withdrawalLimitLogReq.PageSize);
+            result.Data = SearchResult.WithdrawalLimitLogList;
+            result.PageNumber = SearchResult.PageNumber;
+            result.RowCount = SearchResult.RowCount;
+            result.TotalPages = SearchResult.TotalPages;
+            result.ErrorCode = 0;
+
+            return result;
+        }
         #endregion
 
         #endregion

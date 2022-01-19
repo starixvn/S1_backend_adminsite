@@ -470,4 +470,26 @@ namespace BackendSite.Service.Model
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }
+    public class WithdrawalLimitLog
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public int MainType { get; set; }
+        public decimal ChangeWithdrawalLimit { get; set; }
+        public decimal BeforeWithdrawalLimit { get; set; }
+        public decimal AfterWithdrawalLimit { get; set; }
+        public string Memo { get; set; }
+        public string RefTransId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+    public class WithdrawalLimitLogData
+    {
+        public List<WithdrawalLimitLog> WithdrawalLimitLogList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }
