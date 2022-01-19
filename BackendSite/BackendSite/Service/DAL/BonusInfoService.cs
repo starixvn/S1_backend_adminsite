@@ -67,8 +67,10 @@ namespace BackendSite.Service.DAL
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = _reportDbClient.Query<BonusInfo>("Admin_BonusInfo_Get_V7", props);
+
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
+
             return result;
         }
 
@@ -87,8 +89,8 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_CategoryType", rebateCategoriesId);
 
-            var result = _mainDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V7", props);
-            return result;
+            return _reportDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V7", props);
+
         }
 
         public IEnumerable<PendingBonus> GetPendingBonusList(int startIndex, int pageSize, out int totalPages, out int rowCount)
