@@ -62,7 +62,7 @@ namespace BackendSite.Controllers
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string SelectCurrency { get; set; }
             public string BankAccountNumber { get; set; }
             public string SelectStatus { get; set; }
@@ -122,7 +122,7 @@ namespace BackendSite.Controllers
                                                                     custInfoReq.PhoneNo?.Trim(),
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffId,
+                                                                    custInfoReq.AffCode,
                                                                     selectCurrency,
                                                                     custInfoReq.BankAccountNumber?.Trim(),
                                                                     selectStatus);

@@ -44,6 +44,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
+                    <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
                     {
                         (data.siteName == "Nova88") ?
@@ -111,6 +112,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <tr>
                                     <th scope="col">Site Name</th>
                                     <th scope="col">User Name</th>
+                                    <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
                                     <th scope="col">Vip Level</th>
                                     <th scope="col">Deposit Limit Level</th>
@@ -168,7 +170,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 sUserName: this.state.UserName,
                 sTransId: this.state.TransId,
                 sTpUserName: this.state.TpUserName,
-                sAffId: this.state.AffId,
+                sAffCode: this.state.AffCode,
                 sAccountName: this.state.AccountName,
                 sLoginIp: this.state.LoginIp,
                 sEmail: this.state.Email,
@@ -201,7 +203,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
                 PageNumber: pageNumber,
                 PageSize: this._PageSize,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                AffCode: !this.state.sAffCode ? null : this.state.sAffCode,
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
                 SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus,
@@ -241,7 +243,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
                 Email: !this.state.sEmail ? null : this.state.sEmail,
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                AffCode: !this.state.sAffCode ? null : this.state.sAffCode,
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
                 SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus,
@@ -564,9 +566,9 @@ import * as Loading from '../commJS/Loading.jsx';
                                     </div>
                                 </div>
                                 <div className="input-item">
-                                    <label className="label">Affiliates ID</label>
+                                    <label className="label">Affiliates Code</label>
                                     <div className="field">
-                                        <input type="text" placeholder="Affiliates ID" autoComplete="off" name="AffId" value={this.state.AffId} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Affiliates Code" autoComplete="off" name="AffCode" value={this.state.AffCode} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">

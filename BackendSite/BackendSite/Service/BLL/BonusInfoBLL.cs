@@ -73,13 +73,15 @@ namespace BackendSite.Service.BLL
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
-                        ExpiredCancel = row.ExpiredCancel
-                    });
+                        ExpiredCancel = row.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"",string.Empty)
+                    }); ;
                 }
             }
 
             return result;
         }
+
 
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string selectSite, string bonusCode, string transId, int currency, string userName, int promotionType, DateTime startDate, DateTime endDate, int baseCurrencyId, int rebateCategoriesId)
         {
@@ -120,7 +122,8 @@ namespace BackendSite.Service.BLL
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
-                        ExpiredCancel = row.ExpiredCancel
+                        ExpiredCancel = row.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"", string.Empty)
                     });
                 }
             }
