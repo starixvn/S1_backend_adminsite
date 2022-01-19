@@ -215,16 +215,18 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId }));
         }
-        
+
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
-            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins", 
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V2", 
                 new DynamicParameters(new { 
                     _BatchId = req.BatchId,
                     _SiteId = req.SiteId,
                     _LangId = req.LangId,  
                     _CurrencyId = req.CurrencyId,
                     _Status = req.AccountStatus,
+                    _IsPopup = req.IsPopup,
+                    _PopupMessage = req.PopupMessage,
                     _Title = req.Title ,
                     _Content =req.Content,
                     _Operator = req.Operator
@@ -710,6 +712,47 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_UserName", userName);
+            p.Add("_SiteId", siteId);
+            return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
+        }
+        
+        public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_Status", status);
+            return await _mainDbClient.QueryAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoBySite_Get", p);
+        }
+
+        public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
+        {
+            var WithdrawalLimitLogData = new WithdrawalLimitLogData();
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId, DbType.Int32);
+            parameter.Add("StartDate", DateTimeOffset.Parse(StartDate.ToString()).DateTime, DbType.DateTime);
+            parameter.Add("EndDate", DateTimeOffset.Parse(EndDate.ToString()).DateTime, DbType.DateTime);
+            parameter.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("PageSize", PageSize);
+
+            var data = _reportDbClient.Query<WithdrawalLimitLog>("Admin_WithdrawalLimitLog_Get", parameter).ToList();
+
+            WithdrawalLimitLogData.WithdrawalLimitLogList = data;
+            WithdrawalLimitLogData.PageNumber = parameter.Get<int?>("PageNumber") ?? 0;
+            WithdrawalLimitLogData.TotalPages = parameter.Get<int?>("TotalPages") ?? 0;
+            WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
+
+            return WithdrawalLimitLogData;
         }
     }
 }

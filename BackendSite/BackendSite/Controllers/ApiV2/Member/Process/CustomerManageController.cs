@@ -508,6 +508,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         }
 
+        public class WithdrawalLimitLogReq : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate;
+
+            private DateTimeOffset _endDate;
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -2519,6 +2536,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        #endregion
+
+        #region  CSD > Customer Administration > CustInfo > GetWithdrawalLimitLog
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq withdrawalLimitLogReq)
+        {
+            ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
+
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(withdrawalLimitLogReq.CustId, withdrawalLimitLogReq.StartDate.DateTime, withdrawalLimitLogReq.EndDate.DateTime, withdrawalLimitLogReq.PageNumber, withdrawalLimitLogReq.PageSize);
+            result.Data = SearchResult.WithdrawalLimitLogList;
+            result.PageNumber = SearchResult.PageNumber;
+            result.RowCount = SearchResult.RowCount;
+            result.TotalPages = SearchResult.TotalPages;
+            result.ErrorCode = 0;
+
+            return result;
+        }
         #endregion
 
         #region Private Methods
