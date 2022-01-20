@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -58,46 +59,47 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         }
 
-        public class GetBannerReq
+        public class GetBannerRequest
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
         }
 
-        public class GetBannerListReq
+        public class GetListRequest
         {
             public int SiteId { get; set; }
             public int BannerTypeId { get; set; }
             public int Status { get; set; }
         }
 
-        public class UpdateBannerStatusReq
+        public class UpdateStatusRequest
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
             public int Status { get; set; }
         }
-        
+
         #endregion
 
         #region API
 
         /// <summary>
-        /// Banner/GetBanner 
+        /// Banner/GetBanner 取得指定橫幅
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing >  Banner Management > [Edit]
+        /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Edit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<BannerInfo> GetBanner(GetBannerReq req)
+        public ApiResult<BannerInfo> GetBanner(GetBannerRequest request)
         {
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName);
+                var result = _bannerManageBll.GetBanner(request.SiteId, request.BannerName);
                 if (result != null)
                 {
                     apiResult.Data = result;
@@ -117,23 +119,24 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
-        
+
         /// <summary>
-        /// Banner/GetBannerList 
+        /// Banner/GetList 取得橫幅清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing >  Banner Management 
+        /// Func Path：Marketing >  Banner Management > Select [Available Sites]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList(GetBannerListReq req)
+        public ApiResult<IEnumerable<BannerInfoList>> GetList(GetListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
             try
             {
-                apiResult.Data = _bannerManageBll.GetBannerList(req.SiteId, req.BannerTypeId, req.Status);
+                apiResult.Data = _bannerManageBll.GetBannerList(request.SiteId, request.BannerTypeId, request.Status);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success ;
             }
             catch (Exception ex)
@@ -144,7 +147,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
-        
+
         /// <summary>
         /// Banner/SetBanner 
         /// </summary>
@@ -154,6 +157,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management  > [Edit] > [Submit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult SetBanner(SetBannerReq req)
         {
@@ -182,22 +186,23 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         /// <summary>
-        /// Banner/UpdateBannerStatus 
+        /// Banner/UpdateStatus 更新橫幅狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing >  Banner Management  > [Status] 
+        /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Status] 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult UpdateBannerStatus(UpdateBannerStatusReq req)
+        public ApiResult UpdateStatus(UpdateStatusRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
                 var user = _authorizeBll.GetAuthData().UserName;
-                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(req.SiteId, req.BannerName, req.Status, user);
+                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(request.SiteId, request.BannerName, request.Status, user);
             }
             catch (Exception ex)
             {
