@@ -2437,6 +2437,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq request)
         {
             ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
