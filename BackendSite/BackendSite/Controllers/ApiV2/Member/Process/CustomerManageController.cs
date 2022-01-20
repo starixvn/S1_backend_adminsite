@@ -2550,11 +2550,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq withdrawalLimitLogReq)
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq request)
         {
             ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
 
-            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(withdrawalLimitLogReq.CustId, withdrawalLimitLogReq.StartDate.DateTime, withdrawalLimitLogReq.EndDate.DateTime, withdrawalLimitLogReq.PageNumber, withdrawalLimitLogReq.PageSize);
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, request.PageNumber, request.PageSize);
             result.Data = SearchResult.WithdrawalLimitLogList;
             result.PageNumber = SearchResult.PageNumber;
             result.RowCount = SearchResult.RowCount;
