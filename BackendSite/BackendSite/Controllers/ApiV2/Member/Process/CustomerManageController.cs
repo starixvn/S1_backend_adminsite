@@ -508,23 +508,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         }
 
-        public class WithdrawalLimitLogReq : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public int CustId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-        }
         #endregion
 
         #region CSD > Customer Administration
@@ -2550,8 +2533,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
         [HttpPost]
-        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq request)
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
         {
             ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
 
