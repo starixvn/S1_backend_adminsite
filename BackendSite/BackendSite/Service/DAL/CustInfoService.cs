@@ -715,16 +715,15 @@ namespace BackendSite.Service.DAL
             parameter.Add("CustId", custId, DbType.Int32);
             parameter.Add("StartDate", DateTimeOffset.Parse(StartDate.ToString()).DateTime, DbType.DateTime);
             parameter.Add("EndDate", DateTimeOffset.Parse(EndDate.ToString()).DateTime, DbType.DateTime);
-            parameter.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            parameter.Add("PageNumber", Math.Abs(PageNumber), dbType: DbType.Int32);
+            parameter.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),dbType: DbType.Int32);
+            parameter.Add("PageSize", Math.Abs(PageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            parameter.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            parameter.Add("PageSize", PageSize);
 
             var data = _reportDbClient.Query<WithdrawalLimitLog>("Admin_WithdrawalLimitLog_Get", parameter).ToList();
 
             WithdrawalLimitLogData.WithdrawalLimitLogList = data;
-            WithdrawalLimitLogData.PageNumber = parameter.Get<int?>("PageNumber") ?? 0;
             WithdrawalLimitLogData.TotalPages = parameter.Get<int?>("TotalPages") ?? 0;
             WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
 
