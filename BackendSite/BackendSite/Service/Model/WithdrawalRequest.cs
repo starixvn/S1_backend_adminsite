@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model
         public string AccountType { set; get; }
         public string Network { set; get; }
         public int WalletCurrencyID { set; get; }
+        public string CryptoCurrency { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
@@ -336,5 +337,10 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public string Network { get; set; }
         public int NetworkType { get; set; }
+    }
+
+    public class CryptoWithdrawalLimitInfoManage : USDTWithdrawalLimitInfoManage
+    {
+        public int CryptoCurrencyId { get; set; }
     }
 }

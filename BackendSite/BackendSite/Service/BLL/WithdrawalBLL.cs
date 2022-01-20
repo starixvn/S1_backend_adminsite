@@ -1,14 +1,16 @@
-﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BackendSite.Service.Model.WithdrawalBankAccounting;
+using Amazon.Runtime.Internal.Util;
 using BackendSite.ExceptionHandling;
-using BackendSite.Service.Library;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.WithdrawalBankAccounting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -21,22 +23,21 @@ namespace BackendSite.Service.BLL
         private readonly WithdrawalLimitService _withdrawalLimitService;
         private readonly ReportService _reportService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
+        private readonly ILogger<WithdrawalBLL> _logger;
 
         #endregion
 
         #region Constructors
 
-        public WithdrawalBLL(WithdrawalService withdrawalService,
-            ServerInfoService serverInfoService,
-            WithdrawalLimitService withdrawalLimitService,
-            ReportService reportService,
-            WithdrawalBankAccountingService withdrawalBankAccountingService)
+        public WithdrawalBLL(IServiceProvider provider)
         {
-            _withdrawalService = withdrawalService;
-            _serverInfoService = serverInfoService;
-            _withdrawalLimitService = withdrawalLimitService;
-            _reportService = reportService;
-            _withdrawalBankAccountingService = withdrawalBankAccountingService;
+
+            _withdrawalService = provider.GetRequiredService<WithdrawalService>();
+            _serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _reportService = provider.GetRequiredService<ReportService>();
+            _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
+            _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
         }
 
         #endregion
@@ -581,6 +582,80 @@ namespace BackendSite.Service.BLL
             }
 
             return _withdrawalLimitService.EditUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
+        }
+
+        public IEnumerable<CryptoWithdrawalLimitInfoManage> GetCryptoWithdrawalLimitInfos(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            int cryptoCurrencyId,
+            string network,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+
+            var result = _withdrawalLimitService.GetCryptoWithdrawalLimitInfos(
+                JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIds),
+                cryptoCurrencyId,
+                network,
+                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount).ToList();
+
+            result.ForEach(x =>
+            {
+                x.NetworkType = (int)(NetworkTypeEnum)Enum.Parse(typeof(NetworkTypeEnum), x.Network);
+            });
+
+            return result;
+        }
+
+        public bool AddCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        {
+            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            {
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                return false;
+            }
+                
+
+            return _withdrawalLimitService.AddCryptoWithdrawalLimitInfo(input);
+        }
+
+        public bool DeleteCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        {
+            var currentUpperPointInput = new CryptoWithdrawalLimitInfoManage
+            {
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                NetworkType = input.NetworkType,
+                CryptoCurrencyId = input.CryptoCurrencyId,
+                VipLevel = input.VipLevel + 1
+            };
+
+            var currentUpperPoint =
+                _withdrawalLimitService.GetCryptoWithdrawalLimitInfo(currentUpperPointInput);
+
+            if (currentUpperPoint != null)
+            {
+                _logger.LogInformation($"Current upper point is not null. Current VIP level: { input.VipLevel}");
+                return false;
+            }
+
+            return _withdrawalLimitService.DeleteCryptoWithdrawalLimitInfo(input);
+        }
+
+        public bool EditCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        {
+            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            {
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                return false;
+            }
+
+            return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
 
         #region WithdrawalBankAccounting
