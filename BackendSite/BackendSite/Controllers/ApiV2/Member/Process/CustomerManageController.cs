@@ -454,6 +454,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
+        public class WithdrawalLimitLogReq : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate;
+
+            private DateTimeOffset _endDate;
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -2406,6 +2423,34 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        #endregion
+
+        #region  CSD > Customer Administration > CustInfo > GetWithdrawalLimitLog
+
+        /// <summary>
+        /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq request)
+        {
+            ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
+
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, request.PageNumber, request.PageSize);
+            result.Data = SearchResult.WithdrawalLimitLogList;
+            result.PageNumber = SearchResult.PageNumber;
+            result.RowCount = SearchResult.RowCount;
+            result.TotalPages = SearchResult.TotalPages;
+            result.ErrorCode = 0;
+
+            return result;
+        }
         #endregion
 
         #region Private Methods
