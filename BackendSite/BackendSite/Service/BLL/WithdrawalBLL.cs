@@ -639,6 +639,31 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
 
+        public CryptoInfoData GetCryptoInfoData()
+        {
+            var infos = _withdrawalLimitService.GetCryptoInfoList();
+            var cryptoCurrency = infos
+                .Select(x => new CryptoCurrency
+                {
+                    CurrencyId = x.CurrencyId,
+                    CurrencyName = x.CurrencyName
+                }).Distinct(new CryptoCurrencyComparer());
+
+            var cryptoNetwork = infos.Select(x => new CryptoNetwork
+            {
+                CurrencyId = x.CurrencyId,
+                Network = x.Network,
+                NetworkType = x.NetworkType
+            });
+
+            return new CryptoInfoData
+            {
+                CryptoCurrency = cryptoCurrency,
+                CryptoNetwork = cryptoNetwork
+            };
+        }
+     
+
         #region WithdrawalBankAccounting
 
         public GetWithdrawalInfoAndAccountingListModel GetWithdrawalInfoAndAccountingList(

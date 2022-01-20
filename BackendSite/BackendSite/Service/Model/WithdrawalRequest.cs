@@ -338,9 +338,4 @@ namespace BackendSite.Service.Model
         public string Network { get; set; }
         public int NetworkType { get; set; }
     }
-
-    public class CryptoWithdrawalLimitInfoManage : USDTWithdrawalLimitInfoManage
-    {
-        public int CryptoCurrencyId { get; set; }
-    }
 }

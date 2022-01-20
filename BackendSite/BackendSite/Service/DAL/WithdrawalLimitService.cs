@@ -260,18 +260,16 @@ namespace BackendSite.Service.DAL
 
         public CryptoWithdrawalLimitInfoManage GetCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var param = new
-            {
-                _SiteId = input.SiteId,
-                _CurrencyId = input.CurrencyId,
-                _VipLevel = input.VipLevel,
-                _Network = input.Network,
-                _CryptoCurrencyId = input.CryptoCurrencyId
-            };
+            var param = new DynamicParameters();
 
-            return conn.QueryFirstOrDefault<CryptoWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get_V2",
-                param, commandType: CommandType.StoredProcedure);
+            param.Add("_SiteId", input.SiteId);
+            param.Add("_CurrencyId", input.CurrencyId);
+            param.Add("_CryptoCurrencyId", input.CryptoCurrencyId);
+            param.Add("_Network", input.Network);
+            param.Add("_VipLevel", input.VipLevel);
+
+            return _reportDbClient.QueryFirst<CryptoWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get_V2",
+                param);
         }
 
         public bool DeleteCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
@@ -338,5 +336,8 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public IEnumerable<CryptoInfo> GetCryptoInfoList()
+            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
     }
 }
