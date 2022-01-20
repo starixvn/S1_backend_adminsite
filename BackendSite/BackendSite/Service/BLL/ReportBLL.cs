@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
@@ -15,18 +16,20 @@ namespace BackendSite.Service.BLL
 
         private readonly ReportService reportService;
         private readonly SelLangBLL selLangBLL;
+        private readonly Common _common;
 
         #endregion
 
         #region Constructors
 
         public ReportBLL(ReportService reportService,
-                         SelLangBLL selLangBLL)
+                         SelLangBLL selLangBLL,
+                         Common common)
         {
             this.reportService = reportService;
             this.selLangBLL = selLangBLL;
+            _common = common;
         }
-
 
         #endregion
 
@@ -66,46 +69,31 @@ namespace BackendSite.Service.BLL
         {
             return reportService.GetCurrencyList();
         }
-        
+
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
         {
             var tpCategories = await reportService.GetTpCategoryList();
 
-            return tpCategories.Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
+            return tpCategories.Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
         }
-        
+
 
         #endregion
 
-        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds,
-                                                                      string currencyIds,
-                                                                      string startDate,
-                                                                      string endDate)
+        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
         {
             var keyValuePairs = new Dictionary<string, MainFinancialModel>();
-            var dateFormat = string.Empty;
-
-
-            var CurrencyIds = JsonConvert.DeserializeObject<List<int>>(currencyIds);
-
-            var reportList = reportService.GetMainFinancialReport(siteIds,
-                                                                  currencyIds,
-                                                                  startDate,
-                                                                  endDate);
-
-            var turnoverAndWinlossList = reportService.GetTurnoverAndWinlossSummary(siteIds,
-                                                                                    currencyIds,
-                                                                                    startDate,
-                                                                                    endDate);
-
+            string dateFormat;
+            var currencyIdList = JsonConvert.DeserializeObject<List<int>>(currencyIds);
+            var reportList = reportService.GetMainFinancialReport(siteIds, currencyIds, startDate, endDate ,timeZone);
+            var turnoverAndWinLossList = reportService.GetTurnoverAndWinLossSummary(siteIds, currencyIds, startDate, endDate,timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Combine
 
             foreach (var data in reportList["Deposit"])
             {
-                MainFinancialModel mainFinancialModel = null;
-
+                MainFinancialModel mainFinancialModel;
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
                 if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CurrencyId}"))
@@ -126,7 +114,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Withdrawal"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -149,7 +137,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Adjustment"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -172,7 +160,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Bonus"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -194,7 +182,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var data in reportList["Rebate"])
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -214,9 +202,9 @@ namespace BackendSite.Service.BLL
                 mainFinancialModel.RebateInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
             }
 
-            foreach (var data in turnoverAndWinlossList)
+            foreach (var data in turnoverAndWinLossList)
             {
-                MainFinancialModel mainFinancialModel = null;
+                MainFinancialModel mainFinancialModel;
 
                 dateFormat = data.Date.ToString("yyyy/MM/dd");
 
@@ -247,11 +235,11 @@ namespace BackendSite.Service.BLL
 
             var dateList = keyValuePairs.Select(s => s.Value).Select(x => x.Date).Distinct().ToList();
 
-            foreach (var curr in CurrencyIds)
+            foreach (var curr in currencyIdList)
             {
                 foreach (var date in dateList)
                 {
-                    MainFinancialModel mainFinancialModel = null;
+                    MainFinancialModel mainFinancialModel;
 
                     if (!keyValuePairs.ContainsKey($"{date}-{curr}"))
                     {
@@ -274,34 +262,23 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(key => key.Date)
+            var response = keyValuePairs.Select(s => s.Value).OrderBy(key => key.Date)
                                                         .ThenBy(key => key.CurrencyId);
-
-            return Data;
+            return response;
         }
 
-        public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds,
-                                                                        string timeZone,
-                                                                        string startDate,
-                                                                        string endDate)
+        public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
             var keyValuePairs = new Dictionary<string, StatisticalReportModel>();
-            var dateFormat = string.Empty;
-            var statisticalList = reportService.GetStatisticalReport(siteIds,
-                                                                     timeZone,
-                                                                     startDate,
-                                                                     endDate);
-
+            var statisticalList = reportService.GetStatisticalReport(siteIds,timeZone, startDate, endDate);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Statistical
 
             foreach (var data in statisticalList)
             {
-                StatisticalReportModel statisticalReportModel = null;
-
-                //dateFormat = data.Date.ToString("yyyy/MM/dd");
-
+                StatisticalReportModel statisticalReportModel;
+                
                 if (!keyValuePairs.ContainsKey($"{data.CategoryId}-{data.GameId}-{data.CurrencyId}"))
                 {
                     statisticalReportModel = new StatisticalReportModel();
@@ -317,7 +294,7 @@ namespace BackendSite.Service.BLL
 
                 statisticalReportModel = keyValuePairs[$"{data.CategoryId}-{data.GameId}-{data.CurrencyId}"];
 
-                dateFormat = data.Date.ToString("yyyy-MM-dd");
+                var dateFormat = data.Date.ToString("yyyy-MM-dd");
 
                 if (dateFormat == endDate)
                 {
@@ -394,11 +371,9 @@ namespace BackendSite.Service.BLL
             {
                 foreach (var item in categoryGameList)
                 {
-                    StatisticalReportModel statisticalReportModel = null;
-
                     if (!keyValuePairs.ContainsKey($"{item.IdentifyString}-{curr}"))
                     {
-                        statisticalReportModel = new StatisticalReportModel();
+                        var statisticalReportModel = new StatisticalReportModel();
                         keyValuePairs.Add($"{item.IdentifyString}-{curr}", statisticalReportModel);
                         statisticalReportModel.CurrencyId = curr;
                         statisticalReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
@@ -413,38 +388,38 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CategoryId)
+            var response = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CategoryId)
                                                          .ThenBy(value => value.GameId)
-                                                         .ThenBy(Value => Value.CurrencyId);
+                                                         .ThenBy(value => value.CurrencyId);
 
-            return Data;
+            return response;
         }
 
-        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds,
-                                                                      string selectDate)
+        public IEnumerable<UserOnlineReportModel> GetUserOnlineReport(string siteIds, string selectDate, int timeZone)
         {
             var keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
-            var dateTimeFormat = string.Empty;
-            var userOnlineList = reportService.GetUserOnlineReport(siteIds,
-                                                                   selectDate);
+            string dateTimeFormat;
             var siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
             var serverInfoList = reportService.GetServerInfoList();
+
+            var date = new DateTimeOffset(Convert.ToDateTime(selectDate), TimeSpan.FromHours(timeZone));
+            var startTime = new DateTimeOffset(date.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var endTime = new DateTimeOffset(date.ToUniversalTime().DateTime, TimeSpan.Zero).AddHours(24).AddMilliseconds(-1);
+            var timeZoneString = _common.TransferToTimeZoneFormat(timeZone);
+
+            var userOnlineList = reportService.GetUserOnlineReport(siteIds, startTime.DateTime, endTime.DateTime, timeZoneString);
 
             #region Data Statistical
 
             foreach (var data in userOnlineList)
             {
-                UserOnlineReportModel userOnlineReportModel = null;
-
                 dateTimeFormat = data.Time.ToString("HH:00");
-
-                userOnlineReportModel = new UserOnlineReportModel();
+                var userOnlineReportModel = new UserOnlineReportModel();
                 keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
                 userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
                 userOnlineReportModel.SiteId = data.SiteId;
                 userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
                 userOnlineReportModel.MaxCount = data.MaxCount;
-
             }
 
             #endregion
@@ -453,15 +428,13 @@ namespace BackendSite.Service.BLL
 
             for (var i = 0; i < 24; i++)
             {
-                UserOnlineReportModel userOnlineReportModel = null;
-
                 foreach (var site in siteList)
                 {
                     dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("HH:00");
 
                     if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}"))
                     {
-                        userOnlineReportModel = new UserOnlineReportModel();
+                        var userOnlineReportModel = new UserOnlineReportModel();
                         keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
                         userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
                         userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
@@ -472,10 +445,10 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.LocalTime)
-                                                         .ThenBy(value => value.SiteId);
-
-            return Data;
+            return keyValuePairs
+                .Select(s => s.Value)
+                .OrderBy(value => value.LocalTime)
+                .ThenBy(value => value.SiteId);
         }
 
         public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds,

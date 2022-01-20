@@ -28,26 +28,26 @@ namespace BackendSite.Service.BLL
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int PageNumber, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> selectSite, string bonusCode, string transId, int currency, string userName, int promotionType, DateTime startDate, DateTime endDate, int pageSize, int baseCurrencyId, int rebateCategoriesId, int pageNumber, out int totalPages, out int rowCount, out List<string> currencyAmount)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser();
             var datas = _bonusInfoService.GetBonusInfoReport(
-                    SelectSite,
-                    BonusCode,
-                    TransId,
-                    Currency,
-                    UserName,
-                    PromotionType,
+                    selectSite,
+                    bonusCode,
+                    transId,
+                    currency,
+                    userName,
+                    promotionType,
                     siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate,
-                    Math.Abs(PageSize),
-                    BaseCurrencyId,
-                    RebateCategoriesId,
-                    (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
-                    out TotalPages,
-                    out RowCount,
-                    out CurrencyAmount
+                    startDate,
+                    endDate,
+                    Math.Abs(pageSize),
+                    baseCurrencyId,
+                    rebateCategoriesId,
+                    (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                    out totalPages,
+                    out rowCount,
+                    out currencyAmount
                 );
 
             var result = new List<BonusInfoFrontEnd>();
@@ -82,21 +82,22 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int BaseCurrencyId, int RebateCategoriesId)
+
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string selectSite, string bonusCode, string transId, int currency, string userName, int promotionType, DateTime startDate, DateTime endDate, int baseCurrencyId, int rebateCategoriesId)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser();
             var datas = _bonusInfoService.GetBonusInfoExportReport(
-                    SelectSite,
-                    BonusCode,
-                    TransId,
-                    Currency,
-                    UserName,
-                    PromotionType,
+                    selectSite,
+                    bonusCode,
+                    transId,
+                    currency,
+                    userName,
+                    promotionType,
                     siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate,
-                    BaseCurrencyId,
-                    RebateCategoriesId
+                    startDate,
+                    endDate,
+                    baseCurrencyId,
+                    rebateCategoriesId
                 );
 
             var result = new List<BonusInfoFrontEnd>();
@@ -130,9 +131,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList()
+        public IEnumerable<PendingBonus> GetPendingBonusList(int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _bonusInfoService.GetPendingBonusList();
+            return _bonusInfoService.GetPendingBonusList((Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize), out totalPages, out rowCount);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
@@ -155,7 +156,7 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Running,
+                (int) BonusInfoStatusEnum.Running,
             };
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);

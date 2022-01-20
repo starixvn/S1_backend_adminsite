@@ -10,6 +10,7 @@ namespace BackendSite.Extensions
                dt >= startDate && dt <= endDate :
                dt.Date >= startDate.Date && dt.Date <= endDate.Date;
         }
+
         public static DateTime UnixToDateTime(long unixTime)
         {
             return new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime);
@@ -17,7 +18,7 @@ namespace BackendSite.Extensions
 
         public static DateTimeOffset UnixToDateTimeOffset(long unixTime)
         {
-            return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime), TimeSpan.Zero);
+            return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
     }
 }

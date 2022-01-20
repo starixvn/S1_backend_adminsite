@@ -47,50 +47,17 @@ namespace BackendSite.Controllers.Api
 
         public class GetMainFinancialReportReq
         {
-            public IEnumerable<int> SiteIds
-            {
-                get;
-                set;
-            }
-
-            public IEnumerable<int> CurrencyIds
-            {
-                get;
-                set;
-            }
-
-            public string StartDate
-            {
-                get;
-                set;
-            }
-
-            public string EndDate
-            {
-                get;
-                set;
-            }
+            public IEnumerable<int> SiteIds {get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class GetStatisticalReportReq
         {
-            public IEnumerable<int> SiteIds
-            {
-                get;
-                set;
-            }
-
-            public string TimeZone
-            {
-                get;
-                set;
-            }
-
-            public string EndDate
-            {
-                get;
-                set;
-            }
+            public IEnumerable<int> SiteIds {get; set; }
+            public string TimeZone { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class GetUserOnlineReportReq
@@ -188,7 +155,8 @@ namespace BackendSite.Controllers.Api
             var data = _reportBLL.GetMainFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
                                                               JsonConvert.SerializeObject(request.CurrencyIds),
                                                               request.StartDate,
-                                                              request.EndDate);
+                                                              request.EndDate,
+                                                              TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -232,7 +200,8 @@ namespace BackendSite.Controllers.Api
             var ExportData = _reportBLL.GetMainFinancialReport(SiteIds,
                                                               CurrencyIds,
                                                               StartDate,
-                                                              EndDate);
+                                                              EndDate,
+                                                              TransferToTimeZoneFormat(8));
 
             var currencyData = _reportBLL.GetCurrency();
 
@@ -1210,11 +1179,9 @@ namespace BackendSite.Controllers.Api
         /// Report/GetUserOnlineReport 取得使用者線上報表資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Reports > User Online Report > [Submit]
-        /// 
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
@@ -1222,8 +1189,8 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
-            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                           request.SelectDate);
+
+            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds), request.SelectDate, 8);
 
             if (!data.Any())
             {
@@ -1243,11 +1210,9 @@ namespace BackendSite.Controllers.Api
         /// Report/ExportUserOnlineReport 匯出使用者線上報表資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Reports > User Online Report > [Export Excel]
-        /// 
+        /// Func Path：Reports > User Online Report >  [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="SiteIds"></param>
         /// <param name="SelectDate"></param>
@@ -1260,8 +1225,7 @@ namespace BackendSite.Controllers.Api
 
             var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SiteIds);
 
-            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds,
-                                                           SelectDate);
+            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds, SelectDate, 8);
 
             var totalMaxCount = ExportData.GroupBy(x => new
             {
@@ -2641,5 +2605,16 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        private string TransferToTimeZoneFormat(int timeZone)
+        {
+            if (Math.Sign(timeZone) > 0 || Math.Sign(timeZone) == 0)
+            {
+                return string.Format("+" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+            else 
+            {
+                return string.Format("-" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+        }
     }
 }

@@ -1,23 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.PromotionDisplayCondition;
 
 namespace BackendSite.Service.Model
 {
     public class PromotionInfo
     {
+        private DateTimeOffset? _lastUpdateTime{ get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public int? CategoryId { get; set; }
-        public DateTime? PeriodFrom { get; set; }
-        public DateTime? PeriodTo { get; set; }
+        public DateTimeOffset? PeriodFrom
+        {
+            get
+            {
+                if (UnixPeriodFrom != null)
+                {
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodFrom.Value);
+                }
+                return null;
+            }
+            set
+            {
+                if (UnixPeriodFrom != null) 
+                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodFrom.Value);
+            }
+        }
+        public DateTimeOffset? PeriodTo 
+        {
+            get
+            {
+                if (UnixPeriodTo != null)
+                {
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodTo.Value);
+                }
+                return null;
+            }
+            set
+            {
+                if (UnixPeriodTo != null) 
+                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodTo.Value); }
+        }
         public long? UnixPeriodFrom { get; set; }
         public long? UnixPeriodTo { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }
         public int ExpiryDays { get; set; }
-        public DateTime? LastUpdateTime { get; set; }
+        public DateTimeOffset? LastUpdateTime
+        {
+            get => _lastUpdateTime;
+            set
+            {
+                if (value != null) 
+                    _lastUpdateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
         public int SiteId { get; set; }
@@ -36,6 +75,51 @@ namespace BackendSite.Service.Model
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
     }
 
+    public class PromotionInfoReq 
+    {
+        private DateTimeOffset? _periodFromTime;
+        private DateTimeOffset? _periodToTime;
+        public string BonusCode { get; set; }
+        public string Description { get; set; }
+        public int PromotionType { get; set; }
+        public int? CategoryId { get; set; }
+        public DateTimeOffset? PeriodFromTime 
+        {
+            get => _periodFromTime;
+            set
+            {
+                if (value != null)
+                    _periodFromTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? PeriodToTime 
+        {
+            get => _periodToTime;
+            set
+            {
+                if (value != null)
+                    _periodToTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public int ExpiryDays { get; set; }
+        public int? Sort { get; set; }
+        public int Status { get; set; }
+        public int SiteId { get; set; }
+        public int? WalletType { get; set; }
+        public int? TpId { get; set; }
+        public int? RedeemHours { get; set; }
+        public int? PeriodType { get; set; }
+        public int? PeriodDay { get; set; }
+        public string SpecialCode { get; set; }
+        public bool IsSpecial { get; set; }
+        public bool OnlyRegistered { get; set; }
+        public int PromotionDeviceType { get; set; }
+        public int? PromotionAction { get; set; }
+        public int AutoExtend { get; set; }
+        public string LastUpdateUser { get; set; }
+        public IEnumerable<PromotionSpecific> Specific { get; set; }
+    }
+    
     public class PromotionSpecific
     {
         public string BonusCode { get; set; }
@@ -157,8 +241,8 @@ namespace BackendSite.Service.Model
         public string ScratchCardCode { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset CreateTime{ get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
 
@@ -167,28 +251,27 @@ namespace BackendSite.Service.Model
         public string SpecialCode { get; set; }
         public string ScratchCardCode { get; set; }
         public string Joiner { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
         public string Creator { get; set; }
     }
 
-    public class DisplayConditionAbountVipLevel
+    public class DisplayConditionAboutVipLevel
     {
         public bool IsForVipLevel  { get; set; }
-
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
     public class LeaderboardExtraPointList
     {
-        public DateTime ActiveDate { get; set; }
+        public DateTimeOffset ActiveDate { get; set; }
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string Currency { get; set; }
         public string CategoryName { get; set; }
         public decimal ExtraPoint { get; set; }
-        public DateTime CreateTime { set; get; }
-        public DateTime UpdateTime { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+        public DateTimeOffset UpdateTime { set; get; }
         public string LastUpdateUser { get; set; }
 
     }
