@@ -2302,7 +2302,6 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region CSD > Withdrawal Limit Log
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/WithhdrawalLimitLog" })]
         [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(GetWithdrawalLimitLogReq withdrawalLimitLogReq)
         {
