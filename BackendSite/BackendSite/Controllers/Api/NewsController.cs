@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -63,11 +64,26 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<News>();
             try
             {
-                var SearchResult = newsBLL.GetNewsList(para.SelectSite, para.StartDate, para.EndDate, para.PageSize, para.PageNumber, para.Status);
-                apiResult.Data = SearchResult.NewsList;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
+
+                var statusList = new List<int>();
+
+                if (para.Status == 0)
+                {
+                    statusList.Add(0); statusList.Add(1);
+                }
+                else
+                {
+                    statusList.Add(para.Status);
+                }
+
+                var searchResult = newsBLL.GetNewsList(para.SelectSite, startTime, endTime, para.PageSize, para.PageNumber, statusList);
+
+                apiResult.Data = searchResult.NewsList;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

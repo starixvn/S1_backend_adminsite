@@ -54,7 +54,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
                 ErrorCode = 0,
-                Data = rebateManageBLL.GetTpGameTypeListbyCategory(gameTypeListReq.CategoryId)
+                Data = rebateManageBLL.GetTpGameTypeListByCategory(gameTypeListReq.CategoryId)
             };
             return apiResult;
         }

@@ -78,7 +78,7 @@ export default props => {
 
 	useEffect(() => {
 		if (!props.IsAdd) {
-			GetPromoCategories(true, -1, props.Datas.walletType);
+			GetPromoCategories(true, 1, props.Datas.walletType);
 		}
 	}, [props.Datas.walletType, props.IsAdd]);
 
@@ -304,11 +304,12 @@ export default props => {
 	};
 
 	const GetPromoCategories = (isInit, walletType, value) => {
-		if (walletType !== value) {
+		if (value==0) {walletType=2;}
+		else{walletType=1;}
 			let param = {
 				Url: "BonusManage/GetPromoCategories",
 				Data: qs.stringify({
-					WalletType: value
+					WalletType: walletType
 				})
 			};
 			WebAPI.PostData(param).then(res => {
@@ -325,7 +326,7 @@ export default props => {
 					}
 				}
 			});
-		}
+		
 	};
 
 	const SelectTpId = (value, dataColumn, mainKey, oIdx) => {

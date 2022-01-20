@@ -16,9 +16,9 @@ namespace BackendSite.Service.BLL
         {
             return domainTableService.GetDomainList(selectSite, currency);
         }
-        public IEnumerable<DomainTable> GetDomainListbySite(int siteId, int currency)
+        public IEnumerable<DomainTable> GetDomainListBySite(int siteId, int currency)
         {
-            return domainTableService.GetDomainListbySite(siteId, currency);
+            return domainTableService.GetDomainListBySite(siteId, currency);
         }
         public int SetDomain(int siteId, int currencyId, string domain, int status, int sort, string lastUpdateUser)
         {

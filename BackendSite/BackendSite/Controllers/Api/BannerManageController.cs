@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using BackendSite.Controllers.ApiV2.CMS.Setting;
 
 namespace BackendSite.Controllers.Api
 {
@@ -39,8 +40,30 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
+                var req = new BannerController.SetBannerReq
+                {
+                    SiteId = bannerInfo.SiteId,
+                    BannerName = bannerInfo.BannerName,
+                    BannerType = bannerInfo.BannerType,
+                    ActionMode = bannerInfo.ActionMode,
+                    ShowStatus = bannerInfo.ShowStatus,
+                    UnixStartTime = bannerInfo.UnixStartTime,
+                    UnixEndTime = bannerInfo.UnixEndTime,
+                    BonusCode = bannerInfo.BonusCode,
+                    MatchId = bannerInfo.MatchId,
+                    TpId = bannerInfo.TpId,
+                    GameId = bannerInfo.GameId,
+                    UrlRouter = bannerInfo.UrlRouter,
+                    UnixSportBattleDateTime = bannerInfo.UnixSportBattleDateTime,
+                    SportCategoryId = bannerInfo.SportCategoryId,
+                    SportLeaguesId = bannerInfo.SportLeaguesId,
+                    SportTeamsId = bannerInfo.SportTeamsId,
+                    Specific = bannerInfo.Specific,
+                    Sort = bannerInfo.Sort,
+                    SiteName = bannerInfo.SiteName
+                };
                 var user = authorizeBLL.GetAuthData().UserName;
-                var errorCode = bannerManageBLL.SetBanner(bannerInfo, user);
+                var errorCode = bannerManageBLL.SetBanner(req, user);
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1 ? "The Banner Name setting already exists which with same Site." : "";
             }

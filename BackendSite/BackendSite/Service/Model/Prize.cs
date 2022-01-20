@@ -11,11 +11,10 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SelectSite { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }
-        public int CurrencyId { get; set; }
+        public IEnumerable<int> CurrencyId { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
-        public string EventName { get; set; }
-
+        public IEnumerable<string> EventName { get; set; }
         public PrizeSelect()
         {
             //PageSize預設10
@@ -23,6 +22,24 @@ namespace BackendSite.Service.Model
                 PageSize = 10;
         }
     }
+
+    public class PrizeSelectV1
+    {
+        public IEnumerable<int> SelectSite { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public int CurrencyId { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public string EventName { get; set; }
+        public PrizeSelectV1()
+        {
+            //PageSize預設10
+            if (PageSize == 0)
+                PageSize = 10;
+        }
+    }
+
     public class PrizeLogPara
     {
         public int PageNumber { get; set; }
@@ -59,7 +76,7 @@ namespace BackendSite.Service.Model
     public class PrizeLogData
     {
         public string UserName { get; set; }
-        public DateTime DrawTime { get; set; }
+        public DateTimeOffset DrawTime { get; set; }
     }
     public class PrizeSearchResult
     {

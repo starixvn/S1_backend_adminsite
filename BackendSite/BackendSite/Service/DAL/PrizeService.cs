@@ -26,91 +26,105 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect)
+        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect, int timeZone)
         {
-            var SearchResult = new PrizeSearchResult();
+            var searchResult = new PrizeSearchResult();
             var tempCurrencyTotalAmount = new List<string>();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
+            var startDate = new DateTimeOffset(Convert.ToDateTime(prizeSelect.StartDate), TimeSpan.FromHours(timeZone)).ToUniversalTime();
+            var endDate = new DateTimeOffset(Convert.ToDateTime(prizeSelect.EndDate), TimeSpan.FromHours(timeZone)).ToUniversalTime().AddHours(24).AddMilliseconds(-1);
 
-            props.Add("PageSize", prizeSelect.PageSize);
-            props.Add("StartDate", prizeSelect.StartDate);
-            props.Add("EndDate", prizeSelect.EndDate);
-            props.Add("SelectSite", prizeSelect.SelectSite != null ? prizeSelect.SelectSite.Any()? JsonConvert.SerializeObject(prizeSelect.SelectSite) :null: null);
-            props.Add("CurrencyId", prizeSelect.CurrencyId);
-            props.Add("EventName", string.IsNullOrWhiteSpace(prizeSelect.EventName.Trim()) ? null : prizeSelect.EventName);
+            props.Add("_StartDate", startDate.DateTime);
+            props.Add("_EndDate", endDate.DateTime);
+            props.Add("_SiteIds", JsonConvert.SerializeObject(prizeSelect.SelectSite));
+            props.Add("_CurrencyIds", JsonConvert.SerializeObject(prizeSelect.CurrencyId));
+            props.Add("_EventNames", JsonConvert.SerializeObject(prizeSelect.EventName));
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_DrawPrizeTotalAmount_Get", props, commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
+            
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DrawPrizeTotalAmount_Get_V4", props).ToList();
+            if (currencyTotalAmount.Count > 0)
             {
-                CurrencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.ForEach(x =>
                 {
                     tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
             }
-            SearchResult.CurrencyAmount = tempCurrencyTotalAmount;
+            searchResult.CurrencyAmount = tempCurrencyTotalAmount;
+
             #endregion
 
-            props.Add("PageNumber", prizeSelect.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = conn.Query<DrawPrize>("Admin_DrawPrize_GetV2", props, commandType: CommandType.StoredProcedure);
+            props.Add("_PageSize", Math.Abs(prizeSelect.PageSize));
+            props.Add("_TimeZone", TransferToTimeZoneFormat(timeZone));
+            props.Add("_StartIndex", (Math.Abs(prizeSelect.PageNumber) - 1) * Math.Abs(prizeSelect.PageSize),DbType.Int32, ParameterDirection.Input);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            SearchResult.DrawPrize = result.ToList();
-            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
-
+            var result = _reportDbClient.Query<DrawPrize>("Admin_DrawPrize_Get_V4", props);
             
-
-
-            return SearchResult;
+            searchResult.DrawPrize = result.ToList();
+            searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
+            
+            return searchResult;
         }
 
-        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
+        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara,int timeZone)
         {
-            var LogResult = new PrizeLogResult();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var logResult = new PrizeLogResult();
+            var eventTime = new DateTimeOffset(Convert.ToDateTime(prizeLogPara.EventTime), TimeSpan.FromHours(timeZone)).ToUniversalTime();
+            
             var props = new DynamicParameters();
-            props.Add("PageNumber", prizeLogPara.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", prizeLogPara.PageSize);
-            props.Add("EventId", prizeLogPara.EventId);
-            props.Add("PrizeId", prizeLogPara.PrizeId);
-            props.Add("EventTime", prizeLogPara.EventTime);
-            props.Add("PrizeName", prizeLogPara.PrizeName);
+            props.Add("_EventId", prizeLogPara.EventId);
+            props.Add("_PrizeId", prizeLogPara.PrizeId);
+            props.Add("_EventTime", eventTime.Date);
+            props.Add("_PrizeName", prizeLogPara.PrizeName);
 
-            var result = conn.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_GetV2", props, commandType: CommandType.StoredProcedure);
-            LogResult.PrizeLogData = result.ToList();
-            LogResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            LogResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            LogResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+            props.Add("_StartIndex", (Math.Abs(prizeLogPara.PageNumber) - 1) * Math.Abs(prizeLogPara.PageSize), DbType.Int32, ParameterDirection.Input);
+            props.Add("_PageSize", Math.Abs(prizeLogPara.PageSize));
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            return LogResult;
+            var result = _reportDbClient.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get_V4", props);
+            logResult.PrizeLogData = result.ToList();
+            logResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            logResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return logResult;
         }
 
         public IEnumerable<EventDraw> GetEventName()
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<EventDraw>("Admin_EventDraw_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<EventDraw>("Admin_EventDraw_Get");
         }
 
-        public IEnumerable<DrawPrizeExcelData> GetExportData(IEnumerable<int> SelectSite, string StartDate, string EndDate, int CurrencyId, string EventName)
+        public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, string currencyId, string eventName, int timeZone)
         {
+            var startTime = new DateTimeOffset(Convert.ToDateTime(startDate), TimeSpan.FromHours(timeZone)).ToUniversalTime();
+            var endTime = new DateTimeOffset(Convert.ToDateTime(endDate), TimeSpan.FromHours(timeZone)).ToUniversalTime().AddHours(24).AddMilliseconds(-1);
+            
             var props = new DynamicParameters();
-            props.Add("StartDate", StartDate);
-            props.Add("EndDate", EndDate);
-            props.Add("SelectSite", SelectSite != null ? SelectSite.Any() ? JsonConvert.SerializeObject(SelectSite) : null : null);
-            props.Add("CurrencyId", CurrencyId);
-            props.Add("EventName", string.IsNullOrWhiteSpace(EventName) ? null : EventName);
+            props.Add("_TimeZone", TransferToTimeZoneFormat(timeZone));
+            props.Add("_StartDate", startTime.DateTime);
+            props.Add("_EndDate", endTime.DateTime);
+            props.Add("_SiteIds", selectSite);
+            props.Add("_CurrencyIds", currencyId);
+            props.Add("_EventNames", eventName);
 
-            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get", props);
+            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get_V3", props);
 
+        }
+        
+        private string TransferToTimeZoneFormat(int timeZone)
+        {
+            if (Math.Sign(timeZone) > 0 || Math.Sign(timeZone) == 0)
+            {
+                return string.Format("+" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+            else 
+            {
+                return string.Format("-" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
         }
     }
 }
