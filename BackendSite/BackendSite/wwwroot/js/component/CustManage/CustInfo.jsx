@@ -2607,9 +2607,9 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
 
             let authSubKeys = {
-                10: 'ca_resetpwd',
-                12: 'ca_personalMsg',
-                13: 'ca_turnoverReport'
+                11: 'ca_resetpwd',
+                13: 'ca_personalMsg',
+                14: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {
