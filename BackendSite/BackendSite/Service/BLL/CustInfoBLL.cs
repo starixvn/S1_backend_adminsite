@@ -726,5 +726,10 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
+
+        public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
+        {
+            return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
+        }
     }
 }
