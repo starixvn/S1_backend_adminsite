@@ -2539,11 +2539,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region  CSD > Customer Administration > CustInfo > GetWithdrawalLimitLog
-        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq withdrawalLimitLogReq)
+
+        /// <summary>
+        /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(WithdrawalLimitLogReq request)
         {
             ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
 
-            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(withdrawalLimitLogReq.CustId, withdrawalLimitLogReq.StartDate.DateTime, withdrawalLimitLogReq.EndDate.DateTime, withdrawalLimitLogReq.PageNumber, withdrawalLimitLogReq.PageSize);
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, request.PageNumber, request.PageSize);
             result.Data = SearchResult.WithdrawalLimitLogList;
             result.PageNumber = SearchResult.PageNumber;
             result.RowCount = SearchResult.RowCount;
