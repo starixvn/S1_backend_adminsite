@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using Amazon.S3.Model.Internal.MarshallTransformations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -726,7 +727,14 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
-
+        public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
+        {
+            return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
+        }
+        public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
+        {
+            return await _custInfoService.GetCustInfoBySite(siteId, currencyId, status);
+        }
         public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
