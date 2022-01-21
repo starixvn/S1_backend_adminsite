@@ -121,7 +121,7 @@ namespace BackendSite.Service.DAL
         public DepositRequest GetDepositRequest(int depositId, int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V2", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
+            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V3", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)

@@ -46,13 +46,16 @@ namespace BackendSite.Service.DAL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
-            int? affId,
+            string affCode,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount,
@@ -62,8 +65,7 @@ namespace BackendSite.Service.DAL
             var jsonSelectSite = string.Empty;
             var jsonSelectCurrency = string.Empty;
             var jsonSelectStatus = string.Empty;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -85,17 +87,16 @@ namespace BackendSite.Service.DAL
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
+            if (selectTag != null && selectTag.Any() )
+            {
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
+            }
+            else
+            {
+                jsonSelectTagList = null;
+            }
             totalPages = 0;
-
-            if (startDate != null)
-            {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
-            }
-
-            if (endDate != null)
-            {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
-            }
+            
 
             var p = new DynamicParameters(new
             {
@@ -110,21 +111,24 @@ namespace BackendSite.Service.DAL
                 TpUserName = tpUserName,
                 Email = email,
                 PhoneNo = phoneNo,
-                StartDate = startDateParam,
-                EndDate = endDateParam,
+                StartDate = startDate,
+                EndDate = endDate,
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
-                AffId = affId,
+                AffCode = affCode,
                 CurrncyList = currencyList,
                 BankAccountNumber = bankAccountNumber,
-                SelectStatus = jsonSelectStatus
+                SelectStatus = jsonSelectStatus,
+                SelectTagList = jsonSelectTagList
             });
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V7", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -145,7 +149,7 @@ namespace BackendSite.Service.DAL
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
             string siteList,
-            int? AffId,
+            string AffCode,
             IEnumerable<int> selectCurrency,
             string BankAccountNumber,
             string currncyList,
@@ -188,10 +192,10 @@ namespace BackendSite.Service.DAL
                 endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
             }
 
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffId, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffCode = AffCode, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V5", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V6", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -203,8 +207,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V7", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V7", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -706,7 +709,6 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
         {
             var p = new DynamicParameters();
@@ -715,7 +717,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
         }
-        
+
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             var p = new DynamicParameters();
@@ -723,6 +725,28 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", currencyId);
             p.Add("_Status", status);
             return await _mainDbClient.QueryAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoBySite_Get", p);
+        }
+
+        public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
+        {
+            var WithdrawalLimitLogData = new WithdrawalLimitLogData();
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId, DbType.Int32);
+            parameter.Add("StartDate", DateTimeOffset.Parse(StartDate.ToString()).DateTime, DbType.DateTime);
+            parameter.Add("EndDate", DateTimeOffset.Parse(EndDate.ToString()).DateTime, DbType.DateTime);
+            parameter.Add("PageNumber", Math.Abs(PageNumber), dbType: DbType.Int32);
+            parameter.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),dbType: DbType.Int32);
+            parameter.Add("PageSize", Math.Abs(PageSize), DbType.Int32);
+            parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var data = _reportDbClient.Query<WithdrawalLimitLog>("Admin_WithdrawalLimitLog_Get", parameter).ToList();
+
+            WithdrawalLimitLogData.WithdrawalLimitLogList = data;
+            WithdrawalLimitLogData.TotalPages = parameter.Get<int?>("TotalPages") ?? 0;
+            WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
+
+            return WithdrawalLimitLogData;
         }
     }
 }

@@ -18,13 +18,24 @@ const Result = (props) => {
             <tr key={`result-${dIdx}`}>
               <td>{d.bonusId}</td>
               <td>{d.bonusCode}</td>
-              <td>{d.description}-{d.atPage == 0 ? "Promotion page":"Deposit page"}</td>
+              <td>
+                {d.description}-
+                {d.atPage == 0 ? "Promotion page" : "Deposit page"}
+              </td>
               <td>{number_format(d.bonusAmount)}</td>
               <td>{number_format(d.lockedAmount)}</td>
               <td>{number_format(d.custRollOver.rollOver)}</td>
               <td>{number_format(d.custRollOver.turnOver)}</td>
+              <td>{number_format(d.cancelBonusAmount)}</td>
               <td>{moment(d.claimDate).format("l LTS")}</td>
-              <td>{BonusInfoStatus[d.bonusInfoStatus]}{d.bonusInfoStatus == 1 ? "" : "-"}{d.bonusInfoStatus == 1 ? "" : moment(d.updateTime).format("l LTS")}</td>
+              <td>
+                {BonusInfoStatus[d.bonusInfoStatus]}
+                {d.bonusInfoStatus == 1 ? "" : "-"}
+                {d.bonusInfoStatus == 1
+                  ? ""
+                  : moment(d.updateTime).format("l LTS")}
+              </td>
+              <td>{d.expiredCancel ? "TRUE" : "FALSE"}</td>
               <td>
                 {d.bonusInfoStatus == 1 ? (
                   <button
@@ -52,8 +63,10 @@ const Result = (props) => {
               <th scope="col">Locked Amount</th>
               <th scope="col">Rollover</th>
               <th scope="col">Turnover</th>
+              <th scope="col">Cancel Bonus Amount</th>
               <th scope="col">ClaimDate (Adjusted to GMT+8)</th>
               <th scope="col">Status</th>
+              <th scope="col">Expired Cancel</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -64,7 +77,7 @@ const Result = (props) => {
             totalPages: props.PageInfo.totalPages,
             pageNumber: props.PageInfo.pageNumber,
             rowCount: props.PageInfo.rowCount,
-            currencyAmount: props.PageInfo.currencyAmount
+            currencyAmount: props.PageInfo.currencyAmount,
           }}
           ChangePage={props.ChangePage}
         />

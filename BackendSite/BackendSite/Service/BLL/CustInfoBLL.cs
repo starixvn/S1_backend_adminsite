@@ -96,13 +96,16 @@ namespace BackendSite.Service.BLL
             string tpUserName,
             string email,
             string phoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
             int pageSize,
-            int? affId,
+            string affCode,
             IEnumerable<int> selectCurrency,
             string bankAccountNumber,
             IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag,
             ref int pageNumber,
             out int totalPages,
             out int rowCount)
@@ -114,7 +117,7 @@ namespace BackendSite.Service.BLL
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate, pageSize, affId, selectCurrency, bankAccountNumber, selectStatus, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate, pageSize, affCode, selectCurrency, bankAccountNumber, selectStatus, selectTag,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
             if (custInfoList.Count > 0)
             {
                 custInfoList.ForEach(x =>
@@ -122,6 +125,12 @@ namespace BackendSite.Service.BLL
                     x.ITagList = string.IsNullOrWhiteSpace(x.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(x.TagList);
                 });
             }
+
+            // if (selectTag.Any())
+            // {
+            //     custInfoList.RemoveAll(item => !item.ITagList.Any(selectTag.Contains));
+            // }
+            
             return custInfoList;
         }
 
@@ -138,7 +147,7 @@ namespace BackendSite.Service.BLL
             string PhoneNo,
             DateTimeOffset? startDate,
             DateTimeOffset? endDate,
-            int? AffId,
+            string AffCode,
             IEnumerable<int> selectCurrency,
             string BankAccountNumber,
             IEnumerable<int> selectStatus)
@@ -151,7 +160,7 @@ namespace BackendSite.Service.BLL
                 currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffId, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()), selectStatus);
+            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffCode, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()), selectStatus);
 
 
             return result;
@@ -718,15 +727,17 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
-
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
         {
             return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
         }
-
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             return await _custInfoService.GetCustInfoBySite(siteId, currencyId, status);
+        }
+        public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
+        {
+            return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
         }
     }
 }
