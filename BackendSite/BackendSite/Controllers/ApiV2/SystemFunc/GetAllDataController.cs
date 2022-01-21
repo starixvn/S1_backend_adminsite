@@ -249,25 +249,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
-        //[HttpPost]
-        //public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
-        //{
-        //    var apiResult = new ApiResult<IEnumerable<TpGameType>>();
-
-        //    try
-        //    {
-        //        apiResult.Data = _bonusManageBll.GetTpGameList();
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //        apiResult.RawMessage = ex.ToString();
-        //    }
-
-        //    return apiResult;
-        //}
-
         /// <summary>
         /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
         /// </summary>

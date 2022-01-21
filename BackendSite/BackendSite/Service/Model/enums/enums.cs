@@ -576,18 +576,6 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    //public enum TpCategory
-    //{
-    //    Sports = 1,
-    //    Casino = 2,
-    //    LiveCasino = 3,
-    //    Fishing = 4,
-    //    Cockfighting = 5,
-    //    Lottery = 6,
-    //    VirtualSports = 7,
-    //    Poker = 8,
-    //}
-
     public enum SettlementType
     {
         UnSettled = 0,
@@ -666,6 +654,42 @@ namespace BackendSite.Service.Model.enums
         Daily = 1,
         Weekly = 2,
         Monthly = 3
+    }
+
+    #endregion
+
+    #region Banner
+
+    public enum BannerTypeEnum
+    {
+        Promotions = 1,
+        HotEvent = 2,
+        Slots = 3,
+        LiveCasino = 4,
+        Fishing = 5,
+        Lottery = 6
+    }
+
+    public enum BannerActionModeEnum
+    {
+        GoToGame = 1,
+        GoToBonus = 2,
+        OpenWindow = 3,
+        RedirectPage = 4,
+        NoAction = 5
+    }
+
+    public enum ShowStatusEnum
+    {
+        NoLogin = 1,
+        Login = 2,
+        Both = 3
+    }
+
+    public enum BannerStatusEnum
+    {
+        Close = 0,
+        Open = 1
     }
 
     #endregion
