@@ -1225,10 +1225,10 @@ namespace BackendSite.Controllers.Api
             var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(siteIds);
 
             var exportData = _reportBLL.GetUserOnlineReport(siteIds, selectDate, 8);
-
+            
             var totalMaxCount = exportData.GroupBy(x => new
             {
-                LocalTime = x.LocalTime
+                x.LocalTime
             }).Select(x => x.Sum(y => y.MaxCount)).Max();
 
             var serverData = _reportBLL.GetServer();
@@ -1245,34 +1245,67 @@ namespace BackendSite.Controllers.Api
 
             #region Set Title(Merge Title & Title & Total Title & Not Summary Title)
 
-            #region Merge Title
+            #region IsRemoveOld Logic
 
+            var isRemoveOld = exportData.Where(x => x.DeviceType == (short) DeviceId.Old)
+                .All(x => x.MaxCount == 0);
+            var deviceIdCount  = Enum.GetNames(typeof(DeviceId)).Length;
+            var deviceIdList = Enum.GetValues(typeof(DeviceId)).Cast<DeviceId>().ToList();
+            
+            if (isRemoveOld)
+            {
+                deviceIdCount -= 1;
+                deviceIdList.Remove(DeviceId.Old);
+            }
+
+            #endregion
+            
+            #region Merge Title
+            
+            // row 1
             var mergeTitles = new Dictionary<string, MergeTitleModel>
             {
                 {"Date", new MergeTitleModel {Name = selectDate, MergeRange = 1}},
-                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange = siteList.Count() + 1}}
+                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange =  (siteList.Count() * (deviceIdCount +1 )) }}
+            };
+            
+            // row 2
+            var mergeDeviceTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Site", new MergeTitleModel {Name = "Site", MergeRange = 1}}
             };
 
+            foreach (var site in siteList)
+            {
+                var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                var onlinePropName = $"Online-{siteName}";
+                mergeDeviceTitles.Add(onlinePropName, new MergeTitleModel { Name = siteName, MergeRange = deviceIdCount + 1});
+            }
+            
             titlesToMerge.Add(mergeTitles);
-
+            titlesToMerge.Add(mergeDeviceTitles);
+            
             #endregion
 
             #region Title
 
             titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
             titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
-
+            
             foreach (var site in siteList)
             {
                 var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
-
-                var onlinePropName = $"Online-{siteName}";
-
-                var onlineSortId = 100 + site;
-
-                titles.Add(onlinePropName, new TitleModel { Name = siteName, SortId = onlineSortId });
+                foreach (var id in deviceIdList)
+                {
+                    var onlinePropName = $"Online-{siteName}-{(short)id}";
+                    var onlineSortId = 100 + (site*10) +(int) id;
+                    titles.Add(onlinePropName, new TitleModel { Name = id.ToString(), SortId = onlineSortId });
+                }
+                var onlinePropNameSummary = $"Online-{siteName}-Summary";
+                var onlineSummarySortId = 100 + (site*10) + 5;
+                titles.Add(onlinePropNameSummary, new TitleModel { Name = "Site Total", SortId = onlineSummarySortId });
             }
-
+            
             #endregion
 
             var totalTitle = new List<string>
@@ -1287,11 +1320,12 @@ namespace BackendSite.Controllers.Api
             };
 
             #endregion
-
+            
             foreach (var item in exportData)
             {
-                var onlinePropName = $"Online-{item.SiteName}";
-
+                var onlinePropName = $"Online-{item.SiteName}-{item.DeviceType}";
+                var onlineSitePropName = $"Online-{item.SiteName}-Summary";
+                
                 var getKey = $"{item.LocalTime}";
                 var getItem = content.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
@@ -1299,8 +1333,8 @@ namespace BackendSite.Controllers.Api
 
                 if (getItem != null)
                 {
-                    getItem.TryGetValue("TotalOnline", out var totalCountdata);
-                    getItem["TotalOnline"] = (int)totalCountdata + item.MaxCount;
+                    getItem.TryGetValue("TotalOnline", out var totalCountData);
+                    getItem["TotalOnline"] = (int)totalCountData + item.MaxCount;
 
                     if (getItem.ContainsKey(onlinePropName))
                     {
@@ -1312,6 +1346,17 @@ namespace BackendSite.Controllers.Api
                         getItem.Add(onlinePropName, item.MaxCount);
                     }
 
+                    if (getItem.ContainsKey(onlineSitePropName))
+                    {
+                        getItem.TryGetValue(onlineSitePropName, out var maxCountData);
+                        getItem[onlineSitePropName] = (int)maxCountData + item.MaxCount;
+                    }
+                    else
+                    {
+                        getItem.Add(onlineSitePropName, item.MaxCount);
+                    }
+                    
+                    
                     if (getItem["TotalOnline"] == totalMaxCount)
                     {
                         getItem["MaxCount"] = true;
@@ -1324,8 +1369,8 @@ namespace BackendSite.Controllers.Api
                     {
                         { "Key", getKey },
                         { "LocalTime", item.LocalTime },
-
                         { onlinePropName,  item.MaxCount },
+                        { onlineSitePropName,  item.MaxCount },
                         { "TotalOnline", item.MaxCount }
                     };
 
