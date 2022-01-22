@@ -154,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/TpMaintain" })]
-        public ApiResult UpdateTpMaintainAsync(UpdateTpMaintainReq req)
+        public ApiResult Update(UpdateTpMaintainReq req)
         {
             try
             {
@@ -321,28 +321,28 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// 
         /// Func Path：Venders maintenance 
         /// </remarks>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/TpMaintain" })]
-        public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeList()
-        {
-            try
-            {
-                return new ApiResult<IEnumerable<TpGameType>>
-                {
-                    Data = _tpMaintainBll.GetTpGameTypeList().OrderBy(i => i.Type),
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return new ApiResult<IEnumerable<TpGameType>>
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException,
-                    Message = ex.Message,
-                };
-            }
-        }
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/TpMaintain" })]
+        //public ApiResult<IEnumerable<TpGameType>> GetTpGameTypeList()
+        //{
+        //    try
+        //    {
+        //        return new ApiResult<IEnumerable<TpGameType>>
+        //        {
+        //            Data = _tpMaintainBll.GetTpGameTypeList().OrderBy(i => i.Type),
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, ex.Message);
+        //        return new ApiResult<IEnumerable<TpGameType>>
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.SystemException,
+        //            Message = ex.Message,
+        //        };
+        //    }
+        //}
 
         /// <summary>
         /// TpMaintenance/GetTpCategoryList 
@@ -352,28 +352,28 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// 
         /// Func Path：Venders maintenance 
         /// </remarks>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/TpMaintain" })]
-        public ApiResult<IEnumerable<TpCategory>> GetTpCategoryList()
-        {
-            try
-            {
-                return new ApiResult<IEnumerable<TpCategory>>
-                {
-                    Data = _tpMaintainBll.GetTPCategoryList(),
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return new ApiResult<IEnumerable<TpCategory>>
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException,
-                    Message = ex.Message,
-                };
-            }
-        }
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/TpMaintain" })]
+        //public ApiResult<IEnumerable<TpCategory>> GetTpCategoryList()
+        //{
+        //    try
+        //    {
+        //        return new ApiResult<IEnumerable<TpCategory>>
+        //        {
+        //            Data = _tpMaintainBll.GetTPCategoryList(),
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, ex.Message);
+        //        return new ApiResult<IEnumerable<TpCategory>>
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.SystemException,
+        //            Message = ex.Message,
+        //        };
+        //    }
+        //}
         
         #endregion
 

@@ -694,4 +694,21 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region AppLinkTable
+
+    public enum AppTypeEnum
+    {
+        Android = 1,
+        Ios = 2
+    }
+
+    public enum ProtocolTypeEnum
+    {
+        Http = 1,
+        Https = 2
+    }
+
+
+    #endregion
+
 }
