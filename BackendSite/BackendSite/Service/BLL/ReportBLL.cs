@@ -400,6 +400,7 @@ namespace BackendSite.Service.BLL
             var keyValuePairs = new Dictionary<string, UserOnlineReportModel>();
             string dateTimeFormat;
             var siteList = JsonConvert.DeserializeObject<List<int>>(siteIds);
+            var deviceIdList = Enum.GetValues(typeof(DeviceId)).Cast<DeviceId>();
             var serverInfoList = reportService.GetServerInfoList();
 
             var date = new DateTimeOffset(Convert.ToDateTime(selectDate), TimeSpan.FromHours(timeZone));
@@ -415,10 +416,12 @@ namespace BackendSite.Service.BLL
             {
                 dateTimeFormat = data.Time.ToString("HH:00");
                 var userOnlineReportModel = new UserOnlineReportModel();
-                keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}", userOnlineReportModel);
+                keyValuePairs.Add($"{dateTimeFormat}_{data.SiteId}_{data.DeviceType}", userOnlineReportModel);
                 userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{data.Time.AddHours(1).ToString("HH:00")}";
                 userOnlineReportModel.SiteId = data.SiteId;
+                userOnlineReportModel.DeviceType = data.DeviceType;
                 userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == data.SiteId).Select(x => x.SiteName).FirstOrDefault();
+                userOnlineReportModel.DeviceName = Enum.GetName(typeof(DeviceId), data.DeviceType);
                 userOnlineReportModel.MaxCount = data.MaxCount;
             }
 
@@ -432,18 +435,34 @@ namespace BackendSite.Service.BLL
                 {
                     dateTimeFormat = Convert.ToDateTime(selectDate).AddHours(i).ToString("HH:00");
 
-                    if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}"))
+                    foreach (var id in deviceIdList)
                     {
-                        var userOnlineReportModel = new UserOnlineReportModel();
-                        keyValuePairs.Add($"{dateTimeFormat}_{site}", userOnlineReportModel);
-                        userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
-                        userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
-                        userOnlineReportModel.SiteId = site;
+                        if (!keyValuePairs.ContainsKey($"{dateTimeFormat}_{site}_{(short)id}"))
+                        {
+                            var userOnlineReportModel = new UserOnlineReportModel();
+                            keyValuePairs.Add($"{dateTimeFormat}_{site}_{id}", userOnlineReportModel);
+                            userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
+                            userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                            userOnlineReportModel.SiteId = site;
+                            userOnlineReportModel.DeviceType = (short) id;
+                            userOnlineReportModel.DeviceName = Enum.GetName(typeof(DeviceId), id);
+                        }
                     }
                 }
             }
 
             #endregion
+
+            // 不顯示Old登入次數
+            var oldList = keyValuePairs.Where(x => x.Value.DeviceType == (short) DeviceId.Old);
+            var isRemoveOld = oldList.All(x => x.Value.MaxCount == 0);
+            if (isRemoveOld)
+            {
+                foreach(var item in oldList)
+                {
+                    keyValuePairs.Remove(item.Key);
+                }
+            }
 
             return keyValuePairs
                 .Select(s => s.Value)

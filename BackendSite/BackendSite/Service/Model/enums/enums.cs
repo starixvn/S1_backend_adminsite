@@ -645,6 +645,14 @@ namespace BackendSite.Service.Model.enums
         SMS = 0,
         Email = 1
     }
+    
+    public enum DeviceId
+    {
+        Old = 0,
+        Desktop = 1,
+        H5 = 2,
+        APP = 3
+    }
 
     #region BankDetailOff
 
