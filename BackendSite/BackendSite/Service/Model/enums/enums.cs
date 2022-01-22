@@ -708,6 +708,15 @@ namespace BackendSite.Service.Model.enums
         Https = 2
     }
 
+    #endregion
+
+    #region DomainTable
+
+    public enum DomainTableStatusEnum
+    {
+        Close = 0,
+        Open = 1
+    }
 
     #endregion
 
