@@ -65,7 +65,7 @@ const CryptoWithdrawalLimitInfo = () => {
 
   useEffect(() => {
     let param = {
-      Url: "apiV2/WithdrawalLimitCrypto/GetCryptoInfoData",
+      Url: "apiV2/GetAllData/GetCryptoInfoData",
     };
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {

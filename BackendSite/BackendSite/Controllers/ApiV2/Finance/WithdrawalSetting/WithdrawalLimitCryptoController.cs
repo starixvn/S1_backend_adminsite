@@ -202,25 +202,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             return new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_Fail"));
         }
 
-        /// <summary>
-        /// WithdrawalLimitCrypto 取得加密貨幣資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
-        /// </remarks>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        [HttpPost]
-        public ApiResult<CryptoInfoData> GetCryptoInfoData()
-        {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
-
-            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
-        }
-
         #endregion
     }
 }
