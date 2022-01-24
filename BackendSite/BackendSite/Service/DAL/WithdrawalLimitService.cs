@@ -289,9 +289,16 @@ namespace BackendSite.Service.DAL
             }
 
             var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
             tran.Commit();
 
-            return result;
+            return true;
         }
 
         public CryptoWithdrawalLimitInfoManage GetCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
@@ -340,9 +347,16 @@ namespace BackendSite.Service.DAL
             }
 
             var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
             tran.Commit();
 
-            return result;
+            return true;
         }
 
         public bool EditCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
@@ -380,9 +394,16 @@ namespace BackendSite.Service.DAL
             }
 
             var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
             tran.Commit();
 
-            return result;
+            return true;
         }
 
         public IEnumerable<CryptoInfo> GetCryptoInfoList()
