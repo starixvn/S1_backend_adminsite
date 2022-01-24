@@ -528,6 +528,12 @@ namespace BackendSite.Service.Model.enums
         ManualBonus = 6
     }
 
+    public enum VerificationType
+    {
+        SMS = 0,
+        Email = 1
+    }
+
     #region BankDetailOff
 
     public enum BankDetailOffStatusEnum

@@ -213,6 +213,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
+            private DateTimeOffset _tagStartDate;
+            private DateTimeOffset _tagEndDate;
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset? StartDate
@@ -233,6 +235,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
+            public DateTimeOffset? TagStartDate
+            {
+                get => _tagStartDate;
+                set
+                {
+                    if (value != null)
+                        _tagStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? TagEndDate
+            {
+                get => _tagEndDate;
+                set
+                {
+                    if (value != null)
+                        _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -243,9 +263,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
         }
 
         public class CustIdWithReasonRequest : CustIdRequest
@@ -330,7 +351,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string EMail { get; set; }
         }
-
+        public class VerificationRewardReq
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// OTPType (0=SMS, 1=Email)
+            /// </summary>
+            public int OTPType { get; set; }
+        }
         public class AddCustNoteRequest : CustIdRequest
         {
             public string Note { get; set; }
@@ -443,6 +474,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
 
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
@@ -458,11 +491,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PhoneNo?.Trim(),
                 startDate,
                 endDate,
+                tagStartDate,
+                tagEndDate,
                 request.PageSize,
-                request.AffId,
+                request.AffCode,
                 request.CurrencyIds,
                 request.BankAccountNumber?.Trim(),
                 request.Statuses,
+                request.SelectTag,
                 ref pageNumber,
                 out var totalPages,
                 out var rowCount);
@@ -513,7 +549,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    request.AffId,
+                                                                    request.AffCode,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
                                                                     request.Statuses);
@@ -685,7 +721,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Message = "Update Success."
             };
         }
+        /// <summary>
+        /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <param name="verificationRewardReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
 
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+
+            return apiResult;
+        }
         /// <summary>
         /// CustomerManage/SetCustInfo 設定客戶資料(等級、全名；生日(年月日)、電話、Email)
         /// </summary>
@@ -2357,6 +2406,35 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        #endregion
+
+        #region  CSD > Customer Administration > CustInfo > GetWithdrawalLimitLog
+
+        /// <summary>
+        /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
+        [HttpPost]
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
+        {
+            ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
+
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, request.PageNumber, request.PageSize);
+            result.Data = SearchResult.WithdrawalLimitLogList;
+            result.PageNumber = SearchResult.PageNumber;
+            result.RowCount = SearchResult.RowCount;
+            result.TotalPages = SearchResult.TotalPages;
+            result.ErrorCode = 0;
+
+            return result;
+        }
         #endregion
 
         #region Private Methods
