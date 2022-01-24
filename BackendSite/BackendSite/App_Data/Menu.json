@@ -351,10 +351,10 @@
       },
       {
         "Key": "USDTWithdrawalLimitManagement",
-        "Title": "USDT WithdrawalLimit Management",
+        "Title": "Crypto WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
         "Controller": "Finance",
-        "Action": "USDTWithdrawalLimitManagement",
+        "Action": "CryptoWithdrawalLimitManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
