@@ -46,12 +46,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
                     <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
-                    {
-                        (data.siteName == "Nova88") ?
-                            <td>{data.levelName}</td>
-                            :
-                            <td>{data.userLevel}</td>
-                    }
+                    <td>{data.levelName}</td>
                     <td>{data.userLevel}</td>
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
                     <td>{data.agent}</td>
