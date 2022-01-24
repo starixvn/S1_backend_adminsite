@@ -280,9 +280,15 @@ namespace BackendSite.Service.DAL
                 Operator = input.UpdateOperator
             };
 
-            conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure);
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V2", insParam, commandType: CommandType.StoredProcedure) > 0;
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
             tran.Commit();
 
             return result;
@@ -325,9 +331,15 @@ namespace BackendSite.Service.DAL
                 Operator = input.UpdateOperator
             };
 
-            conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure);
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", insParam, commandType: CommandType.StoredProcedure) > 0;
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
             tran.Commit();
 
             return result;
@@ -359,9 +371,15 @@ namespace BackendSite.Service.DAL
                 Operator = input.UpdateOperator
             };
 
-            conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure);
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V2", insParam, commandType: CommandType.StoredProcedure) > 0;
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
             tran.Commit();
 
             return result;
