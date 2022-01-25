@@ -29,7 +29,9 @@ import DateTimePicker from 'react-datetime';
         2: "Mobile Deposit",
         3: "Local Bank",
         4: "Crypto",
-        5: "Load Card"
+        5: "Load Card",
+        6: "QRPay",
+        7: "BankAutoChannel"
     };
     const StatusSelectOp = {
         1: "Pending",
