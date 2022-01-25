@@ -238,6 +238,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 EndDate: !this.state.EndDate ? null : this.state.EndDate,
                 TagStartDate: !this.state.TagStartDate ? null : this.state.TagStartDate,
                 TagEndDate: !this.state.TagEndDate ? null : this.state.TagEndDate,
+                StatusStartDate: !this.state.StatusStartDate ? null : this.state.StatusStartDate,
+                StatusEndDate: !this.state.StatusEndDate ? null : this.state.StatusEndDate,
                 BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
                 BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
                 BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
@@ -255,7 +257,6 @@ import * as Loading from '../commJS/Loading.jsx';
                 selectTag:!this.state.selectTag ? null : this.state.selectTag
             };
             
-
             let ExportParam = [];
             for (var prop in data) {
                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
