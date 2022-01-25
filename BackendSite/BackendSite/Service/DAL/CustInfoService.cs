@@ -144,26 +144,30 @@ namespace BackendSite.Service.DAL
             int? birMonth,
             int? birYear,
             string userName,
-            string AccountName,
-            string LoginIp,
+            string accountName,
+            string loginIp,
             string transId,
-            string TpUserName,
-            string Email,
-            string PhoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            string tpUserName,
+            string email,
+            string phoneNo,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
+            DateTime? statusStartDate,
+            DateTime? statusEndDate,
             string siteList,
-            string AffCode,
+            string affCode,
             IEnumerable<int> selectCurrency,
-            string BankAccountNumber,
-            string currncyList,
-            IEnumerable<int> selectstatus)
+            string bankAccountNumber,
+            string currencyList,
+            IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag)
         {
             string SelectSite = null;
             string SelectCurrency = null;
             string SelectStatus = null;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -173,33 +177,56 @@ namespace BackendSite.Service.DAL
             {
                 SelectCurrency = JsonConvert.SerializeObject(selectCurrency);
             }
-            if (selectstatus != null)
+            if (selectStatus != null)
             {
-                if (selectstatus.ToList().Count == 0)
+                if (selectStatus.ToList().Count == 0)
                 {
                     var templist = new List<int>() { 1, 2, 3 };
                     SelectStatus = JsonConvert.SerializeObject(templist);
                 }
                 else
                 {
-                    SelectStatus = JsonConvert.SerializeObject(selectstatus);
+                    SelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
-
-            if (startDate != null)
+            if (selectTag != null && selectTag.Any() )
             {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
             }
-
-            if (endDate != null)
+            else
             {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
+                jsonSelectTagList = null;
             }
-
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffCode = AffCode, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+            
+            var p = new DynamicParameters(new { 
+                SelectSite,
+                BirDate = birDate, 
+                BirMonth = birMonth,
+                BirYear = birYear, 
+                UserName = userName, 
+                AccountName = accountName,
+                LoginIp = loginIp, 
+                TpUserName = tpUserName,
+                TransId = transId, 
+                Email = email, 
+                PhoneNo = phoneNo, 
+                StartDate = startDate,
+                EndDate = endDate, 
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate, 
+                StatusStartDate = statusStartDate,
+                StatusEndDate = statusEndDate,
+                SiteList = siteList, 
+                AffCode = affCode, 
+                BankAccountNumber = bankAccountNumber,
+                SelectCurrency = SelectCurrency, 
+                CurrncyList = currencyList, 
+                SelectStatus = SelectStatus,
+                SelectTagList = jsonSelectTagList
+            });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V6", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 

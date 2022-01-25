@@ -559,6 +559,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
 
             var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
                                                                     request.BirDate,
@@ -573,10 +577,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.PhoneNo,
                                                                     startDate,
                                                                     endDate,
+                                                                    tagStartDate,
+                                                                    tagEndDate,
+                                                                    statusStartDate,
+                                                                    statusEndDate,
                                                                     request.AffCode,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
-                                                                    request.Statuses);
+                                                                    request.Statuses,
+                                                                    request.SelectTag);
 
             var stream = _excelBll.Export(exportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");

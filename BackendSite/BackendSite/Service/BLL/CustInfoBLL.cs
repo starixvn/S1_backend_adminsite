@@ -135,28 +135,33 @@ namespace BackendSite.Service.BLL
             int? birMonth,
             int? birYear,
             string userName,
-            string AccountName,
-            string LoginIp,
+            string accountName,
+            string loginIp,
             string transId,
-            string TpUserName,
-            string Email,
-            string PhoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
-            string AffCode,
+            string tpUserName,
+            string email,
+            string phoneNo,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
+            DateTime? statusStartDate,
+            DateTime? statusEndDate,
+            string affCode,
             IEnumerable<int> selectCurrency,
-            string BankAccountNumber,
-            IEnumerable<int> selectStatus)
+            string bankAccountNumber,
+            IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
 
-            var currncyList = new List<int>();
+            var currencyList = new List<int>();
             _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x =>
             {
-                currncyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
+                currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, AccountName, LoginIp, transId, TpUserName, Email, PhoneNo, startDate, endDate, JsonConvert.SerializeObject(siteList), AffCode, selectCurrency, BankAccountNumber, JsonConvert.SerializeObject(currncyList.Select(x => x).Distinct().ToList()), selectStatus);
+            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
 
 
             return result;

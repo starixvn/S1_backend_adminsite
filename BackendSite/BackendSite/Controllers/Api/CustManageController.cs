@@ -408,63 +408,43 @@ namespace BackendSite.Controllers.Api
         /// 
         /// ***New Code For Frontend Team.
         /// </remarks>
-        /// <param name="custInfoReq"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
+        public IActionResult ExportCustInfoList(CustInfoListReq req)
         {
-            //List<int> selectSite = new List<int>();
-            //List<int> selectCurrency = new List<int>();
-            //List<int> selectStatus = new List<int>();
-            //if (custInfoReq.SelectSite != null)
-            //{
-            //    selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();
-            //}
-            //if (custInfoReq.SelectCurrency != null)
-            //{
-            //    selectCurrency = Array.ConvertAll<string, int>(custInfoReq.SelectCurrency.Split(','), s => int.Parse(s)).ToList();
-            //}
-            //if (custInfoReq.SelectStatus != null)
-            //{
-            //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
-            //}
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
 
-            DateTime? startDate = null;
-            DateTime? endDate = null;
 
-            if (custInfoReq.StartDate != null)
-            {
-                if (custInfoReq.StartDate > 2147483647)
-                    custInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.StartDate);
-            }
-
-            if (custInfoReq.EndDate != null)
-            {
-                if (custInfoReq.EndDate > 2147483647)
-                    custInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
-            }
-
-            var data = _custInfoBll.GetCustInfoExportList(custInfoReq.SelectSite,
-                                                                    custInfoReq.BirDate,
-                                                                    custInfoReq.BirMonth,
-                                                                    custInfoReq.BirYear,
-                                                                    custInfoReq.UserName,
-                                                                    custInfoReq.AccountName,
-                                                                    custInfoReq.LoginIp,
-                                                                    custInfoReq.TransId,
-                                                                    custInfoReq.TpUserName,
-                                                                    custInfoReq.Email,
-                                                                    custInfoReq.PhoneNo,
+            var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
+                                                                    req.BirDate,
+                                                                    req.BirMonth,
+                                                                    req.BirYear,
+                                                                    req.UserName,
+                                                                    req.AccountName,
+                                                                    req.LoginIp,
+                                                                    req.TransId,
+                                                                    req.TpUserName,
+                                                                    req.Email,
+                                                                    req.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffCode,
-                                                                    custInfoReq.SelectCurrency,
-                                                                    custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.SelectStatus);
+                                                                    tagStartDate,
+                                                                    tagEndDate,
+                                                                    statusStartDate,
+                                                                    statusEndDate,
+                                                                    req.AffCode,
+                                                                    req.SelectCurrency,
+                                                                    req.BankAccountNumber,
+                                                                    req.SelectStatus,
+                                                                    req.SelectTag);
 
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
