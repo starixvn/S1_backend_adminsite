@@ -215,6 +215,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _endDate;
             private DateTimeOffset _tagStartDate;
             private DateTimeOffset _tagEndDate;
+            private DateTimeOffset _statusStartDate;
+            private DateTimeOffset _statusEndDate;
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset? StartDate
@@ -251,6 +253,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     if (value != null)
                         _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? StatusStartDate
+            {
+                get => _statusStartDate;
+                set
+                {
+                    if (value != null)
+                        _statusStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? StatusEndDate
+            {
+                get => _statusEndDate;
+                set
+                {
+                    if (value != null)
+                        _statusEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
             public int? BirDate { get; set; }
@@ -531,7 +551,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
             var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
-
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
+            
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
                 request.BirDate,
@@ -548,6 +570,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 tagStartDate,
                 tagEndDate,
+                statusStartDate,
+                statusEndDate,
                 request.PageSize,
                 request.AffCode,
                 request.CurrencyIds,

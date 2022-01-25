@@ -49,6 +49,8 @@ namespace BackendSite.Service.DAL
             DateTime? endDate,
             DateTime? tagStartDate,
             DateTime? tagEndDate,
+            DateTime? statusStartDate,
+            DateTime? statusEndDate,
             int pageSize,
             string affCode,
             IEnumerable<int> selectCurrency,
@@ -113,7 +115,9 @@ namespace BackendSite.Service.DAL
                 StartDate = startDate,
                 EndDate = endDate,
                 TagStartDate = tagStartDate,
-                TagEndDate = tagEndDate,
+                TagEndDate = tagEndDate, 
+                StatusStartDate = statusStartDate,
+                StatusEndDate = statusEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
@@ -127,7 +131,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V9", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -345,7 +349,7 @@ namespace BackendSite.Service.DAL
         public bool SetCustStatus(int custId, int status)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustStatus_Set", new { CustId = custId, Status = status }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status }, commandType: CommandType.StoredProcedure) > 0;
         }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {

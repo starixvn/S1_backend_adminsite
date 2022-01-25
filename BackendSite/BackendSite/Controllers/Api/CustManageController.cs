@@ -79,6 +79,8 @@ namespace BackendSite.Controllers.Api
             public long? EndDate { get; set; }
             public long? TagStartDate { get; set; }
             public long? TagEndDate { get; set; }
+            public long? StatusStartDate { get; set; }
+            public long? StatusEndDate { get; set; }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -344,30 +346,13 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
-            DateTime? startDate = null;
-            DateTime? endDate = null;
-            DateTime? tagStartDate = null;
-            DateTime? tagEndDate = null;
-
-            if (req.StartDate != null)
-            {
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.StartDate);
-            }
-
-            if (req.EndDate != null)
-            {
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.EndDate);
-            }
-
-            if (req.TagStartDate != null)
-            {
-                tagStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagStartDate);
-            }
-
-            if (req.TagEndDate != null)
-            {
-                tagEndDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagEndDate);
-            }
+            
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
             
             var data = _custInfoBll.GetCustInfoList(req.SelectSite,
                                                    req.BirDate,
@@ -384,6 +369,8 @@ namespace BackendSite.Controllers.Api
                                                    endDate,
                                                    tagStartDate,
                                                    tagEndDate,
+                                                   statusStartDate,
+                                                   statusEndDate,
                                                    req.PageSize,
                                                    req.AffCode,
                                                    req.SelectCurrency,
