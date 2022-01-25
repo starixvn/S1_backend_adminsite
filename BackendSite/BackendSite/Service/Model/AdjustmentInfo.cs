@@ -39,6 +39,11 @@ namespace BackendSite.Service.Model
     {
         public int TransId { get; set; }
     }
+    public class SetVerificationReq
+    {
+        public int CustId { get; set; }
+        public int OTPType { get; set; }
+    }
 }
 
 

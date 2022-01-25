@@ -37,16 +37,16 @@ namespace BackendSite.Service.DAL
         public PromotionListData GetPromotionListByCustIdAndDate(int CustId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             var PromotionListData = new PromotionListData();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var tempCurrencyTotalAmount = new List<string>();
 
             var props = new DynamicParameters();
-            props.Add("CustId", CustId,DbType.Int32);
-            props.Add("StartDate", StartDate.DateTime, DbType.DateTime);
-            props.Add("EndDate", EndDate.DateTime, DbType.DateTime);
+            props.Add("_CustId", CustId, DbType.Int32);
+            props.Add("_StartDate", StartDate.DateTime, DbType.DateTime);
+            props.Add("_EndDate", EndDate.DateTime, DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V2", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -57,17 +57,16 @@ namespace BackendSite.Service.DAL
             PromotionListData.CurrencyAmount = tempCurrencyTotalAmount;
             #endregion
 
-            props.Add("PageNumber", PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", PageSize);
-            var result =  conn.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
+            props.Add("_StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize));
+            props.Add("_PageSize", Math.Abs(PageSize));
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V4", props, commandType: CommandType.StoredProcedure).ToList();
 
             PromotionListData.PromotionList = result;
-            PromotionListData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            PromotionListData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            PromotionListData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            PromotionListData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            PromotionListData.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return PromotionListData;
         }

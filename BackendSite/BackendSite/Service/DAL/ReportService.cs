@@ -219,5 +219,53 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
             return conn.Query<TpBetRecordDataModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
+
+        public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
+            out int totalPages,
+            out int rowCount)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _TpId = input.TpId,
+                    _FromTransTime = input.FromTransTime,
+                    _ToTransTime = input.ToTransTime,
+                    _UserName = input.UserName,
+                    _TransId = input.TransId,
+                    _PageSize = input.PageSize,
+                    _StartIndex = input.StartIndex
+                });
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var spName = "Admin_TpBetFailureRecord_Get";
+            var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+            rowCount = parameters.Get<int>("_RowCount");
+            totalPages = parameters.Get<int>("_TotalPages");
+
+            return result;
+        }
+
+        public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _TpId = input.TpId,
+                    _FromTransTime = input.FromTransTime,
+                    _ToTransTime = input.ToTransTime,
+                    _UserName = input.UserName,
+                    _TransId = input.TransId
+                });
+
+            var spName = "Admin_TpBetFailureRecordForExport_Get";
+            var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+          
+            return result;
+        }
     }
 }

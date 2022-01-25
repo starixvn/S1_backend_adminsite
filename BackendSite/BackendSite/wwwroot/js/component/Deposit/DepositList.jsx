@@ -29,7 +29,9 @@ import DateTimePicker from 'react-datetime';
         2: "Mobile Deposit",
         3: "Local Bank",
         4: "Crypto",
-        5: "Load Card"
+        5: "Load Card",
+        6: "QRPay",
+        7: "BankAutoChannel"
     };
     const StatusSelectOp = {
         1: "Pending",
@@ -76,7 +78,7 @@ import DateTimePicker from 'react-datetime';
         render() {
             let rows = this.props.searchData.data.map((row, idx) => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
-                let showbankname = (row.depositType === 1) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
+                let showbankname = (row.depositType === 1 || row.depositType === 7) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2 || row.depositType === 6) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
                 //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
                 let vipbg = (row.vipLevel === 1 ) ? "c6842c": (row.vipLevel === 2 ) ? "c0c0c0" : (row.vipLevel === 3 ) ? "ffd700" : (row.vipLevel === 4 ) ? "66CDAA" :　(row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
                 return (
@@ -440,6 +442,10 @@ import DateTimePicker from 'react-datetime';
                                 <td>{moment(data.createTime).format('l LTS')}</td>
                             </tr>
                             <tr>
+                                <th scope="row">ChannelName</th>
+                                <td>{data.channelName}</td>
+                            </tr>
+                            <tr>
                                 <th scope="row">Name of Bank</th>
                                 <td>{data.bankName}</td>
                             </tr>
@@ -516,7 +522,7 @@ import DateTimePicker from 'react-datetime';
 
     class DepositPanel extends React.Component {
         _myTimer;
-        _timeInterval = 30;
+        _timeInterval = 15;
         constructor(props) {
             super(props);
             this.selectdate_start = React.createRef();

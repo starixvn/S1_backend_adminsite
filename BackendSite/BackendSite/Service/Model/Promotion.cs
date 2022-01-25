@@ -45,6 +45,9 @@ namespace BackendSite.Service.Model
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public int AtPage { get; set; }
+
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
     }
     public class PromotionListData
     {

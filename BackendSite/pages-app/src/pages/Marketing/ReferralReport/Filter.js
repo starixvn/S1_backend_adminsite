@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import DateTimePicker from "react-datetime";
 
 const defCurrencyType = {
   2: "MYR",
@@ -33,6 +34,39 @@ const Panel = (props) => {
             dataColumn="SelectSite"
           />
         ) : null}
+          <DateTimePickerElem
+              columnTitle="From Date"
+              dateTimePickerProps={{
+                  defaultValue: props.filterInfo.StartDate,
+                  timeFormat: false,
+                  onBlur: (e) => {
+                      try {
+                          if(e === ""){
+                              props.onChange("", "StartDate");
+                          }else{
+                              props.onChange(moment(e).format("l"), "StartDate");
+                          }
+                          
+                      } catch (ex) {}
+                  },
+              }}
+          />
+          <DateTimePickerElem
+              columnTitle="To Date"
+              dateTimePickerProps={{
+                  defaultValue: props.filterInfo.EndDate,
+                  timeFormat: false,
+                  onBlur: (e) => {
+                      try {
+                          if(e === ""){
+                              props.onChange("", "EndDate");
+                          }else{
+                              props.onChange(moment(e).format("l"), "EndDate");
+                          }
+                      } catch (ex) {}
+                  },
+              }}
+          />
         <DropDownBox
           columnTitle="Currency"
           options={Object.keys(defCurrencyType).map((key) => {
@@ -47,7 +81,7 @@ const Panel = (props) => {
       <div className="row-flex">
         <InputField
           columnTitle="User"
-          defaultValue=""
+          defaultValue= {props.filterInfo.User}
           dataColumn="User"
           onChange={props.onChange}
         />
@@ -63,6 +97,15 @@ const Panel = (props) => {
       </div>
     </div>
   );
+};
+
+const DateTimePickerElem = (props) => {
+    return (
+        <div className="input-item">
+            <span className="label">{props.columnTitle}</span>
+            <DateTimePicker {...props.dateTimePickerProps} />
+        </div>
+    );
 };
 
 const CheckBoxElem = ({

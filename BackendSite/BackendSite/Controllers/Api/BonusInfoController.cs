@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using Microsoft.AspNetCore.Authorization;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -30,10 +31,23 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var PageSize = 10;
-                var TotalPages = 0;
-                var RowCount = 0;
-                var CurrencyAmount = new List<string>();
-                result.Data = bonusInfoBLL.GetBonusInfoReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, PageSize, BaseCurrencyId, RebateCategoriesId, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
+                result.Data = bonusInfoBLL.GetBonusInfoReport(
+                    SelectSite, 
+                    BonusCode, 
+                    TransId, 
+                    CurrencyId, 
+                    UserName, 
+                    PromotionType,
+                    DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime,
+                    DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime,
+                    PageSize, 
+                    BaseCurrencyId, 
+                    RebateCategoriesId,
+                    PageNumber, 
+                    out var TotalPages,
+                    out var RowCount,
+                    out var CurrencyAmount
+                );
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
@@ -54,7 +68,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, StartDate, EndDate, BaseCurrencyId, RebateCategoriesId);
+            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, BaseCurrencyId, RebateCategoriesId);
+            foreach (var data in ExportData)
+            {
+                data.ExpiryTime = new DateTimeOffset(data.ExpiryTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = excelBLL.Export(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

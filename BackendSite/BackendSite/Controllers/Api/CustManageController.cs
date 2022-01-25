@@ -76,6 +76,8 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectSite { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
+            public long? TagStartDate { get; set; }
+            public long? TagEndDate { get; set; }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -86,12 +88,13 @@ namespace BackendSite.Controllers.Api
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
             public IEnumerable<int> SelectCurrency { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> SelectStatus { get; set; }
+            public IEnumerable<int> SelectTag { get; set; }
         }
 
         public class CustStatusSwitch
@@ -247,12 +250,33 @@ namespace BackendSite.Controllers.Api
         }
         #endregion
 
+        public class GetWithdrawalLimitLogReq
+        {
+            public int CustId { get; set; }
+            public long StartDate { get; set; }
+            public long EndDate { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
         public class SetEnableDisableBonusPara
         {
             public int CustId { get; set; }
             public int EnablePromotion { get; set; }
         }
 
+        public class VerificationRewardReq
+        {
+            /// <summary>
+            /// 客戶ID
+            /// </summary>
+            public int CustId { get; set; }
+            /// <summary>
+            /// OTPType (0=SMS, 1=Email)
+            /// </summary>
+            public int OTPType { get; set; }
+        }
+        
         #region RegLiveStatus
         public class RegLiveStatusPara
         {
@@ -312,55 +336,63 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD >  Customer Administration > [Submit]
         /// 
         /// </remarks>
-        /// <param name="custInfoListReq"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq custInfoListReq)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
-            int totalPages = 0, rowCount = 0;
-            var pageNumber = custInfoListReq.PageNumber;
+            var pageNumber = req.PageNumber;
             DateTime? startDate = null;
             DateTime? endDate = null;
+            DateTime? tagStartDate = null;
+            DateTime? tagEndDate = null;
 
-            if (custInfoListReq.StartDate != null)
+            if (req.StartDate != null)
             {
-                if (custInfoListReq.StartDate > 2147483647)
-                    custInfoListReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.StartDate);
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.StartDate);
             }
 
-            if (custInfoListReq.EndDate != null)
+            if (req.EndDate != null)
             {
-                if (custInfoListReq.EndDate > 2147483647)
-                    custInfoListReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoListReq.EndDate);
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.EndDate);
             }
 
-            var data = _custInfoBll.GetCustInfoList(custInfoListReq.SelectSite,
-                                                   custInfoListReq.BirDate,
-                                                   custInfoListReq.BirMonth,
-                                                   custInfoListReq.BirYear,
-                                                   custInfoListReq.UserName?.Trim(),
-                                                   custInfoListReq.AccountName?.Trim(),
-                                                   custInfoListReq.LoginIp?.Trim(),
-                                                   custInfoListReq.TransId?.Trim(),
-                                                   custInfoListReq.TpUserName?.Trim(),
-                                                   custInfoListReq.Email?.Trim(),
-                                                   custInfoListReq.PhoneNo?.Trim(),
+            if (req.TagStartDate != null)
+            {
+                tagStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagStartDate);
+            }
+
+            if (req.TagEndDate != null)
+            {
+                tagEndDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagEndDate);
+            }
+            
+            var data = _custInfoBll.GetCustInfoList(req.SelectSite,
+                                                   req.BirDate,
+                                                   req.BirMonth,
+                                                   req.BirYear,
+                                                   req.UserName?.Trim(),
+                                                   req.AccountName?.Trim(),
+                                                   req.LoginIp?.Trim(),
+                                                   req.TransId?.Trim(),
+                                                   req.TpUserName?.Trim(),
+                                                   req.Email?.Trim(),
+                                                   req.PhoneNo?.Trim(),
                                                    startDate,
                                                    endDate,
-                                                   custInfoListReq.PageSize,
-                                                   custInfoListReq.AffId,
-                                                   custInfoListReq.SelectCurrency,
-                                                   custInfoListReq.BankAccountNumber?.Trim(),
-                                                   custInfoListReq.SelectStatus,
+                                                   tagStartDate,
+                                                   tagEndDate,
+                                                   req.PageSize,
+                                                   req.AffCode,
+                                                   req.SelectCurrency,
+                                                   req.BankAccountNumber?.Trim(),
+                                                   req.SelectStatus,
+                                                   req.SelectTag,
                                                    ref pageNumber,
-                                                   out totalPages,
-                                                   out rowCount);
-
-            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-
+                                                   out var totalPages,
+                                                   out var rowCount);
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -441,7 +473,7 @@ namespace BackendSite.Controllers.Api
                                                                     custInfoReq.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffId,
+                                                                    custInfoReq.AffCode,
                                                                     custInfoReq.SelectCurrency,
                                                                     custInfoReq.BankAccountNumber,
                                                                     custInfoReq.SelectStatus);
@@ -554,6 +586,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
+            
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
             switch (custStatusSwitch.Op)
             {
@@ -607,13 +640,53 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success."
+                    Message = "Update Success." 
                 };
             }
             else
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
+        }
+        /// <summary>
+        /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <param name="verificationRewardReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
+
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+            if (apiResult.ErrorCode == 0)
+            {
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                if (verificationRewardReq.OTPType == 0)
+                {
+                    Info.Add("Action", "Payout Verification Reward");
+                    Info.Add("OTPType","SMS");
+                }
+                else if (verificationRewardReq.OTPType == 1)
+                {
+                    Info.Add("Action", "Payout Verification Reward");
+                    Info.Add("OTPType", "EMAIL");
+                }
+                
+                _serverInfoBll.AdminOperateLog(null, verificationRewardReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+            }
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult CheckRewardCondination(VerificationRewardReq verificationRewardReq)
+        {
+            var apiResult = new ApiResult();
+
+            apiResult = _custInfoBll.CheckRewardCondination(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+
+            return apiResult;
         }
 
         #endregion
@@ -1524,7 +1597,8 @@ namespace BackendSite.Controllers.Api
                                 PromoCategoryId = data.PromoCategoryId,
                                 BonusId = data.BonusId,
                                 RemainingBonus = remainingBonus,
-                                RefundAmount = refundAmount
+                                RefundAmount = refundAmount,
+                                UpdateBonusTransferStatus = true
                             };
                             var result = _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
                             apiResult.ErrorCode = result.ErrorCode;
@@ -2225,6 +2299,26 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
+        #endregion
+
+        #region CSD > Withdrawal Limit Log
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
+        public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(GetWithdrawalLimitLogReq withdrawalLimitLogReq)
+        {
+            ApiListResult<WithdrawalLimitLog> result = new ApiListResult<WithdrawalLimitLog>();
+            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalLimitLogReq.StartDate);
+            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(withdrawalLimitLogReq.EndDate);
+
+            var SearchResult = _custInfoBll.GetWithdrawalLimitLog(withdrawalLimitLogReq.CustId, startTime, endTime, withdrawalLimitLogReq.PageNumber, withdrawalLimitLogReq.PageSize);
+            result.Data = SearchResult.WithdrawalLimitLogList;
+            result.PageNumber = SearchResult.PageNumber;
+            result.RowCount = SearchResult.RowCount;
+            result.TotalPages = SearchResult.TotalPages;
+            result.ErrorCode = 0;
+
+            return result;
+        }
         #endregion
 
         #endregion

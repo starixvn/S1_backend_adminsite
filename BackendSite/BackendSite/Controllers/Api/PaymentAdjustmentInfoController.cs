@@ -49,14 +49,14 @@ namespace BackendSite.Controllers.Api
             {
                 if (getAdjustmentInfoReq.StartDate > 2147483647)
                     getAdjustmentInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.StartDate);
+                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.StartDate).AddHours(-8);
             }
 
             if (getAdjustmentInfoReq.EndDate != null)
             {
                 if (getAdjustmentInfoReq.EndDate > 2147483647)
                     getAdjustmentInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.EndDate);
+                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.EndDate).AddHours(-8);
             }
 
 

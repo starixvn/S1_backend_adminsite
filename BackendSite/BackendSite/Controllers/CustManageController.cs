@@ -61,7 +61,7 @@ namespace BackendSite.Controllers
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string SelectCurrency { get; set; }
             public string BankAccountNumber { get; set; }
             public string SelectStatus { get; set; }
@@ -121,7 +121,7 @@ namespace BackendSite.Controllers
                                                                     custInfoReq.PhoneNo?.Trim(),
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffId,
+                                                                    custInfoReq.AffCode,
                                                                     selectCurrency,
                                                                     custInfoReq.BankAccountNumber?.Trim(),
                                                                     selectStatus);
@@ -160,6 +160,14 @@ namespace BackendSite.Controllers
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/UserBetLimit" })]
         public IActionResult UserBetLimit()
+        {
+            return View();
+        }
+
+
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        public IActionResult TpFailRecordReport()
         {
             return View();
         }

@@ -336,6 +336,12 @@
   <data name="lbl_DepositType5" xml:space="preserve">
     <value>Load Card</value>
   </data>
+  <data name="lbl_DepositType6" xml:space="preserve">
+    <value>QRPay Payment</value>
+  </data>
+  <data name="lbl_DepositType7" xml:space="preserve">
+    <value>Bank Auto Channel</value>
+  </data>
   <data name="lbl_Direction1" xml:space="preserve">
     <value>Credit</value>
   </data>
@@ -628,10 +634,10 @@
     <value>CashBack</value>
   </data>
   <data name="lbl_PromotionType8" xml:space="preserve">
-    <value>Advertising</value>
+    <value>Manual Bonus(Static Page)</value>
   </data>
   <data name="lbl_PromotionType9" xml:space="preserve">
-    <value>Retention free bet</value>
+    <value>Retention Bonus</value>
   </data>
   <data name="lbl_DepositSubmission" xml:space="preserve">
     <value>Deposit Submission</value>
