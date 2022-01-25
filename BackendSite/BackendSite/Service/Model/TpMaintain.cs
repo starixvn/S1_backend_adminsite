@@ -77,6 +77,56 @@ namespace BackendSite.Service.Model.TpMaintain
         }
     }
 
+    public class TpMaintainForV2
+    {
+        private DateTimeOffset _beginDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        private DateTimeOffset? _beginTime { get; set; }
+        private DateTimeOffset? _endTime { get; set; }
+        public int? SN { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int TpId { get; set; }
+        public string TpName { get; set; }
+        public int TpGameType { get; set; } = 0;
+        public string TpGameTypeList { get; set; }
+        public string TypeName { get; set; }
+        public int TpCategoryId { get; set; } = 0;
+        public string CategoryName { get; set; }
+        public DateTimeOffset BeginDate
+        {
+            get => _beginDate;
+            set => _beginDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string MaintainType { get; set; }
+        public int TypeValue { get; set; }
+        public DateTimeOffset? BeginTime
+        {
+            get => _beginTime;
+            set
+            {
+                if (value != null)
+                    _beginTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? EndTime
+        {
+            get => _endTime;
+            set
+            {
+                if (value != null)
+                    _endTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public string UpdateUser { get; set; }
+
+    }
+
     public class CommonTpInfo
     {
         public int Id { set; get; }

@@ -141,7 +141,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LatestHighlightVideoManagement" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public ApiResult Update(SetRequest request)
         {
             var apiResult = new ApiResult();
             try
