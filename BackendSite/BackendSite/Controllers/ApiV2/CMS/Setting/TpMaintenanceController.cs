@@ -51,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
 
-            public IEnumerable<int> SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public int TpId { get; set; }
             public int TpGameTypeId { get; set; }
             public int TpCategoryId { get; set; }
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public ApiListResult<TpMaintainForV2> GetList(GetListRequest request)
         {
             var result = new List<TpMaintainForV2>();
-            var data = _tpMaintainBll.GetTpMaintainListByFilter(request.SiteId,
+            var data = _tpMaintainBll.GetTpMaintainListByFilter(request.SiteIds,
                 request.TpId,
                 request.TpCategoryId,
                 request.TpGameTypeId,

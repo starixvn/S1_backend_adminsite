@@ -4,6 +4,7 @@ using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class GameCasinoManagementController : ControllerBase
+    public class GameCasinoController : ControllerBase
     {
         #region Fields
-        
+
         private readonly GameCasinoManageBLL _gameCasinoManageBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly LatestHighlightVideoManagementBLL _highlightVideoManagementBll;
@@ -27,7 +28,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         #region Constructor
 
-        public GameCasinoManagementController(IServiceProvider provider)
+        public GameCasinoController(IServiceProvider provider)
         {
             _gameCasinoManageBll = provider.GetRequiredService<GameCasinoManageBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
@@ -36,9 +37,66 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         #endregion
 
-        #region API
+        #region API Model
 
-         /// <summary>
+        public class GetListRequest : ApiRequestPageModel
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+            public string Name { get; set; }
+
+        }
+
+        #endregion
+
+        #region Action
+
+        /// <summary>
+        /// GameCasino/GetList 取得清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS > GameCasinoManagement > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
+        public ApiListResult<GameCasinoData> GetList(GetListRequest request)
+        {
+            var apiResult = new ApiListResult<GameCasinoData>();
+            try
+            {
+                var param = new GameCasinoPara()
+                {
+                    Site = request.SiteId,
+                    Currency = request.CurrencyId,
+                    TPid = request.TpId,
+                    Categories = request.CategoryId,
+                    Name = request.Name,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
+
+                var gameCasinoData = _gameCasinoManageBll.GameCasinoByTPIdV2(param);
+                apiResult.Data = gameCasinoData.GameCasinoData;
+                apiResult.PageNumber = gameCasinoData.PageNumber;
+                apiResult.TotalPages = gameCasinoData.TotalPages;
+                apiResult.RowCount = gameCasinoData.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
         /// GameCasinoManagement/SetGameCasinoDetail 
         /// </summary>
         /// <remarks>
@@ -83,7 +141,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GameCasinoManagement/InsertGameCasinoDetail 
         /// </summary>
@@ -112,7 +170,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GameCasinoManagement/DeleteGameCasinoDetail 
         /// </summary>
@@ -141,60 +199,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
-        /// <summary>
-        /// GameCasinoManagement/GetTpList 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CMS > GameCasinoManagement
-        /// </remarks>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
-        {
-            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
-            {
-                Data = _gameCasinoManageBll.GetTpList(),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
 
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GameCasinoManagement/GameCasinoByTpId 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CMS > GameCasinoManagement
-        /// </remarks>
-        /// <param name="request"></param>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiListResult<GameCasinoData> GameCasinoByTpId(GameCasinoPara request)
-        {
-            var apiResult = new ApiListResult<GameCasinoData>();
-            try
-            {
-                var gameCasinoData = _gameCasinoManageBll.GameCasinoByTPIdV2(request);
-                apiResult.Data = gameCasinoData.GameCasinoData;
-                apiResult.PageNumber = gameCasinoData.PageNumber;
-                apiResult.TotalPages = gameCasinoData.TotalPages;
-                apiResult.RowCount = gameCasinoData.RowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-        
         /// <summary>
         /// GameCasinoManagement/SetGameCasino 
         /// </summary>
@@ -228,7 +233,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     After = afterStatus ? 1 : 2
                 };
                 _gameCasinoManageBll.AddLog("Marketing/GameCasinoManagement", ActionType.Update, JsonConvert.SerializeObject(log), User.Identity.Name);
-                apiResult.ErrorCode =  (int)ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
@@ -238,7 +243,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GameCasinoManagement/GetGameCasinoDetail 
         /// </summary>
@@ -268,7 +273,28 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// GameCasinoManagement/GetTpList 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS > GameCasinoManagement
+        /// </remarks>
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
+        //public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
+        //{
+        //    var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+        //    {
+        //        Data = _gameCasinoManageBll.GetTpList(),
+        //        ErrorCode = (int)ErrorCodeEnum.Success
+        //    };
+
+        //    return apiResult;
+        //}
+
         #endregion
     }
 }
