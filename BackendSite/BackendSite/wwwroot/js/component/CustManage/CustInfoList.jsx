@@ -54,6 +54,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.sabaID}</td>
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
@@ -117,6 +118,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Registration time (Adjusted to GMT+8)</th>
                                     <th scope="col">Last Active Time (Adjusted to GMT+8)</th>
                                     <th scope="col">Last Tag Update Time (Adjusted to GMT+8)</th>
+                                    <th scope="col">Last Status Update Time (Adjusted to GMT+8)</th>
                                     <th scope="col">Saba ID</th>
                                     <th scope="col">Status</th>
                                 </tr>
@@ -657,6 +659,20 @@ import * as Loading from '../commJS/Loading.jsx';
                                     </div>
                                 </div>
                                 <div className="input-item">
+                                    <span className="label">Status Update Date (From)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_start} type="text" defaultValue={!isNaN(StatusStartDate) ? moment.unix(StatusStartDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusStart}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status Update Date (To)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_end} type="text" defaultValue={!isNaN(StatusEndDate) ? moment.unix(StatusEndDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusEnd}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
                                     <span className="label">Tag Filter</span>
                                     <div className="field">
                                         {tagList}
@@ -674,20 +690,6 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <div className="date">
                                         <input ref={this.selectTagDate_end} type="text" defaultValue={!isNaN(TagEndDate) ? moment.unix(TagEndDate).format('l') : null} size="8" />
                                         <a className="icon-calendar" ref={this.f_trigger_TagEnd}>{ }</a>
-                                    </div>
-                                </div>
-                                <div className="input-item">
-                                    <span className="label">Status Update Date (From)</span>
-                                    <div className="date">
-                                        <input ref={this.selectStatusDate_start} type="text" defaultValue={!isNaN(StatusStartDate) ? moment.unix(StatusStartDate).format('l') : null} size="8" />
-                                        <a className="icon-calendar" ref={this.f_trigger_StatusStart}>{ }</a>
-                                    </div>
-                                </div>
-                                <div className="input-item">
-                                    <span className="label">Status Update Date (To)</span>
-                                    <div className="date">
-                                        <input ref={this.selectStatusDate_end} type="text" defaultValue={!isNaN(StatusEndDate) ? moment.unix(StatusEndDate).format('l') : null} size="8" />
-                                        <a className="icon-calendar" ref={this.f_trigger_StatusEnd}>{ }</a>
                                     </div>
                                 </div>
                                 {Loading ? 
