@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class GameCasinoController : ControllerBase
     {
         #region Fields
