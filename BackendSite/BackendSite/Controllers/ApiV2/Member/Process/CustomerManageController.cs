@@ -514,13 +514,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
-        public class CustInfoReq
-        {
-            public int CustId { get; set; }
-            public string UserName { get; set; }
-            public string Reason { get; set; }
-        }
-
         public class GetCustDetailRequest
         {
             public int SiteId { get; set; }
