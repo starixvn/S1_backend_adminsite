@@ -95,23 +95,34 @@ namespace BackendSite.Service.BLL
             var listRewardModels = new List<ExportVerificationRewardModel>();
             foreach (var data in custVerificationReward)
             {
-                var model = new ExportVerificationRewardModel()
+                if (data.PhoneVerified)
                 {
-                    SiteName = data.SiteName,
-                    CustId = data.CustId,
-                    UserName = data.UserName,
-                    CurrencyId = data.CurrencyId,
-                    Currency = data.Currency,
-                    PhoneVerified = data.PhoneVerified,
-                    PhoneReward = data.PhoneReward,
-                    PhoneRewardTime = ConvertTimezone(data.PhoneRewardTime, timezone),
-                    EmailVerified = data.EmailVerified,
-                    EmailReward = data.EmailReward,
-                    EmailRewardTime = ConvertTimezone(data.EmailRewardTime, timezone),
-                    VerificationReawardAmount = data.PhoneReward + data.EmailReward,
-                    VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime).ToOffset(TimeSpan.FromHours(timezone))
-                };
-                listRewardModels.Add(model);
+                    var modelPhone = new ExportVerificationRewardModel()
+                    {
+                        SiteName = data.SiteName,
+                        UserName = data.UserName,
+                        Currency = data.Currency,
+                        VerificationType = "Phone Number",
+                        RewardAmount = data.PhoneReward,
+                        VerificationTime = data.PhoneRewardTime?.ToOffset(TimeSpan.FromHours(timezone)),
+                    };
+                    listRewardModels.Add(modelPhone); 
+                }
+
+                if (data.EmailVerified)
+                {
+                    var modelEmail = new ExportVerificationRewardModel()
+                    {
+                        SiteName = data.SiteName,
+                        UserName = data.UserName,
+                        Currency = data.Currency,
+                        VerificationType = "Email",
+                        RewardAmount = data.EmailReward,
+                        VerificationTime = data.EmailRewardTime?.ToOffset(TimeSpan.FromHours(timezone)),
+                    };
+                    listRewardModels.Add(modelEmail);
+                }
+               
             }
 
             return listRewardModels;
