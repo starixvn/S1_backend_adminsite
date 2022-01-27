@@ -28,7 +28,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly VipLevelBLL _vipLevelBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly RebateManageBLL _rebateManageBll;
         private readonly SportsBLL _sportsBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
@@ -41,7 +40,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
         }
 
@@ -151,14 +149,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CategoryId { get; set; }
         }
 
-        public class SportLeaguesReq
+        public class GetSportLeaguesRequest
         {
-            public int SportCategoryId { get; set; }
+            public int CategoryId { get; set; }
         }
 
-        public class SportTeamsReq
+        public class GetSportTeamsRequest
         {
-            public int SportLeaguesId { get; set; }
+            public int LeaguesId { get; set; }
         }
 
         #endregion
@@ -392,7 +390,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetPromotionCategories 
+        /// BaseData/GetPromotionCategoryList 取得促銷分類清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -400,7 +398,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromotionCategory(GetPromoCategoryRequest request)
+        public ApiResult<IEnumerable<PromoCategory>> GetPromotionCategoryList(GetPromoCategoryRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
 
@@ -464,24 +462,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
+        /// <summary>
+        /// BaseData/GetSportLeaguesList 取得體育聯賽清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(SportLeaguesReq sportLeaguesReq)
+        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(GetSportLeaguesRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<SportLeagues>>
             {
-                Data = _sportsBll.GetSportLeaguesList(sportLeaguesReq.SportCategoryId),
+                Data = _sportsBll.GetSportLeaguesList(request.CategoryId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
 
+        /// <summary>
+        ///  BaseData/GetSportTeamsList 取得體育賽隊清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(SportTeamsReq sportTeamsReq)
+        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(GetSportTeamsRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<SportTeams>>
             {
-                Data = _sportsBll.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
+                Data = _sportsBll.GetSportTeamsList(request.LeaguesId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
