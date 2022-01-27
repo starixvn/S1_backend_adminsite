@@ -1718,6 +1718,10 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Last Status Time (Adjusted to GMT+8)</th>
+                                        <td>{moment.utc(data.LastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Registration Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
