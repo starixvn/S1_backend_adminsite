@@ -31,8 +31,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly AdminGroupBLL _adminGroupBll;
-        private readonly BonusManageBLL _bonusManageBll;
-        private readonly RebateManageBLL _rebateManageBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly PaymentManageBLL _paymentManageBll;
@@ -50,31 +48,29 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
-            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
         }
 
-            #endregion
+        #endregion
 
-            #region Actions
+        #region Actions
 
-            //==============================================================================================================================================
-            // System 相關：Permission, Currency
-            //==============================================================================================================================================
+        //==============================================================================================================================================
+        // System 相關：Permission, Currency
+        //==============================================================================================================================================
 
-            /// <summary>
-            /// GetAllData/GetCurrency 取得幣別資料
-            /// </summary>
-            /// <remarks>
-            /// Http Method：POST
-            /// 
-            /// Func Path：Global Func.
-            /// </remarks>
-            /// <returns>結果</returns>
-            [HttpPost]
+        /// <summary>
+        /// GetAllData/GetCurrency 取得幣別資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
         public ApiResult<IEnumerable<CurrencyModel>> GetCurrency()
         {
             var data = _reportBll.GetCurrency();
