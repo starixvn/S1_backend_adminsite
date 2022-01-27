@@ -1359,6 +1359,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
 
             let data = this.props.CustInfoData;
+            
             let tagData = this.props.TagList;
             let tpWallet = null;
             let elgibleWithdrawal = 0;
@@ -1719,7 +1720,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Status Time (Adjusted to GMT+8)</th>
-                                        <td>{moment.utc(data.LastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
+                                        <td>{moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Registration Time (Adjusted to GMT+8)</th>
