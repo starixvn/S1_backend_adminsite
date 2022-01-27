@@ -40,30 +40,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                var req = new BannerController.SetBannerReq
-                {
-                    SiteId = bannerInfo.SiteId,
-                    BannerName = bannerInfo.BannerName,
-                    BannerType = bannerInfo.BannerType,
-                    ActionMode = bannerInfo.ActionMode,
-                    ShowStatus = bannerInfo.ShowStatus,
-                    UnixStartTime = bannerInfo.UnixStartTime,
-                    UnixEndTime = bannerInfo.UnixEndTime,
-                    BonusCode = bannerInfo.BonusCode,
-                    MatchId = bannerInfo.MatchId,
-                    TpId = bannerInfo.TpId,
-                    GameId = bannerInfo.GameId,
-                    UrlRouter = bannerInfo.UrlRouter,
-                    UnixSportBattleDateTime = bannerInfo.UnixSportBattleDateTime,
-                    SportCategoryId = bannerInfo.SportCategoryId,
-                    SportLeaguesId = bannerInfo.SportLeaguesId,
-                    SportTeamsId = bannerInfo.SportTeamsId,
-                    Specific = bannerInfo.Specific,
-                    Sort = bannerInfo.Sort,
-                    SiteName = bannerInfo.SiteName
-                };
                 var user = authorizeBLL.GetAuthData().UserName;
-                var errorCode = bannerManageBLL.SetBanner(req, user);
+                var errorCode = bannerManageBLL.SetBanner(bannerInfo, user);
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1 ? "The Banner Name setting already exists which with same Site." : "";
             }
@@ -88,7 +66,40 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
             try
             {
-                apiResult.Data = bannerManageBLL.GetBannerList(SiteId, BannerTypeId, Status);
+                var siteList = new List<int>(); siteList.Add(SiteId);
+                var bannerTypeList = new List<int>(); siteList.Add(SiteId);
+                var statusList = new List<int>(); siteList.Add(SiteId);
+
+                if (BannerTypeId > 0)
+                {
+                    bannerTypeList.Add(BannerTypeId);
+                }
+                else
+                {
+                    bannerTypeList.Add(1);
+                    bannerTypeList.Add(2);
+                    bannerTypeList.Add(3);
+                    bannerTypeList.Add(4);
+                    bannerTypeList.Add(5);
+                    bannerTypeList.Add(6);
+                }
+
+                if (Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0); statusList.Add(1);
+                }
+
+                apiResult.Data = bannerManageBLL.GetBannerList(siteList,
+                    bannerTypeList, statusList,
+                    1, 5000, out _, out _);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

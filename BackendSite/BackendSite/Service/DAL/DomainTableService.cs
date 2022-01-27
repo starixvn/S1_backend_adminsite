@@ -16,12 +16,14 @@ namespace BackendSite.Service.DAL
     public class DomainTableService
     {
         private readonly MySqlClient _mainDbClient;
-        
+        private readonly MySqlClient _reportDbClient;
+
         public DomainTableService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        
+
         public IEnumerable<DomainTable> GetDomainList(IEnumerable<int> selectSite, int currency)
         {
             string SelectSite = null;
@@ -31,9 +33,24 @@ namespace BackendSite.Service.DAL
             }
             return _mainDbClient.Query<DomainTable>("Admin_DomainTable_Get", new DynamicParameters(new { SelectSite = SelectSite, Currency = currency }));
         }
-        public IEnumerable<DomainTable> GetDomainListBySite(int siteId, int currency)
+        public IEnumerable<DomainTable> GetDomainListBySite(string siteId, string currency,
+            int startIndex, int pageSize,
+            out int totalPages, out int rowCount)
         {
-            return _mainDbClient.Query<DomainTable>("Admin_DomainTablebySite_Get", new DynamicParameters(new { SiteId = siteId, Currency = currency }));
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteId);
+            p.Add("_CurrencyIds", currency);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_PageSize", pageSize);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var datas = _reportDbClient.Query<DomainTable>("Admin_DomainTablebySite_Get_V2", p);
+
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return datas;
         }
         public int SetDomain(int siteId, int currencyId, string domain, int status, int sort, string lastUpdateUser)
         {

@@ -31,11 +31,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly AdminGroupBLL _adminGroupBll;
-        private readonly BonusManageBLL _bonusManageBll;
-        private readonly RebateManageBLL _rebateManageBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly WithdrawalBLL _withdrawalBll;
+        private readonly PaymentManageBLL _paymentManageBll;
 
         #endregion
 
@@ -50,35 +49,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
-            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
+            _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
         }
 
         #endregion
 
         #region Actions
 
-        /// <summary>
-        /// GetAllData/BankInfoSys 取得銀行系統資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Bank Card Management.
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankInfoSys>>();
-            var sysBankList = _bankDetailBll.GetSysBankList();
-            apiResult.Data = sysBankList;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
-        }
+        //==============================================================================================================================================
+        // System 相關：Permission, Currency
+        //==============================================================================================================================================
 
         /// <summary>
         /// GetAllData/GetCurrency 取得幣別資料
@@ -108,6 +91,172 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
+
+        /// <summary>
+        ///  GetAllData/GetGroupList 取得所有群組權限清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
+        {
+            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
+            {
+                Data = _adminGroupBll.GetGroupList(1, 1000, out _, out _),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+
+        //==============================================================================================================================================
+        // Finance 相關：Payment, Bank
+        //==============================================================================================================================================
+
+        /// <summary>
+        /// GetAllData/BankInfoSys 取得銀行系統資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management.
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoSys>>();
+            var sysBankList = _bankDetailBll.GetSysBankList();
+            apiResult.Data = sysBankList;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            return apiResult;
+        }
+
+        /// <summary>
+        /// GetAllData/GetAdjustmentInfoLogMenu 取得調整資料記錄程式清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
+        {
+            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>
+            {
+                Data = _adjustmentLogReportBll.GetAdjustmentInfoLogMenu(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+
+
+        /// <summary>
+        /// GetAllData/GetPayList 取得第三方支付廠商清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PayList>> GetPayList()
+        {
+            var data = _paymentManageBll.GetPayList();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PayList>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// GetAllData/GetPayChannel 取得第三方支付廠商通道清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PayChannel>> GetPayChannel()
+        {
+            var data = _paymentManageBll.GetPayChannel();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PayChannel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+
+        /// <summary>
+        /// GetAllData/GetPayCurrency 取得第三方支付廠商幣別資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PayCurrency>> GetPayCurrency()
+        {
+            var data = _paymentManageBll.GetPayCurrency();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PayCurrency>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<CryptoInfoData> GetCryptoInfoData()
+        {
+
+            var result = _withdrawalBll.GetCryptoInfoData();
+
+            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
+        }
+
+        //==============================================================================================================================================
+        // TP 相關
+        //==============================================================================================================================================
+
         /// <summary>
         /// GetAllData/GetTpList 取得Slot第三方品牌
         /// </summary>
@@ -120,21 +269,20 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
         {
-            var apiResult = new ApiResult<IEnumerable<RiskTpListInfo>>();
-            try
+            var data = await _gameCasinoBll.GetTpList();
+
+            if (!data.Any())
             {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<RiskTpListInfo>>
                 {
-                    apiResult.Data = await _gameCasinoBll.GetTpList();
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
         }
 
         /// <summary>
@@ -149,13 +297,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategory()
         {
             var data = await _reportBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
 
-            return apiResult;
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<TpCategoryBetLimit>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
         }
 
         /// <summary>
@@ -168,9 +322,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult GetTpGameType()
+        public ApiResult<IEnumerable<GameType>> GetTpGameType()
         {
             var data = _winLostReportBll.GetTpGameType();
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -180,10 +335,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 return new ApiResult<IEnumerable<GameType>>
                 {
                     Data = data,
-                    ErrorCode = 0
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
         }
+
+        //==============================================================================================================================================
+        // Marketing 相關：Promotion
+        //==============================================================================================================================================
 
         /// <summary>
         /// GetAllData/GetPromotionCategory 取得促銷分類
@@ -212,83 +371,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// GetAllData/GetAdjustmentInfoLogMenu 取得調整資料記錄程式清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
-        {
-            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>
-            {
-                Data = _adjustmentLogReportBll.GetAdjustmentInfoLogMenu(),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
-        }
-
-        /// <summary>
-        ///  GetAllData/GetGroupList 取得所有群組權限清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
-        {
-            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
-            {
-                Data = _adminGroupBll.GetGroupList(1, 1000, out _, out _),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
-        }
-
-        //[HttpPost]
-        //public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
-        //{
-        //    var apiResult = new ApiResult<IEnumerable<TpGameType>>();
-
-        //    try
-        //    {
-        //        apiResult.Data = _bonusManageBll.GetTpGameList();
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //        apiResult.RawMessage = ex.ToString();
-        //    }
-
-        //    return apiResult;
-        //}
-
-        /// <summary>
-        /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
-        {
-            return new ApiResult<IEnumerable<VipLevelModel>>
-            {
-                Data = _custInfoBll.GetAllSiteVipLevelList(),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
         /// AllData/GetEventNameList 取得活動名稱清單
         /// </summary>
         /// <remarks>
@@ -309,24 +391,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
-		/// <summary>
-        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
+        /// <summary>
+        /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<CryptoInfoData> GetCryptoInfoData()
+        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
         {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
-
-            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
+            return new ApiResult<IEnumerable<VipLevelModel>>
+            {
+                Data = _custInfoBll.GetAllSiteVipLevelList(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
-        
+
         #endregion
 
     }
