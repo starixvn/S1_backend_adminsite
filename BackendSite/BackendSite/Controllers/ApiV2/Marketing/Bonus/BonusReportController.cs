@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -58,6 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             public int BaseCurrencyId { get; set; }
             public int PromotionCategoryId { get; set; }
+            public IEnumerable<BonusInfoStatusEnum> Statuses { get; set; }
         }
 
         public class ExportRequest
@@ -82,6 +84,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             public int BaseCurrencyId { get; set; }
             public int PromotionCategoryId { get; set; }
+            public IEnumerable<BonusInfoStatusEnum> Statuses { get; set; }
         }
 
         #endregion
@@ -101,6 +104,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var result = new ApiListResultCurrencyAmount<BonusInfoFrontEnd>();
 
+            var statusList = request.Statuses.Select(x => (int)x);
+
             result.Data = _bonusInfoBll.GetBonusInfoReport(
                 request.SiteIds,
                 request.BonusCode,
@@ -110,10 +115,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 (int)request.PromotionType,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
-                request.PageSize,
                 request.BaseCurrencyId,
                 request.PromotionCategoryId,
+                statusList,
                 request.PageNumber,
+                   request.PageSize,
                 out var totalPages,
                 out var rowCount,
                 out var currencyAmount
@@ -141,10 +147,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
-            var exportData = _bonusInfoBll.GetBonusInfoExportReport(JsonConvert.SerializeObject(request.SiteIds),
-                request.BonusCode, request.TransId, request.CurrencyId,
-                request.UserName, (int)request.PromotionType, request.StartDate.DateTime,
-                request.EndDate.DateTime, request.BaseCurrencyId, request.PromotionCategoryId);
+            var statusList = request.Statuses.Select(x => (int)x);
+
+            var exportData = _bonusInfoBll.GetBonusInfoExportReport(request.SiteIds,
+                request.BonusCode,
+                request.TransId,
+                request.CurrencyId,
+                request.UserName,
+                (int)request.PromotionType,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.BaseCurrencyId, 
+                request.PromotionCategoryId,
+                statusList);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "BonusReport");
         }
