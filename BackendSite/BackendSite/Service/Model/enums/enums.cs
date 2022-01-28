@@ -361,6 +361,74 @@ namespace BackendSite.Service.Model.enums
         RetentionBonus = 9
     }
 
+    public enum PromotionStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum PromotionPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    public enum PromotionDeviceTypeEnum
+    {
+        All = 1,
+        Web = 2,
+        App = 3
+    }
+
+    public enum PromotionActionEnum
+    {
+        Link = 0,
+        Detail = 1
+    }
+
+    public enum WalletTypeEnum
+    {
+        Transfer = 0,
+        Seamless = 1
+    }
+
+    #endregion
+
+    #region PromotionCashBackSetting
+
+    public enum PromotionCashBackSettingStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    #endregion
+
+    #region PromotionRebate
+
+    public enum PromotionRebateStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    #endregion
+
+    #region PromotionSpecific
+
+    public enum PromotionSpecificStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum BonusTypeEnum
+    {
+        Percentage = 1,
+        Amount = 2
+    }
+
     #endregion
 
     #region Referral
@@ -373,11 +441,6 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum BonusType
-    {
-        Percentage = 1,
-        Amount = 2
-    }
     public enum BonusStatus
     {
         Running = 1,
@@ -659,8 +722,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum NewsStatusEnum
     {
-        InActive = 0,
-        Active = 1
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
@@ -706,8 +769,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerStatusEnum
     {
-        Close = 0,
-        Open = 1
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
@@ -732,8 +795,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum DomainTableStatusEnum
     {
-        Close = 0,
-        Open = 1
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
