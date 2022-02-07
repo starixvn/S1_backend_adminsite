@@ -39,11 +39,24 @@ namespace BackendSite.Service.Model
         public bool IsRisk { get; set; }
         public bool PhoneVerified { get; set; }
         public bool EmailVerified { get; set; }
+        public int VerificationType { get; set; }
+        public decimal? CustPhoneReward { get; set; }
+        public decimal? CustEmailReward { get; set; }
+        public string VerificationReward { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        public DateTimeOffset LastLoginTime { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-
+        private DateTimeOffset _lastLoginTime  { get; set; }
+        public DateTimeOffset LastLoginTime 
+        {
+            get => _lastLoginTime;
+            set => _lastLoginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _regTime  { get; set; }
+        public DateTimeOffset RegTime 
+        {
+            get => _regTime;
+            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Email { get; set; }
         public string Profile { get; set; }
         public decimal Balance { get; set; }
@@ -67,7 +80,26 @@ namespace BackendSite.Service.Model
         public IEnumerable<TpWallet> tpWallet { get; set; }
         public IEnumerable<Promotion> promotions { get; set; }
         public string AffiliateId { get; set; }
-        public string ReloadTime { get; set; }
+        private DateTimeOffset? _reloadTime { get; set; }
+        public DateTimeOffset? ReloadTime 
+        {
+            get => _reloadTime;
+            set
+            {
+                if (value != null)
+                    _reloadTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _lastTagUpdateTime  { get; set; }
+        public DateTimeOffset? LastTagUpdateTime 
+        {
+            get => _lastTagUpdateTime;
+            set
+            {
+                if (value != null)
+                    _lastTagUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
@@ -405,5 +437,27 @@ namespace BackendSite.Service.Model
     {
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
+    }
+    public class WithdrawalLimitLog
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public int MainType { get; set; }
+        public decimal ChangeWithdrawalLimit { get; set; }
+        public decimal BeforeWithdrawalLimit { get; set; }
+        public decimal AfterWithdrawalLimit { get; set; }
+        public string Memo { get; set; }
+        public string RefTransId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+    public class WithdrawalLimitLogData
+    {
+        public List<WithdrawalLimitLog> WithdrawalLimitLogList { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
 }

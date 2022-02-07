@@ -21,6 +21,7 @@ import { DepositInfoPagination } from './CustInfo_DepositInfoPagination.jsx';
 import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import Tag from './Tag/index';
 import { NewPagination } from '../commJS/NewPagination.jsx';
+import WithdrawalLimitLog from './WithdrawalLimitLog/index';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -958,42 +959,103 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
         }
 
         onPhoneVerifiedChange(e) {
-            if (confirm('Are you sure change PhoneVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 3 })
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
-        }
+      if (confirm("Are you sure change PhoneVerified ?")) {
+        let data = this.props.CustInfoData;
+        axios
+          .post("/api/CustManage/SetCustStatusSwitch", {
+            CustId: data.custId,
+            OP: 3,
+          })
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                this.props.onGetCustInfoDetail();
+              } else {
+                alert(result.message);
+              }
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
 
-        onEmailVerifiedChange(e) {
-            if (confirm('Are you sure change EmailVerified ?')) {
-                let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetCustStatusSwitch', { CustId: data.custId, OP: 4 })
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.props.onGetCustInfoDetail();
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
+    onEmailVerifiedChange(e) {
+      if (confirm("Are you sure change EmailVerified ?")) {
+        let data = this.props.CustInfoData;
+        axios
+          .post("/api/CustManage/SetCustStatusSwitch", {
+            CustId: data.custId,
+            OP: 4,
+          })
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                this.props.onGetCustInfoDetail();
+              } else {
+                alert(result.message);
+              }
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
+    onPayoutVerifitionReward(_OTPType) {
+      let data = this.props.CustInfoData;
+      let text = "";
+      axios
+        .post("/api/CustManage/CheckRewardCondination", {
+          CustId: data.custId,
+          OTPType: _OTPType,
+        })
+        .then(
+          function (response) {
+            let result = response.data;
+            if (result.errorCode == 0) {
+              text =
+                result.message +
+                "\r\nVerification Reward will payout immediately. \r\n";
+              if (confirm(text)) {
+                axios
+                  .post("/api/CustManage/PayoutVerificationReward", {
+                    CustId: data.custId,
+                    OTPType: _OTPType,
+                  })
+                  .then(
+                    function (response) {
+                      let result = response.data;
+                      if (result.errorCode == 0) {
+                        this.props.onGetCustInfoDetail();
+                      } else {
+                        alert(result.message);
+                      }
+                    }.bind(this)
+                  )
+                  .catch(
+                    function (error) {
+                      alert(error);
+                    }.bind(this)
+                  );
+              }
+            } else {
             }
-        }
+          }.bind(this)
+        )
+        .catch(function (error) {}.bind(this));
+    }
 
         onAskReupload() {
             if (confirm('Are you sure delete Photo ?')) {
@@ -1592,7 +1654,17 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">PhoneVerified</th>
+                                        <th scope="row">
+                    PhoneVerified
+                    {this.props.isShowRewardBotton.SMS ? (
+                      <button
+                        className="btn btn-copy float-right"
+                        onClick={this.onPayoutVerifitionReward.bind(this, 0)}
+                      >
+                        Reward
+                      </button>
+                    ) : null}
+                  </th>
                                         <td>
                                             {data.phoneVerified ? "Yes" : "No"}
                                             {
@@ -1606,7 +1678,17 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th scope="row">EmailVerified</th>
+                                        <th scope="row">
+                    EmailVerified
+                    {this.props.isShowRewardBotton.EMAIL ? (
+                      <button 
+                      className="btn btn-copy float-right"
+                      onClick={this.onPayoutVerifitionReward.bind(this, 1)}
+                      >
+                        Reward
+                      </button>
+                    ) : null}
+                  </th>
                                         <td>
                                             {data.emailVerified ? "Yes" : "No"}
                                             {
@@ -1618,6 +1700,10 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                                                 ) : null
                                             }
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">VerifiedReward</th>
+                                        <td>{data.verificationReward}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Iovation</th>
@@ -1800,12 +1886,13 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
+        _isShowRewardBotton = { SMS: false, EMAIL: false };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{} };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton), };
         }
 
         onTab(idx, tabName) {
@@ -2190,6 +2277,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                             });
                             this.GetBonusWalletLog();
                             this.GetRebateInfoLog();
+                            this.onGetRewardBottonStatus();
                         } else {
                             alert(result.message);
                         }
@@ -2199,7 +2287,61 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
                     }.bind(this));
             }
         }
-
+    onGetRewardBottonStatus() {
+      let CustId = getUrlParameter("custId");
+      if (!isNaN(CustId)) {
+        let iCustId = parseInt(CustId);
+        let obj = this.state.isShowRewardBotton;
+        obj["SMS"] = false;
+        obj["EMAIL"] = false;
+        axios
+          .post("/api/CustManage/CheckRewardCondination", {
+            CustId: iCustId,
+            OTPType: 0,
+          }) //SMS
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                obj["SMS"] = true;
+              } else {
+                //alert(result.message);
+              }
+              this.setState(obj);
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+        axios
+          .post("/api/CustManage/CheckRewardCondination", {
+            CustId: iCustId,
+            OTPType: 1,
+          }) //EMAIL
+          .then(
+            function (response) {
+              //Loading.UnLoading();
+              let result = response.data;
+              if (result.errorCode == 0) {
+                obj["EMAIL"] = true;
+              } else {
+                //alert(result.message);
+              }
+              this.setState(obj);
+            }.bind(this)
+          )
+          .catch(
+            function (error) {
+              //Loading.UnLoading();
+              alert(error);
+            }.bind(this)
+          );
+      }
+    }
         onChange(e, TabName) {
             let Obj = this.state[TabName];
             Obj[event.target.name] = event.target.value;
@@ -2419,7 +2561,7 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList}/>;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList} isShowRewardBotton={this.state.isShowRewardBotton}/>;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {
@@ -2435,37 +2577,39 @@ import { NewPagination } from '../commJS/NewPagination.jsx';
             } else if (TabName == this._Tabs[7]) {
                 dataContainer = <WithdrawalInfo GetWithdrawalListByCust={this.GetWithdrawalListByCust.bind(this)} searchData={this.state.WithdrawalListData} WithdrawalInfo={this.state.WithdrawalInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[8]) {
-                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <WithdrawalLimitLog />
             } else if (TabName == this._Tabs[9]) {
-                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
+                dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[10]) {
-                dataContainer = <ResetPwd />;
+                dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[11]) {
-                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
+                dataContainer = <ResetPwd />;
             } else if (TabName == this._Tabs[12]) {
-                dataContainer = <PersonalMsg />
+                dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
             } else if (TabName == this._Tabs[13]) {
-                dataContainer = <TurnoverReport />
+                dataContainer = <PersonalMsg />
             } else if (TabName == this._Tabs[14]) {
-                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <TurnoverReport />
             } else if (TabName == this._Tabs[15]) {
-                dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} CurrencyId={this.state.CustInfoData.currencyId}/>
+                dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[16]) {
-                dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
+                dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} CurrencyId={this.state.CustInfoData.currencyId}/>
             } else if (TabName == this._Tabs[17]) {
-                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
             } else if (TabName == this._Tabs[18]) {
-                dataContainer = <VipLevel />
+                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[19]) {
-                dataContainer = <PromotionReport />
+                dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[20]) {
+                dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[21]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
             }
 
             let authSubKeys = {
-                10: 'ca_resetpwd',
-                12: 'ca_personalMsg',
-                13: 'ca_turnoverReport'
+                11: 'ca_resetpwd',
+                13: 'ca_personalMsg',
+                14: 'ca_turnoverReport'
             }
 
             var tabBtn = this._Tabs.filter((item, index) => {

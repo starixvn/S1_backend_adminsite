@@ -26,9 +26,20 @@ namespace BackendSite.Service.BLL
 
     public class ExcelBLL
     {
+        private readonly List<string> _excelContentType = new List<string>() 
+        {
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+            "application/vnd.ms-excel",
+            "application/octet-stream"
+        };
         public ExcelBLL()
         {
 
+        }
+
+        public bool IsValidFile(string contentType)
+        {
+            return _excelContentType.Exists(a=> a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
