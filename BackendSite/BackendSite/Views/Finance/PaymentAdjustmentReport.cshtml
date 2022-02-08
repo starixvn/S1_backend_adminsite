@@ -26,7 +26,7 @@
     }
 
     var adjustType = new Dictionary<int, string>();
-    foreach (var value in Enum.GetValues(typeof(AdjustType)))
+    foreach (var value in Enum.GetValues(typeof(AdjustTypeEnum)))
     {
         var _value = (int)value;
         adjustType.Add(_value, selLangBLL.GetResourceValue($"lbl_AdjustmentType{_value}") ?? _value.ToString());        

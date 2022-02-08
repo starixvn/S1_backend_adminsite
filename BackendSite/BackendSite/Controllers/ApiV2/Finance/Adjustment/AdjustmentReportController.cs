@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -38,10 +39,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public string TransId { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public string UserName { get; set; }
-            public int AdjustType { get; set; }
+            public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -52,16 +53,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public string TransId { get; set; }
         }
 
         public class ExportRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public string TransId { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public string UserName { get; set; }
-            public int AdjustType { get; set; }
+            public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -72,6 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public string TransId { get; set; }
         }
 
         #endregion
@@ -84,31 +87,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// 
         /// Func Path：Finance > Adjustment Report > [Submit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetList(GetListRequest request)
         {
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
 
-            var pageNumber = request.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
             var currencyAmount = new List<string>();
+            var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
 
-            var dataList = _paymentAdjustmentBll.GetPaymentAdjustmentReport(request.TransId,
-                request.CurrencyId,
+            var dataList = _paymentAdjustmentBll.GetPaymentAdjustmentReport(request.SiteIds,
+                request.CurrencyIds,
                 request.UserName,
-                request.AdjustType,
+                adjustTypeList,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.TransId,
+                request.PageNumber,
                 request.PageSize,
-                ref pageNumber, ref totalPages, ref rowCount, ref currencyAmount);
+                out int totalPages, out int rowCount, out currencyAmount);
 
             foreach (var data in dataList)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
             }
+
             result.Data = dataList;
-            result.PageNumber = pageNumber;
+            result.PageNumber = request.PageNumber;
             result.RowCount = rowCount;
             result.TotalPages = totalPages;
             result.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -129,12 +133,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
-            var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(request.TransId,
-                request.CurrencyId,
+            var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
+            var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(request.SiteIds,
+                request.CurrencyIds,
                 request.UserName,
-                request.AdjustType,
+                adjustTypeList,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime);
+                request.EndDate.DateTime,
+                request.TransId);
 
             foreach (var data in exportData)
             {

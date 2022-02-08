@@ -64,7 +64,6 @@ namespace BackendSite.Service.Model
         public decimal WithdrawlSum { get; set; }
         public decimal EffectiveBetSum { get; set; }
         public bool HasPhotoId { get; set; }
-        public string FirstDepositTime { get; set; }
         public string AccountName { get; set; }
         public string CountryCode { get; set; }
         public string AreaCode { get; set; }
@@ -100,18 +99,61 @@ namespace BackendSite.Service.Model
                     _lastTagUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
+        private DateTimeOffset? _lastStatusUpdateTime  { get; set; }
+        public DateTimeOffset? LastStatusUpdateTime 
+        {
+            get => _lastStatusUpdateTime;
+            set
+            {
+                if (value != null)
+                    _lastStatusUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
-        public string LastDepositTime { get; set; }
-        public string LastWithdrawlTime { get; set; }
-        public string LastBettingTime { get; set; }
         public decimal TotalAdjustment { get; set; }
         public decimal TotalBonusClaimed { get; set; }
-        public string LastWithdrawalTimeRecord { get; set; }
-        public string LastDepositTimeRecord { get; set; }
-        public string LastTpBetRecordTimeRecord { get; set; }
-        public string FirstDepositTimeRecord { get; set; }
+        private DateTimeOffset? _lastWithdrawlTime;
+        public DateTimeOffset? LastWithdrawlTime 
+        {
+            get => _lastWithdrawlTime;
+            set
+            {
+                if (value != null) 
+                    _lastWithdrawlTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _lastDepositTime;
+        public DateTimeOffset? LastDepositTime 
+        {
+            get => _lastDepositTime;
+            set
+            {
+                if (value != null) 
+                    _lastDepositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _lastBettingTime;
+        public DateTimeOffset? LastBettingTime 
+        {
+            get => _lastBettingTime;
+            set
+            {
+                if (value != null) 
+                    _lastBettingTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _firstDepositTime;
+        public DateTimeOffset? FirstDepositTime 
+        {
+            get => _firstDepositTime;
+            set
+            {
+                if (value != null) 
+                    _firstDepositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
@@ -217,6 +259,8 @@ namespace BackendSite.Service.Model
     }
     public class CustCryptoWalletLog
     {
+        public int CurrencyId { set; get; }
+        public string IsoCode { set; get; }
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }

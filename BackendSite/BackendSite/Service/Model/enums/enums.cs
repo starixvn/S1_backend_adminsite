@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.enums
     //1.請按照table欄位放置區塊(region)
     //2.命名大部分請以 [Table欄位名稱] + Enum，ex.Customer.IsKyc => IsKycEnum
     //3.如欄位名稱重複率很高，命名請以 [Table名稱] + [Table欄位名稱] + Enum，ex.Customer.Status => CustomerStatusEnum
+    //4.如果有特殊選單需要給前端使用，請按照欄位名稱命名。ex.DepositRequest.AmountType => AmountTypeEnum
 
     /// <summary>
     /// DB環境列舉(不屬於任何Table，For專案使用)
@@ -19,6 +20,42 @@ namespace BackendSite.Service.Model.enums
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
     }
+
+    #region Deposit Request / Withdrawal Request For Frontend Use
+
+    public enum AmountTypeEnum
+    {
+        NoUse = 0,
+        AmountGreaterThan = 1,
+        AmountSmallerThan = 2
+    }
+
+    #endregion
+
+    #region Adjustment Report For Frontend Use
+
+    public enum AdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        IncreaseBonus = 3,
+        ReduceBonus = 4,
+        ThirdAdd = 5,
+        ThirdMinus = 6
+    }
+
+    #endregion
+
+    #region Bonus Management For Frontend Use
+
+    public enum ScratchCardStatusEnum
+    {
+        All = 0,
+        UnUsed = 1,
+        Used = 2
+    }
+
+    #endregion
 
     #region Customer
 
@@ -37,7 +74,7 @@ namespace BackendSite.Service.Model.enums
     public enum ActStatusEnum
     {
         NonDepoist = 1,
-        Depoisted = 2,
+        Deposited = 2,
     }
 
     public enum CustomerStatusEnum
@@ -95,7 +132,20 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5
+        LoadCard = 5  //No Use
+    }
+
+    public enum DepositStatusEnum
+    {
+        Draft = 0,    //No Use
+        Pending = 1,
+        Paid = 2,     //No Use
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        Expired = 6,  //No Use
+        OnHold = 7,   //No Use
+        Error = 99    //No Use
     }
 
     #endregion
@@ -158,36 +208,29 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum Direction
+    #region FinancialLog
+
+    public enum DirectionEnum
     {
         Add = 1,
         Deduct = 2
     }
 
-    public enum WithdrawalType
+    #endregion
+
+    #region WithdrawalInfo
+
+    public enum WithdrawalTypeEnum
     {
-        Undefine = 0,
+        Undefine = 0,  //No Use
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
     }
 
-    public enum DepositStatus
+    public enum WithdrawalStatusEnum
     {
-        Draft = 0,
-        Pending = 1,
-        Paid = 2,
-        Approved = 3,
-        Rejected = 4,
-        Canceled = 5,
-        Expired = 6,
-        OnHold = 7,
-        Error = 99
-    }
-
-    public enum WithdrawalStatus
-    {
-        Draft = 0,
+        Draft = 0,  //No Use
         Pending = 1,
         OnHold = 2,
         Verify = 3,
@@ -196,10 +239,91 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Rejected = 7,
         ToKyc = 8,
-        Error = 99
+        Error = 99  //No Use
     }
 
-    public enum AdjustStatus
+    #endregion
+
+    #region TpBetRecord
+
+    public enum SettlementTypeEnum
+    {
+        UnSettled = 0,
+        SettledForValid = 1,
+        SettledForInvalid = 2,
+        SettledForValidNotRollover = 3,
+        Cheating = 4,
+    }
+
+    #endregion
+
+    #region USDTWithdrawalLimitInfo
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// DB欄位開String，此Enum主要for前台顯示判斷使用
+    /// </remarks>
+    public enum NetworkTypeEnum
+    {
+        ERC20 = 1,
+        TRC20 = 2,
+        ETH = 3,
+        BTC = 4
+    }
+
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
+    }
+
+    #endregion
+
+    #region OTPVerifyinfo
+
+    public enum OTPTypeEnum
+    {
+        SMS = 0,
+        Email = 1
+    }
+
+    #endregion
+
+    #region AdjustWithdrawalLimitInfo
+
+    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    {
+        Debit = 1,
+        Credit = 2,
+        //Bonus = 3  NoUse
+    }
+
+    public enum AdjustWithdrawalLimitInfoStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
+    }
+
+    #endregion
+
+    #region AdjustmentInfo
+
+    public enum AdjustmentInfoAdjustTypeEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBonus = 5,
+        ManualBonus = 6
+    }
+
+    public enum AdjustmentInfoStatusEnum
     {
         Draft = 0,
         Pending = 1,
@@ -209,23 +333,22 @@ namespace BackendSite.Service.Model.enums
         Error = 99
     }
 
-    public enum AdjustType
-    {
-        Debit = 1,
-        Credit = 2,
-        IncreaseBonus = 3,
-        ReduceBonus = 4,
-        ThirdAdd = 5,
-        ThirdMinus = 6
-    }
+    #endregion
 
-    public enum AdminUserStatus
+    #region AdminUser
+
+    public enum AdminUserStatusEnum
     {
         Running = 1,
         Suspend = 2,
         Closed = 3,
     }
-    public enum PromotionType
+
+    #endregion
+
+    #region Promotion
+
+    public enum PromotionTypeEnum
     {
         FstDeposit = 1,
         ReDeposit = 2,
@@ -238,11 +361,86 @@ namespace BackendSite.Service.Model.enums
         RetentionBonus = 9
     }
 
-    public enum BonusType
+    public enum PromotionStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum PromotionPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    public enum PromotionDeviceTypeEnum
+    {
+        All = 1,
+        Web = 2,
+        App = 3
+    }
+
+    public enum PromotionActionEnum
+    {
+        Link = 0,
+        Detail = 1
+    }
+
+    public enum WalletTypeEnum
+    {
+        Transfer = 0,
+        Seamless = 1
+    }
+
+    #endregion
+
+    #region PromotionCashBackSetting
+
+    public enum PromotionCashBackSettingStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    #endregion
+
+    #region PromotionRebate
+
+    public enum PromotionRebateStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    #endregion
+
+    #region PromotionSpecific
+
+    public enum PromotionSpecificStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum BonusTypeEnum
     {
         Percentage = 1,
         Amount = 2
     }
+
+    #endregion
+
+    #region Referral
+
+    public enum ReferralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
     public enum BonusStatus
     {
         Running = 1,
@@ -264,17 +462,21 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
-    public enum VipTypeEnum
+    #region Vip Setting
+
+    public enum VipSettingStatusEnum
     {
         Upgrade = 1,
         Downgrade = 2
     }
 
-    public enum VipPreviousDateRangeType
+    public enum PreviousDateRangeTypeEnum
     {
         LastMonth = 1,
         LastThreeMonth = 2
     }
+
+    #endregion
 
     public enum VipStatus
     {
@@ -304,7 +506,9 @@ namespace BackendSite.Service.Model.enums
         VipLevel = 1
     }
 
-    public enum BonusStatusType
+    #region BonusInfo
+
+    public enum BonusInfoStatusEnum
     {
         Initial = 0,
         Running = 1,
@@ -313,6 +517,8 @@ namespace BackendSite.Service.Model.enums
         Fulfill = 4,
         TrasferOut = 5
     }
+
+    #endregion
 
     #region Bank Financial Account
 
@@ -432,38 +638,16 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum VerifyType
-    {
-        No = 0,
-        Verfified = 1
-    }
-    public enum DepositStatusType
-    {
-        Nondeposit = 1,
-        Deposited = 2
-    }
-    public enum RegLiveStatusType
+    #region Customer_RegLiveStatus
+
+    public enum Customer_RegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
         Invalid = 3
     }
-    public enum ErrorCodeType
-    {
-        Success = 0
-    }
 
-    public enum TpCategory
-    {
-        Sports = 1,
-        Casino = 2,
-        LiveCasino = 3,
-        Fishing = 4,
-        Cockfighting = 5,
-        Lottery = 6,
-        VirtualSports = 7,
-        Poker = 8,
-    }
+    #endregion
 
     public enum SettlementType
     {
@@ -482,11 +666,6 @@ namespace BackendSite.Service.Model.enums
     {
         HTTP = 1,
         HTTPS = 2
-    }
-    public enum NetworkType
-    {
-        ERC20 = 1,
-        TRC20 = 2
     }
 
     public enum SendMessageStatus
@@ -517,6 +696,14 @@ namespace BackendSite.Service.Model.enums
         SMS = 0,
         Email = 1
     }
+    
+    public enum DeviceId
+    {
+        Old = 0,
+        Desktop = 1,
+        H5 = 2,
+        APP = 3
+    }
 
     #region BankDetailOff
 
@@ -530,4 +717,88 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    #region News
+
+    public enum NewsStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region RebatePeriod
+
+    public enum RebatePeriodPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    #endregion
+
+    #region Banner
+
+    public enum BannerTypeEnum
+    {
+        Promotions = 1,
+        HotEvent = 2,
+        Slots = 3,
+        LiveCasino = 4,
+        Fishing = 5,
+        Lottery = 6
+    }
+
+    public enum BannerActionModeEnum
+    {
+        GoToGame = 1,
+        GoToBonus = 2,
+        OpenWindow = 3,
+        RedirectPage = 4,
+        NoAction = 5
+    }
+
+    public enum ShowStatusEnum
+    {
+        NoLogin = 1,
+        Login = 2,
+        Both = 3
+    }
+
+    public enum BannerStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AppLinkTable
+
+    public enum AppTypeEnum
+    {
+        Android = 1,
+        Ios = 2
+    }
+
+    public enum ProtocolTypeEnum
+    {
+        Http = 1,
+        Https = 2
+    }
+
+    #endregion
+
+    #region DomainTable
+
+    public enum DomainTableStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
 }

@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,9 +21,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.GetTPCategoryList();
         }
-        public IEnumerable<TpGameType> GetTpGameTypeListbyCategory(int categoryId)
+        public IEnumerable<TpGameType> GetTpGameTypeListByCategory(int categoryId)
         {
-            return rebateManageService.GetTpGameTypeListbyCategory(categoryId);
+            return rebateManageService.GetTpGameTypeListByCategory(categoryId);
         }
         public IEnumerable<RebatePayoutLimitData> GetRebatePayoutLimit(int siteId, int currencyId, int? categoryId)
         {
@@ -58,18 +59,14 @@ namespace BackendSite.Service.BLL
         }
         public RebateCurrencyData GeRebateInfo(int siteId, int currencyId)
         {
-            var reault = new RebateCurrencyData
+            var result = new RebateCurrencyData
             {
                 CurrencyId = currencyId,
                 PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null)
             };
-            var rList= new List<RebateCategoryList>();
-            foreach (var x in GetTPCategoryList())
-            {
-                rList.Add( new RebateCategoryList() { CategoryId = x.CategoryId, CategoryName = x.CategoryName, CategoryLevelList = GetRebateDataByCategory(siteId, x.CategoryId, currencyId)});
-            }
-            reault.CategoryDataList = rList;
-            return reault;
+            var rList = GetTPCategoryList().Select(x => new RebateCategoryList() {CategoryId = x.CategoryId, CategoryName = x.CategoryName, CategoryLevelList = GetRebateDataByCategory(siteId, x.CategoryId, currencyId)}).ToList();
+            result.CategoryDataList = rList;
+            return result;
         }
         public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)
         {
@@ -83,7 +80,7 @@ namespace BackendSite.Service.BLL
             };
 
             var rList = new List<RebateGameTypeList>();
-            foreach (var x in GetTpGameTypeListbyCategory(categoryId))
+            foreach (var x in GetTpGameTypeListByCategory(categoryId))
             {
                 rList.Add(new RebateGameTypeList() { Type = x.Type, TypeName = x.TypeName, GameTypeLevelList = GetRebateDataByGameType(siteId, x.Type, currencyId) });
             }
@@ -94,9 +91,9 @@ namespace BackendSite.Service.BLL
         {
             return rebateManageService.SetRebateCategory( siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
         }
-        public bool SetRebateCategoryBatch(int siteId, int CurrencyId, int categoryId, string levelPercentage, string lastUpdateUser)
+        public bool SetRebateCategoryBatch(int siteId, int currencyId, int categoryId, string levelPercentage, string lastUpdateUser)
         {
-            return rebateManageService.SetRebateCategoryBatch( siteId, CurrencyId, categoryId, levelPercentage, lastUpdateUser);
+            return rebateManageService.SetRebateCategoryBatch( siteId, currencyId, categoryId, levelPercentage, lastUpdateUser);
         }
         public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level, string lastUpdateUser)
         {

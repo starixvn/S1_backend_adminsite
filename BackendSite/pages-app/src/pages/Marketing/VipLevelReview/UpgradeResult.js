@@ -299,13 +299,13 @@ const dateFormat = (createTime) => {
   return moment(createTime).format("l LTS");
 };
 const settletimeFormat = (createTime) => {
-  if (createTime === "") {
+  if (createTime === null) {
     return "";
   }
   return moment(createTime).format("l LTS");
 };
 const qualifiedTimeFormat = (dateTime) => {
-  if (dateTime === "First Time Upgrade") {
+  if (dateTime === null) {
     return "First Time Upgrade";
   }
   if (dateTime === "") {

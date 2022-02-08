@@ -1,6 +1,9 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
+using BackendSite.Controllers.ApiV2.CMS.Setting;
+using Newtonsoft.Json;
+using System;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,18 +21,23 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.SetBanner(bannerInfo, user);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int SiteId,int BannerTypeId,int Status)
+        public IEnumerable<BannerInfoList> GetBannerList(IEnumerable<int> siteId, IEnumerable<int> bannerTypeId,
+            IEnumerable<int> status, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return bannerManageService.GetBannerList(SiteId, BannerTypeId, Status);
+            return bannerManageService.GetBannerList(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(bannerTypeId),
+                JsonConvert.SerializeObject(status),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize), out totalPages, out rowCount);
 
         }
-        public BannerInfo GetBanner(int SiteId, string BannerName)
+        public BannerInfo GetBanner(int siteId, string bannerName)
         {
-            return bannerManageService.GetBanner(SiteId, BannerName);
+            return bannerManageService.GetBanner(siteId, bannerName);
         }
-        public int UpdateBannerStatus(int SiteId, string BannerName, int Status, string User)
+        public int UpdateBannerStatus(int siteId, string bannerName, int status, string user)
         {
-            return bannerManageService.UpdateBannerStatus(SiteId, BannerName, Status, User);
+            return bannerManageService.UpdateBannerStatus(siteId, bannerName, status, user);
         }
     }
 }

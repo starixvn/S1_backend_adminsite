@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using BackendSite.Extensions;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -31,19 +33,24 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var PageSize = 10;
+
+                var statusList = new List<int>() { 0, 1, 2, 3, 4, 5 };
+
+
                 result.Data = bonusInfoBLL.GetBonusInfoReport(
-                    SelectSite, 
-                    BonusCode, 
-                    TransId, 
-                    CurrencyId, 
-                    UserName, 
+                    SelectSite,
+                    BonusCode,
+                    TransId,
+                    CurrencyId,
+                    UserName,
                     PromotionType,
                     DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime,
                     DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime,
-                    PageSize, 
-                    BaseCurrencyId, 
+                    BaseCurrencyId,
                     RebateCategoriesId,
-                    PageNumber, 
+                    statusList,
+                    PageNumber,
+                    PageSize,
                     out var TotalPages,
                     out var RowCount,
                     out var CurrencyAmount
@@ -68,7 +75,11 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportBonusInfoReport(string SelectSite, string BonusCode, string TransId, int CurrencyId, string UserName, int PromotionType, long StartDate, long EndDate, int BaseCurrencyId, int RebateCategoriesId)
         {
-            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(SelectSite, BonusCode, TransId, CurrencyId, UserName, PromotionType, DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, BaseCurrencyId, RebateCategoriesId);
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SelectSite);
+
+            var statusList = new List<int>() { 0, 1, 2, 3, 4, 5 };
+
+            var ExportData = bonusInfoBLL.GetBonusInfoExportReport(siteList, BonusCode, TransId, CurrencyId, UserName, PromotionType, DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, BaseCurrencyId, RebateCategoriesId, statusList);
             foreach (var data in ExportData)
             {
                 data.ExpiryTime = new DateTimeOffset(data.ExpiryTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
@@ -83,7 +94,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<PendingBonus>>
             {
-                Data = bonusInfoBLL.GetPendingBonusList(),
+                Data = bonusInfoBLL.GetPendingBonusList(1, 10000, out _, out _),
                 ErrorCode = 0
             };
             return apiResult;

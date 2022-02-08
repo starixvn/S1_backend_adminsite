@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.Api
 {
@@ -43,8 +42,8 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<UserBetLimit> Get([FromForm] QueryUserBetLimit query)
         {
             var pageNumber = query.PageNumber;
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(query.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(query.EndDate);
             var datas = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, startTime, endTime,
                 query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
             foreach (var data in datas)

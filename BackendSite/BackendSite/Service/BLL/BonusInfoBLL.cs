@@ -28,26 +28,45 @@ namespace BackendSite.Service.BLL
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int PageSize, int BaseCurrencyId, int RebateCategoriesId, int PageNumber, out int TotalPages, out int RowCount, out List<string> CurrencyAmount)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> siteIds,
+            string bonusCode,
+            string transId,
+            int currency,
+            string userName,
+            int promotionType,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId,
+            int rebateCategoriesId,
+            IEnumerable<int> statuses,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount,
+            out List<string> currencyAmount)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser();
+            var siteList = _serverInfoBll.GetSiteList();
+
+            if (!siteIds.Any())
+                siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+
             var datas = _bonusInfoService.GetBonusInfoReport(
-                    SelectSite,
-                    BonusCode,
-                    TransId,
-                    Currency,
-                    UserName,
-                    PromotionType,
-                    siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate,
-                    Math.Abs(PageSize),
-                    BaseCurrencyId,
-                    RebateCategoriesId,
-                    (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
-                    out TotalPages,
-                    out RowCount,
-                    out CurrencyAmount
+                    JsonConvert.SerializeObject(siteIds),
+                    bonusCode,
+                    transId,
+                    currency,
+                    userName,
+                    promotionType,
+                    startDate,
+                    endDate,
+                    baseCurrencyId,
+                    rebateCategoriesId,
+                    JsonConvert.SerializeObject(statuses),
+                    (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                    Math.Abs(pageSize),
+                    out totalPages,
+                    out rowCount,
+                    out currencyAmount
                 );
 
             var result = new List<BonusInfoFrontEnd>();
@@ -74,30 +93,43 @@ namespace BackendSite.Service.BLL
                         RollOver = row.RollOver,
                         CancelBonusAmount = row.CancelBonusAmount,
                         ExpiredCancel = row.ExpiredCancel,
-                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"",string.Empty)
-                    }); ;
+                        Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"", string.Empty)
+                    });
                 }
             }
 
             return result;
         }
 
-        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(string SelectSite, string BonusCode, string TransId, int Currency, string UserName, int PromotionType, DateTime StartDate, DateTime EndDate, int BaseCurrencyId, int RebateCategoriesId)
+        public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(IEnumerable<int> siteIds,
+            string bonusCode,
+            string transId,
+            int currency,
+            string userName,
+            int promotionType,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId,
+            int rebateCategoriesId,
+            IEnumerable<int> statuses)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser();
+            var siteList = _serverInfoBll.GetSiteList();
+
+            if (!siteIds.Any())
+                siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+
             var datas = _bonusInfoService.GetBonusInfoExportReport(
-                    SelectSite,
-                    BonusCode,
-                    TransId,
-                    Currency,
-                    UserName,
-                    PromotionType,
-                    siteList?.Select(x => x.SiteId),
-                    StartDate,
-                    EndDate,
-                    BaseCurrencyId,
-                    RebateCategoriesId
-                );
+                    JsonConvert.SerializeObject(siteIds),
+                    bonusCode,
+                    transId,
+                    currency,
+                    userName,
+                    promotionType,
+                    startDate,
+                    endDate,
+                    baseCurrencyId,
+                    rebateCategoriesId,
+                    JsonConvert.SerializeObject(statuses));
 
             var result = new List<BonusInfoFrontEnd>();
             if (datas != null && datas.Any())
@@ -130,9 +162,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList()
+        public IEnumerable<PendingBonus> GetPendingBonusList(int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _bonusInfoService.GetPendingBonusList();
+            return _bonusInfoService.GetPendingBonusList((Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize), out totalPages, out rowCount);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
@@ -155,7 +187,7 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Running,
+                (int) BonusInfoStatusEnum.Running,
             };
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);

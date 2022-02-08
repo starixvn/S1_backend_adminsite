@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model
         public string AccountType { set; get; }
         public string Network { set; get; }
         public int WalletCurrencyID { set; get; }
+        public string CryptoCurrency { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
@@ -58,8 +59,8 @@ namespace BackendSite.Service.Model
         public bool SameOperator { get; set; }
         public string CalCode => WithdrawalType switch
         {
-            (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            (int)enums.WithdrawalTypeEnum.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)enums.WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -151,8 +152,8 @@ namespace BackendSite.Service.Model
         public string CalCode =>
         WithdrawalType switch
         {
-            (int)enums.WithdrawalType.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)enums.WithdrawalType.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            (int)enums.WithdrawalTypeEnum.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)enums.WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -282,8 +283,8 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public DateTimeOffset? DepositTime { get; set; }
         public string CompleteTime { get; set; }
-        public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalType), WithdrawalType);
-        public string StatusName => Enum.GetName(typeof(WithdrawalStatus), Status);
+        public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalTypeEnum), WithdrawalType);
+        public string StatusName => Enum.GetName(typeof(WithdrawalStatusEnum), Status);
         public int WithdrawalId { get; set; }
         public string ToVerifyTime { get; set; }
         public string ToApprovedTime { get; set; }

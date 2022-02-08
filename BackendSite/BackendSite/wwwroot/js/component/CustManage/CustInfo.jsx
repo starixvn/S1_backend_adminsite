@@ -1359,6 +1359,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
 
             let data = this.props.CustInfoData;
+            
             let tagData = this.props.TagList;
             let tpWallet = null;
             let elgibleWithdrawal = 0;
@@ -1718,6 +1719,10 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         <td>{CustStatusOp[data.status]}</td>
                                     </tr>
                                     <tr>
+                                        <th scope="row">Last Status Time (Adjusted to GMT+8)</th>
+                                        <td>{moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row">Registration Time (Adjusted to GMT+8)</th>
                                         <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
@@ -1727,11 +1732,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">First Deposit Time (Adjusted to GMT+8)</th>
-                                        <td>{data.firstDepositTime}</td>
+                                        <td>{(data.firstDepositTime === null) ? "N/A" : moment.utc(data.firstDepositTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity Time (Adjusted to GMT+8)</th>
-                                        <td>{(typeof data.reloadTime === 'undefined') ? "N/A" : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
+                                        <td>{(data.reloadTime === null) ? "N/A" : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Activity IP</th>
@@ -1778,7 +1783,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Deposit Time (Adjusted to GMT+8)</th>
-                                        <td>{data.lastDepositTime}</td>
+                                        <td>{(data.lastDepositTime === null) ? "N/A" : moment.utc(data.lastDepositTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Deposit Summary</th>
@@ -1786,7 +1791,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Withdrawal Time (Adjusted to GMT+8)</th>
-                                        <td>{data.lastWithdrawlTime}</td>
+                                        <td>{(data.lastWithdrawlTime === null ) ? "N/A" : moment.utc(data.lastWithdrawlTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Withdrawal Summary</th>
@@ -1818,7 +1823,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Betting Time (Adjusted to GMT+8)</th>
-                                        <td>{data.lastBettingTime}</td>
+                                        <td>{(data.lastBettingTime === null) ? "N/A" : moment.utc(data.lastBettingTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Total Adjustment</th>

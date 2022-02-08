@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -78,6 +79,8 @@ namespace BackendSite.Controllers.Api
             public long? EndDate { get; set; }
             public long? TagStartDate { get; set; }
             public long? TagEndDate { get; set; }
+            public long? StatusStartDate { get; set; }
+            public long? StatusEndDate { get; set; }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -343,30 +346,13 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
-            DateTime? startDate = null;
-            DateTime? endDate = null;
-            DateTime? tagStartDate = null;
-            DateTime? tagEndDate = null;
-
-            if (req.StartDate != null)
-            {
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.StartDate);
-            }
-
-            if (req.EndDate != null)
-            {
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.EndDate);
-            }
-
-            if (req.TagStartDate != null)
-            {
-                tagStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagStartDate);
-            }
-
-            if (req.TagEndDate != null)
-            {
-                tagEndDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)req.TagEndDate);
-            }
+            
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
             
             var data = _custInfoBll.GetCustInfoList(req.SelectSite,
                                                    req.BirDate,
@@ -383,6 +369,8 @@ namespace BackendSite.Controllers.Api
                                                    endDate,
                                                    tagStartDate,
                                                    tagEndDate,
+                                                   statusStartDate,
+                                                   statusEndDate,
                                                    req.PageSize,
                                                    req.AffCode,
                                                    req.SelectCurrency,
@@ -420,63 +408,43 @@ namespace BackendSite.Controllers.Api
         /// 
         /// ***New Code For Frontend Team.
         /// </remarks>
-        /// <param name="custInfoReq"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListReq custInfoReq)
+        public IActionResult ExportCustInfoList(CustInfoListReq req)
         {
-            //List<int> selectSite = new List<int>();
-            //List<int> selectCurrency = new List<int>();
-            //List<int> selectStatus = new List<int>();
-            //if (custInfoReq.SelectSite != null)
-            //{
-            //    selectSite = Array.ConvertAll<string, int>(custInfoReq.SelectSite.Split(','), s => int.Parse(s)).ToList();
-            //}
-            //if (custInfoReq.SelectCurrency != null)
-            //{
-            //    selectCurrency = Array.ConvertAll<string, int>(custInfoReq.SelectCurrency.Split(','), s => int.Parse(s)).ToList();
-            //}
-            //if (custInfoReq.SelectStatus != null)
-            //{
-            //    selectStatus = Array.ConvertAll<string, int>(custInfoReq.SelectStatus.Split(','), s => int.Parse(s)).ToList();
-            //}
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
 
-            DateTime? startDate = null;
-            DateTime? endDate = null;
 
-            if (custInfoReq.StartDate != null)
-            {
-                if (custInfoReq.StartDate > 2147483647)
-                    custInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.StartDate);
-            }
-
-            if (custInfoReq.EndDate != null)
-            {
-                if (custInfoReq.EndDate > 2147483647)
-                    custInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)custInfoReq.EndDate);
-            }
-
-            var data = _custInfoBll.GetCustInfoExportList(custInfoReq.SelectSite,
-                                                                    custInfoReq.BirDate,
-                                                                    custInfoReq.BirMonth,
-                                                                    custInfoReq.BirYear,
-                                                                    custInfoReq.UserName,
-                                                                    custInfoReq.AccountName,
-                                                                    custInfoReq.LoginIp,
-                                                                    custInfoReq.TransId,
-                                                                    custInfoReq.TpUserName,
-                                                                    custInfoReq.Email,
-                                                                    custInfoReq.PhoneNo,
+            var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
+                                                                    req.BirDate,
+                                                                    req.BirMonth,
+                                                                    req.BirYear,
+                                                                    req.UserName,
+                                                                    req.AccountName,
+                                                                    req.LoginIp,
+                                                                    req.TransId,
+                                                                    req.TpUserName,
+                                                                    req.Email,
+                                                                    req.PhoneNo,
                                                                     startDate,
                                                                     endDate,
-                                                                    custInfoReq.AffCode,
-                                                                    custInfoReq.SelectCurrency,
-                                                                    custInfoReq.BankAccountNumber,
-                                                                    custInfoReq.SelectStatus);
+                                                                    tagStartDate,
+                                                                    tagEndDate,
+                                                                    statusStartDate,
+                                                                    statusEndDate,
+                                                                    req.AffCode,
+                                                                    req.SelectCurrency,
+                                                                    req.BankAccountNumber,
+                                                                    req.SelectStatus,
+                                                                    req.SelectTag);
 
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
@@ -586,8 +554,9 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
+
             switch (custStatusSwitch.Op)
             {
                 case 1:
@@ -608,6 +577,7 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
+                
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
@@ -1154,8 +1124,8 @@ namespace BackendSite.Controllers.Api
             if (loginLogReq.endDate > 2147483647)
                 loginLogReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.startDate);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.endDate);
+            var startDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.startDate);
+            var endDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.endDate);
 
             var withdrawalList = _custInfoBll.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
@@ -1360,8 +1330,8 @@ namespace BackendSite.Controllers.Api
                 request.EndTime = 2147483647;
             }
 
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.StartTime);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.EndTime);
+            var startTime = DateTimeExtensions.UnixToDateTime(request.StartTime);
+            var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    JsonConvert.SerializeObject(request.GameTypes),
@@ -1509,8 +1479,8 @@ namespace BackendSite.Controllers.Api
                     EndDate = 2147483647;
                 }
 
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
 
                 var SearchResult = _custInfoBll.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
                 //SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
@@ -1563,14 +1533,14 @@ namespace BackendSite.Controllers.Api
             
                 switch (data.PromotionType)
                 {
-                    case PromotionType.FstDeposit:
-                    case PromotionType.ReDeposit:
-                    case PromotionType.FreeBet:
-                    case PromotionType.WalletBonus:
-                    case PromotionType.Rebate:
-                    case PromotionType.Cashback:
-                    case PromotionType.StaticPage:
-                    case PromotionType.RetentionBonus:
+                    case PromotionTypeEnum.FstDeposit:
+                    case PromotionTypeEnum.ReDeposit:
+                    case PromotionTypeEnum.FreeBet:
+                    case PromotionTypeEnum.WalletBonus:
+                    case PromotionTypeEnum.Rebate:
+                    case PromotionTypeEnum.Cashback:
+                    case PromotionTypeEnum.StaticPage:
+                    case PromotionTypeEnum.RetentionBonus:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;
@@ -1678,8 +1648,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
             var SearchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
                                                      JsonConvert.SerializeObject(para.Currency),
                                                       startTime,
@@ -1790,8 +1760,8 @@ namespace BackendSite.Controllers.Api
                                                long StartDate,
                                                long EndDate)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
             var exportData = _custInfoBll.GetTeleCSDExportData(SiteIds,
                                                               Currency,
                                                               startTime,
@@ -2083,8 +2053,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<RegLiveStatus>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(custInfoReq.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(custInfoReq.EndDate);
                 var SearchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
@@ -2288,8 +2258,8 @@ namespace BackendSite.Controllers.Api
             string AffiliatesCode,
             int AgentCodeType)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
             var exportData = _custInfoBll.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
             foreach (var data in exportData)
             {
