@@ -73,13 +73,24 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
         [HttpPost]
-        public ApiListResult<AdminGroup> GetList(ApiRequestPageModel request)
+        public ApiListResult<AdminGroupModel> GetList(ApiRequestPageModel request)
         {
+            var result = new List<AdminGroupModel>();
             var data = _adminGroupBll.GetGroupList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
 
-            var apiResult = new ApiListResult<AdminGroup>
+            foreach (var item in data)
             {
-                Data = data,
+                result.Add(new AdminGroupModel()
+                {
+                    GroupId = (int)item.GroupSEQ,
+                    GroupName = item.GroupName,
+                    Remark = item.Remark
+                });
+            }
+
+            var apiResult = new ApiListResult<AdminGroupModel>
+            {
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
@@ -144,6 +155,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         public ApiResult<IEnumerable<FuncPermissionModel>> GetById(GetByIdRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<FuncPermissionModel>>();
+
+
 
             apiResult.Data = _permissionBll.GetGroupPermissionModel(request.GroupId);
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
