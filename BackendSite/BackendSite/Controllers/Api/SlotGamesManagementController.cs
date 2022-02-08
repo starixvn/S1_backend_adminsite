@@ -1,0 +1,67 @@
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace BackendSite.Controllers.Api
+{
+    [Authorize]
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public class SlotGamesManagementController : ControllerBase
+    {
+        private readonly ServerInfoBLL serverInfoBLL;
+        private readonly SlotGamesManagementBLL slotGamesManagementBLL;
+        public SlotGamesManagementController(ServerInfoBLL serverInfoBLL, SlotGamesManagementBLL slotGamesManagementBLL)
+        {
+            this.serverInfoBLL = serverInfoBLL;
+            this.slotGamesManagementBLL = slotGamesManagementBLL;
+        }
+
+        [HttpPost]
+        public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq req)
+        {
+
+            var apiResult = new ApiListResult<SlotGameData>();
+            try
+            {
+                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TPid, req.Name, req.Status, req.PageNumber, req.PageSize);
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.RowCount = result.RowCount;
+                apiResult.Data = result.SlotGameDataList;
+                apiResult.PageNumber = result.PageNumber;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        public ApiResult SetSlotGame(SetSlotGameReq req)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                slotGamesManagementBLL.SetSlotGame(req, User.Identity.Name);
+                apiResult.ErrorCode = 0;
+            }
+            catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+    }
+}

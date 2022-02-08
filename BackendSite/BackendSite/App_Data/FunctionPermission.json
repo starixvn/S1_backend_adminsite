@@ -551,6 +551,11 @@
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Slot Games Management",
+      "FuncKey": "CMS/SlotGamesManagement",
+      "Enable": false
     }
   ]
 },
