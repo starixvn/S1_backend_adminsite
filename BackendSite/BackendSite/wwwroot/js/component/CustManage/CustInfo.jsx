@@ -1720,7 +1720,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     </tr>
                                     <tr>
                                         <th scope="row">Last Status Time (Adjusted to GMT+8)</th>
-                                        <td>{moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
+                                        <td>{(data.lastStatusUpdateTime === null) ? "N/A" : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Registration Time (Adjusted to GMT+8)</th>
