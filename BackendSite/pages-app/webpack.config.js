@@ -260,6 +260,10 @@ module.exports = {
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
     // "Finance/BonusPayout.min": ["./src/pages/Finance/BonusPayout/index.js"],
+    "Marketing/SlotGamesManagement.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/SlotGamesManagement/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
