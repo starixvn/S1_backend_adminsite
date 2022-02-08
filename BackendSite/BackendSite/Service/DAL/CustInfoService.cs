@@ -722,7 +722,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
         }
-        
+
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             var p = new DynamicParameters();
