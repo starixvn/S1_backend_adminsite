@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static BackendSite.Controllers.Api.AdminUserController;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.CustVipLevel;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -27,6 +30,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PaymentBLL _paymentBll;
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly AdminGroupBLL _adminGroupBll;
+        private readonly BonusManageBLL _bonusManageBll;
+        private readonly RebateManageBLL _rebateManageBll;
+        private readonly CustInfoBLL _custInfoBll;
+        private readonly PrizeBLL _prizeBll;
 
         #endregion
 
@@ -40,6 +48,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _prizeBll = provider.GetRequiredService<PrizeBLL>();
         }
 
         #endregion
@@ -50,11 +63,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// GetAllData/BankInfoSys 取得銀行系統資訊
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Finance > Bank Card Management.
-        /// 
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
@@ -71,11 +82,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// GetAllData/GetCurrency 取得幣別資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Global Func.
-        /// 
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
@@ -151,11 +160,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// GetAllData/GetTpGameType 取得第三方遊戲類型
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path： Show tp  GameType List
-        /// 
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
@@ -201,12 +208,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// GetAllData/GetAdjustmentInfoLogMenu 取得調整資料記錄程式清單
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
@@ -222,7 +228,85 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
+        /// <summary>
+        ///  GetAllData/GetGroupList 取得所有群組權限清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
+        {
+            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
+            {
+                Data = _adminGroupBll.GetGroupList(1, 1000, out _, out _),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+
+        //[HttpPost]
+        //public ApiResult<IEnumerable<TpGameType>> GetTpGameList()
+        //{
+        //    var apiResult = new ApiResult<IEnumerable<TpGameType>>();
+
+        //    try
+        //    {
+        //        apiResult.Data = _bonusManageBll.GetTpGameList();
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //        apiResult.RawMessage = ex.ToString();
+        //    }
+
+        //    return apiResult;
+        //}
+
+        /// <summary>
+        /// BaseData/GetAllSiteVipLevelList  取得所有品牌VIP等級清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<VipLevelModel>> GetAllSiteVipLevelList()
+        {
+            return new ApiResult<IEnumerable<VipLevelModel>>
+            {
+                Data = _custInfoBll.GetAllSiteVipLevelList(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// AllData/GetEventNameList 取得活動名稱清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Draw Prize Report > EventName
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<EventDraw>> GetEventName()
+        {
+            var apiResult = new ApiResult<IEnumerable<EventDraw>>
+            {
+                Data = _prizeBll.GetEventName(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+
         #endregion
 
     }

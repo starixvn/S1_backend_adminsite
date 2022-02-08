@@ -1,30 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
     public class MarketingService
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public MarketingService(IConfiguration configuration)
+        public MarketingService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<PointLevelInfo> GetPointLevelInfos(int siteId, int currencyId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<PointLevelInfo>("PointLevelInfo_Get", new { SiteId = siteId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<PointLevelInfo>("PointLevelInfo_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId }));
         }
 
         public bool AddPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var param = new
             {
                 pointLevelInfo.SiteId,
@@ -34,12 +41,11 @@ namespace BackendSite.Service.DAL
                 pointLevelInfo.WithdrawalCnt,
                 pointLevelInfo.IsKyc
             };
-            return conn.Execute("PointLevelInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("PointLevelInfo_Ins", new DynamicParameters(param)) > 0;
         }
 
         public bool EditPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var param = new
             {
                 pointLevelInfo.SiteId,
@@ -49,18 +55,17 @@ namespace BackendSite.Service.DAL
                 pointLevelInfo.WithdrawalCnt,
                 pointLevelInfo.IsKyc
             };
-            return conn.Execute("PointLevelInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("PointLevelInfo_Set", new DynamicParameters(param)) > 0;
         }
 
         public PointLevelInfo GetPointLevelInfo(int siteId, int currencyId, int point)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<PointLevelInfo>("PointLevelInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, PointLevel = point }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.QueryFirst<PointLevelInfo>("PointLevelInfoDetail_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId, PointLevel = point }));
         }
 
         public int DeletePointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel },commandType: CommandType.StoredProcedure);
         }
     }

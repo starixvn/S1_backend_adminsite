@@ -28,7 +28,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiResult SetGameCasinoDetail(SetGameCasionPara para)
+        public ApiResult SetGameCasinoDetail(SetGameCasinoPara para)
         {
             var apiResult = new ApiResult();
             try
@@ -59,7 +59,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiResult InsertGameCasinoDetail(InsertGameCasionPara para)
+        public ApiResult InsertGameCasinoDetail(InsertGameCasinoPara para)
         {
             var apiResult = new ApiResult();
             try
@@ -79,7 +79,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
-        public ApiResult DeleteGameCasinoDetail(DeleteGameCasionPara para)
+        public ApiResult DeleteGameCasinoDetail(DeleteGameCasinoPara para)
         {
             var apiResult = new ApiResult();
             try

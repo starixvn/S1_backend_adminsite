@@ -39,9 +39,8 @@ namespace BackendSite.Service.BLL
                 {
                     if (funcKeyItem.SubFuncKeys != null)
                     {
-                        var subFuncKeyDatas = funcKeyItem.SubFuncKeys.Select(x => x.FuncKey);
-                        result.AddRange(subFuncKeyDatas.Select(
-                            subFuncKeyItem => new GroupPermisison {GroupSEQ = 0, FuncKey = funcKeyItem.FuncKey, SubFuncKeys = subFuncKeyItem}));
+                        var subFuncKeyDatas = JsonConvert.SerializeObject(funcKeyItem.SubFuncKeys.Select(x => x.FuncKey));
+                        result.Add(new GroupPermisison { GroupSEQ = 0, FuncKey = funcKeyItem.FuncKey, SubFuncKeys = subFuncKeyDatas });
                     }
                     else
                     {

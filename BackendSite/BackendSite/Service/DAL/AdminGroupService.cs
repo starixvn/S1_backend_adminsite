@@ -18,10 +18,21 @@ namespace BackendSite.Service.DAL
             this.configuration = configuration;
         }
 
-        public IEnumerable<AdminGroup> GetGroupList()
+        public IEnumerable<AdminGroup> GetGroupList(int startIndex, int pageSize,out int totalPages,out int rowCount)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<AdminGroup>("Admin_Group_Get", new { SEQ = 0, SelectAll = 1 }, commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("_StartIndex", startIndex);
+            para.Add("_PageSize", pageSize);
+            para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<AdminGroup>("Admin_Group_Get_V2", para, commandType: CommandType.StoredProcedure);
+
+            totalPages = para.Get<int?>("_TotalPages") ?? 0;
+            rowCount = para.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public IEnumerable<GroupPermisison> GetGroupPermissions(int SEQ)
