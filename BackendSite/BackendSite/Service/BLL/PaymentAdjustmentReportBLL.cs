@@ -53,7 +53,7 @@ namespace BackendSite.Service.BLL
                         UserName = row.UserName,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = row.AdjustType == (int)AdjustType.ThirdAdd || row.AdjustType == (int)AdjustType.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         SabaID = row.SabaID,
                         Operator = row.Operator,
@@ -93,7 +93,7 @@ namespace BackendSite.Service.BLL
                         SabaID = row.SabaID,
                         Amount = row.Amount,
                         CreateTime = row.CreateTime,
-                        StatusName = row.AdjustType == (int)AdjustType.ThirdAdd || row.AdjustType == (int)AdjustType.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                        StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
                         Memo = row.Memo,
                         Operator = row.Operator,
                         WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType

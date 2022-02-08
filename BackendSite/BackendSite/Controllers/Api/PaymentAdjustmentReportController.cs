@@ -4,6 +4,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
@@ -29,8 +30,8 @@ namespace BackendSite.Controllers.Api
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 
                 var PageSize = 10;
                 var TotalPages = 0;
@@ -63,8 +64,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, long StartDate, long EndDate)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
             var exportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime);
             foreach (var data in exportData)
             {
@@ -96,14 +97,14 @@ namespace BackendSite.Controllers.Api
             {
                 if (getAdjustmentInfoReq.StartDate > 2147483647)
                     getAdjustmentInfoReq.StartDate = 2147483647;
-                startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.StartDate);
+                startDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.StartDate);
             }
 
             if (getAdjustmentInfoReq.EndDate != null)
             {
                 if (getAdjustmentInfoReq.EndDate > 2147483647)
                     getAdjustmentInfoReq.EndDate = 2147483647;
-                endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)getAdjustmentInfoReq.EndDate);
+                endDate = DateTimeExtensions.UnixToDateTime((long)getAdjustmentInfoReq.EndDate);
             }
 
             var apiListResult = new ApiListResultCurrencyAmount<PaymentAdjustment>

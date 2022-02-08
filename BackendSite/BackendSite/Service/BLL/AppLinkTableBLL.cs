@@ -20,38 +20,38 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<AppLinkTable> GetAppLinkTable(int siteId)
         {
-            var AppLinkTable =  appLinkTableService.GetAppLinkTable(siteId).ToList();
-            var SiteList = serverInfoService.GetSiteList().ToList();
+            var appLinkTable =  appLinkTableService.GetAppLinkTable(siteId).ToList();
+            var siteList = serverInfoService.GetSiteList().ToList();
 
-            if (AppLinkTable.Find(x=> x.AppType == 1) == null){
-                AppLinkTable.Add(new AppLinkTable
+            if (appLinkTable.Find(x=> x.AppType == 1) == null){
+                appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
-                    SiteName = SiteList.Find(x=>x.SiteId == siteId).SiteName,
+                    SiteName = siteList.Find(x=>x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
                     AppType = 1,
                     ProtocolType = 1
                 });
             }
 
-            if (AppLinkTable.Find(x => x.AppType == 2) == null)
+            if (appLinkTable.Find(x => x.AppType == 2) == null)
             {
-                AppLinkTable.Add(new AppLinkTable
+                appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
-                    SiteName = SiteList.Find(x => x.SiteId == siteId).SiteName,
+                    SiteName = siteList.Find(x => x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
                     AppType = 2,
                     ProtocolType = 1
                 });
             }
 
-            return AppLinkTable;
+            return appLinkTable;
         }
 
-        public int SetAppLink(int SiteId, int AppType, string Domain, int ProtocolType,string LastUpdateUser)
+        public int SetAppLink(int siteId, int appType, string domain, int protocolType,string lastUpdateUser)
         {
-            return appLinkTableService.SetAppLink(SiteId, AppType, Domain, ProtocolType, LastUpdateUser);
+            return appLinkTableService.SetAppLink(siteId, appType, domain, protocolType, lastUpdateUser);
         }
     }
 }

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.Api
@@ -112,8 +113,8 @@ namespace BackendSite.Controllers.Api
                     para.EndDate = 2147483647;
                 }
 
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
                 var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageNumber,
                     PageSize, ref TotalPages, ref RowCount);
                 foreach (var r in result)
@@ -203,8 +204,8 @@ namespace BackendSite.Controllers.Api
                     _EndTime = 2147483647;
                 }
 
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
+                var startTime = DateTimeExtensions.UnixToDateTime(_StartTime);
+                var endTime = DateTimeExtensions.UnixToDateTime(_EndTime);
                 var result = messageBLL.AddAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.CreateTime, result.Creator, result.Id };
                 apiResult.ErrorCode = 0;
@@ -252,8 +253,8 @@ namespace BackendSite.Controllers.Api
                     _EndTime = 2147483647;
                 }
 
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_StartTime);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(_EndTime);
+                var startTime = DateTimeExtensions.UnixToDateTime(_StartTime);
+                var endTime = DateTimeExtensions.UnixToDateTime(_EndTime);
                 var result =
                     messageBLL.UpdateAnnouncement(Datas, authData.UserName, authData.UserId, startTime, endTime);
                 apiResult.Data = new { result.LastUpdater, result.LastUpdateTime };
@@ -640,8 +641,8 @@ namespace BackendSite.Controllers.Api
             try
             {
                 messageBLL.DeleteBatchMessage(batchId);
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize,
                     ref PageNumber, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
@@ -748,8 +749,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize,
                     ref PageNumber, ref TotalPages, ref RowCount);
 

@@ -51,6 +51,14 @@ const App = () => {
 		);
 	}, []);
 
+	const setUnixSportBattleDateTime = (dateTime) => {
+		console.log("test",dateTime);
+	  if(dateTime === null) {
+		  return null;
+	  }else{
+		  return moment(dateTime).unix();
+	  }
+	}
 	const FilterOnchange=(v,dataColumn)=>{
 		if(dataColumn == "BannerType"){
 			setBannerType(v);
@@ -196,7 +204,7 @@ const App = () => {
 				TpId: Number(banner.tpId),
 				GameId: banner.gameId,
 				UrlRouter: banner.urlRouter,
-				UnixSportBattleDateTime: moment(banner.sportBattleDateTime).unix(),
+				UnixSportBattleDateTime: setUnixSportBattleDateTime(banner.sportBattleDateTime),
 				SportCategoryId: Number(banner.sportCategoryId),
 				SportLeaguesId: Number(banner.sportLeaguesId),
 				SportTeamsId: (Object.keys(banner.sportTeamsId).length > 0) ? [{ "Home": Number(banner.sportTeamsId.home), "Away": Number(banner.sportTeamsId.away) }] : null,
