@@ -63,7 +63,7 @@ namespace BackendSite.Service.Model
         public int Promotion { get; set; }
         public DateTime UpdateAt { get; set; }
     }
-    public class SetGameCasionPara
+    public class SetGameCasinoPara
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -74,13 +74,13 @@ namespace BackendSite.Service.Model
         public int Promotion { get; set; }
         public string Type { get; set; }
     }
-    public class InsertGameCasionPara
+    public class InsertGameCasinoPara
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public int GameCasinoId { get; set; }
     }
-    public class DeleteGameCasionPara
+    public class DeleteGameCasinoPara
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }

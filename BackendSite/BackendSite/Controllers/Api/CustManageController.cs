@@ -556,6 +556,7 @@ namespace BackendSite.Controllers.Api
             int NewStatus = 0;
             
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
+
             switch (custStatusSwitch.Op)
             {
                 case 1:
@@ -576,6 +577,7 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
+                
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
@@ -1122,8 +1124,8 @@ namespace BackendSite.Controllers.Api
             if (loginLogReq.endDate > 2147483647)
                 loginLogReq.endDate = 2147483647;
 
-            var startDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.startDate);
-            var endDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)loginLogReq.endDate);
+            var startDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.startDate);
+            var endDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.endDate);
 
             var withdrawalList = _custInfoBll.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
@@ -1328,8 +1330,8 @@ namespace BackendSite.Controllers.Api
                 request.EndTime = 2147483647;
             }
 
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.StartTime);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(request.EndTime);
+            var startTime = DateTimeExtensions.UnixToDateTime(request.StartTime);
+            var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    JsonConvert.SerializeObject(request.GameTypes),
@@ -1477,8 +1479,8 @@ namespace BackendSite.Controllers.Api
                     EndDate = 2147483647;
                 }
 
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
 
                 var SearchResult = _custInfoBll.GetPromotionListByCustIdAndDate(CustId, startTime, endTime, PageNumber, PageSize);
                 //SearchResult.PromotionList.ForEach(s => s.ClaimDate = new DateTimeOffset(s.ClaimDate.DateTime.AddHours(8), TimeSpan.FromHours(8)));
@@ -1531,14 +1533,14 @@ namespace BackendSite.Controllers.Api
             
                 switch (data.PromotionType)
                 {
-                    case PromotionType.FstDeposit:
-                    case PromotionType.ReDeposit:
-                    case PromotionType.FreeBet:
-                    case PromotionType.WalletBonus:
-                    case PromotionType.Rebate:
-                    case PromotionType.Cashback:
-                    case PromotionType.StaticPage:
-                    case PromotionType.RetentionBonus:
+                    case PromotionTypeEnum.FstDeposit:
+                    case PromotionTypeEnum.ReDeposit:
+                    case PromotionTypeEnum.FreeBet:
+                    case PromotionTypeEnum.WalletBonus:
+                    case PromotionTypeEnum.Rebate:
+                    case PromotionTypeEnum.Cashback:
+                    case PromotionTypeEnum.StaticPage:
+                    case PromotionTypeEnum.RetentionBonus:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;
@@ -1646,8 +1648,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(para.EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
             var SearchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
                                                      JsonConvert.SerializeObject(para.Currency),
                                                       startTime,
@@ -1758,8 +1760,8 @@ namespace BackendSite.Controllers.Api
                                                long StartDate,
                                                long EndDate)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
             var exportData = _custInfoBll.GetTeleCSDExportData(SiteIds,
                                                               Currency,
                                                               startTime,
@@ -2051,8 +2053,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<RegLiveStatus>();
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(custInfoReq.EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(custInfoReq.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime(custInfoReq.EndDate);
                 var SearchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
 
@@ -2256,8 +2258,8 @@ namespace BackendSite.Controllers.Api
             string AffiliatesCode,
             int AgentCodeType)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(StartDate);
-            var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(EndDate);
+            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
+            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
             var exportData = _custInfoBll.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
             foreach (var data in exportData)
             {

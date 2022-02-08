@@ -172,11 +172,6 @@ namespace BackendSite.Service.BLL
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.LastDepositTime = custInfoDetail.LastDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastWithdrawlTime = custInfoDetail.LastWithdrawalTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastWithdrawalTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.LastBettingTime = custInfoDetail.LastTpBetRecordTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.LastTpBetRecordTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-                custInfoDetail.FirstDepositTime = custInfoDetail.FirstDepositTimeRecord == null ? "N/A" : Convert.ToDateTime(custInfoDetail.FirstDepositTimeRecord).ToUniversalTime().AddHours(8).ToString("M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
-
                 custInfoDetail.tpWallet = await _tpBll.GetTpWalletAsync(custInfoDetail.CustId);
                 custInfoDetail.promotions = _promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
@@ -261,9 +256,9 @@ namespace BackendSite.Service.BLL
         {
             var statusList = new List<int>
             {
-                (int) BonusStatusType.Initial,
-                (int) BonusStatusType.Running,
-                (int) BonusStatusType.TrasferOut,
+                (int) BonusInfoStatusEnum.Initial,
+                (int) BonusInfoStatusEnum.Running,
+                (int) BonusInfoStatusEnum.TrasferOut,
             };
             return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
         }
@@ -656,7 +651,7 @@ namespace BackendSite.Service.BLL
                     Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(RegLiveStatusType), x.Status),
+                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
@@ -728,6 +723,7 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
+
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
         {
             return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
@@ -736,6 +732,7 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustInfoBySite(siteId, currencyId, status);
         }
+
         public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);

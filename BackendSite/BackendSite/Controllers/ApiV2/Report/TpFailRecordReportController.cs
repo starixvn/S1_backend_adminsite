@@ -148,7 +148,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
-        public ApiListResult<object> GetList(GetListReq req)
+        public ApiListResult<TpFailRecordReport> GetList(GetListReq req)
         {
             var data =
                 _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
@@ -166,7 +166,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             if (!data.Any())
                 throw new AdminException(ErrorCodeEnum.NoData);
             
-            return new ApiListResult<object>
+            return new ApiListResult<TpFailRecordReport>
             {
                 Data = data,
                 PageNumber = req.PageNumber,
@@ -194,6 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>Excel File</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportV1(int siteId,
             int tpId,
             DateTimeOffset startTime,

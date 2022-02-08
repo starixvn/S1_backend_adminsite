@@ -27,7 +27,7 @@
     }
 
     var typeList = new Dictionary<int, string>();
-    foreach (var value in Enum.GetValues(typeof(PromotionType)))
+    foreach (var value in Enum.GetValues(typeof(PromotionTypeEnum)))
     {
         var _value = (int)value;
         typeList.Add(_value, selLangBLL.GetResourceValue($"lbl_PromotionType{_value}") ?? _value.ToString());

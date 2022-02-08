@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model.BankFinancial
             set;
         }
 
-        public WithdrawalType WithdrawalType
+        public WithdrawalTypeEnum WithdrawalType
         {
             get;
             set;

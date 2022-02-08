@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +30,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         {
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
+        }
+
+        #endregion
+
+        #region API Model
+
+        public class GetListRequest : ApiRequestPageModel
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<DepositTypeEnum> DepositTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
         #endregion
@@ -63,14 +76,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// 
         /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult<IEnumerable<DepositLimitInfo>> GetList(DepositLimit req)
+        public ApiListResult<DepositLimitInfo> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
-            var depositLimitInfos = _depositBll.GetDepositLimitInfos(req.SiteId, req.DepositType, req.CurrencyId);
+            var apiResult = new ApiListResult<DepositLimitInfo>();
+            var depositTypeList = request.DepositTypes.Select(x => (int)x);
+
+            var depositLimitInfos = _depositBll.GetDepositLimitInfos(request.SiteIds,
+                depositTypeList,
+                request.CurrencyIds,
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
             apiResult.Data = depositLimitInfos;
+            apiResult.PageNumber = request.PageNumber;
+            apiResult.TotalPages = totalPages;
+            apiResult.RowCount = rowCount;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
