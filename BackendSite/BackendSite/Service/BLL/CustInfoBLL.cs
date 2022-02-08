@@ -722,6 +722,7 @@ namespace BackendSite.Service.BLL
             
             return data;
         }
+
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
         {
             return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
@@ -730,6 +731,7 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustInfoBySite(siteId, currencyId, status);
         }
+
         public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);

@@ -1214,22 +1214,21 @@ namespace BackendSite.Controllers.Api
         /// 
         /// Func Path：Reports > User Online Report >  [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="SiteIds"></param>
-        /// <param name="SelectDate"></param>
+        /// <param name="siteIds"></param>
+        /// <param name="selectDate"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportUserOnlineReport(string SiteIds,
-                                                    string SelectDate)
+        public IActionResult ExportUserOnlineReport(string siteIds, string selectDate)
         {
             #region Get Data
 
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SiteIds);
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(siteIds);
 
-            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds, SelectDate, 8);
-
-            var totalMaxCount = ExportData.GroupBy(x => new
+            var exportData = _reportBLL.GetUserOnlineReport(siteIds, selectDate, 8);
+            
+            var totalMaxCount = exportData.GroupBy(x => new
             {
-                LocalTime = x.LocalTime
+                x.LocalTime
             }).Select(x => x.Sum(y => y.MaxCount)).Max();
 
             var serverData = _reportBLL.GetServer();
@@ -1238,41 +1237,75 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            var Content = new List<Dictionary<string, dynamic>>();
-            var Titles = new Dictionary<string, TitleModel>();
+            var content = new List<Dictionary<string, dynamic>>();
+            var titles = new Dictionary<string, TitleModel>();
             var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
             #endregion
 
             #region Set Title(Merge Title & Title & Total Title & Not Summary Title)
 
-            #region Merge Title
+            #region IsRemoveOld Logic
 
-            var MergeTitles = new Dictionary<string, MergeTitleModel>();
-
-            MergeTitles.Add("Date", new MergeTitleModel { Name = SelectDate, MergeRange = 1 });
-            MergeTitles.Add("OnlineCount", new MergeTitleModel { Name = "Online Count", MergeRange = siteList.Count() + 1 });
-
-            titlesToMerge.Add(MergeTitles);
+            var isRemoveOld = exportData.Where(x => x.DeviceType == (short) DeviceId.Old)
+                .All(x => x.MaxCount == 0);
+            var deviceIdCount  = Enum.GetNames(typeof(DeviceId)).Length;
+            var deviceIdList = Enum.GetValues(typeof(DeviceId)).Cast<DeviceId>().ToList();
+            
+            if (isRemoveOld)
+            {
+                deviceIdCount -= 1;
+                deviceIdList.Remove(DeviceId.Old);
+            }
 
             #endregion
-
-            #region Title
-
-            Titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
-            Titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
+            
+            #region Merge Title
+            
+            // row 1
+            var mergeTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Date", new MergeTitleModel {Name = selectDate, MergeRange = 1}},
+                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange =  (siteList.Count() * (deviceIdCount +1 )) }}
+            };
+            
+            // row 2
+            var mergeDeviceTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Site", new MergeTitleModel {Name = "Site", MergeRange = 1}}
+            };
 
             foreach (var site in siteList)
             {
                 var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
-
-                var OnlinePropName = $"Online-{siteName}";
-
-                var onlineSortId = 100 + site;
-
-                Titles.Add(OnlinePropName, new TitleModel { Name = siteName, SortId = onlineSortId });
+                var onlinePropName = $"Online-{siteName}";
+                mergeDeviceTitles.Add(onlinePropName, new MergeTitleModel { Name = siteName, MergeRange = deviceIdCount + 1});
             }
+            
+            titlesToMerge.Add(mergeTitles);
+            titlesToMerge.Add(mergeDeviceTitles);
+            
+            #endregion
 
+            #region Title
+
+            titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
+            titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
+            
+            foreach (var site in siteList)
+            {
+                var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                foreach (var id in deviceIdList)
+                {
+                    var onlinePropName = $"Online-{siteName}-{(short)id}";
+                    var onlineSortId = 100 + (site*10) +(int) id;
+                    titles.Add(onlinePropName, new TitleModel { Name = id.ToString(), SortId = onlineSortId });
+                }
+                var onlinePropNameSummary = $"Online-{siteName}-Summary";
+                var onlineSummarySortId = 100 + (site*10) + 5;
+                titles.Add(onlinePropNameSummary, new TitleModel { Name = "Site Total", SortId = onlineSummarySortId });
+            }
+            
             #endregion
 
             var totalTitle = new List<string>
@@ -1287,31 +1320,43 @@ namespace BackendSite.Controllers.Api
             };
 
             #endregion
-
-            foreach (var item in ExportData)
+            
+            foreach (var item in exportData)
             {
-                var OnlinePropName = $"Online-{item.SiteName}";
-
+                var onlinePropName = $"Online-{item.SiteName}-{item.DeviceType}";
+                var onlineSitePropName = $"Online-{item.SiteName}-Summary";
+                
                 var getKey = $"{item.LocalTime}";
-                var getItem = Content.FirstOrDefault(x =>
+                var getItem = content.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
                 );
 
                 if (getItem != null)
                 {
-                    getItem.TryGetValue("TotalOnline", out var totalCountdata);
-                    getItem["TotalOnline"] = (int)totalCountdata + item.MaxCount;
+                    getItem.TryGetValue("TotalOnline", out var totalCountData);
+                    getItem["TotalOnline"] = (int)totalCountData + item.MaxCount;
 
-                    if (getItem.ContainsKey(OnlinePropName))
+                    if (getItem.ContainsKey(onlinePropName))
                     {
-                        getItem.TryGetValue(OnlinePropName, out var maxCountData);
-                        getItem[OnlinePropName] = (int)maxCountData + item.MaxCount;
+                        getItem.TryGetValue(onlinePropName, out var maxCountData);
+                        getItem[onlinePropName] = (int)maxCountData + item.MaxCount;
                     }
                     else
                     {
-                        getItem.Add(OnlinePropName, item.MaxCount);
+                        getItem.Add(onlinePropName, item.MaxCount);
                     }
 
+                    if (getItem.ContainsKey(onlineSitePropName))
+                    {
+                        getItem.TryGetValue(onlineSitePropName, out var maxCountData);
+                        getItem[onlineSitePropName] = (int)maxCountData + item.MaxCount;
+                    }
+                    else
+                    {
+                        getItem.Add(onlineSitePropName, item.MaxCount);
+                    }
+                    
+                    
                     if (getItem["TotalOnline"] == totalMaxCount)
                     {
                         getItem["MaxCount"] = true;
@@ -1324,12 +1369,12 @@ namespace BackendSite.Controllers.Api
                     {
                         { "Key", getKey },
                         { "LocalTime", item.LocalTime },
-
-                        { OnlinePropName,  item.MaxCount },
+                        { onlinePropName,  item.MaxCount },
+                        { onlineSitePropName,  item.MaxCount },
                         { "TotalOnline", item.MaxCount }
                     };
 
-                    Content.Add(newItem);
+                    content.Add(newItem);
                 }
             }
 
@@ -1338,8 +1383,8 @@ namespace BackendSite.Controllers.Api
                 new ComplexReportExportDataToExcel()
                 {
                     SheetName = "User Online Report",
-                    Content = Content,
-                    Titles = Titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
+                    Content = content,
+                    Titles = titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
                     TotalTitles = totalTitle,
                     TitlesToMerge = titlesToMerge,
                     NotSummaryTitles = notSummaryTitles,
