@@ -131,10 +131,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V2", parameters);
         }
 
-        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds,
-                                                                        string currencyIds,
-                                                                        string startDate,
-                                                                        string endDate)
+        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var parameters = new DynamicParameters(
                 new
@@ -142,11 +139,10 @@ namespace BackendSite.Service.DAL
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
-            var SpName = "Admin_Report_DepositDetailByDay_Get";
-            return _reportDbClient.Query<DepositReportParticalModel>(SpName, parameters);
-
+            return _reportDbClient.Query<DepositReportParticalModel>("Admin_Report_DepositDetailByDay_Get_V2", parameters);
         }
 
         public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
