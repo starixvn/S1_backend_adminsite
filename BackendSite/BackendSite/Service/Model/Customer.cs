@@ -99,6 +99,16 @@ namespace BackendSite.Service.Model
                     _lastTagUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
+        private DateTimeOffset? _lastStatusUpdateTime  { get; set; }
+        public DateTimeOffset? LastStatusUpdateTime 
+        {
+            get => _lastStatusUpdateTime;
+            set
+            {
+                if (value != null)
+                    _lastStatusUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
         public string IP { get; set; }
         public string LevelName { get; set; }
         public string AffiliateCode { get; set; }
