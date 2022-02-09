@@ -705,6 +705,11 @@ namespace BackendSite.Service.Model.enums
         APP = 3
     }
 
+    public enum CustTaskType
+    {
+        LastStatusUpdateTime = 2,
+    }
+    
     #region BankDetailOff
 
     public enum BankDetailOffStatusEnum
