@@ -2015,13 +2015,13 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
-
             var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
                                                                      JsonConvert.SerializeObject(request.SiteIds),
                                                                      JsonConvert.SerializeObject(request.CurrencyIds),
                                                                      request.StartDate,
                                                                      request.EndDate,
-                                                                     request.UserName);
+                                                                     request.UserName,
+                                                                     _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -2054,24 +2054,13 @@ namespace BackendSite.Controllers.Api
         /// <param name="UserName"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportCustomerStatisticalReport(string SiteIds,
-                                               string CurrencyIds,
-                                               string StartDate,
-                                               string EndDate,
-                                               string UserName)
+        public IActionResult ExportCustomerStatisticalReport(string SiteIds, string CurrencyIds, string StartDate, string EndDate, string UserName)
         {
 
             #region Get Data
 
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
-
-            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList,
-                                                                     SiteIds,
-                                                                     CurrencyIds,
-                                                                     StartDate,
-                                                                     EndDate,
-                                                                     UserName);
-
+            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList, SiteIds, CurrencyIds, StartDate, EndDate, UserName, _common.TransferToTimeZoneFormat(8));
             var currencyData = _reportBLL.GetCurrency();
 
             #endregion
@@ -2582,11 +2571,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
-            var data = _reportBLL.GetCustomerDetail(request.CustId,
-                                                          request.GameId,
-                                                          request.Date);
-
-
+            var data = _reportBLL.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(8));
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
