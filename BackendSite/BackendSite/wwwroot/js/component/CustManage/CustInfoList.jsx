@@ -54,6 +54,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.sabaID}</td>
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
@@ -117,6 +118,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Registration time (Adjusted to GMT+8)</th>
                                     <th scope="col">Last Active Time (Adjusted to GMT+8)</th>
                                     <th scope="col">Last Tag Update Time (Adjusted to GMT+8)</th>
+                                    <th scope="col">Last Status Update Time (Adjusted to GMT+8)</th>
                                     <th scope="col">Saba ID</th>
                                     <th scope="col">Status</th>
                                 </tr>
@@ -144,6 +146,11 @@ import * as Loading from '../commJS/Loading.jsx';
             this.selectTagDate_start = React.createRef();
             this.f_trigger_TagEnd = React.createRef();
             this.selectTagDate_end = React.createRef();
+
+            this.f_trigger_StatusStart = React.createRef();
+            this.selectStatusDate_start = React.createRef();
+            this.f_trigger_StatusEnd = React.createRef();
+            this.selectStatusDate_end = React.createRef();
             
             this.ExportForm = React.createRef();
         }
@@ -153,12 +160,15 @@ import * as Loading from '../commJS/Loading.jsx';
             if ((this.state.BirDate || this.state.BirMonth) && (!this.state.BirDate || !this.state.BirMonth)) { alert("Please fill in at least Date and Month"); return; }
             let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
             let tagEndDate = moment(this.selectTagDate_end.current.value).add(1, 'days').unix() - 1;
+            let statusEndDate = moment(this.selectStatusDate_end.current.value).add(1, 'days').unix() - 1;
             this._Search = true;
             this.setState({
                 StartDate: moment(this.selectdate_start.current.value).unix(),
                 EndDate: endDate,
                 TagStartDate: moment(this.selectTagDate_start.current.value).unix(),
                 TagEndDate: tagEndDate,
+                StatusStartDate: moment(this.selectStatusDate_start.current.value).unix(),
+                StatusEndDate: statusEndDate,
                 sBirDate: this.state.BirDate,
                 sBirMonth: this.state.BirMonth,
                 sBirYear: this.state.BirYear,
@@ -186,6 +196,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 EndDate: !this.state.EndDate ? null : this.state.EndDate,
                 TagStartDate: !this.state.TagStartDate ? null : this.state.TagStartDate,
                 TagEndDate: !this.state.TagEndDate ? null : this.state.TagEndDate,
+                StatusStartDate: !this.state.StatusStartDate ? null : this.state.StatusStartDate,
+                StatusEndDate: !this.state.StatusEndDate ? null : this.state.StatusEndDate,
                 BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
                 BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
                 BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
@@ -215,7 +227,7 @@ import * as Loading from '../commJS/Loading.jsx';
                         this.setState({ Loading: false });
                     }
                 }.bind(this)).catch(function (error) {
-                    Loading.UnLoading();
+                    Lading.UnLoading();
                     alert(error);
                     this.setState({ Loading: false });
                 }.bind(this));
@@ -228,6 +240,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 EndDate: !this.state.EndDate ? null : this.state.EndDate,
                 TagStartDate: !this.state.TagStartDate ? null : this.state.TagStartDate,
                 TagEndDate: !this.state.TagEndDate ? null : this.state.TagEndDate,
+                StatusStartDate: !this.state.StatusStartDate ? null : this.state.StatusStartDate,
+                StatusEndDate: !this.state.StatusEndDate ? null : this.state.StatusEndDate,
                 BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
                 BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
                 BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
@@ -245,7 +259,6 @@ import * as Loading from '../commJS/Loading.jsx';
                 selectTag:!this.state.selectTag ? null : this.state.selectTag
             };
             
-
             let ExportParam = [];
             for (var prop in data) {
                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
@@ -444,11 +457,15 @@ import * as Loading from '../commJS/Loading.jsx';
             let f_trigger_End = this.f_trigger_End.current;
             let f_trigger_TagStart = this.f_trigger_TagStart.current;
             let f_trigger_TagEnd = this.f_trigger_TagEnd.current;
+            let f_trigger_StatusStart = this.f_trigger_StatusStart.current;
+            let f_trigger_StatusEnd = this.f_trigger_StatusEnd.current;
             
             let selectdate_end = this.selectdate_end.current;
             let selectdate_start = this.selectdate_start.current;
             let selectTagDate_end = this.selectTagDate_end.current;
             let selectTagDate_start = this.selectTagDate_start.current;
+            let selectStatusDate_end = this.selectStatusDate_end.current;
+            let selectStatusDate_start = this.selectStatusDate_start.current;
 
             //selectdate_start.value
             Calendar.setup({
@@ -459,25 +476,40 @@ import * as Loading from '../commJS/Loading.jsx';
             });
 
             Calendar.setup({
-                inputField: selectdate_start, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_Start,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
+                inputField: selectdate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_Start,
+                singleClick: true
             });
 
             Calendar.setup({
-                inputField: selectTagDate_end, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_TagEnd,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
+                inputField: selectTagDate_end,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_TagEnd,
+                singleClick: true
             });
 
             Calendar.setup({
-                inputField: selectTagDate_start, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_TagStart,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
+                inputField: selectTagDate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_TagStart,
+                singleClick: true
             });
+
+            Calendar.setup({
+                inputField: selectStatusDate_end,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_StatusEnd,
+                singleClick: true
+            });
+
+            Calendar.setup({
+                inputField: selectStatusDate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_StatusStart,
+                singleClick: true
+            });
+            
             this.getSiteList();
             this.getCurrencyList();
             this.getStatusList();
@@ -507,6 +539,8 @@ import * as Loading from '../commJS/Loading.jsx';
             let EndDate = this.state.EndDate;
             let TagStartDate = this.state.TagStartDate;
             let TagEndDate = this.state.TagEndDate;
+            let StatusStartDate = this.state.StatusStartDate;
+            let StatusEndDate = this.state.StatusEndDate;
             let Loading = this.state.Loading;
             let siteList = this.state.SiteList.map(function (obj) {
                 return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
@@ -622,6 +656,20 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status Update Date (From)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_start} type="text" defaultValue={!isNaN(StatusStartDate) ? moment.unix(StatusStartDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusStart}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status Update Date (To)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_end} type="text" defaultValue={!isNaN(StatusEndDate) ? moment.unix(StatusEndDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusEnd}>{ }</a>
                                     </div>
                                 </div>
                                 <div className="input-item">

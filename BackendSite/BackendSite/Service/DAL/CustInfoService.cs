@@ -49,6 +49,8 @@ namespace BackendSite.Service.DAL
             DateTime? endDate,
             DateTime? tagStartDate,
             DateTime? tagEndDate,
+            DateTime? statusStartDate,
+            DateTime? statusEndDate,
             int pageSize,
             string affCode,
             IEnumerable<int> selectCurrency,
@@ -113,7 +115,9 @@ namespace BackendSite.Service.DAL
                 StartDate = startDate,
                 EndDate = endDate,
                 TagStartDate = tagStartDate,
-                TagEndDate = tagEndDate,
+                TagEndDate = tagEndDate, 
+                StatusStartDate = statusStartDate,
+                StatusEndDate = statusEndDate,
                 PageSize = pageSize,
                 SelectCurrency = jsonSelectCurrency,
                 SiteList = siteList,
@@ -127,7 +131,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V8", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V9", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -139,26 +143,30 @@ namespace BackendSite.Service.DAL
             int? birMonth,
             int? birYear,
             string userName,
-            string AccountName,
-            string LoginIp,
+            string accountName,
+            string loginIp,
             string transId,
-            string TpUserName,
-            string Email,
-            string PhoneNo,
-            DateTimeOffset? startDate,
-            DateTimeOffset? endDate,
+            string tpUserName,
+            string email,
+            string phoneNo,
+            DateTime? startDate,
+            DateTime? endDate,
+            DateTime? tagStartDate,
+            DateTime? tagEndDate,
+            DateTime? statusStartDate,
+            DateTime? statusEndDate,
             string siteList,
-            string AffCode,
+            string affCode,
             IEnumerable<int> selectCurrency,
-            string BankAccountNumber,
-            string currncyList,
-            IEnumerable<int> selectstatus)
+            string bankAccountNumber,
+            string currencyList,
+            IEnumerable<int> selectStatus,
+            IEnumerable<int> selectTag)
         {
             string SelectSite = null;
             string SelectCurrency = null;
             string SelectStatus = null;
-            DateTime? startDateParam = null;
-            DateTime? endDateParam = null;
+            var jsonSelectTagList = string.Empty;
 
             if (selectSite != null && selectSite.Any())
             {
@@ -168,33 +176,56 @@ namespace BackendSite.Service.DAL
             {
                 SelectCurrency = JsonConvert.SerializeObject(selectCurrency);
             }
-            if (selectstatus != null)
+            if (selectStatus != null)
             {
-                if (selectstatus.ToList().Count == 0)
+                if (selectStatus.ToList().Count == 0)
                 {
                     var templist = new List<int>() { 1, 2, 3 };
                     SelectStatus = JsonConvert.SerializeObject(templist);
                 }
                 else
                 {
-                    SelectStatus = JsonConvert.SerializeObject(selectstatus);
+                    SelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
-
-            if (startDate != null)
+            if (selectTag != null && selectTag.Any() )
             {
-                startDateParam = DateTimeOffset.Parse(startDate.ToString()).DateTime;
+                jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
             }
-
-            if (endDate != null)
+            else
             {
-                endDateParam = DateTimeOffset.Parse(endDate.ToString()).DateTime;
+                jsonSelectTagList = null;
             }
-
-            var p = new DynamicParameters(new { SelectSite, BirDate = birDate, BirMonth = birMonth, BirYear = birYear, UserName = userName, AccountName = AccountName, LoginIp = LoginIp, TpUserName = TpUserName, TransId = transId, Email = Email, PhoneNo = PhoneNo, StartDate = startDateParam, EndDate = endDateParam, SiteList = siteList, AffCode = AffCode, BankAccountNumber = BankAccountNumber, SelectCurrency = SelectCurrency, CurrncyList = currncyList, SelectStatus = SelectStatus });
+            
+            var p = new DynamicParameters(new { 
+                SelectSite,
+                BirDate = birDate, 
+                BirMonth = birMonth,
+                BirYear = birYear, 
+                UserName = userName, 
+                AccountName = accountName,
+                LoginIp = loginIp, 
+                TpUserName = tpUserName,
+                TransId = transId, 
+                Email = email, 
+                PhoneNo = phoneNo, 
+                StartDate = startDate,
+                EndDate = endDate, 
+                TagStartDate = tagStartDate,
+                TagEndDate = tagEndDate, 
+                StatusStartDate = statusStartDate,
+                StatusEndDate = statusEndDate,
+                SiteList = siteList, 
+                AffCode = affCode, 
+                BankAccountNumber = bankAccountNumber,
+                SelectCurrency = SelectCurrency, 
+                CurrncyList = currencyList, 
+                SelectStatus = SelectStatus,
+                SelectTagList = jsonSelectTagList
+            });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V6", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -206,8 +237,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -342,10 +372,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_ResetCustUSDTInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
         }
-        public bool SetCustStatus(int custId, int status)
+        public bool SetCustStatus(int custId, int status , int taskId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustStatus_Set", new { CustId = custId, Status = status }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status , TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
         }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
