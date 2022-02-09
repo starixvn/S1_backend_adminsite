@@ -862,25 +862,20 @@ namespace BackendSite.Service.BLL
                                                                                         string currencyIds,
                                                                                         string startDate,
                                                                                         string endDate,
-                                                                                        string userName)
+                                                                                        string userName,
+                                                                                        string timeZone)
         {
             var keyValuePairs = new Dictionary<string, CustomerStatisticalReportModel>();
-            var dateFormat = string.Empty;
-            var statisticalList = reportService.GetCustomerStatisticalReport(siteIds,
-                                                                             currencyIds,
-                                                                             startDate,
-                                                                             endDate,
-                                                                             userName);
-
+            var statisticalList = reportService.GetCustomerStatisticalReport(siteIds, currencyIds, startDate, endDate, userName, timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Statistical
 
             foreach (var data in statisticalList)
             {
-                CustomerStatisticalReportModel customerStatisticalReportModel = null;
+                CustomerStatisticalReportModel customerStatisticalReportModel;
 
-                dateFormat = data.Date.ToString("yyyy/MM/dd");
+                var dateFormat = data.Date.ToString("yyyy/MM/dd");
 
                 if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CategoryId}-{data.GameId}-{data.CurrencyId}-{data.CustId}"))
                 {
@@ -909,76 +904,19 @@ namespace BackendSite.Service.BLL
             }
 
             #endregion
-
-            #region 補0
-
-            //List<GameModel> gameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.GameId, c.GameName })
-            //                        .Select(x => new GameModel
-            //                        {
-            //                            GameId = x.Key.GameId,
-            //                            GameName = x.Key.GameName
-            //                        }).ToList();
-
-            //List<CategoryModel> categoryList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.CategoryName })
-            //                        .Select(x => new CategoryModel
-            //                        {
-            //                            CategoryId = x.Key.CategoryId,
-            //                            CategoryName = x.Key.CategoryName
-            //                        }).ToList();
-
-            //List<CategoryGameModel> categoryGameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.GameId })
-            //                        .Select(x => new CategoryGameModel
-            //                        {
-            //                            IdentifyString = $"{x.Key.CategoryId}-{x.Key.GameId}",
-            //                            CategoryId = x.Key.CategoryId,
-            //                            GameId = x.Key.GameId
-            //                        }).ToList();
-
-            //List<int> currencyIds = keyValuePairs.Select(s => s.Value).Select(x => x.CurrencyId).Distinct().ToList();
-
-            //foreach (var curr in currencyIds)
-            //{
-            //    foreach (var item in categoryGameList)
-            //    {
-            //        StatisticalReportModel statisticalReportModel = null;
-
-            //        if (!keyValuePairs.ContainsKey($"{item.IdentifyString}-{curr}"))
-            //        {
-            //            statisticalReportModel = new StatisticalReportModel();
-            //            keyValuePairs.Add($"{item.IdentifyString}-{curr}", statisticalReportModel);
-            //            statisticalReportModel.CurrencyId = curr;
-            //            statisticalReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
-            //            statisticalReportModel.CategoryId = item.CategoryId;
-            //            statisticalReportModel.CategoryName = categoryList.Where(x => x.CategoryId == item.CategoryId).Select(x => x.CategoryName).FirstOrDefault();
-            //            statisticalReportModel.GameId = item.GameId;
-            //            statisticalReportModel.GameName = gameList.Where(x => x.GameId == item.GameId).Select(x => x.GameName).FirstOrDefault();
-            //            statisticalReportModel.ActualRate = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.ActualRate).FirstOrDefault();
-            //        }
-            //    }
-            //}
-
-            #endregion
-
+            
             var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CustId)
                                                          .ThenBy(value => value.Date)
                                                          .ThenBy(value => value.CategoryId)
                                                          .ThenBy(value => value.GameId)
-                                                         .ThenBy(Value => Value.CurrencyId);
+                                                         .ThenBy(value => value.CurrencyId);
 
             return Data;
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
-                                                               int gameId,
-                                                               string date)
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date,string timeZone)
         {
-            var keyValuePairs = new Dictionary<string, TpBetRecordDataModel>();
-            var dateFormat = string.Empty;
-            var detailList = reportService.GetCustomerDetail(custId,
-                                                             gameId,
-                                                             date);
-
-
+            var detailList = reportService.GetCustomerDetail(custId, gameId, date, timeZone);
             return detailList;
         }
 
