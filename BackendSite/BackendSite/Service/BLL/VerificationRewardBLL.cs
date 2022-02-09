@@ -95,7 +95,7 @@ namespace BackendSite.Service.BLL
             var listRewardModels = new List<ExportVerificationRewardModel>();
             foreach (var data in custVerificationReward)
             {
-                if (data.PhoneVerified)
+                if (data.PhoneVerified && data.PhoneRewardTime.HasValue && data.PhoneReward != 0)
                 {
                     var modelPhone = new ExportVerificationRewardModel()
                     {
@@ -109,7 +109,7 @@ namespace BackendSite.Service.BLL
                     listRewardModels.Add(modelPhone); 
                 }
 
-                if (data.EmailVerified)
+                if (data.EmailVerified && data.EmailRewardTime.HasValue && data.EmailReward != 0)
                 {
                     var modelEmail = new ExportVerificationRewardModel()
                     {
