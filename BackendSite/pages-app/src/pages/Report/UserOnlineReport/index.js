@@ -16,6 +16,7 @@ const App = () => {
     Datas: null,
     FilterInfo: null,
     SiteList: null,
+    DeviceList:null,
     MaxCount: null,
   });
 
@@ -106,32 +107,46 @@ const App = () => {
       if (res.data.errorCode === 0) {
         let result = [];
         let resultSiteList = [];
-
+        let resultDeviceList = [];
+        
         res.data.data.forEach((elem) => {
-          if (!resultSiteList.find((x) => x.siteId === elem.siteId)) {
+          if (!resultSiteList.find((x) => x.siteId === elem.siteId )) {
             resultSiteList.push({
               siteId: elem.siteId,
-              siteName: elem.siteName,
+              siteName: elem.siteName
+            });
+          }
+          
+          if (!resultDeviceList.find((x) => x.deviceType === elem.deviceType )) {
+            resultDeviceList.push({
+              deviceType: elem.deviceType,
+              deviceName: elem.deviceName
             });
           }
 
           let getItem = result.find((x) => x.localTime === elem.localTime);
-          let onlineCountColDef = `online_${elem.siteId}`;
-
+          let onlineCountColDef = `online_${elem.siteId}_${elem.deviceType}`;
+          let onlineSiteCountColDef = `online_${elem.siteId}_Summary`;
+          
           if (getItem) {
             getItem.onlineSummary += elem.maxCount;
-
+            if(getItem[onlineSiteCountColDef]){
+              getItem[onlineSiteCountColDef] += elem.maxCount;
+            }else{
+              getItem[onlineSiteCountColDef] = elem.maxCount;
+            }
+            
             getItem[onlineCountColDef] = elem.maxCount;
           } else {
             result.push({
               localTime: elem.localTime,
-
               onlineSummary: elem.maxCount,
-              [onlineCountColDef]: elem.maxCount,
+              [onlineSiteCountColDef]: elem.maxCount,
+              [onlineCountColDef]: elem.maxCount
             });
           }
         });
-
+        
         let GetMaxCount = Math.max.apply(
           Math,
           result.map(function (o) {
@@ -145,6 +160,7 @@ const App = () => {
             ...stateFilter,
           },
           SiteList: resultSiteList,
+          DeviceList: resultDeviceList,
           MaxCount: GetMaxCount,
         });
       } else {

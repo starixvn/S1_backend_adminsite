@@ -686,7 +686,20 @@ namespace BackendSite.Service.Model.enums
         SMS = 0,
         Email = 1
     }
+    
+    public enum DeviceId
+    {
+        Old = 0,
+        Desktop = 1,
+        H5 = 2,
+        APP = 3
+    }
 
+    public enum CustTaskType
+    {
+        LastStatusUpdateTime = 2,
+    }
+    
     #region BankDetailOff
 
     public enum BankDetailOffStatusEnum
