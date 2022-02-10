@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<PendingBonus>>
             {
-                Data = bonusInfoBLL.GetPendingBonusList(1, 10000, out _, out _),
+                Data = bonusInfoBLL.GetAllPendingBonusList(),
                 ErrorCode = 0
             };
             return apiResult;
