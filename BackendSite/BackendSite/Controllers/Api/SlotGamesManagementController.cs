@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
         public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq req)
         {
 
@@ -48,6 +49,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
         public ApiResult SetSlotGame(SetSlotGameReq req)
         {
             var apiResult = new ApiResult();
@@ -57,6 +59,44 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 0;
             }
             catch(Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq req)
+        {
+            var apiResult = new ApiListResult<SlotGameData>();
+            try
+            {
+                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TPid, req.Name, req.Category, req.PageNumber, req.PageSize);
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.RowCount = result.RowCount;
+                apiResult.Data = result.SlotGameCategoryList;
+                apiResult.PageNumber = result.PageNumber;
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        public ApiResult SetSlotGameCategory(SetSlotGameCategoryReq req)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                slotGamesManagementBLL.SetSlotGameCategory(req, User.Identity.Name);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;

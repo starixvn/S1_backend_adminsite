@@ -32,10 +32,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
     // ],
-    "Marketing/BonusInfoReport.min": [
-      // '@babel/polyfill',
-      "./src/pages/Marketing/BonusInfoReport/index.js",
-    ],
+    // "Marketing/BonusInfoReport.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Marketing/BonusInfoReport/index.js",
+    // ],
     // "Finance/PaymentManagement.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
@@ -256,9 +256,13 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
-    "Marketing/SlotGamesManagement.min": [
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    "Marketing/CategoryManagement.min": [
       "@babel/polyfill",
-      "./src/pages/Marketing/SlotGamesManagement/index.js",
+      "./src/pages/Marketing/CategoryManagement/index.js",
     ],
   },
   output: {

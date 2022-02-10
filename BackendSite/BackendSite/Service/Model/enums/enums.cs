@@ -530,4 +530,28 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    public enum SlotGameCategoryType
+    {
+        All = 0,
+        Jackpot = 1,
+        New = 2,
+        Feature = 3,
+        Favourite = 4
+    }
+    public enum SlotGameStatusType 
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum CurrencyCurrencyIdEnum
+    {
+        MYR = 2,
+        THB = 4,
+        RMB = 13,
+        IDR = 15,
+        VND = 51,
+        INR = 61
+    }
 }
