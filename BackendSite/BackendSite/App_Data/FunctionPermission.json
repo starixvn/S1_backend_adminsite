@@ -561,6 +561,11 @@
       "DisplayKey": "Slot Games Management",
       "FuncKey": "CMS/SlotGamesManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Category Management",
+      "FuncKey": "CMS/CategoryManagement",
+      "Enable": false
     }
   ]
 },
