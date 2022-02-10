@@ -1465,12 +1465,8 @@ namespace BackendSite.Service.BLL
 
         #region Bank Financial Report
 
-        public IEnumerable<BankFinancialDataModel> GetBankFinancialReport(string siteIds,
-                                                                               string currencyIds,
-                                                                               string startDate,
-                                                                               string endDate)
+        public IEnumerable<BankFinancialDataModel> GetBankFinancialReport(string siteIds, string currencyIds, string startDate, string endDate,string timeZone)
         {
-
             var keyValuePairs = new Dictionary<string, BankFinancialDataModel>();
 
             var accountData = _bankFinancialService.GetTransferAccountList();
@@ -1478,27 +1474,15 @@ namespace BackendSite.Service.BLL
             var siteData = _reportService.GetServerInfoList();
             var currencyData = _reportService.GetCurrencyList();
 
-            var depositData = _bankFinancialService.GetDepositSummary(siteIds,
-                                                               currencyIds,
-                                                               startDate,
-                                                               endDate);
-
-            var withdrawalData = _bankFinancialService.GetWithdrawalSummary(siteIds,
-                                                               currencyIds,
-                                                               startDate,
-                                                               endDate);
-
-            var transferData = _bankFinancialService.GetTransferSummary(siteIds,
-                                                               currencyIds,
-                                                               startDate,
-                                                               endDate);
+            var depositData = _bankFinancialService.GetDepositSummary(siteIds, currencyIds, startDate, endDate, timeZone);
+            var withdrawalData = _bankFinancialService.GetWithdrawalSummary(siteIds, currencyIds, startDate, endDate, timeZone);
+            var transferData = _bankFinancialService.GetTransferSummary(siteIds, currencyIds, startDate, endDate, timeZone);
+            
             #region Data Combine
 
             foreach (var data in depositData)
             {
-                BankFinancialDataModel bankFinancialDataModel = null;
-                //string channel = string.Empty;
-                //string AccountName = string.Empty;
+                BankFinancialDataModel bankFinancialDataModel;
 
                 if (data.DepositType == DepositTypeEnum.LocalBanking)
                 {
@@ -1506,7 +1490,6 @@ namespace BackendSite.Service.BLL
 
                     if (account != null)
                     {
-
                         if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                         {
                             bankFinancialDataModel = new BankFinancialDataModel();
@@ -1524,10 +1507,7 @@ namespace BackendSite.Service.BLL
                         }
 
                         bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
-
-                        bankFinancialDataModel.DepositAmount = bankFinancialDataModel.DepositAmount + data.DepositSummary;
-                        //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
-
+                        bankFinancialDataModel.DepositAmount += data.DepositSummary;
                     }
                 }
                 else
@@ -1554,16 +1534,14 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.AccountStatus = account?.Status ?? status;
                     }
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
-
-                    bankFinancialDataModel.DepositAmount = bankFinancialDataModel.DepositAmount + data.DepositSummary;
-                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                    bankFinancialDataModel.DepositAmount += data.DepositSummary;
                 }
 
             }
 
             foreach (var data in withdrawalData)
             {
-                BankFinancialDataModel bankFinancialDataModel = null;
+                BankFinancialDataModel bankFinancialDataModel;
 
                 if (data.WithdrawalType == WithdrawalTypeEnum.LocalBank)
                 {
@@ -1589,8 +1567,8 @@ namespace BackendSite.Service.BLL
 
                         bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                        bankFinancialDataModel.WithdrawalAmount = bankFinancialDataModel.WithdrawalAmount + data.WithdrawalSummary;
-                        //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                        bankFinancialDataModel.WithdrawalAmount += data.WithdrawalSummary;
+                        
                     }
                 }
                 else if (data.WithdrawalType == WithdrawalTypeEnum.OnlinePayment)
@@ -1619,20 +1597,19 @@ namespace BackendSite.Service.BLL
 
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                    bankFinancialDataModel.WithdrawalAmount = bankFinancialDataModel.WithdrawalAmount + data.WithdrawalSummary;
-                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                    bankFinancialDataModel.WithdrawalAmount += data.WithdrawalSummary;
+                    
                 }
 
             }
 
             foreach (var data in transferData)
             {
-                BankFinancialDataModel bankFinancialDataModel = null;
-
                 var account = accountData.FirstOrDefault(x => x.AccountNo == data.AccountNo);
 
                 if (account != null)
                 {
+                    BankFinancialDataModel bankFinancialDataModel;
                     if (!keyValuePairs.ContainsKey($"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"))
                     {
                         bankFinancialDataModel = new BankFinancialDataModel();
@@ -1653,8 +1630,7 @@ namespace BackendSite.Service.BLL
 
                     bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
-                    bankFinancialDataModel.TransferAmount = bankFinancialDataModel.TransferAmount + data.TransferSummary;
-                    //bankFinancialDataModel.DepositInMYR = Math.Round(data.Summary * mainFinancialModel.ActualRate, 2, MidpointRounding.AwayFromZero);
+                    bankFinancialDataModel.TransferAmount += data.TransferSummary;
                 }
             }
 
@@ -1667,15 +1643,11 @@ namespace BackendSite.Service.BLL
             var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.SiteId)
                                                          .ThenBy(value => value.CurrencyId)
                                                          .ThenBy(value => value.Channel)
-                                                         .ThenBy(Value => Value.AccountNo);
+                                                         .ThenBy(value => value.AccountNo);
 
             return Data;
-
         }
-
-
-
-
+        
         #endregion
     }
 }

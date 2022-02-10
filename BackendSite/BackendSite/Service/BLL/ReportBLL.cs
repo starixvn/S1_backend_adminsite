@@ -451,13 +451,8 @@ namespace BackendSite.Service.BLL
                 .ThenBy(value => value.SiteId);
         }
 
-        public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds,
-                                                                      string siteIds,
-                                                                      string currencyIds,
-                                                                      string startDate,
-                                                                      string endDate)
+        public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds, string siteIds, string currencyIds, string startDate, string endDate , string timeZone)
         {
-
             var accountKeyValuePairs = new Dictionary<string, DepositAccountModel>();
             var accountDateKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
             var accountDateTotalKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
@@ -467,11 +462,7 @@ namespace BackendSite.Service.BLL
 
             #region Get Data
 
-            var depositDetailList = reportService.GetDepositReport(siteIds,
-                                                                currencyIds,
-                                                                startDate,
-                                                                endDate);
-
+            var depositDetailList = reportService.GetDepositReport(siteIds, currencyIds, startDate, endDate ,timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #endregion
@@ -483,33 +474,31 @@ namespace BackendSite.Service.BLL
             //Base Value Caculate
             foreach (var data in depositDetailList)
             {
-
-                DepositAccountModel depositAccountModel = null;
-                decimal rate = 0;
-                var AccountType = 0;
+                DepositAccountModel depositAccountModel;
+                int accountType;
 
                 switch (data.DepositType)
                 {
                     case DepositTypeEnum.LocalBanking:
-                        AccountType = 3;
+                        accountType = 3;
                         break;
                     default:
-                        AccountType = 99;
+                        accountType = 99;
                         break;
                 }
 
-                if (!accountKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}"))
+                if (!accountKeyValuePairs.ContainsKey($"{accountType}-{data.AccountId}"))
                 {
                     depositAccountModel = new DepositAccountModel();
-                    accountKeyValuePairs.Add($"{AccountType}-{data.AccountId}", depositAccountModel);
-                    depositAccountModel.AccountType = AccountType;
+                    accountKeyValuePairs.Add($"{accountType}-{data.AccountId}", depositAccountModel);
+                    depositAccountModel.AccountType = accountType;
                     depositAccountModel.AccountId = data.AccountId;
                     depositAccountModel.AccountName = data.AccountName;
                 }
 
-                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+                var rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
 
-                depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
+                depositAccountModel = accountKeyValuePairs[$"{accountType}-{data.AccountId}"];
 
                 depositAccountModel.SummaryTotalData.TotalCount += data.TotalCount;
                 depositAccountModel.SummaryTotalData.SuccessCount += data.SuccessCount;
@@ -569,25 +558,23 @@ namespace BackendSite.Service.BLL
             //Base Value Caculate
             foreach (var data in depositDetailList)
             {
-                DepositAccountModel depositAccountModel = null;
-                DepositSummaryReportModel accountCurrencyModel = null;
-                DepositSummaryReportModel summaryCurrencyModel = null;
-                decimal rate = 0;
-                var AccountType = 0;
+                DepositSummaryReportModel accountCurrencyModel;
+                DepositSummaryReportModel summaryCurrencyModel;
+                int accountType;
 
                 switch (data.DepositType)
                 {
                     case DepositTypeEnum.LocalBanking:
-                        AccountType = 3;
+                        accountType = 3;
                         break;
                     default:
-                        AccountType = 99;
+                        accountType = 99;
                         break;
                 }
 
-                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+                var rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
 
-                depositAccountModel = accountKeyValuePairs[$"{AccountType}-{data.AccountId}"];
+                var depositAccountModel = accountKeyValuePairs[$"{accountType}-{data.AccountId}"];
 
                 if (!depositAccountModel.SummaryData.Select(x => x.CurrencyId).Contains(data.CurrencyId))
                 {
@@ -654,13 +641,12 @@ namespace BackendSite.Service.BLL
             //Account Data Special Averange Value Caculate
             foreach (var accountItem in accountKeyValuePairs)
             {
-                DepositSummaryReportModel accountCurrencyModel = null;
                 //補0
                 foreach (var curr in CurrencyIds)
                 {
                     if (!accountItem.Value.SummaryData.Select(x => x.CurrencyId).Contains(curr))
                     {
-                        accountCurrencyModel = new DepositSummaryReportModel
+                        var accountCurrencyModel = new DepositSummaryReportModel
                         {
                             CurrencyId = curr,
                             IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault()
@@ -686,11 +672,9 @@ namespace BackendSite.Service.BLL
             //Summary Data Zero Fill
             foreach (var curr in CurrencyIds)
             {
-                DepositSummaryReportModel summaryCurrencyModel = null;
-
                 if (!summaryCurrencyData.Select(x => x.CurrencyId).Contains(curr))
                 {
-                    summaryCurrencyModel = new DepositSummaryReportModel
+                    var summaryCurrencyModel = new DepositSummaryReportModel
                     {
                         CurrencyId = curr,
                         IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault()
@@ -725,23 +709,22 @@ namespace BackendSite.Service.BLL
             //Base Value Caculate
             foreach (var data in depositDetailList)
             {
-                DepositByDateReportModel depositByDateReportModel = null;
-                DepositByDateReportModel depositByDateReportTotalModel = null;
-                decimal rate = 0;
-                var AccountType = 0;
+                DepositByDateReportModel depositByDateReportModel;
+                DepositByDateReportModel depositByDateReportTotalModel;
+                int accountType;
                 var dateFormat = data.Date.ToString("yyyy/MM/dd");
 
                 switch (data.DepositType)
                 {
                     case DepositTypeEnum.LocalBanking:
-                        AccountType = 3;
+                        accountType = 3;
                         break;
                     default:
-                        AccountType = 99;
+                        accountType = 99;
                         break;
                 }
 
-                if (!accountDateKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"))
+                if (!accountDateKeyValuePairs.ContainsKey($"{accountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"))
                 {
                     depositByDateReportModel = new DepositByDateReportModel
                     {
@@ -750,11 +733,11 @@ namespace BackendSite.Service.BLL
                         IsoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault()
                     };
 
-                    accountDateKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}", depositByDateReportModel);
+                    accountDateKeyValuePairs.Add($"{accountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}", depositByDateReportModel);
                 }
 
-                depositByDateReportModel = accountDateKeyValuePairs[$"{AccountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"];
-                rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
+                depositByDateReportModel = accountDateKeyValuePairs[$"{accountType}-{data.AccountId}-{dateFormat}-{data.CurrencyId}"];
+                var rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
 
                 depositByDateReportModel.TotalAmount += RoundingNumber(data.DepositSummary, 2); ;
                 depositByDateReportModel.TotalAmountInMYR += RoundingNumber(data.DepositSummary * rate, 2);
@@ -762,17 +745,17 @@ namespace BackendSite.Service.BLL
                 depositByDateReportModel.SuccessCount += data.SuccessCount;
                 depositByDateReportModel.FTDCount += data.FTDCount;
 
-                if (!accountDateTotalKeyValuePairs.ContainsKey($"{AccountType}-{data.AccountId}-{dateFormat}"))
+                if (!accountDateTotalKeyValuePairs.ContainsKey($"{accountType}-{data.AccountId}-{dateFormat}"))
                 {
                     depositByDateReportTotalModel = new DepositByDateReportModel
                     {
                         Date = dateFormat
                     };
 
-                    accountDateTotalKeyValuePairs.Add($"{AccountType}-{data.AccountId}-{dateFormat}", depositByDateReportTotalModel);
+                    accountDateTotalKeyValuePairs.Add($"{accountType}-{data.AccountId}-{dateFormat}", depositByDateReportTotalModel);
                 }
 
-                depositByDateReportTotalModel = accountDateTotalKeyValuePairs[$"{AccountType}-{data.AccountId}-{dateFormat}"];
+                depositByDateReportTotalModel = accountDateTotalKeyValuePairs[$"{accountType}-{data.AccountId}-{dateFormat}"];
                 rate = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.ActualRate).FirstOrDefault();
 
                 depositByDateReportTotalModel.TotalAmount += RoundingNumber(data.DepositSummary * rate, 2);
@@ -785,9 +768,6 @@ namespace BackendSite.Service.BLL
             //Account Data Special Averange Value Caculate
             foreach (var accountItem in accountKeyValuePairs)
             {
-                DepositByDateReportModel depositByDateReportModel = null;
-                DepositByDateReportModel depositByDateReportTotalModel = null;
-
                 foreach (var date in dateList)
                 {
 
@@ -795,7 +775,7 @@ namespace BackendSite.Service.BLL
                     {
                         if (!accountDateKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}-{curr}"))
                         {
-                            depositByDateReportModel = new DepositByDateReportModel
+                            var depositByDateReportModel = new DepositByDateReportModel
                             {
                                 Date = date,
                                 CurrencyId = curr,
@@ -814,7 +794,7 @@ namespace BackendSite.Service.BLL
 
                     if (!accountDateTotalKeyValuePairs.ContainsKey($"{accountItem.Value.AccountType}-{accountItem.Value.AccountId}-{date}"))
                     {
-                        depositByDateReportTotalModel = new DepositByDateReportModel
+                        var depositByDateReportTotalModel = new DepositByDateReportModel
                         {
                             Date = date
                         };
@@ -863,25 +843,20 @@ namespace BackendSite.Service.BLL
                                                                                         string currencyIds,
                                                                                         string startDate,
                                                                                         string endDate,
-                                                                                        string userName)
+                                                                                        string userName,
+                                                                                        string timeZone)
         {
             var keyValuePairs = new Dictionary<string, CustomerStatisticalReportModel>();
-            var dateFormat = string.Empty;
-            var statisticalList = reportService.GetCustomerStatisticalReport(siteIds,
-                                                                             currencyIds,
-                                                                             startDate,
-                                                                             endDate,
-                                                                             userName);
-
+            var statisticalList = reportService.GetCustomerStatisticalReport(siteIds, currencyIds, startDate, endDate, userName, timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Statistical
 
             foreach (var data in statisticalList)
             {
-                CustomerStatisticalReportModel customerStatisticalReportModel = null;
+                CustomerStatisticalReportModel customerStatisticalReportModel;
 
-                dateFormat = data.Date.ToString("yyyy/MM/dd");
+                var dateFormat = data.Date.ToString("yyyy/MM/dd");
 
                 if (!keyValuePairs.ContainsKey($"{dateFormat}-{data.CategoryId}-{data.GameId}-{data.CurrencyId}-{data.CustId}"))
                 {
@@ -910,76 +885,19 @@ namespace BackendSite.Service.BLL
             }
 
             #endregion
-
-            #region 補0
-
-            //List<GameModel> gameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.GameId, c.GameName })
-            //                        .Select(x => new GameModel
-            //                        {
-            //                            GameId = x.Key.GameId,
-            //                            GameName = x.Key.GameName
-            //                        }).ToList();
-
-            //List<CategoryModel> categoryList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.CategoryName })
-            //                        .Select(x => new CategoryModel
-            //                        {
-            //                            CategoryId = x.Key.CategoryId,
-            //                            CategoryName = x.Key.CategoryName
-            //                        }).ToList();
-
-            //List<CategoryGameModel> categoryGameList = keyValuePairs.Select(s => s.Value).GroupBy(c => new { c.CategoryId, c.GameId })
-            //                        .Select(x => new CategoryGameModel
-            //                        {
-            //                            IdentifyString = $"{x.Key.CategoryId}-{x.Key.GameId}",
-            //                            CategoryId = x.Key.CategoryId,
-            //                            GameId = x.Key.GameId
-            //                        }).ToList();
-
-            //List<int> currencyIds = keyValuePairs.Select(s => s.Value).Select(x => x.CurrencyId).Distinct().ToList();
-
-            //foreach (var curr in currencyIds)
-            //{
-            //    foreach (var item in categoryGameList)
-            //    {
-            //        StatisticalReportModel statisticalReportModel = null;
-
-            //        if (!keyValuePairs.ContainsKey($"{item.IdentifyString}-{curr}"))
-            //        {
-            //            statisticalReportModel = new StatisticalReportModel();
-            //            keyValuePairs.Add($"{item.IdentifyString}-{curr}", statisticalReportModel);
-            //            statisticalReportModel.CurrencyId = curr;
-            //            statisticalReportModel.IsoCode = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.IsoCode).FirstOrDefault();
-            //            statisticalReportModel.CategoryId = item.CategoryId;
-            //            statisticalReportModel.CategoryName = categoryList.Where(x => x.CategoryId == item.CategoryId).Select(x => x.CategoryName).FirstOrDefault();
-            //            statisticalReportModel.GameId = item.GameId;
-            //            statisticalReportModel.GameName = gameList.Where(x => x.GameId == item.GameId).Select(x => x.GameName).FirstOrDefault();
-            //            statisticalReportModel.ActualRate = currencyList.Where(x => x.CurrencyId == curr).Select(x => x.ActualRate).FirstOrDefault();
-            //        }
-            //    }
-            //}
-
-            #endregion
-
+            
             var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CustId)
                                                          .ThenBy(value => value.Date)
                                                          .ThenBy(value => value.CategoryId)
                                                          .ThenBy(value => value.GameId)
-                                                         .ThenBy(Value => Value.CurrencyId);
+                                                         .ThenBy(value => value.CurrencyId);
 
             return Data;
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
-                                                               int gameId,
-                                                               string date)
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date,string timeZone)
         {
-            var keyValuePairs = new Dictionary<string, TpBetRecordDataModel>();
-            var dateFormat = string.Empty;
-            var detailList = reportService.GetCustomerDetail(custId,
-                                                             gameId,
-                                                             date);
-
-
+            var detailList = reportService.GetCustomerDetail(custId, gameId, date, timeZone);
             return detailList;
         }
 

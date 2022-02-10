@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.Api
 {
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.Api
         private readonly BankFinancialBLL _bankFinancialBLL;
         private readonly ExcelBLL _excelBLL;
         private readonly ResponseSettingBLL _responseSettingBLL;
+        private readonly Common _common;
 
         #endregion
 
@@ -35,12 +37,15 @@ namespace BackendSite.Controllers.Api
                                 AuthorizeBLL authorizeBLL,
                                 BankFinancialBLL bankFinancialBLL,
                                 ExcelBLL excelBLL,
-                                ResponseSettingBLL responseSettingBLL)
+                                ResponseSettingBLL responseSettingBLL,
+                                Common common
+            )
         {
             _authorizeBLL = authorizeBLL;
             _bankFinancialBLL = bankFinancialBLL;
             _excelBLL = excelBLL;
             _responseSettingBLL = responseSettingBLL;
+            _common = common;
         }
 
         #endregion
@@ -200,7 +205,8 @@ namespace BackendSite.Controllers.Api
             var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
                                                               JsonConvert.SerializeObject(request.CurrencyIds),
                                                               request.StartDate,
-                                                              request.EndDate);
+                                                              request.EndDate,
+                                                              _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -240,7 +246,8 @@ namespace BackendSite.Controllers.Api
             var data = _bankFinancialBLL.GetBankFinancialReport(SiteIds,
                                                                 CurrencyIds,
                                                                 StartDate,
-                                                                EndDate);
+                                                                EndDate,
+                                                                _common.TransferToTimeZoneFormat(8));
             var stream = _excelBLL.Export(data);
 
             return File(stream,
