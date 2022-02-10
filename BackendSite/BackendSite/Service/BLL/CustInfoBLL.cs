@@ -431,7 +431,7 @@ namespace BackendSite.Service.BLL
 
             #region Update Status
 
-            result = _custInfoService.SetCustStatus(custId, status);
+            result = _custInfoService.SetCustStatus(custId, status ,(int)CustTaskType.LastStatusUpdateTime);
 
             if (!result)
             {

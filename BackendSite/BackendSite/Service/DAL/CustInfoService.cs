@@ -237,8 +237,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new { CustId = custId, UserName = userName, SiteList = siteList }, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -373,10 +372,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_ResetCustUSDTInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
         }
-        public bool SetCustStatus(int custId, int status)
+        public bool SetCustStatus(int custId, int status , int taskId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status , TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
         }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
