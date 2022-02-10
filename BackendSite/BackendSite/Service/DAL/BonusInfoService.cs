@@ -87,13 +87,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string siteIds, 
+        public IEnumerable<BonusInfo> GetBonusInfoExportReport(string siteIds,
             string bonusCode,
             string transId,
             int currencyId,
             string userName,
             int promotionType,
-            DateTime startDate, 
+            DateTime startDate,
             DateTime endDate,
             int baseCurrencyId,
             int rebateCategoriesId,
@@ -115,15 +115,25 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V8", props);
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(int startIndex, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds,
+            string currencyIds,
+            string promotionType,
+            string bonusCode,
+            string userName,
+            int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
             var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_PromotionTypes", promotionType);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_UserName", userName);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V3", props);
+            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V4", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;

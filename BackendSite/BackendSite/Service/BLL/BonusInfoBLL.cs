@@ -15,6 +15,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly SelLangBLL _selLangBll;
+        private readonly SystemEnumBLL _systemEnumBll;
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
         private readonly string _apiUrl;
@@ -22,6 +23,7 @@ namespace BackendSite.Service.BLL
         public BonusInfoBLL(IServiceProvider provider)
         {
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _systemEnumBll = provider.GetService<SystemEnumBLL>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
@@ -163,9 +165,50 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<PendingBonus> GetPendingBonusList(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            IEnumerable<int> promotionTypes,
+            string bonusCode,
+            string userName,
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _bonusInfoService.GetPendingBonusList((Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize), out totalPages, out rowCount);
+            if(string.IsNullOrWhiteSpace(bonusCode))
+                bonusCode = null;
+            if (string.IsNullOrWhiteSpace(userName))
+                userName = null;
+
+            return _bonusInfoService.GetPendingBonusList(
+                JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIds),
+                JsonConvert.SerializeObject(promotionTypes),
+                bonusCode,
+                userName,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages, out rowCount);
+        }
+
+        public IEnumerable<PendingBonus> GetAllPendingBonusList()
+        {
+
+            var siteList = _serverInfoBll.GetSiteList();
+            var currencyList = new List<int>();
+
+            foreach (var site in siteList)
+            {
+                currencyList.AddRange(site.ICurrencyList);            
+            }
+            var promotionAllList = _systemEnumBll.GetEnumItemByEnumName("PromotionTypeEnum");
+
+            return _bonusInfoService.GetPendingBonusList(
+                JsonConvert.SerializeObject(siteList.Select(x=>x.SiteId)),
+                JsonConvert.SerializeObject(currencyList),
+                JsonConvert.SerializeObject(promotionAllList),
+                null,
+                null,
+                1,
+                10000,
+                out _, out _);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)

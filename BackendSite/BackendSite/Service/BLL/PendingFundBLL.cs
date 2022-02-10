@@ -137,7 +137,7 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
             var errorMsg = new List<string>();
-            foreach (var pendingBonus in bonusInfoService.GetPendingBonusList(0,10000,out _,out _))
+            foreach (var pendingBonus in _bonusInfoBLL.GetAllPendingBonusList())
             {
                 var tpBonusTransfer = new TpBonusTransfer
                 {
@@ -162,8 +162,8 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
             var result = new List<TransferMultiResult>();
-            var pendingBonusList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _);
-            var pendingBonusIdList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _).Select(x => x.BonusId);
+            var pendingBonusList = _bonusInfoBLL.GetAllPendingBonusList();
+            var pendingBonusIdList = _bonusInfoBLL.GetAllPendingBonusList().Select(x => x.BonusId);
 
             foreach (var item in bonusIdList)
             {

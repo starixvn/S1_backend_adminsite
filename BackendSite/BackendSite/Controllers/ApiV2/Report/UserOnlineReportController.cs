@@ -100,6 +100,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">TimeZone(-12~14)</param>
         /// <returns>檔案</returns>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public IActionResult Export(GetListRequest request)
         {
             #region Get Data
