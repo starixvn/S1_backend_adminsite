@@ -177,10 +177,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    // "BankFinancial/TransferInfoReport.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    // ],
+    "BankFinancial/TransferInfoReport.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",

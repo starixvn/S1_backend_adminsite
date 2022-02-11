@@ -399,7 +399,8 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
                                                                                             string accountNo,
                                                                                             string startDate,
-                                                                                            string endDate)
+                                                                                            string endDate,
+                                                                                            string timeZone)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
@@ -408,10 +409,11 @@ namespace BackendSite.Service.DAL
                     _SiteId = siteId,
                     _AccountNo = accountNo,
                     _StartDate = startDate,
-                    _EndDate = endDate
+                    _EndDate = endDate,
+                    _TimeZone = timeZone
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfoDetail_Get";
+            var SpName = "Admin_BankFinancialTransferInfoDetail_Get_V2";
             return conn.Query<BankFinancialTransferInfoDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
