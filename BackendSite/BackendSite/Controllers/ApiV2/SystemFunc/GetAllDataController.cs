@@ -100,11 +100,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<AdminGroup>> GetGroupList()
+        public ApiResult<IEnumerable<AdminGroupModel>> GetGroupList()
         {
-            var apiResult = new ApiResult<IEnumerable<AdminGroup>>
+            var result = new List<AdminGroupModel>();
+            var data = _adminGroupBll.GetGroupList(1, 1000, out _, out _);
+
+            foreach (var item in data)
             {
-                Data = _adminGroupBll.GetGroupList(1, 1000, out _, out _),
+                result.Add(new AdminGroupModel()
+                {
+                    GroupId = (int)item.GroupSEQ,
+                    GroupName = item.GroupName,
+                    Remark = item.Remark
+                });
+            }
+
+            var apiResult = new ApiResult<IEnumerable<AdminGroupModel>>
+            {
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
