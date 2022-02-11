@@ -462,10 +462,7 @@ namespace BackendSite.Service.DAL
 
         #region Bank Financial Report
 
-        public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds,
-                                                                                string currencyIds,
-                                                                                string startDate,
-                                                                                string endDate)
+        public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
@@ -474,17 +471,15 @@ namespace BackendSite.Service.DAL
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_BankFinancialReport_Deposit_Get";
+            var SpName = "Admin_BankFinancialReport_Deposit_Get_V2";
             return conn.Query<BankFinancialDepositSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds,
-                                                                        string currencyIds,
-                                                                        string startDate,
-                                                                        string endDate)
+        public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
@@ -493,17 +488,15 @@ namespace BackendSite.Service.DAL
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_BankFinancialReport_Withdrawal_Get";
+            var SpName = "Admin_BankFinancialReport_Withdrawal_Get_V2";
             return conn.Query<BankFinancialWithdrawalSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds,
-                                                                        string currencyIds,
-                                                                        string startDate,
-                                                                        string endDate)
+        public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
@@ -512,10 +505,11 @@ namespace BackendSite.Service.DAL
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_BankFinancialReport_Transfer_Get";
+            var SpName = "Admin_BankFinancialReport_Transfer_Get_V2";
             return conn.Query<BankFinancialTransferSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
