@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -19,7 +20,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MainFinancialReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly Common _common;
@@ -39,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region API Model
 
-        public class GetReq
+        public class GetListRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
@@ -47,8 +48,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string EndDate { get; set; }
             public int TimeZone { get; set; }
         }
-        
-        public class ExportReq
+
+        public class ExportRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
@@ -62,51 +63,48 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string Name { get; set; }
             public int SortId { get; set; }
         }
-        
+
         #endregion
-        
+
         /// <summary>
-        /// MainFinancialReport/Get 取得金融報表資料
+        /// MainFinancialReport/GetList 取得金融報表資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Reports >  Main Financial Report > [Submit]
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
-        public ApiResult Get(GetReq req)
+        public ApiResult<IEnumerable<MainFinancialModel>> GetList(GetListRequest request)
         {
-            if (req.TimeZone <= 14 && req.TimeZone >= -12)
+
+            if (request.TimeZone > 14 || request.TimeZone < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            var data = _reportBll.GetMainFinancialReport(
+                JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.StartDate,
+                request.EndDate,
+                _common.TransferToTimeZoneFormat(request.TimeZone));
+
+            if (!data.Any())
             {
-                var data = _reportBll.GetMainFinancialReport(
-                    JsonConvert.SerializeObject(req.SiteIds),
-                    JsonConvert.SerializeObject(req.CurrencyIds),
-                    req.StartDate,
-                    req.EndDate,
-                    _common.TransferToTimeZoneFormat(req.TimeZone));
-
-                if (!data.Any())
-                {
-                    return new ApiResult<IEnumerable<MainFinancialModel>>
-                    {
-                        ErrorCode = (int) ErrorCodeEnum.NoData
-                    };
-                }
-
                 return new ApiResult<IEnumerable<MainFinancialModel>>
                 {
-                    Data = data,
-                    ErrorCode = (int) ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.NoData
                 };
             }
-            return new ApiResult
+
+            return new ApiResult<IEnumerable<MainFinancialModel>>
             {
-                Message ="Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
+
         }
 
         /// <summary>
@@ -117,20 +115,21 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// 
         /// Func Path：Reports > Main Financial Report > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult Export(ExportReq req)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
+        public IActionResult Export(ExportRequest request)
         {
             #region Get Data
 
-            var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(JsonConvert.SerializeObject(req.CurrencyIds));
+            var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(JsonConvert.SerializeObject(request.CurrencyIds));
             var exportData = _reportBll.GetMainFinancialReport(
-                JsonConvert.SerializeObject(req.SiteIds), 
-                JsonConvert.SerializeObject(req.CurrencyIds),
-                req.StartDate, 
-                req.EndDate,
-                _common.TransferToTimeZoneFormat(req.TimeZone));
+                JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.StartDate,
+                request.EndDate,
+                _common.TransferToTimeZoneFormat(request.TimeZone));
             var currencyData = _reportBll.GetCurrency();
 
             #endregion
@@ -165,7 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
 
             #region Title
-            
+
             var byDateTitles = new Dictionary<string, TitleModel>
             {
                 {"Date", new TitleModel {Name = "Date", SortId = 1}},
