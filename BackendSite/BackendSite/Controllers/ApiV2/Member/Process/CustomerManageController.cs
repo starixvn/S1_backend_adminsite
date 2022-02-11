@@ -33,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly PaymentBLL _paymentBll;
         private readonly ExcelBLL _excelBll;
-        private readonly Tools _tools;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly MessageBLL _messageBll;
@@ -42,6 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly CustVerifyBLL _custVerifyBll;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -67,7 +67,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _tools = provider.GetRequiredService<Tools>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -76,6 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
         }
 
         #endregion
@@ -215,6 +215,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _endDate;
             private DateTimeOffset _tagStartDate;
             private DateTimeOffset _tagEndDate;
+            private DateTimeOffset _statusStartDate;
+            private DateTimeOffset _statusEndDate;
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset? StartDate
@@ -253,6 +255,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
+            public DateTimeOffset? StatusStartDate
+            {
+                get => _statusStartDate;
+                set
+                {
+                    if (value != null)
+                        _statusStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? StatusEndDate
+            {
+                get => _statusEndDate;
+                set
+                {
+                    if (value != null)
+                        _statusEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int? BirDate { get; set; }
             public int? BirMonth { get; set; }
             public int? BirYear { get; set; }
@@ -267,6 +287,46 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
+        }
+
+        public class ExportCustInfoListRequest
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public int? BirDate { get; set; }
+            public int? BirMonth { get; set; }
+            public int? BirYear { get; set; }
+            public string UserName { get; set; }
+            public string AccountName { get; set; }
+            public string LoginIp { get; set; }
+            public string TransId { get; set; }
+            public string TpUserName { get; set; }
+            public string Email { get; set; }
+            public string PhoneNo { get; set; }
+            public int? AffId { get; set; }
+            public string BankAccountNumber { get; set; }
+            public IEnumerable<int> Statuses { get; set; }
+            public string AffCode { get; set; }
         }
 
         public class CustIdWithReasonRequest : CustIdRequest
@@ -362,6 +422,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public int OTPType { get; set; }
         }
+
         public class AddCustNoteRequest : CustIdRequest
         {
             public string Note { get; set; }
@@ -454,6 +515,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public string Reason { get; set; }
+        }
+
+        public class GetCustDetailRequest
+        {
+            public int SiteId { get; set; }
+            public string UserName { get; set; }
+            public string SabaId { get; set; }
+
+        }
+
         #endregion
 
         #region CSD > Customer Administration
@@ -476,7 +552,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
             var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
-
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
+            
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
                 request.BirDate,
@@ -493,6 +571,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 tagStartDate,
                 tagEndDate,
+                statusStartDate,
+                statusEndDate,
                 request.PageSize,
                 request.AffCode,
                 request.CurrencyIds,
@@ -528,13 +608,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_exportExcel" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
         public IActionResult ExportCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
 
             var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
                                                                     request.BirDate,
@@ -549,10 +633,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.PhoneNo,
                                                                     startDate,
                                                                     endDate,
+                                                                    tagStartDate,
+                                                                    tagEndDate,
+                                                                    statusStartDate,
+                                                                    statusEndDate,
                                                                     request.AffCode,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
-                                                                    request.Statuses);
+                                                                    request.Statuses,
+                                                                    request.SelectTag);
 
             var stream = _excelBll.Export(exportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");
@@ -656,6 +745,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult SetCustStatusSwitch(CustStatusSwitchRequest request)
         {
@@ -666,15 +756,31 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             switch (request.Option)
             {
                 case 1:
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isKyc"))
+                    {
+                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
+                    }
                     OldStatus = custSwitchInfo.IsKyc;
                     break;
                 case 2:
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isRisk"))
+                    {
+                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
+                    }
                     OldStatus = custSwitchInfo.IsRisk;
                     break;
                 case 3:
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_phoneVerified"))
+                    {
+                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
+                    }
                     OldStatus = custSwitchInfo.PhoneVerified;
                     break;
                 default:
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_emailVerified"))
+                    {
+                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
+                    }
                     OldStatus = custSwitchInfo.EmailVerified;
                     break;
             }
@@ -721,11 +827,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Message = "Update Success."
             };
         }
+
         /// <summary>
         /// CustManage/PayoutVerificationReward 派發客戶驗證獎勵金
         /// </summary>
         /// <param name="verificationRewardReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
         {
@@ -745,6 +853,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
         [HttpPost]
         public ApiResult SetCustInfo(EditCustDetailRequest request)
@@ -815,6 +924,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpGet]
         public IActionResult GetCustPhotoId(CustIdRequest request)
         {
@@ -842,6 +952,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="custId"></param>
         /// <param name="file"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm] int custId, [FromForm] IFormFile file)
         {
@@ -892,6 +1003,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
         public ApiResult DelCustPhotoId(CustIdRequest request)
         {
             var data = _custInfoBll.DelCustPhotoId(request.CustId);
@@ -927,6 +1040,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetProfile(CustIdRequest request)
         {
@@ -973,6 +1087,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustBankInfo(CustIdRequest request)
         {
@@ -1020,6 +1135,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustUSDTInfo(CustIdRequest request)
         {
@@ -1229,6 +1345,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
         public ApiResult GetBonusLogByCustId(GetBonusLogRequest request)
         {
             var pageNumber = request.PageNumber;
@@ -1269,6 +1387,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
             var pageNumber = request.PageNumber;
@@ -1309,6 +1429,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(CustIdWithDateRangeNullAndPageRequest request)
         {
@@ -1347,6 +1468,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
         {
@@ -1372,6 +1494,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordByDay(
             CustTpBetRecordListOneDayReq req)
@@ -1399,6 +1522,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordByCategoryId(
             CustTpBetRecordListbyCategoryIdReq req)
@@ -1427,6 +1551,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
             CustTpBetRecordDetailListbyGameTypeReq req)
@@ -1467,6 +1592,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult<dynamic>> GetTpBetRecordDetailAsync(GetTpBetRecordDetailRequest request)
         {
@@ -1487,6 +1613,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult GetDepositInfoByCustId(GetDepositListByCustIdRequest request)
         {
@@ -1527,6 +1654,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
         public ApiListResult<TpTransferInfo> GetTpTransferInfoByCustId(GetTpTransferInfoListByCustIdRequest request)
         {
             var data = _tpBll.GetTpTransferInfoByCust(request.CustId,
@@ -1562,6 +1691,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalInfoByCustId(GetWithdrawalListByCustIdRequest request)
         {
@@ -1602,6 +1732,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCustId(CustIdWithDateRangeAndPageRequest request)
         {
             var pageNumber = request.PageNumber;
@@ -1638,6 +1770,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<LoginLog> GetLoginLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -1708,6 +1841,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_noteEdit" })]
         [HttpPost]
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
@@ -1745,6 +1879,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustNote> GetCustNote(CustIdWithPageRequest request)
         {
@@ -1776,6 +1911,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
         [HttpPost]
         public ApiResult SetCustNote(SetCustNoteRequest request)
         {
@@ -2010,6 +2146,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<GetAdminOperateLog> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2047,6 +2184,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogByCustId(CustIdWithPageRequest request)
         {
@@ -2074,6 +2212,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLogByCustId(CustIdWithPageRequest request)
         {
@@ -2106,6 +2245,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendByCustId(CustIdWithDateRangeNullAndPageRequest request)
         {
@@ -2127,7 +2267,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PageSize,
                 request.PageNumber,
                 out int totalPages,
-                out int rowCount,false);
+                out int rowCount, false);
 
             foreach (var x in data)
             {
@@ -2159,6 +2299,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfoByCustId(CustIdRequest request)
         {
@@ -2182,13 +2323,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdRequest request)
+        public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdWithPageRequest request)
         {
+            int totalPages = 0;
+            int rowCount = 0;
+
+            var result = _vipLevelBll.GetVipLevelLog(request.CustId, request.PageNumber, request.PageSize, out totalPages, out rowCount);
+
             var apiListResult = new ApiListResult<VipLevelLog>
             {
-                Data = _vipLevelBll.GetVipLevelLog(request.CustId),
-                ErrorCode = (int)ErrorCodeEnum.Success
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                PageNumber = request.PageNumber
             };
             return apiListResult;
         }
@@ -2205,6 +2355,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_vipLevelEdit" })]
         [HttpPost]
         public ApiResult SetVipLevel(CustIdWithVipLevelRequest request)
         {
@@ -2239,6 +2390,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_vipLevelEdit" })]
         [HttpPost]
         public ApiResult SetVipLevelManually(CustIdWithVipLevelManuallyRequest request)
         {
@@ -2275,6 +2427,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<Promotion> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2315,6 +2468,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
         {
@@ -2388,6 +2542,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<int>> GetTagByCustId(CustIdRequest request)
         {
@@ -2408,14 +2563,63 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #endregion
 
+        #region Finance > Balance Adjustment
+
+        /// <summary>
+        /// CustomerManage/GetCustDetail 取得客戶明細
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustDetail(GetCustDetailRequest request)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+
+            if (result != ErrorCodeEnum.Success)
+            {
+                throw new AdminException(result);
+            }
+
+            if (custInfo != null)
+            {
+                if (custInfo.Status == (int)CustomerStatusEnum.Running)
+                {
+                    apiResult.Data = custInfo;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else if (custInfo.Status == (int)CustomerStatusEnum.Suspend)
+                {
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend);
+                }
+                else
+                {
+                    throw new AdminException(ErrorCodeEnum.CustStatusIsClosed);
+                }
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+            }
+
+            return apiResult;
+        }
+
+        #endregion
+
         #region  CSD > Customer Administration > CustInfo > GetWithdrawalLimitLog
 
         /// <summary>
         /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
         /// </summary>
         /// <remarks>
-        /// Http Method：POST
-        /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
         /// </remarks>
         /// <param name="request"></param>

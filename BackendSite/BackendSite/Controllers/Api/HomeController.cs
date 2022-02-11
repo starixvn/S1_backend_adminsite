@@ -325,7 +325,7 @@ namespace BackendSite.Controllers.Api
             var CanSearchSite = new List<int>();
 
             _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite);
+            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite,8);
 
             return new ApiResult<DashBoardData>
             {

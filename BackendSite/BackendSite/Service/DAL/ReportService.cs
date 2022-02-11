@@ -1,27 +1,33 @@
-﻿using BackendSite.Service.Model;
+﻿using System;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class ReportService
     {
-
         #region Fields
 
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _reportDbClient;
 
         #endregion
 
         #region Constructors
 
-        public ReportService(IConfiguration configuration)
+        public ReportService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -30,131 +36,99 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyModel> GetCurrencyList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Common_Currency_Get";
-            return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<CurrencyModel>("Common_Currency_Get");
         }
 
         public IEnumerable<ServerInfoModel> GetServerInfoList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Admin_ServerInfoList_Get";
-            return conn.Query<ServerInfoModel>(SpName, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<ServerInfoModel>("Admin_ServerInfoList_Get");
         }
-        
+
         public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return await conn.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", commandType: CommandType.StoredProcedure);
+            return await _reportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get");
         }
 
         #endregion
 
-        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds,
-                                                                                            string currencyIds,
-                                                                                            string startDate,
-                                                                                            string endDate)
+        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
         {
-            var partcialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
-
+            var partialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
             var parameters = new DynamicParameters(
                 new
                 {
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
-
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-
-            conn.Open();
-
+            
             #region Get Data StoreProcedure
 
-            var reportDepositList = conn.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get",
-                                                                     parameters,
-                                                                     commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Deposit", reportDepositList);
+            var reportDepositList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Deposit", reportDepositList);
 
-            var reportWithdrawalList = conn.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Withdrawal", reportWithdrawalList);
+            var reportWithdrawalList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Withdrawal", reportWithdrawalList);
 
-            var reportAdjustmentList = conn.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Adjustment", reportAdjustmentList);
+            var reportAdjustmentList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Adjustment", reportAdjustmentList);
 
-            var reportBonusList = conn.Query<PartcialSummeryModel>("Admin_ReportBonus_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Bonus", reportBonusList);
+            var reportBonusList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportBonus_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Bonus", reportBonusList);
 
-            var reportRebateList = conn.Query<PartcialSummeryModel>("Admin_ReportRebate_GroupByDay_Get",
-                                                                        parameters,
-                                                                        commandType: CommandType.StoredProcedure);
-            partcialSummeryModels.Add("Rebate", reportRebateList);
+            var reportRebateList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportRebate_GroupByDay_Get_V2", parameters);
+            partialSummeryModels.Add("Rebate", reportRebateList);
 
             #endregion
-
-            conn.Close();
-
-            return partcialSummeryModels;
+            
+            return partialSummeryModels;
         }
 
-        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinlossSummary(string siteIds,
-                                                                                        string currencyIds,
-                                                                                        string startDate,
-                                                                                        string endDate)
+        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinLossSummary(string siteIds, string currencyIds, string startDate, string endDate , string timeZone)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_ReportTurnOverAndWinlost_GroupByDay_Get";
-            return conn.Query<TurnoverAndWinlossSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V2", parameters);
         }
 
-        public IEnumerable<StatisticalPartcialSummeryModel> GetStatisticalReport(string siteIds,
-                                                                                 string timeZone,
-                                                                                 string startDate,
-                                                                                 string endDate)
+        public IEnumerable<StatisticalPartialSummeryModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            var parameters = new DynamicParameters(
-                new
+            var parameters = new DynamicParameters( new
                 {
                     _SiteIds = siteIds,
-                    _TimeZone= timeZone,
+                    _TimeZone = timeZone,
                     _StartDate = startDate,
                     _EndDate = endDate
                 });
 
-            var SpName = "Admin_ReportTurnOverValidBet_Statistical_Get";
-            return conn.Query<StatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get", parameters);
         }
 
         public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,
-                                                                               string selectDate)
+            DateTime startTime,
+            DateTime endTime,
+            string timeZone)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
-                    SiteIds = siteIds,
-                    SelDate = selectDate
+                    _SiteIds = siteIds,
+                    _StartTime = startTime,
+                    _EndTime = endTime,
+                    _TimeZone = timeZone
                 });
 
-            var SpName = "Admin_OnlineReport_Get";
-            return conn.Query<UserOnlinePartcialSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V3", parameters);
         }
 
         public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds,
@@ -162,7 +136,6 @@ namespace BackendSite.Service.DAL
                                                                         string startDate,
                                                                         string endDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -172,23 +145,16 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate
                 });
             var SpName = "Admin_Report_DepositDetailByDay_Get";
-            return conn.Query<DepositReportParticalModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<DepositReportParticalModel>(SpName, parameters);
 
-            //Test Data
-            //using (MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport")))
-            //{
-            //    string SpName = "Temp_EttaReportTest_Get";
-            //    return conn.Query<DepositReportParticalModel>(SpName, commandType: CommandType.StoredProcedure);
-            //}
         }
 
         public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
-                                                                                        string currencyIds,
-                                                                                        string startDate,
-                                                                                        string endDate,
-                                                                                        string userName)
+                                                                                                 string currencyIds,
+                                                                                                 string startDate,
+                                                                                                 string endDate,
+                                                                                                 string userName)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -200,14 +166,13 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get";
-            return conn.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
         public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
-                                                               int gameId,
-                                                               string date)
+                                                                   int gameId,
+                                                                   string date)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -217,14 +182,14 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
-            return conn.Query<TpBetRecordDataModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<TpBetRecordDataModel>(SpName, parameters);
         }
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -250,7 +215,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
