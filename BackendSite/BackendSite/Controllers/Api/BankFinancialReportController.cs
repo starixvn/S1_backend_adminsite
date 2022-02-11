@@ -133,7 +133,8 @@ namespace BackendSite.Controllers.Api
             var data = _bankFinancialBLL.GetTransferInfoReport(request.SiteId,
                                                               request.AccountNo,
                                                               request.StartDate,
-                                                              request.EndDate);
+                                                              request.EndDate,
+                                                              _common.TransferToTimeZoneFormat(0));
 
             if (!data.Any())
             {
@@ -173,7 +174,8 @@ namespace BackendSite.Controllers.Api
             var data = _bankFinancialBLL.GetTransferInfoReport(SiteId,
                                                                   AccountNo,
                                                                   StartDate,
-                                                                  EndDate); ;
+                                                                  EndDate,
+                                                                  _common.TransferToTimeZoneFormat(0));
             var stream = _excelBLL.Export(data);
 
             return File(stream,

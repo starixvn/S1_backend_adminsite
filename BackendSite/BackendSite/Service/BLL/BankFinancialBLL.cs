@@ -1453,12 +1453,14 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
                                                                                        string accountNo,
                                                                                        string startDate,
-                                                                                       string endDate)
+                                                                                       string endDate,
+                                                                                       string timeZone)
         {
             return _bankFinancialService.GetTransferInfoReport(siteId,
                                                                accountNo,
                                                                startDate,
-                                                               endDate);
+                                                               endDate,
+                                                               timeZone);
         }
 
         #endregion
