@@ -691,12 +691,22 @@ namespace BackendSite.Service.Model.enums
         ManualBonus = 6
     }
 
-    public enum VerificationType
+    #region VerificationReward
+
+    public enum VerificationTypeEnum
     {
-        SMS = 0,
-        Email = 1
+        EitherOf = 0,
+        BothOf = 1
     }
-    
+
+    public enum VerificationRewardStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
     public enum DeviceId
     {
         Old = 0,
