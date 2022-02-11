@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -90,7 +90,6 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
         public decimal PhoneReward { get; set; }
-
         public DateTimeOffset? PhoneRewardTime
         {
             get => _phoneRewardTime;
@@ -100,10 +99,8 @@ namespace BackendSite.Service.Model
                     _phoneRewardTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
-
         public bool EmailVerified { get; set; }
         public decimal EmailReward { get; set; }
-
         public DateTimeOffset? EmailRewardTime
         {
             get => _emailRewardTime;
@@ -114,7 +111,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -162,17 +159,10 @@ namespace BackendSite.Service.Model
     public class ExportVerificationRewardModel
     {
         public string SiteName { get; set; }
-        public int CustId { get; set; }
         public string UserName { get; set; }
-        public int CurrencyId { get; set; }
         public string Currency { get; set; }
-        public bool PhoneVerified { get; set; }
-        public decimal PhoneReward { get; set; }
-        public DateTimeOffset? PhoneRewardTime { get; set; }
-        public bool EmailVerified { get; set; }
-        public decimal EmailReward { get; set; }
-        public DateTimeOffset? EmailRewardTime { get; set; }
-        public decimal VerificationReawardAmount { get; set; }
-        public DateTimeOffset VerificationReawardTime { get; set; }
+        public string VerificationType { get; set; }
+        public decimal RewardAmount { get; set; }
+        public DateTimeOffset? VerificationTime { get; set; }
     }
 }

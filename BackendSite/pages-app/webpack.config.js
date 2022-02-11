@@ -248,6 +248,9 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
+    // "Finance/CryptoWithdrawalLimitManagement.min": [
+    //   "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
+    // ],
     // "Marketing/VerificationReward.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationReward/index.js",
@@ -256,6 +259,7 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
+    // "Finance/BonusPayout.min": ["./src/pages/Finance/BonusPayout/index.js"],
     // "Marketing/SlotGamesManagement.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/SlotGamesManagement/index.js",

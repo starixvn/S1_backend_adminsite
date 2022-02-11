@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
-        public PromotionType PromotionType { get; set; }
+        public PromotionTypeEnum PromotionType { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public int ExpiryDays { get; set; }
@@ -22,7 +22,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int RollOver { get; set; }
         public decimal Bonus { get; set; }
-        public BonusType BonusType { get; set; }
+        public BonusTypeEnum BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }

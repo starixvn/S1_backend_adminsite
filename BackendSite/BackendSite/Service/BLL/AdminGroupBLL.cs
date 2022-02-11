@@ -24,14 +24,25 @@ namespace BackendSite.Service.BLL
             this.permissionBLL = permissionBLL;
         }
 
-        public IEnumerable<AdminGroup> GetGroupList()
+        public IEnumerable<AdminGroup> GetGroupList(int pageNumber,
+            int pageSize,
+            out int totalPage,
+            out int rowCount)
         {
-            return adminGroupService.GetGroupList();
+            return adminGroupService.GetGroupList((Math.Abs(pageNumber) - 1) * pageSize,
+               Math.Abs(pageSize),
+               out totalPage,
+               out rowCount);
+        }
+
+        public IEnumerable<AdminGroup> GetGroupByIdOrAll(int groupId,bool isAll)
+        {
+            return adminGroupService.GetGroupByIdOrAll(groupId,isAll);
         }
 
         public bool CheckGroupIsExists(string GroupName, int? SEQ)
         {
-            var all_groups = adminGroupService.GetGroupList();
+            var all_groups = adminGroupService.GetGroupList(0, 1000, out _, out _);
             return all_groups.Any(x => x.GroupSEQ != SEQ && string.Equals(x.GroupName, GroupName, StringComparison.OrdinalIgnoreCase));
         }
 

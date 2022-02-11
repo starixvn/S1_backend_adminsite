@@ -7,33 +7,48 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class ReferralManagementService
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public ReferralManagementService(IConfiguration configuration)
+        public ReferralManagementService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<ReferralList> GetReferralBySiteId(int SiteId)
+        public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            return conn.Query<ReferralList>("Admin_Referral_Get", new { SiteId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
         public void SetReferral(List<ReferralManagement> referralList)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
                 if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
-                    para.Add(new ReferralList
+                    //原本的寫法改用新的連線方式會有問題，先用迴圈Set
+                    //para.Add(new ReferralList
+                    //{
+                    //    SiteId = x.SiteId,
+                    //    CurrencyId = x.CurrencyId,
+                    //    PeriodDays = int.Parse(x.PeriodDays),
+                    //    BonusAmount = decimal.Parse(x.BonusAmount),
+                    //    VaildBet = decimal.Parse(x.VaildBet),
+                    //    Deposit = decimal.Parse(x.Deposit)
+                    //});
+                    var param = new DynamicParameters(
+                    new
                     {
                         SiteId = x.SiteId,
                         CurrencyId = x.CurrencyId,
@@ -42,16 +57,16 @@ namespace BackendSite.Service.DAL
                         VaildBet = decimal.Parse(x.VaildBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
+                    _mainDbClient.Execute("Admin_Referral_Set", param);
                 }
+                //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
-            conn.Execute("Admin_Referral_Set", para, commandType: CommandType.StoredProcedure);
         }
-        public void SetReferralStatus(int SiteId, int CurrencyId)
+        public void SetReferralStatus(int siteId, int currencyId, int status)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_Referral_Status_Set", new { SiteId, CurrencyId }, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
-        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate , DateTime? endDate , int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             string SelectSite = null;
             if (selectSite != null && selectSite.Any())
@@ -63,24 +78,24 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = Math.Abs(pageSize) });
             p.Add("StartDate", startDate);
             p.Add("EndDate", endDate);
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get_V2", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        
-        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
-        {
-            var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId ,StartDate = startDate, EndDate= endDate});
 
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate)
+        {
+            var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId, StartDate = startDate, EndDate = endDate });
+
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<ReferralCustList>("Admin_ReferralCustlistExport_Get", p, commandType: CommandType.StoredProcedure);
             return result;
         }
@@ -95,11 +110,12 @@ namespace BackendSite.Service.DAL
             bool byRewardTime)
         {
             var SpName = string.Empty;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             if (byRewardTime)
-            { 
+            {
                 SpName = "Admin_ReferralFriendListByRewardTime_Get";
-            }else
+            }
+            else
             {
                 SpName = "Admin_ReferralFriendList_Get_V3";
             }
@@ -112,7 +128,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<ReferralFriend>(SpName, props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<ReferralFriend>(SpName, props);
             TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             RowCount = props.Get<int?>("_RowCount") ?? 0;
 

@@ -168,6 +168,7 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
+      console.log(data[element.dataColumn]);
       return (
         <td
           key={`td-${element.dataColumn}-${idx}`}

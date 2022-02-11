@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.Api
 {
@@ -25,20 +26,19 @@ namespace BackendSite.Controllers.Api
 
         private readonly ReportBLL _reportBLL;
         private readonly ReportExcelBLL _reportExcelBLL;
-        private readonly ResponseSettingBLL _responseSettingBLL;
+        private readonly Common _common;
 
         #endregion
 
         #region Constructors
 
-        public ReportController(IConfiguration configuration,
-                                ReportBLL reportBLL,
+        public ReportController(ReportBLL reportBLL,
                                 ReportExcelBLL reportExcelBLL,
-                                ResponseSettingBLL responseSettingBLL)
+                                Common common)
         {
             _reportBLL = reportBLL;
             _reportExcelBLL = reportExcelBLL;
-            _responseSettingBLL = responseSettingBLL;
+            _common = common;
         }
 
         #endregion
@@ -47,50 +47,17 @@ namespace BackendSite.Controllers.Api
 
         public class GetMainFinancialReportReq
         {
-            public IEnumerable<int> SiteIds
-            {
-                get;
-                set;
-            }
-
-            public IEnumerable<int> CurrencyIds
-            {
-                get;
-                set;
-            }
-
-            public string StartDate
-            {
-                get;
-                set;
-            }
-
-            public string EndDate
-            {
-                get;
-                set;
-            }
+            public IEnumerable<int> SiteIds {get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public string StartDate { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class GetStatisticalReportReq
         {
-            public IEnumerable<int> SiteIds
-            {
-                get;
-                set;
-            }
-
-            public string TimeZone
-            {
-                get;
-                set;
-            }
-
-            public string EndDate
-            {
-                get;
-                set;
-            }
+            public IEnumerable<int> SiteIds {get; set; }
+            public string TimeZone { get; set; }
+            public string EndDate { get; set; }
         }
 
         public class GetUserOnlineReportReq
@@ -139,13 +106,9 @@ namespace BackendSite.Controllers.Api
         public class GetCustomerStatisticalReportReq
         {
             public IEnumerable<int> SiteIds { get; set; }
-
             public IEnumerable<int> CurrencyIds { get; set; }
-
             public string StartDate { get; set; }
-
             public string EndDate { get; set; }
-
             public string UserName { get; set; }
         }
 
@@ -188,7 +151,8 @@ namespace BackendSite.Controllers.Api
             var data = _reportBLL.GetMainFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
                                                               JsonConvert.SerializeObject(request.CurrencyIds),
                                                               request.StartDate,
-                                                              request.EndDate);
+                                                              request.EndDate,
+                                                              TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -232,7 +196,8 @@ namespace BackendSite.Controllers.Api
             var ExportData = _reportBLL.GetMainFinancialReport(SiteIds,
                                                               CurrencyIds,
                                                               StartDate,
-                                                              EndDate);
+                                                              EndDate,
+                                                              TransferToTimeZoneFormat(8));
 
             var currencyData = _reportBLL.GetCurrency();
 
@@ -1210,11 +1175,9 @@ namespace BackendSite.Controllers.Api
         /// Report/GetUserOnlineReport 取得使用者線上報表資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
         /// Func Path：Reports > User Online Report > [Submit]
-        /// 
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
@@ -1222,8 +1185,8 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public ApiResult GetUserOnlineReport(GetUserOnlineReportReq request)
         {
-            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                           request.SelectDate);
+
+            var data = _reportBLL.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds), request.SelectDate, 8);
 
             if (!data.Any())
             {
@@ -1243,29 +1206,25 @@ namespace BackendSite.Controllers.Api
         /// Report/ExportUserOnlineReport 匯出使用者線上報表資料
         /// </summary>
         /// <remarks>
-        /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Reports > User Online Report > [Export Excel]
-        /// 
+        /// Func Path：Reports > User Online Report >  [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="SiteIds"></param>
-        /// <param name="SelectDate"></param>
+        /// <param name="siteIds"></param>
+        /// <param name="selectDate"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportUserOnlineReport(string SiteIds,
-                                                    string SelectDate)
+        public IActionResult ExportUserOnlineReport(string siteIds, string selectDate)
         {
             #region Get Data
 
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(SiteIds);
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(siteIds);
 
-            var ExportData = _reportBLL.GetUserOnlineReport(SiteIds,
-                                                           SelectDate);
-
-            var totalMaxCount = ExportData.GroupBy(x => new
+            var exportData = _reportBLL.GetUserOnlineReport(siteIds, selectDate, 8);
+            
+            var totalMaxCount = exportData.GroupBy(x => new
             {
-                LocalTime = x.LocalTime
+                x.LocalTime
             }).Select(x => x.Sum(y => y.MaxCount)).Max();
 
             var serverData = _reportBLL.GetServer();
@@ -1274,41 +1233,75 @@ namespace BackendSite.Controllers.Api
 
             #region Initial Param
 
-            var Content = new List<Dictionary<string, dynamic>>();
-            var Titles = new Dictionary<string, TitleModel>();
+            var content = new List<Dictionary<string, dynamic>>();
+            var titles = new Dictionary<string, TitleModel>();
             var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
             #endregion
 
             #region Set Title(Merge Title & Title & Total Title & Not Summary Title)
 
-            #region Merge Title
+            #region IsRemoveOld Logic
 
-            var MergeTitles = new Dictionary<string, MergeTitleModel>();
-
-            MergeTitles.Add("Date", new MergeTitleModel { Name = SelectDate, MergeRange = 1 });
-            MergeTitles.Add("OnlineCount", new MergeTitleModel { Name = "Online Count", MergeRange = siteList.Count() + 1 });
-
-            titlesToMerge.Add(MergeTitles);
+            var isRemoveOld = exportData.Where(x => x.DeviceType == (short) DeviceId.Old)
+                .All(x => x.MaxCount == 0);
+            var deviceIdCount  = Enum.GetNames(typeof(DeviceId)).Length;
+            var deviceIdList = Enum.GetValues(typeof(DeviceId)).Cast<DeviceId>().ToList();
+            
+            if (isRemoveOld)
+            {
+                deviceIdCount -= 1;
+                deviceIdList.Remove(DeviceId.Old);
+            }
 
             #endregion
-
-            #region Title
-
-            Titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
-            Titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
+            
+            #region Merge Title
+            
+            // row 1
+            var mergeTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Date", new MergeTitleModel {Name = selectDate, MergeRange = 1}},
+                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange =  (siteList.Count() * (deviceIdCount +1 )) }}
+            };
+            
+            // row 2
+            var mergeDeviceTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Site", new MergeTitleModel {Name = "Site", MergeRange = 1}}
+            };
 
             foreach (var site in siteList)
             {
                 var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
-
-                var OnlinePropName = $"Online-{siteName}";
-
-                var onlineSortId = 100 + site;
-
-                Titles.Add(OnlinePropName, new TitleModel { Name = siteName, SortId = onlineSortId });
+                var onlinePropName = $"Online-{siteName}";
+                mergeDeviceTitles.Add(onlinePropName, new MergeTitleModel { Name = siteName, MergeRange = deviceIdCount + 1});
             }
+            
+            titlesToMerge.Add(mergeTitles);
+            titlesToMerge.Add(mergeDeviceTitles);
+            
+            #endregion
 
+            #region Title
+
+            titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
+            titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
+            
+            foreach (var site in siteList)
+            {
+                var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                foreach (var id in deviceIdList)
+                {
+                    var onlinePropName = $"Online-{siteName}-{(short)id}";
+                    var onlineSortId = 100 + (site*10) +(int) id;
+                    titles.Add(onlinePropName, new TitleModel { Name = id.ToString(), SortId = onlineSortId });
+                }
+                var onlinePropNameSummary = $"Online-{siteName}-Summary";
+                var onlineSummarySortId = 100 + (site*10) + 5;
+                titles.Add(onlinePropNameSummary, new TitleModel { Name = "Site Total", SortId = onlineSummarySortId });
+            }
+            
             #endregion
 
             var totalTitle = new List<string>
@@ -1323,31 +1316,43 @@ namespace BackendSite.Controllers.Api
             };
 
             #endregion
-
-            foreach (var item in ExportData)
+            
+            foreach (var item in exportData)
             {
-                var OnlinePropName = $"Online-{item.SiteName}";
-
+                var onlinePropName = $"Online-{item.SiteName}-{item.DeviceType}";
+                var onlineSitePropName = $"Online-{item.SiteName}-Summary";
+                
                 var getKey = $"{item.LocalTime}";
-                var getItem = Content.FirstOrDefault(x =>
+                var getItem = content.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
                 );
 
                 if (getItem != null)
                 {
-                    getItem.TryGetValue("TotalOnline", out var totalCountdata);
-                    getItem["TotalOnline"] = (int)totalCountdata + item.MaxCount;
+                    getItem.TryGetValue("TotalOnline", out var totalCountData);
+                    getItem["TotalOnline"] = (int)totalCountData + item.MaxCount;
 
-                    if (getItem.ContainsKey(OnlinePropName))
+                    if (getItem.ContainsKey(onlinePropName))
                     {
-                        getItem.TryGetValue(OnlinePropName, out var maxCountData);
-                        getItem[OnlinePropName] = (int)maxCountData + item.MaxCount;
+                        getItem.TryGetValue(onlinePropName, out var maxCountData);
+                        getItem[onlinePropName] = (int)maxCountData + item.MaxCount;
                     }
                     else
                     {
-                        getItem.Add(OnlinePropName, item.MaxCount);
+                        getItem.Add(onlinePropName, item.MaxCount);
                     }
 
+                    if (getItem.ContainsKey(onlineSitePropName))
+                    {
+                        getItem.TryGetValue(onlineSitePropName, out var maxCountData);
+                        getItem[onlineSitePropName] = (int)maxCountData + item.MaxCount;
+                    }
+                    else
+                    {
+                        getItem.Add(onlineSitePropName, item.MaxCount);
+                    }
+                    
+                    
                     if (getItem["TotalOnline"] == totalMaxCount)
                     {
                         getItem["MaxCount"] = true;
@@ -1360,12 +1365,12 @@ namespace BackendSite.Controllers.Api
                     {
                         { "Key", getKey },
                         { "LocalTime", item.LocalTime },
-
-                        { OnlinePropName,  item.MaxCount },
+                        { onlinePropName,  item.MaxCount },
+                        { onlineSitePropName,  item.MaxCount },
                         { "TotalOnline", item.MaxCount }
                     };
 
-                    Content.Add(newItem);
+                    content.Add(newItem);
                 }
             }
 
@@ -1374,8 +1379,8 @@ namespace BackendSite.Controllers.Api
                 new ComplexReportExportDataToExcel()
                 {
                     SheetName = "User Online Report",
-                    Content = Content,
-                    Titles = Titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
+                    Content = content,
+                    Titles = titles.OrderBy(x=> x.Value.SortId).ToDictionary(x=>x.Key,x=>x.Value.Name),
                     TotalTitles = totalTitle,
                     TitlesToMerge = titlesToMerge,
                     NotSummaryTitles = notSummaryTitles,
@@ -1415,7 +1420,8 @@ namespace BackendSite.Controllers.Api
                                                    JsonConvert.SerializeObject(request.SiteIds),
                                                    JsonConvert.SerializeObject(request.CurrencyIds),
                                                    request.StartDate,
-                                                   request.EndDate);
+                                                   request.EndDate,
+                                                   _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -1460,7 +1466,8 @@ namespace BackendSite.Controllers.Api
                                                          SiteIds,
                                                          CurrencyIds,
                                                          StartDate,
-                                                         EndDate);
+                                                         EndDate, 
+                                                         _common.TransferToTimeZoneFormat(8));
 
             var currencyData = _reportBLL.GetCurrency();
 
@@ -2053,13 +2060,13 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
-
             var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
                                                                      JsonConvert.SerializeObject(request.SiteIds),
                                                                      JsonConvert.SerializeObject(request.CurrencyIds),
                                                                      request.StartDate,
                                                                      request.EndDate,
-                                                                     request.UserName);
+                                                                     request.UserName,
+                                                                     _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -2092,24 +2099,13 @@ namespace BackendSite.Controllers.Api
         /// <param name="UserName"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportCustomerStatisticalReport(string SiteIds,
-                                               string CurrencyIds,
-                                               string StartDate,
-                                               string EndDate,
-                                               string UserName)
+        public IActionResult ExportCustomerStatisticalReport(string SiteIds, string CurrencyIds, string StartDate, string EndDate, string UserName)
         {
 
             #region Get Data
 
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
-
-            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList,
-                                                                     SiteIds,
-                                                                     CurrencyIds,
-                                                                     StartDate,
-                                                                     EndDate,
-                                                                     UserName);
-
+            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList, SiteIds, CurrencyIds, StartDate, EndDate, UserName, _common.TransferToTimeZoneFormat(8));
             var currencyData = _reportBLL.GetCurrency();
 
             #endregion
@@ -2620,11 +2616,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
-            var data = _reportBLL.GetCustomerDetail(request.CustId,
-                                                          request.GameId,
-                                                          request.Date);
-
-
+            var data = _reportBLL.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(8));
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -2641,5 +2634,16 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        private string TransferToTimeZoneFormat(int timeZone)
+        {
+            if (Math.Sign(timeZone) > 0 || Math.Sign(timeZone) == 0)
+            {
+                return string.Format("+" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+            else 
+            {
+                return string.Format("-" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+        }
     }
 }

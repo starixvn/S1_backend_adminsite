@@ -10,7 +10,7 @@ export class CryptoWalletLog extends React.Component {
         let rows = this.props.searchData.length != 0 ? this.props.searchData.map((row, idx) => {
             return (
                 <tr key={"data-" + idx}>
-                    <th>USDT</th>
+                    <th>{row.isoCode}</th>
                     <th>{row.netWork}</th>
                     <th>{row.usdtAddress}</th>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>

@@ -88,6 +88,8 @@ namespace BackendSite.Service.Model.enums
         [Description("msg_CustStatusIsLocked")]
         CustStatusIsLocked = 5004,
 
+        [Description("msg_VerifyCustErrorByParaNotEnough")]
+        VerifyCustErrorByParaNotEnough = 5100,
         #endregion
     }
 }
