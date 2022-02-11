@@ -128,7 +128,7 @@ namespace BackendSite.Service.DAL
                     _TimeZone = timeZone
                 });
 
-            return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V2", parameters);
+            return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V3", parameters);
         }
 
         public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)

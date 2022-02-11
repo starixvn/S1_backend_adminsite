@@ -215,6 +215,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             private DateTimeOffset _endDate;
             private DateTimeOffset _tagStartDate;
             private DateTimeOffset _tagEndDate;
+            private DateTimeOffset _statusStartDate;
+            private DateTimeOffset _statusEndDate;
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset? StartDate
@@ -251,6 +253,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     if (value != null)
                         _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? StatusStartDate
+            {
+                get => _statusStartDate;
+                set
+                {
+                    if (value != null)
+                        _statusStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? StatusEndDate
+            {
+                get => _statusEndDate;
+                set
+                {
+                    if (value != null)
+                        _statusEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
             public int? BirDate { get; set; }
@@ -495,13 +515,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
-        public class CustInfoReq
-        {
-            public int CustId { get; set; }
-            public string UserName { get; set; }
-            public string Reason { get; set; }
-        }
-
         public class GetCustDetailRequest
         {
             public int SiteId { get; set; }
@@ -526,13 +539,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetCustInfoList(CustInfoListRequest request)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
             var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
-
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
+            
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
                 request.BirDate,
@@ -549,6 +564,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 tagStartDate,
                 tagEndDate,
+                statusStartDate,
+                statusEndDate,
                 request.PageSize,
                 request.AffCode,
                 request.CurrencyIds,
@@ -587,10 +604,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_exportExcel" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(ExportCustInfoListRequest request)
+        public IActionResult ExportCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
 
             var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
                                                                     request.BirDate,
@@ -605,10 +626,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.PhoneNo,
                                                                     startDate,
                                                                     endDate,
+                                                                    tagStartDate,
+                                                                    tagEndDate,
+                                                                    statusStartDate,
+                                                                    statusEndDate,
                                                                     request.AffCode,
                                                                     request.CurrencyIds,
                                                                     request.BankAccountNumber,
-                                                                    request.Statuses);
+                                                                    request.Statuses,
+                                                                    request.SelectTag);
 
             var stream = _excelBll.Export(exportCustInfo);
             return _excelBll.ExcelFile(stream, "CustInfoList");
@@ -669,7 +695,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetBonusByCustId(CustIdRequest request)
+        public ApiResult<IEnumerable<CustBonus>> GetBonusByCustId(CustIdRequest request)
         {
             var data = _custInfoBll.GetCustBonus(request.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
@@ -2591,6 +2617,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
         [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
         {

@@ -185,16 +185,29 @@ namespace BackendSite.Service.DAL
             }
 
         }
+
+        public async Task<int> SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId, bool isPopup)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Sender", sender);
+            p.Add("_CustId", custId);
+            p.Add("_SiteId", siteId);
+            p.Add("PersonalMsg", personalMsg);
+            p.Add("_BatchId", batchId);
+            p.Add("_IsPopup", isPopup);
+            return await _mainDbClient.ExecuteAsync("Admin_Msg_Batch_Ins_V3", p);
+        }
+
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator }, commandType: CommandType.StoredProcedure);
         }
-        public bool NewBatchMessage(int siteId, string author, string personalMsg, ref int batchId)
+        public bool NewBatchMessage(int siteId, string author, string personalMsg, bool isPopup, ref int batchId)
         {
-            var p = new DynamicParameters(new { SiteId = siteId, Author = author, Message = personalMsg });
+            var p = new DynamicParameters(new {_SiteId = siteId, _Author = author, _IsPopup = isPopup, _Message = personalMsg});
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Admin_BatchMessage_Ins", p);
+            var result = _mainDbClient.Execute("Admin_BatchMessage_Ins_V2", p);
             batchId = p.Get<int>("BatchId");
             return result > 0;
         }
@@ -241,12 +254,13 @@ namespace BackendSite.Service.DAL
             _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
             return true;
         }
-        public bool UpdateBatchMessage(int batchId, string message)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message)
         {
             var props = new DynamicParameters();
-            props.Add("BatchId", batchId);
-            props.Add("Message", message);
-            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set", props) > 0;
+            props.Add("_BatchId", batchId);
+            props.Add("_IsPopup", isPopup);
+            props.Add("_Message", message);
+            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V2", props) > 0;
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

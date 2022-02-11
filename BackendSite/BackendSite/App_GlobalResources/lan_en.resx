@@ -336,6 +336,12 @@
   <data name="lbl_DepositType5" xml:space="preserve">
     <value>Load Card</value>
   </data>
+  <data name="lbl_DepositType6" xml:space="preserve">
+    <value>QRPay Payment</value>
+  </data>
+  <data name="lbl_DepositType7" xml:space="preserve">
+    <value>Bank Auto Channel</value>
+  </data>
   <data name="lbl_Direction1" xml:space="preserve">
     <value>Credit</value>
   </data>
