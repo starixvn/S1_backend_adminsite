@@ -193,7 +193,7 @@ const App = () => {
   };
   return (
     <div className="container-fluid">
-      <h4 className="page-name">SlotGamesManagement</h4>
+      <h4 className="page-name">CategoryManagement</h4>
       {stateTPList === null ? null : (
         <Filter
           StateFilter={stateFilter}
