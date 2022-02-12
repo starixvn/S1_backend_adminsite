@@ -47,9 +47,6 @@ namespace BackendSite.Service.Model
     public class GetSlotGameListRep 
     {
         public List<SlotGameData> SlotGameDataList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
     }
     public class SlotGameData
     {
@@ -98,9 +95,6 @@ namespace BackendSite.Service.Model
     public class GetSlotGameCategoryListRep
     {
         public List<SlotGameData> SlotGameCategoryList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
     }
     public class SlotGameCategoryList
     {

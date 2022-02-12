@@ -33,11 +33,11 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TPid, req.Name, req.Status, req.PageNumber, req.PageSize);
-                apiResult.TotalPages = result.TotalPages;
-                apiResult.RowCount = result.RowCount;
+                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TPid, req.Name, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                apiResult.TotalPages = TotalPages;
+                apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
-                apiResult.PageNumber = result.PageNumber;
+                apiResult.PageNumber = req.PageNumber;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -72,11 +72,11 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TPid, req.Name, req.Category, req.PageNumber, req.PageSize);
-                apiResult.TotalPages = result.TotalPages;
-                apiResult.RowCount = result.RowCount;
+                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TPid, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                apiResult.TotalPages = TotalPages;
+                apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;
-                apiResult.PageNumber = result.PageNumber;
+                apiResult.PageNumber = req.PageNumber;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
