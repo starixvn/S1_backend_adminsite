@@ -134,7 +134,12 @@ const Panel = (props) => {
                   props.UpdateResultStatus
                 )
               }
-              disabled={false}
+              disabled={
+                window.subFuncKeys &&
+                window.subFuncKeys.includes("cms_sgm_edit")
+                  ? false
+                  : true
+              }
             />
             <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
           </div>

@@ -47,9 +47,6 @@ namespace BackendSite.Service.Model
     public class GetSlotGameListRep 
     {
         public List<SlotGameData> SlotGameDataList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
     }
     public class SlotGameData
     {
@@ -79,5 +76,51 @@ namespace BackendSite.Service.Model
         public int SlotGameId { get; set; }
         public int Site { get; set; }
     }
-
+    public class GetSlotGameCategoryListReq
+    {
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int Site { get; set; }
+        public int TPid { get; set; }
+        public string Name { get; set; }
+        public int Category { get; set; }
+        //public int Status { get; set; }
+        public GetSlotGameCategoryListReq()
+        {
+            //PageSize預設100
+            if (PageSize == 0)
+                PageSize = 100;
+        }
+    }
+    public class GetSlotGameCategoryListRep
+    {
+        public List<SlotGameData> SlotGameCategoryList { get; set; }
+    }
+    public class SlotGameCategoryList
+    {
+        private DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public int TpId { get; set; }
+        public int Id { get; set; }
+        public string GameId { get; set; }
+        public string Name { get; set; }
+        public string Status { get; set; }
+        public string Operator { get; set; }
+    }
+    public class SlotGameStatus
+    {
+        public int CurrencyId { get; set; }
+        public int Status { get; set; }
+    }
+    public class SetSlotGameCategoryReq
+    {
+        public int CurrencyId { get; set; }
+        public int SlotGameId { get; set; }
+        public int Site { get; set; }
+        public int CategoryId { get; set; }
+    }
 }

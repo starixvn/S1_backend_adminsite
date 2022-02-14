@@ -264,9 +264,13 @@ module.exports = {
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
     // "Finance/BonusPayout.min": ["./src/pages/Finance/BonusPayout/index.js"],
-    "Marketing/SlotGamesManagement.min": [
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    "Marketing/CategoryManagement.min": [
       "@babel/polyfill",
-      "./src/pages/Marketing/SlotGamesManagement/index.js",
+      "./src/pages/Marketing/CategoryManagement/index.js",
     ],
   },
   output: {

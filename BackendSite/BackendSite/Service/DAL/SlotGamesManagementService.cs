@@ -51,5 +51,36 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
+
+        public List<SlotGameCategoryList> GetSlotGameCategoryList(int Site, int TPid, string Name, int Category, int PageNumber, int PageSize, out int TotalPages, out int RowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("SiteId", Site, DbType.Int32);
+            parameter.Add("TPId", TPid, DbType.Int32);
+            parameter.Add("CategoryId", Category, DbType.Int32);
+            parameter.Add("Names", string.IsNullOrWhiteSpace(Name) ? null : Name);
+            parameter.Add("PageNumber", Math.Abs(PageNumber), dbType: DbType.Int32);
+            parameter.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), dbType: DbType.Int32);
+            parameter.Add("PageSize", Math.Abs(PageSize), DbType.Int32);
+
+            parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<SlotGameCategoryList>("Admin_SlotGameCategory_Get", parameter).ToList();
+            TotalPages = parameter.Get<int?>("TotalPages") ?? 0;
+            RowCount = parameter.Get<int?>("RowCount") ?? 0;
+            return result;
+        }
+        public int SetSlotGameCategory(int Site, int CurrencyId, int SlotGameId, int CategoryId,string Operator)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("SiteId", Site, DbType.Int32);
+            parameter.Add("CurrencyId", CurrencyId, DbType.Int32);
+            parameter.Add("SlotGameId", SlotGameId, DbType.Int32);
+            parameter.Add("CategoryId", CategoryId, DbType.Int32);
+            parameter.Add("Operator", Operator);
+
+            return _mainDbClient.Execute("Admin_SlotGameDetail_Set", parameter);
+        }
     }
 }
