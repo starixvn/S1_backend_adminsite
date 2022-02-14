@@ -7,7 +7,7 @@ const dataColumnDefs = () => {
     { dataColumn: "funcKey", columnTitle: "FuncKey" },
     { dataColumn: "reasonId", columnTitle: "ReasonId" },
     { dataColumn: "description", columnTitle: "Description" },
-    { dataColumn: "updateTime", columnTitle: "UpdateTime" },
+    { dataColumn: "updateTime", columnTitle: "UpdateTime (Adjusted to GMT+8) " ,body: {format: dateFormat} },
     { dataColumn: "updator", columnTitle: "Updator" },
     { dataColumn: "action", columnTitle: "Action" },
   ];
@@ -91,6 +91,6 @@ const Panel = (props) => {
   );
 };
 const dateFormat = (createTime)=>{
-  return moment(createTime).format('l LTS');
+  return moment(createTime).utc(0).add(8,'hour').format("YYYY-MM-DD HH:mm:ss");
 }
 export default Panel;

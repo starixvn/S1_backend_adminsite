@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
@@ -24,6 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly Common _common;
+        private readonly ExcelBLL _excelBll;
 
         #endregion
 
@@ -34,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _common = provider.GetRequiredService<Common>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
@@ -46,15 +49,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CurrencyIds { get; set; }
             public string StartDate { get; set; }
             public string EndDate { get; set; }
-            public int TimeZone { get; set; }
-        }
 
-        public class ExportRequest
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
@@ -119,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>檔案</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/MainFinancialReport" })]
-        public IActionResult Export(ExportRequest request)
+        public IActionResult Export(GetListRequest request)
         {
             #region Get Data
 
@@ -434,8 +430,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var stream = _reportExcelBll.ComplexReportExportToMultiSheet(d);
 
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"MainFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "MainFinancialReport");
         }
     }
 }

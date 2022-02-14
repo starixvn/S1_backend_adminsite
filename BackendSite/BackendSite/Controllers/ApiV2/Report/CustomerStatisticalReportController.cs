@@ -25,6 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly Common _common;
+        private readonly ExcelBLL _excelBll;
 
         #endregion
 
@@ -35,13 +36,14 @@ namespace BackendSite.Controllers.ApiV2.Report
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _common = provider.GetRequiredService<Common>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
 
         #region Modle
 
-        public class GetCustomerStatisticalReportReq
+        public class GetListRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
@@ -52,7 +54,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int TimeZone { get; set; }
         }
         
-        public class GetCustomerDetailReq
+        public class GetDetailRequest
         {
             public int CustId { get; set; }
             public int GameId { get; set; }
@@ -62,11 +64,11 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
-        
+
         #region StatisticalReport By Customers
 
         /// <summary>
-        /// Report/GetCustomerStatisticalReport 取得客戶下注紀錄明細
+        /// CustomerStatisticalReport/GetList 取得客戶下注紀錄明細
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -77,7 +79,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
-        public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
+        public ApiResult GetList(GetListRequest request)
         {
             var data = _reportBll.GetCustomerStatisticalReport(
                 request.CurrencyIds,
@@ -103,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         /// <summary>
-        /// Report/ExportCustomerStatisticalReport 匯出客戶統計報表
+        /// CustomerStatisticalReport/Export 匯出客戶統計報表
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -113,7 +115,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
+        public IActionResult Export(GetListRequest request)
         {
 
             #region Get Data
@@ -623,7 +626,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         /// <summary>
-        /// Report/GetCustomerDetail 取得客戶下注紀錄明細
+        /// CustomerStatisticalReport/GetDetail 取得客戶下注紀錄明細
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -633,7 +636,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
+        public ApiResult GetDetail(GetDetailRequest request)
         {
             var data = _reportBll.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(request.TimeZone));
             
