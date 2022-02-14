@@ -108,10 +108,10 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public string GameId { get; set; }
         public string Name { get; set; }
-        public string Category { get; set; }
+        public string Status { get; set; }
         public string Operator { get; set; }
     }
-    public class SlotGameCategory
+    public class SlotGameStatus
     {
         public int CurrencyId { get; set; }
         public int Status { get; set; }

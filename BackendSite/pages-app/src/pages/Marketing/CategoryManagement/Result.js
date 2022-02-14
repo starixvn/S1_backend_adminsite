@@ -135,7 +135,14 @@ const Panel = (props) => {
                   props.UpdateResultStatus
                 )
               }
-              disabled={props.BackupFilter.Category == 0}
+              disabled={
+                props.BackupFilter.Category == 0
+                  ? true
+                  : window.subFuncKeys &&
+                    window.subFuncKeys.includes("cms_cm_edit")
+                  ? false
+                  : true
+              }
             />
             <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
           </div>
@@ -178,51 +185,51 @@ const Panel = (props) => {
   );
 };
 
-const handleToggle = (type, value, site, category,UpdateResultStatus) => {
-    console.log(value);
-    if (window.confirm(`Are you sure change ${value.eName}-${type} ?`)) {
-      let currencyId = 0;
-      switch (type) {
-        case "myr":
-          currencyId = 2;
-          break;
-        case "thb":
-          currencyId = 4;
-          break;
-        case "rmb":
-          currencyId = 13;
-          break;
-        case "idr":
-          currencyId = 15;
-          break;
-        case "inr":
-          currencyId = 61;
-          break;
-        case "vnd":
-          currencyId = 51;
-          break;
-      }
-      let Data = {
-        CurrencyId: currencyId,
-        SlotGameId: value.id,
-        Site: site,
-        CategoryId: category
-      };
-      api
-        .post("/api/SlotGamesManagement/SetSlotGameCategory", Data)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            UpdateResultStatus();
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+const handleToggle = (type, value, site, category, UpdateResultStatus) => {
+  console.log(value);
+  if (window.confirm(`Are you sure change ${value.eName}-${type} ?`)) {
+    let currencyId = 0;
+    switch (type) {
+      case "myr":
+        currencyId = 2;
+        break;
+      case "thb":
+        currencyId = 4;
+        break;
+      case "rmb":
+        currencyId = 13;
+        break;
+      case "idr":
+        currencyId = 15;
+        break;
+      case "inr":
+        currencyId = 61;
+        break;
+      case "vnd":
+        currencyId = 51;
+        break;
     }
-  };
-  const dateFormat = (createTime) => {
-    return moment(createTime).format("l LTS");
-  };
-  export default Panel;
+    let Data = {
+      CurrencyId: currencyId,
+      SlotGameId: value.id,
+      Site: site,
+      CategoryId: category,
+    };
+    api
+      .post("/api/SlotGamesManagement/SetSlotGameCategory", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          UpdateResultStatus();
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  }
+};
+const dateFormat = (createTime) => {
+  return moment(createTime).format("l LTS");
+};
+export default Panel;

@@ -27,7 +27,7 @@ namespace BackendSite.Service.BLL
             var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, Status, PageNumber, PageSize,out  TotalPages,out  RowCount);
             result.ForEach(x =>
             {
-                slotGames.Add(GetSlotGameCurrencyStatus(x));
+                slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator));
             });
 
             rep.SlotGameDataList = slotGames;
@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
                 var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, (int)SlotGameStatusType.All, PageNumber, PageSize, out  TotalPages, out  RowCount);
                 result.ForEach(x =>
                 {
-                    slotGames.Add(GetSlotGameCurrencyStatus(x));
+                    slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator));
                 });
             }
             else
@@ -56,58 +56,7 @@ namespace BackendSite.Service.BLL
                 var result = slotGamesManagementService.GetSlotGameCategoryList(Site, TPid, Name, Category, PageNumber, PageSize, out  TotalPages, out  RowCount);
                 result.ForEach(x =>
                 {
-                    string eName = JsonConvert.DeserializeObject<SlotGameName>(x.Name).en;
-                    string cName = JsonConvert.DeserializeObject<SlotGameName>(x.Name).ch;
-                    int MYRStatus = 0;
-                    int THBStatus = 0;
-                    int RMBStatus = 0;
-                    int IDRStatus = 0;
-                    int INRStatus = 0;
-                    int VNDStatus = 0;
-                    if (!string.IsNullOrWhiteSpace(x.Category))
-                    {
-                        var CategoryData = JsonConvert.DeserializeObject<SlotGameCategory[]>(x.Category).ToList();
-                        CategoryData.ForEach(y =>
-                        {
-                            switch (y.CurrencyId) 
-                            {
-                                case (int)CurrencyCurrencyIdEnum.MYR:
-                                    MYRStatus = y.Status;
-                                    break;
-                                case (int)CurrencyCurrencyIdEnum.THB:
-                                    THBStatus = y.Status;
-                                    break;
-                                case (int)CurrencyCurrencyIdEnum.RMB:
-                                    RMBStatus = y.Status;
-                                    break;
-                                case (int)CurrencyCurrencyIdEnum.IDR:
-                                    IDRStatus = y.Status;
-                                    break;
-                                case (int)CurrencyCurrencyIdEnum.INR:
-                                    INRStatus = y.Status;
-                                    break;
-                                case (int)CurrencyCurrencyIdEnum.VND:
-                                    VNDStatus = y.Status;
-                                    break;
-                            }
-                        });
-                    }
-                    slotGames.Add(new SlotGameData
-                    {
-                        UpdateTime = x.UpdateTime,
-                        TpId = x.TpId,
-                        GameId = x.GameId,
-                        Id = x.Id,
-                        Operator = string.IsNullOrWhiteSpace(x.Operator) ? string.Empty : x.Operator,
-                        EName = eName,
-                        CName = cName,
-                        MYR = MYRStatus,
-                        THB = THBStatus,
-                        RMB = RMBStatus,
-                        IDR = IDRStatus,
-                        INR = INRStatus,
-                        VND = VNDStatus
-                    });
+                    slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator));
                 });
             }
 
@@ -118,10 +67,10 @@ namespace BackendSite.Service.BLL
         {
             return slotGamesManagementService.SetSlotGameCategory(req.Site, req.CurrencyId, req.SlotGameId, req.CategoryId, Operator);
         }
-        private SlotGameData GetSlotGameCurrencyStatus(SlotGameList Data)
+        private SlotGameData GetSlotGameCurrencyStatus(string Name,string Status,DateTimeOffset UpdateTime,int TpId,string GameId,int Id,string Operator)
         {
-            string eName = JsonConvert.DeserializeObject<SlotGameName>(Data.Name).en;
-            string cName = JsonConvert.DeserializeObject<SlotGameName>(Data.Name).ch;
+            string eName = JsonConvert.DeserializeObject<SlotGameName>(Name).en;
+            string cName = JsonConvert.DeserializeObject<SlotGameName>(Name).ch;
             int MYRStatus = 0;
             int THBStatus = 0;
             int RMBStatus = 0;
@@ -129,41 +78,41 @@ namespace BackendSite.Service.BLL
             int INRStatus = 0;
             int VNDStatus = 0;
 
-            if (!string.IsNullOrWhiteSpace(Data.Status))
+            if (!string.IsNullOrWhiteSpace(Status))
             {
-                JObject _jObject = JObject.Parse(Data.Status);
-                foreach (JProperty item in _jObject.Children())
+                var CurrencyList = JsonConvert.DeserializeObject<SlotGameStatus[]>(Status).ToList();
+                CurrencyList.ForEach(y =>
                 {
-                    switch (Convert.ToInt32(item.Name))
+                    switch (y.CurrencyId)
                     {
                         case (int)CurrencyCurrencyIdEnum.MYR:
-                            MYRStatus = Convert.ToInt32(item.Value);
+                            MYRStatus = y.Status;
                             break;
                         case (int)CurrencyCurrencyIdEnum.THB:
-                            THBStatus = Convert.ToInt32(item.Value);
+                            THBStatus = y.Status;
                             break;
                         case (int)CurrencyCurrencyIdEnum.RMB:
-                            RMBStatus = Convert.ToInt32(item.Value);
+                            RMBStatus = y.Status;
                             break;
                         case (int)CurrencyCurrencyIdEnum.IDR:
-                            IDRStatus = Convert.ToInt32(item.Value);
+                            IDRStatus = y.Status;
                             break;
                         case (int)CurrencyCurrencyIdEnum.INR:
-                            INRStatus = Convert.ToInt32(item.Value);
+                            INRStatus = y.Status;
                             break;
                         case (int)CurrencyCurrencyIdEnum.VND:
-                            VNDStatus = Convert.ToInt32(item.Value);
+                            VNDStatus = y.Status;
                             break;
                     }
-                }
+                });
             }
             return (new SlotGameData
             {
-                UpdateTime = Data.UpdateTime,
-                TpId = Data.TpId,
-                GameId = Data.GameId,
-                Id = Data.Id,
-                Operator = string.IsNullOrWhiteSpace(Data.Operator) ? string.Empty : Data.Operator,
+                UpdateTime = UpdateTime,
+                TpId = TpId,
+                GameId = GameId,
+                Id = Id,
+                Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
                 EName = eName,
                 CName = cName,
                 MYR = MYRStatus,
