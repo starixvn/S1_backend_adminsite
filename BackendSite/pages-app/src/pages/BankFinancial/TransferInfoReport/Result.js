@@ -3,6 +3,7 @@ import {
   number_format,
   number_toFixed,
 } from "../../../module/Formatting/NumberFormat";
+import moment from "moment";
 
 const TransferTypeFormat = (type) => {
   if (type == 1) {
@@ -174,6 +175,7 @@ const dataColumnDefs = (props) => {
         attr: {
           class: "text-right",
         },
+        format: dateFormat
       },
     },
     {
@@ -192,6 +194,7 @@ const dataColumnDefs = (props) => {
         attr: {
           class: "text-right",
         },
+        format: dateFormat
       },
     },
     {
@@ -284,5 +287,10 @@ const Panel = (props) => {
     </div>
   );
 };
+
+const dateFormat = (createTime) => {
+  return moment(createTime).utc(0).format("YYYY-MM-DD HH:mm:ss");
+};
+
 
 export default Panel;
