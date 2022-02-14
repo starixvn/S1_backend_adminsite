@@ -560,12 +560,26 @@
     {
       "DisplayKey": "Slot Games Management",
       "FuncKey": "CMS/SlotGamesManagement",
-      "Enable": false
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
     },
     {
       "DisplayKey": "Category Management",
       "FuncKey": "CMS/CategoryManagement",
-      "Enable": false
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
     }
   ]
 },

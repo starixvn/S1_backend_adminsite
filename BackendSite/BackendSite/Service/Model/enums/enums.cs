@@ -816,7 +816,7 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-
+    #region SlotGame
     public enum SlotGameCategoryType
     {
         All = 0,
@@ -840,4 +840,5 @@ namespace BackendSite.Service.Model.enums
         VND = 51,
         INR = 61
     }
+    #endregion
 }
