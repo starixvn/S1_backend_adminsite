@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
@@ -14,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    // [Authorize]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositReportController : ControllerBase
@@ -24,7 +25,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly Common _common;
-        
+        private readonly ExcelBLL _excelBll;
+
         #endregion
 
         #region Constructor
@@ -34,27 +36,30 @@ namespace BackendSite.Controllers.ApiV2.Report
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _common = provider.GetRequiredService<Common>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
 
         #region Model
 
-        public class GetDepositReportReq
+        public class GetListRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public string StartDate { get; set; }
             public string EndDate { get; set; }
+           
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
         #endregion
-        
+
         #region Deposit Report
 
         /// <summary>
-        /// Report/GetDepositReport 取得存款報表資料
+        /// DepositReport/GetList 取得存款報表資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -64,14 +69,14 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        // [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
-        public ApiResult Get(GetDepositReportReq request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
+        public ApiResult GetList(GetListRequest request)
         {
             var data = _reportBll.GetDepositReport(request.CurrencyIds,
                                                    JsonConvert.SerializeObject(request.SiteIds),
                                                    JsonConvert.SerializeObject(request.CurrencyIds),
                                                    request.StartDate,
-                                                   request.EndDate, 
+                                                   request.EndDate,
                                                    _common.TransferToTimeZoneFormat(request.TimeZone));
 
             if (!data.Any())
@@ -89,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         /// <summary>
-        /// Report/ExportDepositReport 匯出存款報表資料
+        /// DepositReport/Export 匯出存款報表資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -99,16 +104,17 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult Export(GetDepositReportReq request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/DepositReport" })]
+        public IActionResult Export(GetListRequest request)
         {
             #region Get Data
-            
+
             var exportData = _reportBll.GetDepositReport(
                 request.CurrencyIds,
                 JsonConvert.SerializeObject(request.SiteIds),
                 JsonConvert.SerializeObject(request.CurrencyIds),
                 request.StartDate,
-                request.EndDate, 
+                request.EndDate,
                 _common.TransferToTimeZoneFormat(request.TimeZone));
 
             var currencyData = _reportBll.GetCurrency();
@@ -560,32 +566,11 @@ namespace BackendSite.Controllers.ApiV2.Report
                             x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
                         );
 
-                        //if (getItem != null)
-                        //{
                         getItem.Add(TotalAmountPropName, accountDateItem.TotalAmount);
                         getItem.Add(TotalCountPropName, accountDateItem.TotalCount);
                         getItem.Add(AverangeAmountPropName, accountDateItem.AverangeDeposit);
                         getItem.Add(SuccessRatePropName, accountDateItem.SuccessRate);
                         getItem.Add(FTDCountPropName, accountDateItem.FTDCount);
-                        //}
-                        //else
-                        //{
-                        //    Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
-                        //    {
-                        //        { "Date", $"{accountDateItem.Date}" },
-                        //        { "AccountId", accountItem.AccountId },
-                        //        { "AccountName", accountItem.AccountName },
-
-                        //        { TotalAmountPropName, accountDateItem.TotalAmount },
-                        //        { TotalCountPropName, accountDateItem.TotalCount },
-                        //        { AverangeAmountPropName, accountDateItem.AverangeDeposit },
-                        //        { SuccessRatePropName, accountDateItem.SuccessRate },
-                        //        { FTDCountPropName, accountDateItem.FTDCount },
-                        //    };
-
-                        //    dateContent.Add(newItem);
-
-                        //}
 
                     }
 
@@ -676,9 +661,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var stream = _reportExcelBll.ComplexReportExportToMultiSheet(exelParam);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"DepositReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "DepositReport");
         }
 
         #endregion
