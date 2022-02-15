@@ -343,7 +343,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
+        public async Task<ApiListResult<CustInfoDetail>> GetCustInfoListAsync(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
             
@@ -379,8 +379,23 @@ namespace BackendSite.Controllers.Api
                                                    req.SelectTag,
                                                    ref pageNumber,
                                                    out var totalPages,
-                                                   out var rowCount);
-            
+                                                   out var rowCount).ToList();
+
+            foreach(CustInfoDetail x in data)
+            {
+                var tpWallet = await _custInfoBll.GetTpWalletAsync(x.CustId);
+                var saba = tpWallet.Where(y => y.TpId == 1).ToList();
+                var pt = tpWallet.Where(y => y.TpId == 27).ToList();
+                if (saba.Any())
+                {
+                    x.SABAWallet = saba.FirstOrDefault().Balance;
+                }
+                if (pt.Any())
+                {
+                    x.PTWallet = pt.FirstOrDefault().Balance;
+                }
+            }
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
