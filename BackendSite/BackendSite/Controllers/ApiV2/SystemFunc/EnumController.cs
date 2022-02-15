@@ -47,6 +47,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Adjustment Report For Frontend Use - AdjustTypeEnum
         /// 
+        /// BankDetailOff - PurposeEnum、BankDetailOffStatusEnum
+        /// 
         /// Customer - IsKycEnum、IsRiskEnum、ActStatusEnum
         /// 
         /// CustIovation - IovationEnum
