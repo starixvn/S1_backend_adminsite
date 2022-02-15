@@ -32,7 +32,10 @@ import * as Loading from '../commJS/Loading.jsx';
                 for(let i=0; i < data.iTagList.length;i++){
                     tagData.forEach(element=>{
                         if(element.id === data.iTagList[i]){
-                            tagList.push(element.tagName);
+                            tagList.push({
+                                tagName: element.tagName,
+                                tagColour: element.tagColour
+                            });
                         }
                     })
                 }
@@ -41,20 +44,32 @@ import * as Loading from '../commJS/Loading.jsx';
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
-                    <td>{tagList.toString()}</td>
-                    {
-                        (data.siteName == "Nova88") ?
-                            <td>{data.levelName}</td>
-                            :
-                            <td>{data.userLevel}</td>
-                    }
+                    <td>{data.affiliateCode}</td>
+                    <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
+                    <td>{data.levelName}</td>
+                    <td>{data.userLevel}</td>
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
                     <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.sabaID}</td>
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
+            )
+        }
+    }
+
+    class TagComponent extends React.Component {
+        render() {
+            let data = this.props.tagInfo;
+            return (
+                <div>
+                    <span style={{'padding-right': '3px'}}>{data.tagName}</span>
+                    <span style={{ 'background-color': data.tagColour }}>　</span>
+                </div>
             )
         }
     }
@@ -93,12 +108,17 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <tr>
                                     <th scope="col">Site Name</th>
                                     <th scope="col">User Name</th>
+                                    <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
                                     <th scope="col">Vip Level</th>
+                                    <th scope="col">Deposit Limit Level</th>
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
                                     <th scope="col">IsTest</th>
                                     <th scope="col">Registration time (Adjusted to GMT+8)</th>
+                                    <th scope="col">Last Active Time (Adjusted to GMT+8)</th>
+                                    <th scope="col">Last Tag Update Time (Adjusted to GMT+8)</th>
+                                    <th scope="col">Last Status Update Time (Adjusted to GMT+8)</th>
                                     <th scope="col">Saba ID</th>
                                     <th scope="col">Status</th>
                                 </tr>
@@ -116,11 +136,22 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[],TagList:null};
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[], TagList:[] ,selectTag: []};
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
             this.selectdate_end = React.createRef();
+            
+            this.f_trigger_TagStart = React.createRef();
+            this.selectTagDate_start = React.createRef();
+            this.f_trigger_TagEnd = React.createRef();
+            this.selectTagDate_end = React.createRef();
+
+            this.f_trigger_StatusStart = React.createRef();
+            this.selectStatusDate_start = React.createRef();
+            this.f_trigger_StatusEnd = React.createRef();
+            this.selectStatusDate_end = React.createRef();
+            
             this.ExportForm = React.createRef();
         }
 
@@ -128,17 +159,23 @@ import * as Loading from '../commJS/Loading.jsx';
             event.preventDefault();
             if ((this.state.BirDate || this.state.BirMonth) && (!this.state.BirDate || !this.state.BirMonth)) { alert("Please fill in at least Date and Month"); return; }
             let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
+            let tagEndDate = moment(this.selectTagDate_end.current.value).add(1, 'days').unix() - 1;
+            let statusEndDate = moment(this.selectStatusDate_end.current.value).add(1, 'days').unix() - 1;
             this._Search = true;
             this.setState({
                 StartDate: moment(this.selectdate_start.current.value).unix(),
                 EndDate: endDate,
+                TagStartDate: moment(this.selectTagDate_start.current.value).unix(),
+                TagEndDate: tagEndDate,
+                StatusStartDate: moment(this.selectStatusDate_start.current.value).unix(),
+                StatusEndDate: statusEndDate,
                 sBirDate: this.state.BirDate,
                 sBirMonth: this.state.BirMonth,
                 sBirYear: this.state.BirYear,
                 sUserName: this.state.UserName,
                 sTransId: this.state.TransId,
                 sTpUserName: this.state.TpUserName,
-                sAffId: this.state.AffId,
+                sAffCode: this.state.AffCode,
                 sAccountName: this.state.AccountName,
                 sLoginIp: this.state.LoginIp,
                 sEmail: this.state.Email,
@@ -157,6 +194,10 @@ import * as Loading from '../commJS/Loading.jsx';
                 SelectSite: !this.state.selectSite ? null : this.state.selectSite,
                 StartDate: !this.state.StartDate ? null : this.state.StartDate,
                 EndDate: !this.state.EndDate ? null : this.state.EndDate,
+                TagStartDate: !this.state.TagStartDate ? null : this.state.TagStartDate,
+                TagEndDate: !this.state.TagEndDate ? null : this.state.TagEndDate,
+                StatusStartDate: !this.state.StatusStartDate ? null : this.state.StatusStartDate,
+                StatusEndDate: !this.state.StatusEndDate ? null : this.state.StatusEndDate,
                 BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
                 BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
                 BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
@@ -169,10 +210,11 @@ import * as Loading from '../commJS/Loading.jsx';
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
                 PageNumber: pageNumber,
                 PageSize: this._PageSize,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                AffCode: !this.state.sAffCode ? null : this.state.sAffCode,
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
-                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus
+                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus,
+                selectTag:!this.state.selectTag ? null : this.state.selectTag
             };
             axios.post('/api/CustManage/GetCustInfoList', data)
                 .then(function (response) {
@@ -185,7 +227,7 @@ import * as Loading from '../commJS/Loading.jsx';
                         this.setState({ Loading: false });
                     }
                 }.bind(this)).catch(function (error) {
-                    Loading.UnLoading();
+                    Lading.UnLoading();
                     alert(error);
                     this.setState({ Loading: false });
                 }.bind(this));
@@ -196,6 +238,10 @@ import * as Loading from '../commJS/Loading.jsx';
                 SelectSite: !this.state.selectSite ? null : this.state.selectSite,
                 StartDate: !this.state.StartDate ? null : this.state.StartDate,
                 EndDate: !this.state.EndDate ? null : this.state.EndDate,
+                TagStartDate: !this.state.TagStartDate ? null : this.state.TagStartDate,
+                TagEndDate: !this.state.TagEndDate ? null : this.state.TagEndDate,
+                StatusStartDate: !this.state.StatusStartDate ? null : this.state.StatusStartDate,
+                StatusEndDate: !this.state.StatusEndDate ? null : this.state.StatusEndDate,
                 BirDate: !this.state.sBirDate ? null : parseInt(this.state.sBirDate),
                 BirMonth: !this.state.sBirMonth ? null : parseInt(this.state.sBirMonth),
                 BirYear: !this.state.sBirYear ? null : parseInt(this.state.sBirYear),
@@ -206,13 +252,13 @@ import * as Loading from '../commJS/Loading.jsx';
                 LoginIp: !this.state.sLoginIp ? null : this.state.sLoginIp,
                 Email: !this.state.sEmail ? null : this.state.sEmail,
                 PhoneNo: !this.state.sPhoneNo ? null : this.state.sPhoneNo,
-                AffId: !this.state.sAffId ? null : parseInt(this.state.sAffId),
+                AffCode: !this.state.sAffCode ? null : this.state.sAffCode,
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
-                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus
+                SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus,
+                selectTag:!this.state.selectTag ? null : this.state.selectTag
             };
             
-
             let ExportParam = [];
             for (var prop in data) {
                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
@@ -266,15 +312,12 @@ import * as Loading from '../commJS/Loading.jsx';
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
-                            this.setState({
-                                ...this.state,
-                                TagList:result.data
-                            })
+                            this.setState({...this.state, TagList:result.data});
+                            this.buildSelectTag();
                         } else {
                             alert(result.message);
                         }
                     }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
                         alert(error);
                     }.bind(this));
         }
@@ -307,10 +350,37 @@ import * as Loading from '../commJS/Loading.jsx';
             $('#selectSite').multiselect('updateButtonText');
         }
 
+        buildSelectTag = () => {
+            let state = this.state;
+            $("#selectTag").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectTag.length = 0;
+                    state.TagList.forEach(function (obj) {
+                        state.selectTag.push(obj.id);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectTag.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = parseInt($(option).val()), index = state.selectTag.indexOf(val);
+                    (checked) ? state.selectTag.push(val) : (index > -1) ? state.selectTag.splice(index, 1) : state.selectTag;
+                    state.selectTag.sort();
+                },
+                onInitialized: function () {
+                    // state.TagList.forEach(function (obj) {
+                    //     state.selectTag.push(obj.id);
+                    // });
+                }
+            });
+            $('#selectTag').multiselect('updateButtonText');
+        }
+        
         getCurrencyList() {
             let state = this.state;
             this.buildSelectCurrency();
-
         }
 
         buildSelectCurrency = () => {
@@ -385,8 +455,17 @@ import * as Loading from '../commJS/Loading.jsx';
         componentDidMount() {
             let f_trigger_Start = this.f_trigger_Start.current;
             let f_trigger_End = this.f_trigger_End.current;
+            let f_trigger_TagStart = this.f_trigger_TagStart.current;
+            let f_trigger_TagEnd = this.f_trigger_TagEnd.current;
+            let f_trigger_StatusStart = this.f_trigger_StatusStart.current;
+            let f_trigger_StatusEnd = this.f_trigger_StatusEnd.current;
+            
             let selectdate_end = this.selectdate_end.current;
             let selectdate_start = this.selectdate_start.current;
+            let selectTagDate_end = this.selectTagDate_end.current;
+            let selectTagDate_start = this.selectTagDate_start.current;
+            let selectStatusDate_end = this.selectStatusDate_end.current;
+            let selectStatusDate_start = this.selectStatusDate_start.current;
 
             //selectdate_start.value
             Calendar.setup({
@@ -397,11 +476,40 @@ import * as Loading from '../commJS/Loading.jsx';
             });
 
             Calendar.setup({
-                inputField: selectdate_start, // id of the input field
-                ifFormat: "mm/dd/y",        // format of the input field
-                button: f_trigger_Start,  // trigger for the calendar (button ID)
-                singleClick: true              // double-click mode
+                inputField: selectdate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_Start,
+                singleClick: true
             });
+
+            Calendar.setup({
+                inputField: selectTagDate_end,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_TagEnd,
+                singleClick: true
+            });
+
+            Calendar.setup({
+                inputField: selectTagDate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_TagStart,
+                singleClick: true
+            });
+
+            Calendar.setup({
+                inputField: selectStatusDate_end,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_StatusEnd,
+                singleClick: true
+            });
+
+            Calendar.setup({
+                inputField: selectStatusDate_start,
+                ifFormat: "mm/dd/y",
+                button: f_trigger_StatusStart,
+                singleClick: true
+            });
+            
             this.getSiteList();
             this.getCurrencyList();
             this.getStatusList();
@@ -429,19 +537,25 @@ import * as Loading from '../commJS/Loading.jsx';
             }
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
+            let TagStartDate = this.state.TagStartDate;
+            let TagEndDate = this.state.TagEndDate;
+            let StatusStartDate = this.state.StatusStartDate;
+            let StatusEndDate = this.state.StatusEndDate;
             let Loading = this.state.Loading;
             let siteList = this.state.SiteList.map(function (obj) {
                 return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
-                //return <option key={obj.siteId} value={obj.siteId}>{obj.siteName}</option>;
+            }.bind(this));
+            let tagList = this.state.TagList.map(function (obj) {
+                return <option key={obj.id} value={obj.id} selected="">{obj.tagName}</option>;
             }.bind(this));
             let currencyList = Object.keys(defCurrencyType).map((key) => {
                 return <option key={key} value={key} selected="selected">{defCurrencyType[key]}</option>;
-                //return <option key={key} value={key}>{defCurrencyType[key]}</option>;
             });
             let statusList = Object.keys(defStatusType).map((key) => {
                 return <option key={key} value={key} selected="selected">{defStatusType[key]}</option>;
             });
             siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
+            tagList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagList}</select>;
             currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
             statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
             return (
@@ -481,9 +595,9 @@ import * as Loading from '../commJS/Loading.jsx';
                                     </div>
                                 </div>
                                 <div className="input-item">
-                                    <label className="label">Affiliates ID</label>
+                                    <label className="label">Affiliates Code</label>
                                     <div className="field">
-                                        <input type="text" placeholder="Affiliates ID" autoComplete="off" name="AffId" value={this.state.AffId} onChange={this.onChange.bind(this)} />
+                                        <input type="text" placeholder="Affiliates Code" autoComplete="off" name="AffCode" value={this.state.AffCode} onChange={this.onChange.bind(this)} />
                                     </div>
                                 </div>
                                 <div className="input-item">
@@ -542,6 +656,40 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status Update Date (From)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_start} type="text" defaultValue={!isNaN(StatusStartDate) ? moment.unix(StatusStartDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusStart}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Status Update Date (To)</span>
+                                    <div className="date">
+                                        <input ref={this.selectStatusDate_end} type="text" defaultValue={!isNaN(StatusEndDate) ? moment.unix(StatusEndDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_StatusEnd}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Tag Filter</span>
+                                    <div className="field">
+                                        {tagList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Tag Update Date (From)</span>
+                                    <div className="date">
+                                        <input ref={this.selectTagDate_start} type="text" defaultValue={!isNaN(TagStartDate) ? moment.unix(TagStartDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_TagStart}> </a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Tag Update Date (To)</span>
+                                    <div className="date">
+                                        <input ref={this.selectTagDate_end} type="text" defaultValue={!isNaN(TagEndDate) ? moment.unix(TagEndDate).format('l') : null} size="8" />
+                                        <a className="icon-calendar" ref={this.f_trigger_TagEnd}>{ }</a>
                                     </div>
                                 </div>
                                 {Loading ? 

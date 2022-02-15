@@ -6,7 +6,8 @@ const allSiteDisplayText = "All";
 
 const elemType = {
 	SwitchBtn: "SwitchBtn",
-	DateTimePicker: "DateTimePicker"
+	DateTimePicker: "DateTimePicker",
+	SeqText:"SeqText"
 };
 
 const commonColDefs = [
@@ -29,6 +30,11 @@ const commonColDefs = [
 		datacolumn: "status",
 		columnTitle: "Status",
 		elemType: elemType.SwitchBtn
+	},
+	{
+		datacolumn: "seq",
+		columnTitle: "Display Sequence",
+		elemType: elemType.SeqText
 	}
 ];
 
@@ -101,6 +107,9 @@ const EditPanel = props => {
 		} else if (!stateData.content || !stateData.content.en) {
 			check = false;
 			msg = "Please input en content.";
+		}else if (!stateData.seq) {
+			check = false;
+			msg = "Please input sequence.";
 		}
 
 		if (check) {
@@ -168,6 +177,15 @@ const EditPanel = props => {
 					key={key}
 				/>
 			);
+		}else if (col.elemType === elemType.SeqText){
+			elem = (
+				<SeqText
+					EditFiled={EditFiled}
+					columnTitle={col.columnTitle}
+					datacolumn={col.datacolumn}
+					seq = {stateData[col.datacolumn]}
+				/>
+			);
 		}
 
 		return elem;
@@ -229,6 +247,22 @@ const DateTimePickerElem = props => {
 		<div className="form-group">
 			<span className="label">{props.columnTitle}</span>
 			<DateTimePicker {...props.dateTimePickerProps} />
+		</div>
+	);
+};
+
+const SeqText = props => {
+	return (
+		<div className="form-group">
+			<label>{props.columnTitle}</label>
+			<input
+				className="form-control"
+				type="text"
+				defaultValue={props.seq}
+				onBlur={e => {
+					props.EditFiled(e.target.value, props.datacolumn);
+				}}
+			/>
 		</div>
 	);
 };

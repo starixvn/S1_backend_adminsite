@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.Api
 {
@@ -19,12 +20,14 @@ namespace BackendSite.Controllers.Api
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly ReferralManagementBLL referralManagementBLL;
         private readonly ReportBLL reportBLL;
+        private readonly ExcelBLL excelBll;
 
-        public ReferralManagementController(ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL)
+        public ReferralManagementController(ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL ,ExcelBLL excelBll)
         {
             this.serverInfoBLL = serverInfoBLL;
             this.referralManagementBLL = referralManagementBLL;
             this.reportBLL = reportBLL;
+            this.excelBll = excelBll;
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
@@ -54,6 +57,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = referralManagementList;
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
         [HttpPost]
@@ -83,42 +87,73 @@ namespace BackendSite.Controllers.Api
             {
                 var referralList = referralManagementBLL.GetReferralBySiteId(SiteId).ToList();
                 var referral = referralList.FirstOrDefault(x => x.CurrencyId == CurrencyId);
+                var status = 1;
                 if (referral == null)
                 {
                     apiResult.ErrorCode = 7;
                     apiResult.Message = "";
                     return apiResult;
                 }
-                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId);
+
+                if (referral.Status)
+                    status = 0;
+
+                referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
             }
             catch (Exception ex)
             {
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
             }
+            apiResult.ErrorCode = 0;
             return apiResult;
-
         }
         public class ReferralCustListReq
         {
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
             public IEnumerable<int> SelectSite { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
-        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq referralCustListReq)
+        public ApiListResult<ReferralCustList> GetReferralCustList(ReferralCustListReq req)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
-            int totalPages = 0, rowCount = 0;
 
-            var pageNumber = referralCustListReq.PageNumber;
+            var pageNumber = req.PageNumber;
             var pageSize = 10;
-            if (referralCustListReq.PageSize > 0)
-                pageSize = referralCustListReq.PageSize;
-            apiResult.Data = referralManagementBLL.GetReferralCustList(referralCustListReq.SelectSite, referralCustListReq.UserName, referralCustListReq.CurrencyId, pageSize, ref pageNumber, out totalPages, out rowCount);
+            if (req.PageSize > 0)
+                pageSize = req.PageSize;
+            apiResult.Data = referralManagementBLL.GetReferralCustList(
+                req.SelectSite, 
+                req.UserName, 
+                req.CurrencyId, 
+                req.StartDate?.DateTime,
+                req.EndDate?.DateTime,
+                pageSize, 
+                ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -126,11 +161,47 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
+        public IActionResult GetReferralCustListExport(string selectSite,string userName,int currencyId, DateTimeOffset? startDate,DateTimeOffset? endDate)
+        {
+            var exportData = referralManagementBLL.GetReferralCustListExport(
+                selectSite,
+                userName,
+                currencyId,
+                startDate?.ToUniversalTime().DateTime,
+                endDate?.ToUniversalTime().DateTime);
+
+            var stream = excelBll.Export(exportData);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ReferralCustList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+        }
+      
+        
         public class RefFriendListReq
         {
+            private DateTimeOffset? _startDate;
+            private DateTimeOffset? _endDate;
             public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
+            public DateTimeOffset? StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset? EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                }
+            }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
@@ -147,10 +218,10 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
         /// 
         /// </remarks>
-        /// <param name="refFriendListReq"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
+        public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq req)
         {
             var referralStatus = new Dictionary<int, string>()
             {
@@ -160,24 +231,17 @@ namespace BackendSite.Controllers.Api
             };
 
             var pageSize = 10;
-            if (refFriendListReq.PageSize > 0)
-                pageSize = refFriendListReq.PageSize;
-            var pageNumber = refFriendListReq.PageNumber;
+            if (req.PageSize > 0)
+                pageSize = req.PageSize;
+            var pageNumber = req.PageNumber;
             var apiResult = new ApiListResult<ReferralFriend>();
-
-
-            var startDate = refFriendListReq.StartDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.StartDate);
-            var endDate = refFriendListReq.EndDate == null ? (DateTime?)null
-                : new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds((long)refFriendListReq.EndDate);
-
-            var data = referralManagementBLL.GetRefFriendList(refFriendListReq.CustId,
-                startDate,
-                endDate,
+            var data = referralManagementBLL.GetRefFriendList(req.CustId,
+                req.StartDate?.DateTime,
+                req.EndDate?.DateTime,
                 pageSize,
                 pageNumber,
                 out var totalPages,
-                out var rowCount);
+                out var rowCount,true);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);

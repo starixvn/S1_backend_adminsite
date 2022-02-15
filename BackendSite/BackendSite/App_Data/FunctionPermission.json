@@ -465,6 +465,16 @@
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Verification Reward",
+        "FuncKey": "Marketing/VerificationReward",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Verification Reward Report",
+        "FuncKey": "Marketing/VerificationRewardReport",
+        "Enable": false
       }
     ]
   },

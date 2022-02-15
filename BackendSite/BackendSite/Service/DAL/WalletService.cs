@@ -123,18 +123,17 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateLogList;
         }
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> SelectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
+        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(SelectSite), UserName = userName, RebateType = rebateType
-                , StartDate = startDate, EndDate = endDate, PageSize = pageSize, CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId});
+            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType
+                , StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize), CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId});
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_RebateLogTotalAmountV2_Get", p, commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
+            var currencyTotalAmount = _mainDbClient.Query<TotalAmount>("Admin_RebateLogTotalAmount_Get_V3", p).ToList();
+            if (currencyTotalAmount.Count > 0)
             {
-                CurrencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.ForEach(x =>
                 {
                     tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
                 });
@@ -142,23 +141,24 @@ namespace BackendSite.Service.DAL
             CurrencyAmount = tempCurrencyTotalAmount;
             #endregion
 
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
 
-            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListV3_Get", p, commandType: CommandType.StoredProcedure);
+            var rebateLogList = _mainDbClient.Query<RebateLog>("Admin_RebateLogList_Get_V4", p);
+            
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
 
             return rebateLogList;
         }
-        public IEnumerable<RebateLog> GetRebateLogExport(string SelectSite, string userName, int rebateType, long startDate, long endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
+        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
         {
-            var p = new DynamicParameters(new { SelectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, CategoryType = rebateCategoriesId, CurrencyId = currencyId, BaseCurrencyId = baseCurrencyId });
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListExportV3_Get", p, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters(new {SelectSite = selectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, CategoryType = rebateCategoriesId, CurrencyId = currencyId, BaseCurrencyId = baseCurrencyId });
+            var rebateLogList = _mainDbClient.Query<RebateLog>("Admin_RebateLogListExport_Get_V4", p);
             return rebateLogList;
         }
         public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
@@ -167,28 +167,24 @@ namespace BackendSite.Service.DAL
             var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get_V2", new { CustId }, commandType: CommandType.StoredProcedure);
             return rebateInfoList;
         }
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, long startDate, long endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            var abc= JsonConvert.SerializeObject(selectSite);
-
-            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize) });
+            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoList_Get", p, commandType: CommandType.StoredProcedure);
+            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoList_Get_V2", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return rebateInfoList;
         }
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string SelectSite, string userName, int rebateType, long startDate, long endDate)
+        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate)
         {
-            var p = new DynamicParameters(new { SelectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoListExport_Get", p, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters(new {SelectSite = selectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
+            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoListExport_Get_V2", p);
             return rebateInfoList;
         }
 
@@ -235,46 +231,47 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, long startDate, long endDate, string User, int pageSize, int pageNumber,int CategoryId, int BaseCurrencyId,ref List<string> CurrencyAmount)
+        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate, DateTime endDate, string user, int pageSize, int pageNumber,int categoryId, int baseCurrencyId,ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
-            var SearchData = new VipRebateInfoData();
+            var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
             props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
-            props.Add("PageSize", pageSize);
-            props.Add("CategoryId", CategoryId);
-            props.Add("BaseCurrencyId", BaseCurrencyId);
+            props.Add("PageSize", Math.Abs(pageSize));
+            props.Add("CategoryId", categoryId);
+            props.Add("BaseCurrencyId", baseCurrencyId);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_VipRebateTotalAmountV4_Get", props, commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
+            
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmount_Get_V5", props).ToList();
+            if (currencyTotalAmount.Count > 0)
             {
-                CurrencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
                 });
             }
-            CurrencyAmount = tempCurrencyTotalAmount;
+            currencyAmount = tempCurrencyTotalAmount;
+            
             #endregion
 
-            props.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
+            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V8", props).ToList();
 
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV7_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            searchData.VipRebateInfoList = result;
+            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
 
-            SearchData.VipRebateInfoList = result;
-            SearchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchData.RowCount = props.Get<int?>("RowCount") ?? 0;
-
-            return SearchData;
+            return searchData;
         }
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber)
         {
@@ -313,31 +310,34 @@ namespace BackendSite.Service.DAL
             searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, long startDate, long endDate, string User, int CategoryId, int BaseCurrencyId, int RebateCategoriesId)
+        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite,
+            int currency,
+            DateTime startDate,
+            DateTime endDate, 
+            string user, 
+            int categoryId, 
+            int baseCurrencyId)
         {
-            var SearchData = new VipRebateInfoData();
+            var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
             props.Add("SelectSite", selectSite);
             props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(User) ? null : User);
+            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
-            props.Add("CategoryId", CategoryId);
-            props.Add("BaseCurrencyId", BaseCurrencyId);
-            props.Add("CategoryType", RebateCategoriesId);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<VipRebateInfo>("Admin_VipRebateReportListV4Export_Get", props, commandType: CommandType.StoredProcedure).ToList();
+            props.Add("CategoryId", categoryId);
+            props.Add("BaseCurrencyId", baseCurrencyId);
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V6", props).ToList();
 
-            SearchData.VipRebateInfoList = result;
-            SearchData.PageNumber = 0;
-            SearchData.TotalPages = 0;
-            SearchData.RowCount = 0;
-            return SearchData;
+            searchData.VipRebateInfoList = result;
+            searchData.PageNumber = 0;
+            searchData.TotalPages = 0;
+            searchData.RowCount = 0;
+            return searchData;
         }
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<VipTPCategory>("Admin_TPCategory_Get", commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<VipTPCategory>("Admin_TPCategory_Get");
         }
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
         {

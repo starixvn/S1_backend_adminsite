@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -55,8 +56,8 @@ namespace BackendSite.Controllers.Api
             var pageNumber = query.PageNumber;
             try
             {
-                var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(query.StartDate);
-                var endTime = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds( query.EndDate);
+                var startTime = DateTimeExtensions.UnixToDateTime(query.StartDate);
+                var endTime = DateTimeExtensions.UnixToDateTime( query.EndDate);
                 
                 apiResult.Data = _riskBll.GetTpDisableUser(query.SiteIds,
                     query.UserName,
