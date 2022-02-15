@@ -63,26 +63,24 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForDisplay(bool isSetting, int siteId, int id)
         {
-            return ConvertForDisplay(_bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id));
+            return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForExport(bool isSetting, int siteId, int id)
         {
-            return ConvertForExport(_bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id));
+            return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
 
         public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
-            var status = false;
             var count = 0;
-            var message = string.Empty;
             var updateTransferDataFlag = false;
             var affectTransferData = 0;
             var oldData = new BankFinancialTransferAccountDetailModel();
 
-            if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out message))
+            if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out var message))
             {
-                return (status, count, message);
+                return (false, count, message);
             }
 
             if (bankFinancialTransferAccount.Id != 0)
@@ -127,24 +125,23 @@ namespace BackendSite.Service.BLL
             {
                 using (var scope = new TransactionScope())
                 {
-
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (status, count, "Insert Transfer Account Fail.");
+                        return (false, count, "Insert Transfer Account Fail.");
                     };
 
                     if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (status, count, "Insert Transfer Account Log Fail.");
+                        return (false, count, "Insert Transfer Account Log Fail.");
                     }
 
                     scope.Complete();
                 }
-                status = true;
+
                 count = 1;
                 message = "Insert Transfer Account And Insert Log Success.";
             }
@@ -152,19 +149,18 @@ namespace BackendSite.Service.BLL
             {
                 using (var scope = new TransactionScope())
                 {
-
                     if (_bankFinancialService.UpdateTransferAccount(transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (status, count, "Update Transfer Account Fail.");
+                        return (false, count, "Update Transfer Account Fail.");
                     };
 
                     if (_bankFinancialService.InsertTransferAccountLog(ActionType.Update, transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (status, count, "Insert Transfer Account Log Fail.");
+                        return (false, count, "Insert Transfer Account Log Fail.");
                     }
 
                     if (updateTransferDataFlag)
@@ -173,78 +169,29 @@ namespace BackendSite.Service.BLL
                         {
                             scope.Dispose();
 
-                            return (status, count, "Update Transfer Data Fail.");
+                            return (false, count, "Update Transfer Data Fail.");
                         }
                     }
 
                     scope.Complete();
                 }
-                status = true;
+
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
 
-            return (status, count, message);
+            return (true, count, message);
         }
 
         #region Private Methods For GetTransferAccountInfoList
-
-        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
-        {
-
-            foreach (var data in datas.ToArray())
-            {
-
-                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
-                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
-            }
-
-            return datas;
-
-        }
-
-        private IEnumerable<BankFinancialTransferAccountDetailModel> ConvertForExport(IEnumerable<BankFinancialTransferAccountDetailModel> datas)
-        {
-
-            foreach (var data in datas.ToArray())
-            {
-
-                data.Purpose = GetPurpose(data.Purpose);
-
-                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
-                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
-            }
-
-            return datas;
-
-        }
-
+        
         private string GetTimeZoneDateTimeByDateString(int siteId, string datetime)
         {
             var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
             return Convert.ToDateTime(datetime).AddHours(timeZone).ToString("yyyy-MM-dd HH:mm:ss");
         }
 
-        private string GetPurpose(string purpose)
-        {
-            var result = string.Empty;
-
-            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
-
-            foreach (var i in purposeList)
-            {
-                switch (i)
-                {
-                    case 1: result = result + ",Deposit"; break;
-                    case 2: result = result + ",Withdrawal"; break;
-                    case 3: result = result + ",Transfer"; break;
-                }
-
-            }
-
-            return result.Substring(1);
-        }
-
+        
         private string GetTransferId(TransferTypeEnum transferType)
         {
             var prefix = string.Empty;
@@ -1446,8 +1393,7 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-
-
+        
         #region Transfer Info Report
 
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
