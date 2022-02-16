@@ -171,7 +171,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
                     var receipt = _bankFinancialBll.GetTransferIngoReceipt(data.TransferId);
 
                     var authData = _authorizeBll.GetAuthData();
-                    var dateTime = new DateTimeOffset(DateTime.Now.ToUniversalTime(), TimeSpan.Zero);
+                    var dateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, TimeSpan.Zero);
 
                     if(receipt!=null)
                     {
