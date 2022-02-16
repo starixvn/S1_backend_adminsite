@@ -190,7 +190,7 @@ namespace BackendSite.Controllers.Api
                     }
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
-                    data.UpdateTime = new DateTimeOffset(DateTime.Now,new TimeSpan(8,0,0));
+                    data.UpdateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8,0,0)).AddHours(8);
                     apiResult.Data = data;
                     apiResult.ErrorCode = 0;
                 }
