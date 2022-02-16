@@ -825,13 +825,19 @@ namespace BackendSite.Service.Model.enums
         Feature = 3,
         Favourite = 4
     }
-    public enum SlotGameStatusType 
+    #endregion
+
+    #region SlotGameStatus
+    public enum SlotGameStatusEnum
     {
         All = 0,
         Open = 1,
         Closed = 2,
     }
-    public enum CurrencyCurrencyIdEnum
+    #endregion
+
+    #region Currency
+    public enum IsoCodeEnum
     {
         MYR = 2,
         THB = 4,

@@ -46,7 +46,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameList(request.Site, request.TPid, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameList(request.Site, request.TpId, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
@@ -105,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.Site, request.TPid, request.Name, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.Site, request.TpId, request.Name, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;

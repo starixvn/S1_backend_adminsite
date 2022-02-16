@@ -43,9 +43,9 @@ namespace BackendSite.Service.BLL
         {
             GetSlotGameCategoryListRep rep = new GetSlotGameCategoryListRep();
             List<SlotGameData> slotGames = new List<SlotGameData>();
-            if (Category == (int)SlotGameCategoryType.All)
+            if (Category == (int)SlotGameCategoryEnum.All)
             {
-                var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, (int)SlotGameStatusType.All, PageNumber, PageSize, out  TotalPages, out  RowCount);
+                var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, (int)SlotGameStatusEnum.All, PageNumber, PageSize, out  TotalPages, out  RowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator));
@@ -85,22 +85,22 @@ namespace BackendSite.Service.BLL
                 {
                     switch (y.CurrencyId)
                     {
-                        case (int)CurrencyCurrencyIdEnum.MYR:
+                        case (int)IsoCodeEnum.MYR:
                             MYRStatus = y.Status;
                             break;
-                        case (int)CurrencyCurrencyIdEnum.THB:
+                        case (int)IsoCodeEnum.THB:
                             THBStatus = y.Status;
                             break;
-                        case (int)CurrencyCurrencyIdEnum.RMB:
+                        case (int)IsoCodeEnum.RMB:
                             RMBStatus = y.Status;
                             break;
-                        case (int)CurrencyCurrencyIdEnum.IDR:
+                        case (int)IsoCodeEnum.IDR:
                             IDRStatus = y.Status;
                             break;
-                        case (int)CurrencyCurrencyIdEnum.INR:
+                        case (int)IsoCodeEnum.INR:
                             INRStatus = y.Status;
                             break;
-                        case (int)CurrencyCurrencyIdEnum.VND:
+                        case (int)IsoCodeEnum.VND:
                             VNDStatus = y.Status;
                             break;
                     }
