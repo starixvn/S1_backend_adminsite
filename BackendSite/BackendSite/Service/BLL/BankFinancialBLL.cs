@@ -185,13 +185,6 @@ namespace BackendSite.Service.BLL
 
         #region Private Methods For GetTransferAccountInfoList
         
-        private string GetTimeZoneDateTimeByDateString(int siteId, string datetime)
-        {
-            var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
-            return Convert.ToDateTime(datetime).AddHours(timeZone).ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
-        
         private string GetTransferId(TransferTypeEnum transferType)
         {
             var prefix = string.Empty;
@@ -468,7 +461,7 @@ namespace BackendSite.Service.BLL
                                                                                      int? reason,
                                                                                      string transferId)
         {
-            return ConvertForDisplay(_bankFinancialService.GetTransferInfoList(isSetting,
+            return _bankFinancialService.GetTransferInfoList(isSetting,
                                                              transferType,
                                                              transFromDate,
                                                              transToDate,
@@ -477,34 +470,32 @@ namespace BackendSite.Service.BLL
                                                              toAccountNo,
                                                              toAccountDisplayName,
                                                              reason,
-                                                             transferId));
+                                                             transferId);
         }
 
         public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
-            var status = false;
             var count = 0;
-            var message = string.Empty;
 
             #region Checnk Parameter
 
-            if (!CheckSharedParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
+            if (!CheckSharedParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out var message))
             {
-                return (status, count, message);
+                return (false, count, message);
             }
 
             if (bankFinancialTransferInfoDetail.TransferType != TransferTypeEnum.Other)
             {
                 if (!CheckParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
                 {
-                    return (status, count, message);
+                    return (false, count, message);
                 }
             }
             else
             {
                 if (!CheckParameterWithTypeOtherForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
                 {
-                    return (status, count, message);
+                    return (false, count, message);
                 }
             }
 
@@ -512,7 +503,7 @@ namespace BackendSite.Service.BLL
 
             #region SetParameterModel
 
-            var result = SetParameterModelForSetTransferInfo(bankFinancialTransferInfoDetail);
+            var (transferInfoFromModel, transferInfoToModel) = SetParameterModelForSetTransferInfo(bankFinancialTransferInfoDetail);
 
             #endregion
 
@@ -521,42 +512,42 @@ namespace BackendSite.Service.BLL
                 using (var scope = new TransactionScope())
                 {
                     var TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
-                    result.TransferInfoFromModel.TransferId = TransferId;
-                    result.TransferInfoToModel.TransferId = TransferId;
+                    transferInfoFromModel.TransferId = TransferId;
+                    transferInfoToModel.TransferId = TransferId;
 
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        if (_bankFinancialService.InsertTransferInfo(result.TransferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfo(transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Minus Data Fail.");
+                            return (false, count, "Insert Transfer Info Minus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, result.TransferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
                     }
 
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        if (_bankFinancialService.InsertTransferInfo(result.TransferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfo(transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Plus Data Fail.");
+                            return (false, count, "Insert Transfer Info Plus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, result.TransferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
                     }
 
@@ -566,14 +557,13 @@ namespace BackendSite.Service.BLL
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Receipt Fail.");
+                            return (false, count, "Insert Transfer Receipt Fail.");
                         }
                     }
 
                     scope.Complete();
                 }
 
-                status = true;
                 count = 1;
                 message = "Insert Transfer Info And Insert Log Success.";
             }
@@ -585,37 +575,37 @@ namespace BackendSite.Service.BLL
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
 
-                        if (_bankFinancialService.UpdateTransferInfo(result.TransferInfoFromModel) != 1)
+                        if (_bankFinancialService.UpdateTransferInfo(transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Update Transfer Info Minus Data Fail.");
+                            return (false, count, "Update Transfer Info Minus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, result.TransferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
                     }
 
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        if (_bankFinancialService.UpdateTransferInfo(result.TransferInfoToModel) != 1)
+                        if (_bankFinancialService.UpdateTransferInfo(transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Update Transfer Info Plus Data Fail.");
+                            return (false, count, "Update Transfer Info Plus Data Fail.");
                         };
 
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, result.TransferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
                     }
 
@@ -625,31 +615,29 @@ namespace BackendSite.Service.BLL
                         {
                             scope.Dispose();
 
-                            return (status, count, "Update Transfer Receipt Fail.");
+                            return (false, count, "Update Transfer Receipt Fail.");
                         }
                     }
 
                     scope.Complete();
                 }
 
-                status = true;
                 count = 1;
                 message = "Update Transfer Info And Insert Log Success.";
             }
 
-            return (status, count, message);
+            return (true, count, message);
         }
 
         public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId)
         {
-            var status = false;
             var count = 0;
-            var message = string.Empty;
+            string message;
 
             if (transferId != null)
             {
                 //Step1:Get Data
-                var getdata = _bankFinancialService.GetTransferInfoList(true,
+                var getData = _bankFinancialService.GetTransferInfoList(true,
                                                              null,
                                                              null,
                                                              null,
@@ -662,19 +650,18 @@ namespace BackendSite.Service.BLL
 
                 var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
-                var data = new BankFinancialTransferInfoTransDetailModel();
-
-                if (getdata.Count() == 1)
+                BankFinancialTransferInfoTransDetailModel data;
+                if (getData.Count() == 1)
                 {
-                    data = getdata.FirstOrDefault();
+                    data = getData.FirstOrDefault();
                 }
                 else
                 {
-                    return (status, count, "Delete Transfer Info Data Fail.Data is not exist.");
+                    return (false, count, "Delete Transfer Info Data Fail.Data is not exist.");
                 }
 
                 //Step2: Set Data for Insert Log
-                var result = SetParameterModelForSetTransferInfo(data);
+                var (transferInfoFromModel, transferInfoToModel) = SetParameterModelForSetTransferInfo(data);
 
                 using (var scope = new TransactionScope())
                 {
@@ -684,22 +671,22 @@ namespace BackendSite.Service.BLL
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, result.TransferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Minus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
                         affectCount++;
                     }
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, result.TransferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
-                            return (status, count, "Insert Transfer Info Log Plus Data Fail.");
+                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
                         affectCount++;
                     }
@@ -709,7 +696,7 @@ namespace BackendSite.Service.BLL
                     {
                         scope.Dispose();
 
-                        return (status, count, "Delete Transfer Info Data Fail.");
+                        return (false, count, "Delete Transfer Info Data Fail.");
                     }
 
                     if (transferInfoReceiptModel != null)
@@ -718,7 +705,7 @@ namespace BackendSite.Service.BLL
                         {
                             scope.Dispose();
 
-                            return (status, count, "Delete Transfer Info Receipt Fail.");
+                            return (false, count, "Delete Transfer Info Receipt Fail.");
                         }
                     }
 
@@ -726,15 +713,15 @@ namespace BackendSite.Service.BLL
 
                     count = 1;
                 }
-                status = true;
+
                 message = "Delete Transfer Info Success.";
             }
             else
             {
-                return (status, count, "Delete Transfer Info Data Fail.TransferId is null.");
+                return (false, count, "Delete Transfer Info Data Fail.TransferId is null.");
             }
 
-            return (status, count, message);
+            return (true, count, message);
 
         }
 
@@ -1373,25 +1360,7 @@ namespace BackendSite.Service.BLL
         };
 
         #endregion
-
-        /// <summary>
-        /// 時區轉換
-        /// </summary>
-        /// <param name="datas"></param>
-        /// <returns></returns>
-        private IEnumerable<BankFinancialTransferInfoTransDetailModel> ConvertForDisplay(IEnumerable<BankFinancialTransferInfoTransDetailModel> datas)
-        {
-
-            foreach (var data in datas.ToArray())
-            {
-                data.CreateTime = GetTimeZoneDateTimeByDateString(1, data.CreateTime);
-                data.UpdateTime = GetTimeZoneDateTimeByDateString(1, data.UpdateTime);
-            }
-
-            return datas;
-
-        }
-
+        
         #endregion
         
         #region Transfer Info Report
