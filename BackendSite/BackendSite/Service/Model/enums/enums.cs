@@ -824,7 +824,7 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region SlotGame
-    public enum SlotGameCategoryType
+    public enum SlotGameCategoryEnum
     {
         All = 0,
         Jackpot = 1,
