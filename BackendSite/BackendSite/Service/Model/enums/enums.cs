@@ -719,8 +719,15 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-    
+
     #region BankDetailOff
+
+    public enum PurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        DepositAndWithdrawal = 3
+    }
 
     public enum BankDetailOffStatusEnum
     {
