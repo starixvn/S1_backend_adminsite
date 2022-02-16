@@ -98,6 +98,13 @@ namespace BackendSite.Controllers.Api
                                                                        req.ToAccountDisplayName,
                                                                        req.Reason,
                                                                        req.TransferId);
+                
+                foreach (var data in apiResult.Data.ToArray())
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+                }
+                
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -118,7 +125,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                var dateTime = GetTimeZoneDateTime(1);
+                var dateTime = new DateTimeOffset(DateTime.Now,new TimeSpan(8,0,0));
                 apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
                     TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
@@ -165,26 +172,25 @@ namespace BackendSite.Controllers.Api
                                                                    req.ToAccountDisplayName,
                                                                    req.Reason,
                                                                    req.TransferId);
-
+                
+                foreach (var data in result.ToArray())
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+                }
+                
                 if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
-
                     var receipt = _bankFinancialBLL.GetTransferIngoReceipt(data.TransferId);
-
                     var authData = _authorizeBLL.GetAuthData();
-                    var dateTime = GetTimeZoneDateTime(1);
-
                     if(receipt!=null)
                     {
                         data.UploadReceiptName = receipt.PicFileName;
                         data.TransferPic = receipt.TransferPic;
                     }
-
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
-                    data.UpdateTime = dateTime;
-
+                    data.UpdateTime = new DateTimeOffset(DateTime.Now,new TimeSpan(8,0,0));
                     apiResult.Data = data;
                     apiResult.ErrorCode = 0;
                 }
@@ -214,21 +220,21 @@ namespace BackendSite.Controllers.Api
             {
                 var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
 
-                transferInfoDetails.CreateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.CreateTime);
-                transferInfoDetails.UpdateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.UpdateTime);
+                transferInfoDetails.CreateTime = new DateTimeOffset(transferInfoDetails.CreateTime.ToUniversalTime().DateTime , TimeSpan.Zero);
+                transferInfoDetails.UpdateTime = new DateTimeOffset(transferInfoDetails.UpdateTime.ToUniversalTime().DateTime , TimeSpan.Zero);
 
-                var result = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
+                var (status, count, message) = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
 
-                if (result.Status)
+                if (status)
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 0;
                 }
                 else
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 500;
                 }
 
@@ -296,6 +302,11 @@ namespace BackendSite.Controllers.Api
                                                                        ToAccountDisplayName,
                                                                        Reason,
                                                                        null);
+            foreach (var data in ExportData.ToArray())
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
+            }
             var stream = _excelBLL.Export(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -409,18 +420,7 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #region Private Methods
-
-        private string GetTimeZoneDateTime(int siteId)
-        {
-            var timeZone = siteId == 1 ? 8 : 7;
-            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
-        private string GetTimeZoneZeroDateTimeByDateString(string datetime)
-        {
-            return new DateTimeOffset(Convert.ToDateTime(datetime)).ToOffset(new TimeSpan(0, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
+        
         #endregion
     }
 }
