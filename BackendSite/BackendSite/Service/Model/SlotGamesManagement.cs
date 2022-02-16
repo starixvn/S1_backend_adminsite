@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
-    public class SlotGamesManagement
-    {
-    }
     public class GetSlotGameListReq
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int Site { get; set; }
-        public int TPid { get; set; }
+        public int TpId { get; set; }
         public string Name { get; set; }
         public int Status { get; set; }
         public GetSlotGameListReq()
@@ -57,7 +54,6 @@ namespace BackendSite.Service.Model
         public string EName { get; set; }
         public string CName { get; set; }
         public string Operator { get; set; }
-        //public List<CurrencyStatus> CurrencyStatus { get; set; }
         public int MYR { get; set; }
         public int THB { get; set; }
         public int RMB { get; set; }
@@ -81,10 +77,9 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int Site { get; set; }
-        public int TPid { get; set; }
+        public int TpId { get; set; }
         public string Name { get; set; }
         public int Category { get; set; }
-        //public int Status { get; set; }
         public GetSlotGameCategoryListReq()
         {
             //PageSize預設100
