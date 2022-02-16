@@ -59,7 +59,7 @@ const App = () => {
       return false;
     }
     let Data = {
-      TPid: parseInt(stateFilter.TPid),
+      TpId: parseInt(stateFilter.TPid),
       Name: stateFilter.Name,
       Category: 0,
       Site: parseInt(stateFilter.Site),
@@ -95,7 +95,7 @@ const App = () => {
   };
   const Result_ChangePage = (PageNumber) => {
     let Data = {
-      TPid: parseInt(backupFilter.TPid),
+      TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: parseInt(backupFilter.Category),
       Site: parseInt(backupFilter.Site),
@@ -141,7 +141,7 @@ const App = () => {
       Category: category,
     });
     let Data = {
-      TPid: parseInt(backupFilter.TPid),
+      TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: category,
       Site: parseInt(backupFilter.Site),
@@ -151,11 +151,6 @@ const App = () => {
       .post("/api/SlotGamesManagement/GetSlotGameCategoryList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          // setpageInfo({
-          //   totalPages: res.data.totalPages,
-          //   pageNumber: 1,
-          //   rowCount: res.data.rowCount,
-          // });
           setdatas(res.data.data);
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -167,7 +162,7 @@ const App = () => {
   };
   const UpdateResultStatus = () => {
     let Data = {
-      TPid: parseInt(backupFilter.TPid),
+      TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: parseInt(backupFilter.Category),
       Site: parseInt(backupFilter.Site),
@@ -177,11 +172,6 @@ const App = () => {
       .post("/api/SlotGamesManagement/GetSlotGameCategoryList", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          // setpageInfo({
-          //   totalPages: res.data.totalPages,
-          //   pageNumber: res.data.pageNumber,
-          //   rowCount: res.data.rowCount,
-          // });
           setdatas(res.data.data);
         } else {
           alert(res.data.message ?? "failed to get data.");

@@ -33,27 +33,6 @@ const Panel = (props) => {
       </div>
     );
   });
-  // let categoryRows = Object.keys(defCategoryType).map((_data) => {
-  //   return (
-  //     <div
-  //       key={`CategoryOpt-${defCategoryType[_data]}`}
-  //       className="custom-control custom-radio custom-control-inline"
-  //     >
-  //       <input
-  //         type="radio"
-  //         id={`CategoryId_${_data}`}
-  //         name="CategoryList"
-  //         className="custom-control-input"
-  //         value={_data}
-  //         onChange={props.SetCategory.bind(null, _data)}
-  //         checked={_data == props.StateFilter.Category}
-  //       />
-  //       <label className="custom-control-label" htmlFor={`CategoryId_${_data}`}>
-  //         {defCategoryType[_data]}
-  //       </label>
-  //     </div>
-  //   );
-  // });
   return (
     <div className="filter">
       <label className="col-form-label d-block">Sites</label>
@@ -62,7 +41,7 @@ const Panel = (props) => {
         <DropDownBox
           columnTitle="Tp"
           options={GetTPOptions(props.StateTPList)}
-          hasAll={true}
+          hasAll={false}
           dataColumn="TPid"
           onChange={props.FiterOnChange}
           value={props.StateFilter.TPid}

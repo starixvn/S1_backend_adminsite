@@ -76,7 +76,7 @@ const App = () => {
       return false;
     }
     let Data = {
-      TPid: parseInt(stateFilter.TPid),
+      TpId: parseInt(stateFilter.TPid),
       Name: stateFilter.Name,
       Status: parseInt(stateFilter.Status),
       Site: parseInt(stateFilter.Site),
@@ -108,7 +108,7 @@ const App = () => {
   };
   const UpdateResultStatus = () => {
     let Data = {
-      TPid: parseInt(backupFilter.TPid),
+      TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Status: parseInt(backupFilter.Status),
       Site: parseInt(backupFilter.Site),
@@ -134,7 +134,7 @@ const App = () => {
   };
   const Result_ChangePage = (PageNumber) => {
     let Data = {
-      TPid: parseInt(backupFilter.TPid),
+      TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Status: parseInt(backupFilter.Status),
       Site: parseInt(backupFilter.Site),
