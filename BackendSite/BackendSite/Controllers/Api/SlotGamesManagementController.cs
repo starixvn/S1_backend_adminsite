@@ -33,7 +33,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TPid, req.Name, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TpId, req.Name, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
@@ -72,7 +72,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TPid, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TpId, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;

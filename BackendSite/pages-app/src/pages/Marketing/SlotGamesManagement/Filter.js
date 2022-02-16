@@ -39,7 +39,7 @@ const Panel = (props) => {
         <DropDownBox
           columnTitle="Tp"
           options={GetTPOptions(props.StateTPList)}
-          hasAll={true}
+          hasAll={false}
           dataColumn="TPid"
           onChange={props.FiterOnChange}
           value={props.StateFilter.TPid}
