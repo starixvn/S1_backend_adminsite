@@ -125,7 +125,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                var dateTime = new DateTimeOffset(DateTime.Now,new TimeSpan(8,0,0));
+                var dateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8,0,0)).AddHours(8);
                 apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
                     TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
