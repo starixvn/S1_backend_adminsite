@@ -40,7 +40,6 @@ import * as Loading from '../commJS/Loading.jsx';
                     })
                 }
             }
-            console.log(data,'data');
             return (
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
@@ -52,15 +51,15 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
-                    <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.sabaID}</td>
                     <td>{data.sabaWallet}</td>
                     <td>{data.ptWallet}</td> 
                     <td>{data.balance}</td>
                     <td>{data.bonusAmount == 0 ? "": data.bonusAmount}</td>
+                    <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
+                    <td>{data.sabaID}</td>                  
                     <td>{CustStatusOp[data.status]}</td>
                 </tr>
             )
@@ -120,15 +119,27 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
                                     <th scope="col">IsTest</th>
-                                    <th scope="col">Registration time (Adjusted to GMT+8)</th>
-                                    <th scope="col">Last Active Time (Adjusted to GMT+8)</th>
-                                    <th scope="col">Last Tag Update Time (Adjusted to GMT+8)</th>
-                                    <th scope="col">Last Status Update Time (Adjusted to GMT+8)</th>
-                                    <th scope="col">Saba ID</th>
                                     <th scope="col">Saba Wallet</th>
                                     <th scope="col">PT Wallet</th>
                                     <th scope="col">Seamless Wallet</th>
                                     <th scope="col">Bonus amount</th>
+                                    <th scope="col">
+                                        <tr>Registration time</tr>
+                                        <tr>(Adjusted to GMT+8)</tr>                                      
+                                    </th>
+                                    <th scope="col"> 
+                                        <tr>Last Active Time</tr>
+                                        <tr>(Adjusted to GMT+8)</tr>
+                                    </th>
+                                    <th scope="col"> 
+                                        <tr>Last Tag Update Time</tr>
+                                        <tr>(Adjusted to GMT+8)</tr>
+                                    </th>
+                                    <th scope="col"> 
+                                        <tr>Last Status Update Time</tr>
+                                        <tr>(Adjusted to GMT+8)</tr>
+                                    </th>
+                                    <th scope="col">Saba ID</th>              
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
