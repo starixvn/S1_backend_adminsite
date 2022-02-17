@@ -20,11 +20,11 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
         }
 
-        public GetSlotGameListRep GetSlotGameList(int Site,int TPid,string Name,int Status,int PageNumber,int PageSize, out int TotalPages, out int RowCount)
+        public GetSlotGameListRep GetSlotGameList(int siteId, int tpId, string name, SlotGameFilterStatusEnum status,int pageNumber,int pageSize, out int totalPages, out int rowCount)
         {
             GetSlotGameListRep rep = new GetSlotGameListRep();
             List<SlotGameData> slotGames = new List<SlotGameData>();
-            var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, Status, PageNumber, PageSize,out  TotalPages,out  RowCount);
+            var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, status, pageNumber, pageSize, out totalPages, out rowCount);
             result.ForEach(x =>
             {
                 slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator));
@@ -36,16 +36,16 @@ namespace BackendSite.Service.BLL
 
         public int SetSlotGame(SetSlotGameReq req, string Operator)
         {
-            return slotGamesManagementService.SetSlotGame(req.Site, req.CurrencyId, req.SlotGameId, Operator);
+            return slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId,req.Status, Operator);
         }
 
-        public GetSlotGameCategoryListRep GetSlotGameCategoryList(int Site, int TPid, string Name, int Category,int PageNumber, int PageSize, out int TotalPages, out int RowCount)
+        public GetSlotGameCategoryListRep GetSlotGameCategoryList(int siteId, int tpId, string name, SlotGameCategoryEnum category,int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
             GetSlotGameCategoryListRep rep = new GetSlotGameCategoryListRep();
             List<SlotGameData> slotGames = new List<SlotGameData>();
-            if (Category == (int)SlotGameCategoryEnum.All)
+            if (category == (int)SlotGameCategoryEnum.All)
             {
-                var result = slotGamesManagementService.GetSlotGameList(Site, TPid, Name, (int)SlotGameStatusEnum.All, PageNumber, PageSize, out  TotalPages, out  RowCount);
+                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator));
@@ -53,7 +53,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var result = slotGamesManagementService.GetSlotGameCategoryList(Site, TPid, Name, Category, PageNumber, PageSize, out  TotalPages, out  RowCount);
+                var result = slotGamesManagementService.GetSlotGameCategoryList(siteId, tpId, name, category, pageNumber, pageSize, out totalPages, out rowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator));
@@ -65,22 +65,22 @@ namespace BackendSite.Service.BLL
         }
         public int SetSlotGameCategory(SetSlotGameCategoryReq req, string Operator)
         {
-            return slotGamesManagementService.SetSlotGameCategory(req.Site, req.CurrencyId, req.SlotGameId, req.CategoryId, Operator);
+            return slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, req.CategoryId, req.Status, Operator);
         }
-        private SlotGameData GetSlotGameCurrencyStatus(string Name,string Status,DateTimeOffset UpdateTime,int TpId,string GameId,int Id,string Operator)
+        private SlotGameData GetSlotGameCurrencyStatus(string name, string status,DateTimeOffset updateTime,int tpId,string gameId,int id,string Operator)
         {
-            string eName = JsonConvert.DeserializeObject<SlotGameName>(Name).en;
-            string cName = JsonConvert.DeserializeObject<SlotGameName>(Name).ch;
-            int MYRStatus = 0;
-            int THBStatus = 0;
-            int RMBStatus = 0;
-            int IDRStatus = 0;
-            int INRStatus = 0;
-            int VNDStatus = 0;
+            string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
+            string cName = JsonConvert.DeserializeObject<SlotGameName>(name).ch;
+            int MYRStatus = (int)SlotGameStatusEnum.Closed;
+            int THBStatus = (int)SlotGameStatusEnum.Closed;
+            int RMBStatus = (int)SlotGameStatusEnum.Closed;
+            int IDRStatus = (int)SlotGameStatusEnum.Closed;
+            int INRStatus = (int)SlotGameStatusEnum.Closed;
+            int VNDStatus = (int)SlotGameStatusEnum.Closed;
 
-            if (!string.IsNullOrWhiteSpace(Status))
+            if (!string.IsNullOrWhiteSpace(status))
             {
-                var CurrencyList = JsonConvert.DeserializeObject<SlotGameStatus[]>(Status).ToList();
+                var CurrencyList = JsonConvert.DeserializeObject<SlotGameStatus[]>(status).ToList();
                 CurrencyList.ForEach(y =>
                 {
                     switch (y.CurrencyId)
@@ -106,21 +106,22 @@ namespace BackendSite.Service.BLL
                     }
                 });
             }
+
             return (new SlotGameData
             {
-                UpdateTime = UpdateTime,
-                TpId = TpId,
-                GameId = GameId,
-                Id = Id,
+                UpdateTime = updateTime,
+                TpId = tpId,
+                GameId = gameId,
+                Id = id,
                 Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
                 EName = eName,
                 CName = cName,
-                MYR = MYRStatus,
-                THB = THBStatus,
-                RMB = RMBStatus,
-                IDR = IDRStatus,
-                INR = INRStatus,
-                VND = VNDStatus
+                MYR = (SlotGameStatusEnum)MYRStatus,
+                THB = (SlotGameStatusEnum)THBStatus,
+                RMB = (SlotGameStatusEnum)RMBStatus,
+                IDR = (SlotGameStatusEnum)IDRStatus,
+                INR = (SlotGameStatusEnum)INRStatus,
+                VND = (SlotGameStatusEnum)VNDStatus
             });
         }
     }

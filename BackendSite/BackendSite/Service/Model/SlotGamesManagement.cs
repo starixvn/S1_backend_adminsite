@@ -1,26 +1,25 @@
-﻿using System;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
-    public class GetSlotGameListReq
+    public class GetSlotGameListReq : ApiRequestPageModel
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int Site { get; set; }
+        public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
-        public int Status { get; set; }
+        public SlotGameFilterStatusEnum Status { get; set; }
         public GetSlotGameListReq()
         {
             //PageSize預設100
-            if (PageSize == 0)
-                PageSize = 100;
+            PageSize = 100;
         }
     }
-    public class SlotGameList 
+    public class SlotGameList
     {
         private DateTimeOffset _updateTime { get; set; }
         public DateTimeOffset UpdateTime
@@ -54,12 +53,12 @@ namespace BackendSite.Service.Model
         public string EName { get; set; }
         public string CName { get; set; }
         public string Operator { get; set; }
-        public int MYR { get; set; }
-        public int THB { get; set; }
-        public int RMB { get; set; }
-        public int IDR { get; set; }
-        public int INR { get; set; }
-        public int VND { get; set; }
+        public SlotGameStatusEnum MYR { get; set; }
+        public SlotGameStatusEnum THB { get; set; }
+        public SlotGameStatusEnum RMB { get; set; }
+        public SlotGameStatusEnum IDR { get; set; }
+        public SlotGameStatusEnum INR { get; set; }
+        public SlotGameStatusEnum VND { get; set; }
     }
     public class CurrencyStatus
     {
@@ -70,21 +69,18 @@ namespace BackendSite.Service.Model
     { 
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
-        public int Site { get; set; }
+        public int SiteId { get; set; }
+        public SlotGameStatusEnum Status { get; set; }
     }
-    public class GetSlotGameCategoryListReq
+    public class GetSlotGameCategoryListReq : ApiRequestPageModel
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        public int Site { get; set; }
+        public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
-        public int Category { get; set; }
+        public SlotGameCategoryEnum Category { get; set; }
         public GetSlotGameCategoryListReq()
         {
-            //PageSize預設100
-            if (PageSize == 0)
-                PageSize = 100;
+            PageSize = 100;
         }
     }
     public class GetSlotGameCategoryListRep
@@ -115,7 +111,8 @@ namespace BackendSite.Service.Model
     {
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
-        public int Site { get; set; }
+        public int SiteId { get; set; }
         public int CategoryId { get; set; }
+        public SlotGameDetailStatusEnum Status { get; set; }
     }
 }
