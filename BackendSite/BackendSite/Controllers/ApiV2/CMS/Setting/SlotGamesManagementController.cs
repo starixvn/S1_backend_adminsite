@@ -46,7 +46,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameList(request.Site, request.TpId, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
@@ -78,8 +78,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                _slotGamesManagementBLL.SetSlotGame(request, User.Identity.Name);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var result = _slotGamesManagementBLL.SetSlotGame(request, User.Identity.Name);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
@@ -90,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         /// <summary>
-        /// SlotGamesManagement/GetSlotGameCategoryList 
+        /// CategoryManagement/GetSlotGameCategoryList 
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -105,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.Site, request.TpId, request.Name, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;
@@ -120,7 +127,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         /// <summary>
-        /// SlotGamesManagement/SetSlotGameCategory 
+        /// CategoryManagement/SetSlotGameCategory 
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -135,8 +142,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                _slotGamesManagementBLL.SetSlotGameCategory(request, User.Identity.Name);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var result = _slotGamesManagementBLL.SetSlotGameCategory(request, User.Identity.Name);
+                if(result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
