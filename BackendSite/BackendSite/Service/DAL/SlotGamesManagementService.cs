@@ -28,7 +28,6 @@ namespace BackendSite.Service.DAL
             parameter.Add("TpId", tpId, DbType.Int32);
             parameter.Add("Status", (int)status, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
-            parameter.Add("PageNumber", Math.Abs(pageNumber), dbType: DbType.Int32);
             parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
             parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -59,7 +58,6 @@ namespace BackendSite.Service.DAL
             parameter.Add("TpId", tpId, DbType.Int32);
             parameter.Add("CategoryId", (int)category, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
-            parameter.Add("PageNumber", Math.Abs(pageNumber), dbType: DbType.Int32);
             parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
             parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
