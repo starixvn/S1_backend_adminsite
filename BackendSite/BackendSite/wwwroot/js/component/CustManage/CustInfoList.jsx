@@ -44,6 +44,7 @@ import * as Loading from '../commJS/Loading.jsx';
                 <tr key={data.custId}>
                     <td>{data.siteName}</td>
                     <td><a href={"/CustManage/CustInfo?UserName=" + data.userName + "&custId=" + data.custId + "&TransId=" + (this.props.transId || "")} target="_blank">{data.userName}</a></td>
+                    <td>{data.sabaID}</td> 
                     <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
                     <td>{data.levelName}</td>
@@ -58,9 +59,9 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>
-                    <td>{data.sabaID}</td>                  
+                    <td>{data.lastStatusUpdateTime === null ? 'N/A' : moment.utc(data.lastStatusUpdateTime).add(8,'hour').format('l LTS')}</td>                 
                     <td>{CustStatusOp[data.status]}</td>
+                    <td>{data.ip}</td>  
                 </tr>
             )
         }
@@ -112,6 +113,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                 <tr>
                                     <th scope="col">Site Name</th>
                                     <th scope="col">User Name</th>
+                                    <th scope="col">Saba ID</th>  
                                     <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
                                     <th scope="col">Vip Level</th>
@@ -138,9 +140,9 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col"> 
                                         <tr>Last Status Update Time</tr>
                                         <tr>(Adjusted to GMT+8)</tr>
-                                    </th>
-                                    <th scope="col">Saba ID</th>              
+                                    </th>           
                                     <th scope="col">Status</th>
+                                    <th scope="col">Last Activity IP</th>
                                 </tr>
                             </thead>
                             {custInfoRows}
