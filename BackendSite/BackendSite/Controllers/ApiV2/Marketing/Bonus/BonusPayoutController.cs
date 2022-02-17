@@ -49,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #endregion
 
         /// <summary>
-        /// BonusPayout/BonusPayout 後台手動領取Bonus
+        /// BonusPayout/SetBonusPayout 後台手動領取Bonus
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -59,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
         [HttpPost]
-        public async Task<ApiResult> BonusPayout(BonusPayoutReq request)
+        public async Task<ApiResult> SetBonusPayout(BonusPayoutReq request)
         {
             var apiResult = new ApiResult();
             string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
