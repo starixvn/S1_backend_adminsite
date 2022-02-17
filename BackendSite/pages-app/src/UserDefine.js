@@ -148,6 +148,18 @@ const VerificationReward = lazy(() =>
   import("./pages/Marketing/VerificationReward/index")
 );
 
+const VerificationRewardReport = lazy(() =>
+  import("./pages/Marketing/VerificationRewardReport/index")
+);
+
+const TpFailRecordReport = lazy(() =>
+  import("./pages/CSD/TpFailRecordReport/index")
+);
+
+const CryptoWithdrawalLimitManagement = lazy(() =>
+  import("./pages/Finance/CryptoWithdrawalLimitManagement/index")
+);
+
 export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
@@ -815,19 +827,6 @@ export const pages = {
   TpFailRecordReport: {
     comp: (
       <Suspense fallback="loading...">
-        <TpFailRecordReport />
-      </Suspense>
-    ),
-    css: [
-      "./lib/bootstrap/dist/css/bootstrap.min.css",
-      "./css/css/main.css",
-      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
-    ],
-    layout: layoutType.N88,
-  },
-  VerificationReward: {
-    comp: (
-      <Suspense fallback="loading...">
         <VerificationReward />
       </Suspense>
     ),
@@ -838,4 +837,44 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+  VerificationRewardReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <VerificationRewardReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
+      "./css/common/fonts/main-font/style.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TpFailRecordReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TpFailRecordReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  CryptoWithdrawalLimitManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <CryptoWithdrawalLimitManagement />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css"
+    ],
+    layout: layoutType.N88,
+  }
 };

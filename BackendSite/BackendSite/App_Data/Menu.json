@@ -361,10 +361,10 @@
       },
       {
         "Key": "USDTWithdrawalLimitManagement",
-        "Title": "USDT WithdrawalLimit Management",
+        "Title": "Crypto WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
         "Controller": "Finance",
-        "Action": "USDTWithdrawalLimitManagement",
+        "Action": "CryptoWithdrawalLimitManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -757,6 +757,26 @@
         "FuncKey": "CMS/AppLinkManagement",
         "Controller": "Marketing",
         "Action": "AppLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SlotGamesManagement",
+        "Title": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "SlotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "CategoryManagement",
+        "Title": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Controller": "Marketing",
+        "Action": "CategoryManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

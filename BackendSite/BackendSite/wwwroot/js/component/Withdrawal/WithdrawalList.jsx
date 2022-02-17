@@ -95,7 +95,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         {(row.bankName == null&& row.accountType != null)?
-                        <td>{row.accountType}</td>:<td>{row.bankName}</td>}
+                            <td>{row.cryptoCurrency || row.accountType}</td>:<td>{row.bankName}</td>}
                         {/* <td>{row.accountNo}</td>
                         <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
@@ -230,9 +230,12 @@ import DateTimePicker from 'react-datetime';
                     if (result.errorCode == 0) {
                         //console.log(' onGetData()',result.data);
                         if (result.data.status == 3) {
+                            var channelName = result.data.cryptoCurrency === result.data.network
+                                ? result.data.network
+                                : `${result.data.cryptoCurrency}-${result.data.network}`;
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, result.data.network);
+                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, channelName);
                         }
                         
                         let SelId = null;
@@ -501,8 +504,7 @@ import DateTimePicker from 'react-datetime';
                 if (data.status == 3) {
                     let selectOp = [];
                     selectOp.push(<option key={0} value="0">Undefine</option>);
-                    //console.log(this.state);
-                    if(this.state.Data.accountType == 'USDT')
+                    if(this.state.Data.accountType === 'crypto')
                     {
                         if (this.state.CryptoPayList.length > 0)
                             selectOp.push(<option key={4} value="4">Crypto Pay</option>);
@@ -644,7 +646,7 @@ import DateTimePicker from 'react-datetime';
                             {data.accountType != null ?
                             <tr>
                                 <th scope="row">Account Type</th>
-                                <td>{data.accountType}</td>
+                                <td>{data.cryptoCurrency || data.accountType}</td>
                             </tr>
                             : null}
                             {data.accountType != null ?
