@@ -257,7 +257,6 @@ namespace BackendSite.Service.DAL
                                                                                      int? reason,
                                                                                      string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -274,7 +273,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialTransferInfo_Get";
-            return conn.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
         }
 
         public int InsertTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
@@ -302,9 +301,9 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _CreateTime = bankFinancialTransferInfo.CreateTime,
+                    _CreateTime = bankFinancialTransferInfo.CreateTime.DateTime,
                     _Creator = bankFinancialTransferInfo.Creator,
-                    _UpdateTime = bankFinancialTransferInfo.UpdateTime,
+                    _UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
@@ -338,7 +337,7 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _UpdateTime = bankFinancialTransferInfo.UpdateTime,
+                    _UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
@@ -372,7 +371,7 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _OperateTime = bankFinancialTransferInfo.UpdateTime,
+                    _OperateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Operator = bankFinancialTransferInfo.Updator,
                     _Action = action
                 });
@@ -422,14 +421,13 @@ namespace BackendSite.Service.DAL
 
         public BankFinancialTransferInfoReceiptModel GetTransferInfoReceipt(string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
                     _TransferId = transferId
                 });
             var SpName = "Admin_BankFinancialTransferInfoReceipt_Get";
-            return conn.QueryFirstOrDefault<BankFinancialTransferInfoReceiptModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.QueryFirst<BankFinancialTransferInfoReceiptModel>(SpName, parameters);
         }
 
         public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
