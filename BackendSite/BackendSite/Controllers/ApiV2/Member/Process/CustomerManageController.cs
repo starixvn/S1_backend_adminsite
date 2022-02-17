@@ -585,12 +585,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             foreach (CustInfoDetail x in data)
             {
-                var tpWallet = await _custInfoBll.GetTpWalletAsync(x.CustId);
+                var tpWallet = await _custInfoBll.GetSabaPtWalletAsync(x.CustId);
                 var saba = tpWallet.Where(y => y.TpId == 1).ToList();
                 var pt = tpWallet.Where(y => y.TpId == 27).ToList();
                 if (saba.Any())
                 {
-                    x.SABAWallet = saba.FirstOrDefault().Balance;
+                    x.SabaWallet = saba.FirstOrDefault().Balance;
                 }
                 if (pt.Any())
                 {

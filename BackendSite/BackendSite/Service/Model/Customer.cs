@@ -158,7 +158,7 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal BonusAmount { get; set; }
-        public decimal SABAWallet { get; set; }
+        public decimal SabaWallet { get; set; }
         public decimal PTWallet { get; set; }
     }
 

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using static BackendSite.Controllers.Api.TpController;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -325,7 +326,7 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 foreach (var tpWallet in tpWalletList)
                 {
-                    if(tpWallet.TpId == 1 || tpWallet.TpId == 27)
+                    if(tpWallet.TpId == (int)TpListIdEnum.Saba || tpWallet.TpId == (int)TpListIdEnum.PT)
                     {
                         try
                         {
