@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -36,7 +39,10 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ExcelBLL _excelBLL;
         private readonly CustInfoBLL _custInfoBLL;
+        private readonly RebateManageBLL _rebateManageBLL;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly CourierAdapter courierAdapter;
+        private readonly string _bonusApiUrl;
         #endregion
 
         #region Constructors
@@ -49,6 +55,9 @@ namespace BackendSite.Controllers.Api
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
+            RebateManageBLL rebateManageBLL,
+            CourierAdapter courierAdapter,
+            IConfiguration configuration,
             IServiceProvider provider)
         {
             _bonusManageBLL = bonusManageBLL;
@@ -59,7 +68,10 @@ namespace BackendSite.Controllers.Api
             _authorizeBLL = authorizeBLL;
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
+            _rebateManageBLL = rebateManageBLL;
+            this.courierAdapter = courierAdapter;
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         #endregion
@@ -110,7 +122,7 @@ namespace BackendSite.Controllers.Api
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
         }
-        
+
         public class RefFriendListReq
         {
             public int CustId { get; set; }
@@ -157,6 +169,15 @@ namespace BackendSite.Controllers.Api
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
+        }
+        public class BonusPayoutReq 
+        {
+            public int CustId { get; set; }
+            public decimal Amount { get; set; }
+            public string Memo { set; get; }
+            public string BounsCode { get; set; }
+            public int RollOver { get; set; }
+            public int PromotionType { get; set; }
         }
         #endregion
 
@@ -598,7 +619,7 @@ namespace BackendSite.Controllers.Api
                 req.CurrencyId,
                 req.StartDate?.DateTime,
                 req.EndDate?.DateTime,
-                pageSize, 
+                pageSize,
                 ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
@@ -607,7 +628,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-        
+
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendList(RefFriendListReq refFriendListReq)
         {
@@ -629,7 +650,7 @@ namespace BackendSite.Controllers.Api
             var pageNumber = refFriendListReq.PageNumber;
             var apiResult = new ApiListResult<ReferralFriend>();
             var data = _referralManagementBLL.GetRefFriendList(refFriendListReq.CustId, startDate,
-                endDate, PageSize, pageNumber, out var totalPages, out var rowCount,false);
+                endDate, PageSize, pageNumber, out var totalPages, out var rowCount, false);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);
@@ -786,20 +807,50 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.EndDate);
             int totalPages = 0, rowCount = 0;
 
+            var categoryList = new List<int>();
+            var categoryAllList = _rebateManageBLL.GetTPCategoryList();
+            var currencyList = new List<int>();
+            var siteInfoList = _reportBLL.GetServer();
+
             var pageNumber = leaderboardExtraPointReq.PageNumber;
             var pageSize = 10;
             if (leaderboardExtraPointReq.PageSize > 0)
                 pageSize = leaderboardExtraPointReq.PageSize;
+
+            if (leaderboardExtraPointReq.CategoryId == 0)
+            {
+                categoryList.AddRange(categoryAllList.Select(x => x.CategoryId));
+            }
+            else
+            {
+                categoryList.Add(leaderboardExtraPointReq.CategoryId);
+            }
+
+            if (leaderboardExtraPointReq.Currency == 0)
+            {
+                foreach (var a in siteInfoList)
+                {
+                    currencyList.AddRange(a.ICurrencyList);
+                }
+            }
+            else
+            {
+                currencyList.Add(leaderboardExtraPointReq.Currency);
+            }
+
             apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
-                leaderboardExtraPointReq.CategoryId, leaderboardExtraPointReq.Currency, startTime,
-                endTime, pageSize, ref pageNumber, out totalPages, out rowCount);
+                categoryList,
+                currencyList,
+                startTime,
+                endTime,
+                pageNumber, pageSize, out totalPages, out rowCount);
 
             foreach (var data in apiResult.Data)
             {
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            
+
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
@@ -843,6 +894,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         #endregion
+
         #endregion
     }
 }

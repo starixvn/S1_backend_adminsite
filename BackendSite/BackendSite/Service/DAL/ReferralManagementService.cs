@@ -37,7 +37,18 @@ namespace BackendSite.Service.DAL
             {
                 if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
-                    para.Add(new ReferralList
+                    //原本的寫法改用新的連線方式會有問題，先用迴圈Set
+                    //para.Add(new ReferralList
+                    //{
+                    //    SiteId = x.SiteId,
+                    //    CurrencyId = x.CurrencyId,
+                    //    PeriodDays = int.Parse(x.PeriodDays),
+                    //    BonusAmount = decimal.Parse(x.BonusAmount),
+                    //    VaildBet = decimal.Parse(x.VaildBet),
+                    //    Deposit = decimal.Parse(x.Deposit)
+                    //});
+                    var param = new DynamicParameters(
+                    new
                     {
                         SiteId = x.SiteId,
                         CurrencyId = x.CurrencyId,
@@ -46,15 +57,16 @@ namespace BackendSite.Service.DAL
                         VaildBet = decimal.Parse(x.VaildBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
+                    _mainDbClient.Execute("Admin_Referral_Set", param);
                 }
+                //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
-            _mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
         }
         public void SetReferralStatus(int siteId, int currencyId, int status)
         {
             _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
-        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate , DateTime? endDate , int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             string SelectSite = null;
             if (selectSite != null && selectSite.Any())
@@ -66,11 +78,11 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { SelectSite, UserName = userName, CurrencyId = currencyId, PageSize = Math.Abs(pageSize) });
             p.Add("StartDate", startDate);
             p.Add("EndDate", endDate);
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get_V2", p, commandType: CommandType.StoredProcedure);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
@@ -78,10 +90,10 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        
-        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+
+        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate)
         {
-            var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId ,StartDate = startDate, EndDate= endDate});
+            var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId, StartDate = startDate, EndDate = endDate });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = conn.Query<ReferralCustList>("Admin_ReferralCustlistExport_Get", p, commandType: CommandType.StoredProcedure);
@@ -100,9 +112,10 @@ namespace BackendSite.Service.DAL
             var SpName = string.Empty;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             if (byRewardTime)
-            { 
+            {
                 SpName = "Admin_ReferralFriendListByRewardTime_Get";
-            }else
+            }
+            else
             {
                 SpName = "Admin_ReferralFriendList_Get_V3";
             }

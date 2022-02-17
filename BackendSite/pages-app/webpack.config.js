@@ -32,10 +32,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
     // ],
-    "Marketing/BonusInfoReport.min": [
-      // '@babel/polyfill',
-      "./src/pages/Marketing/BonusInfoReport/index.js",
-    ],
+    // "Marketing/BonusInfoReport.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Marketing/BonusInfoReport/index.js",
+    // ],
     // "Finance/PaymentManagement.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
@@ -148,6 +148,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
+    // "BankFinancial/ReasonManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/ReasonManagement/index.js",
+    // ],
     // "Marketing/VipRebateInfoReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
@@ -177,10 +181,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    // "BankFinancial/TransferInfoReport.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    // ],
+    "BankFinancial/TransferInfoReport.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
@@ -248,6 +252,9 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
+    // "Finance/CryptoWithdrawalLimitManagement.min": [
+    //   "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
+    // ],
     // "Marketing/VerificationReward.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationReward/index.js",
@@ -256,6 +263,15 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
+    // "Finance/BonusPayout.min": ["./src/pages/Finance/BonusPayout/index.js"],
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    "Marketing/CategoryManagement.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/CategoryManagement/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -323,10 +323,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
         }
 
         public class CustIdWithReasonRequest : CustIdRequest
@@ -515,13 +514,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
-        public class CustInfoReq
-        {
-            public int CustId { get; set; }
-            public string UserName { get; set; }
-            public string Reason { get; set; }
-        }
-
         public class GetCustDetailRequest
         {
             public int SiteId { get; set; }
@@ -546,7 +538,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult> GetCustInfoListAsync(CustInfoListRequest request)
+        public async Task<ApiListResult<CustInfoDetail>> GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -717,7 +709,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetBonusByCustId(CustIdRequest request)
+        public ApiResult<IEnumerable<CustBonus>> GetBonusByCustId(CustIdRequest request)
         {
             var data = _custInfoBll.GetCustBonus(request.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
@@ -2635,6 +2627,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
         /// </summary>
         /// <remarks>
+        /// Http Method：POST
+        /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
         /// </remarks>
         /// <param name="request"></param>

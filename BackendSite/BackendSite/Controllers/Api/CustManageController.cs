@@ -569,7 +569,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
 
             switch (custStatusSwitch.Op)
