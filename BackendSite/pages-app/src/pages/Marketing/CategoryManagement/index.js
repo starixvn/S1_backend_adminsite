@@ -62,7 +62,7 @@ const App = () => {
       TpId: parseInt(stateFilter.TPid),
       Name: stateFilter.Name,
       Category: 0,
-      Site: parseInt(stateFilter.Site),
+      SiteId: parseInt(stateFilter.Site),
       PageNumber: 1,
     };
     api
@@ -98,7 +98,7 @@ const App = () => {
       TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: parseInt(backupFilter.Category),
-      Site: parseInt(backupFilter.Site),
+      SiteId: parseInt(backupFilter.Site),
       PageNumber: PageNumber,
     };
     api
@@ -144,7 +144,7 @@ const App = () => {
       TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: category,
-      Site: parseInt(backupFilter.Site),
+      SiteId: parseInt(backupFilter.Site),
       PageNumber: pageInfo.pageNumber,
     };
     api
@@ -165,7 +165,7 @@ const App = () => {
       TpId: parseInt(backupFilter.TPid),
       Name: backupFilter.Name,
       Category: parseInt(backupFilter.Category),
-      Site: parseInt(backupFilter.Site),
+      SiteId: parseInt(backupFilter.Site),
       PageNumber: pageInfo.pageNumber,
     };
     api

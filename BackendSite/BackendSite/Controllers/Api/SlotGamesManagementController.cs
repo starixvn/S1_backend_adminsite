@@ -33,7 +33,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameList(req.Site, req.TpId, req.Name, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                var result = slotGamesManagementBLL.GetSlotGameList(req.SiteId, req.TpId, req.Name, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
@@ -55,8 +55,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                slotGamesManagementBLL.SetSlotGame(req, User.Identity.Name);
-                apiResult.ErrorCode = 0;
+                var result = slotGamesManagementBLL.SetSlotGame(req, User.Identity.Name);
+                if(result > 0)
+                {
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                }
             }
             catch(Exception ex)
             {
@@ -72,7 +79,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.Site, req.TpId, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.SiteId, req.TpId, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;
@@ -93,8 +100,15 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                slotGamesManagementBLL.SetSlotGameCategory(req, User.Identity.Name);
-                apiResult.ErrorCode = 0;
+                var result = slotGamesManagementBLL.SetSlotGameCategory(req, User.Identity.Name);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                }
             }
             catch (Exception ex)
             {
