@@ -43,6 +43,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Enum List：
         /// 
+        /// Deposit Request / Withdrawal Request For Frontend Use - AmountTypeEnum
+        /// 
+        /// Adjustment Report For Frontend Use - AdjustTypeEnum
+        /// 
         /// Customer - IsKycEnum、IsRiskEnum、ActStatusEnum
         /// 
         /// CustIovation - IovationEnum
@@ -50,6 +54,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// CustProfile - PhoneVerifiedEnum、EmailVerifiedEnum
         /// 
         /// DepositInfo - DepositTypeEnum
+        /// 
+        /// TpBetRecord - SettlementTypeEnum
+        /// 
+        /// AdjustWithdrawalLimitInfo - AdjustWithdrawalLimitInfoAdjustTypeEnum、AdjustWithdrawalLimitInfoStatusEnum
+        /// 
+        /// Promotion - PromotionTypeEnum
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>Data 結果</returns>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using BackendSite.Extensions;
 
@@ -37,9 +38,9 @@ namespace BackendSite.Controllers.Api
                     TransId, 
                     CurrencyId, 
                     UserName, 
-                    PromotionType,
-                    DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime,
-                    DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime,
+                    PromotionType, 
+                    DateTimeExtensions.UnixToDateTimeOffset(StartDate).DateTime, 
+                    DateTimeExtensions.UnixToDateTimeOffset(EndDate).DateTime, 
                     PageSize, 
                     BaseCurrencyId, 
                     RebateCategoriesId,
@@ -83,7 +84,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<PendingBonus>>
             {
-                Data = bonusInfoBLL.GetPendingBonusList(),
+                Data = bonusInfoBLL.GetPendingBonusList(1, 10000, out _, out _),
                 ErrorCode = 0
             };
             return apiResult;

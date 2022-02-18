@@ -53,5 +53,24 @@ namespace BackendSite.Service.Library
 
             return _custId;
         }
+
+        public string TransferToTimeZoneFormat(int timeZone)
+        {
+            if (Math.Sign(timeZone) > 0 || Math.Sign(timeZone) == 0)
+            {
+                return string.Format("+" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+            else
+            {
+                return string.Format("-" + Math.Abs(timeZone).ToString("D2") + ":00");
+            }
+        }
+
+        public (int StartIndex, int PageSize) CalculatePageStartIndexAndPageSize(int pageNumber, int pageSize)
+        {
+            int newPageSize = Math.Abs(pageSize);
+            int startIndex = (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize);
+            return (startIndex, newPageSize);
+        }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
@@ -134,7 +135,7 @@ namespace BackendSite.Controllers.Api
         {
             var data = _vipLevelBLL.GetVipLevelInfo(custIdReq.CustId);
 
-            if(data != null)
+            if (data != null)
             {
                 data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.DateTime.AddHours(8), TimeSpan.FromHours(8));
 
@@ -163,7 +164,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLog(CustIdReq custIdReq)
         {
-            var data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId);
+            var data = _vipLevelBLL.GetVipLevelLog(custIdReq.CustId, 1, 1000, out _, out _);
 
             data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
@@ -259,6 +260,14 @@ namespace BackendSite.Controllers.Api
                 request.PageNumber,
                 request.PageSize);
 
+            foreach (var data in result.Data)
+            {
+                data.CalculateTime = new DateTimeOffset(data.CalculateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.SettleTime != null)
+                    data.SettleTime = new DateTimeOffset(data.SettleTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.QualifiedTime != null)
+                    data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             return new ApiListResult<VipUpgradeReviewDetailModel>
             {
                 Data = result.Data,
@@ -280,7 +289,28 @@ namespace BackendSite.Controllers.Api
                 (VipStatus)Status,
                 UserName);
 
-            var stream = _excelBLL.Export(data);
+            var exportList = data.Select(d => new ExportVipUpgradeReviewModel
+                {
+                    SiteId = d.SiteId,
+                    SiteName = d.SiteName,
+                    CustId = d.CustId,
+                    UserName = d.UserName,
+                    CurrencyId = d.CurrencyId,
+                    IsoCode = d.IsoCode,
+                    CurrentVipLevel = d.CurrencyId,
+                    CurrentVipName = d.CurrentVipName,
+                    UpgradeVipLevel = d.UpgradeVipLevel,
+                    UpgradeVipName = d.UpgradeVipName,
+                    ThresholdDeposit = d.ThresholdDeposit,
+                    DepositAmount = d.DepositAmount,
+                    UpgradeBonus = d.UpgradeBonus,
+                    Status = d.Status,
+                    CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                    SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                    QualifiedTime = d.QualifiedTime == null ? "First Time Upgrade" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                    LastUpdateUser = d.LastUpdateUser
+                }).ToList();
+            var stream = _excelBLL.Export(exportList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -322,6 +352,15 @@ namespace BackendSite.Controllers.Api
                 request.PageNumber,
                 request.PageSize);
 
+            foreach (var data in result.Data)
+            {
+                data.CalculateTime = new DateTimeOffset(data.CalculateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.SettleTime != null)
+                    data.SettleTime = new DateTimeOffset(data.SettleTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                if (data.QualifiedTime != null)
+                    data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+            
             return new ApiListResult<VipDowngradeReviewDetailModel>
             {
                 Data = result.Data,
@@ -350,12 +389,34 @@ namespace BackendSite.Controllers.Api
             int Status,
             string UserName)
         {
-            var exportData = _vipLevelBLL.ExportVipDowngradeReviewList(SiteId,
+            var data = _vipLevelBLL.ExportVipDowngradeReviewList(SiteId,
                 CalculateYearMonth,
                 (VipStatus)Status,
                 UserName);
 
-            var stream = _excelBLL.Export(exportData);
+            var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
+            {
+                SiteId = d.SiteId,
+                SiteName = d.SiteName,
+                CustId = d.CustId,
+                UserName = d.UserName,
+                CurrencyId = d.CurrencyId,
+                IsoCode = d.IsoCode,
+                CurrentVipLevel = d.CurrencyId,
+                CurrentVipName = d.CurrentVipName,
+                DowngradeVipLevel = d.DowngradeVipLevel,
+                DowngradeVipName = d.DowngradeVipName,
+                ThresholdDeposit = d.ThresholdDeposit,
+                DepositAmount = d.DepositAmount,
+                ThresholdTurnOver = d.ThresholdTurnOver,
+                TurnOverAmount = d.TurnOverAmount,
+                Status = d.Status,
+                CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                QualifiedTime = d.QualifiedTime == null ? "" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
+                LastUpdateUser = d.LastUpdateUser
+            }).ToList();
+            var stream = _excelBLL.Export(exportList);
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipDowngrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

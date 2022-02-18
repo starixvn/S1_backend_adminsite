@@ -1,29 +1,33 @@
-﻿using BackendSite.Service.Model;
+﻿using System;
+using BackendSite.Service.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class SportsService
     {
-        private readonly IConfiguration configuration;
-        public SportsService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+        
+        public SportsService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
-        public IEnumerable<SportLeagues> GetSportLeaguesList(int SportCategoryId)
+        public IEnumerable<SportLeagues> GetSportLeaguesList(int sportCategoryId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SportLeagues>("Admin_SportLeagues_Get", new { SportCategoryId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<SportLeagues>("Admin_SportLeagues_Get", new DynamicParameters(new {SportCategoryId = sportCategoryId }));
         }
-        public IEnumerable<SportTeams> GetSportTeamsList(int SportLeaguesId)
+        public IEnumerable<SportTeams> GetSportTeamsList(int sportLeaguesId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SportTeams>("Admin_SportTeams_Get", new { SportLeaguesId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<SportTeams>("Admin_SportTeams_Get", new DynamicParameters(new {SportLeaguesId = sportLeaguesId }));
         }
 
     }

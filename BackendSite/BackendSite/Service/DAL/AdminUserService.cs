@@ -31,15 +31,26 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<AdminUser> GetUserList()
+        public IEnumerable<AdminUser> GetUserList(int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<AdminUser>("Admin_User_GetAll", commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("_StartIndex", startIndex);
+            para.Add("_PageSize", pageSize);
+            para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = conn.Query<AdminUser>("Admin_User_GetAll_V2", para, commandType: CommandType.StoredProcedure);
+
+            totalPages = para.Get<int?>("_TotalPages") ?? 0;
+            rowCount = para.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public IEnumerable<AssignSites> GetAssignSiteList(int userId)
         {
-            return _mainDbClient.Query<AssignSites>("Admin_AuthorSite_Get",new DynamicParameters(new { UserId = userId  }) );
+            return _mainDbClient.Query<AssignSites>("Admin_AuthorSite_Get", new DynamicParameters(new { UserId = userId }));
         }
 
         public void AssignSiteList(int UserId, IEnumerable<int> SiteIds)
@@ -99,7 +110,7 @@ namespace BackendSite.Service.DAL
             conn.Execute("Admin_User_SetStatus", new { UserId, UserStatus = Status }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, int[] SiteList, int? GroupSEQ)
+        public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, IEnumerable<int> SiteList, int? GroupSEQ)
         {
             IEnumerable<AdminUser> userList = null;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -116,7 +127,7 @@ namespace BackendSite.Service.DAL
 
             var UserId = UserInfo.Get<int?>("@UserId");
 
-            if(UserId != null)
+            if (UserId != null)
             {
                 if (GroupSEQ != null)
                 {
@@ -142,7 +153,7 @@ namespace BackendSite.Service.DAL
 
         public AdminUser GetUser(int userId)
         {
-            return _mainDbClient.QueryFirst<AdminUser>("Admin_User_Get",new DynamicParameters(new {UserId = userId }));
+            return _mainDbClient.QueryFirst<AdminUser>("Admin_User_Get", new DynamicParameters(new { UserId = userId }));
         }
     }
 }
