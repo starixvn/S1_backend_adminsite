@@ -281,6 +281,16 @@
       },
       {
         "Key": "",
+        "Title": "Bonus Payout",
+        "FuncKey": "Finance/BonusPayout",
+        "Controller": "Finance",
+        "Action": "BonusPayout",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "",
         "Title": "WithdrawalLimit Adjustment",
         "FuncKey": "Finance/WithdrawalLimitAdjust",
         "Controller": "Finance",
