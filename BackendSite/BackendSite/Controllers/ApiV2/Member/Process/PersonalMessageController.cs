@@ -123,7 +123,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
         [HttpPost]
-        public async Task<ApiResult<int>> SendMessageBatch(SendMessageBatchRequest req)
+        public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
             var batchId = 0;
@@ -144,7 +144,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     {
                         var custUsername = sheet.Cells[rowId, 1].Text.Trim();
                         var sabaId = sheet.Cells[rowId, 2].Text.Trim();
-                        var custId = _common.TpIdToCustId(sabaId); 
+                        var custId = _common.TpIdToCustId(sabaId);
 
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
                 };
-                
+
                 foreach (var lang in langList)
                 {
                     var msg = JObject.Parse(req.personalMsg)[lang];
@@ -379,7 +379,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region Private Methods
 
-        private void PreSendBatchMessage(ExcelData data,string personalMsg ,AuthData authData,int optSite , int batchId)
+        private void PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId)
         {
             var resultMessage = string.Empty;
             var errorCode = 0;
@@ -388,11 +388,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 resultMessage =
                     $"Not found. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
             }
-            else 
+            else
             {
                 switch (data.CustInfoDetail.Status)
                 {
-                    case (int) CustomerStatusEnum.Running:
+                    case (int)CustomerStatusEnum.Running:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -400,22 +400,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustomerStatusEnum) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum)data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
 
-                    case (int) CustomerStatusEnum.Suspend:
+                    case (int)CustomerStatusEnum.Suspend:
                         resultMessage =
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
                         break;
 
-                    case (int) CustomerStatusEnum.Closed:
+                    case (int)CustomerStatusEnum.Closed:
                         resultMessage =
                             $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
                         break;
 
-                    case (int) CustomerStatusEnum.Lock:
+                    case (int)CustomerStatusEnum.Lock:
                         SendBatchMessage(personalMsg,
                             data.CustInfoDetail.CustId,
                             optSite,
@@ -423,13 +423,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             batchId,
                             data.CustUserName,
                             data.SabaId,
-                            (CustomerStatusEnum) data.CustInfoDetail.Status,
+                            (CustomerStatusEnum)data.CustInfoDetail.Status,
                             out errorCode,
                             out resultMessage);
                         break;
                 }
             }
-            
+
             int status = (errorCode == 1) ? 3 : 4;
 
             InsertBatchMessageSendLog(batchId,
@@ -442,7 +442,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 status);
         }
 
-        
+
         private void SendBatchMessage(string personalMsg,
             int custId,
             int siteId,
