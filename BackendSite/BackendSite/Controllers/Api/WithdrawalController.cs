@@ -59,11 +59,11 @@ namespace BackendSite.Controllers.Api
             this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             this.bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
             this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this.courierAdapter = provider.GetRequiredService<CourierAdapter>(); ;
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalController>>();
 
             payApiUrl = configuration.GetValue<string>("PayService");
-            this.courierAdapter = courierAdapter;
             awsKey = configuration.GetValue<string>("AWSKey");
             awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
