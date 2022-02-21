@@ -56,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         [HttpPost]
-        public ApiResult Submit(DepositSubmissionRequest request)
+        public ApiResult Submit([FromForm] DepositSubmissionRequest request)
         {
 
             var result = _depositBll.CreateDeposit(request.depositDetailInfo, request.Receipt);
