@@ -131,7 +131,8 @@ const Panel = (props) => {
                   element.dataColumn,
                   data,
                   props.BackupFilter.Site,
-                  props.UpdateResultStatus
+                  props.UpdateResultStatus,
+                  data[element.dataColumn]
                 )
               }
               disabled={
@@ -182,7 +183,7 @@ const Panel = (props) => {
   );
 };
 
-const handleToggle = (type, value, site, UpdateResultStatus) => {
+const handleToggle = (type, value, site, UpdateResultStatus, status) => {
   if (window.confirm(`Are you sure change ${value.eName}-${type} ?`)) {
     let currencyId = 0;
     switch (type) {
@@ -208,7 +209,8 @@ const handleToggle = (type, value, site, UpdateResultStatus) => {
     let Data = {
       CurrencyId: currencyId,
       SlotGameId: value.id,
-      Site: site,
+      SiteId: site,
+      Status: status == 0 ? 1 : 0,
     };
     api
       .post("/api/SlotGamesManagement/SetSlotGame", Data)

@@ -835,11 +835,16 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region SlotGameStatus
-    public enum SlotGameStatusEnum
+    public enum SlotGameFilterStatusEnum
     {
         All = 0,
         Open = 1,
         Closed = 2,
+    }
+    public enum SlotGameStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
     }
     #endregion
 
@@ -852,6 +857,22 @@ namespace BackendSite.Service.Model.enums
         IDR = 15,
         VND = 51,
         INR = 61
+    }
+    #endregion
+
+    #region SlotGameDetail
+    public enum SlotGameDetailStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
+    }
+    #endregion
+
+    #region TpList
+    public enum TpListIdEnum 
+    {
+        Saba = 1,
+        PT = 27
     }
     #endregion
 }

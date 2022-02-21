@@ -538,7 +538,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
+        public async Task<ApiListResult<CustInfoDetail>> GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -574,6 +574,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ref pageNumber,
                 out var totalPages,
                 out var rowCount);
+
+            foreach (CustInfoDetail x in data)
+            {
+                var tpWallet = await _custInfoBll.GetSabaPtWalletAsync(x.CustId);
+                var saba = tpWallet.Where(y => y.TpId == 1).ToList();
+                var pt = tpWallet.Where(y => y.TpId == 27).ToList();
+                if (saba.Any())
+                {
+                    x.SabaWallet = saba.FirstOrDefault().Balance;
+                }
+                if (pt.Any())
+                {
+                    x.PTWallet = pt.FirstOrDefault().Balance;
+                }
+            }
 
             var custInfoDetails = data.ToList();
             if (!custInfoDetails.Any())
