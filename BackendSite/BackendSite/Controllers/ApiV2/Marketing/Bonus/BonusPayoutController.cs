@@ -81,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
                 if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
                 {
-                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = $"Success.";
                 }
                 else

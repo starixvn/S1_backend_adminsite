@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.Api
                     await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
                 if (apiOnlineResult.ErrorCode == 0)
                 {
-                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = $"Success.";
                 }
                 else
