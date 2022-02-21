@@ -384,15 +384,15 @@ namespace BackendSite.Controllers.Api
             foreach(CustInfoDetail x in data)
             {
                 var tpWallet = await _custInfoBll.GetSabaPtWalletAsync(x.CustId);
-                var saba = tpWallet.Where(y => y.TpId == (int)TpListIdEnum.Saba).ToList();
-                var pt = tpWallet.Where(y => y.TpId == (int)TpListIdEnum.PT).ToList();
-                if (saba.Any())
+                var sabaWallet = tpWallet.ToList().Find(y => y.TpId == (int)TpListIdEnum.Saba);
+                var ptWallet = tpWallet.ToList().Find(y => y.TpId == (int)TpListIdEnum.PT);
+                if(sabaWallet != null)
                 {
-                    x.SabaWallet = saba.FirstOrDefault().Balance;
+                    x.SabaWallet = sabaWallet.Balance;
                 }
-                if (pt.Any())
+                if (ptWallet != null)
                 {
-                    x.PTWallet = pt.FirstOrDefault().Balance;
+                    x.PTWallet = ptWallet.Balance;
                 }
             }
 
