@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
@@ -326,7 +326,7 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 foreach (var tpWallet in tpWalletList)
                 {
-                    if(tpWallet.TpId == (int)TpListIdEnum.Saba || tpWallet.TpId == (int)TpListIdEnum.PT)
+                    if (tpWallet.TpId == (int)TpListIdEnum.Saba || tpWallet.TpId == (int)TpListIdEnum.PT)
                     {
                         try
                         {
@@ -356,6 +356,11 @@ namespace BackendSite.Service.BLL
             }
 
             return tpWalletList;
+        }
+
+        public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
+        {
+            return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
     }
 }
