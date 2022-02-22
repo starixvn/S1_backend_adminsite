@@ -40,8 +40,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SiteId { get; set; }
-            public IEnumerable<int> CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
         public class CreateRequest
@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             var apiResult = new ApiListResult<DomainTable>
             {
-                Data = _domainTableBll.GetDomainListBySite(request.SiteId, request.CurrencyId, request.PageNumber,
+                Data = _domainTableBll.GetDomainListBySite(request.SiteIds, request.CurrencyIds, request.PageNumber,
                 request.PageSize, out int totalPages, out int rowCount),
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 PageNumber = request.PageNumber,
