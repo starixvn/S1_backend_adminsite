@@ -813,4 +813,13 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region TpCustInfo
+
+    public enum TpCustInfoStatusEnum
+    {
+        Enable = 1,
+        Locked = 2
+    }
+    #endregion
+
 }

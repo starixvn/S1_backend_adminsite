@@ -316,5 +316,10 @@ namespace BackendSite.Service.BLL
                 };
             }
         }
+
+        public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
+        {
+            return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
+        }
     }
 }
