@@ -157,6 +157,9 @@ namespace BackendSite.Service.Model
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
+        public decimal BonusAmount { get; set; }
+        public decimal SabaWallet { get; set; }
+        public decimal PTWallet { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -259,6 +262,8 @@ namespace BackendSite.Service.Model
     }
     public class CustCryptoWalletLog
     {
+        public int CurrencyId { set; get; }
+        public string IsoCode { set; get; }
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }

@@ -52,9 +52,12 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<IEnumerable<DomainTable>> GetDomainListbySite(DomainListbySiteReq domainListbySiteReq)
         {
+            var siteList = new List<int>(); siteList.Add(domainListbySiteReq.SiteId);
+            var currencyList = new List<int>(); currencyList.Add(domainListbySiteReq.CurrencyId);
+
             var apiResult = new ApiResult<IEnumerable<DomainTable>>
             {
-                Data = domainTableBLL.GetDomainListBySite(domainListbySiteReq.SiteId, domainListbySiteReq.CurrencyId),
+                Data = domainTableBLL.GetDomainListBySite(siteList, currencyList, 1, 1000, out _, out _),
                 ErrorCode = 0
             };
 
@@ -102,7 +105,7 @@ namespace BackendSite.Controllers.Api
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode =91;
+                apiResult.ErrorCode = 91;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
             }
             return apiResult;

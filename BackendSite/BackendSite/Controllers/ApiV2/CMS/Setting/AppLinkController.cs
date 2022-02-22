@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -15,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     public class AppLinkController : ControllerBase
     {
         #region Fields
-        
+
         private readonly AppLinkTableBLL _appLinkTableBll;
         private readonly SelLangBLL _selLangBll;
         private readonly AuthorizeBLL _authorizeBll;
@@ -33,44 +34,47 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         #endregion
-        
+
         /// <summary>
-        /// AppLink/GetAppLinkTable 
+        /// AppLink/GetList 取得App連結清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > App Link Management 
+        /// Func Path：Marketing > App Link Management > Select [Site Name]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/AppLinkManagement" })]
         [HttpPost]
-        public ApiResult<IEnumerable<AppLinkTable>> GetAppLinkTable(GetAppLinkTableReq req)
+        public ApiResult<IEnumerable<AppLinkTable>> GetList(GetAppLinkTableReq request)
         {
             var apiResult = new ApiResult<IEnumerable<AppLinkTable>>
             {
-                Data = _appLinkTableBll.GetAppLinkTable(req.SiteId),
+                Data = _appLinkTableBll.GetAppLinkTable(request.SiteId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
-        
+
         /// <summary>
-        /// AppLink/GetAppLinkTable 
+        /// AppLink/Set 新增/更新App連結清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > App Link Management > [Edit]
+        /// Func Path：Marketing > App Link Management > Select [Site Name] > [Edit] > [Save]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/AppLinkManagement" })]
         [HttpPost]
-        public ApiResult SetAppLink(SetAppLinkReq req)
+        public ApiResult Set(SetAppLinkReq request)
         {
             var apiResult = new ApiResult();
             try
             {
-                if (_appLinkTableBll.SetAppLink(req.SiteId, req.AppType, req.Domain, req.ProtocolType, _authorizeBll.GetAuthData().UserName) > 0)
+                if (_appLinkTableBll.SetAppLink(request.SiteId, (int)request.AppType, request.Domain, (int)request.ProtocolType,
+                    _authorizeBll.GetAuthData().UserName) > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
@@ -87,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
             }
-            
+
             return apiResult;
         }
     }

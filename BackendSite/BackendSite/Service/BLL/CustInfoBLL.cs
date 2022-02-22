@@ -198,6 +198,7 @@ namespace BackendSite.Service.BLL
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
+            
             return custInfoDetail;
         }
 
@@ -736,6 +737,11 @@ namespace BackendSite.Service.BLL
         public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
+        }
+
+        public async Task<IEnumerable<TpWallet>> GetSabaPtWalletAsync(int CustId)
+        {
+            return await _tpBll.GetSabaPtWalletAsync(CustId);
         }
     }
 }

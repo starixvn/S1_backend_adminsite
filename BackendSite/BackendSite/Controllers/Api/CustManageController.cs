@@ -343,7 +343,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
+        public async Task<ApiListResult<CustInfoDetail>> GetCustInfoListAsync(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
             
@@ -379,8 +379,23 @@ namespace BackendSite.Controllers.Api
                                                    req.SelectTag,
                                                    ref pageNumber,
                                                    out var totalPages,
-                                                   out var rowCount);
-            
+                                                   out var rowCount).ToList();
+
+            foreach(CustInfoDetail x in data)
+            {
+                var tpWallet = await _custInfoBll.GetSabaPtWalletAsync(x.CustId);
+                var sabaWallet = tpWallet.ToList().Find(y => y.TpId == (int)TpListIdEnum.Saba);
+                var ptWallet = tpWallet.ToList().Find(y => y.TpId == (int)TpListIdEnum.PT);
+                if(sabaWallet != null)
+                {
+                    x.SabaWallet = sabaWallet.Balance;
+                }
+                if (ptWallet != null)
+                {
+                    x.PTWallet = ptWallet.Balance;
+                }
+            }
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -554,7 +569,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
 
             switch (custStatusSwitch.Op)
