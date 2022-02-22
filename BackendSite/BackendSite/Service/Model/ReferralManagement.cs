@@ -61,7 +61,7 @@ namespace BackendSite.Service.Model
     public class ReferralExcel
     {
         public string UserName { get; set; }
-        public string ReferralUser { get; set; }
+        public string ReferredUser { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public DateTime RegTime { get; set; }
@@ -71,8 +71,8 @@ namespace BackendSite.Service.Model
     }
     public class ReferralExcelData
     {
+        public string ReferredUser { get; set; }
         public string UserName { get; set; }
-        public string ReferralUser { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public DateTime RegTime { get; set; }
