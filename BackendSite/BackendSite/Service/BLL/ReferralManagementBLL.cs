@@ -40,8 +40,8 @@ namespace BackendSite.Service.BLL
             {
                 result.Add(new ReferralExcelData()
                 {
+                    ReferralUser = x.ReferralUser,
                     ReferredUser = x.ReferredUser,
-                    UserName = x.UserName,
                     CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
                     RegTime = x.RegTime,
