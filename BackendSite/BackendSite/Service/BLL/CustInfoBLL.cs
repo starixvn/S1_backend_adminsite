@@ -737,5 +737,10 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
         }
+
+        public async Task<IEnumerable<TpWallet>> GetSabaPtWalletAsync(int CustId)
+        {
+            return await _tpBll.GetSabaPtWalletAsync(CustId);
+        }
     }
 }
