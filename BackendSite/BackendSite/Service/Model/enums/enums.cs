@@ -693,4 +693,11 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region TpList
+    public enum TpListIdEnum 
+    {
+        Saba = 1,
+        PT = 27
+    }
+    #endregion
 }
