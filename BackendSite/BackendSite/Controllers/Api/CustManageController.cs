@@ -343,7 +343,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public  ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
             
