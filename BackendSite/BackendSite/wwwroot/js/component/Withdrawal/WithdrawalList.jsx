@@ -92,7 +92,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
-                        <td>{row.channelName}</td>
+                        <td>{row.withdrawalType === 4 ? row.channelName : "" }</td>
                         <td>{JSON.parse(row.withdrawalInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
