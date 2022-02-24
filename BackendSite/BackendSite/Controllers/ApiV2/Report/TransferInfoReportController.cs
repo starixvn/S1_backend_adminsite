@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class TransferInfoReportController : Controller
+    public class TransferInfoReportController : ControllerBase
     {
         #region Fields
         
@@ -50,11 +50,11 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
-        
+
         #region TransferInfo Report
 
         /// <summary>
-        /// BankFinancialReport/Get 取得轉帳報表資料
+        ///  TransferInfoReport/GetList 取得轉帳資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -63,9 +63,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public ApiResult Get(GetTransferInfoReportReq request)
+        [HttpPost]
+        public ApiResult GetList(GetTransferInfoReportReq request)
         {
 
             var data = _bankFinancialBll.GetTransferInfoReport(
@@ -90,15 +90,16 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         /// <summary>
-        /// BankFinancialReport/Export 匯出轉帳報表資料
+        ///  TransferInfoReport/Export 匯出轉帳資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：BankFinancial > Transfer Info Report > [Export]
+        /// Func Path：BankFinancial > Transfer Info Report > [Submit] > [Export]
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>檔案</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
         public IActionResult Export(GetTransferInfoReportReq request)
         {
@@ -111,9 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             
             var stream = _excelBll.Export(data);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "TransferInfoReport");
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -15,10 +16,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
     public class ReasonController : ControllerBase
     {
         #region Fields
-        
+
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly AuthorizeBLL _authorizeBll;
-        
+
         #endregion
 
         #region Constructors
@@ -30,74 +31,76 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         #endregion
-        
-        public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKey()
-        {
-            var apiResult = new ApiResult<IEnumerable<ReasonManagementFuncKey>>
-            {
-                Data = _reasonManagementBll.GetFuncKey(),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
 
-            return apiResult;
-
-        }
-        
+        /// <summary>
+        /// Reason/GetList 取得原因碼清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Reason Management > [Submit]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
-        public ApiListResult<ReasonManagementData> GetReasonManagementData(GetReasonManagementDataPara para)
+        public ApiListResult<ReasonManagementData> GetList(GetReasonManagementDataPara request)
         {
             var apiResult = new ApiListResult<ReasonManagementData>();
-            try
-            {
-                var searchResult = _reasonManagementBll.GetReasonManagementData(para);
-                apiResult.Data = searchResult.ReasonManagementData;
-                apiResult.PageNumber = searchResult.PageNumber;
-                apiResult.TotalPages = searchResult.TotalPages;
-                apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+
+            var searchResult = _reasonManagementBll.GetReasonManagementData(request);
+            apiResult.Data = searchResult.ReasonManagementData;
+            apiResult.PageNumber = searchResult.PageNumber;
+            apiResult.TotalPages = searchResult.TotalPages;
+            apiResult.RowCount = searchResult.RowCount;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// Reason/Set 更新原因碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Reason Management > [Edit] > [Submit]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
-        public ApiResult SetReasonManagement(SetReasonManagementPara para)
+        public ApiResult Set(SetReasonManagementPara request)
         {
             var apiResult = new ApiResult();
-            try
-            {
-                var authData = _authorizeBll.GetAuthData();
-                _reasonManagementBll.SetReasonManagement(para, authData.UserId);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+
+            var authData = _authorizeBll.GetAuthData();
+            _reasonManagementBll.SetReasonManagement(request, authData.UserId);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// Reason/Insert 新增原因碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：BankFinancial > Reason Management > [Create] > [Submit]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
-        public ApiResult InsertReasonManagement(InsertReasonManagementPara para)
+        public ApiResult Insert(InsertReasonManagementPara request)
         {
             var apiResult = new ApiResult();
-            try
-            {
-                var authData = _authorizeBll.GetAuthData();
-                _reasonManagementBll.InsertReasonManagement(para, authData.UserId);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+
+            var authData = _authorizeBll.GetAuthData();
+            _reasonManagementBll.InsertReasonManagement(request, authData.UserId);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
             return apiResult;
         }
     }

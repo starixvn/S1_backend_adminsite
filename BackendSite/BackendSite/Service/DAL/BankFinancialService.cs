@@ -400,7 +400,6 @@ namespace BackendSite.Service.DAL
                                                                                             string endDate,
                                                                                             string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -411,8 +410,7 @@ namespace BackendSite.Service.DAL
                     _TimeZone = timeZone
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfoDetail_Get_V2";
-            return conn.Query<BankFinancialTransferInfoDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialTransferInfoDetailModel>("Admin_BankFinancialTransferInfoDetail_Get_V2", parameters);
         }
 
         #endregion
