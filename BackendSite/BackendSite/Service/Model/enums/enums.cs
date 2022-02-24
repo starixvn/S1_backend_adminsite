@@ -402,7 +402,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 1,
         Enable = 2
     }
-
+    public enum ReferralCustStatusEnum 
+    {
+        Approved = 0,
+        Running = 1,
+        Expired = 2
+    }
     #endregion
 
     #region PromotionRebate
@@ -875,4 +880,15 @@ namespace BackendSite.Service.Model.enums
         PT = 27
     }
     #endregion
+
+    #region TpCustInfo
+
+    public enum TpCustInfoStatusEnum
+    {
+        Enable = 1,
+        Locked = 2
+    }
+
+    #endregion
+    
 }

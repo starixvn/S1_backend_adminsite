@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -60,9 +61,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public class GetAdjustWithdrawalLimitsLogRequest : ApiRequestPageModel
         {
             /// <summary>
-            /// 會員ID
+            /// 品牌ID
             /// </summary>
-            public int CustId { get; set; }
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 會員名稱
+            /// </summary>
+            public string UserName { get; set; }
         }
 
         public class SetAdjustWithdrawalLimitRequest
@@ -171,24 +176,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
 
             var result = new ApiListResult<AdjustWithdrawalLimit>();
-            try
-            {
-                result.Data = _adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(request.CustId,
-                    request.PageNumber,
-                    request.PageSize,
-                    out int TotalPages,
-                    out int RowCount);
 
-                result.PageNumber = request.PageNumber;
-                result.RowCount = RowCount;
-                result.TotalPages = TotalPages;
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                result.RawMessage = ex.ToString();
-            }
+            var custInfo = _custInfoBLL.GetCustInfoDetails(null, request.UserName, request.SiteId);
+
+            if (custInfo == null)
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+
+            result.Data = _adjustWithdrawalLimitBLL.GetAdjustWithdrawalLimitsLog(custInfo.CustId,
+                request.PageNumber,
+                request.PageSize,
+                out int TotalPages,
+                out int RowCount);
+
+            result.PageNumber = request.PageNumber;
+            result.RowCount = RowCount;
+            result.TotalPages = TotalPages;
+            result.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return result;
         }
