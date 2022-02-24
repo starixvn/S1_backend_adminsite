@@ -38,7 +38,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public class DepositSubmissionRequest
         {
-
             public string Detail { get; set; }
             public IFormFile Receipt { get; set; }
         }
@@ -65,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var detail = JsonConvert.DeserializeObject<DepositDetailInfo>(request.Detail);
 
             var result = await _depositBll.CreateDeposit(detail, request.Receipt);
+
             var apiResult = new ApiResult();
             if (result == 1)
             {
