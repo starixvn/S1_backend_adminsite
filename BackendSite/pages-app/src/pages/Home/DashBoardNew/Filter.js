@@ -58,10 +58,10 @@ const Panel = (props) => {
           <div>
             <button
               type="button"
-              className="btn btn-refresh"
-              onClick={props.Refresh}
+              onClick={props.Submit}
             >
-              Refresh <span>{props.Count}</span>
+              Submit 
+              {/* <span>{props.Count}</span> */}
             </button>
           </div>
         )}
