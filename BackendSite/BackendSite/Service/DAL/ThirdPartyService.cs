@@ -56,7 +56,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<SiteTpListIfo> GetSiteTpList(int siteId)
         {
-            return _mainDbClient.Query<SiteTpListIfo>("Admin_SiteTpList_Get", new DynamicParameters(new {SiteId = siteId }));
+            return _mainDbClient.Query<SiteTpListIfo>("Admin_SiteTpList_Get", new DynamicParameters(new { SiteId = siteId }));
         }
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int siteId, int tpId, int custId, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
@@ -65,7 +65,7 @@ namespace BackendSite.Service.DAL
             props.Add("@TpId", tpId);
             props.Add("@CustId", custId);
             props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
-            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("@PageSize", Math.Abs(pageSize));
@@ -97,7 +97,12 @@ namespace BackendSite.Service.DAL
 
         public async Task<TpCurrency> GetTpCurrency(int tpId, int currencyId)
         {
-            return await _reportDbClient.QueryFirstAsync<TpCurrency>("TpCurrency_Get", new DynamicParameters(new { TpId = tpId, CurrencyId = currencyId }) );
+            return await _reportDbClient.QueryFirstAsync<TpCurrency>("TpCurrency_Get", new DynamicParameters(new { TpId = tpId, CurrencyId = currencyId }));
+        }
+
+        public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoListByCustId(int custId)
+        {
+            return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId", new DynamicParameters(new { _CustId = custId }));
         }
     }
 }
