@@ -57,8 +57,9 @@ const Panel = (props) => {
         ) : (
           <div>
             <button
-              type="button"
+              type="submit"
               onClick={props.Submit}
+              className="btn btn-search"
             >
               Submit 
               {/* <span>{props.Count}</span> */}
