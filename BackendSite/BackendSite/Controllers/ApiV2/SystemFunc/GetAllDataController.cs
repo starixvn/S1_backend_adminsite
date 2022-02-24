@@ -34,6 +34,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly PaymentManageBLL _paymentManageBll;
+        private readonly ReasonManagementBLL _reasonManagementBll;
 
         #endregion
 
@@ -51,6 +52,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
+            _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
         }
 
         #endregion
@@ -58,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         #region Actions
 
         //==============================================================================================================================================
-        // System 相關：Permission, Currency
+        // System 相關：Permission, Currency. Module(Menu)
         //==============================================================================================================================================
 
         /// <summary>
@@ -123,6 +125,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
+        /// <summary>
+        /// GetAllData/GetFuncKeyAboutReason 取得原因碼的FuncKey
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKeyAboutReason()
+        {
+            var apiResult = new ApiResult<IEnumerable<ReasonManagementFuncKey>>
+            {
+                Data = _reasonManagementBll.GetFuncKey(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+
+        }
+
         //==============================================================================================================================================
         // Finance 相關：Payment, Bank
         //==============================================================================================================================================
@@ -165,7 +187,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-
 
         /// <summary>
         /// GetAllData/GetPayList 取得第三方支付廠商清單
@@ -219,7 +240,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-
         /// <summary>
         /// GetAllData/GetPayCurrency 取得第三方支付廠商幣別資料清單
         /// </summary>
@@ -245,7 +265,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 };
             }
         }
-
 
         //==============================================================================================================================================
         // TP 相關
