@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using static BackendSite.Controllers.Api.TpController;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
