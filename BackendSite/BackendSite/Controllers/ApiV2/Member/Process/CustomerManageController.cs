@@ -644,6 +644,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region CSD > Customer Administration > CustInfo
 
         /// <summary>
+        /// <summary>
         /// CustomerManage/GetCustInfoDetail 取得客戶資料明細
         /// </summary>
         /// <remarks>
@@ -954,7 +955,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
             }
-
 
             await using var fileStream = file.OpenReadStream();
             using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
