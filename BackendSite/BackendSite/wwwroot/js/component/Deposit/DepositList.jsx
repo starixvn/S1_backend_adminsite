@@ -92,6 +92,8 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        <td>{row.channelName}</td>
+                        <td>{JSON.parse(row.depositInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         <td className="text-right">{number_format(row.actualDeposit)}</td>
@@ -135,6 +137,8 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">NetWork</th>
+                                <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col" className="text-right">{i18n.lbl_ActualDeposit}</th>
@@ -596,6 +600,7 @@ import DateTimePicker from 'react-datetime';
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
+                    console.log(result);
                     if (result.errorCode == 0) {
                         this.setState({
                             searchData: result,

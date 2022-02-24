@@ -83,7 +83,7 @@ namespace BackendSite.Service.Model
             get => _flowEndTime;
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-
+        public string ChannelName { set; get; }
     }
     public class WithdrawalInfo
     {
