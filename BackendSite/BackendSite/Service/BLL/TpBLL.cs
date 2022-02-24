@@ -317,45 +317,5 @@ namespace BackendSite.Service.BLL
                 };
             }
         }
-        public async Task<IEnumerable<TpWallet>> GetSabaPtWalletAsync(int custId)
-        {
-            var sKey = $"TpWallet_{custId}";
-            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
-            if (tpWalletList == null)
-            {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId);
-                foreach (var tpWallet in tpWalletList)
-                {
-                    if(tpWallet.TpId == (int)TpListIdEnum.Saba || tpWallet.TpId == (int)TpListIdEnum.PT)
-                    {
-                        try
-                        {
-                            var tpInfo = new TpInfo
-                            {
-                                TpId = tpWallet.TpId,
-                                CustId = custId,
-                            };
-                            var apiResult = await GetBalanceAsync(tpInfo);
-                            if (apiResult.ErrorCode == 0)
-                            {
-                                tpWallet.Balance = apiResult.Data.balance;
-                            }
-
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    }
-                }
-
-                if (tpWalletList != null)
-                {
-                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
-                }
-            }
-
-            return tpWalletList;
-        }
     }
 }
