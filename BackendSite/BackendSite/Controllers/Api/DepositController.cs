@@ -345,11 +345,11 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
-        public ApiResult DepositSubmission([FromForm] DepositDetailSubmission deposit)
+        public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission deposit)
         {
             var depositDetails = JsonConvert.DeserializeObject<DepositDetailInfo>(deposit.DepositDetails);
 
-            var result = depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
+            var result = await depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
             var apiResult = new ApiResult();
             if (result == 1)
             {
