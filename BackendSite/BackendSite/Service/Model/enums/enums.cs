@@ -873,14 +873,6 @@ namespace BackendSite.Service.Model.enums
     }
     #endregion
 
-    #region TpList
-    public enum TpListIdEnum 
-    {
-        Saba = 1,
-        PT = 27
-    }
-    #endregion
-
     #region TpCustInfo
 
     public enum TpCustInfoStatusEnum
@@ -890,5 +882,4 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
 }

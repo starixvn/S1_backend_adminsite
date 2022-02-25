@@ -52,10 +52,8 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
                     <td>{data.agent}</td>
                     <td>{data.isTest.toString()}</td>
-                    <td>{data.sabaWallet}</td>
-                    <td>{data.ptWallet}</td> 
                     <td>{data.balance}</td>
-                    <td>{data.bonusAmount == 0 ? "": data.bonusAmount}</td>
+                    <td>{data.bonus == 0 ? "": data.bonus}</td>
                     <td>{moment.utc(data.regTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.reloadTime === null ? 'N/A' : moment.utc(data.reloadTime).add(8,'hour').format('l LTS')}</td>
                     <td>{data.lastTagUpdateTime === null ? 'N/A' : moment.utc(data.lastTagUpdateTime).add(8,'hour').format('l LTS')}</td>
@@ -121,10 +119,8 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
                                     <th scope="col">IsTest</th>
-                                    <th scope="col">Saba Wallet</th>
-                                    <th scope="col">PT Wallet</th>
                                     <th scope="col">Seamless Wallet</th>
-                                    <th scope="col">Bonus amount</th>
+                                    <th scope="col">Bonus Wallet</th>
                                     <th scope="col">
                                         <tr>Registration time</tr>
                                         <tr>(Adjusted to GMT+8)</tr>                                      
