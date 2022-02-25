@@ -213,5 +213,10 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
+        {
+            return View();
+        }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -37,7 +38,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public class DepositSubmissionRequest
         {
-
             public string Detail { get; set; }
             public IFormFile Receipt { get; set; }
         }
@@ -58,12 +58,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         [HttpPost]
-        public ApiResult Submit([FromForm] DepositSubmissionRequest request)
+        public async Task<ApiResult> SubmitAsync([FromForm] DepositSubmissionRequest request)
         {
-
             var detail = JsonConvert.DeserializeObject<DepositDetailInfo>(request.Detail);
+            var result = await _depositBll.CreateDeposit(detail, request.Receipt);
 
-            var result = _depositBll.CreateDeposit(detail, request.Receipt);
             var apiResult = new ApiResult();
             if (result == 1)
             {

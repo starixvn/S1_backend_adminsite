@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
@@ -38,6 +41,8 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoBLL _custInfoBLL;
         private readonly RebateManageBLL _rebateManageBLL;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly CourierAdapter courierAdapter;
+        private readonly string _bonusApiUrl;
         #endregion
 
         #region Constructors
@@ -51,7 +56,10 @@ namespace BackendSite.Controllers.Api
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
             RebateManageBLL rebateManageBLL,
-            IServiceProvider provider)
+            IServiceProvider provider,
+            CourierAdapter courierAdapter,
+            IConfiguration configuration)
+
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
@@ -63,6 +71,8 @@ namespace BackendSite.Controllers.Api
             _custInfoBLL = custInfoBLL;
             _rebateManageBLL = rebateManageBLL;
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            this.courierAdapter = courierAdapter;
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         #endregion
@@ -160,6 +170,15 @@ namespace BackendSite.Controllers.Api
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
+        }
+        public class BonusPayoutReq 
+        {
+            public int CustId { get; set; }
+            public decimal Amount { get; set; }
+            public string Memo { set; get; }
+            public string BounsCode { get; set; }
+            public int RollOver { get; set; }
+            public int PromotionType { get; set; }
         }
         #endregion
 
@@ -876,6 +895,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         #endregion
+
         #endregion
     }
 }
