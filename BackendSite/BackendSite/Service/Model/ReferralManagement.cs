@@ -64,9 +64,9 @@ namespace BackendSite.Service.Model
         public string ReferredUser { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
-        public DateTime RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
-        public DateTime? RewardTime { get; set; }
+        public DateTimeOffset? RewardTime { get; set; }
         public int Status { get; set; }
     }
     public class ReferralExcelData
@@ -75,9 +75,9 @@ namespace BackendSite.Service.Model
         public string ReferredUser { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
-        public DateTime RegTime { get; set; }
+        public DateTimeOffset RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
-        public DateTime? RewardTime { get; set; }
+        public DateTimeOffset? RewardTime { get; set; }
         public string Status { get; set; }
     }
 }
