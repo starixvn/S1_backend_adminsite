@@ -7,6 +7,7 @@ using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -31,7 +32,7 @@ namespace BackendSite.Service.DAL
             var searchResult = new GetReasonManagementDataResult();
             
             var props = new DynamicParameters();
-            props.Add("_FuncKey", para.FuncKey == "0" ? null : para.FuncKey);
+            props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKey));
             props.Add("_PageSize", Math.Abs(para.PageSize));
             props.Add("_StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

@@ -547,7 +547,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-            
+
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
                 request.BirDate,

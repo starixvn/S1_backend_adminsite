@@ -12,7 +12,7 @@ namespace BackendSite.Service.Model
     }
     public class GetReasonManagementDataPara
     {
-        public string FuncKey { get; set; }
+        public IEnumerable<string> FuncKey { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
