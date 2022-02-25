@@ -45,10 +45,8 @@ namespace BackendSite.Service.BLL
                     CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
                     RegTime = new DateTimeOffset(x.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)),
-                    //RegTime = x.RegTime,
                     ReferralAmount = x.ReferralAmount,
                     RewardTime = x.RewardTime == null? x.RewardTime : new DateTimeOffset(x.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)),
-                    //RewardTime = x.RewardTime,
                     Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
                 });
             });
