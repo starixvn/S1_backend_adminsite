@@ -258,7 +258,7 @@ const App = () => {
     sethasCheckPassword(true);
 
     axios
-      .post("/api/BonusManage/SetBonusPayout", {
+      .post("/api/BonusPayout/SetBonusPayout", {
         CustId: custData.custId,
         Amount: bonusData.Amount,
         BounsCode: bonusData.CheckedBonusCode,
