@@ -44,12 +44,13 @@ namespace BackendSite.Service.BLL
                     ReferredUser = x.ReferredUser,
                     CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
-                    RegTime = x.RegTime,
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)),
                     ReferralAmount = x.ReferralAmount,
-                    RewardTime = x.RewardTime,
+                    RewardTime = x.RewardTime == null? x.RewardTime : new DateTimeOffset(x.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)),
                     Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
                 });
             });
+           
             return result;
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,

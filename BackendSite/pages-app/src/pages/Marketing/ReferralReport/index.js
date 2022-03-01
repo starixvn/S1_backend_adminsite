@@ -8,6 +8,7 @@ import Detail from "./Detail";
 import moment from "moment-timezone";
 
 const App = () => {
+  moment.tz.setDefault("Asia/Taipei");
   const [state, setstate] = useState(0);
   const [siteList, setSiteList] = useState();
   const [stateFilter, setFilter] = useState({
