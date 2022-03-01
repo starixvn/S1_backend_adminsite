@@ -57,6 +57,24 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region Member Listing For Frontend Use
+
+    public enum SetCustNoteTypeEnum
+    {
+        Update = 1,
+        Delete = 2
+    }
+
+    public enum CustStatusSwitchOptionEnum
+    {
+        IsKyc = 1,
+        IsRisk = 2,
+        PhoneVerified = 3,
+        EmailVerified = 4
+    }
+
+    #endregion
+
     #region Customer
 
     public enum IsKycEnum
@@ -85,6 +103,12 @@ namespace BackendSite.Service.Model.enums
         Lock = 4,
     }
 
+    public enum EnablePromotionEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
     #endregion
 
     #region CustProfile
@@ -111,6 +135,16 @@ namespace BackendSite.Service.Model.enums
     //    Deny = "D",
     //    Review = "R"
     //}
+
+    #endregion
+
+    #region CustVip
+
+    public enum ManuallyEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 
     #endregion
 

@@ -45,6 +45,7 @@ const dataColumnDefs = (props) => {
         attr: {
           class: "text-center",
         },
+        format: dateFormat,
       },
     },
     {
@@ -175,7 +176,7 @@ const dataColumnDefs = (props) => {
         attr: {
           class: "text-right",
         },
-        format: dateFormat
+        format: dateFormat,
       },
     },
     {
@@ -194,7 +195,7 @@ const dataColumnDefs = (props) => {
         attr: {
           class: "text-right",
         },
-        format: dateFormat
+        format: dateFormat,
       },
     },
     {
@@ -291,6 +292,5 @@ const Panel = (props) => {
 const dateFormat = (createTime) => {
   return moment(createTime).utc(0).format("YYYY-MM-DD HH:mm:ss");
 };
-
 
 export default Panel;

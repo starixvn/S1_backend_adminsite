@@ -60,7 +60,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public async Task<ApiResult> SubmitAsync([FromForm] DepositSubmissionRequest request)
         {
-
             var detail = JsonConvert.DeserializeObject<DepositDetailInfo>(request.Detail);
 
             var result = await _depositBll.CreateDeposit(detail, request.Receipt);

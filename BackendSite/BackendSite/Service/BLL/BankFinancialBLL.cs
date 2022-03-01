@@ -5,6 +5,7 @@ using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -184,7 +185,7 @@ namespace BackendSite.Service.BLL
         }
 
         #region Private Methods For GetTransferAccountInfoList
-        
+
         private string GetTransferId(TransferTypeEnum transferType)
         {
             var prefix = string.Empty;
@@ -1360,29 +1361,46 @@ namespace BackendSite.Service.BLL
         };
 
         #endregion
-        
+
         #endregion
-        
+
         #region Transfer Info Report
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
-                                                                                       string accountNo,
-                                                                                       string startDate,
-                                                                                       string endDate,
-                                                                                       string timeZone)
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(IEnumerable<int> siteIds,
+                                                                                       IEnumerable<string> accountNos,
+                                                                                       DateTime startDate,
+                                                                                       DateTime endDate,
+                                                                                       int pageNumber,
+                                                                                       int pageSize,
+                                                                                       out int totalPages,
+                                                                                       out int rowCount)
         {
-            return _bankFinancialService.GetTransferInfoReport(siteId,
-                                                               accountNo,
+            return _bankFinancialService.GetTransferInfoReport(JsonConvert.SerializeObject(siteIds),
+                                                               JsonConvert.SerializeObject(accountNos),
                                                                startDate,
                                                                endDate,
-                                                               timeZone);
+                                                               (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                                                               Math.Abs(pageSize),
+                                                               out totalPages,
+                                                               out rowCount);
+        }
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReportForExport(IEnumerable<int> siteIds,
+                                                                                  IEnumerable<string> accountNos,
+                                                                                  DateTime startDate,
+                                                                                  DateTime endDate)
+        {
+            return _bankFinancialService.GetTransferInfoReportForExport(JsonConvert.SerializeObject(siteIds),
+                                                               JsonConvert.SerializeObject(accountNos),
+                                                               startDate,
+                                                               endDate);
         }
 
         #endregion
 
         #region Bank Financial Report
 
-        public IEnumerable<BankFinancialDataModel> GetBankFinancialReport(string siteIds, string currencyIds, string startDate, string endDate,string timeZone)
+        public IEnumerable<BankFinancialDataModel> GetBankFinancialReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var keyValuePairs = new Dictionary<string, BankFinancialDataModel>();
 
@@ -1394,7 +1412,7 @@ namespace BackendSite.Service.BLL
             var depositData = _bankFinancialService.GetDepositSummary(siteIds, currencyIds, startDate, endDate, timeZone);
             var withdrawalData = _bankFinancialService.GetWithdrawalSummary(siteIds, currencyIds, startDate, endDate, timeZone);
             var transferData = _bankFinancialService.GetTransferSummary(siteIds, currencyIds, startDate, endDate, timeZone);
-            
+
             #region Data Combine
 
             foreach (var data in depositData)
@@ -1485,7 +1503,7 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel = keyValuePairs[$"{account.Channel.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                         bankFinancialDataModel.WithdrawalAmount += data.WithdrawalSummary;
-                        
+
                     }
                 }
                 else if (data.WithdrawalType == WithdrawalTypeEnum.OnlinePayment)
@@ -1506,7 +1524,7 @@ namespace BackendSite.Service.BLL
                         bankFinancialDataModel.Channel = TransferChannelEnum.PSP;
                         bankFinancialDataModel.PayId = account?.PayId ?? pay.Id;
                         bankFinancialDataModel.PayName = account == null ? pay.PayName : account.PayName;
-                        bankFinancialDataModel.AccountNo = account == null ? pay.PayName+" "+bankFinancialDataModel.IsoCode : account.AccountNo;
+                        bankFinancialDataModel.AccountNo = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.AccountNo;
                         bankFinancialDataModel.AccountName = account == null ? pay.PayName + " " + bankFinancialDataModel.IsoCode : account.DisplayName;
                         bankFinancialDataModel.Purpose = account == null ? "1,2,3" : account.Purpose;
                         bankFinancialDataModel.AccountStatus = account?.Status ?? status;
@@ -1515,7 +1533,7 @@ namespace BackendSite.Service.BLL
                     bankFinancialDataModel = keyValuePairs[$"{TransferChannelEnum.PSP.GetDescription()}-{data.AccountNo}-{data.CurrencyId}"];
 
                     bankFinancialDataModel.WithdrawalAmount += data.WithdrawalSummary;
-                    
+
                 }
 
             }
@@ -1564,7 +1582,7 @@ namespace BackendSite.Service.BLL
 
             return Data;
         }
-        
+
         #endregion
     }
 }

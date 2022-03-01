@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.ApiModel;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
@@ -10,11 +11,9 @@ namespace BackendSite.Service.Model
     {
         public string FuncKey { get; set; }
     }
-    public class GetReasonManagementDataPara
+    public class GetReasonManagementDataPara : ApiRequestPageModel
     {
-        public string FuncKey { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
+        public IEnumerable<string> FuncKey { get; set; }
     }
     public class ReasonManagementData
     {
