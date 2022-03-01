@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using static BackendSite.Controllers.Api.AdminUserController;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.TpMaintain;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -36,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
+        private readonly TpMaintainBLL _tpMaintainBll;
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
+            _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
         }
 
         #endregion
@@ -300,7 +303,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetTpList()
+        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList()
         {
             var data = await _gameCasinoBll.GetTpList();
 
@@ -311,6 +314,32 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             else
             {
                 return new ApiResult<IEnumerable<RiskTpListInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// GetAllData/GetTpList 取得第三方品牌
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<CommonTpInfo>> GetTpList()
+        {
+            var data = _tpMaintainBll.GetCommonTpList();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<CommonTpInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success

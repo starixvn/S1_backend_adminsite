@@ -56,9 +56,9 @@ namespace BackendSite.Controllers.Api
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
             RebateManageBLL rebateManageBLL,
+            IServiceProvider provider,
             CourierAdapter courierAdapter,
-            IConfiguration configuration,
-            IServiceProvider provider)
+            IConfiguration configuration)
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
@@ -170,7 +170,7 @@ namespace BackendSite.Controllers.Api
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
-        public class BonusPayoutReq 
+        public class BonusPayoutReq
         {
             public int CustId { get; set; }
             public decimal Amount { get; set; }
