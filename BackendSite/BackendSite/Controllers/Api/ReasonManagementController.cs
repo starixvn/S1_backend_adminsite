@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Controllers.Api
 {
@@ -22,6 +23,17 @@ namespace BackendSite.Controllers.Api
             this.authorizeBLL = authorizeBLL;
         }
 
+        #region API Model
+
+        public class GetReasonManagementDataRequest
+        {
+            public string FuncKey { get; set; }
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+        }
+
+        #endregion
+
         public ApiResult<IEnumerable<ReasonManagementFuncKey>> GetFuncKey()
         {
 
@@ -35,12 +47,23 @@ namespace BackendSite.Controllers.Api
 
         }
         [HttpPost]
-        public ApiListResult<ReasonManagementData> GetReasonManagementData(GetReasonManagementDataPara para)
+        public ApiListResult<ReasonManagementData> GetReasonManagementData(GetReasonManagementDataRequest para)
         {
             var apiResult = new ApiListResult<ReasonManagementData>();
             try
             {
-                var SearchResult = reasonManagementBLL.GetReasonManagementData(para);
+                var funcKeyList = new List<string>();
+                if (para.FuncKey == "0")
+                    funcKeyList = reasonManagementBLL.GetFuncKey().Select(z => z.FuncKey).ToList();
+                else 
+                    funcKeyList.Add(para.FuncKey);
+
+                var SearchResult = reasonManagementBLL.GetReasonManagementData(new GetReasonManagementDataPara()
+                {
+                    FuncKey = funcKeyList,
+                    PageNumber = para.PageNumber,
+                    PageSize = para.PageSize
+                });
                 apiResult.Data = SearchResult.ReasonManagementData;
                 apiResult.PageNumber = SearchResult.PageNumber;
                 apiResult.TotalPages = SearchResult.TotalPages;
