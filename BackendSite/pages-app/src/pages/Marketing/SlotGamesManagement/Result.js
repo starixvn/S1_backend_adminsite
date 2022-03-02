@@ -8,14 +8,14 @@ const dataColumnDefs = (CurrencyList) => {
     return [
       { dataColumn: "gameId", columnTitle: "GameId" },
       { dataColumn: "eName", columnTitle: "Ename" },
-      { dataColumn: "cName", columnTitle: "Cname" },
-      { dataColumn: "operator", columnTitle: "LastOperator" },
+      { dataColumn: "cName", columnTitle: "Cname" },  
       ...CurrencyList.map((x) => {
         return {
           dataColumn: x,
           columnTitle: window.i18n[`lbl_Currency${x}`],
         };
       }),
+      { dataColumn: "operator", columnTitle: "LastOperator" },
       {
         dataColumn: "updateTime",
         columnTitle: "LastUpdateTime",
@@ -88,7 +88,7 @@ const Panel = (props) => {
         <td key={`td-${element.dataColumn}-${idx}-${props.BackupFilter.Site}`}>
           <div className="switch__container">
             <input
-              id={`switch-${element.dataColumn + dataidx}`}
+              id={`switch-${window.i18n[`lbl_Currency${element.dataColumn}`] + dataidx}`}
               className="switch switch--flat"
               checked={currencyStatusList[element.dataColumn]}
               type="checkbox"
@@ -108,7 +108,7 @@ const Panel = (props) => {
                   : true
               }
             />
-            <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
+            <label htmlFor={`switch-${window.i18n[`lbl_Currency${element.dataColumn}`] + dataidx}`}></label>
           </div>
         </td>
       );
@@ -138,6 +138,7 @@ const Panel = (props) => {
 };
 
 const handleToggle = (type, value, site, UpdateResultStatus, status) => {
+  console.log(value);
   if (window.confirm(`Are you sure change ${value.eName}-${window.i18n[`lbl_Currency${type}`]} ?`)) {
     let Data = {
       CurrencyId: type,

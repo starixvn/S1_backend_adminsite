@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
             result.ForEach(x =>
             {
-                slotGames.Add(GetSlotGameCurrencyStatus2(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
+                slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
             });
 
             rep.SlotGameDataList = slotGames;
@@ -69,64 +69,7 @@ namespace BackendSite.Service.BLL
         {
             return slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, req.CategoryId, req.Status, Operator);
         }
-        private SlotGameData GetSlotGameCurrencyStatus(string name, string status,DateTimeOffset updateTime,int tpId,string gameId,int id,string Operator, ServerInfo userSiteData)
-        {
-            string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
-            string cName = JsonConvert.DeserializeObject<SlotGameName>(name).ch;
-            int MYRStatus = (int)SlotGameStatusEnum.Closed;
-            int THBStatus = (int)SlotGameStatusEnum.Closed;
-            int RMBStatus = (int)SlotGameStatusEnum.Closed;
-            int IDRStatus = (int)SlotGameStatusEnum.Closed;
-            int INRStatus = (int)SlotGameStatusEnum.Closed;
-            int VNDStatus = (int)SlotGameStatusEnum.Closed;
-
-            if (!string.IsNullOrWhiteSpace(status))
-            {
-                var CurrencyList = JsonConvert.DeserializeObject<SlotGameStatus[]>(status).ToList();
-                CurrencyList.ForEach(y =>
-                {
-                    switch (y.CurrencyId)
-                    {
-                        case (int)IsoCodeEnum.MYR:
-                            MYRStatus = y.Status;
-                            break;
-                        case (int)IsoCodeEnum.THB:
-                            THBStatus = y.Status;
-                            break;
-                        case (int)IsoCodeEnum.RMB:
-                            RMBStatus = y.Status;
-                            break;
-                        case (int)IsoCodeEnum.IDR:
-                            IDRStatus = y.Status;
-                            break;
-                        case (int)IsoCodeEnum.INR:
-                            INRStatus = y.Status;
-                            break;
-                        case (int)IsoCodeEnum.VND:
-                            VNDStatus = y.Status;
-                            break;
-                    }
-                });
-            }
-
-            return (new SlotGameData
-            {
-                UpdateTime = updateTime,
-                TpId = tpId,
-                GameId = gameId,
-                Id = id,
-                Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
-                EName = eName,
-                CName = cName,
-                //MYR = (SlotGameStatusEnum)MYRStatus,
-                //THB = (SlotGameStatusEnum)THBStatus,
-                //RMB = (SlotGameStatusEnum)RMBStatus,
-                //IDR = (SlotGameStatusEnum)IDRStatus,
-                //INR = (SlotGameStatusEnum)INRStatus,
-                //VND = (SlotGameStatusEnum)VNDStatus
-            });
-        }
-        private SlotGameData GetSlotGameCurrencyStatus2(string name, string status, DateTimeOffset updateTime, int tpId, string gameId, int id, string Operator, ServerInfo userSiteData)
+        private SlotGameData GetSlotGameCurrencyStatus(string name, string status, DateTimeOffset updateTime, int tpId, string gameId, int id, string Operator, ServerInfo userSiteData)
         {
             string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
             string cName = JsonConvert.DeserializeObject<SlotGameName>(name).ch;
