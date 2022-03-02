@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
@@ -18,6 +19,8 @@ using Amazon;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.Api
 {
@@ -45,27 +48,22 @@ namespace BackendSite.Controllers.Api
         private readonly string ProxyHost;
         private readonly int ProxyPort;
         private readonly AuthorizeBLL _authorizeBLL;
+        private readonly ILogger<WithdrawalController> _logger;
 
-        public WithdrawalController(IConfiguration configuration,
-            CourierAdapter courierAdapter,
-            WithdrawalBLL withdrawalBLL,
-            SelLangBLL selLangBLL,
-            MessageBLL messageBLL,
-            CustInfoBLL custInfoBLL,
-            BankDetailBLL bankDetailBLL,
-            ExcelBLL excelBLL,
-            AuthorizeBLL authorizeBLL)
+        public WithdrawalController(IServiceProvider provider)
         {
-            this.withdrawalBLL = withdrawalBLL;
-            this.selLangBLL = selLangBLL;
-            this.messageBLL = messageBLL;
-            this.custInfoBLL = custInfoBLL;
-            this.bankDetailBLL = bankDetailBLL;
-            this.excelBLL = excelBLL;
-            _authorizeBLL = authorizeBLL;
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            this.withdrawalBLL = provider.GetRequiredService<WithdrawalBLL>();
+            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            this.messageBLL = provider.GetRequiredService<MessageBLL>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this.bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
+            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this.courierAdapter = provider.GetRequiredService<CourierAdapter>(); ;
+            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _logger = provider.GetRequiredService<ILogger<WithdrawalController>>();
 
             payApiUrl = configuration.GetValue<string>("PayService");
-            this.courierAdapter = courierAdapter;
             awsKey = configuration.GetValue<string>("AWSKey");
             awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
@@ -203,16 +201,23 @@ namespace BackendSite.Controllers.Api
             //var apiResult = new ApiResult();
             var withdrawConfirmReuslt = -1;
             var authData = _authorizeBLL.GetAuthData();
+            
             if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Approved)
             {
+                var timer = new Stopwatch();
+                timer.Start();
+
                 //Check has pic or not
                 var hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
-
+                _logger.LogInformation($"CheckWithdrawalPicture use: {timer.ElapsedMilliseconds} ms");
+                timer.Restart();
                 withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
                     User.Identity.Name, authData.UserId, hasPic);
+                _logger.LogInformation($"WithdrawalApproved use: {timer.ElapsedMilliseconds} ms");
 
                 if (withdrawConfirmReuslt > 0)
                 {
+                    timer.Restart();
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
                     var userLang = custInfoBLL.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
                     // Send message to player
@@ -222,13 +227,16 @@ namespace BackendSite.Controllers.Api
                     var content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
                     messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                    _logger.LogInformation($" SendMessageToPlayer use: {timer.ElapsedMilliseconds} ms");
 
                     #region Copy Picture
 
                     if (withdrawalRequest.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
                         && hasPic)
                     {
+                        timer.Restart();
                         await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
+                        _logger.LogInformation($" CopyWithdrawalPicture use: {timer.ElapsedMilliseconds} ms");
                     }
 
                     #endregion
@@ -449,8 +457,13 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var cryptoPay = bankDetailBLL.GetCryptoPay();
+            // 為了rls測試crypto只能先暫時這樣寫，之後會還原
+            var network = withdrawalReq.ChannelName;
+            var channelName = $"usdt-{network}";
             var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
+                            where x.CurrencyId == withdrawalReq.CurrencyId 
+                                  && (x.ChannelName.Equals(network, StringComparison.OrdinalIgnoreCase)
+                                    || x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase))
                             select new Pay
                             {
                                 PayId = x.PayId,

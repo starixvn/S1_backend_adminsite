@@ -28,17 +28,20 @@ const App = () => {
   const [adjustmentLimitMAX, setadjustmentLimitMAX] = useState(0);
   const [needCheckPassword, setneedCheckPassword] = useState(false);
   const [hasCheckPassword, sethasCheckPassword] = useState(false);
+
   useEffect(() => {
-    let param = {
-      Url: "Common/AdminUserSiteList",
-    };
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        setSiteList(res.data.data);
-      } else {
-        alert(res.data.message ?? "failed to get data.");
-      }
-    });
+    api
+      .post("/api/Common/AdminUserSiteList")
+      .then(function (response) {
+        if (response.data.errorCode === 0) {
+          setSiteList(response.data.data);
+        } else {
+          alert(response.message);
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   }, []);
 
   const Filter_OnChange = (v, dataColumn) => {
@@ -182,7 +185,7 @@ const App = () => {
                     RollOver: result.data.rollOver,
                     ProductCategory: result.data.name,
                     WalletType: result.data.walletType,
-                    Amount: 1
+                    Amount: 1,
                   });
                 }
                 alert("BonusCode " + result.data.bonusCode + " exist");
@@ -211,21 +214,25 @@ const App = () => {
   };
 
   const SubmitBonusPayout = () => {
-    if(!bonusData.Amount || parseInt(bonusData.Amount) === 0){
-      alert('Please Enter Amount(cannot be 0)');
+    if (!bonusData.Amount || parseInt(bonusData.Amount) === 0) {
+      alert("Please Enter Amount(cannot be 0)");
       return;
     }
-    if (bonusData.Amount > adjustmentLimitMAX && adjustmentLimitMAX !== 0 && !hasCheckPassword) {
+    if (
+      bonusData.Amount > adjustmentLimitMAX &&
+      adjustmentLimitMAX !== 0 &&
+      !hasCheckPassword
+    ) {
       setneedCheckPassword(true);
       return;
     }
     axios
-      .post("/api/BonusManage/BonusPayout", {
+      .post("/api/BonusPayout/SetBonusPayout", {
         CustId: custData.custId,
         Amount: bonusData.Amount,
         BounsCode: bonusData.CheckedBonusCode,
         RollOver: bonusData.RollOver,
-        PromotionType: stateFilter.BonusType == 1 ? 9 : 8
+        PromotionType: stateFilter.BonusType == 1 ? 9 : 8,
       })
       .then(
         function (response) {
@@ -251,12 +258,12 @@ const App = () => {
     sethasCheckPassword(true);
 
     axios
-      .post("/api/BonusManage/BonusPayout", {
+      .post("/api/BonusManage/SetBonusPayout", {
         CustId: custData.custId,
         Amount: bonusData.Amount,
         BounsCode: bonusData.CheckedBonusCode,
         RollOver: bonusData.RollOver,
-        PromotionType: stateFilter.BonusType == 1 ? 9 : 8
+        PromotionType: stateFilter.BonusType == 1 ? 9 : 8,
       })
       .then(
         function (response) {

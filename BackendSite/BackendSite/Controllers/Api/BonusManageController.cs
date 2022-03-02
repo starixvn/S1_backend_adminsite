@@ -895,45 +895,6 @@ namespace BackendSite.Controllers.Api
         }
         #endregion
 
-        [HttpPost]
-        public async Task<ApiResult> BonusPayout(BonusPayoutReq bonusPayoutReq)
-        {
-            var apiResult = new ApiResult();
-            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
-            try
-            {
-                var authData = _authorizeBLL.GetAuthData();
-                var custInfo = _custInfoBLL.GetCustInfoWithCache(bonusPayoutReq.CustId);
-
-                var setAdjustBonusReq = new SetAdjustBonusReq()
-                {
-                    CustId = custInfo.CustId,
-                    BonusCode = bonusPayoutReq.BounsCode,
-                    Memo = bonusPayoutReq.Memo,
-                    Operator = authData.UserName,
-                    Amount = bonusPayoutReq.Amount,
-                    PromotionType = bonusPayoutReq.PromotionType
-                };
-                var apiOnlineResult =
-                    await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
-                if (apiOnlineResult.ErrorCode == 0)
-                {
-                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                    apiResult.Message = $"Success.";
-                }
-                else
-                {
-                    apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                    apiResult.Message = apiOnlineResult.Message;
-                }
-            }
-            catch(Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.ToString();
-            }
-            return apiResult;
-        }
         #endregion
     }
 }

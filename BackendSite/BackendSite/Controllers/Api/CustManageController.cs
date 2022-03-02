@@ -379,8 +379,8 @@ namespace BackendSite.Controllers.Api
                                                    req.SelectTag,
                                                    ref pageNumber,
                                                    out var totalPages,
-                                                   out var rowCount);
-            
+                                                   out var rowCount).ToList();
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
