@@ -887,18 +887,6 @@ namespace BackendSite.Service.Model.enums
     }
     #endregion
 
-    #region Currency
-    public enum IsoCodeEnum
-    {
-        MYR = 2,
-        THB = 4,
-        RMB = 13,
-        IDR = 15,
-        VND = 51,
-        INR = 61
-    }
-    #endregion
-
     #region SlotGameDetail
     public enum SlotGameDetailStatusEnum 
     {

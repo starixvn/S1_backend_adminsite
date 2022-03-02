@@ -204,6 +204,7 @@ const App = () => {
             UpdateResultStatus={UpdateResultStatus}
             PageInfo={pageInfo}
             ChangePage={Result_ChangePage}
+            SiteList={siteList}
           />
         </>
       )}

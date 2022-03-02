@@ -24,9 +24,6 @@ const App = () => {
   const [datas, setdatas] = useState(null);
   const [pageInfo, setpageInfo] = useState(null);
   useEffect(() => {
-    let param = {
-      Url: "Common/AdminUserSiteList",
-    };
     api.post("/api/Common/AdminUserSiteList").then((res) => {
       if (res.data.errorCode === 0) {
         setSiteList(res.data.data);
@@ -117,7 +114,7 @@ const App = () => {
     api
       .post("/api/SlotGamesManagement/GetSlotGameList", Data)
       .then(function (res) {
-        if (res.data.errorCode === 0) {        
+        if (res.data.errorCode === 0) {
           setpageInfo({
             totalPages: res.data.totalPages,
             pageNumber: res.data.pageNumber,
@@ -143,7 +140,7 @@ const App = () => {
     api
       .post("/api/SlotGamesManagement/GetSlotGameList", Data)
       .then(function (res) {
-        if (res.data.errorCode === 0) {       
+        if (res.data.errorCode === 0) {
           setpageInfo({
             totalPages: res.data.totalPages,
             pageNumber: res.data.pageNumber,
@@ -180,6 +177,7 @@ const App = () => {
           UpdateResultStatus={UpdateResultStatus}
           PageInfo={pageInfo}
           ChangePage={Result_ChangePage}
+          SiteList={siteList}
         />
       )}
     </div>

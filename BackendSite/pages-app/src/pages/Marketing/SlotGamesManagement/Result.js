@@ -3,92 +3,42 @@ import WebAPI from "../../../module/WebAPI";
 import { api } from "../../../module/WebAPI";
 import Pagination from "./Pagination";
 
-const dataNovaColumnDefs = () => {
-  return [
-    { dataColumn: "gameId", columnTitle: "GameId" },
-    { dataColumn: "eName", columnTitle: "Ename" },
-    { dataColumn: "cName", columnTitle: "Cname" },
-    { dataColumn: "myr", columnTitle: "MYR" },
-    { dataColumn: "thb", columnTitle: "THB" },
-    { dataColumn: "rmb", columnTitle: "RMB" },
-    { dataColumn: "idr", columnTitle: "IDR" },
-    { dataColumn: "inr", columnTitle: "INR" },
-    { dataColumn: "operator", columnTitle: "LastOperator" },
-    {
-      dataColumn: "updateTime",
-      columnTitle: "LastUpdateTime",
-      body: {
-        format: dateFormat,
+const dataColumnDefs = (CurrencyList) => {
+  if (CurrencyList != null) {
+    return [
+      { dataColumn: "gameId", columnTitle: "GameId" },
+      { dataColumn: "eName", columnTitle: "Ename" },
+      { dataColumn: "cName", columnTitle: "Cname" },  
+      ...CurrencyList.map((x) => {
+        return {
+          dataColumn: x,
+          columnTitle: window.i18n[`lbl_Currency${x}`],
+        };
+      }),
+      { dataColumn: "operator", columnTitle: "LastOperator" },
+      {
+        dataColumn: "updateTime",
+        columnTitle: "LastUpdateTime",
+        body: {
+          format: dateFormat,
+        },
       },
-    },
-  ];
-};
-const dataGoalColumnDefs = () => {
-  return [
-    { dataColumn: "gameId", columnTitle: "GameId" },
-    { dataColumn: "eName", columnTitle: "Ename" },
-    { dataColumn: "cName", columnTitle: "Cname" },
-    { dataColumn: "vnd", columnTitle: "VND" },
-    { dataColumn: "operator", columnTitle: "LastOperator" },
-    {
-      dataColumn: "updateTime",
-      columnTitle: "LastUpdateTime",
-      body: {
-        format: dateFormat,
-      },
-    },
-  ];
-};
-const dataBwingColumnDefs = () => {
-  return [
-    { dataColumn: "gameId", columnTitle: "GameId" },
-    { dataColumn: "eName", columnTitle: "Ename" },
-    { dataColumn: "cName", columnTitle: "Cname" },
-    { dataColumn: "vnd", columnTitle: "VND" },
-    { dataColumn: "operator", columnTitle: "LastOperator" },
-    {
-      dataColumn: "updateTime",
-      columnTitle: "LastUpdateTime",
-      body: {
-        format: dateFormat,
-      },
-    },
-  ];
-};
-const dataSoonColumnDefs = () => {
-  return [
-    { dataColumn: "gameId", columnTitle: "GameId" },
-    { dataColumn: "eName", columnTitle: "Ename" },
-    { dataColumn: "cName", columnTitle: "Cname" },
-    { dataColumn: "rmb", columnTitle: "RMB" },
-    { dataColumn: "inr", columnTitle: "INR" },
-    { dataColumn: "operator", columnTitle: "LastOperator" },
-    {
-      dataColumn: "updateTime",
-      columnTitle: "LastUpdateTime",
-      body: {
-        format: dateFormat,
-      },
-    },
-  ];
+    ];
+  } else {
+    return [];
+  }
 };
 const Panel = (props) => {
+  let CurrencyList = null;
+  props.SiteList.forEach((x) => {
+    if (parseInt(x.siteId, 10) == parseInt(props.BackupFilter.Site, 10)) {
+      CurrencyList = x.iCurrencyList;
+    }
+  });
+
   let headerRows = [];
   let columnDefs = [];
-  switch (props.BackupFilter.Site) {
-    case 1:
-      columnDefs = dataNovaColumnDefs();
-      break;
-    case 2:
-      columnDefs = dataGoalColumnDefs();
-      break;
-    case 3:
-      columnDefs = dataBwingColumnDefs();
-      break;
-    case 4:
-      columnDefs = dataSoonColumnDefs();
-      break;
-  }
+  columnDefs = dataColumnDefs(CurrencyList);
   columnDefs.forEach((element, idx) => {
     headerRows.push(
       <th
@@ -113,39 +63,15 @@ const Panel = (props) => {
           subData[s] = data[s];
         });
       }
-      return element.dataColumn === "myr" ||
-        element.dataColumn === "thb" ||
-        element.dataColumn === "rmb" ||
-        element.dataColumn === "idr" ||
-        element.dataColumn === "inr" ||
-        element.dataColumn === "vnd" ? (
-        <td key={`td-${element.dataColumn}-${idx}-${props.BackupFilter.Site}`}>
-          <div className="switch__container">
-            <input
-              id={`switch-${element.dataColumn + dataidx}`}
-              className="switch switch--flat"
-              checked={data[element.dataColumn]}
-              type="checkbox"
-              onChange={() =>
-                handleToggle(
-                  element.dataColumn,
-                  data,
-                  props.BackupFilter.Site,
-                  props.UpdateResultStatus,
-                  data[element.dataColumn]
-                )
-              }
-              disabled={
-                window.subFuncKeys &&
-                window.subFuncKeys.includes("cms_sgm_edit")
-                  ? false
-                  : true
-              }
-            />
-            <label htmlFor={`switch-${element.dataColumn + dataidx}`}></label>
-          </div>
-        </td>
-      ) : (
+      let currencyStatusList = Object.assign(
+        {},
+        ...data.currencyStatusList.map((x) => ({ [x.currencyId]: x.status }))
+      );
+      return element.dataColumn === "gameId" ||
+        element.dataColumn === "eName" ||
+        element.dataColumn === "cName" ||
+        element.dataColumn === "operator" ||
+        element.dataColumn === "updateTime" ? (
         <td
           key={`td-${element.dataColumn}-${idx}-${props.BackupFilter.Site}`}
           className={
@@ -158,11 +84,39 @@ const Panel = (props) => {
             ? element.body.format(data[element.dataColumn], subData)
             : data[element.dataColumn]}
         </td>
+      ) : (
+        <td key={`td-${element.dataColumn}-${idx}-${props.BackupFilter.Site}`}>
+          <div className="switch__container">
+            <input
+              id={`switch-${window.i18n[`lbl_Currency${element.dataColumn}`] + dataidx}`}
+              className="switch switch--flat"
+              checked={currencyStatusList[element.dataColumn]}
+              type="checkbox"
+              onChange={() =>
+                handleToggle(
+                  element.dataColumn,
+                  data,
+                  props.BackupFilter.Site,
+                  props.UpdateResultStatus,
+                  currencyStatusList[element.dataColumn]
+                )
+              }
+              disabled={
+                window.subFuncKeys &&
+                window.subFuncKeys.includes("cms_sgm_edit")
+                  ? false
+                  : true
+              }
+            />
+            <label htmlFor={`switch-${window.i18n[`lbl_Currency${element.dataColumn}`] + dataidx}`}></label>
+          </div>
+        </td>
       );
     });
 
     return <tr key={`result-body-${dataidx}`}>{row}</tr>;
   });
+
   return (
     <div className="table">
       <table className="table table-striped">
@@ -184,30 +138,10 @@ const Panel = (props) => {
 };
 
 const handleToggle = (type, value, site, UpdateResultStatus, status) => {
-  if (window.confirm(`Are you sure change ${value.eName}-${type} ?`)) {
-    let currencyId = 0;
-    switch (type) {
-      case "myr":
-        currencyId = 2;
-        break;
-      case "thb":
-        currencyId = 4;
-        break;
-      case "rmb":
-        currencyId = 13;
-        break;
-      case "idr":
-        currencyId = 15;
-        break;
-      case "inr":
-        currencyId = 61;
-        break;
-      case "vnd":
-        currencyId = 51;
-        break;
-    }
+  console.log(value);
+  if (window.confirm(`Are you sure change ${value.eName}-${window.i18n[`lbl_Currency${type}`]} ?`)) {
     let Data = {
-      CurrencyId: currencyId,
+      CurrencyId: type,
       SlotGameId: value.id,
       SiteId: site,
       Status: status == 0 ? 1 : 0,
