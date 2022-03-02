@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
             result.ForEach(x =>
             {
-                slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
+                slotGames.Add(GetSlotGameCurrencyStatus2(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
             });
 
             rep.SlotGameDataList = slotGames;
@@ -118,12 +118,49 @@ namespace BackendSite.Service.BLL
                 Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
                 EName = eName,
                 CName = cName,
-                MYR = (SlotGameStatusEnum)MYRStatus,
-                THB = (SlotGameStatusEnum)THBStatus,
-                RMB = (SlotGameStatusEnum)RMBStatus,
-                IDR = (SlotGameStatusEnum)IDRStatus,
-                INR = (SlotGameStatusEnum)INRStatus,
-                VND = (SlotGameStatusEnum)VNDStatus
+                //MYR = (SlotGameStatusEnum)MYRStatus,
+                //THB = (SlotGameStatusEnum)THBStatus,
+                //RMB = (SlotGameStatusEnum)RMBStatus,
+                //IDR = (SlotGameStatusEnum)IDRStatus,
+                //INR = (SlotGameStatusEnum)INRStatus,
+                //VND = (SlotGameStatusEnum)VNDStatus
+            });
+        }
+        private SlotGameData GetSlotGameCurrencyStatus2(string name, string status, DateTimeOffset updateTime, int tpId, string gameId, int id, string Operator, ServerInfo userSiteData)
+        {
+            string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
+            string cName = JsonConvert.DeserializeObject<SlotGameName>(name).ch;
+            List<CurrencyStatus> currencyStatusList = new List<CurrencyStatus>();
+            List<SlotGameStatus> slotGameStatusList = new List<SlotGameStatus>();
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                slotGameStatusList = JsonConvert.DeserializeObject<SlotGameStatus[]>(status).ToList();
+            }
+
+            userSiteData.ICurrencyList.ToList().ForEach(x =>
+            {
+                var CurrencyData = slotGameStatusList.Find(y => y.CurrencyId == x);
+                if(CurrencyData != null)
+                {
+                    currencyStatusList.Add(new CurrencyStatus { CurrencyId = x, Status = CurrencyData.Status });
+                }
+                else
+                {
+                    currencyStatusList.Add(new CurrencyStatus { CurrencyId = x, Status = (int)SlotGameStatusEnum.Closed });
+                }
+                
+            });
+
+            return (new SlotGameData
+            {
+                UpdateTime = updateTime,
+                TpId = tpId,
+                GameId = gameId,
+                Id = id,
+                Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
+                EName = eName,
+                CName = cName,
+                CurrencyStatusList = currencyStatusList
             });
         }
     }

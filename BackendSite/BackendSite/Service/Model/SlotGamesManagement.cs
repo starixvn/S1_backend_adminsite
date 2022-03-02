@@ -53,12 +53,13 @@ namespace BackendSite.Service.Model
         public string EName { get; set; }
         public string CName { get; set; }
         public string Operator { get; set; }
-        public SlotGameStatusEnum MYR { get; set; }
-        public SlotGameStatusEnum THB { get; set; }
-        public SlotGameStatusEnum RMB { get; set; }
-        public SlotGameStatusEnum IDR { get; set; }
-        public SlotGameStatusEnum INR { get; set; }
-        public SlotGameStatusEnum VND { get; set; }
+        //public SlotGameStatusEnum MYR { get; set; }
+        //public SlotGameStatusEnum THB { get; set; }
+        //public SlotGameStatusEnum RMB { get; set; }
+        //public SlotGameStatusEnum IDR { get; set; }
+        //public SlotGameStatusEnum INR { get; set; }
+        //public SlotGameStatusEnum VND { get; set; }
+        public List<CurrencyStatus> CurrencyStatusList { get; set; }
     }
     public class CurrencyStatus
     {
