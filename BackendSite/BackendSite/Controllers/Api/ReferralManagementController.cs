@@ -121,7 +121,7 @@ namespace BackendSite.Controllers.Api
                 set
                 {
                     if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                        _startDate = new DateTimeOffset(value.Value.DateTime.AddHours(-8), TimeSpan.Zero);
                 }
             }
             public DateTimeOffset? EndDate
@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.Api
                 set
                 {
                     if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                        _endDate = new DateTimeOffset(value.Value.DateTime.AddHours(-8), TimeSpan.Zero);
                 }
             }
             public int PageNumber { get; set; }
@@ -170,8 +170,8 @@ namespace BackendSite.Controllers.Api
                 selectSite,
                 userName,
                 currencyId,
-                startDate?.ToUniversalTime().DateTime,
-                endDate?.ToUniversalTime().DateTime);
+                startDate?.DateTime.AddHours(-8),
+                endDate?.DateTime.AddHours(-8));
 
             var stream = excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -190,7 +190,7 @@ namespace BackendSite.Controllers.Api
                 set
                 {
                     if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                        _startDate = new DateTimeOffset(value.Value.DateTime.AddHours(-8), TimeSpan.Zero);
                 }
             }
             public DateTimeOffset? EndDate
@@ -199,7 +199,7 @@ namespace BackendSite.Controllers.Api
                 set
                 {
                     if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                        _endDate = new DateTimeOffset(value.Value.DateTime.AddHours(-8), TimeSpan.Zero);
                 }
             }
             public int PageNumber { get; set; }

@@ -127,14 +127,25 @@ namespace BackendSite.Controllers.Api
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public ApiResult GetTransferInfoReport(GetTransferInfoReportReq request)
+        public ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>> GetTransferInfoReport(GetTransferInfoReportReq request)
         {
 
-            var data = _bankFinancialBLL.GetTransferInfoReport(request.SiteId,
-                                                              request.AccountNo,
-                                                              request.StartDate,
-                                                              request.EndDate,
-                                                              _common.TransferToTimeZoneFormat(0));
+            var siteList = new List<int>(); siteList.Add(request.SiteId);
+            var accountNoList = new List<string>(); accountNoList.Add(request.AccountNo);
+
+            //因為現在資料的transDate是以+8存在DB，固這邊站不轉換時間。
+            var startDate = Convert.ToDateTime(request.StartDate);
+            var endDate = Convert.ToDateTime(request.EndDate);
+
+            var data = _bankFinancialBLL.GetTransferInfoReport(siteList,
+                                                              accountNoList,
+                                                              startDate,
+                                                              endDate,
+                                                              1,
+                                                              10000, out _, out _);
+
+            data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             if (!data.Any())
             {
@@ -171,16 +182,23 @@ namespace BackendSite.Controllers.Api
                                                     string StartDate,
                                                     string EndDate)
         {
-            var data = _bankFinancialBLL.GetTransferInfoReport(SiteId,
-                                                                  AccountNo,
-                                                                  StartDate,
-                                                                  EndDate,
-                                                                  _common.TransferToTimeZoneFormat(0));
+            var siteList = new List<int>(); siteList.Add(SiteId);
+            var accountNoList = new List<string>(); accountNoList.Add(AccountNo);
+
+            var startDate = Convert.ToDateTime(StartDate);
+            var endDate = Convert.ToDateTime(EndDate);
+
+            var data = _bankFinancialBLL.GetTransferInfoReportForExport(siteList,
+                                                              accountNoList,
+                                                              startDate,
+                                                              endDate);
+
+            data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            
             var stream = _excelBLL.Export(data);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBLL.ExcelFile(stream, "TransferInfoReport");
         }
 
         #endregion

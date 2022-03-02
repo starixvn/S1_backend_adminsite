@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
@@ -316,6 +316,11 @@ namespace BackendSite.Service.BLL
                     Message = "AdminSite Error: " + ex.Message
                 };
             }
+        }
+
+        public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
+        {
+            return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
     }
 }

@@ -6,6 +6,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +18,10 @@ namespace BackendSite.Controllers.ApiV2.Report
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class TransferInfoReportController : Controller
+    public class TransferInfoReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly ExcelBLL _excelBll;
         private readonly Common _common;
@@ -40,21 +41,48 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetTransferInfoReportReq
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
-            public string AccountNo { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
-            public int TimeZone { get; set; }
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<string> AccountNos { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+
+        public class ExportRequest
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<string> AccountNos { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
         }
 
         #endregion
-        
+
         #region TransferInfo Report
 
         /// <summary>
-        /// BankFinancialReport/Get 取得轉帳報表資料
+        ///  TransferInfoReport/GetList 取得轉帳資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -63,17 +91,20 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
-        public ApiResult Get(GetTransferInfoReportReq request)
+        [HttpPost]
+        public ApiResult GetList(GetListRequest request)
         {
 
             var data = _bankFinancialBll.GetTransferInfoReport(
-                request.SiteId,
-                request.AccountNo,
-                request.StartDate,
-                request.EndDate,
-                _common.TransferToTimeZoneFormat(request.TimeZone));
+                request.SiteIds,
+                request.AccountNos,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
 
             if (!data.Any())
             {
@@ -81,39 +112,40 @@ namespace BackendSite.Controllers.ApiV2.Report
             }
             else
             {
-                return new ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>>
+                return new ApiListResult<BankFinancialTransferInfoDetailModel>
                 {
                     Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    PageNumber = request.PageNumber,
+                    TotalPages = totalPages,
+                    RowCount = rowCount
                 };
             }
         }
 
         /// <summary>
-        /// BankFinancialReport/Export 匯出轉帳報表資料
+        ///  TransferInfoReport/Export 匯出轉帳資料清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：BankFinancial > Transfer Info Report > [Export]
+        /// Func Path：BankFinancial > Transfer Info Report > [Submit] > [Export]
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>檔案</returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
-        public IActionResult Export(GetTransferInfoReportReq request)
+        public IActionResult Export(ExportRequest request)
         {
-            var data = _bankFinancialBll.GetTransferInfoReport(
-                request.SiteId,
-                request.AccountNo,
-                request.StartDate,
-                request.EndDate,
-                _common.TransferToTimeZoneFormat(request.TimeZone));
-            
+            var data = _bankFinancialBll.GetTransferInfoReportForExport(
+                request.SiteIds,
+                request.AccountNos,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime);
+
             var stream = _excelBll.Export(data);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"TransferInfoReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "TransferInfoReport");
         }
 
         #endregion

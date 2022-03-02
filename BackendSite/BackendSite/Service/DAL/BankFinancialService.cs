@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Constructors
-        
+
         public BankFinancialService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
@@ -200,7 +200,7 @@ namespace BackendSite.Service.DAL
                 {
                     _AccountNo = accountNo,
                 });
-            parameters.Add("_Count", count, DbType.Int32,ParameterDirection.InputOutput);
+            parameters.Add("_Count", count, DbType.Int32, ParameterDirection.InputOutput);
 
             var SpName = "Admin_BankFinancialTransferInfo_ByAccountNo_Get";
             _mainDbClient.Execute(SpName, parameters);
@@ -394,26 +394,78 @@ namespace BackendSite.Service.DAL
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(int siteId,
-                                                                                            string accountNo,
-                                                                                            string startDate,
-                                                                                            string endDate,
-                                                                                            string timeZone)
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(string siteIds,
+                                                                                            string accountNos,
+                                                                                            DateTime startDate,
+                                                                                            DateTime endDate,
+                                                                                            int startIndex,
+                                                                                            int pageSize)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = siteId,
-                    _AccountNo = accountNo,
+                    _SiteId = siteIds,
+                    _AccountNo = accountNos,
                     _StartDate = startDate,
                     _EndDate = endDate,
-                    _TimeZone = timeZone
+                    _StartIndex = startIndex,
+                    _PageSize = pageSize
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfoDetail_Get_V2";
-            return conn.Query<BankFinancialTransferInfoDetailModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialTransferInfoDetailModel>("Admin_BankFinancialTransferInfoDetail_Get_V2", parameters);
         }
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(string siteIds,
+                                                                                      string accountNos,
+                                                                                    DateTime startDate,
+                                                                                    DateTime endDate,
+                                                                                    int startIndex,
+                                                                                    int pageSize,
+                                                                                    out int totalPages,
+                                                                                    out int rowCount)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteIds = siteIds,
+                    _AccountNos = accountNos,
+                    _StartDate = startDate,
+                    _EndDate = endDate,
+                    _StartIndex = startIndex,
+                    _PageSize = pageSize
+                });
+
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+
+            var result = _reportDbClient.Query<BankFinancialTransferInfoDetailModel>("Admin_BankFinancialTransferInfoDetail_Get_V2", parameters);
+
+            totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameters.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+
+        public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReportForExport(string siteIds,
+                                                                              string accountNos,
+                                                                            DateTime startDate,
+                                                                            DateTime endDate)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteIds = siteIds,
+                    _AccountNos = accountNos,
+                    _StartDate = startDate,
+                    _EndDate = endDate
+                });
+
+            var result = _reportDbClient.Query<BankFinancialTransferInfoDetailModel>("Admin_BankFinancialTransferInfoDetailForExport_Get", parameters);
+
+            return result;
+        }
+
 
         #endregion
 

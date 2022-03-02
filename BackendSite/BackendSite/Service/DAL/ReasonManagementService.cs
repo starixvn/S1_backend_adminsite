@@ -7,6 +7,7 @@ using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -31,18 +32,16 @@ namespace BackendSite.Service.DAL
             var searchResult = new GetReasonManagementDataResult();
             
             var props = new DynamicParameters();
-            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32,  ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", Math.Abs(para.PageSize));
-            props.Add("FuncKey", para.FuncKey == "0" ? null: para.FuncKey);
+            props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKey));
+            props.Add("_PageSize", Math.Abs(para.PageSize));
+            props.Add("_StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize));
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = _reportDbClient.Query<ReasonManagementData>("Admin_BankFinancialReason_Get_V2", props);
 
             searchResult.ReasonManagementData = result.ToList();
-            searchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            searchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            searchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
+            searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return searchResult;
         }

@@ -1,7 +1,9 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -30,9 +32,26 @@ namespace BackendSite.Service.BLL
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
         }
         
-        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
-            return referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
+            List<ReferralExcelData> result = new List<ReferralExcelData>();
+            var referralCustList =  referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate).ToList();
+            referralCustList.ForEach(x =>
+            {
+                result.Add(new ReferralExcelData()
+                {
+                    ReferralUser = x.ReferralUser,
+                    ReferredUser = x.ReferredUser,
+                    CurrencyId = x.CurrencyId,
+                    Currency = x.Currency,
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)),
+                    ReferralAmount = x.ReferralAmount,
+                    RewardTime = x.RewardTime == null? x.RewardTime : new DateTimeOffset(x.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)),
+                    Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
+                });
+            });
+           
+            return result;
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
             DateTime? StartDate,

@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly SportsBLL _sportsBll;
+        private readonly TpBLL _tpBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -41,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
+            _tpBll = provider.GetRequiredService<TpBLL>();
         }
 
         #region Model
@@ -159,6 +161,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int LeaguesId { get; set; }
         }
 
+        public class GetBySiteIdAndUserNameRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public string UserName { get; set; }
+        }
+
         #endregion
 
         /// <summary>
@@ -253,6 +267,52 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+
+            if (result != ErrorCodeEnum.Success)
+            {
+                throw new AdminException(result);
+            }
+
+            if (custInfo != null)
+            {
+                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
+
+                if (bankInfoOff != null)
+                {
+                    apiResult.Data = bankInfoOff;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 21;
+                    apiResult.Message = "BankAccount not found.";
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = 21;
+                apiResult.Message = "Player not found.";
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
         /// BaseData/GetTpGameTypeListbyCategory 取得指定第三方遊戲類型清單
         /// </summary>
         /// <remarks>
@@ -300,6 +360,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetTpCustInfoList 取得指定客戶第三方資訊清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCustInfo>>> GetTpCustInfoList(GetBySiteIdAndUserNameRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoDetails(null, request.UserName, request.SiteId);
+
+            if (custInfo == null)
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+
+            var datas = await _tpBll.GetTpCustInfoList(custInfo.CustId);
+
+            if (!datas.Any())
+                throw new AdminException(ErrorCodeEnum.NoData);
+
+            return new ApiResult<IEnumerable<TpCustInfo>>()
+            {
+                Data = datas,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -411,52 +499,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.RawMessage = ex.ToString();
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="AdminException"></exception>
-        [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-
-            if (result != ErrorCodeEnum.Success)
-            {
-                throw new AdminException(result);
-            }
-
-            if (custInfo != null)
-            {
-                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
-
-                if (bankInfoOff != null)
-                {
-                    apiResult.Data = bankInfoOff;
-                    apiResult.ErrorCode = 0;
-                }
-                else
-                {
-                    apiResult.ErrorCode = 21;
-                    apiResult.Message = "BankAccount not found.";
-                }
-            }
-            else
-            {
-                apiResult.ErrorCode = 21;
-                apiResult.Message = "Player not found.";
             }
 
             return apiResult;

@@ -1,12 +1,14 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
+using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -36,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public class DepositSubmissionRequest
         {
-            public DepositDetailInfo depositDetailInfo { get; set; }
+            public string Detail { get; set; }
             public IFormFile Receipt { get; set; }
         }
 
@@ -56,24 +58,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         [HttpPost]
-        public ApiResult Submit(DepositSubmissionRequest request)
+        public async Task<ApiResult> SubmitAsync([FromForm] DepositSubmissionRequest request)
         {
+            var detail = JsonConvert.DeserializeObject<DepositDetailInfo>(request.Detail);
 
-            var result = _depositBll.CreateDeposit(request.depositDetailInfo, request.Receipt);
+            var result = await _depositBll.CreateDeposit(detail, request.Receipt);
+
             var apiResult = new ApiResult();
             if (result == 1)
             {
-                apiResult.ErrorCode = 1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertSuccessful");
             }
             else if (result == -1)
             {
-                apiResult.ErrorCode = -1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_UserNotFound");
             }
             else
             {
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertFailed");
             }
             return apiResult;
