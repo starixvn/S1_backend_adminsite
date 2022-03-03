@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using BackendSite.Service.Model.ApiModel;
+using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -9,21 +11,29 @@ namespace BackendSite.Service.Model
     {
         public string FuncKey { get; set; }
     }
-    public class GetReasonManagementDataPara
+    public class GetReasonManagementDataPara : ApiRequestPageModel
     {
-        public string FuncKey { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
+        public IEnumerable<string> FuncKey { get; set; }
     }
     public class ReasonManagementData
     {
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset _updateTime { get; set; }
         public int Id { get; set; }
         public string FuncKey { get; set; }
         public int ReasonId { get; set; }
         public string Description { get; set; }
-        public string CreateTime { get; set; }
+        public DateTimeOffset CreateTime 
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Creator { get; set; }
-        public string UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime 
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Updator { get; set; }
     }
 

@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model
         public string AccountType { set; get; }
         public string Network { set; get; }
         public int WalletCurrencyID { set; get; }
+        public string CryptoCurrency { set; get; }
         public string RefId { set; get; }
         public bool HasPhotoId { set; get; }
         public string VipLevelName { set; get; }
@@ -83,7 +84,7 @@ namespace BackendSite.Service.Model
             get => _flowEndTime;
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-
+        public string ChannelName { set; get; }
     }
     public class WithdrawalInfo
     {

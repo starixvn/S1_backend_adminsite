@@ -260,6 +260,8 @@ namespace BackendSite.Service.Model
     }
     public class CustCryptoWalletLog
     {
+        public int CurrencyId { set; get; }
+        public string IsoCode { set; get; }
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }
