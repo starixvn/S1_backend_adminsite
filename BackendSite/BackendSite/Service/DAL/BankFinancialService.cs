@@ -248,8 +248,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
-                                                                                     string fromDate,
-                                                                                     string toDate,
+                                                                                     DateTime? fromDate,
+                                                                                     DateTime? toDate,
                                                                                      string fromAccountNo,
                                                                                      string fromAccountDisplayName,
                                                                                      string toAccountNo,
@@ -272,7 +272,7 @@ namespace BackendSite.Service.DAL
                     _TransferId = transferId
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfo_Get";
+            var SpName = "Admin_BankFinancialTransferInfo_Get_V2";
             return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
         }
 
@@ -346,7 +346,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        public int InsertTransferInfoLog(ActionType action, BankFinancialTransferInfoModel bankFinancialTransferInfo)
+        public int InsertTransferInfoLog(ActionEnum action, BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
@@ -371,12 +371,12 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _OperateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
+                    //_OperateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Operator = bankFinancialTransferInfo.Updator,
                     _Action = action
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfoLog_Ins";
+            var SpName = "Admin_BankFinancialTransferInfoLog_Ins_V2";
 
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }

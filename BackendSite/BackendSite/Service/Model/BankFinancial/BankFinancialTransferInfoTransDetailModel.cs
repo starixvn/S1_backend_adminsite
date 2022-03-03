@@ -31,7 +31,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 交易日期
         /// </summary>
-        public string TransDate { get; set; }
+        public DateTimeOffset TransDate { get; set; }
 
         #region From Data
 
@@ -215,12 +215,12 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料建立時間
         /// </summary>
         public DateTimeOffset CreateTime { get; set; }
-        
+
         /// <summary>
         /// 讀寫 資料建立者
         /// </summary>
         public int Creator { get; set; }
-        
+
         /// <summary>
         /// 讀寫 資料建立者名稱
         /// </summary>
@@ -249,7 +249,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 圖檔Binary
         /// </summary>
-        public byte[] TransferPic  { get; set; }
+        public byte[] TransferPic { get; set; }
 
         /// <summary>
         /// 讀寫 上傳收據

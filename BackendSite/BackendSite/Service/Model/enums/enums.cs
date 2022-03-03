@@ -486,6 +486,18 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
+    #region BankFinancialTransferInfoLog
+
+    public enum ActionEnum 
+    {
+        Create = 1,
+        Read = 2,
+        Update = 3,
+        Delete = 4
+    }
+
+    #endregion
+
     #region Vip Setting
 
     public enum VipSettingStatusEnum

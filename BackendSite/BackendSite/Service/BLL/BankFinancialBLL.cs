@@ -453,8 +453,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
                                                                                      TransferTypeEnum? transferType,
-                                                                                     string transFromDate,
-                                                                                     string transToDate,
+                                                                                     DateTime? transFromDate,
+                                                                                     DateTime? transToDate,
                                                                                      string fromAccountNo,
                                                                                      string fromAccountDisplayName,
                                                                                      string toAccountNo,
@@ -526,7 +526,7 @@ namespace BackendSite.Service.BLL
                             return (false, count, "Insert Transfer Info Minus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Create, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
@@ -544,7 +544,7 @@ namespace BackendSite.Service.BLL
                             return (false, count, "Insert Transfer Info Plus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Create, transferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Create, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
@@ -583,7 +583,7 @@ namespace BackendSite.Service.BLL
                             return (false, count, "Update Transfer Info Minus Data Fail.");
                         };
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Update, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
@@ -602,7 +602,7 @@ namespace BackendSite.Service.BLL
                         };
 
 
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Update, transferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Update, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
@@ -672,7 +672,7 @@ namespace BackendSite.Service.BLL
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, transferInfoFromModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Delete, transferInfoFromModel) != 1)
                         {
                             scope.Dispose();
 
@@ -683,7 +683,7 @@ namespace BackendSite.Service.BLL
                     if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
                        || data.TransactionType == TransactionTypeEnum.OnlyPlus)
                     {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionType.Delete, transferInfoToModel) != 1)
+                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Delete, transferInfoToModel) != 1)
                         {
                             scope.Dispose();
 
