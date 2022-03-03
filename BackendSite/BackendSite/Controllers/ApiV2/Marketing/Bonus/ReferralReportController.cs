@@ -92,7 +92,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             private DateTimeOffset? _startDate;
             private DateTimeOffset? _endDate;
-            public IEnumerable<int> SelectSite { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
             public DateTimeOffset? StartDate
@@ -220,7 +220,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public IActionResult Export(ExportRequest request)
         {
             var exportData = _referralManagementBll.GetReferralCustListExport(
-                JsonConvert.SerializeObject(request.SelectSite),
+                JsonConvert.SerializeObject(request.SiteIds),
                 request.UserName,
                 request.CurrencyId,
                 request.StartDate?.ToUniversalTime().DateTime,

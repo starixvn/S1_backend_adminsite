@@ -6,6 +6,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -20,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class TransferInfoReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly ExcelBLL _excelBll;
         private readonly Common _common;
@@ -40,13 +41,40 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetTransferInfoReportReq
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
-            public string AccountNo { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
-            public int TimeZone { get; set; }
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<string> AccountNos { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+
+        public class ExportRequest
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<string> AccountNos { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
         }
 
         #endregion
@@ -65,15 +93,18 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
-        public ApiResult GetList(GetTransferInfoReportReq request)
+        public ApiResult GetList(GetListRequest request)
         {
 
             var data = _bankFinancialBll.GetTransferInfoReport(
-                request.SiteId,
-                request.AccountNo,
-                request.StartDate,
-                request.EndDate,
-                _common.TransferToTimeZoneFormat(request.TimeZone));
+                request.SiteIds,
+                request.AccountNos,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.PageNumber,
+                request.PageSize,
+                out int totalPages,
+                out int rowCount);
 
             if (!data.Any())
             {
@@ -81,10 +112,13 @@ namespace BackendSite.Controllers.ApiV2.Report
             }
             else
             {
-                return new ApiResult<IEnumerable<BankFinancialTransferInfoDetailModel>>
+                return new ApiListResult<BankFinancialTransferInfoDetailModel>
                 {
                     Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    PageNumber = request.PageNumber,
+                    TotalPages = totalPages,
+                    RowCount = rowCount
                 };
             }
         }
@@ -101,15 +135,14 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>檔案</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
-        public IActionResult Export(GetTransferInfoReportReq request)
+        public IActionResult Export(ExportRequest request)
         {
-            var data = _bankFinancialBll.GetTransferInfoReport(
-                request.SiteId,
-                request.AccountNo,
-                request.StartDate,
-                request.EndDate,
-                _common.TransferToTimeZoneFormat(request.TimeZone));
-            
+            var data = _bankFinancialBll.GetTransferInfoReportForExport(
+                request.SiteIds,
+                request.AccountNos,
+                request.StartDate.DateTime,
+                request.EndDate.DateTime);
+
             var stream = _excelBll.Export(data);
 
             return _excelBll.ExcelFile(stream, "TransferInfoReport");

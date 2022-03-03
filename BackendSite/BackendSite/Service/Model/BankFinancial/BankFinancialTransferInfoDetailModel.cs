@@ -5,6 +5,7 @@ namespace BackendSite.Service.Model.BankFinancial
 {
     public class BankFinancialTransferInfoDetailModel
     {
+        private DateTimeOffset _transDate { get; set; }
         private DateTimeOffset _createTime { get; set; }
         private DateTimeOffset _updateTime { get; set; }
         
@@ -36,7 +37,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 交易日期
         /// </summary>
-        public string TransDate { get; set; }
+        public DateTimeOffset TransDate
+        {
+            get => _transDate;
+            set => _transDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         
         /// <summary>
         /// 讀寫 付款方式
