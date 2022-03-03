@@ -286,7 +286,7 @@ namespace BackendSite.Service.DAL
                     _TransactionType = bankFinancialTransferInfo.TransactionType,
                     _TransferType = bankFinancialTransferInfo.TransferType,
                     _PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
-                    _TransDate = bankFinancialTransferInfo.TransDate,
+                    _TransDate = bankFinancialTransferInfo.TransDate.DateTime,
                     _Channel = bankFinancialTransferInfo.Channel,
                     _Agent = bankFinancialTransferInfo.Agent,
                     _PayId = bankFinancialTransferInfo.PayId,
@@ -301,13 +301,13 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _CreateTime = bankFinancialTransferInfo.CreateTime.DateTime,
+                    //_CreateTime = bankFinancialTransferInfo.CreateTime.DateTime,
                     _Creator = bankFinancialTransferInfo.Creator,
-                    _UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
+                    //_UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfo_Ins";
+            var SpName = "Admin_BankFinancialTransferInfo_Ins_V2";
 
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
@@ -322,7 +322,7 @@ namespace BackendSite.Service.DAL
                     _TransactionType = bankFinancialTransferInfo.TransactionType,
                     _TransferType = bankFinancialTransferInfo.TransferType,
                     _PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
-                    _TransDate = bankFinancialTransferInfo.TransDate,
+                    _TransDate = bankFinancialTransferInfo.TransDate.DateTime,
                     _Channel = bankFinancialTransferInfo.Channel,
                     _Agent = bankFinancialTransferInfo.Agent,
                     _PayId = bankFinancialTransferInfo.PayId,
@@ -337,11 +337,11 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    _UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
+                    //_UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferInfo_Upd";
+            var SpName = "Admin_BankFinancialTransferInfo_Upd_V2";
 
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
@@ -356,7 +356,7 @@ namespace BackendSite.Service.DAL
                     _TransactionType = bankFinancialTransferInfo.TransactionType,
                     _TransferType = bankFinancialTransferInfo.TransferType,
                     _PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
-                    _TransDate = bankFinancialTransferInfo.TransDate,
+                    _TransDate = bankFinancialTransferInfo.TransDate.DateTime,
                     _Channel = bankFinancialTransferInfo.Channel,
                     _Agent = bankFinancialTransferInfo.Agent,
                     _PayId = bankFinancialTransferInfo.PayId,

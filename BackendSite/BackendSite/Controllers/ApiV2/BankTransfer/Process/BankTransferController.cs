@@ -23,7 +23,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
 
         private readonly AuthorizeBLL _authorizeBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly BankDetailBLL _bankDetailBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
@@ -34,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
         {
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
-            _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -281,24 +279,21 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
         [HttpPost]
         public ApiResult Set([FromForm] BankFinancialTransferInfoTransDetailModelForSet request)
         {
-            var apiResult = new ApiResult<int>();
+            var apiResult = new ApiResult();
 
-            request.TransferInfoDetail.CreateTime = new DateTimeOffset(request.TransferInfoDetail.CreateTime.DateTime, TimeSpan.Zero);
-            request.TransferInfoDetail.UpdateTime = new DateTimeOffset(request.TransferInfoDetail.UpdateTime.DateTime, TimeSpan.Zero);
+            //request.TransferInfoDetail.CreateTime = new DateTimeOffset(request.TransferInfoDetail.CreateTime.DateTime, TimeSpan.Zero);
+            //request.TransferInfoDetail.UpdateTime = new DateTimeOffset(request.TransferInfoDetail.UpdateTime.DateTime, TimeSpan.Zero);
 
             var (status, count, message) = _bankFinancialBll.SetTransferInfo(request.TransferInfoDetail, request.UploadReceipt);
 
             if (status)
             {
-                apiResult.Data = count;
                 apiResult.Message = message;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.Data = count;
-                apiResult.Message = message;
-                apiResult.ErrorCode = 500;
+                throw new AdminException(ErrorCodeEnum.Fail, message);
             }
 
             return apiResult;
@@ -333,7 +328,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
                 throw new AdminException(ErrorCodeEnum.Fail, message);
             }
 
-            return apiResult;
+            return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success, Message = message };
         }
 
         /// <summary>

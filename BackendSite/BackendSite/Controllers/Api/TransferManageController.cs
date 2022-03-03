@@ -125,6 +125,7 @@ namespace BackendSite.Controllers.Api
 
                 foreach (var data in apiResult.Data.ToArray())
                 {
+                    data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
@@ -152,7 +153,7 @@ namespace BackendSite.Controllers.Api
                 var dateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
-                    TransDate = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).AddHours(8),
+                    TransDate = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().Date, new TimeSpan(8, 0, 0)),
 
                     FromAmount = 0,
                     FromFee = 0,
@@ -243,6 +244,8 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
+
+                transferInfoDetails.TransDate = new DateTimeOffset(transferInfoDetails.TransDate.ToUniversalTime().DateTime, TimeSpan.Zero);
 
                 transferInfoDetails.CreateTime = new DateTimeOffset(transferInfoDetails.CreateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
                 transferInfoDetails.UpdateTime = new DateTimeOffset(transferInfoDetails.UpdateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
@@ -352,6 +355,7 @@ namespace BackendSite.Controllers.Api
                                                                        null);
             foreach (var data in ExportData.ToArray())
             {
+                data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }

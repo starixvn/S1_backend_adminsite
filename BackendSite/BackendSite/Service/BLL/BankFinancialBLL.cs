@@ -652,6 +652,8 @@ namespace BackendSite.Service.BLL
                 var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
                 BankFinancialTransferInfoTransDetailModel data;
+
+
                 if (getData.Count() == 1)
                 {
                     data = getData.FirstOrDefault();
@@ -1228,7 +1230,7 @@ namespace BackendSite.Service.BLL
                     TransactionType = bankFinancialTransferInfoDetail.TransactionType,
                     TransferType = bankFinancialTransferInfoDetail.TransferType,
                     PlusOrMinus = PlusOrMinusEnum.Minus,
-                    TransDate = bankFinancialTransferInfoDetail.TransDate,
+                    TransDate = bankFinancialTransferInfoDetail.TransDate.DateTime,
                     Channel = bankFinancialTransferInfoDetail.FromChannel,
                     Agent = bankFinancialTransferInfoDetail.FromAgent == "" ? null : bankFinancialTransferInfoDetail.FromAgent,
                     PayId = bankFinancialTransferInfoDetail.FromPayId == 0 ? null : bankFinancialTransferInfoDetail.FromPayId,
@@ -1243,9 +1245,9 @@ namespace BackendSite.Service.BLL
                     Fee = bankFinancialTransferInfoDetail.FromFee,
                     Reason = bankFinancialTransferInfoDetail.Reason,
                     Remark = bankFinancialTransferInfoDetail.Remark,
-                    CreateTime = bankFinancialTransferInfoDetail.CreateTime,
+                    //CreateTime = bankFinancialTransferInfoDetail.CreateTime,
                     Creator = bankFinancialTransferInfoDetail.Creator,
-                    UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
+                    //UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
                     Updator = bankFinancialTransferInfoDetail.Updator
                 };
             }
@@ -1258,7 +1260,7 @@ namespace BackendSite.Service.BLL
                     TransactionType = bankFinancialTransferInfoDetail.TransactionType,
                     TransferType = bankFinancialTransferInfoDetail.TransferType,
                     PlusOrMinus = PlusOrMinusEnum.Plus,
-                    TransDate = bankFinancialTransferInfoDetail.TransDate,
+                    TransDate = bankFinancialTransferInfoDetail.TransDate.DateTime,
                     Channel = bankFinancialTransferInfoDetail.ToChannel,
                     Agent = bankFinancialTransferInfoDetail.ToAgent == "" ? null : bankFinancialTransferInfoDetail.ToAgent,
                     PayId = bankFinancialTransferInfoDetail.ToPayId == 0 ? null : bankFinancialTransferInfoDetail.ToPayId,
@@ -1273,9 +1275,9 @@ namespace BackendSite.Service.BLL
                     Fee = bankFinancialTransferInfoDetail.ToFee,
                     Reason = bankFinancialTransferInfoDetail.Reason,
                     Remark = bankFinancialTransferInfoDetail.Remark,
-                    CreateTime = bankFinancialTransferInfoDetail.CreateTime,
+                    //CreateTime = bankFinancialTransferInfoDetail.CreateTime,
                     Creator = bankFinancialTransferInfoDetail.Creator,
-                    UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
+                    //UpdateTime = bankFinancialTransferInfoDetail.UpdateTime,
                     Updator = bankFinancialTransferInfoDetail.Updator
                 };
             }
