@@ -144,18 +144,6 @@ const TpFailRecordReport = lazy(() =>
   import("./pages/CSD/TpFailRecordReport/index")
 );
 
-const VerificationReward = lazy(() =>
-  import("./pages/Marketing/VerificationReward/index")
-);
-
-const VerificationRewardReport = lazy(() =>
-  import("./pages/Marketing/VerificationRewardReport/index")
-);
-
-const TpFailRecordReport = lazy(() =>
-  import("./pages/CSD/TpFailRecordReport/index")
-);
-
 const CryptoWithdrawalLimitManagement = lazy(() =>
   import("./pages/Finance/CryptoWithdrawalLimitManagement/index")
 );

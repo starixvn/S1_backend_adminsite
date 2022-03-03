@@ -26,7 +26,6 @@ const defDateType = {
 };
 
 export default function Filter ({ siteList, filterInfo, onChange = f => f, siteChecked = g => g, search = h => h, datePickerOnChange = i => i }) {
-    console.log(filterInfo)
     return (
         <div className="filter">
             <div className="row-flex">
