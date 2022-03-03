@@ -206,7 +206,7 @@ namespace BackendSite.Service.BLL
                 JsonConvert.SerializeObject(promotionAllList),
                 null,
                 null,
-                1,
+                0,
                 10000,
                 out _, out _);
         }
