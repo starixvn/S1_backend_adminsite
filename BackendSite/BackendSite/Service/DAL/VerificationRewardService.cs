@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Currency", currencyId);
             p.Add("_UserName", userName);
             p.Add("_StartDate", startDate.DateTime);
-            p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
+            p.Add("_EndDate", endDate.DateTime);
             p.Add("_PageSize", Math.Abs(pageSize));
             p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -71,7 +71,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Currency", currencyId);
             p.Add("_UserName", userName);
             p.Add("_StartDate", startDate.DateTime);
-            p.Add("_EndDate", endDate.DateTime.AddSeconds(-1));
+            p.Add("_EndDate", endDate.DateTime);
 
             var result = await _reportDbClient.QueryAsync<CustVerificationReward>("Admin_CustVerificationRewardExport_Get", p);
             return result;
