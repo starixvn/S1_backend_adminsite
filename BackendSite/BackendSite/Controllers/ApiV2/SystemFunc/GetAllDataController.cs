@@ -3,18 +3,15 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static BackendSite.Controllers.Api.AdminUserController;
-using BackendSite.Extensions;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
+using BackendSite.Service.Model.BankFinancial;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -38,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
 
         #endregion
 
@@ -58,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
         #endregion
@@ -287,6 +286,29 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var result = _withdrawalBll.GetCryptoInfoData();
 
             return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
+        }
+
+        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetTransferAccountList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
+
+            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
+            foreach (var data in apiResult.Data.ToArray())
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+            }
+
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            return apiResult;
         }
 
         //==============================================================================================================================================

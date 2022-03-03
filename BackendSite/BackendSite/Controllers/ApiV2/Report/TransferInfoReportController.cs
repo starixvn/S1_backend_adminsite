@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest: ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -87,13 +87,13 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：BankFinancial > Transfer Info Report > [Submit]
+        /// Func Path：Bank Transfer > Transfer Info Report > [Submit]
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
-        public ApiResult GetList(GetListRequest request)
+        public ApiListResult<BankFinancialTransferInfoDetailModel> GetList(GetListRequest request)
         {
 
             var data = _bankFinancialBll.GetTransferInfoReport(
@@ -129,7 +129,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：BankFinancial > Transfer Info Report > [Submit] > [Export]
+        /// Func Path：Bank Transfer > Transfer Info Report > [Submit] > [Export]
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>檔案</returns>

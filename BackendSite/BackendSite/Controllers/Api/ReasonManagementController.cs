@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.Api
 
                 var SearchResult = reasonManagementBLL.GetReasonManagementData(new GetReasonManagementDataPara()
                 {
-                    FuncKey = funcKeyList,
+                    FuncKeys = funcKeyList,
                     PageNumber = para.PageNumber,
                     PageSize = para.PageSize
                 });

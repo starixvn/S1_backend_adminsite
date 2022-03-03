@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model
     }
     public class GetReasonManagementDataPara : ApiRequestPageModel
     {
-        public IEnumerable<string> FuncKey { get; set; }
+        public IEnumerable<string> FuncKeys { get; set; }
     }
     public class ReasonManagementData
     {
