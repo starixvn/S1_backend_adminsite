@@ -20,6 +20,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
     [ApiController]
     public class BaseDataController : ControllerBase
     {
+        #region Fields
 
         private readonly BankDetailBLL _bankDetailBll;
         private readonly UserBetLimitBLL _userBetLimitBll;
@@ -30,7 +31,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BonusManageBLL _bonusManageBll;
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
+
+        #endregion
+
+        #region Constructors
 
         public BaseDataController(IServiceProvider provider)
         {
@@ -45,7 +51,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _tpBll = provider.GetRequiredService<TpBLL>();
         }
 
-        #region Model
+        #endregion
+
+        #region API Model
 
         public class GetBankInfoOffListRequest
         {
@@ -171,6 +179,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 幣別
             /// </summary>
             public string UserName { get; set; }
+        }
+
+        public class GetReasonByFuncKeyRequest
+        {
+            public string FuncKey { get; set; }
         }
 
         #endregion
@@ -522,7 +535,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        ///  BaseData/GetSportTeamsList 取得體育賽隊清單
+        /// BaseData/GetSportTeamsList 取得體育賽隊清單
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -534,6 +547,22 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _sportsBll.GetSportTeamsList(request.LeaguesId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetReasonList 取得原因碼清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankFinancialReasonModel>> GetReasonList(GetReasonByFuncKeyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialReasonModel>>();
+
+            apiResult.Data = _bankFinancialBll.GetReason(request.FuncKey);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }

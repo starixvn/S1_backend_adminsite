@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
@@ -17,12 +18,11 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
     public class BankTransferAccountController : ControllerBase
     {
         #region Fields
-        
+
         private readonly AuthorizeBLL _authorizeBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly BankDetailBLL _bankDetailBll;
         private readonly ExcelBLL _excelBll;
-        
+
         #endregion
 
         #region Constructors
@@ -31,7 +31,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         {
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
-            _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -39,10 +38,15 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 
         #region API Model
 
-        public class GetTransferAccountInfoReq
+        public class GetListRequest
         {
             public int SiteId { get; set; }
             public int Id { get; set; }
+        }
+
+        public class ExportRequest
+        {
+            public int SiteId { get; set; }
         }
 
         public class CreateTransferAccountReq
@@ -52,11 +56,12 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         }
 
         #endregion
-        
+
         #region Action
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
-        public ApiResult GetTransferAccountInfoList(GetTransferAccountInfoReq req)
+        public ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>> GetList(GetListRequest req)
         {
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
 
@@ -80,68 +85,85 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
-        public ApiResult CreateTransferAccount(CreateTransferAccountReq req)
+        public IActionResult Export(ExportRequest request)
         {
-            var apiResult = new ApiResult<BankFinancialTransferAccountDetailModel>();
-            
-            try
+            var ExportData = _bankFinancialBll.GetTransferAccountInfoListForExport(false, request.SiteId, 0);
+            foreach (var data in ExportData.ToArray())
             {
-                var authData = _authorizeBll.GetAuthData();
-                var dateTime =  new DateTimeOffset(DateTime.Now, TimeSpan.Zero);
-                apiResult.Data = new BankFinancialTransferAccountDetailModel()
-                {
-                    SiteId = req.SiteId,
-                    CurrencyId = req.CurrencyId,
-                    InitialAmount = 0,
-                    MaxBalanceAlertAmount = 0,
-                    Status = TransferAccountStatusEnum.Open,
-                    CreateTime = dateTime,
-                    Creator = authData.UserId,
-                    CreatorName = authData.UserName,
-                    UpdateTime = dateTime,
-                    Updator = authData.UserId,
-                    UpdatorName = authData.UserName,
-                };
-
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.Message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "something went wrong.";
+                data.Purpose = GetPurpose(data.Purpose);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
 
-            return apiResult;
+            var stream = _excelBll.Export(ExportData);
+            return _excelBll.ExcelFile(stream, "TransferAccountInfoList");
         }
 
+        //[HttpPost]
+        //public ApiResult CreateTransferAccount(CreateTransferAccountReq req)
+        //{
+        //    var apiResult = new ApiResult<BankFinancialTransferAccountDetailModel>();
+
+        //    try
+        //    {
+        //        var authData = _authorizeBll.GetAuthData();
+        //        var dateTime =  new DateTimeOffset(DateTime.Now, TimeSpan.Zero);
+        //        apiResult.Data = new BankFinancialTransferAccountDetailModel()
+        //        {
+        //            SiteId = req.SiteId,
+        //            CurrencyId = req.CurrencyId,
+        //            InitialAmount = 0,
+        //            MaxBalanceAlertAmount = 0,
+        //            Status = TransferAccountStatusEnum.Open,
+        //            CreateTime = dateTime,
+        //            Creator = authData.UserId,
+        //            CreatorName = authData.UserName,
+        //            UpdateTime = dateTime,
+        //            Updator = authData.UserId,
+        //            UpdatorName = authData.UserName,
+        //        };
+
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        apiResult.RawMessage = ex.Message;
+        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //        apiResult.Message = "something went wrong.";
+        //    }
+
+        //    return apiResult;
+        //}
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
-        public ApiResult<BankFinancialTransferAccountDetailModel> GetTransferAccountData(GetTransferAccountInfoReq req)
+        public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetListRequest req)
         {
             var apiResult = new ApiResult<BankFinancialTransferAccountDetailModel>();
 
             try
             {
                 var result = _bankFinancialBll.GetTransferAccountInfoListForDisplay(true, req.SiteId, req.Id);
-                
+
                 foreach (var data in result.ToArray())
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
                 }
-                
+
                 if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
 
                     var authData = _authorizeBll.GetAuthData();
                     var dateTime = new DateTimeOffset(DateTime.Now.ToUniversalTime(), TimeSpan.Zero);
-                    
+
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
                     data.UpdateTime = dateTime;
-                    
+
                     apiResult.Data = data;
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
@@ -161,8 +183,9 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
-        public ApiResult SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
+        public ApiResult Set(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
 
             var apiResult = new ApiResult<int>();
@@ -194,92 +217,10 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return apiResult;
         }
 
-        [HttpPost]
-        public IActionResult ExportTransferAccountInfoList(int siteId)
-        {
-            var ExportData = _bankFinancialBll.GetTransferAccountInfoListForExport(false, siteId, 0);
-            foreach (var data in ExportData.ToArray())
-            {
-                data.Purpose = GetPurpose(data.Purpose);
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-            
-            var stream = _excelBll.Export(ExportData);
-            return File(stream,
-                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                       $"TransferAccountInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        }
-
-
-        #region Data For Set
-
-        [HttpPost]
-        public ApiResult GetTransferAccountReason()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialReasonModel>>();
-
-            try
-            {
-                apiResult.Data = _bankFinancialBll.GetReason("BankFinancial/TransferAccountManage");
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.Message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "something went wrong.";
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult GetSysBankList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankInfoSys>>();
-
-            try
-            {
-                apiResult.Data = _bankDetailBll.GetSysBankList();
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.Message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "something went wrong.";
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult GetPayList()
-        {
-            var apiResult = new ApiResult<IEnumerable<PayList>>();
-
-            try
-            {
-                apiResult.Data = _bankFinancialBll.GetPayList();
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.Message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = "something went wrong.";
-            }
-
-            return apiResult;
-        }
-
         #endregion
 
-        #endregion
-        
         #region Private Methods
-        
+
         private string GetPurpose(string purpose)
         {
             var result = string.Empty;
@@ -298,8 +239,8 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             }
             return result.Substring(1);
         }
-        
+
         #endregion
-        
+
     }
 }

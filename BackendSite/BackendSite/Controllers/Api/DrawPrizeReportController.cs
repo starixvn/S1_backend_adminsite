@@ -158,7 +158,7 @@ namespace BackendSite.Controllers.Api
                 eventNameList.Add(eventName);
 
             var exportData = prizeBLL.GetExportData(selectSite, startDate, endDate, JsonConvert.SerializeObject(currencyIdList),
-               JsonConvert.SerializeObject(eventNameList), 0);
+               JsonConvert.SerializeObject(eventNameList), 8);
 
             var stream = excelBLL.Export(exportData);
             return excelBLL.ExcelFile(stream, "DrawPrizeReport");

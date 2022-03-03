@@ -32,7 +32,7 @@ namespace BackendSite.Service.DAL
             var searchResult = new GetReasonManagementDataResult();
             
             var props = new DynamicParameters();
-            props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKey));
+            props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKeys));
             props.Add("_PageSize", Math.Abs(para.PageSize));
             props.Add("_StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 交易日期
         /// </summary>
-        public string TransDate { get; set; }
+        public DateTimeOffset TransDate { get; set; }
 
         /// <summary>
         /// 讀寫 付款方式
