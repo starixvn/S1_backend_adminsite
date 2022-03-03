@@ -317,5 +317,43 @@ namespace BackendSite.Service.BLL
                 };
             }
         }
+
+        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
+        {
+            var sKey = $"TpWallet_{custId}";
+            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
+            if (tpWalletList == null)
+            {
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)WalletTypeEnum.FundTransfer);
+                foreach (var tpWallet in tpWalletList)
+                {
+                    try
+                    {
+                        var tpInfo = new TpInfo
+                        {
+                            TpId = tpWallet.TpId,
+                            CustId = custId,
+                        };
+                        var apiResult = await GetBalanceAsync(tpInfo);
+                        if (apiResult.ErrorCode == 0)
+                        {
+                            tpWallet.Balance = apiResult.Data.balance;
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
+                if (tpWalletList != null)
+                {
+                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
+                }
+            }
+
+            return tpWalletList;
+        }
     }
 }

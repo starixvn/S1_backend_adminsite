@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers
@@ -80,13 +82,16 @@ namespace BackendSite.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoReq req)
+        public async Task<IActionResult> ExportCustInfoList(CustInfoReq req)
         {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Reset();
+            sw.Start();
             var selectSite = new List<int>();
             var selectCurrency = new List<int>();
             var selectStatus = new List<int>();
             var selectTag = new List<int>();
-            
+            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
             if (req.SelectSite != null)
             {
                 selectSite = Array.ConvertAll(req.SelectSite.Split(','), int.Parse).ToList();
@@ -138,7 +143,31 @@ namespace BackendSite.Controllers
 
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            var stream = excelBLL.Export(data);
+            foreach (var custInfoDetailForExport in data)
+            {
+                exportData.Add(custInfoBLL.GetTransferWalletAsync(custInfoDetailForExport));
+            }
+            var reslut = await Task.WhenAll(exportData);
+
+            //foreach (CustInfoDetailForExport x in data)
+            //{
+            //    var tpWallet = await custInfoBLL.GetTransferWalletAsync2(x.CustId);
+            //    var sabaWallet = tpWallet.ToList().Find(y => y.TpId == 1);
+            //    var ptWallet = tpWallet.ToList().Find(y => y.TpId == 27);
+            //    if (sabaWallet != null)
+            //    {
+            //        x.SabaWallet = sabaWallet.Balance;
+            //    }
+            //    if (ptWallet != null)
+            //    {
+            //        x.PtWallet = ptWallet.Balance;
+            //    }
+            //}
+
+            sw.Stop();
+            string result1 = sw.Elapsed.TotalMilliseconds.ToString();
+            var stream = excelBLL.Export(reslut);
+            //var stream = excelBLL.Export(data);
             return excelBLL.ExcelFile(stream, "CustInfoList");
         }
 

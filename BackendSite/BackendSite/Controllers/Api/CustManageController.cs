@@ -413,7 +413,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListReq req)
+        public async Task<IActionResult> ExportCustInfoList(CustInfoListReq req)
         {
             var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
             var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
@@ -421,7 +421,7 @@ namespace BackendSite.Controllers.Api
             var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
-
+            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
 
             var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
                                                                     req.BirDate,
@@ -444,11 +444,19 @@ namespace BackendSite.Controllers.Api
                                                                     req.SelectCurrency,
                                                                     req.BankAccountNumber,
                                                                     req.SelectStatus,
-                                                                    req.SelectTag);
+                                                                    req.SelectTag).ToList();
 
-            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            var stream = _excelBll.Export(data);
+            foreach(var custInfoDetailForExport in data)
+            {
+                exportData.Add(_custInfoBll.GetTransferWalletAsync(custInfoDetailForExport));
+            }
+            var reslut = await Task.WhenAll(exportData);
+            //data.Select(x => { x.SabaWallet = _custInfoBll.GetTransferWalletAsync(x.CustId)});
+            //GetTransferWalletAsync
+
+            var stream = _excelBll.Export(reslut);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 

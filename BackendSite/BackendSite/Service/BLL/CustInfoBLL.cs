@@ -737,5 +737,27 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
         }
+
+        public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
+        {
+            CustInfoDetailForExport result = new CustInfoDetailForExport();
+            result = custInfoDetailForExport;
+            var transferWallet = await _tpBll.GetTransferWalletAsync(custInfoDetailForExport.CustId);
+            var sabawallet = transferWallet.ToList().Find(y => y.TpId == 1);
+            var ptwallet = transferWallet.ToList().Find(y => y.TpId == 27);
+            if(sabawallet != null)
+            {
+                result.SabaWallet = sabawallet.Balance;
+            }
+            if (ptwallet != null)
+            {
+                result.PtWallet = ptwallet.Balance;
+            }
+            return result;
+        }
+        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync2(int custId)
+        {
+            return await _tpBll.GetTransferWalletAsync(custId);
+        }
     }
 }
