@@ -426,7 +426,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 1,
         Enable = 2
     }
-
+    public enum ReferralCustStatusEnum
+    {
+        Approved = 0,
+        Running = 1,
+        Expired = 2
+    }
     #endregion
 
     #region PromotionRebate
@@ -488,7 +493,7 @@ namespace BackendSite.Service.Model.enums
 
     #region BankFinancialTransferInfoLog
 
-    public enum ActionEnum 
+    public enum ActionEnum
     {
         Create = 1,
         Read = 2,
@@ -797,6 +802,7 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+
     #region Banner
 
     public enum BannerTypeEnum
@@ -868,4 +874,13 @@ namespace BackendSite.Service.Model.enums
     }
     #endregion
 
+    #region TpTransferInfo
+    
+    public enum TpTransferDirectionEnum
+    {
+        ToTP = 1,
+        ToMain = 2
+    }
+
+    #endregion
 }

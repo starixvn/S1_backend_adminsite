@@ -144,10 +144,6 @@ const TpFailRecordReport = lazy(() =>
   import("./pages/CSD/TpFailRecordReport/index")
 );
 
-const VerificationReward = lazy(() =>
-  import("./pages/Marketing/VerificationReward/index")
-);
-
 export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
