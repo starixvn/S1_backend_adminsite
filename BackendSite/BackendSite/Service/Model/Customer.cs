@@ -164,12 +164,15 @@ namespace BackendSite.Service.Model
     {
         public string SiteName { get; set; }
         public string UserName { get; set; }
+        public int CustId { get; set; }
         public int Birth_d { get; set; }
         public int Birth_m { get; set; }
         public int Birth_y { get; set; }
         public int IsTest { get; set; }
         public int IsKyc { get; set; }
         public int IsRisk { get; set; }
+        public decimal SeamlessWallet { get; set; }
+        public decimal BonusWallet { get; set; }
         public string Email { get; set; }
         public string RealName { get; set; }
         public string CountryCode { get; set; }
@@ -185,6 +188,40 @@ namespace BackendSite.Service.Model
         public string SignupUrl { get; set; }
         public string AffiliateId { get; set; }
         public string AffiliateCode { get; set; }
+        public string LastActivityIP { get; set; }      
+    }
+
+    public class CustInfoDetailForExportHasTransferWallet
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public int Birth_d { get; set; }
+        public int Birth_m { get; set; }
+        public int Birth_y { get; set; }
+        public int IsTest { get; set; }
+        public int IsKyc { get; set; }
+        public int IsRisk { get; set; }
+        public decimal SabaWallet { get; set; }
+        public decimal PtWallet { get; set; }
+        public decimal SeamlessWallet { get; set; }
+        public decimal BonusWallet { get; set; }
+        public string Email { get; set; }
+        public string RealName { get; set; }
+        public string CountryCode { get; set; }
+        public string AreaCode { get; set; }
+        public string PhoneNo { get; set; }
+        public int CurrencyId { get; set; }
+        //public int VipLevel { get; set; }
+        public string LevelName { get; set; }
+        public string Agent { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public int Status { get; set; }
+        public string SabaID { get; set; }
+        public string SignupUrl { get; set; }
+        public string AffiliateId { get; set; }
+        public string AffiliateCode { get; set; }
+        public string LastActivityIP { get; set; }       
     }
 
     public class CustPhotoId
@@ -260,6 +297,8 @@ namespace BackendSite.Service.Model
     }
     public class CustCryptoWalletLog
     {
+        public int CurrencyId { set; get; }
+        public string IsoCode { set; get; }
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }

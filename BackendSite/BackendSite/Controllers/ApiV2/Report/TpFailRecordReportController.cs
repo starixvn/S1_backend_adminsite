@@ -25,7 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         private readonly ExcelBLL _excelBll;
 
         #endregion
-        
+
         #region Constructor
 
         public TpFailRecordReportController(IServiceProvider provider)
@@ -38,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetListReq : ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startTime { get; set; }
             private DateTimeOffset _endTime { get; set; }
@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string TransId { get; set; }
         }
 
-        public class ExportReq
+        public class ExportRequest
         {
             private DateTimeOffset _startTime { get; set; }
             private DateTimeOffset _endTime { get; set; }
@@ -144,32 +144,32 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// 
         /// Func Path：Reports > Bet Failure Record > [Submit]
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
-        public ApiListResult<TpFailRecordReport> GetList(GetListReq req)
+        public ApiListResult<TpFailRecordReport> GetList(GetListRequest request)
         {
             var data =
                 _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
                 {
-                    SiteId = req.SiteId,
-                    TpId = req.TpId,
-                    FromTransTime = req.StartTime.DateTime,
-                    ToTransTime = req.EndTime.DateTime,
-                    UserName = req.UserName,
-                    TransId = req.TransId,
-                    PageSize = req.PageSize,
-                    StartIndex = (Math.Abs(req.PageNumber) - 1) * Math.Abs(req.PageSize)
+                    SiteId = request.SiteId,
+                    TpId = request.TpId,
+                    FromTransTime = request.StartTime.DateTime,
+                    ToTransTime = request.EndTime.DateTime,
+                    UserName = request.UserName,
+                    TransId = request.TransId,
+                    PageSize = request.PageSize,
+                    StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
                 }, out int totalPages, out int rowCount);
 
             if (!data.Any())
                 throw new AdminException(ErrorCodeEnum.NoData);
-            
+
             return new ApiListResult<TpFailRecordReport>
             {
                 Data = data,
-                PageNumber = req.PageNumber,
+                PageNumber = request.PageNumber,
                 RowCount = rowCount,
                 TotalPages = totalPages,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -220,19 +220,19 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// 
         /// Func Path：Reports > Bet Failure Record > [Submit]
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="request">參數</param>
         /// <returns>Excel File</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
-        public IActionResult Export(ExportReq req)
+        public IActionResult Export(ExportRequest request)
         {
-            return ExportTpFailRecordReport(req.SiteId,
-                req.TpId,
-                req.StartTime.DateTime,
-                req.EndTime.DateTime,
-                req.UserName,
-                req.TransId,
-                req.TimeZone);
+            return ExportTpFailRecordReport(request.SiteId,
+                request.TpId,
+                request.StartTime.DateTime,
+                request.EndTime.DateTime,
+                request.UserName,
+                request.TransId,
+                request.TimeZone);
         }
 
         #endregion

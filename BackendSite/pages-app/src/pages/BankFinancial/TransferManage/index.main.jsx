@@ -19,9 +19,10 @@ const lastUpdateUserFormat = userName => {
 	return userName ?? "-";
 };
 
-const lastUpdateTimeFormat = lastUpdTime => {
-	return lastUpdTime ?? "-";
-};
+const dateFormat = (datetime)=>{
+	return moment.parseZone(datetime).format("YYYY-MM-DD HH:mm:ss") ?? "-"  ;
+}
+
 
 const numberFormat = number => {
 	return number_format(number);
@@ -164,7 +165,8 @@ const titleData = [
 	},
 	{
 		dataColumn: "createTime",
-		columnTitle: "Create Time"
+		columnTitle: "Create Time",
+		body: { format: dateFormat }
 	},
 	{
 		dataColumn: "creatorName",
@@ -173,7 +175,7 @@ const titleData = [
 	{
 		dataColumn: "updateTime",
 		columnTitle: "Last Update Time",
-		body: { format: lastUpdateTimeFormat }
+		body: { format: dateFormat }
 	},
 	{
 		dataColumn: "updatorName",

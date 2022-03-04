@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,20 +63,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var detail = JsonConvert.DeserializeObject<DepositDetailInfo>(request.Detail);
 
             var result = await _depositBll.CreateDeposit(detail, request.Receipt);
+
             var apiResult = new ApiResult();
             if (result == 1)
             {
-                apiResult.ErrorCode = 1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertSuccessful");
             }
             else if (result == -1)
             {
-                apiResult.ErrorCode = -1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_UserNotFound");
             }
             else
             {
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertFailed");
             }
             return apiResult;

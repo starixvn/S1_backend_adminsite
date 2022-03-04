@@ -115,6 +115,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var pageNumber = request.PageNumber;
             var currencyAmount = new List<string>();
 
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var depositList = _depositBll.GetDepositRequestList(request.SiteIds,
                 request.DepositTypes,
                 request.StartDate.DateTime,

@@ -20,6 +20,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
     [ApiController]
     public class BaseDataController : ControllerBase
     {
+        #region Fields
 
         private readonly BankDetailBLL _bankDetailBll;
         private readonly UserBetLimitBLL _userBetLimitBll;
@@ -28,9 +29,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly VipLevelBLL _vipLevelBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly RebateManageBLL _rebateManageBll;
         private readonly SportsBLL _sportsBll;
+        private readonly TpBLL _tpBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
+
+        #endregion
+
+        #region Constructors
 
         public BaseDataController(IServiceProvider provider)
         {
@@ -41,11 +47,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
+            _tpBll = provider.GetRequiredService<TpBLL>();
         }
 
-        #region Model
+        #endregion
+
+        #region API Model
 
         public class GetBankInfoOffListRequest
         {
@@ -151,14 +159,31 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CategoryId { get; set; }
         }
 
-        public class SportLeaguesReq
+        public class GetSportLeaguesRequest
         {
-            public int SportCategoryId { get; set; }
+            public int CategoryId { get; set; }
         }
 
-        public class SportTeamsReq
+        public class GetSportTeamsRequest
         {
-            public int SportLeaguesId { get; set; }
+            public int LeaguesId { get; set; }
+        }
+
+        public class GetBySiteIdAndUserNameRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public string UserName { get; set; }
+        }
+
+        public class GetReasonByFuncKeyRequest
+        {
+            public string FuncKey { get; set; }
         }
 
         #endregion
@@ -255,6 +280,52 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+
+            if (result != ErrorCodeEnum.Success)
+            {
+                throw new AdminException(result);
+            }
+
+            if (custInfo != null)
+            {
+                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
+
+                if (bankInfoOff != null)
+                {
+                    apiResult.Data = bankInfoOff;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = 21;
+                    apiResult.Message = "BankAccount not found.";
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = 21;
+                apiResult.Message = "Player not found.";
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
         /// BaseData/GetTpGameTypeListbyCategory 取得指定第三方遊戲類型清單
         /// </summary>
         /// <remarks>
@@ -302,6 +373,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetTpCustInfoList 取得指定客戶第三方資訊清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCustInfo>>> GetTpCustInfoList(GetBySiteIdAndUserNameRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoDetails(null, request.UserName, request.SiteId);
+
+            if (custInfo == null)
+                throw new AdminException(ErrorCodeEnum.CustNotFound);
+
+            var datas = await _tpBll.GetTpCustInfoList(custInfo.CustId);
+
+            if (!datas.Any())
+                throw new AdminException(ErrorCodeEnum.NoData);
+
+            return new ApiResult<IEnumerable<TpCustInfo>>()
+            {
+                Data = datas,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -392,7 +491,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetPromotionCategories 
+        /// BaseData/GetPromotionCategoryList 取得促銷分類清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -400,7 +499,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromoCategory>> GetPromotionCategory(GetPromoCategoryRequest request)
+        public ApiResult<IEnumerable<PromoCategory>> GetPromotionCategoryList(GetPromoCategoryRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromoCategory>>();
 
@@ -419,71 +518,51 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetBankInfoOffListByCustVerify 根據客戶驗證取得銀行戶口資料清單
+        /// BaseData/GetSportLeaguesList 取得體育聯賽清單
         /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Deposit Submission > Click[Submit] > Get [Account No] List
-        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        /// <exception cref="AdminException"></exception>
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-
-            if (result != ErrorCodeEnum.Success)
-            {
-                throw new AdminException(result);
-            }
-
-            if (custInfo != null)
-            {
-                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
-
-                if (bankInfoOff != null)
-                {
-                    apiResult.Data = bankInfoOff;
-                    apiResult.ErrorCode = 0;
-                }
-                else
-                {
-                    apiResult.ErrorCode = 21;
-                    apiResult.Message = "BankAccount not found.";
-                }
-            }
-            else
-            {
-                apiResult.ErrorCode = 21;
-                apiResult.Message = "Player not found.";
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(SportLeaguesReq sportLeaguesReq)
+        public ApiResult<IEnumerable<SportLeagues>> GetSportLeaguesList(GetSportLeaguesRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<SportLeagues>>
             {
-                Data = _sportsBll.GetSportLeaguesList(sportLeaguesReq.SportCategoryId),
+                Data = _sportsBll.GetSportLeaguesList(request.CategoryId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
 
+        /// <summary>
+        /// BaseData/GetSportTeamsList 取得體育賽隊清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(SportTeamsReq sportTeamsReq)
+        public ApiResult<IEnumerable<SportTeams>> GetSportTeamsList(GetSportTeamsRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<SportTeams>>
             {
-                Data = _sportsBll.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
+                Data = _sportsBll.GetSportTeamsList(request.LeaguesId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetReasonList 取得原因碼清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankFinancialReasonModel>> GetReasonList(GetReasonByFuncKeyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialReasonModel>>();
+
+            apiResult.Data = _bankFinancialBll.GetReason(request.FuncKey);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }

@@ -41,6 +41,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region API Model
 
+        public class GetListRequest : ApiRequestPageModel
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<PromotionTypeEnum> PromotionTypes { get; set; }
+            public string BonusCode { get; set; }
+            public string UserName { get; set; }
+        }
+
         public class TransferListRequest
         {
             public List<int> BonusIdList { get; set; }
@@ -59,9 +68,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
         [HttpPost]
-        public ApiListResult<PendingBonus> GetList(ApiRequestPageModel request)
+        public ApiListResult<PendingBonus> GetList(GetListRequest request)
         {
-            var data = _bonusInfoBll.GetPendingBonusList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+
+            var promotionTypeList = request.PromotionTypes.Select(x => (int)x);
+            var data = _bonusInfoBll.GetPendingBonusList(request.SiteIds,request.CurrencyIds, promotionTypeList,
+                request.BonusCode,request.UserName,
+                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
 
             if (!data.Any())
             {
