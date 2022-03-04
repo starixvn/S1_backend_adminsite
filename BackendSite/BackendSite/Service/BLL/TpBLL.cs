@@ -352,7 +352,6 @@ namespace BackendSite.Service.BLL
                     _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
                 }
             }
-
             return tpWalletList;
         }
     }

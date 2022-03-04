@@ -75,6 +75,7 @@ namespace BackendSite.Controllers
             public string BankAccountNumber { get; set; }
             public string SelectStatus { get; set; }
             public string SelectTag { get; set; }
+            public bool ExportTransferWallet { get; set; } = false;
         }
 
         // 這隻For現行後台使用，有另一支API For Frontend Team，
@@ -82,16 +83,12 @@ namespace BackendSite.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public async Task<IActionResult> ExportCustInfoList(CustInfoReq req)
+        public async Task<IActionResult> ExportCustInfoListAsync(CustInfoReq req)
         {
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Reset();
-            sw.Start();
             var selectSite = new List<int>();
             var selectCurrency = new List<int>();
             var selectStatus = new List<int>();
             var selectTag = new List<int>();
-            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
             if (req.SelectSite != null)
             {
                 selectSite = Array.ConvertAll(req.SelectSite.Split(','), int.Parse).ToList();
@@ -140,35 +137,24 @@ namespace BackendSite.Controllers
                                                                     selectStatus,
                                                                     selectTag);
 
-
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-
-            foreach (var custInfoDetailForExport in data)
+            if (req.ExportTransferWallet)
             {
-                exportData.Add(custInfoBLL.GetTransferWalletAsync(custInfoDetailForExport));
+                List<CustInfoDetailForExportHasTransferWallet> exportDatas = new List<CustInfoDetailForExportHasTransferWallet>();
+                var tasks = data.Select(async x =>
+                {
+                    var exprotdata = await custInfoBLL.GetTransferWalletAsync(x);
+                    exportDatas.Add(exprotdata);
+                });
+                await Task.WhenAll(tasks);
+                var stream = excelBLL.Export(exportDatas);
+                return excelBLL.ExcelFile(stream, "CustInfoList");
             }
-            var reslut = await Task.WhenAll(exportData);
-
-            //foreach (CustInfoDetailForExport x in data)
-            //{
-            //    var tpWallet = await custInfoBLL.GetTransferWalletAsync2(x.CustId);
-            //    var sabaWallet = tpWallet.ToList().Find(y => y.TpId == 1);
-            //    var ptWallet = tpWallet.ToList().Find(y => y.TpId == 27);
-            //    if (sabaWallet != null)
-            //    {
-            //        x.SabaWallet = sabaWallet.Balance;
-            //    }
-            //    if (ptWallet != null)
-            //    {
-            //        x.PtWallet = ptWallet.Balance;
-            //    }
-            //}
-
-            sw.Stop();
-            string result1 = sw.Elapsed.TotalMilliseconds.ToString();
-            var stream = excelBLL.Export(reslut);
-            //var stream = excelBLL.Export(data);
-            return excelBLL.ExcelFile(stream, "CustInfoList");
+            else
+            {
+                var stream = excelBLL.Export(data);
+                return excelBLL.ExcelFile(stream, "CustInfoList");
+            }
         }
 
         #endregion

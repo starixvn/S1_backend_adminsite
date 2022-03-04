@@ -98,6 +98,7 @@ namespace BackendSite.Controllers.Api
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> SelectStatus { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
+            public bool ExportTransferWallet { get; set; } = false;
         }
 
         public class CustStatusSwitch
@@ -413,7 +414,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public async Task<IActionResult> ExportCustInfoList(CustInfoListReq req)
+        public async Task<IActionResult> ExportCustInfoListAsync(CustInfoListReq req)
         {
             var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
             var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
@@ -448,16 +449,23 @@ namespace BackendSite.Controllers.Api
 
             data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            foreach(var custInfoDetailForExport in data)
+            if (req.ExportTransferWallet)
             {
-                exportData.Add(_custInfoBll.GetTransferWalletAsync(custInfoDetailForExport));
+                List<CustInfoDetailForExportHasTransferWallet> exportDatas = new List<CustInfoDetailForExportHasTransferWallet>();
+                var tasks = data.Select(async x =>
+                {
+                    var exprotdata = await _custInfoBll.GetTransferWalletAsync(x);
+                    exportDatas.Add(exprotdata);
+                });
+                await Task.WhenAll(tasks);
+                var stream = _excelBll.Export(exportDatas);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
             }
-            var reslut = await Task.WhenAll(exportData);
-            //data.Select(x => { x.SabaWallet = _custInfoBll.GetTransferWalletAsync(x.CustId)});
-            //GetTransferWalletAsync
-
-            var stream = _excelBll.Export(reslut);
-            return _excelBll.ExcelFile(stream, "CustInfoList");
+            else
+            {
+                var stream = _excelBll.Export(data);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
+            }
         }
 
         #endregion
