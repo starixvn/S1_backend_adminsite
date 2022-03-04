@@ -60,6 +60,7 @@ namespace BackendSite.Service.Model
     }
     public class ReferralExcel
     {
+        public string SiteName { get; set; }
         public string ReferralUser { get; set; }
         public string ReferredUser { get; set; }
         public int CurrencyId { get; set; }
@@ -71,6 +72,7 @@ namespace BackendSite.Service.Model
     }
     public class ReferralExcelData
     {
+        public string SiteName { get; set; }
         public string ReferralUser { get; set; }
         public string ReferredUser { get; set; }
         public int CurrencyId { get; set; }

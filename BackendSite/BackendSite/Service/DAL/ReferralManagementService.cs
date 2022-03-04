@@ -83,7 +83,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId ,StartDate = startDate, EndDate= endDate});
 
-            var result = _reportDbClient.Query<ReferralExcel>("Admin_ReferralCustlistExport_Get_V2", p);
+            var result = _reportDbClient.Query<ReferralExcel>("Admin_ReferralCustlistExport_Get_V3", p);
             return result;
         }
 
