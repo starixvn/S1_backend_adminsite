@@ -190,7 +190,9 @@ namespace BackendSite.Service.BLL
                             Result = new ApiResult()
                             {
                                 ErrorCode = (int)ErrorCodeEnum.Success,
-                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:Transfer Successful !"
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:Transfer Successful !",
+                                RawMessage = "This is TpService/BonusTransfer Success Result."
+
                             }
                         });
                     }
@@ -202,7 +204,8 @@ namespace BackendSite.Service.BLL
                             Result = new ApiResult()
                             {
                                 ErrorCode = (int)ErrorCodeEnum.Fail,
-                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:{(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}"
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:{(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}",
+                                RawMessage = "This is TpService/BonusTransfer Error Result."
                             }
                         });
                     }
@@ -215,7 +218,8 @@ namespace BackendSite.Service.BLL
                         Result = new ApiResult()
                         {
                             ErrorCode = (int)ErrorCodeEnum.Fail,
-                            Message = $"BonusId:{item}, Message:Not Found."
+                            Message = $"Admin Error：BonusId:{item}, Message:Not Found.",
+                            RawMessage = "This is Admin Error Result."
                         }
                     });
                 }
