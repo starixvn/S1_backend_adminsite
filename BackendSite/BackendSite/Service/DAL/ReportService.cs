@@ -131,29 +131,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V3", parameters);
         }
 
-        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds,
-                                                                        string currencyIds,
-                                                                        string startDate,
-                                                                        string endDate)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate
-                });
-            var SpName = "Admin_Report_DepositDetailByDay_Get";
-            return _reportDbClient.Query<DepositReportParticalModel>(SpName, parameters);
-
-        }
-
-        public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
-                                                                                                 string currencyIds,
-                                                                                                 string startDate,
-                                                                                                 string endDate,
-                                                                                                 string userName)
+        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var parameters = new DynamicParameters(
                 new
@@ -162,26 +140,45 @@ namespace BackendSite.Service.DAL
                     CurrencyIds = currencyIds,
                     StartDate = startDate,
                     EndDate = endDate,
-                    CustomerName = userName
+                    TimeZone = timeZone
+                });
+            return _reportDbClient.Query<DepositReportParticalModel>("Admin_Report_DepositDetailByDay_Get_V2", parameters);
+        }
+
+        public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
+                                                                                                 string currencyIds,
+                                                                                                 string startDate,
+                                                                                                 string endDate,
+                                                                                                 string userName,
+                                                                                                 string timeZone)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    CustomerName = userName,
+                    TimeZone = timeZone
                 });
 
-            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get";
+            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V2";
             return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId,
-                                                                   int gameId,
-                                                                   string date)
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
         {
             var parameters = new DynamicParameters(
                 new
                 {
                     _CustId = custId,
                     _GameId = gameId,
-                    _SelDate = date
+                    _SelDate = date,
+                    _TimeZone = timeZone
                 });
 
-            var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get";
+            var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get_V2";
             return _reportDbClient.Query<TpBetRecordDataModel>(SpName, parameters);
         }
 

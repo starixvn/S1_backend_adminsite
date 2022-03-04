@@ -47,6 +47,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Adjustment Report For Frontend Use - AdjustTypeEnum
         /// 
+        /// BankDetailOff - PurposeEnum、BankDetailOffStatusEnum
+        /// 
         /// Customer - IsKycEnum、IsRiskEnum、ActStatusEnum
         /// 
         /// CustIovation - IovationEnum
@@ -59,7 +61,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// AdjustWithdrawalLimitInfo - AdjustWithdrawalLimitInfoAdjustTypeEnum、AdjustWithdrawalLimitInfoStatusEnum
         /// 
-        /// Promotion - PromotionTypeEnum
+        /// Promotion - PromotionTypeEnum、PromotionStatusEnum、PromotionPeriodTypeEnum
+        ///             PromotionDeviceTypeEnum、PromotionActionEnum 、WalletTypeEnum
+        ///             
+        /// PromotionCashBackSetting - PromotionCashBackSettingStatusEnum
+        /// 
+        /// PromotionRebate - PromotionRebateStatusEnum
+        /// 
+        /// PromotionSpecific - BonusTypeEnum、PromotionSpecificStatusEnum
         /// </remarks>
         /// <param name="reqest">參數</param>
         /// <returns>Data 結果</returns>

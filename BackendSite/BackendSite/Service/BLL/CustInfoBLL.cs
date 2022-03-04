@@ -198,6 +198,7 @@ namespace BackendSite.Service.BLL
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
+            
             return custInfoDetail;
         }
 

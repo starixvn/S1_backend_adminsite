@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,22 +22,57 @@ namespace BackendSite.Service.BLL
             this.selLangBLL = selLangBLL;
         }
 
-        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, ref List<string> currencyAmount)
+        public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            string userName,
+            IEnumerable<int> adjustTypes,
+            DateTime startDate,
+            DateTime endDate,
+            string transId,
+            int pageNumber,
+            int pageSize,
+            out int totalPages,
+            out int rowCount,
+            out List<string> currencyAmount)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            var siteList = serverInfoBLL.GetSiteList();
+            var getFromAdjustmentInfo = false;
+            var AdjustTypesForAI = new List<int>();
+            var getFromLogAdminAdjustWallet = false;
+            var AdjustTypesForLAAW = new List<int>();
+
+            if (!siteIds.Any())
+                siteIds = serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+
+            #region AdjustType
+
+            if (!AdjustTypeCheck(adjustTypes,
+            out getFromAdjustmentInfo,
+            out AdjustTypesForAI,
+            out getFromLogAdminAdjustWallet,
+            out AdjustTypesForLAAW))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            #endregion
+
             var datas = paymentAdjustmentService.GetPaymentAdjustmentReport(
-                    transId,
-                    currency,
+                    JsonConvert.SerializeObject(siteIds),
+                    JsonConvert.SerializeObject(currencyIds),
+                    getFromAdjustmentInfo,
+                    JsonConvert.SerializeObject(AdjustTypesForAI),
+                    getFromLogAdminAdjustWallet,
+                    JsonConvert.SerializeObject(AdjustTypesForLAAW),
                     userName,
-                    adjustType,
-                    siteList?.Select(x => x.SiteId),
                     startDate,
                     endDate,
-                    pageSize,
-                    ref pageNumber,
-                    ref totalPages,
-                    ref rowCount,
-                    ref currencyAmount
+                    transId,
+                    (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                    Math.Abs(pageSize),
+                    out totalPages,
+                    out rowCount,
+                    out currencyAmount
                 );
 
             var result = new List<PaymentAdjustmentFrontEnd>();
@@ -65,18 +102,47 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate)
+        public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            string userName,
+            IEnumerable<int> adjustTypes,
+            DateTime startDate,
+            DateTime endDate,
+            string transId)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser();
+            var siteList = serverInfoBLL.GetSiteList();
+            var getFromAdjustmentInfo = false;
+            var AdjustTypesForAI = new List<int>();
+            var getFromLogAdminAdjustWallet = false;
+            var AdjustTypesForLAAW = new List<int>();
+
+            if (!siteIds.Any())
+                siteIds = serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+
+            #region AdjustType
+
+            if (!AdjustTypeCheck(adjustTypes,
+            out getFromAdjustmentInfo,
+            out AdjustTypesForAI,
+            out getFromLogAdminAdjustWallet,
+            out AdjustTypesForLAAW))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            #endregion
+
             var datas = paymentAdjustmentService.GetPaymentAdjustmentExportReport(
-                    transId,
-                    currency,
+                    JsonConvert.SerializeObject(siteIds),
+                    JsonConvert.SerializeObject(currencyIds),
+                    getFromAdjustmentInfo,
+                    JsonConvert.SerializeObject(AdjustTypesForAI),
+                    getFromLogAdminAdjustWallet,
+                    JsonConvert.SerializeObject(AdjustTypesForLAAW),
                     userName,
-                    adjustType,
-                    siteList?.Select(x => x.SiteId),
                     startDate,
-                    endDate
-                );
+                    endDate,
+                    transId);
 
             var result = new List<PaymentAdjustmentFrontEnd>();
             if (datas != null && datas.Any())
@@ -115,5 +181,58 @@ namespace BackendSite.Service.BLL
         {
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
+
+        #region Private Methods
+
+        private bool AdjustTypeCheck(IEnumerable<int> adjustTypes,
+            out bool getFromAdjustmentInfo,
+            out List<int> AdjustTypesForAI,
+            out bool getFromLogAdminAdjustWallet,
+            out List<int> AdjustTypesForLAAW)
+        {
+            getFromAdjustmentInfo = false;
+            AdjustTypesForAI = new List<int>();
+            getFromLogAdminAdjustWallet = false;
+            AdjustTypesForLAAW = new List<int>();
+
+            //先暫時寫死
+            //原本是1234抓AdjustmentInfo,56抓LogAdminAdjustWallet
+            //但是現在AdjustmentInfo也有56了......後續打算要怎麼規劃呢
+
+            foreach (var adjustType in adjustTypes)
+            {
+                switch (adjustType)
+                {
+                    case 1:
+                        getFromAdjustmentInfo = true;
+                        AdjustTypesForAI.Add(1);
+                        break;
+                    case 2:
+                        getFromAdjustmentInfo = true;
+                        AdjustTypesForAI.Add(2);
+                        break;
+                    case 3:
+                        getFromAdjustmentInfo = true;
+                        AdjustTypesForAI.Add(3);
+                        break;
+                    case 4:
+                        getFromAdjustmentInfo = true;
+                        AdjustTypesForAI.Add(4);
+                        break;
+                    case 5:
+                        getFromLogAdminAdjustWallet = true;
+                        AdjustTypesForLAAW.Add(1);
+                        break;
+                    case 6:
+                        getFromLogAdminAdjustWallet = true;
+                        AdjustTypesForLAAW.Add(2);
+                        break;
+                }
+            }
+            return true;
+        }
+
+        #endregion
+
     }
 }
