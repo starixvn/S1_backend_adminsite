@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -88,6 +89,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > Adjustment Report > [Submit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentReport" })]
+        [HttpPost]
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetList(GetListRequest request)
         {
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
@@ -130,6 +133,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > Adjustment Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentReport" })]
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {

@@ -116,9 +116,9 @@ namespace BackendSite.Service.BLL
                 Reason = bankFinancialTransferAccount.Reason == 0 ? null : bankFinancialTransferAccount.Reason,
                 Remark = bankFinancialTransferAccount.Remark,
                 Status = bankFinancialTransferAccount.Status,
-                CreateTime = bankFinancialTransferAccount.CreateTime,
+                //CreateTime = bankFinancialTransferAccount.CreateTime,
                 Creator = bankFinancialTransferAccount.Creator,
-                UpdateTime = bankFinancialTransferAccount.UpdateTime,
+                //UpdateTime = bankFinancialTransferAccount.UpdateTime,
                 Updator = bankFinancialTransferAccount.Updator
             };
 

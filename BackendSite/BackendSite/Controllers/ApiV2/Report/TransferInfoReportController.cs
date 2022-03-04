@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region TransferInfo Report
 
         /// <summary>
-        ///  TransferInfoReport/GetList 取得轉帳資料清單
+        ///  TransferInfoReport/Get 取得轉帳資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -93,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/TransferInfoReport" })]
         [HttpPost]
-        public ApiListResult<BankFinancialTransferInfoDetailModel> GetList(GetListRequest request)
+        public ApiListResult<BankFinancialTransferInfoDetailModel> Get(GetListRequest request)
         {
 
             var data = _bankFinancialBll.GetTransferInfoReport(
