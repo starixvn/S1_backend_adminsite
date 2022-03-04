@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
@@ -41,12 +42,13 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetBankFinancialReportReq
+        public class GetListRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public string StartDate { get; set; }
             public string EndDate { get; set; }
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
@@ -66,7 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
-        public ApiResult Get(GetBankFinancialReportReq request)
+        public ApiResult<IEnumerable<BankFinancialDataModel>> Get(GetListRequest request)
         {
             var data = _bankFinancialBll.GetBankFinancialReport(
                 JsonConvert.SerializeObject(request.SiteIds),
@@ -95,12 +97,13 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：BankFinancial > Bank Financial Report > [Export]
+        /// Func Path：BankFinancial > Bank Financial Report > [Submit] > [Export]
         /// </remarks>
         /// <param name="request"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult Export(GetBankFinancialReportReq request)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
+        public IActionResult Export(GetListRequest request)
         {
             var data = _bankFinancialBll.GetBankFinancialReport(
                 JsonConvert.SerializeObject(request.SiteIds),
@@ -111,9 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             
             var stream = _excelBll.Export(data);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "BankFinancialReport");
         }
 
         #endregion
