@@ -440,70 +440,48 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public DepositTimeData DepositTimeReportGet(DepositTimeReportPara para)
+        public IEnumerable<DepositTimeList> DepositTimeReportGet(string siteIds,
+            string currencyIds,
+            string statuses,
+            DateTime startDate,
+            DateTime endDate,
+            string depositId,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            var selectSite = JsonConvert.SerializeObject(para.SiteIds);
-            var selectStatus = new List<int>();
-            if (para.Status == 0)
-            {
-                selectStatus.Add(3);
-                selectStatus.Add(4);
-                selectStatus.Add(5);
-            }
-            else
-            {
-                selectStatus.Add(para.Status);
-            }
-            var SelectStatus = JsonConvert.SerializeObject(selectStatus);
-
-            var searchData = new DepositTimeData();
             var props = new DynamicParameters();
-            int.TryParse(para.DepositId, out var tempDepositId);
+            int.TryParse(depositId, out var tempDepositId);
 
-            props.Add("SelectSite", selectSite);
-            props.Add("DepositId", tempDepositId);
-            props.Add("StartDate", para.StartDate.DateTime);
-            props.Add("EndDate", para.EndDate.DateTime);
-            props.Add("SelectStatus", SelectStatus);
-            props.Add("CurrencyId", para.CurrencyId);
-            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize), DbType.Int32, ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(para.PageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", Math.Abs(para.PageSize));
-            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V3", props).ToList();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_DepositId", tempDepositId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_Statuses", statuses);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V4", props).ToList();
 
-            searchData.DepositTimeList = result;
-            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
-            return searchData;
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+            return result;
         }
-        public List<DepositTimeList> GetExportData(IEnumerable<int> SelectSite, string depositId, DateTime startDate, DateTime endDate, int status, int currencyId)
+        public List<DepositTimeList> GetExportData(string siteIds, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
         {
-            var selectSite = JsonConvert.SerializeObject(SelectSite);
-            var selectstatus = new List<int>();
-            if (status == 0)
-            {
-                selectstatus.Add(3);
-                selectstatus.Add(4);
-                selectstatus.Add(5);
-            }
-            else
-            {
-                selectstatus.Add(status);
-            }
-            var selectStatus = JsonConvert.SerializeObject(selectstatus);
             int.TryParse(depositId, out var tempDepositId);
 
             var props = new DynamicParameters();
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("SelectSite", selectSite);
-            props.Add("CurrencyId", currencyId);
-            props.Add("DepositId", tempDepositId);
-            props.Add("SelectStatus", selectStatus);
-            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V3", props).ToList();
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_DepositId", tempDepositId);
+            props.Add("_Statuses", statuses);
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V4", props).ToList();
 
         }
         public bool SetDepositRequestAmount(string transId, decimal amount, string Operator)
