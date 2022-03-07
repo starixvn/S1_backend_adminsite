@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -298,34 +299,46 @@ namespace BackendSite.Service.BLL
             { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
         };
 
-        public DepositTimeData DepositTimeReportGet(DepositTimeReportPara para)
+        public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,
+            out int totalPages, out int rowCount)
         {
-            var result = depositService.DepositTimeReportGet(para);
+            var result = depositService.DepositTimeReportGet(JsonConvert.SerializeObject(para.SiteIds),
+                JsonConvert.SerializeObject(para.CurrencyId),
+                JsonConvert.SerializeObject(para.Status),
+                para.StartDate.DateTime,
+                para.EndDate.DateTime,
+                para.DepositId,
+                (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),
+                Math.Abs(para.PageSize),
+                out totalPages,
+                out rowCount);
 
-            result?.DepositTimeList.ForEach(x =>
-           {
-               var tsC = new TimeSpan(x.CreateTime.Ticks);
-               var tsU = new TimeSpan(x.UpdateTime.Ticks);
-               var ts = tsC.Subtract(tsU).Duration();
-               x.CompleteTime = GetTimeString(ts);
+            if (result.Any())
+            {
+                result.ToList().ForEach(x =>
+                {
+                    var tsC = new TimeSpan(x.CreateTime.Ticks);
+                    var tsU = new TimeSpan(x.UpdateTime.Ticks);
+                    var ts = tsC.Subtract(tsU).Duration();
+                    x.CompleteTime = GetTimeString(ts);
 
-               if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
-               {
-                   var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
-                   var ts2 = tsC.Subtract(tsA).Duration();
-                   x.ToApprovedTime = GetTimeString(ts2);
-               }
-           });
+                    if (x.ApprovedTime > DateTime.Now.AddYears(-1000))
+                    {
+                        var tsA = new TimeSpan(x.ApprovedTime.Value.Ticks);
+                        var ts2 = tsC.Subtract(tsA).Duration();
+                        x.ToApprovedTime = GetTimeString(ts2);
+                    }
+                });
+            }
 
             return result;
         }
 
-        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, int status, int currencyId)
+        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
         {
             var exportDataToExcel = new List<DepositTimeExportData>();
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
 
-            var result = depositService.GetExportData(siteList, depositId, startDate, endDate, status, currencyId);
+            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds);
 
             result?.ForEach(x =>
             {
