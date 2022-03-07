@@ -78,6 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public string Title { get; set; }
             public string Content { get; set; }
+            public string PopupMessage { get; set; }
         }
 
         public class GetBatchMessageReq
