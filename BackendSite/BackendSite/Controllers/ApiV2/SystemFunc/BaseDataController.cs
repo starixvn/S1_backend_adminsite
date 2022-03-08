@@ -49,6 +49,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
         #endregion
