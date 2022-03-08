@@ -738,37 +738,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
         }
 
-        public async Task<CustInfoDetailForExportHasTransferWallet> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
+        public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
         {
-            CustInfoDetailForExportHasTransferWallet result = new CustInfoDetailForExportHasTransferWallet() 
-            { 
-                SiteName = custInfoDetailForExport.SiteName,
-                UserName = custInfoDetailForExport.UserName,
-                CustId = custInfoDetailForExport.CustId,
-                Birth_d = custInfoDetailForExport.Birth_d,
-                Birth_m = custInfoDetailForExport.Birth_m,
-                Birth_y = custInfoDetailForExport.Birth_y,
-                IsTest = custInfoDetailForExport.IsTest,
-                IsKyc  = custInfoDetailForExport.IsKyc,
-                IsRisk = custInfoDetailForExport.IsRisk,
-                Email = custInfoDetailForExport.Email,
-                RealName = custInfoDetailForExport.RealName,
-                CountryCode = custInfoDetailForExport.CountryCode,
-                AreaCode = custInfoDetailForExport.AreaCode,
-                PhoneNo = custInfoDetailForExport.PhoneNo,
-                CurrencyId = custInfoDetailForExport.CurrencyId,
-                LevelName = custInfoDetailForExport.LevelName,
-                Agent = custInfoDetailForExport.Agent,
-                RegTime = custInfoDetailForExport.RegTime,
-                Status = custInfoDetailForExport.Status,
-                SabaID = custInfoDetailForExport.SabaID,
-                SignupUrl = custInfoDetailForExport.SignupUrl,
-                AffiliateId = custInfoDetailForExport.AffiliateId,
-                AffiliateCode = custInfoDetailForExport.AffiliateCode,
-                LastActivityIP = custInfoDetailForExport.LastActivityIP,
-                BonusWallet = custInfoDetailForExport.BonusWallet,
-                SeamlessWallet = custInfoDetailForExport.SeamlessWallet
-            };
+            var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferWalletAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
@@ -778,7 +750,7 @@ namespace BackendSite.Service.BLL
             }
             if (ptwallet != null)
             {
-                result.PtWallet = ptwallet.Balance;
+                result.PTWallet = ptwallet.Balance;
             }
             return result;
         }

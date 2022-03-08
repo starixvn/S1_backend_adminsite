@@ -104,7 +104,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t) where T : notnull, new()
+        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -112,7 +112,10 @@ namespace BackendSite.Service.BLL
 
             if (t.Any())
             {
-                var propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                if (propertyInfo == null)
+                {
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                }
                 ExportBody(ws, t, propertyInfo);
                 ExportHeader(ws, propertyInfo);
             }
