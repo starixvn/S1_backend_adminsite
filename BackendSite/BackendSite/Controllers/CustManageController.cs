@@ -147,6 +147,8 @@ namespace BackendSite.Controllers
                     exportDatas.Add(exprotdata);
                 });
                 await Task.WhenAll(tasks);
+                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PtWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = excelBLL.Export(exportDatas);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
