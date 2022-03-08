@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.enums;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
@@ -43,6 +44,28 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
         public int Status { get; set; }
         public int TpId { get; set; }
+        public string DirectionName 
+        {
+            get
+            {
+                if(Direction == (int)TpTransferDirectionEnum.ToTP)
+                {
+                    if(TpId == (int)TpEnum.Saba)
+                    {
+                        return "Main Wallet -> Sportsbook Wallet";
+                    }
+                    return $"Main Wallet -> {TpName} Wallet";
+                }
+                else
+                {
+                    if (TpId == (int)TpEnum.Saba)
+                    {
+                        return "Sportsbook Wallet -> Main Wallet";
+                    }
+                    return $"{TpName} Wallet -> Main Wallet";
+                }
+            }
+        }
     }
     public class AdminTpTransferInfo : TpTransferInfo
     {

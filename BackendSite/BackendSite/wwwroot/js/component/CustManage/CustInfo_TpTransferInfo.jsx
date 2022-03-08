@@ -15,12 +15,6 @@ class TpTransferInfoList extends React.Component {
     }
 
     render() {
-        const Direction = {
-            1: "Main Wallet -> Sportsbook Wallet",
-            2: "Sportsbook Wallet -> Main Wallet",
-            3: "PT Wallet -> Main Wallet",
-            4: "Main Wallet -> PT Wallet",
-        }
         const TpTransferInfoStatus = {
             0: "Success",
             1: "Fail",
@@ -34,7 +28,7 @@ class TpTransferInfoList extends React.Component {
                 <th scope="row">{row.transId}</th>
                 <td>{row.tpName}</td>
                 <td>
-                    {row.direction == 1 ? row.tpId == 1 ? Direction[1] : Direction[4] : row.tpId == 1 ? Direction[2] : Direction[3]}             
+                    {row.directionName}
                 </td>
                 <td className="text-right">{number_format(row.amount)}</td>
                 <td>{row.thirdId}</td>

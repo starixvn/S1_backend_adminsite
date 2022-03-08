@@ -200,6 +200,7 @@ namespace BackendSite.Controllers.Api
 
                 foreach (var data in result.ToArray())
                 {
+                    data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
 
@@ -245,7 +246,7 @@ namespace BackendSite.Controllers.Api
             {
                 var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
 
-                transferInfoDetails.TransDate = new DateTimeOffset(transferInfoDetails.TransDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+                transferInfoDetails.TransDate = new DateTimeOffset(transferInfoDetails.TransDate.DateTime, TimeSpan.Zero).AddHours(-8);
 
                 transferInfoDetails.CreateTime = new DateTimeOffset(transferInfoDetails.CreateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
                 transferInfoDetails.UpdateTime = new DateTimeOffset(transferInfoDetails.UpdateTime.ToUniversalTime().DateTime, TimeSpan.Zero);

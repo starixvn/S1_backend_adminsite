@@ -33,18 +33,17 @@ namespace BackendSite.Service.BLL
             var sportBetSetting = betSetting.SingleOrDefault(a => a.TpCategory == 1);
             if (sportBetSetting != null)
             {
-                var minBet = sportBetSetting.MinBet;
-                var maxBet = sportBetSetting.MaxBet;
-                var sabaBetSetting = sportBetSetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == 1);
+                var sabaBetSetting = sportBetSetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == 69);
                 if (sabaBetSetting != null)
                 {
-                    minBet = sabaBetSetting.MinBet;
-                    maxBet = sabaBetSetting.MaxBet;
+                    var minBet = sabaBetSetting.MinBet;
+                    var maxBet = sabaBetSetting.MaxBet;
+                    var apiResult = await _tpBll.SetBetLimitAsync(41, custId, minBet, maxBet);
+                    if (apiResult.ErrorCode != (int)ErrorCodeEnum.Success)
+                        throw new AdminException(ErrorCodeEnum.SystemException, "Set third party bet limit failed");
                 }
 
-                var apiResult = await _tpBll.SetBetLimitAsync(1, custId, minBet, maxBet);
-                if (apiResult.ErrorCode != (int)ErrorCodeEnum.Success)
-                    throw new AdminException(ErrorCodeEnum.SystemException, "Set third party bet limit failed");
+              
             }
 
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);

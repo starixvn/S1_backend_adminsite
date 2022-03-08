@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
 {
@@ -84,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
 
         public class BankFinancialTransferInfoTransDetailModelForSet
         {
-            public BankFinancialTransferInfoTransDetailModel TransferInfoDetail { get; set; }
+            public string Detail { get; set; }
             public IFormFile UploadReceipt { get; set; }
         }
 
@@ -283,8 +284,9 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
 
             //request.TransferInfoDetail.CreateTime = new DateTimeOffset(request.TransferInfoDetail.CreateTime.DateTime, TimeSpan.Zero);
             //request.TransferInfoDetail.UpdateTime = new DateTimeOffset(request.TransferInfoDetail.UpdateTime.DateTime, TimeSpan.Zero);
+            var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(request.Detail);
 
-            var (status, count, message) = _bankFinancialBll.SetTransferInfo(request.TransferInfoDetail, request.UploadReceipt);
+            var (status, count, message) = _bankFinancialBll.SetTransferInfo(transferInfoDetails, request.UploadReceipt);
 
             if (status)
             {

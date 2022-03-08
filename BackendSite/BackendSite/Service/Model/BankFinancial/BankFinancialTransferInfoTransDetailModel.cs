@@ -12,7 +12,6 @@ namespace BackendSite.Service.Model.BankFinancial
 
     public class BankFinancialTransferInfoTransDetailModel
     {
-
         /// <summary>
         /// 讀寫 交易ID
         /// </summary>
