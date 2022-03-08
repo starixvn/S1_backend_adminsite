@@ -2073,17 +2073,13 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = DateTimeExtensions.UnixToDateTime(custInfoReq.StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(custInfoReq.EndDate);
-                var SearchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
+                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-
-                //foreach (var data in SearchResult.RegLiveStatusDatas)
-                //{
-                //    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
-                //}
-                apiResult.Data = SearchResult.RegLiveStatusDatas;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                
+                apiResult.Data = searchResult.RegLiveStatusDatas;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
