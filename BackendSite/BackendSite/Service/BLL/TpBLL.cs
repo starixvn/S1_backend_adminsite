@@ -330,27 +330,20 @@ namespace BackendSite.Service.BLL
             if (tpWalletList == null)
             {
                 tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)WalletTypeEnum.Transfer);
-                foreach (var tpWallet in tpWalletList)
+                var tasks = tpWalletList.Select(async x =>
                 {
-                    try
+                    var tpInfo = new TpInfo
                     {
-                        var tpInfo = new TpInfo
-                        {
-                            TpId = tpWallet.TpId,
-                            CustId = custId,
-                        };
-                        var apiResult = await GetBalanceAsync(tpInfo);
-                        if (apiResult.ErrorCode == 0)
-                        {
-                            tpWallet.Balance = apiResult.Data.balance;
-                        }
-
-                    }
-                    catch (Exception)
+                        TpId = x.TpId,
+                        CustId = custId,
+                    };
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    if (apiResult.ErrorCode == 0)
                     {
-
-                    }
-                }
+                        x.Balance = apiResult.Data.balance;
+                    }                   
+                });
+                await Task.WhenAll(tasks);
 
                 if (tpWalletList != null)
                 {
