@@ -451,7 +451,7 @@ namespace BackendSite.Controllers.Api
 
             if (req.ExportTransferWallet)
             {
-                List<CustInfoDetailForExportHasTransferWallet> exportDatas = new List<CustInfoDetailForExportHasTransferWallet>();
+                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = data.Select(async x =>
                 {
                     var exprotdata = await _custInfoBll.GetTransferWalletAsync(x);
@@ -459,13 +459,14 @@ namespace BackendSite.Controllers.Api
                 });
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PtWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = _excelBll.Export(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var stream = _excelBll.Export(data);
+                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
+                var stream = _excelBll.Export(data, properties);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
         }

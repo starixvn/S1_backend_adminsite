@@ -140,7 +140,7 @@ namespace BackendSite.Controllers
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             if (req.ExportTransferWallet)
             {
-                List<CustInfoDetailForExportHasTransferWallet> exportDatas = new List<CustInfoDetailForExportHasTransferWallet>();
+                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = data.Select(async x =>
                 {
                     var exprotdata = await custInfoBLL.GetTransferWalletAsync(x);
@@ -148,13 +148,14 @@ namespace BackendSite.Controllers
                 });
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PtWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = excelBLL.Export(exportDatas);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var stream = excelBLL.Export(data);
+                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
+                var stream = excelBLL.Export(data, properties);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
         }
