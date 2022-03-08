@@ -418,6 +418,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string AffCode { get; set; }
         public string Agent { get; set; }
+        public string ReferralUrl { get; set; }
     }
     public class RegLiveStatusResult
     {
