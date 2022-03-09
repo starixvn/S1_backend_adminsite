@@ -1124,8 +1124,8 @@ namespace BackendSite.Controllers.Api
             if (loginLogReq.endDate > 2147483647)
                 loginLogReq.endDate = 2147483647;
 
-            var startDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.startDate);
-            var endDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.endDate);
+            var startDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.startDate).AddHours(-8);
+            var endDate = DateTimeExtensions.UnixToDateTime((long)loginLogReq.endDate).AddHours(-8);
 
             var withdrawalList = _custInfoBll.GetLoginLogByCust(loginLogReq.CustId, startDate, endDate, 10, loginLogReq.PageNumber, out totalPages, out rowCount);
             apiListResult.Data = withdrawalList;
