@@ -362,7 +362,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
+    public enum ReferralCustStatusEnum 
+    {
+        Approved = 0,
+        Running = 1,
+        Expired = 2
+    }
     #endregion
 
     public enum BonusType
@@ -693,4 +698,12 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-}
+    #region TpTransferInfo
+    public enum TpTransferDirectionEnum
+    {
+        ToTP = 1,
+        ToMain = 2
+    }
+
+    #endregion
+    }

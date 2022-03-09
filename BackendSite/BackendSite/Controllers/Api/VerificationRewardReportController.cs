@@ -77,7 +77,9 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
         public async Task<IActionResult> Export(string siteIds, string userName, int currencyId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(siteIds, currencyId, userName, startDate, endDate);
+            var utcStartDate = new DateTimeOffset(startDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var utcEndDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero);
+            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(siteIds, currencyId, userName, utcStartDate, utcEndDate);
             var stream = _excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VerificationReward_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

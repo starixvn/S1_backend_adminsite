@@ -58,4 +58,28 @@ namespace BackendSite.Service.Model
         public string StatusName { get; set; }
 
     }
+    public class ReferralExcel
+    {
+        public string SiteName { get; set; }
+        public string ReferralUser { get; set; }
+        public string ReferredUser { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public decimal ReferralAmount { get; set; }
+        public DateTimeOffset? RewardTime { get; set; }
+        public int Status { get; set; }
+    }
+    public class ReferralExcelData
+    {
+        public string SiteName { get; set; }
+        public string ReferralUser { get; set; }
+        public string ReferredUser { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public decimal ReferralAmount { get; set; }
+        public DateTimeOffset? RewardTime { get; set; }
+        public string Status { get; set; }
+    }
 }

@@ -66,16 +66,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// 
         /// Func Path：Marketing  > Verification Reward Report > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="siteIds"></param>
-        /// <param name="currencyId"></param>
-        /// <param name="userName"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
+        /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
-        public async Task<IActionResult> Export(string siteIds, string userName, int currencyId, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IActionResult> Export(ExportVerificationRewardReport req)
         {
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(siteIds, currencyId, userName, startDate, endDate);
+            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(req.SiteIds, req.CurrencyId, req.UserName, req.StartDate, req.EndDate);
             var stream = _excelBll.Export(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VerificationReward_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

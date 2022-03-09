@@ -157,6 +157,7 @@ namespace BackendSite.Service.Model
         public string TagList { get; set; }
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
+        public decimal Bonus { get; set; }
     }
 
     public class CustInfoDetailForExport
