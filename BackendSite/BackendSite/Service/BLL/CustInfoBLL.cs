@@ -200,6 +200,7 @@ namespace BackendSite.Service.BLL
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
+            
             return custInfoDetail;
         }
 
@@ -738,6 +739,23 @@ namespace BackendSite.Service.BLL
         public WithdrawalLimitLogData GetWithdrawalLimitLog(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
             return _custInfoService.GetWithdrawalLimitLog(custId, StartDate, EndDate, PageNumber, PageSize);
+        }
+
+        public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
+        {
+            var result = custInfoDetailForExport;
+            var transferWallet = await _tpBll.GetTransferWalletAsync(custInfoDetailForExport.CustId);
+            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
+            var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
+            if(sabaWallet != null)
+            {
+                result.SabaWallet = sabaWallet.Balance;
+            }
+            if (ptwallet != null)
+            {
+                result.PTWallet = ptwallet.Balance;
+            }
+            return result;
         }
 
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)

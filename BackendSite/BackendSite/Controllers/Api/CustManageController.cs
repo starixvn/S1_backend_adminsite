@@ -98,6 +98,7 @@ namespace BackendSite.Controllers.Api
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> SelectStatus { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
+            public bool ExportTransferWallet { get; set; } = false;
         }
 
         public class CustStatusSwitch
@@ -413,7 +414,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListReq req)
+        public async Task<IActionResult> ExportCustInfoListAsync(CustInfoListReq req)
         {
             var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
             var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
@@ -421,7 +422,7 @@ namespace BackendSite.Controllers.Api
             var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
-
+            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
 
             var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
                                                                     req.BirDate,
@@ -444,12 +445,30 @@ namespace BackendSite.Controllers.Api
                                                                     req.SelectCurrency,
                                                                     req.BankAccountNumber,
                                                                     req.SelectStatus,
-                                                                    req.SelectTag);
+                                                                    req.SelectTag).ToList();
 
-            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            var stream = _excelBll.Export(data);
-            return _excelBll.ExcelFile(stream, "CustInfoList");
+            if (req.ExportTransferWallet)
+            {
+                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
+                var tasks = data.Select(async x =>
+                {
+                    var exprotdata = await _custInfoBll.GetTransferWalletAsync(x);
+                    exportDatas.Add(exprotdata);
+                });
+                await Task.WhenAll(tasks);
+                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                var stream = _excelBll.Export(exportDatas);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
+            }
+            else
+            {
+                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
+                var stream = _excelBll.Export(data, properties);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
+            }
         }
 
         #endregion
@@ -554,7 +573,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
 
             switch (custStatusSwitch.Op)
@@ -2055,17 +2074,13 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = DateTimeExtensions.UnixToDateTime(custInfoReq.StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(custInfoReq.EndDate);
-                var SearchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
+                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-
-                //foreach (var data in SearchResult.RegLiveStatusDatas)
-                //{
-                //    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0));
-                //}
-                apiResult.Data = SearchResult.RegLiveStatusDatas;
-                apiResult.PageNumber = SearchResult.PageNumber;
-                apiResult.TotalPages = SearchResult.TotalPages;
-                apiResult.RowCount = SearchResult.RowCount;
+                
+                apiResult.Data = searchResult.RegLiveStatusDatas;
+                apiResult.PageNumber = searchResult.PageNumber;
+                apiResult.TotalPages = searchResult.TotalPages;
+                apiResult.RowCount = searchResult.RowCount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
