@@ -503,7 +503,7 @@ namespace BackendSite.Service.Model.enums
 
     #region BankFinancialTransferInfoLog
 
-    public enum ActionEnum 
+    public enum ActionEnum
     {
         Create = 1,
         Read = 2,
@@ -530,6 +530,22 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     public enum VipStatus
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
+    public enum VipDowngradeReviewStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
+    public enum VipUpgradeReviewStatusEnum
     {
         Pending = 1,
         Approved = 2,
