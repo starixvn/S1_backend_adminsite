@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
+        private readonly ThirdPartyService _thirdPartyService;
 
         public CustInfoBLL(IServiceProvider provider)
         {
@@ -49,6 +50,7 @@ namespace BackendSite.Service.BLL
             var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
+            _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -166,13 +168,13 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public async Task<CustInfoDetail> GetCustInfoDetailAsync(int custId, string userName)
+        public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
-                custInfoDetail.tpWallet = await _tpBll.GetTpWalletAsync(custInfoDetail.CustId);
+                custInfoDetail.tpWallet = _thirdPartyService.GetTpWallet(custId);
                 custInfoDetail.promotions = _promotionService.GetPromotionListByCustId(custInfoDetail.CustId);
                 if (custInfoDetail.promotions != null)
                 {
@@ -754,6 +756,11 @@ namespace BackendSite.Service.BLL
                 result.PTWallet = ptwallet.Balance;
             }
             return result;
+        }
+
+        public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
+        {
+            return await _tpBll.GetTpWalletAsync(custId);
         }
     }
 }

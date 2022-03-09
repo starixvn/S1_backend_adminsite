@@ -665,10 +665,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustIdRequest request)
+        public ApiResult<CustInfoDetail> GetCustInfoDetail(CustIdRequest request)
         {
 
-            var custInfoDetail = await _custInfoBll.GetCustInfoDetailAsync(request.CustId, null);
+            var custInfoDetail = _custInfoBll.GetCustInfoDetail(request.CustId, null);
 
             if (custInfoDetail != null)
             {
@@ -2644,6 +2644,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             result.ErrorCode = 0;
 
             return result;
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Get TPWallet]
+        /// <summary>
+        /// CustomerManage/GetCustTPWallet 取得客戶第三方錢包資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpWallet>>> GetCustTPWalletAsync(CustIdRequest request)
+        {
+
+            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
+
+            return new ApiResult<IEnumerable<TpWallet>>
+            {
+                Data = custTPWallet,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
         #endregion
 
