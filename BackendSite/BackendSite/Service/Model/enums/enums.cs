@@ -527,6 +527,22 @@ namespace BackendSite.Service.Model.enums
         Settled = 4 //已異動
     }
 
+    public enum VipDowngradeReviewStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
+    public enum VipUpgradeReviewStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
     public enum GetVipUpgradeReviewErrorCode
     {
         CanUpgrade = 0,
