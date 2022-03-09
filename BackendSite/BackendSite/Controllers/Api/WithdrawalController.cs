@@ -457,13 +457,8 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
             var cryptoPay = bankDetailBLL.GetCryptoPay();
-            // 為了rls測試crypto只能先暫時這樣寫，之後會還原
-            var network = withdrawalReq.ChannelName;
-            var channelName = $"usdt-{network}";
             var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId 
-                                  && (x.ChannelName.Equals(network, StringComparison.OrdinalIgnoreCase)
-                                    || x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase))
+                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay
                             {
                                 PayId = x.PayId,
