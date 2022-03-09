@@ -30,7 +30,8 @@ namespace BackendSite.Extensions.Middlewares
         private readonly List<string> _accessController = new List<string>
         {
             "TpFailRecordReport",
-            "WithdrawalLimitCrypto"
+            "WithdrawalLimitCrypto",
+            "GetAllData"
         };
 
         #endregion
