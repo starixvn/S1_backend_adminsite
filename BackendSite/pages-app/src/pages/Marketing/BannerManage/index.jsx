@@ -52,7 +52,6 @@ const App = () => {
 	}, []);
 
 	const setUnixSportBattleDateTime = (dateTime) => {
-		console.log("test",dateTime);
 	  if(dateTime === null) {
 		  return null;
 	  }else{

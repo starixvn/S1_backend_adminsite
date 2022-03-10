@@ -5,10 +5,9 @@ import SelectBox from "./Component/SelectBox";
 import RadioBox from "./Component/RadioBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment-timezone";
-import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
+import { initBannerType, initActionModeType, initShowStatusType , initCurrencyLangMap } from "./defCols";
 
 export default ({ state, action, IsAdd, processing }) => {
-	console.log(state);
 	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
@@ -31,8 +30,7 @@ export default ({ state, action, IsAdd, processing }) => {
 		}).map(i => {
 			return i;
 		});
-
-	console.log(newActionModeType);
+	
 	const currencyList = Object.keys(state.specific);
 	const currencyOptions = currencyList.map(i => {
 		return {
@@ -320,6 +318,7 @@ export default ({ state, action, IsAdd, processing }) => {
 												EditCurrencyLangPanelValue={action.EditCurrencyLangPanelValue}
 												currencyId={state.currentTab}
 												action={action}
+												isAdd = {IsAdd}
 											/>
 										</div>
 									</div>
@@ -348,7 +347,12 @@ export default ({ state, action, IsAdd, processing }) => {
 
 const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bannerName}-${props.currencyId}`;
-	const langList = Object.keys(props.state.specific[props.currencyId].lang);
+	let langList = Object.keys(props.state.specific[props.currencyId].lang);
+	
+	if (props.isAdd && props.state.siteId === 1){
+		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
+	}
+	
 	const langOptions = langList.map((lang, i) => {
 		return {
 			value: lang,

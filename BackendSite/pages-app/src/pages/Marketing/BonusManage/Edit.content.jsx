@@ -8,6 +8,7 @@ import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
 import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction, AutoExtendOptions,VipLevelOptions } from "./defCols";
 import { defActionType } from "./Edit.reducer";
+import { initCurrencyLangMap } from "./defCols";
 
 const initBonusAmountType = promoType => {
 	return Number(promoType) === 3 || Number(promoType) === 9
@@ -479,6 +480,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								)}
 								currencyId={state.currentTab}
 								action={action}
+								isAdd = {IsAdd}
 							/>
 						</div>
 					</div>
@@ -504,7 +506,10 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 
 const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`;
-	const langList = Object.keys(props.state.specific[props.currencyId].lang);
+	let langList = Object.keys(props.state.specific[props.currencyId].lang);
+	if (props.isAdd && props.state.siteId === 1){
+		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
+	}
 	const langOptions = langList.map((lang, i) => {
 		return {
 			value: lang,
