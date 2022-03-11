@@ -120,8 +120,11 @@ namespace BackendSite.Service.BLL
             {
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
+            var wTransId = IsWithdrawalInfoTransId(transId) ? transId : null;
+            var dTransId = IsDepositInfoTransId(transId) ? transId : null;
+            var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
 
-            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate, statusStartDate,statusEndDate, pageSize, affCode, selectCurrency, bankAccountNumber, selectStatus, selectTag,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate, statusStartDate,statusEndDate, pageSize, affCode, selectCurrency, bankAccountNumber, selectStatus, selectTag,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
             if (custInfoList.Count > 0)
             {
                 custInfoList.ForEach(x =>
@@ -743,6 +746,42 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
         {
             return await _tpBll.GetTpWalletAsync(custId);
+        }
+        private bool IsWithdrawalInfoTransId(string transId)
+        {
+            if (string.IsNullOrWhiteSpace(transId))
+            {
+                return false;
+            }
+            if (transId.Substring(0, 1) != "W")
+            {
+                return false;
+            }
+            return true;
+        }
+        private bool IsDepositInfoTransId(string transId)
+        {
+            if (string.IsNullOrWhiteSpace(transId))
+            {
+                return false;
+            }
+            if (transId.Substring(0, 1) != "D")
+            {
+                return false;
+            }
+            return true;
+        }
+        private bool IsTpTransferInfoTransId(string transId)
+        {
+            if (string.IsNullOrWhiteSpace(transId))
+            {
+                return false;
+            }
+            if (transId.Substring(0, 1) != "T" && transId.Substring(0, 2) != "AT" && transId.Substring(0, 2) != "BT")
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

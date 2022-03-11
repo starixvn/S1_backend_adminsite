@@ -41,7 +41,9 @@ namespace BackendSite.Service.DAL
             string userName,
             string accountName,
             string loginIp,
-            string transId,
+            string wTransId,
+            string dTransId,
+            string tTransId,
             string tpUserName,
             string email,
             string phoneNo,
@@ -108,7 +110,9 @@ namespace BackendSite.Service.DAL
                 UserName = userName,
                 AccountName = accountName,
                 LoginIp = loginIp,
-                TransId = transId,
+                WTransId = wTransId,
+                DTransId = dTransId,
+                TTransId = tTransId,
                 TpUserName = tpUserName,
                 Email = email,
                 PhoneNo = phoneNo,
@@ -131,7 +135,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V11", p);
+            var result = _reportDbClient.Query<CustInfoDetail>("Admin_CustInfoSearch_Get_V12", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
