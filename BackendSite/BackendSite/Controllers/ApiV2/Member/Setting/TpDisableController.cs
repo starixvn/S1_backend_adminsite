@@ -128,49 +128,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCustId(TpDisableUserForGameDetailReq req)
         {
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
-            try
+
+            var tpList = await _gameCasinoBll.GetTpList();
+            var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
+
+            if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
             {
-                var tpList = await _gameCasinoBll.GetTpList();
-                var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
+                var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
 
-                if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
+                foreach (var disableGame in disableGames)
                 {
-                    var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
-
-                    foreach (var disableGame in disableGames)
+                    foreach (var tp in tpList)
                     {
-                        foreach (var tp in tpList)
+                        if (disableGame.TpId == tp.TpId)
                         {
-                            if (disableGame.TpId == tp.TpId)
+                            tp.Checked = true;
+                            var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                            tp.GameList = games.Select(a => new TpGameCasino()
                             {
-                                tp.Checked = true;
-                                var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
-                                tp.GameList = games.Select(a => new TpGameCasino()
-                                {
-                                    GameId = a.GameId,
-                                    Name = a.Name,
-                                    Checked = disableGame.GameList != null && disableGame.GameList.Any(c => c == a.GameId)
-                                }).ToList();
-                            }
+                                GameId = a.GameId,
+                                Name = a.Name,
+                                Checked = disableGame.GameList != null && disableGame.GameList.Any(c => c == a.GameId)
+                            }).ToList();
                         }
                     }
                 }
+            }
 
-                var editInfo = new TpDisableUserForGameDetail()
-                {
-                    SiteId = userDisableGames.SiteId,
-                    UserName = userDisableGames.UserName,
-                    DisableGames = tpList.ToList()
-                };
-                apiResult.Data = editInfo;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
+            var editInfo = new TpDisableUserForGameDetail()
             {
-                _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+                SiteId = userDisableGames.SiteId,
+                UserName = userDisableGames.UserName,
+                DisableGames = tpList.ToList()
+            };
+            apiResult.Data = editInfo;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
             return apiResult;
         }
 
@@ -188,34 +181,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         public async Task<ApiResult> Set(DisableUser disableGames)
         {
             var apiResult = new ApiResult();
-            try
-            {
-                var updateOperator = User.Identity.Name;
-                var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
-                if (customer == null)
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
-                    apiResult.Message = "User Not Found";
-                    return apiResult;
-                }
 
-                var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
-                    disableGames.DisableTpGame, updateOperator);
-                return new ApiResult
-                {
-                    //result: 1 (新增成功),2 (修改成功)
-                    ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
-                };
-            }
-            catch (Exception ex)
+            var updateOperator = User.Identity.Name;
+            var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
+            if (customer == null)
             {
-                _logger.LogError(ex, ex.Message);
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException,
-                    Message = ex.Message,
-                };
+                apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
+                apiResult.Message = "User Not Found";
+                return apiResult;
             }
+
+            var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
+                disableGames.DisableTpGame, updateOperator);
+            return new ApiResult
+            {
+                //result: 1 (新增成功),2 (修改成功)
+                ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
+            };
+
         }
 
         /// <summary>
@@ -231,24 +214,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult> UpdateStatus(DisableDisableUser disable)
         {
-            try
+
+            var updateOperator = User.Identity.Name;
+            var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+            return new ApiResult
             {
-                var updateOperator = User.Identity.Name;
-                var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
-                return new ApiResult
-                {
-                    ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException,
-                    Message = ex.Message,
-                };
-            }
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+
         }
 
         /// <summary>
@@ -264,23 +237,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult> Delete(DeleteReq req)
         {
-            try
+
+            var result = await _riskBll.DeleteTpDisableUser(req.CustId);
+            return new ApiResult
             {
-                var result = await _riskBll.DeleteTpDisableUser(req.CustId);
-                return new ApiResult
-                {
-                    ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.SystemException,
-                    Message = ex.Message,
-                };
-            }
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+
         }
 
     }
