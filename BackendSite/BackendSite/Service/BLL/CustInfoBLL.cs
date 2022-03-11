@@ -166,7 +166,11 @@ namespace BackendSite.Service.BLL
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
 
-            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, transId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
+            var wTransId = IsWithdrawalInfoTransId(transId) ? transId : null;
+            var dTransId = IsDepositInfoTransId(transId) ? transId : null;
+            var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
+
+            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
 
 
             return result;
@@ -753,7 +757,7 @@ namespace BackendSite.Service.BLL
             {
                 return false;
             }
-            if (transId.Substring(0, 1) != "W")
+            if (transId.Length < 3 || transId.Substring(0, 1) != "W")
             {
                 return false;
             }
@@ -765,7 +769,7 @@ namespace BackendSite.Service.BLL
             {
                 return false;
             }
-            if (transId.Substring(0, 1) != "D")
+            if (transId.Length < 3 || transId.Substring(0, 1) != "D")
             {
                 return false;
             }
@@ -777,7 +781,7 @@ namespace BackendSite.Service.BLL
             {
                 return false;
             }
-            if (transId.Substring(0, 1) != "T" && transId.Substring(0, 2) != "AT" && transId.Substring(0, 2) != "BT")
+            if (transId.Length < 3 || (transId.Substring(0, 1) != "T" && transId.Substring(0, 2) != "AT" && transId.Substring(0, 2) != "BT"))
             {
                 return false;
             }

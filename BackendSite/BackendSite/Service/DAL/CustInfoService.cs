@@ -149,7 +149,9 @@ namespace BackendSite.Service.DAL
             string userName,
             string accountName,
             string loginIp,
-            string transId,
+            string wTransId,
+            string dTransId,
+            string tTransId,
             string tpUserName,
             string email,
             string phoneNo,
@@ -210,7 +212,9 @@ namespace BackendSite.Service.DAL
                 AccountName = accountName,
                 LoginIp = loginIp, 
                 TpUserName = tpUserName,
-                TransId = transId, 
+                WTransId = wTransId,
+                DTransId = dTransId,
+                TTransId = tTransId,
                 Email = email, 
                 PhoneNo = phoneNo, 
                 StartDate = startDate,
@@ -229,7 +233,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V9", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
