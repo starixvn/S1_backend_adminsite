@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
         public string TpName { set; get; }
         public string TpUserName { set; get; }
         public decimal Balance { set; get; }
+        public int WalletType { get; set; }
     }
     public class TpInfo
     {

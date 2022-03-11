@@ -706,4 +706,10 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    public enum WalletTypeEnum
+    {
+        FundTransfer = 0,
+        SeamlessWallet=1
     }
+}

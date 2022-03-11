@@ -225,7 +225,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V8", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -669,7 +669,7 @@ namespace BackendSite.Service.DAL
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get_V4", props).ToList();
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatus_Get_V5", props).ToList();
             searchData.RegLiveStatusDatas = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
             searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
