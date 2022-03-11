@@ -60,8 +60,8 @@ namespace BackendSite.Service.BLL
             var betSetting = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
             if (betSetting.Any(a => a.TpCategory == 1))
             {
-                var sabaBetLimit = await _tpBll.GetBetLimitAsync(1, custId);
-                var apiResult = await _tpBll.SetBetLimitAsync(1, custId, sabaBetLimit.Data);
+                var sabaBetLimit = await _tpBll.GetBetLimitAsync(41, custId);
+                var apiResult = await _tpBll.SetBetLimitAsync(41, custId, sabaBetLimit.Data);
                 if (apiResult.ErrorCode != 0)
                 {
                     throw new AdminException(ErrorCodeEnum.Fail, "reset third party bet limit failed");
