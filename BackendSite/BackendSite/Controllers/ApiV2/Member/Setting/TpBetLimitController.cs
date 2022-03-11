@@ -41,6 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public string UserName { get; set; }
             public DateTimeOffset StartDate
             {
@@ -73,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         public ApiListResult<UserBetLimit> GetList(QueryUserBetLimitReq req)
         {
             var pageNumber = req.PageNumber;
-            var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.UserName, req.StartDate, req.EndDate,
+            var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.CurrencyIds,req.UserName, req.StartDate, req.EndDate,
                 req.PageSize, req.PageNumber, out var totalPages, out var rowCount);
             foreach (var data in datas)
             {
