@@ -39,7 +39,19 @@ namespace BackendSite.Service.BLL
         }
 
         public async Task<int> Delete(int custId)
-        {            
+        {
+            var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+            var betSetting = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
+            if (betSetting.Any(a => a.TpCategory == 1))
+            {
+                var sabaBetLimit = await _tpBll.GetBetLimitAsync(41, custId);
+                var apiResult = await _tpBll.SetBetLimitAsync(41, custId, sabaBetLimit.Data);
+                if (apiResult.ErrorCode != 0)
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail, "reset third party bet limit failed");
+                }
+            }
+            
             return await _userBetLimitService.Delete(custId);
         }
 
