@@ -1,26 +1,43 @@
 import { number_format } from '../commJS/common';
 import qs from 'qs';
 
+const AdjustReasonCategory = [
+    { reasonId: 1, description: "None - (Default)"},
+    { reasonId: 2, description: "Retention Bonus"},
+    { reasonId: 3, description: "Manual Bonus(Special Bonus)"},
+    { reasonId: 4, description: "Vip Upgrade Reward"},
+    { reasonId: 5, description: "Prize Drop"},
+    { reasonId: 6, description: "Tech Issue None Affected"},
+    { reasonId: 7, description: "Test"},
+    { reasonId: 8, description: "Vendor Mistake"},
+    { reasonId: 9, description: "Deposit"},
+    { reasonId: 10, description: "Withdrawal"},
+    { reasonId: 11, description: "Other"}
+];
+
 (function ($, React, ReactDOM, i18n, axios, moment) {
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-            this.state = { UserName: "", 
-            CustData: null, 
-            Checkwd: false, 
-            Withdrawal: 1, 
-            SiteList: [], 
-            SiteId: null, 
-            SabaId: "", 
-            AdjustMentLimitMax:0, 
-            CheckPassword:false,
-            BonusCode:"",
-            CheckedBonusCode:"",
-            WalletType:0,
-            RollOver:1,
-            Amount:1,
-            HasBonusCode:false,
-            Name:""};
+            this.state = {
+                UserName: "", 
+                CustData: null, 
+                Checkwd: false, 
+                Withdrawal: 1, 
+                SiteList: [], 
+                SiteId: null, 
+                SabaId: "", 
+                AdjustMentLimitMax:0, 
+                CheckPassword:false,
+                BonusCode:"",
+                CheckedBonusCode:"",
+                WalletType:0,
+                RollOver:1,
+                Amount:1,
+                HasBonusCode:false,
+                Name:"",
+                Category:1
+            };
         }
 
         componentDidMount = () => {
@@ -132,6 +149,7 @@ import qs from 'qs';
             let memo = this.state.Memo;
             let bonusCode = this.state.CheckedBonusCode;
             let rollOver = this.state.RollOver;
+            let category = this.state.Category;
 
             if (option == null) {
                 alert('Please select one Option.');
@@ -163,8 +181,17 @@ import qs from 'qs';
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
-                BounsCode:  bonusCode, RollOver: rollOver})
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', {
+                CustId: custData.custId,
+                Option: parseInt(option),
+                Amount: parseFloat(amount),
+                WithdrawalLimitOption: checkwd,
+                WithdrawalLimitAmount: withdrawalamount,
+                Memo: memo,
+                BounsCode: bonusCode,
+                RollOver: rollOver,
+                Category: category
+            })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -190,8 +217,18 @@ import qs from 'qs';
             let memo = this.state.Memo;
             let bonusCode = this.state.CheckedBonusCode;
             let rollOver = this.state.RollOver;
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
-                BounsCode:  bonusCode, RollOver: rollOver})
+            let category = this.state.Category;
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { 
+                CustId: custData.custId,
+                Option: parseInt(option),
+                Amount: parseFloat(amount),
+                WithdrawalLimitOption: checkwd,
+                WithdrawalLimitAmount: withdrawalamount,
+                Memo: memo,
+                BounsCode: bonusCode,
+                RollOver: rollOver,
+                Category: category
+            })
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
@@ -307,6 +344,10 @@ import qs from 'qs';
                     </li>;
                 }.bind(this))}</ul>;
             }
+
+            let reasonList = AdjustReasonCategory.map((item) => {
+                return <option value={item.reasonId}>{item.description}</option>;
+            });
 
 
             let siteList = this.state.SiteList.map(function (obj) {
@@ -452,6 +493,12 @@ import qs from 'qs';
                                     <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 || this.state.Option == 6 ? true:false} value={this.state.RollOver}/>
                                 </div>
                                 :null}
+                                <div className="form-group width-200">
+                                    <label className="col-form-label">Category</label>
+                                    <select className="form-control" name="Category" onChange={this.onChange.bind(this)}>
+                                        {reasonList}
+                                    </select>
+                                </div>
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Memo</label>
                                     <textarea className="form-control" name="Memo" onChange={this.onChange.bind(this)} />

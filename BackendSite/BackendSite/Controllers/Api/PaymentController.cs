@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.Api
             public string Memo { set; get; }
             public string BounsCode { get; set; }
             public int RollOver { get; set; }
+            public int Category { get; set; }
         }
 
         public class GetFinancialLogReq
