@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -20,6 +22,8 @@ namespace BackendSite.Service.Model
 
         public string UserName { get; set; }
 
+        public int CurrencyId { get; set; }
+
         public DateTimeOffset TransTime
         {
             get => _transTime;
@@ -31,7 +35,9 @@ namespace BackendSite.Service.Model
 
     public class GetTpFailRecordReportInput
     {
-        public int SiteId { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+
+        public IEnumerable<int> CurrencyIds { get; set; }
 
         public int TpId { get; set; }
 
