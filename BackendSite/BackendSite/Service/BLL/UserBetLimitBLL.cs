@@ -30,22 +30,6 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> SetUserBetLimit(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
         {
-            var sportBetSetting = betSetting.SingleOrDefault(a => a.TpCategory == 1);
-            if (sportBetSetting != null)
-            {
-                var sabaBetSetting = sportBetSetting.TpBetSetting?.SingleOrDefault(a => a.GameTypeId == 69);
-                if (sabaBetSetting != null)
-                {
-                    var minBet = sabaBetSetting.MinBet;
-                    var maxBet = sabaBetSetting.MaxBet;
-                    var apiResult = await _tpBll.SetBetLimitAsync(41, custId, minBet, maxBet);
-                    if (apiResult.ErrorCode != (int)ErrorCodeEnum.Success)
-                        throw new AdminException(ErrorCodeEnum.SystemException, "Set third party bet limit failed");
-                }
-
-              
-            }
-
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
         }
 
@@ -55,19 +39,7 @@ namespace BackendSite.Service.BLL
         }
 
         public async Task<int> Delete(int custId)
-        {
-            var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSetting = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
-            if (betSetting.Any(a => a.TpCategory == 1))
-            {
-                var sabaBetLimit = await _tpBll.GetBetLimitAsync(1, custId);
-                var apiResult = await _tpBll.SetBetLimitAsync(1, custId, sabaBetLimit.Data);
-                if (apiResult.ErrorCode != 0)
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "reset third party bet limit failed");
-                }
-            }
-            
+        {            
             return await _userBetLimitService.Delete(custId);
         }
 
