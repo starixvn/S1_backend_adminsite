@@ -42,12 +42,14 @@ const App = () => {
             alert("Please Choose at least one Site");
             return false;
         }
+        let startTime = moment(filter.startDate).format('YYYY-MM-DD 00:00:00.000+08:00');
+        let endTime = moment(filter.endDate).format('YYYY-MM-DD 23:59:59.999+08:00');
         let query = {
             SiteIds: filter.siteIds,
             UserName: filter.userName === "" ? null : filter.userName,
             CurrencyId: filter.currency,
-            StartDate: moment(filter.startDate).utc(),
-            EndDate: moment(filter.endDate).utc(),
+            StartDate: startTime,
+            EndDate: endTime,
             PageNumber: pageNumber,
             PageSize: pageSize
         };
@@ -56,7 +58,6 @@ const App = () => {
             Url: "VerificationRewardReport/Get",
             Data: query,
         };
-  
         WebAPI.PostData(param).then((res) => {
             if (res.data.errorCode === 0) {
                 setDatas({
@@ -74,14 +75,16 @@ const App = () => {
     }
 
     const exportReport = () => {
+
+        let startTime = moment(stateFilter.startDate).format('YYYY-MM-DD 00:00:00.000+08:00');
+        let endTime = moment(stateFilter.endDate).format('YYYY-MM-DD 23:59:59.999+08:00');
         let query = {
-            siteIds: JSON.stringify(stateFilter.siteIds),
-            userName: stateFilter.userName,
-            currencyId: stateFilter.currency,
-            startDate: stateFilter.startDate,
-            endDate: stateFilter.endDate,
+            SiteIds: JSON.stringify(stateFilter.siteIds),
+            UserName: stateFilter.userName,
+            CurrencyId: stateFilter.currency,
+            StartDate: startTime,
+            EndDate: endTime,
         };
-    
         let param = {
             Url: "VerificationRewardReport/Export",
             Data: query

@@ -7,16 +7,25 @@ import moment from "moment";
 const Panel = (props) => {
   const [detailBody, setDetailBody] = useState([]);
   const [stateDatas, setDatas] = useState({
-    PageInfo: null
+    PageInfo: null,
   });
   const titleData = [
     { dataColumn: "UserName", columnTitle: "UserName" },
     { dataColumn: "Currency", columnTitle: "Currency" },
-    { dataColumn: "Reg Time", columnTitle: "Reg Time" },
+    {
+      dataColumn: "Reg Time",
+      columnTitle: "Reg Time (Adjusted to GMT+8)",
+    },
     { dataColumn: "TotalDeposit", columnTitle: "TotalDeposit" },
     { dataColumn: "TotalBet", columnTitle: "TotalBet" },
-    { dataColumn: "Reward Amount", columnTitle: "Reward Amount" },
-    { dataColumn: "Reward Time", columnTitle: "Reward Time" },
+    {
+      dataColumn: "Reward Amount",
+      columnTitle: "Reward Amount",
+    },
+    {
+      dataColumn: "Reward Time",
+      columnTitle: "Reward Time (Adjusted to GMT+8)",
+    },
     { dataColumn: "Status", columnTitle: "Status" },
   ];
   let headerRows = [];
@@ -27,8 +36,14 @@ const Panel = (props) => {
   useEffect(() => {
     let Data = {
       CustId: props.CustId,
-      StartDate: props.Filter.StartDate === "" ? null : moment(props.Filter.StartDate).format("YYYY-MM-DD") ,
-      EndDate: props.Filter.EndDate === "" ? null : moment(props.Filter.EndDate).format("YYYY-MM-DD"),
+      StartDate:
+        props.Filter.StartDate === ""
+          ? null
+          : moment(props.Filter.StartDate).format("YYYY-MM-DD"),
+      EndDate:
+        props.Filter.EndDate === ""
+          ? null
+          : moment(props.Filter.EndDate).format("YYYY-MM-DD"),
       PageNumber: 1,
     };
     api
@@ -54,30 +69,30 @@ const Panel = (props) => {
 
   const ChangePage = (PageNumber) => {
     let Data = {
-        CustId: props.CustId,
-        StartDate:props.StartDate,
-        EndDate:props.EndDate,
-        PageNumber: PageNumber,
-      };
-      api
-        .post("/api/ReferralManagement/GetRefFriendList", Data)
-        .then(function (res) {
-          if (res.data.errorCode === 0) {
-            setDetailBody(res.data.data);
-            setDatas({
-              PageInfo: {
-                totalPages: res.data.totalPages,
-                pageNumber: PageNumber,
-                rowCount: res.data.rowCount,
-              },
-            });
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      CustId: props.CustId,
+      StartDate: props.StartDate,
+      EndDate: props.EndDate,
+      PageNumber: PageNumber,
+    };
+    api
+      .post("/api/ReferralManagement/GetRefFriendList", Data)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          setDetailBody(res.data.data);
+          setDatas({
+            PageInfo: {
+              totalPages: res.data.totalPages,
+              pageNumber: PageNumber,
+              rowCount: res.data.rowCount,
+            },
+          });
+        } else {
+          alert(res.data.message ?? "failed to get data.");
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
 
   const bodyRows = detailBody.map((item, index) => {
@@ -90,7 +105,9 @@ const Panel = (props) => {
           <span className="label">{item.currency}</span>
         </td>
         <td>
-          <span className="label">{moment(item.registerDate).format("l LTS")}</span>
+          <span className="label">
+            {moment.utc(item.registerDate).add(8, "hour").format("l LTS")}
+          </span>
         </td>
         <td>
           <span className="label">
@@ -106,7 +123,11 @@ const Panel = (props) => {
           <span className="label">{item.bonusAmount}</span>
         </td>
         <td>
-          <span className="label">{ item.rewardTime != null ? moment(item.rewardTime).format("l LTS") : null }</span>
+          <span className="label">
+            {item.rewardTime != null
+              ? moment.utc(item.rewardTime).add(8, "hour").format("l LTS")
+              : null}
+          </span>
         </td>
         <td>
           <span className="label">{item.statusName}</span>

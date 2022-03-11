@@ -79,12 +79,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public IEnumerable<ReferralCustList> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
             var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId ,StartDate = startDate, EndDate= endDate});
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<ReferralCustList>("Admin_ReferralCustlistExport_Get", p, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<ReferralExcel>("Admin_ReferralCustlistExport_Get_V3", p);
             return result;
         }
 

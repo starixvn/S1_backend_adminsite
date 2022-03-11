@@ -223,5 +223,190 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public IEnumerable<CryptoWithdrawalLimitInfoManage> GetCryptoWithdrawalLimitInfos(string siteIds,
+            string currencyIds,
+            int cryptoCurrencyId,
+            string network,
+            int startIndex, 
+            int pageSize, 
+            out int totalPages, 
+            out int rowCount)
+        {
+            var param = new DynamicParameters();
+
+            param.Add("_SiteIds", siteIds);
+            param.Add("_CurrencyIds", currencyIds);
+            param.Add("_CryptoCurrencyId", cryptoCurrencyId);
+            param.Add("_Network", network);
+            param.Add("_StartIndex", startIndex);
+            param.Add("_PageSize", pageSize);
+            param.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            param.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result =
+                _reportDbClient.Query<CryptoWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfo_Get_V4", param);
+
+            totalPages = param.Get<int?>("_TotalPages") ?? 0;
+            rowCount = param.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+
+        }
+
+        public bool AddCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var tran = conn.BeginTransaction();
+            var insParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _VipLevel = input.VipLevel,
+                _WithdrawalMin = input.WithdrawalMin,
+                _WithdrawalMax = input.WithdrawalMax,
+                _UpdateOperator = input.UpdateOperator,
+                _CryptoCurrencyId = input.CryptoCurrencyId,
+                _Network = Enum.GetName(typeof(NetworkTypeEnum), input.NetworkType)
+            };
+
+            var logParam = new
+            {
+                Menu = "USDTWithdrawalLimitManagement",
+                ActionType = 1,
+                DetailInfo = JsonConvert.SerializeObject(insParam),
+                Operator = input.UpdateOperator
+            };
+
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
+        }
+
+        public CryptoWithdrawalLimitInfoManage GetCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
+        {
+            var param = new DynamicParameters();
+
+            param.Add("_SiteId", input.SiteId);
+            param.Add("_CurrencyId", input.CurrencyId);
+            param.Add("_CryptoCurrencyId", input.CryptoCurrencyId);
+            param.Add("_Network", input.Network);
+            param.Add("_VipLevel", input.VipLevel);
+
+            return _reportDbClient.QueryFirst<CryptoWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get_V2",
+                param);
+        }
+
+        public bool DeleteCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var tran = conn.BeginTransaction();
+            var insParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _VipLevel = input.VipLevel,
+                _Network = Enum.GetName(typeof(NetworkTypeEnum), input.NetworkType),
+                _CryptoCurrencyId = input.CryptoCurrencyId
+            };
+
+            var logParam = new
+            {
+                Menu = "USDTWithdrawalLimitManagement",
+                ActionType = 2,
+                DetailInfo = JsonConvert.SerializeObject(insParam),
+                Operator = input.UpdateOperator
+            };
+
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
+        }
+
+        public bool EditCryptoWithdrawalLimitInfo(CryptoWithdrawalLimitInfoManage input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var tran = conn.BeginTransaction();
+            var insParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _VipLevel = input.VipLevel,
+                _WithdrawalMin = input.WithdrawalMin,
+                _WithdrawalMax = input.WithdrawalMax,
+                _UpdateOperator = input.UpdateOperator,
+                _Network = Enum.GetName(typeof(NetworkTypeEnum), input.NetworkType),
+                _CryptoCurrencyId = input.CryptoCurrencyId
+            };
+
+            var logParam = new
+            {
+                Menu = "USDTWithdrawalLimitManagement",
+                ActionType = 1,
+                DetailInfo = JsonConvert.SerializeObject(insParam),
+                Operator = input.UpdateOperator
+            };
+
+            var logResult = conn.Execute("Admin_AdjustmentInfoLog_Set", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
+        }
+
+        public IEnumerable<CryptoInfo> GetCryptoInfoList()
+            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
     }
 }
