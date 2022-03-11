@@ -225,7 +225,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V8", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
