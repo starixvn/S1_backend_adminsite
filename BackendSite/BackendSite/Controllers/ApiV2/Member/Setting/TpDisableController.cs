@@ -88,28 +88,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var apiResult = new ApiListResult<TpDisableUser>();
 
             var pageNumber = req.PageNumber;
-            try
-            {
-                apiResult.Data = _riskBll.GetTpDisableUser(
-                    req.SiteIds,
-                    req.UserName,
-                    req.StartDate,
-                    req.EndDate,
-                    req.PageSize,
-                    req.PageNumber,
-                    out var totalPages,
-                    out var rowCount);
-                apiResult.TotalPages = totalPages;
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = rowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+
+            apiResult.Data = _riskBll.GetTpDisableUser(
+                req.SiteIds,
+                req.UserName,
+                req.StartDate,
+                req.EndDate,
+                req.PageSize,
+                req.PageNumber,
+                out var totalPages,
+                out var rowCount);
+            apiResult.TotalPages = totalPages;
+            apiResult.PageNumber = pageNumber;
+            apiResult.RowCount = rowCount;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
