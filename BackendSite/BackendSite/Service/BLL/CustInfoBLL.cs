@@ -738,6 +738,7 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustInfoByCust(siteId, custId, userName);
         }
+
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             return await _custInfoService.GetCustInfoBySite(siteId, currencyId, status);
