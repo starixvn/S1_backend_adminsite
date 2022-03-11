@@ -319,7 +319,7 @@ namespace BackendSite.Service.BLL
             var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
             if (tpWalletList == null)
             {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)WalletTypeEnum.Transfer);
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)TpListWalletTypeEnum.FundTransfer);
                 var tasks = tpWalletList.Select(async x =>
                 {
                     var tpInfo = new TpInfo

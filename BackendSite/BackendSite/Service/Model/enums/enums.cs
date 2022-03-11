@@ -421,7 +421,7 @@ namespace BackendSite.Service.Model.enums
         Detail = 1
     }
 
-    public enum WalletTypeEnum
+    public enum PromotionWalletTypeEnum
     {
         Transfer = 0,
         Seamless = 1
@@ -436,7 +436,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 1,
         Enable = 2
     }
-    public enum ReferralCustStatusEnum 
+    public enum ReferralCustStatusEnum
     {
         Approved = 0,
         Running = 1,
@@ -908,7 +908,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         Closed = 2,
     }
-    public enum SlotGameStatusEnum 
+    public enum SlotGameStatusEnum
     {
         Closed = 0,
         Open = 1
@@ -916,7 +916,7 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region SlotGameDetail
-    public enum SlotGameDetailStatusEnum 
+    public enum SlotGameDetailStatusEnum
     {
         Closed = 0,
         Open = 1
@@ -941,4 +941,10 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    public enum TpListWalletTypeEnum
+    {
+        FundTransfer = 0,
+        SeamlessWallet = 1
+    }
 }
