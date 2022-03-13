@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
@@ -60,23 +60,27 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 foreach (var tpWallet in tpWalletList)
                 {
-                    try
+                    //20220314 先disable TpId=27 PT 的餘額查詢
+                    if (tpWallet.TpId != 27)
                     {
-                        var tpInfo = new TpInfo
+                        try
                         {
-                            TpId = tpWallet.TpId,
-                            CustId = custId,
-                        };
-                        var apiResult = await GetBalanceAsync(tpInfo);
-                        if (apiResult.ErrorCode == 0)
-                        {
-                            tpWallet.Balance = apiResult.Data.balance;
+                            var tpInfo = new TpInfo
+                            {
+                                TpId = tpWallet.TpId,
+                                CustId = custId,
+                            };
+                            var apiResult = await GetBalanceAsync(tpInfo);
+                            if (apiResult.ErrorCode == 0)
+                            {
+                                tpWallet.Balance = apiResult.Data.balance;
+                            }
+
                         }
+                        catch (Exception)
+                        {
 
-                    }
-                    catch (Exception)
-                    {
-
+                        }
                     }
                 }
 
@@ -114,6 +118,7 @@ namespace BackendSite.Service.BLL
         {
             var input = new Dictionary<string, string>();
             var myUrl = $"{_apiUrl}GetBalance";
+
             var oTpInfo = new TpInfo
             {
                 TpId = inInfo.TpId,
@@ -123,14 +128,18 @@ namespace BackendSite.Service.BLL
 
             var data = new ApiResult<UserBalance>();
 
-            try
+            //20220314 先disable TpId=27 PT 的餘額查詢
+            if (inInfo.TpId != 27)
             {
-                data = await _courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo, _balanceTimeoutSecond);
-            }
-            catch (Exception ex)
-            {
-                data.ErrorCode = 9000;
-                data.Message = ex.ToString();
+                try
+                {
+                    data = await _courierAdapter.MyPostAsync<UserBalance, TpInfo>(myUrl, oTpInfo, _balanceTimeoutSecond);
+                }
+                catch (Exception ex)
+                {
+                    data.ErrorCode = 9000;
+                    data.Message = ex.ToString();
+                }
             }
 
             var result = data;
@@ -324,19 +333,23 @@ namespace BackendSite.Service.BLL
             var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
             if (tpWalletList == null)
             {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)WalletTypeEnum.FundTransfer);
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)WalletTypeEnum.FundTransfer);
                 var tasks = tpWalletList.Select(async x =>
                 {
-                    var tpInfo = new TpInfo
+                    //20220314 先disable TpId=27 PT 的餘額查詢
+                    if (x.TpId != 27)
                     {
-                        TpId = x.TpId,
-                        CustId = custId,
-                    };
-                    var apiResult = await GetBalanceAsync(tpInfo);
-                    if (apiResult.ErrorCode == 0)
-                    {
-                        x.Balance = apiResult.Data.balance;
-                    }                   
+                        var tpInfo = new TpInfo
+                        {
+                            TpId = x.TpId,
+                            CustId = custId,
+                        };
+                        var apiResult = await GetBalanceAsync(tpInfo);
+                        if (apiResult.ErrorCode == 0)
+                        {
+                            x.Balance = apiResult.Data.balance;
+                        }
+                    }
                 });
                 await Task.WhenAll(tasks);
 
