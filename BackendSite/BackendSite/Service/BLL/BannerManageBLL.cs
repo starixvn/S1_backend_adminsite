@@ -1,9 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using System;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
 using BackendSite.Controllers.ApiV2.CMS.Setting;
 using Newtonsoft.Json;
-using System;
 
 namespace BackendSite.Service.BLL
 {
@@ -22,11 +22,12 @@ namespace BackendSite.Service.BLL
             return bannerManageService.SetBanner(bannerInfo, user);
         }
         public IEnumerable<BannerInfoList> GetBannerList(IEnumerable<int> siteId, IEnumerable<int> bannerTypeId,
-            IEnumerable<int> status, int pageNumber, int pageSize, out int totalPages, out int rowCount)
+            IEnumerable<int> status, IEnumerable<int> currency, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
             return bannerManageService.GetBannerList(JsonConvert.SerializeObject(siteId),
                 JsonConvert.SerializeObject(bannerTypeId),
                 JsonConvert.SerializeObject(status),
+                JsonConvert.SerializeObject(currency),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize), out totalPages, out rowCount);
 

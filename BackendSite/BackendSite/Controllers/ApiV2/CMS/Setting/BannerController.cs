@@ -101,6 +101,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
 
@@ -161,31 +162,37 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetList(GetListRequest request)
+        public ApiListResult<BannerInfoList> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
+            var apiListResult = new ApiListResult<BannerInfoList>();
             try
             {
                 var bannerTypeList = request.BannerTypes.Select(x => (int)x);
                 var statusList = request.Statuses.Select(x => (int)x);
+                var currencyIds = request.CurrencyIds.Select(x => x);
 
-                apiResult.Data = _bannerManageBll.GetBannerList(request.SiteIds,
+                var data = _bannerManageBll.GetBannerList(request.SiteIds,
                     bannerTypeList,
                     statusList,
+                    currencyIds,
                     request.PageNumber,
                     request.PageSize,
-                    out int totalPages, out int pageSize);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    out var totalPages, out var rowCount);
+
+                apiListResult.Data = data;
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiListResult.TotalPages = totalPages;
+                apiListResult.RowCount = rowCount;
+                apiListResult.PageNumber = request.PageNumber;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiListResult.Message = ex.Message;
+                apiListResult.RawMessage = ex.ToString();
             }
-            return apiResult;
+            return apiListResult;
         }
 
         /// <summary>

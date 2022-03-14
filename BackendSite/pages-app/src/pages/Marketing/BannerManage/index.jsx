@@ -1,15 +1,10 @@
-import React, { useEffect, useRef, useReducer, useState } from "react";
+import React, {useEffect, useReducer, useRef, useState} from "react";
 import ReactDOM from "react-dom";
 import WebAPI from "../../../module/WebAPI";
 import moment from "moment-timezone";
 import Edit from "./Edit";
 import qs from "qs";
-import {
-	defActionType,
-	defPanelType,
-	reducer,
-	initState
-} from "./index.reducer";
+import {defActionType, defPanelType, initState, reducer} from "./index.reducer";
 import Main from "./index.main";
 
 const App = () => {
@@ -18,6 +13,7 @@ const App = () => {
 	const [BannerType, setBannerType] = useState(0);
 	const [Status, setStatus] = useState(0);
 	const [Sitid, setSitid] = useState(0);
+	const [CurrencyId, setCurrencyId] = useState(0);
 	const isMountedRef = useRef(null);
 	useEffect(() => {
 		isMountedRef.current = true;
@@ -76,6 +72,7 @@ const App = () => {
 					Data: qs.stringify({
 						SiteId: Sitid,
 						BannerTypeId:parseInt(v),
+						Currency: CurrencyId,
 						Status:parseInt(Status)
 					})
 				};
@@ -86,6 +83,7 @@ const App = () => {
 					Data: qs.stringify({
 						SiteId: Sitid,
 						BannerTypeId:parseInt(BannerType),
+						Currency: CurrencyId,
 						Status:parseInt(v)
 					})
 				};
@@ -119,16 +117,23 @@ const App = () => {
 			);
 		}
 	}
+	const SetSiteId = (siteId, currencyId) => {
+		setSitid(siteId);
+		setCurrencyId(currencyId);
+		GetSiteBannerList(siteId,currencyId);
+	};
 
-	const GetSiteBannerList = siteId => {
+	const GetSiteBannerList = (siteId,currency) => {
 		if (!processing) {
 			if (isMountedRef.current) {
 				setProcessing(true);
+				setCurrencyId(currency);
 			}
 			let param = {
 				Url: "BannerManage/GetBannerList",
 				Data: qs.stringify({
 					SiteId: siteId,
+					Currency : currency,
 					BannerTypeId:BannerType,
 					Status:Status
 				})
@@ -149,14 +154,12 @@ const App = () => {
 							alert(res.data.message ?? "failed to get data.");
 						}
 						setProcessing(false);
-						setSitid(siteId);
 					}
 				},
 				err => {
 					if (isMountedRef.current) {
 						alert("API Server Error.");
 						setProcessing(false);
-						setSitid(siteId);
 					}
 				}
 			);
@@ -221,7 +224,7 @@ const App = () => {
 					if (isMountedRef.current) {
 						if (res.data.errorCode <= 2 ) {
 							dispatch({ type: defActionType.SET_BANNER });
-							GetSiteBannerList(_banner.SiteId);
+							GetSiteBannerList(_banner.SiteId , CurrencyId);
 						} else if (res.data.errorCode === 1062) {
 							alert("Duplicate Bonus Code.");
 						} else {
@@ -254,7 +257,8 @@ const App = () => {
 						BannerName: state.bannerList[idx].bannerName
 					})
 				})
-
+				res.data.data.specific = [res.data.data.specific.find(x => x.currencyId === CurrencyId)];
+				
 				bannerData = {
 					errorCode: res.data.errorCode,
 					data: res.data.data,
@@ -307,7 +311,7 @@ const App = () => {
 			WebAPI.PostData(param).then(res => {
 				if (isMountedRef.current) {
 					if (res.data.errorCode === 0) {
-						GetSiteBannerList(_banner.siteId);
+						GetSiteBannerList(_banner.siteId ,CurrencyId);
 					} else {
 						alert(res.data.message ?? "failed to get data.");
 					}
@@ -337,6 +341,10 @@ const App = () => {
 			FilterOnchange={FilterOnchange}
 			BannerType={BannerType}
 			Status={Status}
+			SiteId={Sitid}
+			CurrencyId={CurrencyId}
+			SetSiteId={SetSiteId}
+			
 		/>
 	) : (
 			<Edit
@@ -346,6 +354,7 @@ const App = () => {
 				SetLangList={state.setLangList}
 				action={{ SetBanner, ClickBack, setProcessing }}
 				IsAdd={state.panelType === defPanelType.Add}
+				CurrencyId={CurrencyId}
 				processing={processing}
 				skipField={skipField}
 			/>
