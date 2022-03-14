@@ -51,10 +51,30 @@ namespace BackendSite.Service.DAL
             
             return _mainDbClient.Execute("Admin_Banner_Set", p);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int siteId,int bannerTypeId,int status)
+        public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
+            string status,string currencies ,int startIndex,
+            int pageSize,out int totalPages,out int rowCount)
         {
-            return _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V4", new DynamicParameters(new {SiteId = siteId, BannerTypeId = bannerTypeId, Status = status }));
+
+            var props = new DynamicParameters();
+
+            props.Add("_SiteIds", siteIds);
+            props.Add("_BannerTypes", bannerTypes);
+            props.Add("_Statuses", status);
+            props.Add("_CurrencyIds", currencies);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V5", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
+
         public BannerInfo GetBanner(int siteId, string bannerName)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));

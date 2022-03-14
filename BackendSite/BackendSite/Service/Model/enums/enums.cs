@@ -595,6 +595,42 @@ namespace BackendSite.Service.Model.enums
     //    Poker = 8,
     //}
 
+    #region Banner
+
+    public enum BannerTypeEnum
+    {
+        Promotions = 1,
+        HotEvent = 2,
+        Slots = 3,
+        LiveCasino = 4,
+        Fishing = 5,
+        Lottery = 6
+    }
+
+    public enum BannerActionModeEnum
+    {
+        GoToGame = 1,
+        GoToBonus = 2,
+        OpenWindow = 3,
+        RedirectPage = 4,
+        NoAction = 5
+    }
+
+    public enum ShowStatusEnum
+    {
+        NoLogin = 1,
+        Login = 2,
+        Both = 3
+    }
+
+    public enum BannerStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+    
     public enum SettlementType
     {
         UnSettled = 0,
