@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
@@ -10,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -23,6 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         private readonly ReportBLL _reportBll;
         private readonly ExcelBLL _excelBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -32,6 +35,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+
         }
 
         #endregion
@@ -46,7 +51,12 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// <summary>
             /// 品牌ID
             /// </summary>
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public IEnumerable<int> CurrencyIds { get; set; }
 
             /// <summary>
             /// 三方ID
@@ -86,11 +96,15 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             private DateTimeOffset _startTime { get; set; }
             private DateTimeOffset _endTime { get; set; }
-
             /// <summary>
             /// 品牌ID
             /// </summary>
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public IEnumerable<int> CurrencyIds { get; set; }
 
             /// <summary>
             /// 三方ID
@@ -150,10 +164,41 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
         public ApiListResult<TpFailRecordReport> GetList(GetListRequest request)
         {
+            var siteInfoList = _serverInfoBll.GetSiteList();
+            var currencyIdList = new List<int>();
+            var siteList = new List<int>();
+
+            if (request.SiteIds.Contains(0))
+            {
+                siteList.AddRange(siteInfoList.Select(x => x.SiteId));
+            }
+            else
+            {
+                siteList = request.SiteIds.ToList();
+            }
+
+            if (request.CurrencyIds == null)
+            {
+                foreach (var site in siteInfoList)
+                {
+                    currencyIdList.AddRange(site.ICurrencyList);
+                }
+            }
+            else
+                currencyIdList = request.CurrencyIds.ToList();
+
+            if (string.IsNullOrWhiteSpace(request.TransId))
+                request.TransId = null;
+
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var data =
                 _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
                 {
-                    SiteId = request.SiteId,
+
+                    SiteIds = siteList,
+                    CurrencyIds = currencyIdList,
                     TpId = request.TpId,
                     FromTransTime = request.StartTime.DateTime,
                     ToTransTime = request.EndTime.DateTime,
@@ -195,7 +240,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult ExportV1(int siteId,
+        public IActionResult ExportV1(string siteIds,
             int tpId,
             DateTimeOffset startTime,
             DateTimeOffset endTime,
@@ -203,7 +248,29 @@ namespace BackendSite.Controllers.ApiV2.Report
             string transId,
             int timezone)
         {
-            return ExportTpFailRecordReport(siteId,
+            var siteInfoList = _serverInfoBll.GetSiteList();
+
+            var currencyIdList = new List<int>();
+
+            foreach (var site in siteInfoList)
+            {
+                currencyIdList.AddRange(site.ICurrencyList);
+            }
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(siteIds);
+
+            if (siteList.Contains(0))
+            {
+                siteList = siteInfoList.Select(x => x.SiteId);
+            }
+
+            if (string.IsNullOrWhiteSpace(transId))
+                transId = null;
+
+            if (string.IsNullOrWhiteSpace(userName))
+                userName = null;
+
+            return ExportTpFailRecordReport(siteList,
+                currencyIdList,
                 tpId,
                 new DateTimeOffset(startTime.DateTime, TimeSpan.Zero).DateTime,
                 new DateTimeOffset(endTime.DateTime, TimeSpan.Zero).DateTime,
@@ -226,7 +293,15 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
         public IActionResult Export(ExportRequest request)
         {
-            return ExportTpFailRecordReport(request.SiteId,
+
+            if (string.IsNullOrWhiteSpace(request.TransId))
+                request.TransId = null;
+
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
+            return ExportTpFailRecordReport(request.SiteIds,
+                request.CurrencyIds,
                 request.TpId,
                 request.StartTime.DateTime,
                 request.EndTime.DateTime,
@@ -239,7 +314,8 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Private Methods
 
-        private FileContentResult ExportTpFailRecordReport(int siteId,
+        private FileContentResult ExportTpFailRecordReport(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
             int tpId,
             DateTime fromTransTime,
             DateTime toTransTime,
@@ -250,7 +326,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             var exportData =
                 _reportBll.GetTpFailRecordReportForExport(new GetTpFailRecordReportInput
                 {
-                    SiteId = siteId,
+                    SiteIds = siteIds,
+                    CurrencyIds = currencyIds,
                     TpId = tpId,
                     FromTransTime = fromTransTime,
                     ToTransTime = toTransTime,
