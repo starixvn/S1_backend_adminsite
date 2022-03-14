@@ -7,7 +7,7 @@ import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment-timezone";
 import { initBannerType, initActionModeType, initShowStatusType , initCurrencyLangMap } from "./defCols";
 
-export default ({ state, action, IsAdd, processing }) => {
+export default ({ state, action, IsAdd, CurrencyId, processing }) => {
 	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
@@ -31,23 +31,39 @@ export default ({ state, action, IsAdd, processing }) => {
 			return i;
 		});
 	
-	const currencyList = Object.keys(state.specific);
-	const currencyOptions = currencyList.map(i => {
-		return {
-			value: Number(i),
-			displayText: window.i18n[`lbl_Currency${i}`]
-		};
-	});
-	let tabArr = state.selectedCurrencies.map(item => {
-		return (
-			<button
-				key={`${state.siteId}-tab-${item}`}
-				className={`btn btn-add ${state.currentTab === item ? 'active1' : ''}`}
-				onClick={action.EditMainValue.bind(this, item, "currentTab")}>
-				{window.i18n[`lbl_Currency${item}`]}
-			</button>
-		);
-	});
+	// const currencyList = Object.keys(state.specific);
+	// const currencyOptions = currencyList.map(i => {
+	// 	return {
+	// 		value: Number(i),
+	// 		displayText: window.i18n[`lbl_Currency${i}`]
+	// 	};
+	// });
+	
+	const currencyOptions = [{
+		value: Number(CurrencyId),
+		displayText: window.i18n[`lbl_Currency${CurrencyId}`]
+	}];
+	
+	// let tabArr = state.selectedCurrencies.map(item => {
+	// 	return (
+	// 		<button
+	// 			key={`${state.siteId}-tab-${item}`}
+	// 			className={`btn btn-add ${state.currentTab === item ? 'active1' : ''}`}
+	// 			onClick={action.EditMainValue.bind(this, item, "currentTab")}>
+	// 			{window.i18n[`lbl_Currency${item}`]}
+	// 		</button>
+	// 	);
+	// });
+	
+	let tabArr = [(
+		<button
+			key={`${state.siteId}-tab-${CurrencyId}`}
+			className={`btn btn-add ${state.currentTab === CurrencyId ? 'active1' : ''}`}
+			onClick={action.EditMainValue.bind(this, CurrencyId, "currentTab")}>
+			{window.i18n[`lbl_Currency${CurrencyId}`]}
+		</button>
+	)];
+	
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -316,7 +332,7 @@ export default ({ state, action, IsAdd, processing }) => {
 												displayText={window.i18n[`lbl_Currency${state.currentTab}`]}
 												EditMainValue={action.EditCurrencyPanel.bind(this, state.currentTab)}
 												EditCurrencyLangPanelValue={action.EditCurrencyLangPanelValue}
-												currencyId={state.currentTab}
+												currencyId={CurrencyId}
 												action={action}
 												isAdd = {IsAdd}
 											/>
@@ -349,7 +365,7 @@ const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bannerName}-${props.currencyId}`;
 	let langList = Object.keys(props.state.specific[props.currencyId].lang);
 	
-	if (props.isAdd && props.state.siteId === 1){
+	if (props.state.siteId === 1){
 		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
 	}
 	

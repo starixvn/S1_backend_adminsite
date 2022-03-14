@@ -212,6 +212,7 @@ export default props => {
 				EditSportsTeamsValue
 			}}
 			IsAdd={props.IsAdd}
+			CurrencyId={props.CurrencyId}
 			processing={props.processing}
 		/>
 	);
