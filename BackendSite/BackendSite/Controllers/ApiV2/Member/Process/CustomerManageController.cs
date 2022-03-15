@@ -287,6 +287,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
+            public bool ExportTransferWallet { get; set; } = false;
         }
 
         public class ExportCustInfoListRequest
@@ -611,7 +612,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_exportExcel" })]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoListRequest request)
+        public async Task<IActionResult> ExportCustInfoListAsync(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -643,8 +644,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                                     request.Statuses,
                                                                     request.SelectTag);
 
-            var stream = _excelBll.Export(exportCustInfo);
-            return _excelBll.ExcelFile(stream, "CustInfoList");
+            if (request.ExportTransferWallet)
+            {
+                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
+                var tasks = exportCustInfo.Select(async x =>
+                {
+                    var exprotdata = await _custInfoBll.GetTransferWalletAsync(x);
+                    exportDatas.Add(exprotdata);
+                });
+                await Task.WhenAll(tasks);
+                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                var stream = _excelBll.Export(exportDatas);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
+            }
+            else
+            {
+                var properties = exportCustInfo.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
+                var stream = _excelBll.Export(exportCustInfo, properties);
+                return _excelBll.ExcelFile(stream, "CustInfoList");
+            }
         }
 
         #endregion

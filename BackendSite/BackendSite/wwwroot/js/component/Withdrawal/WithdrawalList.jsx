@@ -92,10 +92,12 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        <td>{row.withdrawalType === 4 ? row.channelName : "" }</td>
+                        <td>{JSON.parse(row.withdrawalInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         {(row.bankName == null&& row.accountType != null)?
-                        <td>{row.accountType}</td>:<td>{row.bankName}</td>}
+                            <td>{row.cryptoCurrency || row.accountType}</td>:<td>{row.bankName}</td>}
                         {/* <td>{row.accountNo}</td>
                         <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
@@ -134,6 +136,8 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">NetWork</th>
+                                <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
                                 <th scope="col" className="text-right">{i18n.lbl_Amount}</th>
                                 <th scope="col">Bank Name</th>
@@ -230,9 +234,12 @@ import DateTimePicker from 'react-datetime';
                     if (result.errorCode == 0) {
                         //console.log(' onGetData()',result.data);
                         if (result.data.status == 3) {
+                            var channelName = result.data.cryptoCurrency === result.data.network
+                                ? result.data.network
+                                : `${result.data.cryptoCurrency}-${result.data.network}`;
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, result.data.network);
+                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, channelName);
                         }
                         
                         let SelId = null;
@@ -501,8 +508,7 @@ import DateTimePicker from 'react-datetime';
                 if (data.status == 3) {
                     let selectOp = [];
                     selectOp.push(<option key={0} value="0">Undefine</option>);
-                    //console.log(this.state);
-                    if(this.state.Data.accountType == 'USDT')
+                    if(this.state.Data.accountType === 'crypto')
                     {
                         if (this.state.CryptoPayList.length > 0)
                             selectOp.push(<option key={4} value="4">Crypto Pay</option>);
@@ -644,7 +650,7 @@ import DateTimePicker from 'react-datetime';
                             {data.accountType != null ?
                             <tr>
                                 <th scope="row">Account Type</th>
-                                <td>{data.accountType}</td>
+                                <td>{data.cryptoCurrency || data.accountType}</td>
                             </tr>
                             : null}
                             {data.accountType != null ?

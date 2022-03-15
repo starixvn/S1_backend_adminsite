@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers
@@ -73,6 +75,7 @@ namespace BackendSite.Controllers
             public string BankAccountNumber { get; set; }
             public string SelectStatus { get; set; }
             public string SelectTag { get; set; }
+            public bool ExportTransferWallet { get; set; } = false;
         }
 
         // 這隻For現行後台使用，有另一支API For Frontend Team，
@@ -80,13 +83,12 @@ namespace BackendSite.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [RequestSizeLimit(40000000)]
-        public IActionResult ExportCustInfoList(CustInfoReq req)
+        public async Task<IActionResult> ExportCustInfoListAsync(CustInfoReq req)
         {
             var selectSite = new List<int>();
             var selectCurrency = new List<int>();
             var selectStatus = new List<int>();
             var selectTag = new List<int>();
-            
             if (req.SelectSite != null)
             {
                 selectSite = Array.ConvertAll(req.SelectSite.Split(','), int.Parse).ToList();
@@ -135,11 +137,27 @@ namespace BackendSite.Controllers
                                                                     selectStatus,
                                                                     selectTag);
 
-
             data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-
-            var stream = excelBLL.Export(data);
-            return excelBLL.ExcelFile(stream, "CustInfoList");
+            if (req.ExportTransferWallet)
+            {
+                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
+                var tasks = data.Select(async x =>
+                {
+                    var exprotdata = await custInfoBLL.GetTransferWalletAsync(x);
+                    exportDatas.Add(exprotdata);
+                });
+                await Task.WhenAll(tasks);
+                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                var stream = excelBLL.Export(exportDatas);
+                return excelBLL.ExcelFile(stream, "CustInfoList");
+            }
+            else
+            {
+                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
+                var stream = excelBLL.Export(data, properties);
+                return excelBLL.ExcelFile(stream, "CustInfoList");
+            }
         }
 
         #endregion

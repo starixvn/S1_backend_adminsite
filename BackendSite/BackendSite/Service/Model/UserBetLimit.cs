@@ -81,6 +81,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public int CurrencyId { get; set; }
         public int Status { get; set; }
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { get; set; }
