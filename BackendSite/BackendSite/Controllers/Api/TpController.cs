@@ -11,6 +11,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {
@@ -23,12 +24,14 @@ namespace BackendSite.Controllers.Api
         private readonly TpBLL tpBLL;
         private readonly Common common;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly SelLangBLL _selLangBLL;
 
-        public TpController(TpBLL tpBLL, Common common, CustInfoBLL custInfoBLL)
+        public TpController(IServiceProvider provider)
         {
-            this.tpBLL = tpBLL;
-            this.common = common;
-            this.custInfoBLL = custInfoBLL;
+            this.tpBLL = provider.GetRequiredService<TpBLL>();
+            this.common = provider.GetRequiredService<Common>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this._selLangBLL = provider.GetRequiredService<SelLangBLL>();
         }
 
         public class TransferInfoReq
@@ -213,6 +216,9 @@ namespace BackendSite.Controllers.Api
                 foreach (var data in result.Data)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.CategoryName = data.Category == 0
+                        ? string.Empty
+                        : _selLangBLL.GetResourceValue($"lbl_AdjustCategory{data.Category}");
                 }
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
