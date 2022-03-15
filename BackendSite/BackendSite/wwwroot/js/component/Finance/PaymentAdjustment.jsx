@@ -480,7 +480,7 @@ import qs from 'qs';
                                 </div>
                                 :null} */}
                                 <div className="form-group width-200">
-                                    <label className="col-form-label">Category</label>
+                                    <label className="col-form-label">Adjust Reason</label>
                                     <select className="form-control" name="Category" onChange={this.onChange.bind(this)}>
                                         {reasonList}
                                     </select>

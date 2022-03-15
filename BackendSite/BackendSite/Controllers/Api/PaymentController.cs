@@ -786,7 +786,7 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
         public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite,
-            [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal, [FromForm] string bonuscode)
+            [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal, [FromForm] string bonuscode, [FromForm] int category)
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBLL.GetAuthData();
@@ -851,7 +851,8 @@ namespace BackendSite.Controllers.Api
                                                 Operator = authData.UserName,
                                                 WithdrawalLimitAmount = withdrawalLimitAmount,
                                                 WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                                Memo = memo
+                                                Memo = memo,
+                                                Category = category
                                             };
 
                                         string transId = null;
@@ -937,7 +938,7 @@ namespace BackendSite.Controllers.Api
                                             }
                                         }
                                     }
-                                    else
+                                    /*else
                                     {
                                         var setAdjustBonusReq = new SetAdjustBonusReq()
                                         {
@@ -966,7 +967,7 @@ namespace BackendSite.Controllers.Api
                                                 Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {apiOnlineResult.Message}"
                                             });
                                         }
-                                    }
+                                    }*/
 
                                 }
                                 catch (Exception ex)

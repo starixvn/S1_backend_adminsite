@@ -18,6 +18,7 @@ const initData = {
     WalletType:0,
     NeedCheckPassword:false,
     HasCheckPassword:false,
+    category: 1,
 }
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
                     WalletType:0,
                     NeedCheckPassword:false,
                     HasCheckPassword:false,
+                    category: 1,
                     [datacolumn]: v 
                 }); 
         }
@@ -64,6 +66,7 @@ const App = () => {
             formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
             formData.append('withdrawal',isNaN(parseFloat(stateData.withdrawal)) ? 0 : parseFloat(stateData.withdrawal));
             formData.append('bonuscode',stateData.CheckedBonusCode);
+            formData.append('category',stateData.category);
             let Data = {
                 BonusCode: stateData.bonusCode,
                 SiteId: parseInt(stateData.optSite)
@@ -141,8 +144,9 @@ const App = () => {
         formData.append('option', parseInt(stateData.option));
         formData.append('optSite', parseInt(stateData.optSite));
         formData.append('withdrawalLimitOption', (stateData.checkwd) ? 1 : 0);
-        formData.append('withdrawal',parseFloat(stateData.withdrawal))
-        formData.append('bonuscode',stateData.CheckedBonusCode)
+        formData.append('withdrawal',parseFloat(stateData.withdrawal));
+        formData.append('bonuscode',stateData.CheckedBonusCode);
+        formData.append('category',stateData.category);
         updateSend(true);
         api.post('/api/Payment/BalanceAdjustmentBatch', formData, settings)
             .then(function (response) {
@@ -242,13 +246,13 @@ const App = () => {
                 <td>
                     {value.currency}
                 </td>
-                {stateData.option == 5 ? 
+                {/* {stateData.option == 5 ? 
                 <>
                     <td>
                         {value.bonus}
                     </td>
                 </>
-                :null}
+                :null} */}
                 <td>
                     {value.rollOver}
                 </td>
@@ -260,6 +264,9 @@ const App = () => {
             NeedCheckPassword: false
         })
     }
+    let reasonList = gAdjustCategoryList.map((item) => {
+        return <option value={item.value}>{item.name}</option>;
+    });
 
     return (
         <>
@@ -291,16 +298,16 @@ const App = () => {
                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(4, 'option') }} disabled={stateSend} checked={stateData.option === 4} />
                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                     </div>
-                    <div className="custom-control custom-radio custom-control-inline">
+                    {/* <div className="custom-control custom-radio custom-control-inline">
                         <input type="radio" id="Option_5" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(5, 'option') }} disabled={stateSend} checked={stateData.option === 5} />
                         <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                     </div>
                     <div className="custom-control custom-radio custom-control-inline">
                         <input type="radio" id="Option_6" name="Option" className="custom-control-input" onChange={(e) => { EditFiled(6, 'option') }} disabled={stateSend} checked={stateData.option === 6} />
                         <label className="custom-control-label" htmlFor="Option_6">Manual Bonus</label>
-                    </div>
+                    </div> */}
                 </div>
-                {
+                {/*{
                     stateData.option == 5 || stateData.option == 6? 
                     <>
                         <div className="form-group">
@@ -310,7 +317,7 @@ const App = () => {
                         <button className="btn btn-add" style={{marginBottom: '5px' }} onClick={CheckBonusCode}>CheckBonusCode</button>
                     </>:null
                 }
-                {/* {
+                 {
                     stateData.option == 6 ? 
                     <>
                         <div className="form-group">
@@ -319,7 +326,7 @@ const App = () => {
                         </div>
                         <button className="btn btn-add" style={{marginBottom: '5px' }} onClick={CheckBonusCode}>CheckBonusCode</button>
                     </>:null
-                } */}
+                }
                 {
                     stateData.BonusCodeDetail !== null && (stateData.option == 5 || stateData.option == 6) ?
                     <>
@@ -359,7 +366,7 @@ const App = () => {
                             </tr>
                         </table>
                     </>:null
-                }
+                } */}
                 {
                     (stateData.option != 5 && stateData.option != 6) ?
                     <div className="form-group">
@@ -369,7 +376,13 @@ const App = () => {
                         </div>
                         <input className="form-control width-200" type="number" defaultValue={stateData.withdrawal} onChange={(e) => { EditFiled(e.target.value, 'withdrawal') }} />
                     </div>:null                    
-                }           
+                }
+                <div className="form-group width-200">
+                    <label className="col-form-label">Adjust Reason</label>
+                    <select className="form-control" name="Category" onChange={(e) => { EditFiled(e.target.value, 'category') }}>
+                        {reasonList}
+                    </select>
+                </div>
                 <div className="form-group width-200">
                     <label className="col-form-label">Upload File</label>
                     <input id="uploadfile" className="form-control" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" onChange={(e) => { EditFiled(e.target.value, 'file') }} disabled={stateSend} value={stateData.file} />
