@@ -60,13 +60,16 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 var tasks = tpWalletList.Select(async x =>
                 {
-                    var tpInfo = new TpInfo
+                    if(x.WalletType == (int)WalletTypeEnum.FundTransfer) 
                     {
-                        TpId = x.TpId,
-                        CustId = custId,
-                    };
-                    var apiResult = await GetBalanceAsync(tpInfo);
-                    x.Balance = apiResult.Data.balance;
+                        var tpInfo = new TpInfo
+                        {
+                            TpId = x.TpId,
+                            CustId = custId,
+                        };
+                        var apiResult = await GetBalanceAsync(tpInfo);
+                        x.Balance = apiResult.Data.balance;
+                    }
                 });
                 await Task.WhenAll(tasks);
 
@@ -307,36 +310,6 @@ namespace BackendSite.Service.BLL
                     Message = "AdminSite Error: " + ex.Message
                 };
             }
-        }
-
-        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
-        {
-            var sKey = $"TpWallet_{custId}";
-            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
-            if (tpWalletList == null)
-            {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)WalletTypeEnum.FundTransfer);
-                var tasks = tpWalletList.Select(async x =>
-                {
-                    var tpInfo = new TpInfo
-                    {
-                        TpId = x.TpId,
-                        CustId = custId,
-                    };
-                    var apiResult = await GetBalanceAsync(tpInfo);
-                    if (apiResult.ErrorCode == 0)
-                    {
-                        x.Balance = apiResult.Data.balance;
-                    }
-                });
-                await Task.WhenAll(tasks);
-
-                if (tpWalletList != null)
-                {
-                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
-                }
-            }
-            return tpWalletList;
         }
     }
 }
