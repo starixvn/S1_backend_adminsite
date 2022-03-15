@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
         public string SabaID { get; set; }
         public string Operator { get; set; }
         public string WalletType { get; set; }
+        public int Category { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
@@ -26,6 +27,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string TransId { get; set; }
         public string AdjustTypeName { get; set; }
+        public string AdjustReasonCategoryName { get; set; }
         public string UserName { get; set; }
         public string CurrencyName { get; set; }
         public decimal Amount { get; set; }

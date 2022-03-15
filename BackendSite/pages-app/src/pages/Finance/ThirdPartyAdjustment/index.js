@@ -227,7 +227,14 @@ const App = () => {
                             : null
                     }
                 </div>
-                <CustInfo CustData={custData} SendFiled={SendFiled} OnPressEnter={UpdateDate} AdjustmentOptionData={AdjustmentOptionData} StateSend={stateSend} SendData={sendData} />
+                <CustInfo
+                    CustData={custData}
+                    SendFiled={SendFiled}
+                    OnPressEnter={UpdateDate}
+                    AdjustmentOptionData={AdjustmentOptionData}
+                    StateSend={stateSend}
+                    SendData={sendData}
+                    AdjustCategory={gAdjustCategoryList} />
                 <hr />
                 <Log PageInfo={AdjustmentLog.PageInfo} Datas={AdjustmentLog.Datas} AdjustmentOptionData={AdjustmentOptionData} ChangePage={getLog} />
             </div>

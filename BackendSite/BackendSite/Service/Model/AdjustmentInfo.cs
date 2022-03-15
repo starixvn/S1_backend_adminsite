@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
         public string Memo { set; get; }
         public string Comment { set; get; }
         public int Status { set; get; }
+        public int Category { set; get; }
     }
     public class AdjustmentAndWithdrawalLimit : AdjustmentInfo
     {

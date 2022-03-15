@@ -637,10 +637,11 @@ namespace BackendSite.Controllers.Api
 
                 if (custInfo != null)
                 {
+                    // Totti說RetentionBonus,ManualBonus搬到Bonus Payout，這兩個可以拔掉了
                     //非RetentionBonus,ManualBonus
-                    if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
-                    {
-                        adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
+                    //if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                    //{
+                    adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
                         adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
                         adjustmentAndWithdrawalLimit.UserName = custInfo.UserName;
                         adjustmentAndWithdrawalLimit.SiteId = custInfo.SiteId;
@@ -653,6 +654,7 @@ namespace BackendSite.Controllers.Api
                         adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType =
                             adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
                         adjustmentAndWithdrawalLimit.Memo = adjustmentAndWithdrawalLimitReq.Memo;
+                        adjustmentAndWithdrawalLimit.Category = adjustmentAndWithdrawalLimitReq.Category;
 
                         string transId = null;
 
@@ -746,7 +748,7 @@ namespace BackendSite.Controllers.Api
                                 apiResult.Message = $"Success. ID is {transId}";
                             }
                         }
-                    }
+                    /*}
                     else
                     {
                         var setAdjustBonusReq = new SetAdjustBonusReq()
@@ -770,7 +772,7 @@ namespace BackendSite.Controllers.Api
                             apiResult.ErrorCode = apiOnlineResult.ErrorCode;
                             apiResult.Message = apiOnlineResult.Message;
                         }
-                    }
+                    }*/
                 }
             }
             catch (Exception ex)

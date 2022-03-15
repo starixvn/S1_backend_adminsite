@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
 @using BackendSite.Service.Model.enums
+@using Newtonsoft.Json
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -31,6 +32,10 @@
         var _value = (int)value;
         adjustType.Add(_value, selLangBLL.GetResourceValue($"lbl_AdjustmentType{_value}") ?? _value.ToString());        
     }
+
+    var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
+        .Cast<int>()
+        .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
 }
 
 <div id="content"></div>
@@ -38,11 +43,12 @@
 
 @section Scripts {  
     <script>
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en'
-        window.gCurrencyList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(currencyList));
-        window.gAdjustTypeList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(adjustType));
+        window.gCurrencyList = @Html.Raw(JsonConvert.SerializeObject(currencyList));
+        window.gAdjustTypeList = @Html.Raw(JsonConvert.SerializeObject(adjustType));
+        window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
     </script>
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
     <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>

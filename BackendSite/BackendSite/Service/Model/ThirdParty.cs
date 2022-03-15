@@ -31,6 +31,7 @@ namespace BackendSite.Service.Model
     {
         public string Operator { set; get; }
         public string Remarks { set; get; }
+        public int Category { set; get; }
     }
     public class TpTransferInfo
     {

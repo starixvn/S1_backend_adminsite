@@ -253,10 +253,22 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var adjustmentP = new DynamicParameters(new { adjustmentAndWithdrawalLimit.AdjustType, adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.CurrencyId, adjustmentAndWithdrawalLimit.SiteId, adjustmentAndWithdrawalLimit.AdjustIdInfo, adjustmentAndWithdrawalLimit.Amount, Prefix = $"A{common.GetEnv()}", adjustmentAndWithdrawalLimit.Memo });
+            var adjustmentP = new DynamicParameters(new
+            {
+                adjustmentAndWithdrawalLimit.AdjustType,
+                adjustmentAndWithdrawalLimit.CustId,
+                adjustmentAndWithdrawalLimit.UserName,
+                adjustmentAndWithdrawalLimit.CurrencyId,
+                adjustmentAndWithdrawalLimit.SiteId,
+                adjustmentAndWithdrawalLimit.AdjustIdInfo,
+                adjustmentAndWithdrawalLimit.Amount,
+                Prefix = $"A{common.GetEnv()}",
+                adjustmentAndWithdrawalLimit.Memo,
+                adjustmentAndWithdrawalLimit.Category
+            });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Admin_Adjustment_Ins", adjustmentP, trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {

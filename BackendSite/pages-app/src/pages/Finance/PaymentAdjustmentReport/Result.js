@@ -56,6 +56,9 @@ const dataColumnDefs = () => {
             dataColumn: 'statusName', columnTitle: 'Status'
         },
         {
+            dataColumn: 'adjustReasonCategoryName', columnTitle: 'AdjustReason'
+        },
+        {
             dataColumn: 'memo', columnTitle: 'Memo'
         },
         {

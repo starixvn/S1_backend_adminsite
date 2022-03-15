@@ -49,6 +49,9 @@ namespace BackendSite.Service.BLL
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                        AdjustReasonCategoryName = row.Category == 0
+                            ? string.Empty
+                            : selLangBLL.GetResourceValue($"lbl_AdjustCategory{row.Category}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         Amount = row.Amount,

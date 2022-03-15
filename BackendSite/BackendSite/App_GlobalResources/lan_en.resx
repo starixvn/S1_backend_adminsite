@@ -597,6 +597,39 @@
   <data name="lbl_AdjustmentType6" xml:space="preserve">
     <value>3RD Minus</value>
   </data>
+  <data name="lbl_AdjustCategory1" xml:space="preserve">
+    <value>None - (Default)</value>
+  </data>
+  <data name="lbl_AdjustCategory2" xml:space="preserve">
+    <value>Retention Bonus</value>
+  </data>
+  <data name="lbl_AdjustCategory3" xml:space="preserve">
+    <value>Manual Bonus(Special Bonus)</value>
+  </data>
+  <data name="lbl_AdjustCategory4" xml:space="preserve">
+    <value>Vip Upgrade Reward</value>
+  </data>
+  <data name="lbl_AdjustCategory5" xml:space="preserve">
+    <value>Prize Drop</value>
+  </data>
+  <data name="lbl_AdjustCategory6" xml:space="preserve">
+    <value>Tech Issue None Affected</value>
+  </data>
+  <data name="lbl_AdjustCategory7" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="lbl_AdjustCategory8" xml:space="preserve">
+    <value>Vendor Mistake</value>
+  </data>
+  <data name="lbl_AdjustCategory9" xml:space="preserve">
+    <value>Deposit</value>
+  </data>
+  <data name="lbl_AdjustCategory10" xml:space="preserve">
+    <value>Withdrawal</value>
+  </data>
+  <data name="lbl_AdjustCategory11" xml:space="preserve">
+    <value>Other</value>
+  </data>
   <data name="lbl_BonusStatus1" xml:space="preserve">
     <value>Running</value>
   </data>

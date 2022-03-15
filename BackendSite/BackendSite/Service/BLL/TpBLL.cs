@@ -172,7 +172,8 @@ namespace BackendSite.Service.BLL
                 direction = inAdminTpTransfer.direction,
                 inputs = null,
                 Operator = inAdminTpTransfer.Operator,
-                Remarks = inAdminTpTransfer.Remarks
+                Remarks = inAdminTpTransfer.Remarks,
+                Category = inAdminTpTransfer.Category
             };
             var myUrl = $"{_apiUrl}AdjustWallet";
             var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, adminTpTransfer);

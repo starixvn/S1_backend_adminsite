@@ -1,20 +1,6 @@
 import { number_format } from '../commJS/common';
 import qs from 'qs';
 
-const AdjustReasonCategory = [
-    { reasonId: 1, description: "None - (Default)"},
-    { reasonId: 2, description: "Retention Bonus"},
-    { reasonId: 3, description: "Manual Bonus(Special Bonus)"},
-    { reasonId: 4, description: "Vip Upgrade Reward"},
-    { reasonId: 5, description: "Prize Drop"},
-    { reasonId: 6, description: "Tech Issue None Affected"},
-    { reasonId: 7, description: "Test"},
-    { reasonId: 8, description: "Vendor Mistake"},
-    { reasonId: 9, description: "Deposit"},
-    { reasonId: 10, description: "Withdrawal"},
-    { reasonId: 11, description: "Other"}
-];
-
 (function ($, React, ReactDOM, i18n, axios, moment) {
     class PaymentAdjustment extends React.Component {
         constructor(props) {
@@ -345,8 +331,8 @@ const AdjustReasonCategory = [
                 }.bind(this))}</ul>;
             }
 
-            let reasonList = AdjustReasonCategory.map((item) => {
-                return <option value={item.reasonId}>{item.description}</option>;
+            let reasonList = gAdjustCategoryList.map((item) => {
+                return <option value={item.value}>{item.name}</option>;
             });
 
 
@@ -422,16 +408,16 @@ const AdjustReasonCategory = [
                                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" value={4} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                                     </div>
-                                    <div className="custom-control custom-radio custom-control-inline">
+                                    {/* <div className="custom-control custom-radio custom-control-inline">
                                         <input type="radio" id="Option_5" name="Option" className="custom-control-input" value={5} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                                     </div>
                                     <div className="custom-control custom-radio custom-control-inline">
                                         <input type="radio" id="Option_6" name="Option" className="custom-control-input" value={6} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_6">Manual Bonus</label>
-                                    </div>
+                                    </div> */}
                                 </div>
-                                {this.state.Option == 5? 
+                                {/* {this.state.Option == 5? 
                                 <div className="form-group width-200">
                                     <div>
                                         <label className="col-form-label">BonusCode</label>
@@ -452,7 +438,7 @@ const AdjustReasonCategory = [
                                         <button onClick={this.onCheckBonusCode.bind(this)}>CheckBonusCode</button>
                                     </div>
                                 </div>
-                                :null}
+                                :null} 
                                 {
                                     this.state.HasBonusCode ? 
                                     <>
@@ -473,7 +459,7 @@ const AdjustReasonCategory = [
                                     </table>
                                     </>
                                     :null
-                                }
+                                }*/}
                                 {this.state.Option != 5 && this.state.Option != 6 ? 
                                 <div className="form-group">
                                     <div className="custom-control custom-checkbox custom-control-inline">
@@ -487,12 +473,12 @@ const AdjustReasonCategory = [
                                     <label className="col-form-label">Amount</label>
                                     <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.Option == 5 ? true:false} value={this.state.Amount} />
                                 </div>
-                                {this.state.Option == 5 || this.state.Option == 6 ? 
+                                {/* {this.state.Option == 5 || this.state.Option == 6 ? 
                                 <div className="form-group width-200">
                                     <label className="col-form-label">RollOver</label>
                                     <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 || this.state.Option == 6 ? true:false} value={this.state.RollOver}/>
                                 </div>
-                                :null}
+                                :null} */}
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Category</label>
                                     <select className="form-control" name="Category" onChange={this.onChange.bind(this)}>
