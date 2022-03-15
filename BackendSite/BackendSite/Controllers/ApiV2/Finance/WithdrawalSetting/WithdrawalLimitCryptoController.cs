@@ -43,7 +43,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public CryptoCurrencyEnum CryptoCurrency { get; set; }
         }
 
-        public class CreateOrUpdateRequest
+        public class CreateRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public double WithdrawalMin { get; set; }
+            public double WithdrawalMax { get; set; }
+            public NetworkTypeEnum NetworkType { get; set; }
+            public CryptoCurrencyEnum CryptoCurrency { get; set; }
+        }
+
+        public class UpdateRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
@@ -114,13 +124,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(CreateOrUpdateRequest request)
+        public ApiResult Create(CreateRequest request)
         {
             var data = new CryptoWithdrawalLimitInfoManage()
             {
                 SiteId = request.SiteId,
                 CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
                 WithdrawalMax = request.WithdrawalMax,
                 WithdrawalMin = request.WithdrawalMin,
                 NetworkType = (int)request.NetworkType,
@@ -148,7 +157,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(CreateOrUpdateRequest request)
+        public ApiResult Update(UpdateRequest request)
         {
             var data = new CryptoWithdrawalLimitInfoManage()
             {
