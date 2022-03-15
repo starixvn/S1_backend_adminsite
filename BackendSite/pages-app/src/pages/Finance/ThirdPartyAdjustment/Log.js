@@ -9,8 +9,8 @@ const StatusData = {
 }
 const Panel = (props) => {
     let dataRows = props.Datas.length === 0 ? <tr></tr> : props.Datas.map((data, idx) => {
-        console.log(data);
-        console.log(idx);
+        //console.log(data);
+        //console.log(idx);
         return (
             <tr key={`result-body-${idx}`}>
                 <td>{data.siteName}</td>

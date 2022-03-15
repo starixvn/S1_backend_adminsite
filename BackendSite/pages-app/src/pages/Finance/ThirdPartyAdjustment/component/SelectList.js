@@ -10,7 +10,7 @@ export const SelectList = (props) => {
             <span className="label">{props.DisplayText}</span>
             <div className="field">
                 
-                <select className="form-control" value={props.Value} onChange={props.OnChange} disabled={props.Disabled}>
+                <select className="form-control" value={props.Value} onChange={(e) => { props.OnChange(e.target.value)}} disabled={props.Disabled}>
                     {selectOptions}
                 </select>
             </div>

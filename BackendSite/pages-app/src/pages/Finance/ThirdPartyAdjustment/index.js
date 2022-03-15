@@ -60,6 +60,7 @@ const App = () => {
             setTp([]);
             setCustData();
             setSearchData({ ...searchData, optTp: 0, userName: "", userTpId: "" });
+            setSendData({...sendData, category: 1})
             api.post('/api/Tp/GetTpBySite', qs.stringify({ 'SiteId': searchData.optSite }))
                 .then(function (response) {
                     if (mounted) {
@@ -101,6 +102,7 @@ const App = () => {
     }
     const UpdateDate = () => {
         let mounted = true;
+        
         if (sendData.adjustmentOpt && sendData.amount) {
             setStateSend(true);
             if (!stateSend) {
@@ -113,6 +115,7 @@ const App = () => {
                         'Opt': sendData.adjustmentOpt,
                         'Amount': sendData.amount,
                         'Memo': sendData.memo,
+                        'Category': sendData.category
                     }))
                     .then((res) => {
                         if (mounted) {
