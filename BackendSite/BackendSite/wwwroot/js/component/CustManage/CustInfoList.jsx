@@ -22,6 +22,10 @@ import * as Loading from '../commJS/Loading.jsx';
         3: "Closed",
         4: "Lock",
     };
+    const defExportTransferWalletType = {
+        0: "Close",
+        1: "Open"
+    };
 
     class CustInfoRow extends React.Component {
         render() {
@@ -154,7 +158,7 @@ import * as Loading from '../commJS/Loading.jsx';
         _Search = false;
         constructor(props) {
             super(props);
-            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[], TagList:[] ,selectTag: []};
+            this.state = { SiteList: [], selectSite: [], searchData: null, UserName: "", TransId: "", Loading: false, CurrencyList: [], selectCurrency: [] , selectStatus:[], TagList:[] ,selectTag: [],ExportTransferWallet:0};
             this.f_trigger_Start = React.createRef();
             this.selectdate_start = React.createRef();
             this.f_trigger_End = React.createRef();
@@ -274,7 +278,8 @@ import * as Loading from '../commJS/Loading.jsx';
                 SelectCurrency: !this.state.selectCurrency ? null : this.state.selectCurrency,
                 BankAccountNumber: !this.state.sBankAccountNumber ? null : this.state.sBankAccountNumber,
                 SelectStatus:!this.state.selectStatus ? null : this.state.selectStatus,
-                selectTag:!this.state.selectTag ? null : this.state.selectTag
+                selectTag:!this.state.selectTag ? null : this.state.selectTag,
+                ExportTransferWallet: this.state.ExportTransferWallet == 0 ? false:true
             };
             
             let ExportParam = [];
@@ -560,6 +565,7 @@ import * as Loading from '../commJS/Loading.jsx';
             let StatusStartDate = this.state.StatusStartDate;
             let StatusEndDate = this.state.StatusEndDate;
             let Loading = this.state.Loading;
+            let ExportTransferWallet = this.state.ExportTransferWallet;
             let siteList = this.state.SiteList.map(function (obj) {
                 return <option key={obj.siteId} value={obj.siteId} selected="selected">{obj.siteName}</option>;
             }.bind(this));
@@ -572,10 +578,17 @@ import * as Loading from '../commJS/Loading.jsx';
             let statusList = Object.keys(defStatusType).map((key) => {
                 return <option key={key} value={key} selected="selected">{defStatusType[key]}</option>;
             });
+            let exportTransferWallet = Object.keys(defExportTransferWalletType).map((key)=>{
+                let selected = ExportTransferWallet == key ? "selected" : "";
+                return (
+                    <option key={key} value={key} selected={selected}>{defExportTransferWalletType[key]}</option>
+                )
+            })
             siteList = <select id="selectSite" name="selectSite[]" multiple="multiple">{siteList}</select>;
             tagList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagList}</select>;
             currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
             statusList = <select id="selectStatus" name="selectStatus[]" multiple="multiple">{statusList}</select>;
+            exportTransferWallet = <select onChange={this.onChange.bind(this)} name="ExportTransferWallet">{exportTransferWallet}</select>
             return (
                 <div>
                     <h4 className="page-name">Customer Search</h4>
@@ -708,6 +721,12 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <div className="date">
                                         <input ref={this.selectTagDate_end} type="text" defaultValue={!isNaN(TagEndDate) ? moment.unix(TagEndDate).format('l') : null} size="8" />
                                         <a className="icon-calendar" ref={this.f_trigger_TagEnd}>{ }</a>
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Export Transfer Wallet</span>
+                                    <div className="field">
+                                        {exportTransferWallet}
                                     </div>
                                 </div>
                                 {Loading ? 

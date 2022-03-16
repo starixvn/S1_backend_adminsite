@@ -268,7 +268,9 @@ namespace BackendSite.Service.Model.enums
     public enum NetworkTypeEnum
     {
         ERC20 = 1,
-        TRC20 = 2
+        TRC20 = 2,
+        ETH = 3,
+        BTC = 4
     }
 
     #endregion
@@ -612,6 +614,14 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
 
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
+    }
+
     public enum SendMessageStatus
     {
         Pending = 0,
@@ -687,4 +697,19 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    #region TpTransferInfo
+    public enum TpTransferDirectionEnum
+    {
+        ToTP = 1,
+        ToMain = 2
+    }
+
+    #endregion
+
+    public enum WalletTypeEnum
+    {
+        FundTransfer = 0,
+        SeamlessWallet=1
+    }
 }
