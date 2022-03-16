@@ -48,8 +48,8 @@ namespace BackendSite.Service.DAL
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
-
-            return _mainDbClient.Execute("Admin_Banner_Set", p);
+            
+            return _mainDbClient.Execute("Admin_Banner_Set_V2", p);
         }
         public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
             string status,string currencies ,int startIndex,

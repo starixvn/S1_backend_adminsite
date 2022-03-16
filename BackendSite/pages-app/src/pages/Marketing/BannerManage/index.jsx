@@ -257,8 +257,7 @@ const App = () => {
 						BannerName: state.bannerList[idx].bannerName
 					})
 				})
-				res.data.data.specific = [res.data.data.specific.find(x => x.currencyId === CurrencyId)];
-				
+			
 				bannerData = {
 					errorCode: res.data.errorCode,
 					data: res.data.data,
