@@ -480,7 +480,6 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 								)}
 								currencyId={state.currentTab}
 								action={action}
-								isAdd = {IsAdd}
 							/>
 						</div>
 					</div>
@@ -507,7 +506,7 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`;
 	let langList = Object.keys(props.state.specific[props.currencyId].lang);
-	if (props.isAdd && props.state.siteId === 1){
+	if (props.state.siteId === 1){
 		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
 	}
 	const langOptions = langList.map((lang, i) => {
@@ -517,7 +516,8 @@ const SubPanel = props => {
 		};
 	});
 	let langId = props.state.specific[props.currencyId].currentLang;
-	let tabArr = props.state.specific[props.currencyId].selectedLang.map(
+	let tabArr = props.state.specific[props.currencyId].selectedLang
+		.filter(item => initCurrencyLangMap[props.currencyId].includes(item)).map(
 		item => {
 			return (
 				<button
@@ -838,7 +838,7 @@ const SubPanel = props => {
 						</div>
 						<div className="filter noBGcolor tag">{tabArr}</div>
 						{props.state.specific[props.currencyId].selectedLang.length >
-							0 &&
+							0 && initCurrencyLangMap[props.currencyId].includes(langId) &&
 							langId !== null &&
 							langId !== "" ? (
 							<div className="filter">
