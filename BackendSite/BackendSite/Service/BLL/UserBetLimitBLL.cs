@@ -50,9 +50,9 @@ namespace BackendSite.Service.BLL
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
         }
 
-        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
-            return _userBetLimitService.GetUserBetLimit(siteIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
+            return _userBetLimitService.GetUserBetLimit(siteIds,currencyIds,  userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
 
         public async Task<int> Delete(int custId)

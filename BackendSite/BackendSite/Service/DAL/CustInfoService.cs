@@ -225,7 +225,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V7", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V8", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 
@@ -752,7 +752,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
         }
-
+        
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             var p = new DynamicParameters();

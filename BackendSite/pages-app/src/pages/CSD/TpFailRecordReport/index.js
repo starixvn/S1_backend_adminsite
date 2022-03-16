@@ -15,14 +15,14 @@ const App = () => {
     EndTime: moment().format("l"),
     SiteId: 0,
     TpId: 0,
-    UserName: '',
-    TransId: ''
+    UserName: "",
+    TransId: "",
   });
 
   const [stateDatas, setDatas] = useState({
     Datas: null,
     FilterInfo: null,
-    SiteList: null
+    SiteList: null,
   });
 
   const [siteList, setSiteList] = useState();
@@ -39,8 +39,7 @@ const App = () => {
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         setSiteList(res.data.data);
-      }
-      else {
+      } else {
         alert(res.data.message ?? "failed to get site list.");
       }
     });
@@ -54,23 +53,29 @@ const App = () => {
   };
 
   const Filter_Submit = () => {
-    if (!CheckTransTime())
-      return false;
-    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
-    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
-    console.log(startTime, endTime);
+    if (!CheckTransTime()) return false;
+    let startTime = moment(stateFilter.StartTime).format(
+      "YYYY-MM-DD HH:mm:ss.SSSZ"
+    );
+    let endTime = moment(stateFilter.EndTime).format(
+      "YYYY-MM-DD 23:59:59.999Z"
+    );
+    //console.log(startTime, endTime);
+    var siteList = [stateFilter.SiteId];
+
     let param = {
-      Url: 'apiV2/TpFailRecordReport/GetList',
+      Url: "apiV2/TpFailRecordReport/GetList",
       Data: {
-        SiteId:stateFilter.SiteId,
-        TpId:stateFilter.TpId,
+        SiteIds: siteList,
+        CurrencyIds: null,
+        TpId: stateFilter.TpId,
         StartTime: startTime,
         EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
         PageSize: pageSize,
-        PageNumber: 1
-      }
+        PageNumber: 1,
+      },
     };
 
     setSubmitStatus(true);
@@ -98,21 +103,26 @@ const App = () => {
   };
 
   const ChangePage = (PageNumber) => {
-    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
-    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
-
+    let startTime = moment(stateFilter.StartTime).format(
+      "YYYY-MM-DD HH:mm:ss.SSSZ"
+    );
+    let endTime = moment(stateFilter.EndTime).format(
+      "YYYY-MM-DD 23:59:59.999Z"
+    );
+    var siteList = [stateFilter.SiteId];
     let param = {
-      Url: 'apiV2/TpFailRecordReport/GetList',
+      Url: "apiV2/TpFailRecordReport/GetList",
       Data: {
-        SiteId:stateFilter.SiteId,
-        TpId:stateFilter.TpId,
+        SiteIds: siteList,
+        CurrencyIds: null,
+        TpId: stateFilter.TpId,
         StartTime: startTime,
         EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
         PageSize: pageSize,
-        PageNumber: PageNumber
-      }
+        PageNumber: PageNumber,
+      },
     };
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
@@ -134,25 +144,32 @@ const App = () => {
   };
 
   const ExportToExcel = () => {
-    if (!CheckTransTime())
-      return false;
+    if (!CheckTransTime()) return false;
 
     setSubmitStatus(true);
     setExportStatus(true);
 
-    let startTime = moment(stateFilter.StartTime).format('YYYY-MM-DD HH:mm:ss.SSSZ');
-    let endTime = moment(stateFilter.EndTime).format('YYYY-MM-DD 23:59:59.999Z');
+    let startTime = moment(stateFilter.StartTime).format(
+      "YYYY-MM-DD HH:mm:ss.SSSZ"
+    );
+    let endTime = moment(stateFilter.EndTime).format(
+      "YYYY-MM-DD 23:59:59.999Z"
+    );
+
+    var siteList = [stateFilter.SiteId];
+
     let param = {
-      Url: 'apiV2/TpFailRecordReport/ExportV1',
+      Url: "apiV2/TpFailRecordReport/ExportV1",
       Data: {
-        SiteId: stateFilter.SiteId,
+        SiteIds: JSON.stringify(siteList),
+        CurrencyIds: null,
         TpId: stateFilter.TpId,
         StartTime: startTime,
         EndTime: endTime,
         UserName: stateFilter.UserName,
         TransId: stateFilter.TransId,
-        TimeZone: timeZone
-      }
+        TimeZone: timeZone,
+      },
     };
 
     WebAPI.DownloadData(param);
@@ -163,19 +180,18 @@ const App = () => {
     }, 5000);
   };
 
-  
   const CheckTransTime = () => {
     let momFromTransTime = moment(stateFilter.StartTime);
-    let momToTransTime = moment(stateFilter.StartTime)
+    let momToTransTime = moment(stateFilter.StartTime);
 
     if (!momFromTransTime.unix() || !momToTransTime.unix()) {
       alert("Please choose TransTime of report.");
-        return false;
+      return false;
     }
 
     if (Math.abs(momFromTransTime.diff(moment(), "days")) > 30) {
       alert("Only the data of the past 30 days can be queried.");
-        return false;
+      return false;
     }
 
     return true;
@@ -196,7 +212,6 @@ const App = () => {
       <Filter
         filterInfo={stateFilter}
         onChange={Filter_OnChange}
-
         ClickSubmit={Filter_Submit}
         SiteList={siteList}
         SubmitBtnDisabled={SubmitStatus}
