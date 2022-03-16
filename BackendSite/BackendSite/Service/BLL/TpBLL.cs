@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
@@ -114,6 +114,7 @@ namespace BackendSite.Service.BLL
         {
             var input = new Dictionary<string, string>();
             var myUrl = $"{_apiUrl}GetBalance";
+
             var oTpInfo = new TpInfo
             {
                 TpId = inInfo.TpId,
@@ -321,6 +322,36 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
         {
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
+        }
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
+        {
+            var sKey = $"TpWallet_{custId}";
+            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
+            if (tpWalletList == null)
+            {
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)TpListWalletTypeEnum.FundTransfer);
+                var tasks = tpWalletList.Select(async x =>
+                {
+                    var tpInfo = new TpInfo
+                    {
+                        TpId = x.TpId,
+                        CustId = custId,
+                    };
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    if (apiResult.ErrorCode == 0)
+                    {
+                        x.Balance = apiResult.Data.balance;
+                    }
+                });
+                await Task.WhenAll(tasks);
+
+                if (tpWalletList != null)
+                {
+                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
+                }
+            }
+            return tpWalletList;
         }
     }
 }

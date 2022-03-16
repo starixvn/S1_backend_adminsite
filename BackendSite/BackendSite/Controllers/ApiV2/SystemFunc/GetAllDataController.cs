@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly WithdrawalBLL _withdrawalBll;
 
         #endregion
 
@@ -55,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
         }
 
         #endregion
@@ -454,6 +456,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
 
             return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<CryptoInfoData> GetCryptoInfoData()
+        {
+
+            var result = _withdrawalBll.GetCryptoInfoData();
+
+            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }
 
         /// <summary>

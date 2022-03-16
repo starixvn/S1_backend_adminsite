@@ -19,11 +19,14 @@ namespace BackendSite.Controllers.Api
     {
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         public UserBetLimitController(UserBetLimitBLL userBetLimitBll,
-            CustInfoBLL custInfoBll)
+            CustInfoBLL custInfoBll,
+            ServerInfoBLL serverInfoBll)
         {
             _userBetLimitBll = userBetLimitBll;
             _custInfoBll = custInfoBll;
+            _serverInfoBll = serverInfoBll;
         }
 
         /// <summary>
@@ -44,7 +47,17 @@ namespace BackendSite.Controllers.Api
             var pageNumber = query.PageNumber;
             var startTime = DateTimeExtensions.UnixToDateTime(query.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(query.EndDate);
-            var datas = _userBetLimitBll.GetUserBetLimit(query.SiteIds, query.UserName, startTime, endTime,
+
+            var siteInfoList = _serverInfoBll.GetSiteList();
+
+            var currencyIdList = new List<int>();
+
+            foreach (var site in siteInfoList)
+            {
+                currencyIdList.AddRange(site.ICurrencyList);
+            }
+
+            var datas = _userBetLimitBll.GetUserBetLimit(query.SiteIds, currencyIdList, query.UserName, startTime, endTime,
                 query.PageSize, query.PageNumber, out var totalPages, out var rowCount);
             foreach (var data in datas)
             {
@@ -181,7 +194,7 @@ namespace BackendSite.Controllers.Api
             var data = await _userBetLimitBll.GetTpCategoryList();
             var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
             {
-                Data = data, 
+                Data = data,
                 ErrorCode = 0
             };
 
