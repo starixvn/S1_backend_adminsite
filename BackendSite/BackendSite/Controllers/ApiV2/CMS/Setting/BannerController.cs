@@ -64,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         public class GetListRequest : ApiRequestPageModel
@@ -100,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName);
+                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName , req.CurrencyId);
                 if (result != null)
                 {
                     apiResult.Data = result;
