@@ -264,7 +264,6 @@ namespace BackendSite.Service.DAL
             {
                 _SiteId = input.SiteId,
                 _CurrencyId = input.CurrencyId,
-                _VipLevel = input.VipLevel,
                 _WithdrawalMin = input.WithdrawalMin,
                 _WithdrawalMax = input.WithdrawalMax,
                 _UpdateOperator = input.UpdateOperator,
@@ -288,7 +287,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V3", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
 
             if (!result)
             {
