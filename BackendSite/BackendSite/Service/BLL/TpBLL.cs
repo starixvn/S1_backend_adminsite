@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                (Math.Abs(pageNumber)-1) * Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
@@ -114,6 +114,7 @@ namespace BackendSite.Service.BLL
         {
             var input = new Dictionary<string, string>();
             var myUrl = $"{_apiUrl}GetBalance";
+
             var oTpInfo = new TpInfo
             {
                 TpId = inInfo.TpId,
@@ -324,7 +325,7 @@ namespace BackendSite.Service.BLL
             var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
             if (tpWalletList == null)
             {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x=>x.WalletType == (int)WalletTypeEnum.FundTransfer);
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)WalletTypeEnum.FundTransfer);
                 var tasks = tpWalletList.Select(async x =>
                 {
                     var tpInfo = new TpInfo
@@ -336,7 +337,7 @@ namespace BackendSite.Service.BLL
                     if (apiResult.ErrorCode == 0)
                     {
                         x.Balance = apiResult.Data.balance;
-                    }                   
+                    }
                 });
                 await Task.WhenAll(tasks);
 
