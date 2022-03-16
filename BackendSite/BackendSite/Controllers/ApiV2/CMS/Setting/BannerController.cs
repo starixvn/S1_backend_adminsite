@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,13 +64,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
+            public int CurrencyId { get; set; }
         }
 
-        public class GetBannerListReq
+        public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
-            public int BannerTypeId { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
 
         public class UpdateBannerStatusReq
@@ -97,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName);
+                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName , req.CurrencyId);
                 if (result != null)
                 {
                     apiResult.Data = result;
@@ -126,23 +130,38 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// 
         /// Func Path：Marketing >  Banner Management 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList(GetBannerListReq req)
+        public ApiListResult<BannerInfoList> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
+            var apiListResult = new ApiListResult<BannerInfoList>();
             try
             {
-                apiResult.Data = _bannerManageBll.GetBannerList(req.SiteId, req.BannerTypeId, req.Status);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success ;
+                var bannerTypeList = request.BannerTypes.Select(x => (int)x);
+                var statusList = request.Statuses.Select(x => (int)x);
+                var currencyIds = request.CurrencyIds.Select(x => x);
+
+                var data = _bannerManageBll.GetBannerList(request.SiteIds,
+                    bannerTypeList,
+                    statusList,
+                    currencyIds,
+                    request.PageNumber,
+                    request.PageSize,
+                    out var totalPages, out var rowCount);
+
+                apiListResult.Data = data;
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiListResult.TotalPages = totalPages;
+                apiListResult.RowCount = rowCount;
+                apiListResult.PageNumber = request.PageNumber;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiListResult.Message = ex.Message;
+                apiListResult.RawMessage = ex.ToString();
             }
-            return apiResult;
+            return apiListResult;
         }
         
         /// <summary>

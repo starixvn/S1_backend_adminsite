@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -63,9 +64,10 @@ namespace BackendSite.Controllers.Api
                     SiteName = bannerInfo.SiteName
                 };
                 var user = authorizeBLL.GetAuthData().UserName;
-                var errorCode = bannerManageBLL.SetBanner(req, user);
-                apiResult.ErrorCode = errorCode;
-                apiResult.Message = errorCode == 1 ? "The Banner Name setting already exists which with same Site." : "";
+                var result = bannerManageBLL.SetBanner(req, user);
+                
+                apiResult.ErrorCode = result >=0 ? (int)ErrorCodeEnum.Success :(int) ErrorCodeEnum.Fail;
+                apiResult.Message = apiResult.ErrorCode != 0 ? "Update Failed" : "";
             }
             catch (MySqlException sqlException)
             {
@@ -83,12 +85,46 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Status)
+        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Currency ,[FromForm] int Status)
         {
             var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
             try
             {
-                apiResult.Data = bannerManageBLL.GetBannerList(SiteId, BannerTypeId, Status);
+                var siteList = new List<int> {SiteId};
+                var bannerTypeList = new List<int>(); 
+                var statusList = new List<int>();
+                var currencyList = new List<int> {Currency};
+
+                if (BannerTypeId > 0)
+                {
+                    bannerTypeList.Add(BannerTypeId);
+                }
+                else
+                {
+                    bannerTypeList.Add(1);
+                    bannerTypeList.Add(3);
+                    bannerTypeList.Add(4);
+                    bannerTypeList.Add(5);
+                    bannerTypeList.Add(6);
+                }
+
+                if (Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0);
+                    statusList.Add(1);
+                }
+
+                apiResult.Data = bannerManageBLL.GetBannerList(siteList,
+                    bannerTypeList, statusList,currencyList,
+                    1, 5000, out _, out _);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -100,12 +136,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName)
+        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName , [FromForm] int Currency)
         {
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = bannerManageBLL.GetBanner(SiteId, BannerName);
+                var result = bannerManageBLL.GetBanner(SiteId, BannerName ,Currency);
                 if (result != null)
                 {
                     apiResult.Data = result;
