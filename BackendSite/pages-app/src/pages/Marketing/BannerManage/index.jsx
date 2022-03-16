@@ -254,7 +254,8 @@ const App = () => {
 					Url: "BannerManage/GetBanner",
 					Data: qs.stringify({
 						SiteId: state.bannerList[idx].siteId,
-						BannerName: state.bannerList[idx].bannerName
+						BannerName: state.bannerList[idx].bannerName,
+						Currency: CurrencyId
 					})
 				})
 			

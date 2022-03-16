@@ -75,11 +75,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public BannerInfo GetBanner(int siteId, string bannerName)
+        public BannerInfo GetBanner(int siteId, string bannerName , int currency)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = new BannerInfo();
-            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V2", new { SiteId = siteId, BannerName = bannerName }, commandType: CommandType.StoredProcedure);
+            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency }, commandType: CommandType.StoredProcedure);
 
             if (queryResult != null)
             {
