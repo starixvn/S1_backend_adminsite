@@ -205,7 +205,7 @@
     <value>Processed Success.</value>
   </data>
   <data name="msg_SystemException" xml:space="preserve">
-    <value>System Error happend.Please contant system admin.</value>
+    <value>System Error happend.Please contact system admin.</value>
   </data>
   <data name="msg_UpdateFailed" xml:space="preserve">
     <value>Update Failed</value>
