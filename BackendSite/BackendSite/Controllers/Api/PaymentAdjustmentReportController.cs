@@ -6,6 +6,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -18,11 +19,13 @@ namespace BackendSite.Controllers.Api
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
         private readonly ExcelBLL excelBLL;
+        private readonly ServerInfoBLL serverInfoBLL;
 
-        public PaymentAdjustmentReportController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL)
+        public PaymentAdjustmentReportController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL, ServerInfoBLL serverInfoBLL)
         {
             this.paymentAdjustmentBLL = paymentAdjustmentBLL;
             this.excelBLL = excelBLL;
+            this.serverInfoBLL = serverInfoBLL;
         }
 
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
@@ -30,20 +33,51 @@ namespace BackendSite.Controllers.Api
             var result = new ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd>();
             try
             {
+                var siteInfoList = serverInfoBLL.GetSiteList();
+
                 var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
-                
+
+                var currencyIdList = new List<int>();
+                var adjustTypeList = new List<int>();
+
+                if (CurrencyId == 0)
+                {
+                    foreach (var site in siteInfoList)
+                    {
+                        currencyIdList.AddRange(site.ICurrencyList);
+                    }
+                }
+                else
+                    currencyIdList.Add(CurrencyId);
+
+                if (AdjustType == 0)
+                {
+                    adjustTypeList.AddRange(new List<int>() { 1, 2, 3, 4, 5, 6 });
+                }
+                else
+                    adjustTypeList.Add(AdjustType);
+
+
                 var PageSize = 10;
-                var TotalPages = 0;
-                var RowCount = 0;
                 var CurrencyAmount = new List<string>();
-                var dataList = paymentAdjustmentBLL.GetPaymentAdjustmentReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime, PageSize, ref PageNumber, ref TotalPages, ref RowCount, ref CurrencyAmount);
-                
+                var dataList = paymentAdjustmentBLL.GetPaymentAdjustmentReport(new List<int>(),
+                    currencyIdList,
+                    UserName,
+                    adjustTypeList,
+                    startTime,
+                    endTime,
+                    TransId,
+                    PageNumber,
+                    PageSize,
+                    out int TotalPages, out int RowCount, out CurrencyAmount);
+
                 foreach (var data in dataList)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 }
-                result.Data = dataList; 
+
+                result.Data = dataList;
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;
                 result.TotalPages = TotalPages;
@@ -64,16 +98,47 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public IActionResult ExportPaymentAdjustmentReport(string TransId, int CurrencyId, string UserName, int AdjustType, long StartDate, long EndDate)
         {
+            var siteInfoList = serverInfoBLL.GetSiteList();
+
             var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
-            var exportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(TransId, CurrencyId, UserName, AdjustType, startTime, endTime);
+
+            var currencyIdList = new List<int>();
+            var adjustTypeList = new List<int>();
+
+            if (CurrencyId == 0)
+            {
+                foreach (var site in siteInfoList)
+                {
+                    currencyIdList.AddRange(site.ICurrencyList);
+                }
+            }
+            else
+                currencyIdList.Add(CurrencyId);
+
+            if (AdjustType == 0)
+            {
+                adjustTypeList.AddRange(new List<int>() { 1, 2, 3, 4, 5, 6 });
+            }
+            else
+                adjustTypeList.Add(AdjustType);
+
+
+
+            var exportData = paymentAdjustmentBLL.GetPaymentAdjustmentExportReport(new List<int>(),
+                    currencyIdList,
+                    UserName,
+                    adjustTypeList,
+                    startTime,
+                    endTime,
+                    TransId);
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            
+
             var stream = excelBLL.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"PaymentAdjustmentReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return excelBLL.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 
         public class GetAdjustmentInfoReq

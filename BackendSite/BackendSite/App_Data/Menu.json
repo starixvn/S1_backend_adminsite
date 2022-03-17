@@ -476,6 +476,16 @@
         "Childs": null
       },
       {
+        "Key": "",
+        "Title": "Registration Management",
+        "FuncKey": "Marketing/RegistrationForMarketing",
+        "Controller": "Marketing",
+        "Action": "RegistrationForMarketing",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "BonusInfoReport",
         "Title": "Bonus Report",
         "FuncKey": "Marketing/BonusInfoReport",
@@ -757,6 +767,26 @@
         "FuncKey": "CMS/AppLinkManagement",
         "Controller": "Marketing",
         "Action": "AppLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SlotGamesManagement",
+        "Title": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "SlotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "CategoryManagement",
+        "Title": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Controller": "Marketing",
+        "Action": "CategoryManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

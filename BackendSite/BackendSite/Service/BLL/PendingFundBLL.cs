@@ -137,7 +137,7 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
             var errorMsg = new List<string>();
-            foreach (var pendingBonus in bonusInfoService.GetPendingBonusList(0,10000,out _,out _))
+            foreach (var pendingBonus in _bonusInfoBLL.GetAllPendingBonusList())
             {
                 var tpBonusTransfer = new TpBonusTransfer
                 {
@@ -162,8 +162,8 @@ namespace BackendSite.Service.BLL
         {
             var apiResult = new ApiResult();
             var result = new List<TransferMultiResult>();
-            var pendingBonusList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _);
-            var pendingBonusIdList = bonusInfoService.GetPendingBonusList(0, 10000, out _, out _).Select(x => x.BonusId);
+            var pendingBonusList = _bonusInfoBLL.GetAllPendingBonusList();
+            var pendingBonusIdList = _bonusInfoBLL.GetAllPendingBonusList().Select(x => x.BonusId);
 
             foreach (var item in bonusIdList)
             {
@@ -190,7 +190,9 @@ namespace BackendSite.Service.BLL
                             Result = new ApiResult()
                             {
                                 ErrorCode = (int)ErrorCodeEnum.Success,
-                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:Transfer Successful !"
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:Transfer Successful !",
+                                RawMessage = "This is TpService/BonusTransfer Success Result."
+
                             }
                         });
                     }
@@ -202,7 +204,8 @@ namespace BackendSite.Service.BLL
                             Result = new ApiResult()
                             {
                                 ErrorCode = (int)ErrorCodeEnum.Fail,
-                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:{(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}"
+                                Message = $"BonusId:{item}, UserName:{processItem.UserName}, Message:{(string.IsNullOrWhiteSpace(apiResult.RawMessage) ? apiResult.Message : apiResult.RawMessage)}",
+                                RawMessage = "This is TpService/BonusTransfer Error Result."
                             }
                         });
                     }
@@ -215,7 +218,8 @@ namespace BackendSite.Service.BLL
                         Result = new ApiResult()
                         {
                             ErrorCode = (int)ErrorCodeEnum.Fail,
-                            Message = $"BonusId:{item}, Message:Not Found."
+                            Message = $"Admin Error：BonusId:{item}, Message:Not Found.",
+                            RawMessage = "This is Admin Error Result."
                         }
                     });
                 }

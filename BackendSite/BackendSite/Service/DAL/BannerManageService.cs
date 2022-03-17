@@ -19,14 +19,14 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        
+
         public BannerManageService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public int SetBanner(BannerController.SetBannerReq bannerInfo, string user)
+        public int SetBanner(BannerInfo bannerInfo, string user)
         {
             var p = new DynamicParameters();
             p.Add("BannerName", bannerInfo.BannerName);
@@ -49,17 +49,37 @@ namespace BackendSite.Service.DAL
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
             
-            return _mainDbClient.Execute("Admin_Banner_Set", p);
+            return _mainDbClient.Execute("Admin_Banner_Set_V2", p);
         }
-        public IEnumerable<BannerInfoList> GetBannerList(int siteId,int bannerTypeId,int status)
+        public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
+            string status,string currencies ,int startIndex,
+            int pageSize,out int totalPages,out int rowCount)
         {
-            return _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V4", new DynamicParameters(new {SiteId = siteId, BannerTypeId = bannerTypeId, Status = status }));
+
+            var props = new DynamicParameters();
+
+            props.Add("_SiteIds", siteIds);
+            props.Add("_BannerTypes", bannerTypes);
+            props.Add("_Statuses", status);
+            props.Add("_CurrencyIds", currencies);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V5", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
-        public BannerInfo GetBanner(int siteId, string bannerName)
+
+        public BannerInfo GetBanner(int siteId, string bannerName , int currency)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = new BannerInfo();
-            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V2", new {SiteId = siteId, BannerName = bannerName }, commandType: CommandType.StoredProcedure);
+            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency }, commandType: CommandType.StoredProcedure);
 
             if (queryResult != null)
             {
@@ -109,7 +129,7 @@ namespace BackendSite.Service.DAL
             var errorCode = 0;
             try
             {
-                _mainDbClient.Execute("Admin_BannerStatus_Set", new DynamicParameters(new {SiteId = siteId, BannerName = bannerName, Status = status, AdminUser = user }));
+                _mainDbClient.Execute("Admin_BannerStatus_Set", new DynamicParameters(new { SiteId = siteId, BannerName = bannerName, Status = status, AdminUser = user }));
             }
             catch (Exception)
             {

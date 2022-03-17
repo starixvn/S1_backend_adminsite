@@ -155,5 +155,23 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RegistrationForMarketing" })]
+        public IActionResult RegistrationForMarketing()
+        {
+            return View();
+        }
+        
+         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
+        public IActionResult SlotGamesManagement()
+        {
+            return View();
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        public IActionResult CategoryManagement()
+        {
+            return View();
+        }
     }
 }

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.Api
 {
@@ -25,20 +26,19 @@ namespace BackendSite.Controllers.Api
 
         private readonly ReportBLL _reportBLL;
         private readonly ReportExcelBLL _reportExcelBLL;
-        private readonly ResponseSettingBLL _responseSettingBLL;
+        private readonly Common _common;
 
         #endregion
 
         #region Constructors
 
-        public ReportController(IConfiguration configuration,
-                                ReportBLL reportBLL,
+        public ReportController(ReportBLL reportBLL,
                                 ReportExcelBLL reportExcelBLL,
-                                ResponseSettingBLL responseSettingBLL)
+                                Common common)
         {
             _reportBLL = reportBLL;
             _reportExcelBLL = reportExcelBLL;
-            _responseSettingBLL = responseSettingBLL;
+            _common = common;
         }
 
         #endregion
@@ -106,13 +106,9 @@ namespace BackendSite.Controllers.Api
         public class GetCustomerStatisticalReportReq
         {
             public IEnumerable<int> SiteIds { get; set; }
-
             public IEnumerable<int> CurrencyIds { get; set; }
-
             public string StartDate { get; set; }
-
             public string EndDate { get; set; }
-
             public string UserName { get; set; }
         }
 
@@ -1424,7 +1420,8 @@ namespace BackendSite.Controllers.Api
                                                    JsonConvert.SerializeObject(request.SiteIds),
                                                    JsonConvert.SerializeObject(request.CurrencyIds),
                                                    request.StartDate,
-                                                   request.EndDate);
+                                                   request.EndDate,
+                                                   _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -1469,7 +1466,8 @@ namespace BackendSite.Controllers.Api
                                                          SiteIds,
                                                          CurrencyIds,
                                                          StartDate,
-                                                         EndDate);
+                                                         EndDate, 
+                                                         _common.TransferToTimeZoneFormat(8));
 
             var currencyData = _reportBLL.GetCurrency();
 
@@ -2062,13 +2060,13 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetCustomerStatisticalReport(GetCustomerStatisticalReportReq request)
         {
-
             var data = _reportBLL.GetCustomerStatisticalReport(request.CurrencyIds,
                                                                      JsonConvert.SerializeObject(request.SiteIds),
                                                                      JsonConvert.SerializeObject(request.CurrencyIds),
                                                                      request.StartDate,
                                                                      request.EndDate,
-                                                                     request.UserName);
+                                                                     request.UserName,
+                                                                     _common.TransferToTimeZoneFormat(8));
 
             if (!data.Any())
             {
@@ -2101,24 +2099,13 @@ namespace BackendSite.Controllers.Api
         /// <param name="UserName"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult ExportCustomerStatisticalReport(string SiteIds,
-                                               string CurrencyIds,
-                                               string StartDate,
-                                               string EndDate,
-                                               string UserName)
+        public IActionResult ExportCustomerStatisticalReport(string SiteIds, string CurrencyIds, string StartDate, string EndDate, string UserName)
         {
 
             #region Get Data
 
             var currencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyIds);
-
-            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList,
-                                                                     SiteIds,
-                                                                     CurrencyIds,
-                                                                     StartDate,
-                                                                     EndDate,
-                                                                     UserName);
-
+            var ExportData = _reportBLL.GetCustomerStatisticalReport(currencyList, SiteIds, CurrencyIds, StartDate, EndDate, UserName, _common.TransferToTimeZoneFormat(8));
             var currencyData = _reportBLL.GetCurrency();
 
             #endregion
@@ -2629,11 +2616,8 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetCustomerDetail(GetCustomerDetailReq request)
         {
-            var data = _reportBLL.GetCustomerDetail(request.CustId,
-                                                          request.GameId,
-                                                          request.Date);
-
-
+            var data = _reportBLL.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(8));
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
