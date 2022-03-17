@@ -68,7 +68,10 @@ namespace BackendSite.Service.BLL
                             CustId = custId,
                         };
                         var apiResult = await GetBalanceAsync(tpInfo);
-                        x.Balance = apiResult.Data.balance;
+                        if(apiResult.Data != null)
+                        {
+                            x.Balance = apiResult.Data.balance;
+                        }                    
                     }
                 });
                 await Task.WhenAll(tasks);
