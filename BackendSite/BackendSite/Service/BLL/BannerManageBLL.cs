@@ -32,9 +32,9 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize), out totalPages, out rowCount);
 
         }
-        public BannerInfo GetBanner(int siteId, string bannerName)
+        public BannerInfo GetBanner(int siteId, string bannerName ,int currency)
         {
-            return bannerManageService.GetBanner(siteId, bannerName);
+            return bannerManageService.GetBanner(siteId, bannerName, currency);
         }
         public int UpdateBannerStatus(int siteId, string bannerName, int status, string user)
         {

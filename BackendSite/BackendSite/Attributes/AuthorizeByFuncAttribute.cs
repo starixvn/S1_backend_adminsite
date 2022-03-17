@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +15,13 @@ namespace BackendSite.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AuthorizeByFuncAttribute : Attribute, IAuthorizationFilter
     {
-        public string FuncKey { get; set; }
+        public object FuncKey { get; set; }
         public string SubFuncKey { get; set; }
         private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminUserService adminUserService;
         private readonly PermissionBLL permissionBLL;
         
-        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, string FuncKey = null, string SubFuncKey=null)
+        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, object FuncKey = null, string SubFuncKey=null)
         {
             this.authorizeBLL = authorizeBLL;
             this.adminUserService = adminUserService;
@@ -35,8 +37,11 @@ namespace BackendSite.Attributes
 
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
-            if (!string.IsNullOrEmpty(FuncKey))
+            if (FuncKey != null)
             {
+                var funkeyList = FuncKey is string funcKey ? 
+                    new List<string> {funcKey} : ((IEnumerable)FuncKey).Cast<string>().ToList();
+                
                 var pageStatus = PageStatus.Allow;
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
@@ -58,15 +63,29 @@ namespace BackendSite.Attributes
                             var permissions = permissionBLL.GetUserPermission((int)loginUser.GroupSEQ);
                             if (string.IsNullOrEmpty(SubFuncKey))
                             {
-                                pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase)) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
+                                foreach (var key in funkeyList)
+                                {
+                                    pageStatus = !permissions.Any(x => string.Equals(x.FuncKey, key, StringComparison.OrdinalIgnoreCase)) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
+                                    if (pageStatus == PageStatus.Allow)
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                             else
                             {
-                                pageStatus = !permissions.Any(x => 
-                                    string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase) 
-                                    && !string.IsNullOrEmpty(x.SubFuncKeys) 
-                                    && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
+                                foreach (var key in funkeyList)
+                                {
+                                    pageStatus = !permissions.Any(x => 
+                                        string.Equals(x.FuncKey, key, StringComparison.OrdinalIgnoreCase) 
+                                        && !string.IsNullOrEmpty(x.SubFuncKeys) 
+                                        && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
                                     ) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
+                                    if (pageStatus == PageStatus.Allow)
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }

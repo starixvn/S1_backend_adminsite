@@ -476,6 +476,16 @@
         "Childs": null
       },
       {
+        "Key": "",
+        "Title": "Registration Management",
+        "FuncKey": "Marketing/RegistrationForMarketing",
+        "Controller": "Marketing",
+        "Action": "RegistrationForMarketing",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "BonusInfoReport",
         "Title": "Bonus Report",
         "FuncKey": "Marketing/BonusInfoReport",

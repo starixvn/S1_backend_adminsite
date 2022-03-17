@@ -439,6 +439,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
 
+        /// <summary>
+        /// Deposit/GetReceiptByTransId 取得存款收據
+        /// </summary>
+        /// <remarks>
+        /// Http Method：GET
+        /// <param name="transId"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
+        [HttpGet]
+        public IActionResult GetReceiptByTransId(string transId)
+        {
+            var depositReceipt = _depositBll.GetDepositReceipt(transId);
+            if (depositReceipt == null)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            var image = depositReceipt.DepositPic;
+            return File(image, "image/jpeg");
+        }
+
         #region Private function
 
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)

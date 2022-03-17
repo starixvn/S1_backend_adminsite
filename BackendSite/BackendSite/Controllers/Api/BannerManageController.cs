@@ -9,6 +9,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -41,9 +42,10 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var user = authorizeBLL.GetAuthData().UserName;
-                var errorCode = bannerManageBLL.SetBanner(bannerInfo, user);
-                apiResult.ErrorCode = errorCode;
-                apiResult.Message = errorCode == 1 ? "The Banner Name setting already exists which with same Site." : "";
+                var result = bannerManageBLL.SetBanner(bannerInfo, user);
+                
+                apiResult.ErrorCode = result >=0 ? (int)ErrorCodeEnum.Success :(int) ErrorCodeEnum.Fail;
+                apiResult.Message = apiResult.ErrorCode != 0 ? "Update Failed" : "";
             }
             catch (MySqlException sqlException)
             {
@@ -112,12 +114,12 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
-        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName)
+        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName , [FromForm] int Currency)
         {
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = bannerManageBLL.GetBanner(SiteId, BannerName);
+                var result = bannerManageBLL.GetBanner(SiteId, BannerName ,Currency);
                 if (result != null)
                 {
                     apiResult.Data = result;
