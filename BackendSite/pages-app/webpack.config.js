@@ -32,10 +32,10 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
     // ],
-    "Marketing/BonusInfoReport.min": [
-      // '@babel/polyfill',
-      "./src/pages/Marketing/BonusInfoReport/index.js",
-    ],
+    // "Marketing/BonusInfoReport.min": [
+    //   // '@babel/polyfill',
+    //   "./src/pages/Marketing/BonusInfoReport/index.js",
+    // ],
     // "Finance/PaymentManagement.min": [
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
@@ -221,6 +221,10 @@ module.exports = {
     //   '@babel/polyfill',
     // "./src/pages/CSD/RegistrationManagement/index.js",
     // ],
+    // "Marketing/RegistrationForMarketing.min": [
+    //   '@babel/polyfill',
+    //   "./src/pages/Marketing/RegistrationForMarketing/index.js",
+    // ],
     // "CSD/DisableUserForGame.min": [
     //   '@babel/polyfill',
     // "./src/pages/CSD/DisableUserForGame/index.js"
@@ -259,9 +263,9 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
-    "Finance/BonusPayout.min": [
-      "./src/pages/Finance/BonusPayout/index.js",
-    ],
+    // "Finance/BonusPayout.min": [
+    //   "./src/pages/Finance/BonusPayout/index.js",
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

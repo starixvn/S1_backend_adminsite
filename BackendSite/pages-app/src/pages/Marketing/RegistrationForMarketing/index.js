@@ -203,6 +203,7 @@ const App = () => {
         EndDate: moment(stateFilter.EndDate).add(1, "days").unix() - 1,
         AffiliatesCode: stateFilter.AffiliatesCode,
         AgentCodeType: Number(stateFilter.AgentCodeType),
+        ISMarketing: true
       },
     };
 
