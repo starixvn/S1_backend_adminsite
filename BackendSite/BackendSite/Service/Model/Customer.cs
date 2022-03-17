@@ -451,6 +451,19 @@ namespace BackendSite.Service.Model
         public string AffCode { get; set; }
         public string Agent { get; set; }
     }
+    
+    public class RegLiveStatusForMarketingExport
+    {
+        public string Site { get; set; }
+        public string Currency { get; set; }
+        public string AffCode { get; set; }
+        public string Agent { get; set; }
+        public string UserName { get; set; }
+        public string ReferralUrl { get; set; }
+        public string Verify { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public string DepositStatus { get; set; }
+    }
 
     public class CustomerForRisk
     {

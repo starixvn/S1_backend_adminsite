@@ -36,8 +36,6 @@ const dataColumnDefs = () => {
       },
     },
     { dataColumn: "actStatus", columnTitle: "Deposit Staus" },
-    { dataColumn: "action", columnTitle: "ACTION" },
-    { dataColumn: "status", columnTitle: "STATUS" },
     { dataColumn: "note", columnTitle: "NOTE" },
   ];
 };

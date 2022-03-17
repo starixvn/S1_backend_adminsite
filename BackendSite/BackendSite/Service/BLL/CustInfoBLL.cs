@@ -668,6 +668,28 @@ namespace BackendSite.Service.BLL
             });
             return list;
         }
+        
+        public IEnumerable<RegLiveStatusForMarketingExport> GetExportRegLiveStatusForMarketing(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var list = new List<RegLiveStatusForMarketingExport>();
+            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            result.ToList().ForEach(x =>
+            {
+                list.Add(new RegLiveStatusForMarketingExport()
+                {
+                    Site = x.SiteName,
+                    Currency = x.Currency,
+                    UserName = x.UserName,
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
+                    ReferralUrl = x.ReferralUrl,
+                    AffCode = x.AffCode,
+                    Agent = x.Agent
+                });
+            });
+            return list;
+        }
 
         public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
         {
