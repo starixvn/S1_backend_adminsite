@@ -187,12 +187,12 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
+                        if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.Running || promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
                         {
                             promotion.custRollOver = _rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
-                            if (promotion.BonusInfoStatus == 5)
+                            if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
                             {
-                                promotion.BonusInfoStatus = 1;
+                                promotion.BonusInfoStatus = (int)BonusInfoStatusEnum.Running;
                             }
                         }
                         else
