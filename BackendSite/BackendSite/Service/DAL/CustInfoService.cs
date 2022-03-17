@@ -65,8 +65,8 @@ namespace BackendSite.Service.DAL
             string siteList,
             string currencyList)
         {
-            var jsonSelectSite = string.Empty;
-            var jsonSelectCurrency = string.Empty;
+            string jsonSelectSite = null;
+            string jsonSelectCurrency = null;
             var jsonSelectStatus = string.Empty;
             var jsonSelectTagList = string.Empty;
 
