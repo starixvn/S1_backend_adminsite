@@ -702,6 +702,16 @@
         "Childs": null
       },
       {
+        "Key": "HotEventManagement",
+        "Title": "Hot Event Management",
+        "FuncKey": "CMS/HotEventManagement",
+        "Controller": "Marketing",
+        "Action": "HotEventManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "GameCasinoManagement",
         "Title": "Game Casino Management",
         "FuncKey": "CMS/GameCasinoManagement",
