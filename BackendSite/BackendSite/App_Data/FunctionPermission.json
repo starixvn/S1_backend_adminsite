@@ -450,6 +450,26 @@
         ]
       },
       {
+        "DisplayKey": "Registration Management",
+        "FuncKey": "Marketing/RegistrationForMarketing",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Add Note",
+            "FuncKey": "rm_add_note"
+          },
+          {
+            "DisplayKey": "Edit Note",
+            "FuncKey": "rm_edit_note"
+          },
+          {
+            "DisplayKey": "Delete Note",
+            "FuncKey": "rm_delete_note"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Vip Rebate Mangetment",
         "FuncKey": "Marketing/VipRebateMangetment",
         "Enable": false,
