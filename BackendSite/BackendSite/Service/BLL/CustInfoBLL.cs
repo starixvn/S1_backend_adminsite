@@ -187,12 +187,12 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
+                        if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.Running || promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
                         {
                             promotion.custRollOver = _rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
-                            if (promotion.BonusInfoStatus == 5)
+                            if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
                             {
-                                promotion.BonusInfoStatus = 1;
+                                promotion.BonusInfoStatus = (int)BonusInfoStatusEnum.Running;
                             }
                         }
                         else
@@ -662,6 +662,28 @@ namespace BackendSite.Service.BLL
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
                     Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
+                    AffCode = x.AffCode,
+                    Agent = x.Agent
+                });
+            });
+            return list;
+        }
+        
+        public IEnumerable<RegLiveStatusForMarketingExport> GetExportRegLiveStatusForMarketing(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var list = new List<RegLiveStatusForMarketingExport>();
+            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            result.ToList().ForEach(x =>
+            {
+                list.Add(new RegLiveStatusForMarketingExport()
+                {
+                    Site = x.SiteName,
+                    Currency = x.Currency,
+                    UserName = x.UserName,
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
+                    ReferralUrl = x.ReferralUrl,
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });

@@ -27,7 +27,7 @@ namespace BackendSite.Service.BLL
             result.TodayData = new List<DashBoardDetailData>
                 {dashBoardService.GetDashBoardTodayData(siteId, currencyId, baseCurrencyId,startTime.DateTime,endTime.DateTime, canSearchSite,timeZone)};
 
-            Parallel.ForEach(type, item =>
+            type.ForEach(item =>
             {
                 var data = dashBoardService.GetDashBoardTodayExtraData(siteId, currencyId, baseCurrencyId, startTime.DateTime, endTime.DateTime, canSearchSite, item, timeZone);
                 if (data != null)
