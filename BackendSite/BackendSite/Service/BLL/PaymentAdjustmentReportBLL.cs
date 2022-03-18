@@ -126,24 +126,27 @@ namespace BackendSite.Service.BLL
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
 
-        public bool SetAdjustment(string transId, int category, string memo, string userName)
+        public bool SetAdjustment(SetAdjustment input)
         {
-            var m = Regex.Match(transId, @"\d+");
+            var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);
 
             var logDetail = new Dictionary<string, string>
             {
-                { "AdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{category}") },
-                { "Memo", memo }
+                { "TransId", input.TransId },
+                { "BeforeAdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{input.BeforeCategory}") },
+                { "AfterAdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{input.AfterCategory}") },
+                { "BeforeMemo", input.BeforeMemo },
+                { "AfterMemo", input.AfterMemo }
             };
 
             var strLogDetail = JsonConvert.SerializeObject(logDetail);
 
             // 依 prefix 判斷更新哪張表
-            if (transId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
-                return paymentAdjustmentService.SetAdjustmentInfo(id, category, memo, strLogDetail, userName);
+            if (input.TransId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+                return paymentAdjustmentService.SetAdjustmentInfo(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
 
-            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, category, memo, strLogDetail, userName);
+            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
         }
     }
 }

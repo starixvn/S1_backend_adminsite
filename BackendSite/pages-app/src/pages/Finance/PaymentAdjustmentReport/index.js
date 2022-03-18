@@ -165,22 +165,27 @@ const App = () => {
     const Result_EditHandleUpdate = () => {
         let data = stateDatas.Datas[editValue.idx];
         let transId = data.transId;
-        let category = editValue.type === 'reason' ? editValue.value : data.adjustCategory;
-        let memo = editValue.type === 'memo' ? editValue.value : data.memo;
+        let beforeCategory = data.adjustCategory;
+        let beforeMemo = data.memo;
+        let afterCategory = editValue.type === 'reason' ? editValue.value : data.adjustCategory;
+        let afterMemo = editValue.type === 'memo' ? editValue.value : data.memo;
 
         //console.log(transId, category, memo);
         let param = {
             Url: 'PaymentAdjustmentReport/SetAdjustment',
             Data: qs.stringify({
                 TransId: transId,
-                Category: category,
-                Memo: memo
+                BeforeCategory: beforeCategory,
+                AfterCategory: afterCategory,
+                BeforeMemo: beforeMemo,
+                AfterMemo: afterMemo
             })
         };
         
         WebAPI.PostData(param).then((res) => {
-            console.log(res);
+            //console.log(res);
             if (res.data.errorCode === 0) {
+                setEdit({});
                 Filter_Submit();
                 alert(!res.data.message ? 'Update successful.' : res.data.message);
             } else {

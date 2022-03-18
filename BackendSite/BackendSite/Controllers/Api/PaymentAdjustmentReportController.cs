@@ -134,8 +134,10 @@ namespace BackendSite.Controllers.Api
         public class SetAdjustmentReq
         {
             public string TransId { get; set; }
-            public int Category { get; set; }
-            public string Memo { get; set; }
+            public int BeforeCategory { get; set; }
+            public int AfterCategory { get; set; }
+            public string BeforeMemo { get; set; }
+            public string AfterMemo { get; set; }
         }
 
         [HttpPost]
@@ -154,7 +156,15 @@ namespace BackendSite.Controllers.Api
                 }
 
                 var success =
-                    paymentAdjustmentBLL.SetAdjustment(req.TransId, req.Category, req.Memo, User.Identity.Name);
+                    paymentAdjustmentBLL.SetAdjustment(new SetAdjustment
+                    {
+                        TransId = req.TransId,
+                        BeforeCategory = req.BeforeCategory,
+                        AfterCategory = req.AfterCategory,
+                        BeforeMemo = req.BeforeMemo,
+                        AfterMemo = req.AfterMemo,
+                        Operator = User.Identity.Name
+                    });
 
                 return new ApiResult
                 {
