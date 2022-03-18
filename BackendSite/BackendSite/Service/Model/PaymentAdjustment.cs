@@ -1,4 +1,5 @@
 ﻿using System;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -18,6 +19,7 @@ namespace BackendSite.Service.Model
         public string SabaID { get; set; }
         public string Operator { get; set; }
         public string WalletType { get; set; }
+        public int Category { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
@@ -26,6 +28,9 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string TransId { get; set; }
         public string AdjustTypeName { get; set; }
+        [ExportIgnore]
+        public int AdjustCategory { get; set; }
+        public string AdjustCategoryName { get; set; }
         public string UserName { get; set; }
         public string CurrencyName { get; set; }
         public decimal Amount { get; set; }

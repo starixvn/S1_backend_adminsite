@@ -5,22 +5,25 @@ import qs from 'qs';
     class PaymentAdjustment extends React.Component {
         constructor(props) {
             super(props);
-            this.state = { UserName: "", 
-            CustData: null, 
-            Checkwd: false, 
-            Withdrawal: 1, 
-            SiteList: [], 
-            SiteId: null, 
-            SabaId: "", 
-            AdjustMentLimitMax:0, 
-            CheckPassword:false,
-            BonusCode:"",
-            CheckedBonusCode:"",
-            WalletType:0,
-            RollOver:1,
-            Amount:1,
-            HasBonusCode:false,
-            Name:""};
+            this.state = {
+                UserName: "", 
+                CustData: null, 
+                Checkwd: false, 
+                Withdrawal: 1, 
+                SiteList: [], 
+                SiteId: null, 
+                SabaId: "", 
+                AdjustMentLimitMax:0, 
+                CheckPassword:false,
+                BonusCode:"",
+                CheckedBonusCode:"",
+                WalletType:0,
+                RollOver:1,
+                Amount:1,
+                HasBonusCode:false,
+                Name:"",
+                Category:1
+            };
         }
 
         componentDidMount = () => {
@@ -132,6 +135,7 @@ import qs from 'qs';
             let memo = this.state.Memo;
             let bonusCode = this.state.CheckedBonusCode;
             let rollOver = this.state.RollOver;
+            let category = this.state.Category;
 
             if (option == null) {
                 alert('Please select one Option.');
@@ -163,8 +167,17 @@ import qs from 'qs';
                 return;
             }
 
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
-                BounsCode:  bonusCode, RollOver: rollOver})
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', {
+                CustId: custData.custId,
+                Option: parseInt(option),
+                Amount: parseFloat(amount),
+                WithdrawalLimitOption: checkwd,
+                WithdrawalLimitAmount: withdrawalamount,
+                Memo: memo,
+                BounsCode: bonusCode,
+                RollOver: rollOver,
+                Category: category
+            })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -190,8 +203,18 @@ import qs from 'qs';
             let memo = this.state.Memo;
             let bonusCode = this.state.CheckedBonusCode;
             let rollOver = this.state.RollOver;
-            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { CustId: custData.custId, Option: parseInt(option), Amount: parseFloat(amount), WithdrawalLimitOption: checkwd, WithdrawalLimitAmount: withdrawalamount, Memo: memo,
-                BounsCode:  bonusCode, RollOver: rollOver})
+            let category = this.state.Category;
+            axios.post('/api/Payment/AdjustmentAndWithdrawalLimit', { 
+                CustId: custData.custId,
+                Option: parseInt(option),
+                Amount: parseFloat(amount),
+                WithdrawalLimitOption: checkwd,
+                WithdrawalLimitAmount: withdrawalamount,
+                Memo: memo,
+                BounsCode: bonusCode,
+                RollOver: rollOver,
+                Category: category
+            })
             .then(function (response) {
                 //Loading.UnLoading();
                 let result = response.data;
@@ -308,6 +331,10 @@ import qs from 'qs';
                 }.bind(this))}</ul>;
             }
 
+            let reasonList = gAdjustCategoryList.map((item) => {
+                return <option value={item.value}>{item.name}</option>;
+            });
+
 
             let siteList = this.state.SiteList.map(function (obj) {
                 return <div key={obj.siteId} className="custom-control custom-radio custom-control-inline">
@@ -381,16 +408,16 @@ import qs from 'qs';
                                         <input type="radio" id="Option_4" name="Option" className="custom-control-input" value={4} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_4">Bonus(-)</label>
                                     </div>
-                                    <div className="custom-control custom-radio custom-control-inline">
+                                    {/* <div className="custom-control custom-radio custom-control-inline">
                                         <input type="radio" id="Option_5" name="Option" className="custom-control-input" value={5} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_5">Retention Bonus</label>
                                     </div>
                                     <div className="custom-control custom-radio custom-control-inline">
                                         <input type="radio" id="Option_6" name="Option" className="custom-control-input" value={6} onChange={this.onChange.bind(this)} />
                                         <label className="custom-control-label" htmlFor="Option_6">Manual Bonus</label>
-                                    </div>
+                                    </div> */}
                                 </div>
-                                {this.state.Option == 5? 
+                                {/* {this.state.Option == 5? 
                                 <div className="form-group width-200">
                                     <div>
                                         <label className="col-form-label">BonusCode</label>
@@ -411,7 +438,7 @@ import qs from 'qs';
                                         <button onClick={this.onCheckBonusCode.bind(this)}>CheckBonusCode</button>
                                     </div>
                                 </div>
-                                :null}
+                                :null} 
                                 {
                                     this.state.HasBonusCode ? 
                                     <>
@@ -432,7 +459,7 @@ import qs from 'qs';
                                     </table>
                                     </>
                                     :null
-                                }
+                                }*/}
                                 {this.state.Option != 5 && this.state.Option != 6 ? 
                                 <div className="form-group">
                                     <div className="custom-control custom-checkbox custom-control-inline">
@@ -446,12 +473,18 @@ import qs from 'qs';
                                     <label className="col-form-label">Amount</label>
                                     <input className="form-control" type="number" name="Amount" onChange={this.onChange.bind(this)} step="1" min="1" disabled={this.state.Option == 5 ? true:false} value={this.state.Amount} />
                                 </div>
-                                {this.state.Option == 5 || this.state.Option == 6 ? 
+                                {/* {this.state.Option == 5 || this.state.Option == 6 ? 
                                 <div className="form-group width-200">
                                     <label className="col-form-label">RollOver</label>
                                     <input className="form-control" type="number" name="RollOver" onChange={this.onChange.bind(this)} disabled={this.state.Option == 5 || this.state.Option == 6 ? true:false} value={this.state.RollOver}/>
                                 </div>
-                                :null}
+                                :null} */}
+                                <div className="form-group width-200">
+                                    <label className="col-form-label">Adjust Reason</label>
+                                    <select className="form-control" name="Category" onChange={this.onChange.bind(this)}>
+                                        {reasonList}
+                                    </select>
+                                </div>
                                 <div className="form-group width-200">
                                     <label className="col-form-label">Memo</label>
                                     <textarea className="form-control" name="Memo" onChange={this.onChange.bind(this)} />

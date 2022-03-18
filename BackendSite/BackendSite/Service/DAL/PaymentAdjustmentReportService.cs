@@ -150,5 +150,81 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
+
+        public bool SetLogAdminAdjustWallet(int id, int category, string memo, string logDetail, string userName)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters();
+            p.Add("_TransferId", id);
+            p.Add("_Category", category);
+            p.Add("_Memo", memo);
+
+            var success = conn
+                .Execute("Admin_LogAdminAdjustWallet_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                p = new DynamicParameters();
+                p.Add("Menu", "EditAdjustmentInfo");
+                p.Add("ActionType", 1);
+                p.Add("DetailInfo", logDetail);
+                p.Add("Operator", userName);
+
+                var logSuccess = conn
+                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
+                
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+                
+            }
+
+            trans.Rollback();
+
+            return false;
+        }
+
+        public bool SetAdjustmentInfo(int id, int category, string memo, string logDetail, string userName)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters();
+            p.Add("_AdjustId", id);
+            p.Add("_Category", category);
+            p.Add("_Memo", memo);
+
+            var success = conn
+                .Execute("Admin_AdjustmentInfo_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                p = new DynamicParameters();
+                p.Add("Menu", "EditAdjustmentInfo");
+                p.Add("ActionType", 1);
+                p.Add("DetailInfo", logDetail);
+                p.Add("Operator", userName);
+
+                var logSuccess = conn
+                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+
+            }
+
+            trans.Rollback();
+
+            return false;
+        }
     }
 }

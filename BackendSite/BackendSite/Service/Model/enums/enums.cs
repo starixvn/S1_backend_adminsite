@@ -44,6 +44,21 @@ namespace BackendSite.Service.Model.enums
         ThirdMinus = 6
     }
 
+    public enum AdjustCategoryEnum
+    {
+        None = 1,
+        RetentionBonus = 2,
+        ManualBonus = 3,
+        VipUpgradeReward = 4,
+        PrizeDrop = 5,
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
+    }
+
     #endregion
 
     #region Bonus Management For Frontend Use
