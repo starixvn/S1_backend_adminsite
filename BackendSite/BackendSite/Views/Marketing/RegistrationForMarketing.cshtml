@@ -39,7 +39,6 @@
 <div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/Marketing/RegistrationForMarketing.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
@@ -47,4 +46,5 @@
         window.LangCode = 'en'
         window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
+    <script src="~/js/component/Marketing/RegistrationForMarketing.min.js" asp-append-version="true"></script>
 }
