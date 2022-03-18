@@ -185,7 +185,6 @@ const App = () => {
         WebAPI.PostData(param).then((res) => {
             //console.log(res);
             if (res.data.errorCode === 0) {
-                setEdit({});
                 Filter_Submit();
                 alert(!res.data.message ? 'Update successful.' : res.data.message);
             } else {

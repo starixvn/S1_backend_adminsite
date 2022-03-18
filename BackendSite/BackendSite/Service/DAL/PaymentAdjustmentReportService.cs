@@ -131,7 +131,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_TransferId", id);
             p.Add("_Category", category);
-            p.Add("_Memo", memo);
+            p.Add("_Memo", memo ?? string.Empty);
 
             var success = conn
                 .Execute("Admin_LogAdminAdjustWallet_Set", p, commandType: CommandType.StoredProcedure) > 0;
