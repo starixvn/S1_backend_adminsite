@@ -7,6 +7,7 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {
@@ -19,11 +20,13 @@ namespace BackendSite.Controllers.Api
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
         private readonly ExcelBLL excelBLL;
+        private readonly PermissionBLL _permissionBll;
 
-        public PaymentAdjustmentReportController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL)
+        public PaymentAdjustmentReportController(IServiceProvider provider)
         {
-            this.paymentAdjustmentBLL = paymentAdjustmentBLL;
-            this.excelBLL = excelBLL;
+            this.paymentAdjustmentBLL = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
+            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
@@ -140,8 +143,18 @@ namespace BackendSite.Controllers.Api
         {
             try
             {
+                if (!_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_reason")
+                    && !_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_memo"))
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.PermissionDenied,
+                        Message = "Permission denied."
+                    };
+                }
+
                 var success =
-                    paymentAdjustmentBLL.SetAdjustment(req.TransId, req.Category, req.Memo);
+                    paymentAdjustmentBLL.SetAdjustment(req.TransId, req.Category, req.Memo, User.Identity.Name);
 
                 return new ApiResult
                 {

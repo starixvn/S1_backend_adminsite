@@ -73,7 +73,9 @@ const dataColumnDefs = () => {
 const Panel = (props) => {
     const columnDefs = dataColumnDefs();
     let headerRows = [];
-
+    console.log(window.subFuncKeys);
+    let canEditReason = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_reason");
+    let canEditMemo = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_memo");
     columnDefs.forEach((element, idx) => {
         headerRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
@@ -94,46 +96,42 @@ const Panel = (props) => {
             if (element.dataColumn === 'adjustCategoryName')
                 return (
                     <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
-                        <div className="button-action">
-                            {isEditReason ? (
-                                <SelectList
-                                    SelectOptions={gAdjustCategoryList}
-                                    Value={props.EditValue.value}
-                                    OnChange={props.ChangeData}
+                        {canEditReason ?
+                            (<div className="button-action">
+                                {isEditReason ? (
+                                    <SelectList
+                                        SelectOptions={gAdjustCategoryList}
+                                        Value={props.EditValue.value}
+                                        OnChange={props.ChangeData}
+                                    />
+                                ) :(data[element.dataColumn])}
+                                <ActionButtons
+                                    IsEdit={isEditReason}
+                                    HandleEdit={props.HandleEdit.bind(null, 'reason', idx, data['adjustCategory'])}
+                                    HandleCancel={props.HandleCancel}
+                                    HandleUpdate={props.HandleUpdate}
                                 />
-                            ) :
-                                (
-                                    data[element.dataColumn]
-                                )}
-                            <ActionButtons
-                                IsEdit={isEditReason}
-                                HandleEdit={props.HandleEdit.bind(null, 'reason', idx, data['adjustCategory'])}
-                                HandleCancel={props.HandleCancel}
-                                HandleUpdate={props.HandleUpdate}
-                            />
-                        </div>
+                        </div>): (data[element.dataColumn])}
                     </td>
                 );
             if (element.dataColumn === 'memo')
                 return (
                     <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
-                        <div className="button-action">
-                            {isEditMemo ? (
-                                <InputBox
-                                    DefaultValue={data[element.dataColumn]}
-                                    OnChange={props.ChangeData}
+                        {canEditMemo? (
+                            <div className="button-action">
+                                {isEditMemo ? (
+                                    <InputBox
+                                        DefaultValue={data[element.dataColumn]}
+                                        OnChange={props.ChangeData}
+                                    />
+                                ) :(data[element.dataColumn])}
+                                <ActionButtons
+                                    IsEdit={isEditMemo}
+                                    HandleEdit={props.HandleEdit.bind(null, 'memo', idx, data[element.dataColumn])}
+                                    HandleCancel={props.HandleCancel}
+                                    HandleUpdate={props.HandleUpdate}
                                 />
-                            ) :
-                                (
-                                    data[element.dataColumn]
-                                )}
-                            <ActionButtons
-                                IsEdit={isEditMemo}
-                                HandleEdit={props.HandleEdit.bind(null, 'memo', idx, data[element.dataColumn])}
-                                HandleCancel={props.HandleCancel}
-                                HandleUpdate={props.HandleUpdate}
-                            />
-                        </div>
+                        </div>): (data[element.dataColumn])}
                     </td>
                 );
             return (

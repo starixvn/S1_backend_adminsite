@@ -7,6 +7,7 @@
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
+@inject PermissionBLL permissionBLL
 @section Style {
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -36,6 +37,9 @@
     var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
         .Cast<int>()
         .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
+
+    var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/AdjustmentReport");
+    subFuncKeys ??= new List<string>();
 }
 
 <div id="content"></div>
@@ -49,6 +53,7 @@
         window.gCurrencyList = @Html.Raw(JsonConvert.SerializeObject(currencyList));
         window.gAdjustTypeList = @Html.Raw(JsonConvert.SerializeObject(adjustType));
         window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
+        window.subFuncKeys = @Html.Raw(JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>
     <script src="~/lib/Oneworks/jscalendar/lang/calendar-en.js"></script>

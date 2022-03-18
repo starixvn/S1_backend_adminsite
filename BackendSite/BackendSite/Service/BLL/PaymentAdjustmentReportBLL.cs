@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -93,6 +94,10 @@ namespace BackendSite.Service.BLL
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                        AdjustCategory = row.Category,
+                        AdjustCategoryName = row.Category == 0
+                            ? string.Empty
+                            : selLangBLL.GetResourceValue($"lbl_AdjustCategory{row.Category}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         SabaID = row.SabaID,
@@ -121,16 +126,24 @@ namespace BackendSite.Service.BLL
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
 
-        public bool SetAdjustment(string transId, int category, string memo)
+        public bool SetAdjustment(string transId, int category, string memo, string userName)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var id);
 
+            var logDetail = new Dictionary<string, string>
+            {
+                { "AdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{category}") },
+                { "Memo", memo }
+            };
+
+            var strLogDetail = JsonConvert.SerializeObject(logDetail);
+
             // 依 prefix 判斷更新哪張表
             if (transId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
-                return paymentAdjustmentService.SetAdjustmentInfo(id, category, memo);
+                return paymentAdjustmentService.SetAdjustmentInfo(id, category, memo, strLogDetail, userName);
 
-            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, category, memo);
+            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, category, memo, strLogDetail, userName);
         }
     }
 }

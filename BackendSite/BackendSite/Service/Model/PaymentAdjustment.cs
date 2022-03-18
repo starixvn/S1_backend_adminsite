@@ -1,4 +1,5 @@
 ﻿using System;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -27,6 +28,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string TransId { get; set; }
         public string AdjustTypeName { get; set; }
+        [ExportIgnore]
         public int AdjustCategory { get; set; }
         public string AdjustCategoryName { get; set; }
         public string UserName { get; set; }

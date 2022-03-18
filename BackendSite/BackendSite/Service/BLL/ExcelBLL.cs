@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.BLL
 {
@@ -112,7 +113,9 @@ namespace BackendSite.Service.BLL
 
             if (t.Any())
             {
-                var propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                var propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    .Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
+
                 ExportBody(ws, t, propertyInfo);
                 ExportHeader(ws, propertyInfo);
             }
