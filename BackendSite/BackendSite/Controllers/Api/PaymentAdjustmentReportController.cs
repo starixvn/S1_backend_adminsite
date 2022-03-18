@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
@@ -125,6 +126,39 @@ namespace BackendSite.Controllers.Api
             };
 
             return apiListResult;
+        }
+
+        public class SetAdjustmentReq
+        {
+            public string TransId { get; set; }
+            public int Category { get; set; }
+            public string Memo { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult SetAdjustment([FromForm] SetAdjustmentReq req)
+        {
+            try
+            {
+                var success =
+                    paymentAdjustmentBLL.SetAdjustment(req.TransId, req.Category, req.Memo);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)(success 
+                        ? ErrorCodeEnum.Success 
+                        : ErrorCodeEnum.SetAdjustmentError)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult
+                {
+                    Message = "Something went wrong.",
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    RawMessage = ex.ToString()
+                };
+            }
         }
     }
 }

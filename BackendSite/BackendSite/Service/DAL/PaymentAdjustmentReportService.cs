@@ -121,5 +121,25 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
+
+        public bool SetLogAdminAdjustWallet(int id, int category, string memo)
+        {
+            var p = new DynamicParameters();
+            p.Add("_TransferId", id);
+            p.Add("_Category", category);
+            p.Add("_Memo", memo);
+
+            return _mainDbClient.Execute("Admin_LogAdminAdjustWallet_Set", p) > 0;
+        }
+
+        public bool SetAdjustmentInfo(int id, int category, string memo)
+        {
+            var p = new DynamicParameters();
+            p.Add("_AdjustId", id);
+            p.Add("_Category", category);
+            p.Add("_Memo", memo);
+
+            return _mainDbClient.Execute("Admin_AdjustmentInfo_Set", p) > 0;
+        }
     }
 }

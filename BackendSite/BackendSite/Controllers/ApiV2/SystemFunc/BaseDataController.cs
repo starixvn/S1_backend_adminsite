@@ -30,6 +30,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BonusManageBLL _bonusManageBll;
         private readonly RebateManageBLL _rebateManageBll;
         private readonly SportsBLL _sportsBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         public BaseDataController(IServiceProvider provider)
@@ -43,6 +44,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
         #region Model
@@ -159,6 +161,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class SportTeamsReq
         {
             public int SportLeaguesId { get; set; }
+        }
+
+        public class GetReasonByFuncKeyRequest
+        {
+            public string FuncKey { get; set; }
         }
 
         #endregion
@@ -484,6 +491,22 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _sportsBll.GetSportTeamsList(sportTeamsReq.SportLeaguesId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// BaseData/GetReasonList 取得原因碼清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankFinancialReasonModel>> GetReasonList(GetReasonByFuncKeyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialReasonModel>>();
+
+            apiResult.Data = _bankFinancialBll.GetReason(request.FuncKey);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }

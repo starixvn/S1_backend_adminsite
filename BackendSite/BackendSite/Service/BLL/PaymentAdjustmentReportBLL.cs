@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -49,7 +50,8 @@ namespace BackendSite.Service.BLL
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
-                        AdjustReasonCategoryName = row.Category == 0
+                        AdjustCategory = row.Category,
+                        AdjustCategoryName = row.Category == 0
                             ? string.Empty
                             : selLangBLL.GetResourceValue($"lbl_AdjustCategory{row.Category}"),
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
@@ -117,6 +119,18 @@ namespace BackendSite.Service.BLL
             ref List<string> CurrencyAmount)
         {
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
+        }
+
+        public bool SetAdjustment(string transId, int category, string memo)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var id);
+
+            // 依 prefix 判斷更新哪張表
+            if (transId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+                return paymentAdjustmentService.SetAdjustmentInfo(id, category, memo);
+
+            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, category, memo);
         }
     }
 }

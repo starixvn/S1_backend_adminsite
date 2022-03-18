@@ -45,7 +45,7 @@
     <script>
         window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
-        window.LangCode = 'en'
+        window.LangCode = 'en';
         window.gCurrencyList = @Html.Raw(JsonConvert.SerializeObject(currencyList));
         window.gAdjustTypeList = @Html.Raw(JsonConvert.SerializeObject(adjustType));
         window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));

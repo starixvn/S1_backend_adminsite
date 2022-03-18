@@ -27,7 +27,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string TransId { get; set; }
         public string AdjustTypeName { get; set; }
-        public string AdjustReasonCategoryName { get; set; }
+        public int AdjustCategory { get; set; }
+        public string AdjustCategoryName { get; set; }
         public string UserName { get; set; }
         public string CurrencyName { get; set; }
         public decimal Amount { get; set; }
