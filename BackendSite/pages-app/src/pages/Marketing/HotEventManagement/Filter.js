@@ -19,7 +19,7 @@ const Panel = (props) => {
           name="SiteList"
           className="custom-control-input"
           value={value.siteId}
-          onChange={props.ChangeFilter.bind(null, value.siteId, "SiteId")}
+          onChange={props.SetSiteId.bind(null, value.siteId, value.iCurrencyList[0])}
           checked={value.siteId === props.Filter.SiteId}
         />
         <label
