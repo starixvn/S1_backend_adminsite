@@ -477,7 +477,7 @@
       },
       {
         "Key": "",
-        "Title": "Registration Management",
+        "Title": "Registration Data",
         "FuncKey": "Marketing/RegistrationForMarketing",
         "Controller": "Marketing",
         "Action": "RegistrationForMarketing",

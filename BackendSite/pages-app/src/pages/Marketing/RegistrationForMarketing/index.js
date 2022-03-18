@@ -12,6 +12,7 @@ const App = () => {
   const [siteList, setSiteList] = useState([]);
   const [stateFilter, setFilter] = useState({
     SelectSite: [],
+    // SelectSite: [{"label":"Nova88","value":1}],
     Currency: 0,
     DepositStatus: 0,
     Status: 0,
@@ -20,7 +21,7 @@ const App = () => {
     StartDate: moment().add(-10, "days").format("l"),
     EndDate: moment().format("l"),
     AffiliatesCode: "",
-    AgentCodeType: 1,
+    AgentCodeType: 0,
   });
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
@@ -51,28 +52,32 @@ const App = () => {
     }, 1000);
     return () => clearInterval(id);
   });
-
+  
   useEffect(() => {
     let param = {
       Url: "Common/AdminUserSiteList",
     };
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
+        stateFilter.SelectSite = [{
+          label: res.data.data[0].siteName,
+          value: res.data.data[0].siteId,
+        }];
         setSiteList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
     });
   }, []);
-
+  
+  
   const Filter_OnChange = (v, dataColumn) => {
-    console.log(v, dataColumn);
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
     });
   };
-
+  
   const Submit = () => {
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
@@ -180,7 +185,7 @@ const App = () => {
         });
     }
   }, [count]);
-
+  
   const Result_ExportToExcel = () => {
     if (stateFilter.SelectSite.length === 0) {
       alert("Please Choose at least one Site");
@@ -509,7 +514,7 @@ const App = () => {
   };
   return status === 0 ? (
     <div className="container-fluid">
-      <h4 className="page-name">Registration Management</h4>
+      <h4 className="page-name">Registration Data</h4>
       <Filter
         SiteList={siteList}
         filterInfo={stateFilter}

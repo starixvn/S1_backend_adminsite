@@ -450,7 +450,7 @@
         ]
       },
       {
-        "DisplayKey": "Registration Management",
+        "DisplayKey": "Registration Data",
         "FuncKey": "Marketing/RegistrationForMarketing",
         "Enable": false,
         "InputBoxType": "checkbox",

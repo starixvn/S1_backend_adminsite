@@ -25,6 +25,7 @@ const defRegTimeType = {
   2: "Later ",
 };
 const defAgentCodeType = {
+  0: "All",
   1: "Credit site ",
   2: "Others ",
 };
@@ -118,7 +119,7 @@ const Panel = (props) => {
             return { value: key, displayText: defAgentCodeType[key] };
           })}
           hasAll={false}
-          selectedValue={1}
+          selectedValue={0}
           dataColumn="AgentCodeType"
           onChange={props.onChange}
         />
