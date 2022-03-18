@@ -51,12 +51,14 @@ export const periodType = {
   1: "Daily",
   2: "Weekly",
   3: "Monthly",
+  4: "Unlimited",
 };
 
 export const initPeriodType = [
   { value: 1, displayText: periodType[1] },
   { value: 2, displayText: periodType[2] },
   { value: 3, displayText: periodType[3] },
+  { value: 4, displayText: periodType[4] },
 ];
 
 export const weekOptions = {
