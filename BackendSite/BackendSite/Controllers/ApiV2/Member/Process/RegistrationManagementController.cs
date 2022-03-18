@@ -109,7 +109,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query)
         /// </remarks>
         /// <param name="custInfoReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
         {
@@ -146,7 +146,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusReq para)
         {
@@ -172,7 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotesReq addCustNoteReq)
         {
@@ -201,7 +201,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
         [HttpPost]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotesReq addCustNoteReq)
         {
@@ -227,7 +227,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
         /// </remarks>
         /// <param name="deleteCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
         [HttpPost]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotesReq deleteCustNoteReq)
         {
@@ -253,7 +253,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Edit] > [Submit]
         /// </remarks>
         /// <param name="editRegLiveStatusNote"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
         [HttpPost]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotesReq editRegLiveStatusNote)
         {
@@ -279,7 +279,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
         {
