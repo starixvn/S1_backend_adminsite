@@ -73,7 +73,6 @@ const dataColumnDefs = () => {
 const Panel = (props) => {
     const columnDefs = dataColumnDefs();
     let headerRows = [];
-    console.log(window.subFuncKeys);
     let canEditReason = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_reason");
     let canEditMemo = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_memo");
     columnDefs.forEach((element, idx) => {
