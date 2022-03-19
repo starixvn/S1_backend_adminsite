@@ -9,15 +9,17 @@ const titleData = [
   { dataColumn: "bannerName", columnTitle: "HotEventName" },
   { dataColumn: "siteName", columnTitle: "SiteName" },
   {
-    dataColumn: "actionMode",
-    columnTitle: "ActionMode",
-    body: { format: actionModeTypeFormat },
-  },
-  {
     dataColumn: "showStatus",
     columnTitle: "ShowStatus",
     body: { format: showStatusTypeFormat },
   },
+  {
+    dataColumn: "sportBattleDateTime",
+    columnTitle: "Battle Time",
+    body: { format: battleTimeFormat },
+  },
+  { dataColumn: "Home", columnTitle: "Home Team" },
+  { dataColumn: "Away", columnTitle: "Away Team" },
   {
     dataColumn: "startTime",
     columnTitle: "Start Time",
@@ -38,7 +40,6 @@ const titleData = [
     columnTitle: "LastUpdateTime",
     body: { format: lastUpdateTimeFormat },
   },
-  { dataColumn: "sort", columnTitle: "Sort" },
   {
     dataColumn: "status",
     columnTitle: "Status",
@@ -54,9 +55,6 @@ const titleData = [
 const dateFormat = (createTime) => {
   return moment(createTime).format("l LTS");
 };
-const actionModeTypeFormat = (type) => {
-  return defActionModeType[type];
-};
 const showStatusTypeFormat = (type) => {
   return defShowStatusType[type];
 };
@@ -66,14 +64,9 @@ const lastUpdateUserFormat = (userName) => {
 const lastUpdateTimeFormat = (lastUpdTime) => {
   return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
 };
-const defActionModeType = {
-  1: "No Action",
-  2: "Go to Game",
-  3: "Go to Bonus",
-  4: "Open Window",
-  5: "Redirect Page",
-  6: "Redirect pages of this site",
-};
+const battleTimeFormat = (battleTime) => {
+    return battleTime ? moment(battleTime).format("l LTS") : "-";
+  };
 const defShowStatusType = {
   1: "No login",
   2: "Login",

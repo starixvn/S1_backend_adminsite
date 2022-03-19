@@ -31,13 +31,12 @@ const App = () => {
     });
     if (filter.SiteId != 0) {
       let param = {
-        Url: "BannerManage/GetBannerList",
-        Data: qs.stringify({
+        Url: "BannerManage/GetHotEventList",
+        Data: {
           SiteId: filter.SiteId,
-          Currency: type == "CurrencyId" ? value : filter.CurrencyId,
-          BannerTypeId: 2,
+          CurrencyId: type == "CurrencyId" ? value : filter.CurrencyId,
           Status: type == "Status" ? value : filter.Status,
-        }),
+        },
       };
       WebAPI.PostData(param).then(
         (res) => {
@@ -60,13 +59,12 @@ const App = () => {
       CurrencyId: currencyId,
     });
     let param = {
-      Url: "BannerManage/GetBannerList",
-      Data: qs.stringify({
+      Url: "BannerManage/GetHotEventList",
+      Data: {
         SiteId: siteId,
-        Currency: currencyId,
-        BannerTypeId: 2,
+        CurrencyId: currencyId,
         Status: filter.Status,
-      }),
+      },
     };
     WebAPI.PostData(param).then(
       (res) => {
@@ -85,8 +83,8 @@ const App = () => {
     let _banner = bannerList[idx];
     let msg =
       _banner.status === 1
-        ? "Disable this banner all currency?"
-        : "Enable this banner all currency?";
+        ? "Disable this HotEnent all currency?"
+        : "Enable this HotEnent all currency?";
     if (_banner && window.confirm(msg)) {
       let newStatus = _banner.status === 0 ? 1 : 0;
       let param = {
@@ -98,21 +96,16 @@ const App = () => {
         }),
       };
       WebAPI.PostData(param).then((res) => {
-        if (isMountedRef.current) {
-          if (res.data.errorCode === 0) {
-            GetSiteBannerList(_banner.siteId, CurrencyId);
-          } else {
-            alert(res.data.message ?? "failed to get data.");
-          }
+        if (res.data.errorCode === 0) {
+          GetSiteBannerList(_banner.siteId, CurrencyId);
+        } else {
+          alert(res.data.message ?? "failed to get data.");
         }
       });
     }
   };
-  const ClickCreateBanner = () => {
-	};
-  const ClickEdit = idx => {
-		
-	};
+  const ClickCreateBanner = () => {};
+  const ClickEdit = (idx) => {};
   return (
     <div>
       <h4 className="detail">Hot Event Management</h4>

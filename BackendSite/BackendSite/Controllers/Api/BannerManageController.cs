@@ -35,6 +35,13 @@ namespace BackendSite.Controllers.Api
             this.common = common;
         }
 
+        public class GetHotEventListRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int Status { get; set; }
+        }
+
         [HttpPost]
         public ApiResult SetBanner([FromForm] BannerInfo bannerInfo)
         {
@@ -180,6 +187,43 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiResult<IEnumerable<HotEventList>> GetHotEventList(GetHotEventListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<HotEventList>>();
+            try
+            {
+                var siteList = new List<int> { request.SiteId };
+                var bannerTypeList = new List<int>();
+                var statusList = new List<int>();
+                var currencyList = new List<int> { request.CurrencyId };
 
+                if (request.Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (request.Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0);
+                    statusList.Add(1);
+                }
+
+                apiResult.Data = bannerManageBLL.GetHotEventList(siteList,
+                    statusList, currencyList,
+                    1, 5000, out _, out _);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
     }
 }
