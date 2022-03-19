@@ -336,6 +336,11 @@
         "DisplayKey": "USDT WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Line Management",
+        "FuncKey": "Finance/LineChannel",
+        "Enable": false
       }
     ]
   },
