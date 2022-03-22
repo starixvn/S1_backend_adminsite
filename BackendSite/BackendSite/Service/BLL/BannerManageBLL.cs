@@ -40,5 +40,14 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.UpdateBannerStatus(siteId, bannerName, status, user);
         }
+        public IEnumerable<HotEventList> GetHotEventList(IEnumerable<int> siteId,
+            IEnumerable<int> status, int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        {
+            return bannerManageService.GetHotEventList(JsonConvert.SerializeObject(siteId),
+                JsonConvert.SerializeObject(status),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize), out totalPages, out rowCount);
+
+        }
     }
 }

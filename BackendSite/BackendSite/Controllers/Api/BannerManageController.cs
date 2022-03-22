@@ -16,7 +16,6 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class BannerManageController : Controller
     {
@@ -33,6 +32,17 @@ namespace BackendSite.Controllers.Api
             this.authorizeBLL = authorizeBLL;
             this.custInfoService = custInfoService;
             this.common = common;
+        }
+
+        public class GetHotEventListRequest
+        {
+            public int SiteId { get; set; }
+            public int Status { get; set; }
+        }
+        public class GetHotEventRequest
+        {
+            public int SiteId { get; set; }
+            public string BannerName { get; set; }
         }
 
         [HttpPost]
@@ -62,6 +72,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Currency ,[FromForm] int Status)
         {
@@ -113,6 +124,7 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName , [FromForm] int Currency)
         {
@@ -157,7 +169,70 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<IEnumerable<HotEventList>> GetHotEventList(GetHotEventListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<HotEventList>>();
+            try
+            {
+                var siteList = new List<int> { request.SiteId };
+                var bannerTypeList = new List<int>();
+                var statusList = new List<int>();
 
+                if (request.Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (request.Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0);
+                    statusList.Add(1);
+                }
 
+                apiResult.Data = bannerManageBLL.GetHotEventList(siteList,
+                    statusList,
+                    1, 5000, out _, out _);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<BannerInfo> GetHotEvent(GetHotEventRequest request)
+        {
+            var apiResult = new ApiResult<BannerInfo>();
+            try
+            {
+                var result = bannerManageBLL.GetBanner(request.SiteId, request.BannerName, 0);
+                if (result != null)
+                {
+                    apiResult.Data = result;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                    apiResult.Message = "The Hot Event Detail No Data";
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
     }
 }
