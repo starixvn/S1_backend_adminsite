@@ -196,7 +196,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var data =
                 _reportBll.GetTpFailRecordReport(new GetTpFailRecordReportInput
                 {
-
                     SiteIds = siteList,
                     CurrencyIds = currencyIdList,
                     TpId = request.TpId,
@@ -293,7 +292,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
         public IActionResult Export(ExportRequest request)
         {
-
             if (string.IsNullOrWhiteSpace(request.TransId))
                 request.TransId = null;
 
