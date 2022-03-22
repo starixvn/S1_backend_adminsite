@@ -949,6 +949,7 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region TpTransferInfo
+
     public enum TpTransferDirectionEnum
     {
         ToTP = 1,
