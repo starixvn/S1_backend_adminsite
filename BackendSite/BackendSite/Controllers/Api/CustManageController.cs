@@ -487,10 +487,10 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult<CustInfoDetail>> GetCustInfoDetailAsync(CustInfoReq custInfoReq)
+        public ApiResult<CustInfoDetail> GetCustInfoDetail(CustInfoReq custInfoReq)
         {
 
-            var custInfoDetail = await _custInfoBll.GetCustInfoDetailAsync(custInfoReq.CustId, custInfoReq.UserName);
+            var custInfoDetail = _custInfoBll.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
             if (custInfoDetail != null)
             {
                 if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
@@ -2065,7 +2065,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}})]
         [HttpPost]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
@@ -2104,7 +2104,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="para"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
         {
@@ -2133,7 +2133,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
         {
@@ -2145,8 +2145,8 @@ namespace BackendSite.Controllers.Api
 
             foreach (var data in apiResult.Data)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0));
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0));
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
             return apiResult;
@@ -2164,7 +2164,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_add_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
         [HttpPost]
         public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
         {
@@ -2193,7 +2193,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="deleteCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_delete_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
         [HttpPost]
         public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
         {
@@ -2222,7 +2222,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="EditRegLiveStatusNote"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement", "rm_edit_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
         [HttpPost]
         public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
         {
@@ -2260,7 +2260,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="AffiliatesCode"></param>
         /// <param name="AgentCodeType"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(string SelectSite,
             int Currency,
@@ -2271,16 +2271,31 @@ namespace BackendSite.Controllers.Api
             long StartDate,
             long EndDate,
             string AffiliatesCode,
-            int AgentCodeType)
+            int AgentCodeType,
+            bool isMarketing)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
-            var exportData = _custInfoBll.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
-            foreach (var data in exportData)
+            byte[] stream;
+            if (!isMarketing)
             {
-                data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                var exportData = _custInfoBll.GetExportRegLiveStatus(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
+                foreach (var data in exportData)
+                {
+                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                stream = _excelBll.Export(exportData);
             }
-            var stream = _excelBll.Export(exportData);
+            else
+            {
+                var exportData = _custInfoBll.GetExportRegLiveStatusForMarketing(SelectSite, Currency, DepositStatus, Status, User, Sort, startTime, endTime, AffiliatesCode, AgentCodeType);
+                foreach (var data in exportData)
+                {
+                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+                stream = _excelBll.Export(exportData);
+            }
+            
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -2303,6 +2318,32 @@ namespace BackendSite.Controllers.Api
             result.ErrorCode = 0;
 
             return result;
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Get TPWallet]
+        /// <summary>
+        /// CustManage/GetCustTPWallet 取得客戶第三方錢包資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="custInfoReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpWallet>>> GetCustTPWalletAsync(CustInfoReq custInfoReq)
+        {
+
+            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(custInfoReq.CustId);
+
+            return new ApiResult<IEnumerable<TpWallet>>
+            {
+                Data = custTPWallet,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
         #endregion
 
