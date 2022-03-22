@@ -139,7 +139,7 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
         public IEnumerable<HotEventList> GetHotEventList(string siteIds,
-            string status, string currencies, int startIndex,
+            string status, int startIndex,
             int pageSize, out int totalPages, out int rowCount)
         {
 
@@ -147,7 +147,6 @@ namespace BackendSite.Service.DAL
 
             props.Add("_SiteIds", siteIds);
             props.Add("_Statuses", status);
-            props.Add("_CurrencyIds", currencies);
             props.Add("_StartIndex", startIndex);
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

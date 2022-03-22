@@ -2,9 +2,53 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
 const SpecialItemType = {
-    actionBtn: "actionBtn",
-    statusBtn: "statusBtn",
-  };
+  actionBtn: "actionBtn",
+  statusBtn: "statusBtn",
+};
+const defShowStatusType = {
+  1: "No login",
+  2: "Login",
+  3: "Both",
+};
+const dateFormat = (createTime) => {
+  return moment(createTime).format("l LTS");
+};
+const showStatusTypeFormat = (type) => {
+  return defShowStatusType[type];
+};
+const lastUpdateUserFormat = (userName) => {
+  return userName ?? "-";
+};
+const lastUpdateTimeFormat = (lastUpdTime) => {
+  return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
+};
+const battleTimeFormat = (battleTime) => {
+  return battleTime ? moment(battleTime).format("l LTS") : "-";
+};
+const ActionButtons = (props) => {
+  return (
+    <div className="button-action" onClick={props.clickEdit}>
+      <button className="btn btn-edit">
+        <i className="icon-edit"></i>
+      </button>
+    </div>
+  );
+};
+const StatusBtn = ({ checked, onChange, mainKey }) => {
+  let id = `switch-${mainKey}`;
+  return (
+    <div className="switch__container">
+      <input
+        id={id}
+        className="switch switch--flat"
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+      />
+      <label htmlFor={id}></label>
+    </div>
+  );
+};
 const titleData = [
   { dataColumn: "bannerName", columnTitle: "HotEventName" },
   { dataColumn: "siteName", columnTitle: "SiteName" },
@@ -18,8 +62,8 @@ const titleData = [
     columnTitle: "Battle Time",
     body: { format: battleTimeFormat },
   },
-  { dataColumn: "Home", columnTitle: "Home Team" },
-  { dataColumn: "Away", columnTitle: "Away Team" },
+  { dataColumn: "home", columnTitle: "Home Team" },
+  { dataColumn: "away", columnTitle: "Away Team" },
   {
     dataColumn: "startTime",
     columnTitle: "Start Time",
@@ -51,51 +95,6 @@ const titleData = [
     body: { SpecialItem: SpecialItemType.actionBtn },
   },
 ];
-
-const dateFormat = (createTime) => {
-  return moment(createTime).format("l LTS");
-};
-const showStatusTypeFormat = (type) => {
-  return defShowStatusType[type];
-};
-const lastUpdateUserFormat = (userName) => {
-  return userName ?? "-";
-};
-const lastUpdateTimeFormat = (lastUpdTime) => {
-  return lastUpdTime ? moment(lastUpdTime).format("l LTS") : "-";
-};
-const battleTimeFormat = (battleTime) => {
-    return battleTime ? moment(battleTime).format("l LTS") : "-";
-  };
-const defShowStatusType = {
-  1: "No login",
-  2: "Login",
-  3: "Both",
-};
-const ActionButtons = (props) => {
-  return (
-    <div className="button-action" onClick={props.clickEdit}>
-      <button className="btn btn-edit">
-        <i className="icon-edit"></i>
-      </button>
-    </div>
-  );
-};
-const StatusBtn = ({ checked, onChange, mainKey }) => {
-  let id = `switch-${mainKey}`;
-  return (
-    <div className="switch__container">
-      <input
-        id={id}
-        className="switch switch--flat"
-        type="checkbox"
-        checked={checked}
-        onChange={onChange}
-      />
-      <label htmlFor={id}></label>
-    </div>
-  );
-};
 
 const Panel = (props) => {
   let headerRows = [];

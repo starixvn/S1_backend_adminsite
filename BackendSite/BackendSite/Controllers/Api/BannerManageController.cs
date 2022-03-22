@@ -16,7 +16,6 @@ namespace BackendSite.Controllers.Api
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class BannerManageController : Controller
     {
@@ -38,8 +37,12 @@ namespace BackendSite.Controllers.Api
         public class GetHotEventListRequest
         {
             public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
             public int Status { get; set; }
+        }
+        public class GetHotEventRequest
+        {
+            public int SiteId { get; set; }
+            public string BannerName { get; set; }
         }
 
         [HttpPost]
@@ -91,6 +94,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Currency ,[FromForm] int Status)
         {
@@ -142,6 +146,7 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName , [FromForm] int Currency)
         {
@@ -186,7 +191,7 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
-
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
         [HttpPost]
         public ApiResult<IEnumerable<HotEventList>> GetHotEventList(GetHotEventListRequest request)
         {
@@ -196,7 +201,6 @@ namespace BackendSite.Controllers.Api
                 var siteList = new List<int> { request.SiteId };
                 var bannerTypeList = new List<int>();
                 var statusList = new List<int>();
-                var currencyList = new List<int> { request.CurrencyId };
 
                 if (request.Status == 1)
                 {
@@ -213,9 +217,36 @@ namespace BackendSite.Controllers.Api
                 }
 
                 apiResult.Data = bannerManageBLL.GetHotEventList(siteList,
-                    statusList, currencyList,
+                    statusList,
                     1, 5000, out _, out _);
                 apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<BannerInfo> GetHotEvent(GetHotEventRequest request)
+        {
+            var apiResult = new ApiResult<BannerInfo>();
+            try
+            {
+                var result = bannerManageBLL.GetBanner(request.SiteId, request.BannerName, 0);
+                if (result != null)
+                {
+                    apiResult.Data = result;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                    apiResult.Message = "The Hot Event Detail No Data";
+                }
             }
             catch (Exception ex)
             {
