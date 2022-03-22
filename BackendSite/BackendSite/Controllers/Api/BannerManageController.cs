@@ -51,30 +51,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                var req = new BannerController.SetBannerReq
-                {
-                    SiteId = bannerInfo.SiteId,
-                    BannerName = bannerInfo.BannerName,
-                    BannerType = bannerInfo.BannerType,
-                    ActionMode = bannerInfo.ActionMode,
-                    ShowStatus = bannerInfo.ShowStatus,
-                    UnixStartTime = bannerInfo.UnixStartTime,
-                    UnixEndTime = bannerInfo.UnixEndTime,
-                    BonusCode = bannerInfo.BonusCode,
-                    MatchId = bannerInfo.MatchId,
-                    TpId = bannerInfo.TpId,
-                    GameId = bannerInfo.GameId,
-                    UrlRouter = bannerInfo.UrlRouter,
-                    UnixSportBattleDateTime = bannerInfo.UnixSportBattleDateTime,
-                    SportCategoryId = bannerInfo.SportCategoryId,
-                    SportLeaguesId = bannerInfo.SportLeaguesId,
-                    SportTeamsId = bannerInfo.SportTeamsId,
-                    Specific = bannerInfo.Specific,
-                    Sort = bannerInfo.Sort,
-                    SiteName = bannerInfo.SiteName
-                };
                 var user = authorizeBLL.GetAuthData().UserName;
-                var result = bannerManageBLL.SetBanner(req, user);
+                var result = bannerManageBLL.SetBanner(bannerInfo, user);
                 
                 apiResult.ErrorCode = result >=0 ? (int)ErrorCodeEnum.Success :(int) ErrorCodeEnum.Fail;
                 apiResult.Message = apiResult.ErrorCode != 0 ? "Update Failed" : "";

@@ -137,7 +137,18 @@ namespace BackendSite.Controllers
             var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
-            var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(withdrawalListReq.SelectSite, withdrawalListReq.withdrawalType, startTime, endTime, withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId, withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.AmountType, withdrawalListReq.Amount);
+            var SelectSite = "[" + withdrawalListReq.SelectSite + "]";
+            var WithdrawalType = "[" + withdrawalListReq.withdrawalType + "]";
+            var CurrencyId = "[" + withdrawalListReq.CurrencyId + "]";
+            var Status = "[" + withdrawalListReq.status + "]";
+            var VipStatus = $"[{withdrawalListReq.LevelStatus}]";
+
+            var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(SelectSite,
+                WithdrawalType,
+                startTime, endTime, withdrawalListReq.WithdrawalId,
+                withdrawalListReq.UserName, CurrencyId,
+                Status, VipStatus,
+                withdrawalListReq.AmountType, withdrawalListReq.Amount);
 
             foreach (var data in exportWithdrawal)
             {
@@ -213,13 +224,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }

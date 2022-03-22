@@ -148,6 +148,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
+    // "BankFinancial/ReasonManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/ReasonManagement/index.js",
+    // ],
     // "Marketing/VipRebateInfoReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
@@ -221,6 +225,10 @@ module.exports = {
     //   '@babel/polyfill',
     // "./src/pages/CSD/RegistrationManagement/index.js",
     // ],
+    // "Marketing/RegistrationForMarketing.min": [
+    //   '@babel/polyfill',
+    //   "./src/pages/Marketing/RegistrationForMarketing/index.js",
+    // ],
     // "CSD/DisableUserForGame.min": [
     //   '@babel/polyfill',
     // "./src/pages/CSD/DisableUserForGame/index.js"
@@ -262,9 +270,17 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
-    "Marketing/HotEventManagement.min": [
-      "./src/pages/Marketing/HotEventManagement/index.js",
-    ],
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
+      "Marketing/HotEventManagement.min": [
+          "./src/pages/Marketing/HotEventManagement/index.js",
+      ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -19,10 +20,11 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class StatisticalReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly Common _common;
+        private readonly ExcelBLL _excelBll;
 
         #endregion
 
@@ -33,56 +35,51 @@ namespace BackendSite.Controllers.ApiV2.Report
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _common = provider.GetRequiredService<Common>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         #endregion
 
         #region Model
-        
-        public class GetReq
+
+        public class GetListRequest
         {
-            public IEnumerable<int> SiteIds {get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
             public string EndDate { get; set; }
         }
 
-        public class ExportReq
-        {
-            public IEnumerable<int> SiteIds {get; set; }
-            public int TimeZone { get; set; }
-            public string EndDate { get; set; }
-        }
-        
         public class TitleModel
         {
             public string Name { get; set; }
             public int SortId { get; set; }
         }
-        
+
         #endregion
-        
+
         /// <summary>
-        /// StatisticalReport/Get 取得統計報表資料
+        /// StatisticalReport/GetList 取得統計報表資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：Reports > Statistical Report > [Submit]
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
-        public ApiResult GetStatisticalReport(GetReq req)
+        public ApiResult GetList(GetListRequest request)
         {
             #region Date Caculate
 
-            var endDate = Convert.ToDateTime(req.EndDate);
+            var endDate = Convert.ToDateTime(request.EndDate);
             var startDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
 
             #endregion
 
-            var data = _reportBll.GetStatisticalReport(JsonConvert.SerializeObject(req.SiteIds), _common.TransferToTimeZoneFormat(req.TimeZone), startDate, req.EndDate);
+            var data = _reportBll.GetStatisticalReport(JsonConvert.SerializeObject(request.SiteIds), _common.TransferToTimeZoneFormat(request.TimeZone), startDate, request.EndDate);
 
             if (!data.Any())
             {
@@ -108,22 +105,23 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// 
         /// Func Path：Reports > Statistical Report > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         /// <returns>檔案</returns>
         [HttpPost]
-        public IActionResult Export(ExportReq req)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/StatisticalReport" })]
+        public IActionResult Export(GetListRequest request)
         {
 
             #region Date Caculate
 
-            var endDate = Convert.ToDateTime(req.EndDate);
+            var endDate = Convert.ToDateTime(request.EndDate);
             var startDate = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(-1).ToString("yyyy-MM-dd");
 
             #endregion
 
             #region Get Data
 
-            var exportData = _reportBll.GetStatisticalReport(JsonConvert.SerializeObject(req.SiteIds), _common.TransferToTimeZoneFormat(req.TimeZone), startDate, req.EndDate);
+            var exportData = _reportBll.GetStatisticalReport(JsonConvert.SerializeObject(request.SiteIds), _common.TransferToTimeZoneFormat(request.TimeZone), startDate, request.EndDate);
             var currencyList = exportData.Select(x => x.CurrencyId).Distinct();
             var currencyData = _reportBll.GetCurrency();
 
@@ -699,9 +697,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var stream = _reportExcelBll.ComplexReportExportToMultiSheet(d);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"StatisticalReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "StatisticalReport");
         }
     }
 }

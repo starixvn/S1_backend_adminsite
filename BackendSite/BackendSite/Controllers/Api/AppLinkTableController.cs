@@ -43,7 +43,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                if (appLinkTableBLL.SetAppLink(setAppLinkReq.SiteId, setAppLinkReq.AppType, setAppLinkReq.Domain, setAppLinkReq.ProtocolType, authorizeBLL.GetAuthData().UserName) > 0)
+                if (appLinkTableBLL.SetAppLink(setAppLinkReq.SiteId, (int)setAppLinkReq.AppType, setAppLinkReq.Domain, (int)setAppLinkReq.ProtocolType, authorizeBLL.GetAuthData().UserName) > 0)
                 {
                     apiResult.ErrorCode = 0;
                     apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");

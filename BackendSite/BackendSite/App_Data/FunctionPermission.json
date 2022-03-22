@@ -274,7 +274,18 @@
       {
         "DisplayKey": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Reason",
+            "FuncKey": "rm_edit_reason"
+          },
+          {
+            "DisplayKey": "Edit Memo",
+            "FuncKey": "rm_edit_memo"
+          }
+        ]
       },
       {
         "DisplayKey": "Payment Management",
@@ -335,6 +346,11 @@
       {
         "DisplayKey": "USDT WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Line Management",
+        "FuncKey": "Finance/LineChannel",
         "Enable": false
       }
     ]
@@ -450,6 +466,26 @@
         ]
       },
       {
+        "DisplayKey": "Registration Data",
+        "FuncKey": "Marketing/RegistrationForMarketing",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Add Note",
+            "FuncKey": "rm_add_note"
+          },
+          {
+            "DisplayKey": "Edit Note",
+            "FuncKey": "rm_edit_note"
+          },
+          {
+            "DisplayKey": "Delete Note",
+            "FuncKey": "rm_delete_note"
+          }
+        ]
+      },
+      {
         "DisplayKey": "Vip Rebate Mangetment",
         "FuncKey": "Marketing/VipRebateMangetment",
         "Enable": false,
@@ -561,6 +597,30 @@
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Slot Games Management",
+      "FuncKey": "CMS/SlotGamesManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
+    },
+    {
+      "DisplayKey": "Category Management",
+      "FuncKey": "CMS/CategoryManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
     }
   ]
 },

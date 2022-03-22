@@ -44,6 +44,21 @@ namespace BackendSite.Service.Model.enums
         ThirdMinus = 6
     }
 
+    public enum AdjustCategoryEnum
+    {
+        None = 1,
+        RetentionBonus = 2,
+        ManualBonus = 3,
+        VipUpgradeReward = 4,
+        PrizeDrop = 5,
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
+    }
+
     #endregion
 
     #region Bonus Management For Frontend Use
@@ -53,6 +68,24 @@ namespace BackendSite.Service.Model.enums
         All = 0,
         UnUsed = 1,
         Used = 2
+    }
+
+    #endregion
+
+    #region Member Listing For Frontend Use
+
+    public enum SetCustNoteTypeEnum
+    {
+        Update = 1,
+        Delete = 2
+    }
+
+    public enum CustStatusSwitchOptionEnum
+    {
+        IsKyc = 1,
+        IsRisk = 2,
+        PhoneVerified = 3,
+        EmailVerified = 4
     }
 
     #endregion
@@ -85,6 +118,12 @@ namespace BackendSite.Service.Model.enums
         Lock = 4,
     }
 
+    public enum EnablePromotionEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
     #endregion
 
     #region CustProfile
@@ -111,6 +150,16 @@ namespace BackendSite.Service.Model.enums
     //    Deny = "D",
     //    Review = "R"
     //}
+
+    #endregion
+
+    #region CustVip
+
+    public enum ManuallyEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 
     #endregion
 
@@ -273,6 +322,14 @@ namespace BackendSite.Service.Model.enums
         BTC = 4
     }
 
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
+    }
+
     #endregion
 
     #region OTPVerifyinfo
@@ -353,6 +410,79 @@ namespace BackendSite.Service.Model.enums
         RetentionBonus = 9
     }
 
+    public enum PromotionStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum PromotionPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    public enum PromotionDeviceTypeEnum
+    {
+        All = 1,
+        Web = 2,
+        App = 3
+    }
+
+    public enum PromotionActionEnum
+    {
+        Link = 0,
+        Detail = 1
+    }
+
+    public enum PromotionWalletTypeEnum
+    {
+        Transfer = 0,
+        Seamless = 1
+    }
+
+    #endregion
+
+    #region PromotionCashBackSetting
+
+    public enum PromotionCashBackSettingStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+    public enum ReferralCustStatusEnum
+    {
+        Approved = 0,
+        Running = 1,
+        Expired = 2
+    }
+    #endregion
+
+    #region PromotionRebate
+
+    public enum PromotionRebateStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    #endregion
+
+    #region PromotionSpecific
+
+    public enum PromotionSpecificStatusEnum
+    {
+        Disable = 1,
+        Enable = 2
+    }
+
+    public enum BonusTypeEnum
+    {
+        Percentage = 1,
+        Amount = 2
+    }
+
     #endregion
 
     #region Referral
@@ -362,19 +492,9 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    public enum ReferralCustStatusEnum 
-    {
-        Approved = 0,
-        Running = 1,
-        Expired = 2
-    }
+
     #endregion
 
-    public enum BonusType
-    {
-        Percentage = 1,
-        Amount = 2
-    }
     public enum BonusStatus
     {
         Running = 1,
@@ -396,6 +516,18 @@ namespace BackendSite.Service.Model.enums
         Delete = 4
     }
 
+    #region BankFinancialTransferInfoLog
+
+    public enum ActionEnum
+    {
+        Create = 1,
+        Read = 2,
+        Update = 3,
+        Delete = 4
+    }
+
+    #endregion
+
     #region Vip Setting
 
     public enum VipSettingStatusEnum
@@ -413,6 +545,22 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     public enum VipStatus
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
+    public enum VipDowngradeReviewStatusEnum
+    {
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3,
+        Settled = 4 //已異動
+    }
+
+    public enum VipUpgradeReviewStatusEnum
     {
         Pending = 1,
         Approved = 2,
@@ -583,17 +731,117 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    //public enum TpCategory
-    //{
-    //    Sports = 1,
-    //    Casino = 2,
-    //    LiveCasino = 3,
-    //    Fishing = 4,
-    //    Cockfighting = 5,
-    //    Lottery = 6,
-    //    VirtualSports = 7,
-    //    Poker = 8,
-    //}
+    public enum SettlementType
+    {
+        UnSettled = 0,
+        SettledForValid = 1,
+        SettledForInvalid = 2,
+        SettledForValidNotRollover = 3,
+        Cheating = 4
+    }
+    public enum AppLinkAppType
+    {
+        Andriod = 1,
+        IOS = 2
+    }
+    public enum AppLinkProtocolType
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
+
+    public enum SendMessageStatus
+    {
+        Pending = 0,
+        Approved = 1,
+        Processing = 2,
+        Success = 3,
+        Failed = 4
+    }
+    public enum TpEnum
+    {
+        Saba = 1,
+        PT = 27
+    }
+    public enum BalanceAdjustmentType
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        RetentionBouns = 5,
+        ManualBonus = 6
+    }
+
+    #region VerificationReward
+
+    public enum VerificationTypeEnum
+    {
+        EitherOf = 0,
+        BothOf = 1
+    }
+
+    public enum VerificationRewardStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    public enum DeviceId
+    {
+        Old = 0,
+        Desktop = 1,
+        H5 = 2,
+        APP = 3
+    }
+
+    public enum CustTaskType
+    {
+        LastStatusUpdateTime = 2,
+    }
+
+    #region BankDetailOff
+
+    public enum PurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        DepositAndWithdrawal = 3
+    }
+
+    public enum BankDetailOffStatusEnum
+    {
+        Initial = 0,     //Front-End Hidden
+        Open = 1,        //Front-End green
+        Suspend = 2,
+        Closed = 3,      //Never Open
+        Maintenance = 4  //frontend red
+    }
+
+    #endregion
+
+    #region News
+
+    public enum NewsStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region RebatePeriod
+
+    public enum RebatePeriodPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2,
+        Monthly = 3
+    }
+
+    #endregion
 
     #region Banner
 
@@ -630,111 +878,78 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
-    public enum SettlementType
+
+    #region AppLinkTable
+
+    public enum AppTypeEnum
     {
-        UnSettled = 0,
-        SettledForValid = 1,
-        SettledForInvalid = 2,
-        SettledForValidNotRollover = 3,
-        Cheating = 4
-    }
-    public enum AppLinkAppType
-    {
-        Andriod = 1,
-        IOS = 2
-    }
-    public enum AppLinkProtocolType
-    {
-        HTTP = 1,
-        HTTPS = 2
+        Android = 1,
+        Ios = 2
     }
 
-    public enum CryptoCurrencyEnum
+    public enum ProtocolTypeEnum
     {
-        USDT = 96,
-        USDC = 97,
-        ETH = 98,
-        BTC = 99
-    }
-
-    public enum SendMessageStatus
-    {
-        Pending = 0,
-        Approved = 1,
-        Processing = 2,
-        Success = 3,
-        Failed = 4
-    }
-    public enum TpEnum
-    {
-        Saba = 1,
-        PT = 27
-    }
-    public enum BalanceAdjustmentType
-    {
-        BalancePlus = 1,
-        BalanceMinus = 2,
-        BonusPlus = 3,
-        BonusMinus = 4,
-        RetentionBouns = 5,
-        ManualBonus = 6
-    }
-
-    public enum VerificationType
-    {
-        SMS = 0,
-        Email = 1
-    }
-    
-    public enum DeviceId
-    {
-        Old = 0,
-        Desktop = 1,
-        H5 = 2,
-        APP = 3
-    }
-
-    public enum CustTaskType
-    {
-        LastStatusUpdateTime = 2,
-    }
-    
-    #region BankDetailOff
-
-    public enum BankDetailOffStatusEnum
-    {
-        Initial = 0,     //Front-End Hidden
-        Open = 1,        //Front-End green
-        Suspend = 2,
-        Closed = 3,      //Never Open
-        Maintenance = 4  //frontend red
+        Http = 1,
+        Https = 2
     }
 
     #endregion
 
-    #region News
+    #region DomainTable
 
-    public enum NewsStatusEnum
+    public enum DomainTableStatusEnum
     {
-        InActive = 0,
-        Active = 1
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
 
-    #region RebatePeriod
-
-    public enum RebatePeriodPeriodTypeEnum
+    #region SlotGame
+    public enum SlotGameCategoryEnum
     {
-        Daily = 1,
-        Weekly = 2,
-        Monthly = 3
+        All = 0,
+        Jackpot = 1,
+        New = 2,
+        Feature = 3,
+        Favourite = 4
+    }
+    #endregion
+
+    #region SlotGameStatus
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+    #endregion
+
+    #region SlotGameDetail
+    public enum SlotGameDetailStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+    #endregion
+
+    #region TpCustInfo
+
+    public enum TpCustInfoStatusEnum
+    {
+        Enable = 1,
+        Locked = 2
     }
 
     #endregion
 
     #region TpTransferInfo
+
     public enum TpTransferDirectionEnum
     {
         ToTP = 1,
@@ -743,9 +958,9 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum WalletTypeEnum
+    public enum TpListWalletTypeEnum
     {
         FundTransfer = 0,
-        SeamlessWallet=1
+        SeamlessWallet = 1
     }
 }

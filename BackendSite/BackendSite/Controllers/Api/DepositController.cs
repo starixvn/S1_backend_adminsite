@@ -29,9 +29,10 @@ namespace BackendSite.Controllers.Api
         private readonly BankDetailBLL bankDetailBLL;
         private readonly ExcelBLL excelBLL;
         private readonly int mainWalletType;
+        private readonly ServerInfoBLL serverInfoBLL;
 
 
-        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL)
+        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL, ServerInfoBLL serverInfoBLL)
         {
             this.depositBLL = depositBLL;
             this.selLangBLL = selLangBLL;
@@ -40,6 +41,7 @@ namespace BackendSite.Controllers.Api
             this.custInfoBLL = custInfoBLL;
             this.bankDetailBLL = bankDetailBLL;
             this.excelBLL = excelBLL;
+            this.serverInfoBLL = serverInfoBLL;
             mainWalletType = configuration.GetValue<int>("MainWalletType");
         }
         public class DepositListReq
@@ -68,18 +70,18 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
-            
+
             var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
             foreach (var data in depositRequestList)
             {
-                data.CreateTime =new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (data.DepositTime != null)
                     data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (data.UpdateTime != null)
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            
+
             apiListResult.Data = depositRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
@@ -172,12 +174,12 @@ namespace BackendSite.Controllers.Api
             {
                 var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
 
-                depositRequest.CreateTime =new DateTimeOffset(depositRequest.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                depositRequest.CreateTime = new DateTimeOffset(depositRequest.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (depositRequest.DepositTime != null)
                     depositRequest.DepositTime = new DateTimeOffset(depositRequest.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (depositRequest.UpdateTime != null)
                     depositRequest.UpdateTime = new DateTimeOffset(depositRequest.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                
+
                 apiResult.Data = depositRequest;
                 apiResult.ErrorCode = 0;
             }
@@ -194,12 +196,12 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<Comments>>();
             var comments = depositBLL.GetDepositRequestComment(depositReq.TransId);
-            
+
             //foreach (var data in comments)
             //{
             //    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8,0,0)).AddHours(8);
             //}
-            
+
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -337,7 +339,7 @@ namespace BackendSite.Controllers.Api
             var depositTypeList = new List<int>(); depositTypeList.Add(depositLimit.DepositType);
             var currencyIdList = new List<int>(); currencyIdList.Add(depositLimit.CurrencyId);
 
-            var depositLimitInfos = depositBLL.GetDepositLimitInfos(siteIdList, depositTypeList, currencyIdList,1,1000,out _,out _);
+            var depositLimitInfos = depositBLL.GetDepositLimitInfos(siteIdList, depositTypeList, currencyIdList, 1, 1000, out _, out _);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = 0;
             return apiResult;
@@ -478,6 +480,32 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<DepositTimeList>();
             try
             {
+                var siteInfoList = serverInfoBLL.GetSiteList();
+
+                var currencyIdList = new List<int>();
+
+                if (para.CurrencyId == 0)
+                {
+                    foreach (var site in siteInfoList)
+                    {
+                        currencyIdList.AddRange(site.ICurrencyList);
+                    }
+                }
+                else
+                    currencyIdList.Add(para.CurrencyId);
+
+                var statusList = new List<DepositStatusEnum>();
+                if (para.Status == 0)
+                {
+                    statusList.Add(DepositStatusEnum.Approved);
+                    statusList.Add(DepositStatusEnum.Canceled);
+                    statusList.Add(DepositStatusEnum.Rejected);
+                }
+                else
+                {
+                    statusList.Add((DepositStatusEnum)para.Status);
+                }
+
                 var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate).AddHours(8);
                 var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate).AddHours(8);
                 var req = new DepositTimeReportPara
@@ -486,26 +514,26 @@ namespace BackendSite.Controllers.Api
                     StartDate = startTime,
                     EndDate = endTime,
                     SiteIds = para.SelectSite,
-                    CurrencyId = para.CurrencyId,
-                    Status = para.Status,
+                    CurrencyId = currencyIdList,
+                    Status = (IEnumerable<DepositStatusEnum>)statusList,
                     PageNumber = para.PageNumber,
                     PageSize = para.PageSize
                 };
-                
-                var searchResult = depositBLL.DepositTimeReportGet(req);
-                foreach (var data in searchResult.DepositTimeList)
+
+                var result = depositBLL.DepositTimeReportGet(req, out int totalPages, out int rowCount);
+                foreach (var data in result)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                    if (data.DepositTime != null) 
+                    if (data.DepositTime != null)
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     if (data.ApprovedTime != null)
                         data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                apiListResult.Data = searchResult.DepositTimeList;
-                apiListResult.PageNumber = searchResult.PageNumber;
-                apiListResult.TotalPages = searchResult.TotalPages;
-                apiListResult.RowCount = searchResult.RowCount;
+                apiListResult.Data = result;
+                apiListResult.PageNumber = para.PageNumber;
+                apiListResult.TotalPages = totalPages;
+                apiListResult.RowCount = rowCount;
                 apiListResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -522,12 +550,39 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = DateTimeExtensions.UnixToDateTime(startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(endDate);
-            var exportData = depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, status, currencyId);
+
+            var siteInfoList = serverInfoBLL.GetSiteList();
+
+            var currencyIdList = new List<int>();
+
+            if (currencyId == 0)
+            {
+                foreach (var site in siteInfoList)
+                {
+                    currencyIdList.AddRange(site.ICurrencyList);
+                }
+            }
+            else
+                currencyIdList.Add(currencyId);
+
+            var statusList = new List<DepositStatusEnum>();
+            if (status == 0)
+            {
+                statusList.Add(DepositStatusEnum.Approved);
+                statusList.Add(DepositStatusEnum.Canceled);
+                statusList.Add(DepositStatusEnum.Rejected);
+            }
+            else
+            {
+                statusList.Add((DepositStatusEnum)status);
+            }
+
+            var exportData = depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, JsonConvert.SerializeObject(statusList), JsonConvert.SerializeObject(currencyIdList));
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.EndFlowTime != null) 
+                if (data.EndFlowTime != null)
                     data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             var stream = excelBLL.Export(exportData);

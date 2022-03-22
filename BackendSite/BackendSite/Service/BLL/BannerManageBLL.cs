@@ -17,7 +17,7 @@ namespace BackendSite.Service.BLL
             this.bannerManageService = bannerManageService;
             this.serverInfoBLL = serverInfoBLL;
         }
-        public int SetBanner(BannerController.SetBannerReq bannerInfo, string user)
+        public int SetBanner(BannerInfo bannerInfo, string user)
         {
             return bannerManageService.SetBanner(bannerInfo, user);
         }

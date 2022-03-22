@@ -1369,6 +1369,8 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             let selectTagValue = [];
             let tag = "";
             let tagSelectList = null;
+            let isTempTPWllet = this.props.isTempTPWallet;
+            console.log(this.props,'props');
 
             if (data != null) {
                 elgibleWithdrawal = data.withdrawalLimit - data.turnOver;
@@ -1382,7 +1384,8 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         return <li key={wallet.tpId} className="wallet-item table-detail">
                             <span className="wallet-name">{wallet.tpName}</span>
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
-                            <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>
+                            {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
+                            {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
                             {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
@@ -1897,7 +1900,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         _isShowRewardBotton = { SMS: false, EMAIL: false };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton), };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton),isTempTPWallet:false };
         }
 
         onTab(idx, tabName) {
@@ -2277,12 +2280,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         let result = response.data;
                         let tagList=[];
                         if (result.errorCode == 0) {
-                            this.setState({ CustInfoData: result.data }, function () {
+                            this.setState({ CustInfoData: result.data,isTempTPWallet:true }, function () {
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
                             this.GetBonusWalletLog();
                             this.GetRebateInfoLog();
                             this.onGetRewardBottonStatus();
+                            this.GetTPWalletData();
                         } else {
                             alert(result.message);
                         }
@@ -2561,12 +2565,40 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         alert(error);
                     }.bind(this));
         }
+
+        GetTPWalletData(){
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/CustManage/GetCustTPWallet', { CustId: iCustId })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({
+                                ...this.state,
+                                isTempTPWallet:false,
+                                CustInfoData:
+                                {
+                                    ...this.state.CustInfoData,
+                                    tpWallet: result.data
+                                }
+                            });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
             let TabName = this.state.TabName;
             if (TabName == this._Tabs[0]) {
-                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList} isShowRewardBotton={this.state.isShowRewardBotton}/>;
+                dataContainer = <CustInfo CustInfoData={this.state.CustInfoData} onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)} isEdit={this.state.isEdit} onClickEdit={this.onClickEdit} editOnChange={this.editOnChange} editUpdate={this.editUpdate} TagList={this.state.TagList} isShowRewardBotton={this.state.isShowRewardBotton} isTempTPWallet={this.state.isTempTPWallet}/>;
             } else if (TabName == this._Tabs[1]) {
                 dataContainer = <BonusLog GetPromotionCategory={this.GetPromotionCategory.bind(this)} PromotionCategoryData={this.state.PromotionCategoryData} GetBonusLog={this.GetBonusLog.bind(this)} searchData={this.state.BonusLogData} BonusLog={this.state.BonusLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[2]) {
