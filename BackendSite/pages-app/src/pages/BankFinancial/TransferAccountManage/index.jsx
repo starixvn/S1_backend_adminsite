@@ -238,7 +238,8 @@ const App = () => {
 				const res = await WebAPI.PostData({
 					Url: "TransferAccountManage/GetTransferAccountData",
 					Data: {
-						Id: state.transferAccountList[idx].id
+						Id: state.transferAccountList[idx].id,
+						SiteId: state.transferAccountList[idx].siteId
 					}
 				})
 

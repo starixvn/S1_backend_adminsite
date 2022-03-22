@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
+    public class AdminUserWithAllowSite : AdminUser
+    {
+        public Dictionary<int, string> AllowSiteList { set; get; }
+    }
+
     public class AdminUser
     {
         public int UserId { set; get; }
