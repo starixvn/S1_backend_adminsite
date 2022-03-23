@@ -17,11 +17,6 @@
 }
 @{
     var i18n = new Dictionary<string, string>();
-    
-
-    var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
-        .Cast<int>()
-        .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
 }
 
 <div id="content"></div>
@@ -31,7 +26,6 @@
         window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en';
-        window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
     </script>
     <script src="~/js/component/Finance/BalanceAdjustmentBatch.min.js" asp-append-version="true"></script>
 }

@@ -34,10 +34,6 @@
         adjustType.Add(_value, selLangBLL.GetResourceValue($"lbl_AdjustmentType{_value}") ?? _value.ToString());        
     }
 
-    var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
-        .Cast<int>()
-        .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
-
     var subFuncKeys = permissionBLL.GetSubFunckeys("Finance/AdjustmentReport");
     subFuncKeys ??= new List<string>();
 }
@@ -52,7 +48,6 @@
         window.LangCode = 'en';
         window.gCurrencyList = @Html.Raw(JsonConvert.SerializeObject(currencyList));
         window.gAdjustTypeList = @Html.Raw(JsonConvert.SerializeObject(adjustType));
-        window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
         window.subFuncKeys = @Html.Raw(JsonConvert.SerializeObject(subFuncKeys));
     </script>
     <script src="~/lib/Oneworks/jscalendar/calendar.js"></script>

@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -14,12 +16,15 @@ namespace BackendSite.Service.BLL
         private readonly PaymentAdjustmentReportService paymentAdjustmentService;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly SelLangBLL selLangBLL;
+        private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly ILogger<PaymentAdjustmentReportBLL> _logger;
 
-        public PaymentAdjustmentReportBLL(PaymentAdjustmentReportService paymentAdjustmentService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
+        public PaymentAdjustmentReportBLL(IServiceProvider provider)
         {
-            this.paymentAdjustmentService = paymentAdjustmentService;
-            this.serverInfoBLL = serverInfoBLL;
-            this.selLangBLL = selLangBLL;
+            this.paymentAdjustmentService = provider.GetRequiredService<PaymentAdjustmentReportService>();
+            this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            this._bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
         public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(string transId, int currency, string userName, int adjustType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, ref List<string> currencyAmount)
@@ -52,9 +57,7 @@ namespace BackendSite.Service.BLL
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
                         AdjustCategory = row.Category,
-                        AdjustCategoryName = row.Category == 0
-                            ? string.Empty
-                            : selLangBLL.GetResourceValue($"lbl_AdjustCategory{row.Category}"),
+                        AdjustCategoryName = row.CategoryName,
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         Amount = row.Amount,
@@ -95,9 +98,7 @@ namespace BackendSite.Service.BLL
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
                         AdjustCategory = row.Category,
-                        AdjustCategoryName = row.Category == 0
-                            ? string.Empty
-                            : selLangBLL.GetResourceValue($"lbl_AdjustCategory{row.Category}"),
+                        AdjustCategoryName = row.CategoryName,
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         SabaID = row.SabaID,
@@ -128,14 +129,25 @@ namespace BackendSite.Service.BLL
 
         public bool SetAdjustment(SetAdjustment input)
         {
+            var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+
+            if (reasons == null || !reasons.Any())
+            {
+                _logger.LogError("FuncKey: Finance/PaymentAdjustment, GetReason has no data.");
+                return false;
+            }
+
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);
+            
+            var beforeCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.BeforeCategory)?.Description;
+            var afterCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.AfterCategory)?.Description;
 
             var logDetail = new Dictionary<string, string>
             {
                 { "TransId", input.TransId },
-                { "BeforeAdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{input.BeforeCategory}") },
-                { "AfterAdjustReason", selLangBLL.GetResourceValue($"lbl_AdjustCategory{input.AfterCategory}") },
+                { "BeforeAdjustReason", beforeCategoryName },
+                { "AfterAdjustReason", afterCategoryName },
                 { "BeforeMemo", input.BeforeMemo },
                 { "AfterMemo", input.AfterMemo }
             };

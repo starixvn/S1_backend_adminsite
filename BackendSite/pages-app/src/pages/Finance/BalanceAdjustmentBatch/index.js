@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import { api } from '../../../module/WebAPI';
-import qs from 'qs';
 import { PopBoxContent } from "./PopBoxContent";
 
 const initData = {
@@ -24,6 +23,7 @@ const initData = {
 const App = () => {
     let _site = [];
     const [site, setSite] = useState([]);
+    const [adjustCategoryList, setAdjustCategoryList] = useState([]);
     const [stateSend, updateSend] = useState(false);
     const [stateData, updateData] = useState({ ...initData });
     const [sendData, updateSendData] = useState([]);
@@ -39,7 +39,6 @@ const App = () => {
                     WalletType:0,
                     NeedCheckPassword:false,
                     HasCheckPassword:false,
-                    category: 1,
                     [datacolumn]: v 
                 }); 
         }
@@ -225,6 +224,19 @@ const App = () => {
             })
     }, []);
 
+    useEffect(() => {
+        api.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    setAdjustCategoryList(response.data.data === null ? [] : response.data.data);
+                } else {
+                    alert(!response.message ? 'Get reason list failed.' : response.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
+    }, []);
+
     if (site.length === 0) {
         return <></>
     } else {
@@ -264,9 +276,9 @@ const App = () => {
             NeedCheckPassword: false
         })
     }
-    let reasonList = gAdjustCategoryList.map((item) => {
-        return <option value={item.value}>{item.name}</option>;
-    });
+    let reasonList = adjustCategoryList && adjustCategoryList.length > 0 ? adjustCategoryList.map((item) => {
+        return <option value={item.reasonId}>{item.description}</option>;
+    }) : null;
 
     return (
         <>
@@ -379,7 +391,7 @@ const App = () => {
                 }
                 <div className="form-group width-200">
                     <label className="col-form-label">Adjust Reason</label>
-                    <select className="form-control" name="Category" onChange={(e) => { EditFiled(e.target.value, 'category') }}>
+                    <select className="form-control" name="Category" value={stateData.category}  onChange={(e) => { EditFiled(e.target.value, 'category') }}>
                         {reasonList}
                     </select>
                 </div>
