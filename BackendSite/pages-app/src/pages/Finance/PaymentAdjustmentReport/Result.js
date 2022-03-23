@@ -99,9 +99,10 @@ const Panel = (props) => {
                             (<div className="button-action">
                                 {isEditReason ? (
                                     <SelectList
-                                        SelectOptions={gAdjustCategoryList}
+                                        SelectOptions={props.AdjustCategoryList}
                                         Value={props.EditValue.value}
                                         OnChange={props.ChangeData}
+                                        Disabled={props.Disabled}
                                     />
                                 ) :(data[element.dataColumn])}
                                 <ActionButtons
@@ -109,6 +110,7 @@ const Panel = (props) => {
                                     HandleEdit={props.HandleEdit.bind(null, 'reason', idx, data['adjustCategory'])}
                                     HandleCancel={props.HandleCancel}
                                     HandleUpdate={props.HandleUpdate}
+                                    Disabled={props.Disabled}
                                 />
                         </div>): (data[element.dataColumn])}
                     </td>
@@ -122,6 +124,7 @@ const Panel = (props) => {
                                     <InputBox
                                         DefaultValue={data[element.dataColumn]}
                                         OnChange={props.ChangeData}
+                                        Disabled={props.Disabled}
                                     />
                                 ) :(data[element.dataColumn])}
                                 <ActionButtons
@@ -129,6 +132,7 @@ const Panel = (props) => {
                                     HandleEdit={props.HandleEdit.bind(null, 'memo', idx, data[element.dataColumn])}
                                     HandleCancel={props.HandleCancel}
                                     HandleUpdate={props.HandleUpdate}
+                                    Disabled={props.Disabled}
                                 />
                         </div>): (data[element.dataColumn])}
                     </td>
