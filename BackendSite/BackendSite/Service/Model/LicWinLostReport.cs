@@ -22,5 +22,9 @@ namespace BackendSite.Service.Model
     {
         public int Type { get; set; }
         public string TypeName { get; set; }
+
+        public int TpId { get; set; }
+
+        public int CategoryId { get; set; }
     }
 }

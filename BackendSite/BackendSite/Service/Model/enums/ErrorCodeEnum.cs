@@ -72,6 +72,8 @@ namespace BackendSite.Service.Model.enums
         BalanceAdjustmentError = 4004,
         [Description("msg_FileTypeError")]
         FileTypeError = 4005,
+        [Description("msg_SetAdjustmentError")]
+        SetAdjustmentError = 4006,
         #endregion
 
         #region CSD

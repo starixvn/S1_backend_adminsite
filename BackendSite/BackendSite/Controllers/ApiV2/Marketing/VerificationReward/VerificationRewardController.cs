@@ -66,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             
             var updateOperator = User.Identity.Name;
             var result = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
-                request.VerificationType, request.PhoneReward, request.EmailReward, updateOperator);
+                (int)request.VerificationType, request.PhoneReward, request.EmailReward, updateOperator);
 
             var apiResult = new ApiResult()
             {
@@ -90,7 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         public async Task<ApiResult> UpdateStatus(UpdateVerificationRewardStatusReq request)
         {
             var updateOperator = User.Identity.Name;
-            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId, request.Status, updateOperator);
+            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId,(int)request.Status, updateOperator);
             var apiResult = new ApiResult()
             {
                 ErrorCode = (result == 1 || result == 2) ? (int) ErrorCodeEnum.Success : (int) ErrorCodeEnum.UpdateFailed,

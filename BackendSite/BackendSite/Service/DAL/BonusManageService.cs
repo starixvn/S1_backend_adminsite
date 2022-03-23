@@ -210,27 +210,33 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new { SpecialCode = specialCode }));
         }
-        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite, int categoryType, int currencyId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(string selectSite,
+            string categoryType,
+            string currencyId,
+            DateTime startDate,
+            DateTime endDate,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
         {
-            string SelectSite = null;
-            if (selectSite != null && selectSite.Any())
-            {
-                SelectSite = JsonConvert.SerializeObject(selectSite);
-            }
-            totalPages = 0;
 
-            var p = new DynamicParameters(new { SelectSite, CategoryType = categoryType, CurrencyId = currencyId, PageSize = Math.Abs(pageSize) });
-            p.Add("StartDate", startDate);
-            p.Add("EndDate", endDate.AddDays(1).AddSeconds(-1));
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32,ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", selectSite);
+            p.Add("_CurrencyIds", currencyId);
+            p.Add("_CategoryIds", categoryType);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate.AddDays(1).AddSeconds(-1));
+            p.Add("_StartIndex", startIndex);
+            p.Add("_PageSize", pageSize);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get_V2", p);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
+            var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get_V3", p);
+
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+
             return result;
         }
 
@@ -240,7 +246,7 @@ namespace BackendSite.Service.DAL
             p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
             _mainDbClient.Execute("Admin_LeaderboardExtraPoint_Set", p);
             var rtn = p.Get<int?>("RTN") ?? -1;
-            
+
             return rtn;
         }
 
@@ -513,6 +519,8 @@ namespace BackendSite.Service.DAL
                 {
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
+                    WinOver = specific.WinOver,
+                    FullFillType = specific.WinOver > 0 ? 2 : 1 ,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
                     MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
@@ -778,7 +786,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecificV4_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionSpecific_Set_V5", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");

@@ -1,11 +1,12 @@
 ﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
+@using BackendSite.Service.Model.enums
+@using Newtonsoft.Json
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
-@inject IWebHostEnvironment environment
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -22,14 +23,19 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
+
+    var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
+        .Cast<int>()
+        .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
 }
 
 <div id="content"></div>
 @section Scripts {
     <script>
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
-        window.LangCode = 'en'
+        window.LangCode = 'en';
+        window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/js/component/Finance/ThirdPartyAdjustment.min.js" asp-append-version="true"></script>

@@ -17,7 +17,7 @@ namespace BackendSite.Service.Model
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
 
-        public DateTimeOffset ExpiryTime 
+        public DateTimeOffset ExpiryTime
         {
             get => _expiryTime;
             set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);

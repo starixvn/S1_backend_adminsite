@@ -736,7 +736,7 @@ export default ({ state, action, processing,isAdd }) => {
 							Title="Create Time"
 							OnChange={action.EditMainValue}
 							dataColumn="createTime"
-							value={state.createTime}
+							value={moment.parseZone(state.createTime).format("YYYY-MM-DD HH:mm:ss")}
 							Disabled={true}
 						/>
 						<InputBox
@@ -752,7 +752,7 @@ export default ({ state, action, processing,isAdd }) => {
 							Title="Update Time"
 							OnChange={action.EditMainValue}
 							dataColumn="updateTime"
-							value={state.updateTime}
+							value={moment.parseZone(state.updateTime).format("YYYY-MM-DD HH:mm:ss")}
 							Disabled={true}
 						/>
 						<InputBox

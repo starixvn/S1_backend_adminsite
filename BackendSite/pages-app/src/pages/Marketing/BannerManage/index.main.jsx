@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment-timezone";
 import { defBannerType, defActionModeType, defShowStatusType,defStatusType } from "./defCols";
+import qs from "qs";
 const SpecialItemType = {
 	actionBtn: "actionBtn",
 	statusBtn: "statusBtn"
@@ -109,16 +110,34 @@ export default ({
 	bannerList,
 	FilterOnchange,
 	BannerType,
-	Status
+	Status, 
+	SiteId,
+	SetSiteId,
+	CurrencyId
 }) => {
+	
 	let siteRows = siteList.map((_data) => {
 		return (
 			<div key={`SiteOpt-${_data.siteId}`} className="custom-control custom-radio custom-control-inline">
-				<input type="radio" id={`SiteId_${_data.siteId}`} name="SiteList" className="custom-control-input" value={_data.siteId} onChange={GetSiteBannerList.bind(null, _data.siteId)} checked={_data.siteId === setSite} />
+				<input type="radio" id={`SiteId_${_data.siteId}`} name="SiteList" className="custom-control-input" value={_data.siteId} onChange={SetSiteId.bind(null, _data.siteId, _data.iCurrencyList[0])} checked={_data.siteId === SiteId} />
 				<label className="custom-control-label" htmlFor={`SiteId_${_data.siteId}`}>{_data.siteName}</label>
 			</div>
 		)
 	});
+	
+	let currencyRows = siteList.length === 0 || !SiteId ? null :  
+		siteList
+		.find(x => x.siteId === SiteId)
+		.iCurrencyList
+		.map((currency) => {
+		return(
+			<div key={`CurrencyOpt-${currency}`} className="custom-control custom-radio custom-control-inline">
+				<input type="radio" id={`Currency_${currency}`} name="CurrencyList" onChange={GetSiteBannerList.bind(null, SiteId ,currency )} className="custom-control-input" value={currency}  checked={ currency === CurrencyId} />
+				<label className="custom-control-label" htmlFor={`Currency_${currency}`}>{i18n[`lbl_Currency${currency}`]}</label>
+			</div>
+		)
+	});
+
 
 	let headerRows = [];
 	titleData.forEach((e, i) => {
@@ -158,6 +177,13 @@ export default ({
 			<div className="filter">
 				<label className="col-form-label d-block">Available Sites</label>
 				{siteRows}
+				{!SiteId ? null:
+					<div className="table">
+						<label className="col-form-label d-block">Available Currency</label>
+						<div className="row-flex">
+							{currencyRows}
+						</div>
+					</div>	}
 				<div className="row-flex">
 					<DropDownBox
 					columnTitle="Banner Type"
