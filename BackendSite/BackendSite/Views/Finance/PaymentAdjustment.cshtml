@@ -31,17 +31,12 @@
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
     }
-
-    var adjustCategory = Enum.GetValues(typeof(AdjustCategoryEnum))
-        .Cast<int>()
-        .Select(x => new { name = selLangBLL.GetResourceValue($"lbl_AdjustCategory{x}") ?? string.Empty, value = x});
 }
 <h4 class="page-name">Balance Adjustment</h4>
 <div id="App"></div>
 @section Scripts {
     <script>
         $.extend(i18n, @Html.Raw(JsonConvert.SerializeObject(i18n)));
-        window.gAdjustCategoryList = @Html.Raw(JsonConvert.SerializeObject(adjustCategory));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/js/component/Finance/PaymentAdjustment.min.js" asp-append-version="true"></script>

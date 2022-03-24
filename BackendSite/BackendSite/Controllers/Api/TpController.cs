@@ -216,9 +216,6 @@ namespace BackendSite.Controllers.Api
                 foreach (var data in result.Data)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                    data.CategoryName = data.Category == 0
-                        ? string.Empty
-                        : _selLangBLL.GetResourceValue($"lbl_AdjustCategory{data.Category}");
                 }
                 result.PageNumber = PageNumber;
                 result.RowCount = RowCount;

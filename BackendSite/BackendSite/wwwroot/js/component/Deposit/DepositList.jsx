@@ -54,6 +54,11 @@ import DateTimePicker from 'react-datetime';
         1: "Amount Greater Than",
         2: "Amount Smaller Than"
     }
+    const PageSize = {
+        10: 10,
+        25: 25,
+        50: 50
+    }
 
     class DepositList extends React.Component {
         constructor(props) {
@@ -547,7 +552,8 @@ import DateTimePicker from 'react-datetime';
                 rejectChecks: {},
                 levelStatus: [],
                 amountType:0,
-                amount: ""
+                amount: "",
+                pageSize:25
             };
             this.searchFilter = {};
         }
@@ -570,7 +576,7 @@ import DateTimePicker from 'react-datetime';
             }
             //Loading.OnLoading();
             let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite,
-                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize
                         };
 
             if (this.searchFilter.SelectDepositID != "") {
@@ -1024,6 +1030,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{AmountStatus[obj]}</option>;
             }.bind(this));
             AmountList = <select onChange={this.onChange.bind(this)} name="amountType" value={this.state.amountType}>{AmountList}</select>
+
+            let PageSizeList = Object.keys(PageSize).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{PageSize[obj]}</option>;
+            }.bind(this));
+            PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
             
 
             let searchData = this.state.searchData;
@@ -1103,7 +1114,13 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">Amount</span>
                                     <div className="field">
-                                        <input type="text" name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
+                                        <input name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Page Size</span>
+                                    <div className="field">
+                                        {PageSizeList}
                                     </div>
                                 </div>
                                 {IsRefresh ? 

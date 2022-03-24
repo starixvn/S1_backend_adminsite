@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string WalletType { get; set; }
         public int Category { get; set; }
+        public string CategoryName { get; set; }
     }
 
     public class PaymentAdjustmentFrontEnd
