@@ -13,7 +13,6 @@ export const PopBoxContentAddPoint = (props) => {
     link = lastList.link;
   }
   const [Link, setLink] = useState(link);
-  //const [IsActive, setStatus] = useState(IsActive);
   let newLineChannelList = {
     IsAdd: true,
     Id: 0,
@@ -29,7 +28,7 @@ export const PopBoxContentAddPoint = (props) => {
       .then(function (response) {
         if (response.data.errorCode === 0) {
           props.ClickSave(newLineChannelList);
-          alert(response.data.message);
+          alert("Add Successful.");
         } else {
           alert(response.data.message);
         }
@@ -69,27 +68,13 @@ export const PopBoxContentAddPoint = (props) => {
                         <div className="textfield">
                           <input
                             type="text"
-                            defaultValue={link}
+                            defaultValue={null}
                             onChange={(e) => {
                               setLink(e.target.value.toString());
                             }}
                           />
                         </div>
                       </div>
-                      {/* <div className="form__group">
-                        <div className="form__title">
-                          <span className="text">Status</span>
-                        </div>
-                        <div className="textfield">
-                          <input
-                            type="checkbox"
-                            checked={isActive === 1}
-                            onChange={(e) => {
-                              setStatus(e.target.checked ? 1 : 0);
-                            }}
-                          />
-                        </div>
-                      </div> */}
                     </div>
                   </div>
                   <div className="popup__row">

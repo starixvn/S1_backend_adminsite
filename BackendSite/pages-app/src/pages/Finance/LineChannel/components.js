@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 
 export const InputBox = (props) => {
-  console.log(props);
   return props.isEdit ? (
     <input
       type={props.type ? props.type : "text"}
       style={{ width: "100%" }}
       defaultValue={props.defaultValue}
       onChange={(e) => {
-        let value = e.target.value;
-        // if (!isNaN(value)) {
         props.onChange(e.target.value);
-        //}
       }}
     />
   ) : (
@@ -33,6 +29,9 @@ export const ActionButtons = (props) => {
     <div className="button-action">
       <button className="btn btn-edit" onClick={props.ClickEdit}>
         <i className="icon-edit"></i>
+      </button>
+      <button className="btn btn-icon-delete" onClick={props.HandleDelete}>
+        <i className="icon-delete"></i>
       </button>
     </div>
   );

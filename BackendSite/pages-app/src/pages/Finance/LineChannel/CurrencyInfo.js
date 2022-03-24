@@ -30,7 +30,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_BetLeast: "Bet least",
     lbl_AddPointLevel: "Add point level",
     lbl_AddNewPointLevel: "Add new point level",
-    //lbl_Delete: "Delete",
+    lbl_Delete: "Delete",
     lbl_AreYouSure: "Are you sure?",
     lbl_OK: "OK",
     lbl_Cancel: "Cancel",
@@ -70,7 +70,7 @@ const Result = (props) => {
     setOpen(_isOpen);
   };
 
-  const handleAddDomainList = (_newList) => {
+  const handleAddLineChannelList = (_newList) => {
     let mounted = true;
     api
       .post("/api/LineChannel/GetList", {
@@ -80,15 +80,12 @@ const Result = (props) => {
       })
       .then(function (response) {
         if (response.data.errorCode === 0) {
-          //   if (response.data !== null) {
-          //     console.log(response.data);
-          //   }
-
           if (mounted) {
-            // setDomainList(response.data === null ? [] : response.data.data);
+            setLineChannelList(
+              response.data === null ? [] : response.data.data
+            );
           }
         } else {
-          // alert(response.message);
         }
       })
       .catch(function (error) {
@@ -107,44 +104,62 @@ const Result = (props) => {
     });
   };
 
-  const handleSetDomainList = (idx, status, Domain, dstatus) => {
+  const handleSetLineChannelList = (idx, status, Link, dstatus) => {
     let tmp = [...lineChannelList];
-    if (status === "Update") {
-      tmp[idx].domain = Domain;
+    if (status === "Delete") {
+      tmp.splice(idx, 1);
+      setLineChannelList(tmp);
+    } else if (status === "Update") {
+      tmp[idx].link = Link;
       tmp[idx].status = dstatus;
 
       setLineChannelList(tmp);
     }
   };
 
+  const handleDelete = (idx) => {
+    if (window.confirm("Are you sure ?") === true) {
+      api
+        .post("/api/LineChannel/Delete", { Id: lineChannelList[idx].id })
+        .then(function (response) {
+          if (response.data.errorCode === 0) {
+            handleSetLineChannelList(idx, "Delete");
+            alert("delete successful.");
+          } else {
+            alert(response.data.message);
+          }
+        })
+        .catch(function (error) {
+          alert(error);
+        });
+    }
+  };
+
   const handleUpdate = (idx) => {
     if (editValue !== null) {
-      let Domain =
-        editValue.domain === undefined
-          ? lineChannelList[idx].domain
-          : editValue.domain;
+      let Link =
+        editValue.link === undefined
+          ? lineChannelList[idx].link
+          : editValue.link;
       let Status =
         editValue.status === undefined
           ? lineChannelList[idx].status
           : editValue.status
           ? 1
           : 0;
-      let param = {
-        dId: lineChannelList[idx].dId,
-        domain: Domain,
-        status: parseInt(Status),
-      };
-
       api
-        .post("/api/DomainTable/UpdateDomain", {
-          dId: lineChannelList[idx].dId,
-          domain: Domain,
+        .post("/api/LineChannel/Set", {
+          isAdd: false,
+          id: lineChannelList[idx].id,
+          siteId: props.siteId,
+          currencyId: props.currId,
+          link: Link,
           status: parseInt(Status),
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetDomainList(idx, "Update", Domain, Status);
-            alert(response.data.message);
+            handleSetLineChannelList(idx, "Update", Link, Status);
+            alert("update successful.");
             handleEdit(idx);
           } else {
             alert(response.data.message);
@@ -165,20 +180,23 @@ const Result = (props) => {
     tmp[idx].status = status;
     setLineChannelList(tmp);
     let param = {
-      dId: lineChannelList[idx].dId,
-      domain: lineChannelList[idx].domain,
+      Id: lineChannelList[idx].id,
+      link: lineChannelList[idx].link,
       status: status,
     };
 
     api
       .post("/api/LineChannel/Set", {
-        dId: lineChannelList[idx].dId,
-        link: lineChannelList[idx].domain,
+        isAdd: false,
+        id: lineChannelList[idx].id,
+        siteId: props.siteId,
+        currencyId: props.currId,
+        link: lineChannelList[idx].link,
         status: parseInt(status),
       })
       .then(function (response) {
         if (response.data.errorCode === 0) {
-          alert(response.data.message);
+          alert("update successful.");
         } else {
           alert(response.data.message);
         }
@@ -240,7 +258,7 @@ const Result = (props) => {
               CurrencyId={props.currId}
               handleEdit={handleEdit}
               handleUpdate={handleUpdate}
-              //handleDelete={handleDelete}
+              handleDelete={handleDelete}
               EditValue={editValue}
               StateEdit={stateEdit}
               StatusValue={statusValue}
@@ -254,7 +272,7 @@ const Result = (props) => {
               lineChannelList={lineChannelList}
               SiteId={props.siteId}
               CurrencyId={props.currId}
-              ClickSave={handleAddDomainList}
+              ClickSave={handleAddLineChannelList}
             />
           ) : null}
         </div>
