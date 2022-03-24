@@ -225,5 +225,30 @@ namespace BackendSite.Controllers.Api
             };
             return apiResult;
         }
+
+        /// <summary>
+        /// UserBetLimit/GetTpBetLimit 取得指定第三方投注限額
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Enable TpGame
+        /// 
+        /// </remarks>
+        /// <param name="tpId"></param>
+        /// <param name="currencyId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<TpBetLimit>>> GetTpBetLimit(int tpId, int currencyId)
+        {
+            var data = await _userBetLimitBll.GetTpBetLimit(tpId, currencyId);
+            var apiResult = new ApiResult<IEnumerable<TpBetLimit>>
+            {
+                Data = data,
+                ErrorCode = 0
+            };
+            return apiResult;
+        }
     }
 }

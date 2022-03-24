@@ -712,4 +712,16 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet=1
     }
+
+    public enum TpCategoryEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        LiveCasino = 3,
+        Fishing = 4,
+        Cockfighting = 5,
+        Lottery = 6,
+        VirtualSports = 7,
+        Poker = 8
+    }
 }

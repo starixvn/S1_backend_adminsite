@@ -35,7 +35,7 @@ namespace BackendSite.Service.DAL
 
         #region Methods
 
-        public async Task<int> InsertOrUpdate(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
+        public async Task<int> InsertOrUpdate(int custId, int siteId, List<TpBetSetting> betSetting, string updateOperator)
         {
             var p = new DynamicParameters();
 
@@ -104,5 +104,13 @@ namespace BackendSite.Service.DAL
 
         #endregion
 
+        public async Task<IEnumerable<TpBetLimit>> GetTpBetLimit(int tpId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_TpId", tpId);
+            p.Add("_CurrencyId", currencyId);
+            var data = await _reportDbClient.QueryFirstAsync<string>("Admin_TpBetLimit_Get", p);
+            return !string.IsNullOrEmpty(data) ? JsonConvert.DeserializeObject<IEnumerable<TpBetLimit>>(data) : null;
+        }
     }
 }

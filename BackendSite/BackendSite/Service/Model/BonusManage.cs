@@ -145,6 +145,7 @@ namespace BackendSite.Service.Model
 
     public class TpGameType
     {
+        public int TpId { get; set; }
         public int Type { get; set; }
         public string TypeName { get; set; }
     }
