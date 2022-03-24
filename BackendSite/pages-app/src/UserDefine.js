@@ -144,7 +144,11 @@ const TpFailRecordReport = lazy(() =>
   import("./pages/CSD/TpFailRecordReport/index")
 );
 
-export const defaultPage = "PersonalMsgBatch";
+const LineChannelManagement = lazy(() =>
+  import("./pages/Finance/LineChannel/index")
+);
+
+export const defaultPage = "LineChannelManagement";
 
 export const layoutType = {
   N88: "N88",
@@ -825,6 +829,19 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <VerificationReward />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
+    ],
+    layout: layoutType.N88,
+  },
+  LineChannelManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LineChannelManagement />
       </Suspense>
     ),
     css: [

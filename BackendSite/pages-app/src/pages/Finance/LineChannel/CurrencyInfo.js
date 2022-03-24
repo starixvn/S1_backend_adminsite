@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { LevelInfo } from "./LevelInfo";
-import { PopBoxContentAddLevel } from "./PopBoxContentAddLevel";
+import { LineChannelInfo } from "./LineChannelInfo";
+import { PopBoxContentAddPoint } from "./PopboxContentAddPoint";
 import { api } from "../../../module/WebAPI";
 
 if (process.env.NODE_ENV !== "production") {
@@ -30,22 +30,18 @@ if (process.env.NODE_ENV !== "production") {
     lbl_BetLeast: "Bet least",
     lbl_AddPointLevel: "Add point level",
     lbl_AddNewPointLevel: "Add new point level",
-    lbl_Delete: "Delete",
+    //lbl_Delete: "Delete",
     lbl_AreYouSure: "Are you sure?",
     lbl_OK: "OK",
     lbl_Cancel: "Cancel",
     lbl_Error: "Error",
-    lbl_Currency61: "INR",
   };
 }
 
 export const CurrencyInfo = (props) => {
   let CurrencyList = props.optSite.siteCurrencyList.map((value) => {
     return (
-      <div
-        key={`Site-${props.optSite.siteId}-CurrencyInfo-${value}`}
-        className="panel mt-20"
-      >
+      <div key={`CurrencyInfo-${value}`} className="panel mt-20">
         <a
           className="panel-title"
           data-toggle="collapse"
@@ -67,13 +63,37 @@ const Result = (props) => {
   const [stateEdit, setEdit] = useState({});
   const [editValue, setEditValue] = useState(null);
   const [isOpen, setOpen] = useState(false);
-  const [levelList, setLevelList] = useState(null);
+  const [lineChannelList, setLineChannelList] = useState(null);
+  const [statusValue, setstatusValue] = useState({});
+
   const handleOpen = (_isOpen) => {
     setOpen(_isOpen);
   };
 
-  const handleAddLevelList = (_newList) => {
-    setLevelList([...levelList, _newList]);
+  const handleAddDomainList = (_newList) => {
+    let mounted = true;
+    api
+      .post("/api/LineChannel/GetList", {
+        siteId: props.siteId,
+        pageNumber: 1,
+        pageSize: 100,
+      })
+      .then(function (response) {
+        if (response.data.errorCode === 0) {
+          //   if (response.data !== null) {
+          //     console.log(response.data);
+          //   }
+
+          if (mounted) {
+            // setDomainList(response.data === null ? [] : response.data.data);
+          }
+        } else {
+          // alert(response.message);
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
     setOpen(false);
   };
 
@@ -87,61 +107,43 @@ const Result = (props) => {
     });
   };
 
-  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax) => {
-    let tmp = [...levelList];
-    if (status === "Delete") {
-      tmp.splice(idx, 1);
-      setLevelList(tmp);
-    } else if (status === "Update") {
-      tmp[idx].withdrawalMin = withdrawalMin;
-      tmp[idx].withdrawalMax = withdrawalMax;
-      setLevelList(tmp);
-    }
-  };
+  const handleSetDomainList = (idx, status, Domain, dstatus) => {
+    let tmp = [...lineChannelList];
+    if (status === "Update") {
+      tmp[idx].domain = Domain;
+      tmp[idx].status = dstatus;
 
-  const handleDelete = (idx) => {
-    if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
-      api
-        .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
-          siteId: levelList[idx].siteId,
-          currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-        })
-        .then(function (response) {
-          if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Delete");
-            alert(response.data.message);
-          } else {
-            alert(response.data.message);
-          }
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      setLineChannelList(tmp);
     }
   };
 
   const handleUpdate = (idx) => {
     if (editValue !== null) {
-      let withdrawalMin =
-        typeof editValue.withdrawalMin === "undefined"
-          ? levelList[idx].withdrawalMin
-          : editValue.withdrawalMin;
-      let withdrawalMax =
-        typeof editValue.withdrawalMax === "undefined"
-          ? levelList[idx].withdrawalMax
-          : editValue.withdrawalMax;
+      let Domain =
+        editValue.domain === undefined
+          ? lineChannelList[idx].domain
+          : editValue.domain;
+      let Status =
+        editValue.status === undefined
+          ? lineChannelList[idx].status
+          : editValue.status
+          ? 1
+          : 0;
+      let param = {
+        dId: lineChannelList[idx].dId,
+        domain: Domain,
+        status: parseInt(Status),
+      };
+
       api
-        .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
-          siteId: levelList[idx].siteId,
-          currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
+        .post("/api/DomainTable/UpdateDomain", {
+          dId: lineChannelList[idx].dId,
+          domain: Domain,
+          status: parseInt(Status),
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax);
+            handleSetDomainList(idx, "Update", Domain, Status);
             alert(response.data.message);
             handleEdit(idx);
           } else {
@@ -153,7 +155,38 @@ const Result = (props) => {
         });
     }
   };
+  const handleStatusChange = (idx, _newData) => {
+    if (statusValue !== null) {
+      setstatusValue(null);
+    }
+    setstatusValue({ [idx]: _newData });
+    let tmp = [...lineChannelList],
+      status = _newData ? 1 : 0;
+    tmp[idx].status = status;
+    setLineChannelList(tmp);
+    let param = {
+      dId: lineChannelList[idx].dId,
+      domain: lineChannelList[idx].domain,
+      status: status,
+    };
 
+    api
+      .post("/api/LineChannel/Set", {
+        dId: lineChannelList[idx].dId,
+        link: lineChannelList[idx].domain,
+        status: parseInt(status),
+      })
+      .then(function (response) {
+        if (response.data.errorCode === 0) {
+          alert(response.data.message);
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
+  };
   const ChangeData = (idx, _locate, _newData) => {
     setEditValue({
       ...editValue,
@@ -165,17 +198,20 @@ const Result = (props) => {
   useEffect(() => {
     let mounted = true;
     api
-      .post("/api/Withdrawal/GetWithdrawalLimitInfos", {
+      .post("/api/LineChannel/GetList", {
         siteId: props.siteId,
-        currencyId: props.currId,
+        pageNumber: 1,
+        pageSize: 100,
       })
       .then(function (response) {
         if (response.data.errorCode === 0) {
           if (mounted) {
-            setLevelList(response.data === null ? [] : response.data.data);
+            setLineChannelList(
+              response.data === null ? [] : response.data.data
+            );
           }
         } else {
-          // alert(response.message);
+          alert(response.message);
         }
       })
       .catch(function (error) {
@@ -184,7 +220,7 @@ const Result = (props) => {
     return () => (mounted = false);
   }, []);
 
-  if (levelList === null) {
+  if (lineChannelList === null) {
     return <></>;
   } else {
     return (
@@ -196,25 +232,29 @@ const Result = (props) => {
                 className="btn btn-add"
                 onClick={handleOpen.bind(null, true)}
               >
-                Add point level
+                Add
               </button>
             </div>
-            <LevelInfo
-              LevelList={levelList}
+            <LineChannelInfo
+              lineChannelList={lineChannelList}
+              CurrencyId={props.currId}
               handleEdit={handleEdit}
               handleUpdate={handleUpdate}
-              handleDelete={handleDelete}
-              EditValue={stateEdit}
+              //handleDelete={handleDelete}
+              EditValue={editValue}
+              StateEdit={stateEdit}
+              StatusValue={statusValue}
               ChangeData={ChangeData}
+              handleStatusChange={handleStatusChange}
             />
           </div>
           {isOpen ? (
-            <PopBoxContentAddLevel
+            <PopBoxContentAddPoint
               ClickCancel={handleOpen.bind(null, false)}
-              LevelList={levelList}
+              lineChannelList={lineChannelList}
               SiteId={props.siteId}
               CurrencyId={props.currId}
-              ClickSave={handleAddLevelList}
+              ClickSave={handleAddDomainList}
             />
           ) : null}
         </div>

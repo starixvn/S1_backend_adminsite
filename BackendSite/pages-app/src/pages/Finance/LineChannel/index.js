@@ -8,13 +8,13 @@ const App = () => {
     <div className="container-fluid">
       <h4 className="page-name">Line Channel Management</h4>
       <div>
-        <WithdrawalLimitInfo />
+        <PointInfoList />
       </div>
     </div>
   );
 };
 
-const WithdrawalLimitInfo = () => {
+const PointInfoList = () => {
   const [opt, setOpt] = useState({
     siteId: 0,
     siteCurrencyList: [],
