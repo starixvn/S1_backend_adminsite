@@ -35,6 +35,16 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public IEnumerable<AdminGroup> GetGroupByIdOrAll(int groupId,bool isAll)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            var para = new DynamicParameters();
+            para.Add("_GroupId", groupId);
+            para.Add("_SelectAll", isAll);
+
+            return conn.Query<AdminGroup>("Admin_Group_GetByIdOrAll", para, commandType: CommandType.StoredProcedure);
+        }
+
         public IEnumerable<GroupPermisison> GetGroupPermissions(int SEQ)
         {
             string FuncKey = null;

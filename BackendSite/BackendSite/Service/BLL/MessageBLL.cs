@@ -165,7 +165,7 @@ namespace BackendSite.Service.BLL
 
         private string StripHTML(string input)
         {
-            return Regex.Replace(input, "<.*?>", String.Empty);
+            return !string.IsNullOrEmpty(input) ? Regex.Replace(input, "<.*?>", string.Empty) : input;
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
