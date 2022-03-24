@@ -124,7 +124,25 @@ namespace BackendSite.Controllers.Api
                 LastOperator = updator
             };
 
-            _lineChannelBll.Set(request.IsAdd, setData);
+            _lineChannelBll.Set(setData);
+
+            return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
+        }
+
+        /// <summary>
+        /// LineChannel/Delete 刪除資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        [HttpPost]
+        public ApiResult Delete(GetByIdRequest request)
+        {
+            var updator = _authorizeBll.GetAuthData().UserName;
+
+            _lineChannelBll.Delete(request.Id);
 
             return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
         }

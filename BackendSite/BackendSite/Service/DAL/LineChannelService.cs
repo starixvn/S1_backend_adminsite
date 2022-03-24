@@ -43,15 +43,21 @@ namespace BackendSite.Service.DAL
         public int Set(LineChannelDto data)
         {
             var p = new DynamicParameters();
+            p.Add("_Id", data.Id);
             p.Add("_SiteId", data.SiteId);
             p.Add("_CurrencyId", data.CurrencyId);
             p.Add("_Link", data.Link);
             p.Add("_Status", data.Status);
             p.Add("_Operator", data.LastOperator);
 
-            var result = _mainDbClient.Execute("Admin_LineChannel_Set", p);
+            return _mainDbClient.Execute("Admin_LineChannel_Set", p); ;
+        }
 
-            return result;
+        public int Delete(int id)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id", id);
+            return _mainDbClient.Execute("Admin_LineChannel_Del", p); 
         }
     }
 }
