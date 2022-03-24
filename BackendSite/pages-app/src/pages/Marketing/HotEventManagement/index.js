@@ -211,9 +211,9 @@ const App = () => {
             bannerName: bannerdata.bannerName,
             actionMode: bannerdata.actionMode,
             showStatus: bannerdata.showStatus,
-            startTime: bannerdata.startTime,
-            endTime: bannerdata.endTime,
-            sportBattledate: bannerdata.sportBattleDateTime,
+            startTime: moment.utc(bannerdata.startTime).add(8, "hour").format("l LTS"),
+            endTime: moment.utc(bannerdata.endTime).add(8, "hour").format("l LTS"),
+            sportBattledate: moment.utc(bannerdata.sportBattleDateTime).add(8, "hour").format("l LTS"),
             matchId: bannerdata.matchId,
             tpId: bannerdata.tpId,
             gameId: bannerdata.gameId,
@@ -318,6 +318,7 @@ const App = () => {
       (res) => {
         if (res.data.errorCode <= 2) {
           GetSiteBannerList();
+          initbannerData();
           setpageStatus(0);
         } else {
           alert(res.data.message ?? "failed to set data.");
