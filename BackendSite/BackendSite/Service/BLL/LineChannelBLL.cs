@@ -45,17 +45,24 @@ namespace BackendSite.Service.BLL
             return new LineChannelModel(data);
         }
 
-        public bool Set(bool isAdd, LineChannelDto newsDatas)
+        public bool Set(LineChannelDto newsDatas)
         {
             var result = _lineChannelService.Set(newsDatas);
 
-            if (isAdd && result != 1)
+            if (result != 1)
                 //Insert Affect Row Should be 1;
                 throw new AdminException(ErrorCodeEnum.UpdateFailed);
 
-            if (!isAdd && result != 2)
-                //Update Affect Row Should be 2;
-                throw new AdminException(ErrorCodeEnum.UpdateFailed);
+            return true;
+        }
+
+        public bool Delete(int id)
+        {
+            var result = _lineChannelService.Delete(id);
+
+            if (result != 1)
+                //Delete Affect Row Should be 1;
+                throw new AdminException(ErrorCodeEnum.Fail);
 
             return true;
         }
