@@ -22,12 +22,14 @@ import qs from 'qs';
                 Amount:1,
                 HasBonusCode:false,
                 Name:"",
-                Category:1
+                Category:1,
+                AdjustCategoryList: []
             };
         }
 
         componentDidMount = () => {
             this.getSiteList();
+            this.getAdjustCategoryList();
         }
 
         handleSubmit(event) {
@@ -51,6 +53,19 @@ import qs from 'qs';
                     alert(error);
                 }.bind(this));
         }
+
+        getAdjustCategoryList(){
+            axios.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+                .then(function (response) {
+                    if (response.data.errorCode === 0) {
+                        this.setState({AdjustCategoryList: response.data.data === null ? [] : response.data.data});
+                    } else {
+                        alert(!response.message ? 'Get reason list failed.' : response.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));
+        };
 
         onSiteChanged(e) {
             let siteId = parseInt(e.target.value);
@@ -331,10 +346,9 @@ import qs from 'qs';
                 }.bind(this))}</ul>;
             }
 
-            let reasonList = gAdjustCategoryList.map((item) => {
-                return <option value={item.value}>{item.name}</option>;
-            });
-
+            let reasonList = this.state.AdjustCategoryList.map((item) => {
+                    return <option value={item.reasonId}>{item.description}</option>;
+                });
 
             let siteList = this.state.SiteList.map(function (obj) {
                 return <div key={obj.siteId} className="custom-control custom-radio custom-control-inline">

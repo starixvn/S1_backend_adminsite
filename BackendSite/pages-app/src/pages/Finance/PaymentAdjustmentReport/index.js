@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from 'react-dom';
 import Filter from './Filter';
 import Result from './Result';
-import WebAPI from '../../../module/WebAPI';
+import WebAPI, { api } from '../../../module/WebAPI';
 import qs from 'qs';
 import moment from 'moment';
 
@@ -32,6 +32,8 @@ const App = () => {
 
     const [stateEdit, setEdit] = useState({});
     const [editValue, setEditValue] = useState(null);
+    const [adjustCategoryList, setAdjustCategoryList] = useState([]);
+    const [stateDisabled, setDisabled] = useState(false);
 
     useEffect(() => {
         let f_trigger_Start = stateRef.f_trigger_Start.current;
@@ -55,6 +57,26 @@ const App = () => {
         });
         /*eslint-enable */
     }, [stateRef]);
+
+    useEffect(() => {
+        api.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    let list = [];
+                    if (response.data.data !== null)
+                    {
+                        response.data.data.map(x => {
+                            list.push({ name: x.description, value: x.reasonId });
+                        })
+                        setAdjustCategoryList(list);
+                    }
+                } else {
+                    alert(!response.message ? 'Get reason list failed.' : response.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
+    }, []);
 
     const Filter_OnChange = (v, dataColumn) => {
         setFilter({
@@ -163,6 +185,7 @@ const App = () => {
         setEdit({});
     };
     const Result_EditHandleUpdate = () => {
+        setDisabled(true);
         let data = stateDatas.Datas[editValue.idx];
         let transId = data.transId;
         let beforeCategory = data.adjustCategory;
@@ -183,13 +206,13 @@ const App = () => {
         };
         
         WebAPI.PostData(param).then((res) => {
-            //console.log(res);
             if (res.data.errorCode === 0) {
                 Filter_Submit();
                 alert(!res.data.message ? 'Update successful.' : res.data.message);
             } else {
                 alert(!res.data.message ? 'Failed to update data.' : res.data.message);
             }
+            setDisabled(false);
         });
     };
 
@@ -215,6 +238,8 @@ const App = () => {
                         ChangeData={Result_EditChangeData}
                         StateEdit={stateEdit}
                         EditValue={editValue}
+                        AdjustCategoryList={adjustCategoryList}
+                        Disabled={stateDisabled}
                     />
             }
         </div>
