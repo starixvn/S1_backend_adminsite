@@ -58,6 +58,7 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> LevelStatus { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+            public int PageSize { get; set; }
         }
 
         [HttpPost]
@@ -70,8 +71,8 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
-
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, 10, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            
+            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, depositListReq.PageSize, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
             foreach (var data in depositRequestList)
             {
