@@ -988,7 +988,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecificDuplicate_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionSpecificDuplicate_Set_V2", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
