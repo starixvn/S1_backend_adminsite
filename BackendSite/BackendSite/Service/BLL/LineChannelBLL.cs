@@ -1,8 +1,10 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,10 +15,12 @@ namespace BackendSite.Service.BLL
     public class LineChannelBLL
     {
         private readonly LineChannelService _lineChannelService;
+        private readonly ILogger<LineChannelBLL> _logger;
 
         public LineChannelBLL(IServiceProvider provider)
         {
             _lineChannelService = provider.GetRequiredService<LineChannelService>();
+            _logger = provider.GetService<ILogger<LineChannelBLL>>();
         }
 
         public IEnumerable<LineChannelModel> GetList(int siteId, int pageNumber, int pageSize,
@@ -47,13 +51,21 @@ namespace BackendSite.Service.BLL
 
         public bool Set(LineChannelDto newsDatas)
         {
-            var result = _lineChannelService.Set(newsDatas);
+            try
+            {
+                var result = _lineChannelService.Set(newsDatas);
 
-            if (result != 1)
-                //Insert Affect Row Should be 1;
-                throw new AdminException(ErrorCodeEnum.UpdateFailed);
+                if (result != 1)
+                    //Insert Affect Row Should be 1;
+                    throw new AdminException(ErrorCodeEnum.UpdateFailed);
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Line Channel Exception:{ex}");
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
         }
 
         public bool Delete(int id)
