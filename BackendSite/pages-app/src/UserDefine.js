@@ -144,11 +144,19 @@ const TpFailRecordReport = lazy(() =>
   import("./pages/CSD/TpFailRecordReport/index")
 );
 
+<<<<<<< HEAD
 const CryptoWithdrawalLimitManagement = lazy(() =>
   import("./pages/Finance/CryptoWithdrawalLimitManagement/index")
 );
 
 export const defaultPage = "PersonalMsgBatch";
+=======
+const LineChannelManagement = lazy(() =>
+  import("./pages/Finance/LineChannel/index")
+);
+
+export const defaultPage = "LineChannelManagement";
+>>>>>>> Feature_DpeositByLine
 
 export const layoutType = {
   N88: "N88",
@@ -838,16 +846,30 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
+<<<<<<< HEAD
   CryptoWithdrawalLimitManagement: {
     comp: (
       <Suspense fallback="loading...">
         <CryptoWithdrawalLimitManagement />
+        </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+        "./css/css/main.css"
+    ],
+    layout: layoutType.N88,
+  },
+  LineChannelManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LineChannelManagement />
       </Suspense>
     ),
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
-      "./css/css/main.css"
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
     ],
     layout: layoutType.N88,
-  }
+  },
 };
