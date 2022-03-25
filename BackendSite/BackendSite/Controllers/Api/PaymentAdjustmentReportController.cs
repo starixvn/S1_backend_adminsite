@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
@@ -20,12 +22,14 @@ namespace BackendSite.Controllers.Api
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
         private readonly ExcelBLL excelBLL;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly PermissionBLL _permissionBll;
 
-        public PaymentAdjustmentReportController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL, ServerInfoBLL serverInfoBLL)
+        public PaymentAdjustmentReportController(IServiceProvider provider)
         {
-            this.paymentAdjustmentBLL = paymentAdjustmentBLL;
-            this.excelBLL = excelBLL;
-            this.serverInfoBLL = serverInfoBLL;
+            this.paymentAdjustmentBLL = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
+            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
@@ -190,6 +194,59 @@ namespace BackendSite.Controllers.Api
             };
 
             return apiListResult;
+        }
+
+        public class SetAdjustmentReq
+        {
+            public string TransId { get; set; }
+            public int BeforeCategory { get; set; }
+            public int AfterCategory { get; set; }
+            public string BeforeMemo { get; set; }
+            public string AfterMemo { get; set; }
+        }
+
+        [HttpPost]
+        public ApiResult SetAdjustment([FromForm] SetAdjustmentReq req)
+        {
+            try
+            {
+                if (!_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_reason")
+                    && !_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_memo"))
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.PermissionDenied,
+                        Message = "Permission denied."
+                    };
+                }
+
+                var success =
+                    paymentAdjustmentBLL.SetAdjustment(new SetAdjustment
+                    {
+                        TransId = req.TransId,
+                        BeforeCategory = req.BeforeCategory,
+                        AfterCategory = req.AfterCategory,
+                        BeforeMemo = req.BeforeMemo,
+                        AfterMemo = req.AfterMemo,
+                        Operator = User.Identity.Name
+                    });
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)(success 
+                        ? ErrorCodeEnum.Success 
+                        : ErrorCodeEnum.SetAdjustmentError)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult
+                {
+                    Message = "Something went wrong.",
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    RawMessage = ex.ToString()
+                };
+            }
         }
     }
 }
