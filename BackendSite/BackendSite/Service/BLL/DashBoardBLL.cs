@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL
 
             if(result != null)
             {
-                cache.Set(sKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
+                cache.Set(sKey, result, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
             }
 
             return result;
