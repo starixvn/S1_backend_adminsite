@@ -26,7 +26,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         private readonly ReportBLL _reportBll;
         private readonly ReportExcelBLL _reportExcelBll;
         private readonly ExcelBLL _excelBll;
-        private readonly Common _common;
 
         #endregion
 
@@ -37,7 +36,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion
@@ -52,6 +50,12 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             [Range(-12, 14)]
             public int TimeZone { get; set; }
+        }
+
+        public class TitleModel
+        {
+            public string Name { get; set; }
+            public int SortId { get; set; }
         }
 
         #endregion
@@ -100,14 +104,19 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">TimeZone(-12~14)</param>
         /// <returns>檔案</returns>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
         public IActionResult Export(GetListRequest request)
         {
             #region Get Data
 
-            var exportData = _reportBll.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds), request.SelectDate, request.TimeZone);
+            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(JsonConvert.SerializeObject(request.SiteIds));
 
-            var totalMaxCount = exportData.GroupBy(x => new { x.LocalTime })
-                .Select(x => x.Sum(y => y.MaxCount)).Max();
+            var exportData = _reportBll.GetUserOnlineReport(JsonConvert.SerializeObject(request.SiteIds), request.SelectDate, 8);
+
+            var totalMaxCount = exportData.GroupBy(x => new
+            {
+                x.LocalTime
+            }).Select(x => x.Sum(y => y.MaxCount)).Max();
 
             var serverData = _reportBll.GetServer();
 
@@ -116,36 +125,72 @@ namespace BackendSite.Controllers.ApiV2.Report
             #region Initial Param
 
             var content = new List<Dictionary<string, dynamic>>();
-            var titles = new Dictionary<string, Api.ReportController.TitleModel>();
+            var titles = new Dictionary<string, TitleModel>();
             var titlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
             #endregion
 
             #region Set Title(Merge Title & Title & Total Title & Not Summary Title)
 
+            #region IsRemoveOld Logic
+
+            var isRemoveOld = exportData.Where(x => x.DeviceType == (short)DeviceId.Old)
+                .All(x => x.MaxCount == 0);
+            var deviceIdCount = Enum.GetNames(typeof(DeviceId)).Length;
+            var deviceIdList = Enum.GetValues(typeof(DeviceId)).Cast<DeviceId>().ToList();
+
+            if (isRemoveOld)
+            {
+                deviceIdCount -= 1;
+                deviceIdList.Remove(DeviceId.Old);
+            }
+
+            #endregion
+
             #region Merge Title
 
+            // row 1
             var mergeTitles = new Dictionary<string, MergeTitleModel>
             {
                 {"Date", new MergeTitleModel {Name = request.SelectDate, MergeRange = 1}},
-                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange = request.SiteIds.Count() + 1}}
+                {"OnlineCount", new MergeTitleModel {Name = "Online Count", MergeRange =  (siteList.Count() * (deviceIdCount +1 )) }}
             };
 
+            // row 2
+            var mergeDeviceTitles = new Dictionary<string, MergeTitleModel>
+            {
+                {"Site", new MergeTitleModel {Name = "Site", MergeRange = 1}}
+            };
+
+            foreach (var site in siteList)
+            {
+                var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
+                var onlinePropName = $"Online-{siteName}";
+                mergeDeviceTitles.Add(onlinePropName, new MergeTitleModel { Name = siteName, MergeRange = deviceIdCount + 1 });
+            }
+
             titlesToMerge.Add(mergeTitles);
+            titlesToMerge.Add(mergeDeviceTitles);
 
             #endregion
 
             #region Title
 
-            titles.Add("LocalTime", new Api.ReportController.TitleModel { Name = "Local Time(GMT " + request.TimeZone + ")", SortId = 1 });
-            titles.Add("TotalOnline", new Api.ReportController.TitleModel { Name = "Total Online", SortId = 200 });
+            titles.Add("LocalTime", new TitleModel { Name = "Local Time(GMT +8)", SortId = 1 });
+            titles.Add("TotalOnline", new TitleModel { Name = "Total Online", SortId = 200 });
 
-            foreach (var site in request.SiteIds)
+            foreach (var site in siteList)
             {
                 var siteName = serverData.Where(x => x.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
-                var onlinePropName = $"Online-{siteName}";
-                var onlineSortId = 100 + site;
-                titles.Add(onlinePropName, new Api.ReportController.TitleModel { Name = siteName, SortId = onlineSortId });
+                foreach (var id in deviceIdList)
+                {
+                    var onlinePropName = $"Online-{siteName}-{(short)id}";
+                    var onlineSortId = 100 + (site * 10) + (int)id;
+                    titles.Add(onlinePropName, new TitleModel { Name = id.ToString(), SortId = onlineSortId });
+                }
+                var onlinePropNameSummary = $"Online-{siteName}-Summary";
+                var onlineSummarySortId = 100 + (site * 10) + 5;
+                titles.Add(onlinePropNameSummary, new TitleModel { Name = "Site Total", SortId = onlineSummarySortId });
             }
 
             #endregion
@@ -165,7 +210,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             foreach (var item in exportData)
             {
-                var onlinePropName = $"Online-{item.SiteName}";
+                var onlinePropName = $"Online-{item.SiteName}-{item.DeviceType}";
+                var onlineSitePropName = $"Online-{item.SiteName}-Summary";
+
                 var getKey = $"{item.LocalTime}";
                 var getItem = content.FirstOrDefault(x =>
                     x.Any(y => y.Key == "Key" && (string)y.Value == getKey)
@@ -186,6 +233,17 @@ namespace BackendSite.Controllers.ApiV2.Report
                         getItem.Add(onlinePropName, item.MaxCount);
                     }
 
+                    if (getItem.ContainsKey(onlineSitePropName))
+                    {
+                        getItem.TryGetValue(onlineSitePropName, out var maxCountData);
+                        getItem[onlineSitePropName] = (int)maxCountData + item.MaxCount;
+                    }
+                    else
+                    {
+                        getItem.Add(onlineSitePropName, item.MaxCount);
+                    }
+
+
                     if (getItem["TotalOnline"] == totalMaxCount)
                     {
                         getItem["MaxCount"] = true;
@@ -198,8 +256,8 @@ namespace BackendSite.Controllers.ApiV2.Report
                     {
                         { "Key", getKey },
                         { "LocalTime", item.LocalTime },
-
                         { onlinePropName,  item.MaxCount },
+                        { onlineSitePropName,  item.MaxCount },
                         { "TotalOnline", item.MaxCount }
                     };
 

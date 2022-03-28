@@ -32,6 +32,7 @@ namespace BackendSite.Service.Model
     {
         public string Operator { set; get; }
         public string Remarks { set; get; }
+        public int Category { set; get; }
     }
     public class TpTransferInfo
     {
@@ -73,6 +74,8 @@ namespace BackendSite.Service.Model
         public string UserName { set; get; }
         public string Operator { set; get; }
         public string Remarks { set; get; }
+        public int Category { set; get; }
+        public string CategoryName { set; get; }
     }
     public enum TpDirection
     {
