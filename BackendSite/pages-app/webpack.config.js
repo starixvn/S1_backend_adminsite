@@ -270,6 +270,9 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    "Marketing/HotEventManagement.min": [
+      "./src/pages/Marketing/HotEventManagement/index.js",
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

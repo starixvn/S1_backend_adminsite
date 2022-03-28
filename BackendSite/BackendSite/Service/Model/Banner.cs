@@ -83,5 +83,9 @@ namespace BackendSite.Service.Model
         }
         public string LastUpdateUser { get; set; }
     }
-
+    public class HotEventList : BannerInfoList
+    {
+        public string Away { get; set; }
+        public string Home { get; set; }
+    }
 }
