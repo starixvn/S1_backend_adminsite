@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -60,6 +61,19 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
 
         #endregion
 
+        #region Response Model
+
+        public class GetByIdResponse
+        {
+            public int GroupId { get; set; }
+            public string GroupName { get; set; }
+            public string Remark { get; set; }
+
+            public IEnumerable<FuncPermissionModel> Permission { get; set; }
+        }
+
+        #endregion
+
         #region Actions
 
         /// <summary>
@@ -73,13 +87,24 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
         [HttpPost]
-        public ApiListResult<AdminGroup> GetList(ApiRequestPageModel request)
+        public ApiListResult<AdminGroupModel> GetList(ApiRequestPageModel request)
         {
+            var result = new List<AdminGroupModel>();
             var data = _adminGroupBll.GetGroupList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
 
-            var apiResult = new ApiListResult<AdminGroup>
+            foreach (var item in data)
             {
-                Data = data,
+                result.Add(new AdminGroupModel()
+                {
+                    GroupId = (int)item.GroupSEQ,
+                    GroupName = item.GroupName,
+                    Remark = item.Remark
+                });
+            }
+
+            var apiResult = new ApiListResult<AdminGroupModel>
+            {
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
@@ -141,11 +166,28 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
         [HttpPost]
-        public ApiResult<IEnumerable<FuncPermissionModel>> GetById(GetByIdRequest request)
+        public ApiResult<GetByIdResponse> GetById(GetByIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<FuncPermissionModel>>();
+            var apiResult = new ApiResult<GetByIdResponse>();
+            var result = new GetByIdResponse();
 
-            apiResult.Data = _permissionBll.GetGroupPermissionModel(request.GroupId);
+            var groupdata = _adminGroupBll.GetGroupByIdOrAll(request.GroupId, false);
+
+            if (groupdata.Count() == 1)
+            {
+                var group = groupdata.FirstOrDefault();
+                result.GroupId = (int)group.GroupSEQ;
+                result.GroupName = group.GroupName;
+                result.Remark = group.Remark;
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            result.Permission = _permissionBll.GetGroupPermissionModel(request.GroupId);
+
+            apiResult.Data = result;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;

@@ -19,14 +19,14 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        
+
         public BannerManageService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public int SetBanner(BannerController.SetBannerReq bannerInfo, string user)
+        public int SetBanner(BannerInfo bannerInfo, string user)
         {
             var p = new DynamicParameters();
             p.Add("BannerName", bannerInfo.BannerName);
@@ -129,7 +129,7 @@ namespace BackendSite.Service.DAL
             var errorCode = 0;
             try
             {
-                _mainDbClient.Execute("Admin_BannerStatus_Set", new DynamicParameters(new {SiteId = siteId, BannerName = bannerName, Status = status, AdminUser = user }));
+                _mainDbClient.Execute("Admin_BannerStatus_Set", new DynamicParameters(new { SiteId = siteId, BannerName = bannerName, Status = status, AdminUser = user }));
             }
             catch (Exception)
             {

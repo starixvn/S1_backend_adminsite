@@ -43,15 +43,7 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
-
-        public class TitleModel
-        {
-            public string Name { get; set; }
-
-            public int SortId { get; set; }
-        }
-
-
+        
         #region API Model
 
         public class GetTransferAccountInfoReq
@@ -75,12 +67,17 @@ namespace BackendSite.Controllers.Api
         //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManages" })]
         public ApiResult GetTransferAccountInfoList(GetTransferAccountInfoReq req)
         {
-
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
-
+           
             try
             {
                 apiResult.Data = _bankFinancialBLL.GetTransferAccountInfoListForDisplay(false, req.SiteId, req.Id);
+               
+                foreach (var data in apiResult.Data.ToArray())
+                {
+                    data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
+                    data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+                }
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -97,7 +94,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult CreateTransferAccount(CreateTransferAccountReq req)
         {
-
             var apiResult = new ApiResult<BankFinancialTransferAccountDetailModel>();
 
             try
@@ -108,7 +104,6 @@ namespace BackendSite.Controllers.Api
                 {
                     SiteId = req.SiteId,
                     CurrencyId = req.CurrencyId,
-
                     InitialAmount = 0,
                     MaxBalanceAlertAmount = 0,
                     Status = TransferAccountStatusEnum.Open,
@@ -136,25 +131,28 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<BankFinancialTransferAccountDetailModel> GetTransferAccountData(GetTransferAccountInfoReq req)
         {
-
             var apiResult = new ApiResult<BankFinancialTransferAccountDetailModel>();
 
             try
             {
                 var result = _bankFinancialBLL.GetTransferAccountInfoListForDisplay(true, req.SiteId, req.Id);
 
+                foreach (var data in result.ToArray())
+                {
+                    data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
+                    data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+                }
+
                 if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
-
                     var authData = _authorizeBLL.GetAuthData();
-                    var dateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
 
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
-                    data.UpdateTime = dateTime;
-
+                    data.UpdateTime = GetTimeZoneDateTimeBySiteId(req.SiteId);
                     apiResult.Data = data;
+                    
                     apiResult.ErrorCode = 0;
                 }
                 else
@@ -177,25 +175,22 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
-
             var apiResult = new ApiResult<int>();
 
             try
             {
-                bankFinancialTransferAccount.CreateTime = GetTimeZoneZeroDateTimeByDateString(bankFinancialTransferAccount.CreateTime);
-                bankFinancialTransferAccount.UpdateTime = GetTimeZoneZeroDateTimeByDateString(bankFinancialTransferAccount.UpdateTime);
-                var result = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount);
+                var (status, count, message) = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount);
 
-                if (result.Status)
+                if (status)
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 0;
                 }
                 else
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 500;
                 }
 
@@ -214,6 +209,13 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportTransferAccountInfoList(int SiteId)
         {
             var ExportData = _bankFinancialBLL.GetTransferAccountInfoListForExport(false, SiteId, 0);
+            foreach (var data in ExportData.ToArray())
+            {
+                data.Purpose = GetPurpose(data.Purpose);
+                data.CreateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.CreateTime);
+                data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
+            }
+            
             var stream = _excelBLL.Export(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -287,17 +289,37 @@ namespace BackendSite.Controllers.Api
 
         #region Private Methods
 
-        private string GetTimeZoneDateTimeBySiteId(int siteId)
+        private DateTimeOffset GetTimeZoneDateTimeBySiteId(int siteId)
         {
             var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
-            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0));
         }
 
-        private string GetTimeZoneZeroDateTimeByDateString(string datetime)
+        private DateTimeOffset GetTimeZoneDateTimeByDateString(int siteId, DateTimeOffset datetime)
         {
-            return new DateTimeOffset(Convert.ToDateTime(datetime)).ToOffset(new TimeSpan(0, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            var timeZone = (siteId == 2 || siteId == 3) ? 7 : 8;
+            return new DateTimeOffset(datetime.DateTime, new TimeSpan(timeZone,0,0)).AddHours(timeZone);
         }
+        
+        private string GetPurpose(string purpose)
+        {
+            var result = string.Empty;
 
+            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
+
+            foreach (var i in purposeList)
+            {
+                switch (i)
+                {
+                    case 1: result += ",Deposit"; break;
+                    case 2: result += ",Withdrawal"; break;
+                    case 3: result += ",Transfer"; break;
+                }
+
+            }
+            return result.Substring(1);
+        }
+        
         #endregion
     }
 }

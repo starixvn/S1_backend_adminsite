@@ -25,6 +25,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         #endregion
 
+        #region Constructors
+
+        public DepositTimeReportController(IServiceProvider provider)
+        {
+            _depositBll = provider.GetRequiredService<DepositBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+        }
+
+        #endregion
+
         #region API Model
 
         public class ExportDepositTimeReq
@@ -32,6 +42,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<DepositStatusEnum> Statuses { get; set; }
             public string DepositId { get; set; }
             public DateTimeOffset StartDate
             {
@@ -43,21 +55,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public int Status { get; set; }
-            public int CurrencyId { get; set; }
         }
 
         #endregion
 
-        #region Constructors
-
-        public DepositTimeReportController(IServiceProvider provider)
-        {
-            _depositBll = provider.GetRequiredService<DepositBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
-        }
-
-        #endregion
 
         #region Finance > Deposit Time Report
 
@@ -75,30 +76,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public ApiListResult<DepositTimeList> GetList(DepositTimeReportPara req)
         {
             var apiListResult = new ApiListResult<DepositTimeList>();
-            try
-            {
-                var searchResult = _depositBll.DepositTimeReportGet(req);
-                foreach (var data in searchResult.DepositTimeList)
-                {
-                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-                    if (data.DepositTime != null)
-                        data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
-                    if (data.ApprovedTime != null)
-                        data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, TimeSpan.Zero);
-                }
 
-                apiListResult.Data = searchResult.DepositTimeList;
-                apiListResult.PageNumber = searchResult.PageNumber;
-                apiListResult.TotalPages = searchResult.TotalPages;
-                apiListResult.RowCount = searchResult.RowCount;
-                apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
+            var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount);
+
+            foreach (var data in result)
             {
-                apiListResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiListResult.Message = ex.Message;
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                if (data.DepositTime != null)
+                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                if (data.ApprovedTime != null)
+                    data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, TimeSpan.Zero);
             }
+
+            apiListResult.Data = result;
+            apiListResult.PageNumber = req.PageNumber;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
             return apiListResult;
         }
 
@@ -115,13 +111,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
         public IActionResult Export(ExportDepositTimeReq req)
         {
-            var exportData = _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds), req.DepositId, req.StartDate.DateTime, req.EndDate.DateTime, req.Status, req.CurrencyId);
+            var exportData = _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds),
+                req.DepositId, req.StartDate.DateTime, req.EndDate.DateTime,
+                JsonConvert.SerializeObject(req.Statuses), JsonConvert.SerializeObject(req.CurrencyIds));
 
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-                if (data.EndFlowTime != null) 
+                if (data.EndFlowTime != null)
                     data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, TimeSpan.Zero);
             }
 

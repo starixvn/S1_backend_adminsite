@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+
+namespace BackendSite.Service.Model
 {
     public class DomainTable
     {
@@ -20,7 +22,7 @@
     {
         public int SiteId { get; set; }
         public string Domain { get; set; }
-        public int AppType { get; set; }
-        public int ProtocolType { get; set; }
+        public AppTypeEnum AppType { get; set; }
+        public ProtocolTypeEnum ProtocolType { get; set; }
     }
 }

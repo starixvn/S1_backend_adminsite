@@ -274,7 +274,18 @@
       {
         "DisplayKey": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Reason",
+            "FuncKey": "rm_edit_reason"
+          },
+          {
+            "DisplayKey": "Edit Memo",
+            "FuncKey": "rm_edit_memo"
+          }
+        ]
       },
       {
         "DisplayKey": "Payment Management",
@@ -446,6 +457,26 @@
           {
             "DisplayKey": "Update Status",
             "FuncKey": "viplevelreview_update"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Registration Data",
+        "FuncKey": "Marketing/RegistrationForMarketing",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Add Note",
+            "FuncKey": "rm_add_note"
+          },
+          {
+            "DisplayKey": "Edit Note",
+            "FuncKey": "rm_edit_note"
+          },
+          {
+            "DisplayKey": "Delete Note",
+            "FuncKey": "rm_delete_note"
           }
         ]
       },

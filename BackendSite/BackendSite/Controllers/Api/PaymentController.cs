@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.Api
             public string Memo { set; get; }
             public string BounsCode { get; set; }
             public int RollOver { get; set; }
+            public int Category { get; set; }
         }
 
         public class GetFinancialLogReq
@@ -636,10 +637,11 @@ namespace BackendSite.Controllers.Api
 
                 if (custInfo != null)
                 {
+                    // Totti說RetentionBonus,ManualBonus搬到Bonus Payout，這兩個可以拔掉了
                     //非RetentionBonus,ManualBonus
-                    if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
-                    {
-                        adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
+                    //if (adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus && adjustmentAndWithdrawalLimitReq.Option != (int)AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                    //{
+                    adjustmentAndWithdrawalLimit.CustId = custInfo.CustId;
                         adjustmentAndWithdrawalLimit.CurrencyId = custInfo.CurrencyId;
                         adjustmentAndWithdrawalLimit.UserName = custInfo.UserName;
                         adjustmentAndWithdrawalLimit.SiteId = custInfo.SiteId;
@@ -652,6 +654,7 @@ namespace BackendSite.Controllers.Api
                         adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType =
                             adjustmentAndWithdrawalLimitReq.WithdrawalLimitOption;
                         adjustmentAndWithdrawalLimit.Memo = adjustmentAndWithdrawalLimitReq.Memo;
+                        adjustmentAndWithdrawalLimit.Category = adjustmentAndWithdrawalLimitReq.Category;
 
                         string transId = null;
 
@@ -745,7 +748,7 @@ namespace BackendSite.Controllers.Api
                                 apiResult.Message = $"Success. ID is {transId}";
                             }
                         }
-                    }
+                    /*}
                     else
                     {
                         var setAdjustBonusReq = new SetAdjustBonusReq()
@@ -769,7 +772,7 @@ namespace BackendSite.Controllers.Api
                             apiResult.ErrorCode = apiOnlineResult.ErrorCode;
                             apiResult.Message = apiOnlineResult.Message;
                         }
-                    }
+                    }*/
                 }
             }
             catch (Exception ex)
@@ -783,7 +786,7 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
         public async Task<List<ApiResult>> BalanceAdjustmentBatch([FromForm] int option, [FromForm] int optSite,
-            [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal, [FromForm] string bonuscode)
+            [FromForm] int withdrawalLimitOption, [FromForm] IFormFile excelUpload, [FromForm] decimal withdrawal, [FromForm] string bonuscode, [FromForm] int category)
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBLL.GetAuthData();
@@ -848,7 +851,8 @@ namespace BackendSite.Controllers.Api
                                                 Operator = authData.UserName,
                                                 WithdrawalLimitAmount = withdrawalLimitAmount,
                                                 WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
-                                                Memo = memo
+                                                Memo = memo,
+                                                Category = category
                                             };
 
                                         string transId = null;
@@ -934,7 +938,7 @@ namespace BackendSite.Controllers.Api
                                             }
                                         }
                                     }
-                                    else
+                                    /*else
                                     {
                                         var setAdjustBonusReq = new SetAdjustBonusReq()
                                         {
@@ -963,7 +967,7 @@ namespace BackendSite.Controllers.Api
                                                 Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {apiOnlineResult.Message}"
                                             });
                                         }
-                                    }
+                                    }*/
 
                                 }
                                 catch (Exception ex)

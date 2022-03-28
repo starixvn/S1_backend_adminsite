@@ -2,6 +2,7 @@ import React from "react";
 import Pagination from './Pagination';
 import moment from 'moment';
 import { number_format, number_toFixed } from '../../../module/Formatting/NumberFormat';
+import { InputBox, SelectList, ActionButtons } from './Components';
 
 const dataColumnDefs = () => {
     return [
@@ -56,6 +57,11 @@ const dataColumnDefs = () => {
             dataColumn: 'statusName', columnTitle: 'Status'
         },
         {
+            dataColumn: 'adjustCategoryName',
+            columnTitle: 'AdjustReason',
+
+        },
+        {
             dataColumn: 'memo', columnTitle: 'Memo'
         },
         {
@@ -67,7 +73,8 @@ const dataColumnDefs = () => {
 const Panel = (props) => {
     const columnDefs = dataColumnDefs();
     let headerRows = [];
-
+    let canEditReason = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_reason");
+    let canEditMemo = window.subFuncKeys && window.subFuncKeys.includes("rm_edit_memo");
     columnDefs.forEach((element, idx) => {
         headerRows.push(
             <th key={`th-${element.dataColumn}-${idx}`} scope="col" className={element.header && element.header.attr && element.header.attr.class ? element.header.attr.class : ''}>
@@ -77,11 +84,59 @@ const Panel = (props) => {
     });
 
     let bodyRows = props.Datas.map((data, idx) => {
-        let row = columnDefs.map((element, idx) => {
+        let row = columnDefs.map((element) => {
             let subData = {};
+            let stateEdit = props.StateEdit;
+            let isEditReason = stateEdit.type === 'reason' && stateEdit.idx === idx;
+            let isEditMemo = stateEdit.type === 'memo' && stateEdit.idx === idx;
             if (element.body && element.body.subData) {
                 element.body.subData.forEach(s => { subData[s] = data[s] });
             }
+            if (element.dataColumn === 'adjustCategoryName')
+                return (
+                    <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
+                        {canEditReason ?
+                            (<div className="button-action">
+                                {isEditReason ? (
+                                    <SelectList
+                                        SelectOptions={props.AdjustCategoryList}
+                                        Value={props.EditValue.value}
+                                        OnChange={props.ChangeData}
+                                        Disabled={props.Disabled}
+                                    />
+                                ) :(data[element.dataColumn])}
+                                <ActionButtons
+                                    IsEdit={isEditReason}
+                                    HandleEdit={props.HandleEdit.bind(null, 'reason', idx, data['adjustCategory'])}
+                                    HandleCancel={props.HandleCancel}
+                                    HandleUpdate={props.HandleUpdate}
+                                    Disabled={props.Disabled}
+                                />
+                        </div>): (data[element.dataColumn])}
+                    </td>
+                );
+            if (element.dataColumn === 'memo')
+                return (
+                    <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
+                        {canEditMemo? (
+                            <div className="button-action">
+                                {isEditMemo ? (
+                                    <InputBox
+                                        DefaultValue={data[element.dataColumn]}
+                                        OnChange={props.ChangeData}
+                                        Disabled={props.Disabled}
+                                    />
+                                ) :(data[element.dataColumn])}
+                                <ActionButtons
+                                    IsEdit={isEditMemo}
+                                    HandleEdit={props.HandleEdit.bind(null, 'memo', idx, data[element.dataColumn])}
+                                    HandleCancel={props.HandleCancel}
+                                    HandleUpdate={props.HandleUpdate}
+                                    Disabled={props.Disabled}
+                                />
+                        </div>): (data[element.dataColumn])}
+                    </td>
+                );
             return (
                 <td key={`td-${element.dataColumn}-${idx}`} className={element.body && element.body.attr && element.body.attr.class ? element.body.attr.class : ''}>
                     {element.body && element.body.format ? element.body.format(data[element.dataColumn], subData) : data[element.dataColumn]}

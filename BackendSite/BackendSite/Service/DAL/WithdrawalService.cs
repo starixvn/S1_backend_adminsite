@@ -212,11 +212,6 @@ namespace BackendSite.Service.DAL
             DateTime startDate, DateTime endDate, string WithdrawalId, string UserName, string currencyId, string status,
             string LevelStatus, int AmountType, string Amount)
         {
-            var SelectSite = "[" + selectSite + "]";
-            var WithdrawalType = "[" + withdrawalType + "]";
-            var CurrencyId = "[" + currencyId + "]";
-            var Status = "[" + status + "]";
-            var VipStatus = $"[{LevelStatus}]";
             var withdrawalId = 0;
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
@@ -230,16 +225,16 @@ namespace BackendSite.Service.DAL
             }
             var p = new DynamicParameters(new
             {
-                 _SiteIds = SelectSite,
-                _WithdrawalTypes = WithdrawalType,
+                 _SiteIds = selectSite,
+                _WithdrawalTypes = withdrawalType,
                 _StartDate = startDate,
                 _EndDate = endDate,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
                 _UserName = UserName,
-                _CurrencyIds = CurrencyId,
-                _Statuses = Status,
-                _VipStatuses = VipStatus,
+                _CurrencyIds = currencyId,
+                _Statuses = status,
+                _VipStatuses = LevelStatus,
                 _AmountType = AmountType,
                 _Amount = tempAmount
             });
