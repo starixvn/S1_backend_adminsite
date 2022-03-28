@@ -9,7 +9,7 @@ function reducer (state, action) {
     switch (action.type) {
         case 'initial' :
             return action.data.data;
-        case "categoryCheck": 
+        case "categoryCheck":
             let idx = state.findIndex(x => x.categoryId === action.data.id);
             state[idx].checked = !action.data.checked
             state[idx].gameTypeBetLimit = action.data.gameTypeBetLimit
@@ -31,27 +31,25 @@ function reducer (state, action) {
                     a.gameTypeBetLimit.forEach(b => {
                         if(b.typeId === parseInt(gameTypeId))
                             b.checked = !action.data.checked
-                        })    
+                        })
                 }
             });
             return [...state];
-        case "inputTpBetLimit":
-            const [limit1, categoryId1, gametypeId1] = action.data.id.split(/[\s-]+/);
+        case "groupChange":
+            const [col, cacId, gtId] = action.data.id.split(/[\s-]+/);
+            console.log(col)
+            console.log(cacId)
+            console.log(gtId)
 
             state.forEach(a => {
-                if(a.categoryId === parseInt(categoryId1)) {
+                if(a.categoryId === parseInt(cacId)) {
                     a.gameTypeBetLimit.forEach(b => {
-                        if(b.typeId === parseInt(gametypeId1)) {
-                            if(limit1 == "MinBet") {
-                                b.minBet = action.data.value;
-                            } else if(limit1 == "MaxBet") {
-                                b.maxBet = action.data.value;
-                            }
+                        if(b.typeId === parseInt(gtId)) {
+                            b.selectedValue = action.data.value;
                         }
-                    })    
+                    })
                 }
             });
-            
             return [...state];
         default:
             return [...state];
@@ -67,11 +65,11 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     const [currentTab, setTab] = useState({ id:0, name:"" });
 
     useEffect(() => {
-        
+
         WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
             if (res.data.errorCode === 0) {
                 setSiteList(res.data.data);
-            } 
+            }
             else {
                 alert(res.data.message ?? "failed to get data.");
             }
@@ -86,7 +84,7 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
                     dispatch({ type: "initial", data: { data: temp.betSetting}  });
                     let first = temp.betSetting.filter(a=>a.checked === true);
                     setTab({ id: first[0].categoryId, name: first[0].categoryName })
-                } 
+                }
                 else {
                     alert(res.data.message ?? "failed to get data.");
                 }
@@ -95,7 +93,7 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             WebAPI.fetchData({ Url: "UserBetLimit/GetTpCategoryList" }).then((res) => {
                 if (res.data.errorCode === 0) {
                     dispatch({ type: "initial", data: { data: res.data.data}  });
-                } 
+                }
                 else {
                     alert(res.data.message ?? "failed to get data.");
                 }
@@ -105,8 +103,9 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
     }, []);
 
     const TpCategoryCheck = (categoryId, categoryName, checked) => {
+        var currencyId=2
         if(!checked) {
-            WebAPI.fetchData({ Url: `UserBetLimit/GetTpGameTypeListbyCategory/${categoryId}` }).then((res) => {
+            WebAPI.fetchData({ Url: `UserBetLimit/GetTpBetLimitGroup?categoryId=${categoryId}&currencyId=${currencyId}` }).then((res) => {
                 if (res.data.errorCode === 0) {
                     dispatch({ type: "categoryCheck", data: { id: categoryId, checked: checked, gameTypeBetLimit: res.data.data } });
                     if(currentTab.id === 0)
@@ -130,8 +129,8 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             dispatch({ type: "categoryCheck", data: { id: categoryId, checked: checked, gameTypeBetLimit: []} });
         }
     }
-    
-    const ClickTab = (categoryId, categoryName) => {
+
+    const clickTab = (categoryId, categoryName) => {
         setTab({ id: categoryId, name: categoryName })
     }
 
@@ -139,12 +138,12 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         dispatch({ type: "inputBetLimit", data: { id: inputId, value: value } });
     }
 
-    const EnableGameType = (id, checked) => {
+    const enableGameType = (id, checked) => {
         dispatch({ type: "gameTypeCheck", data: { id: id, checked: checked} });
     }
 
-    const SetTpBetLimit = (value, inputId) => {
-        dispatch({ type: "inputTpBetLimit", data: { id: inputId, value: value } });
+    const groupChange = (value, title) => {
+        dispatch({ type: "groupChange", data: { id: title, value: value } });
     }
 
     const Submit = () => {
@@ -162,18 +161,10 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         }
         let checked = true;
         let betSetting = [];
+
         tpCategories.forEach(a => {
-            if(a.checked) {    
+            if(a.checked) {
                 let tpBetSetting = []
-                if(a.minBet === 0) {
-                    alert(`${a.categoryName} MinBet can't be 0`);
-                    checked = false;
-                    return;
-                } else if (a.maxBet === 0) {
-                    alert(`${a.categoryName} MaxBet can't be 0`);
-                    checked = false;
-                    return;
-                }
                 a.gameTypeBetLimit.forEach( b => {
                     if(b.checked) {
                         if(b.minBet === 0) {
@@ -185,11 +176,11 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
                             checked = false;
                             return;
                         }
-                        tpBetSetting.push({ GameTypeId: b.typeId, MinBet: b.minBet, MaxBet: b.maxBet })
+                        tpBetSetting.push({ GameTypeId: b.typeId, LimitGroup: b.selectedValue })
                     }
                 })
 
-                betSetting.push({ TpCategory:a.categoryId, MinBet:a.minBet, MaxBet:a.maxBet, TpBetSetting: tpBetSetting})
+                betSetting.push({ TpCategory:a.categoryId, TpBetSetting: tpBetSetting})
             }
         })
         if(checked) {
@@ -203,7 +194,7 @@ function Edit ({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             <div className="filter noBGcolor"><SiteRadioGroup title="Available Sites" siteList={siteList} selectSite={siteId} disabled={!IsAdd} toggle={setSite}/></div>
             <div className="row-flex"><InputBox title="UserName" value={userName} disabled={!IsAdd} onChange={setUserName} dataColumn = "UserName"/></div>
             <div className="filter noBGcolor"><TpCategoryCheckList title="Available Category" tpCategoryList={tpCategories} toggle={TpCategoryCheck} /></div>
-            {currentTab.id !==0 && currentTab.name !=="" ? <SubPanel tpGames={tpCategories} currentTab={currentTab} clickTab={ClickTab} setBetLimit={SetBetLimit} enableGameType={EnableGameType} setTpBetLimit={SetTpBetLimit} />:null}
+            {currentTab.id !==0 && currentTab.name !=="" ? <SubPanel tpGames={tpCategories} currentTab={currentTab} clickTab={clickTab} groupChange={groupChange} enableGameType={enableGameType} />:null}
             <div className="filter float-btn-group">
                 <button className="btn btn-back" onClick={ClickBack}>Back</button>
                 <button className="btn btn-add" onClick={Submit}> Submit</button>

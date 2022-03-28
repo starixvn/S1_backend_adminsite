@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -113,7 +114,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="custBetLimit"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> PostUserBetLimit([FromForm] CustBetLimit custBetLimit)
+        public async Task<ApiResult> PostUserBetLimit(CustBetLimit custBetLimit)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(custBetLimit.UserName, custBetLimit.SiteId);
@@ -122,8 +123,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
 
-            var result = await _userBetLimitBll.SetUserBetLimit(customer.CustId, customer.SiteId,
-                custBetLimit.BetSetting, updateOperator);
+            var result = await _userBetLimitBll.SetUserBetLimit(customer.CustId, customer.SiteId, custBetLimit.BetSetting, updateOperator);
             return new ApiResult
             {
                 //result: 1 (新增成功),2 (修改成功)
@@ -236,14 +236,14 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Enable TpGame
         /// 
         /// </remarks>
-        /// <param name="tpId"></param>
+        /// <param name="categoryId"></param>
         /// <param name="currencyId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<IEnumerable<TpBetLimit>>> GetTpBetLimit(int tpId, int currencyId)
+        public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
         {
-            var data = await _userBetLimitBll.GetTpBetLimit(tpId, currencyId);
-            var apiResult = new ApiResult<IEnumerable<TpBetLimit>>
+            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(categoryId, currencyId);
+            var apiResult = new ApiResult<IEnumerable<TpBetLimitGroup>>
             {
                 Data = data,
                 ErrorCode = 0

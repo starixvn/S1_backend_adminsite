@@ -29,7 +29,7 @@ namespace BackendSite.Service.BLL
                 .Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
         }
 
-        public async Task<int> SetUserBetLimit(int custId, int siteId, List<TpBetSetting> betSetting, string updateOperator)
+        public async Task<int> SetUserBetLimit(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
         {
             return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
         }
@@ -52,13 +52,35 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
         {
             var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
-            var gameTypeWithBetLimit = tpGameType.Where(t => t.TpId == 4)
+            var gameTypeWithBetLimit = tpGameType
                 .Select(a => new GameTypeBetLimit()
                 {
                     TypeId = a.Type,
                     TypeName = a.TypeName
                 });
             return gameTypeWithBetLimit;
+        }
+
+        public async Task<IEnumerable<TpBetLimitGroup>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
+        {
+            var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var listTpLimitGroup = new List<TpBetLimitGroup>();
+            foreach (var type in tpGameType.Where(t => t.Type == 10))
+            {
+                var group = await _userBetLimitService.GetTpBetLimit(type.Type, currencyId);
+                if (group != null)
+                {
+                    var tpBetLimitGroup = new TpBetLimitGroup()
+                    {
+                        TypeId = type.Type,
+                        TypeName = type.TypeName,
+                        SelectedValue = group.DefaultGroup,
+                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
+                    };
+                    listTpLimitGroup.Add(tpBetLimitGroup);
+                }
+            }
+            return listTpLimitGroup;
         }
 
         public async Task<CustBetLimitByCustId> GetByCustId(int custId)
@@ -84,11 +106,6 @@ namespace BackendSite.Service.BLL
                 BetSetting = listCategoryBetLimit
             };
             return resp;
-        }
-
-        public async Task<IEnumerable<TpBetLimit>> GetTpBetLimit(int tpId, int currencyId)
-        {
-            return await _userBetLimitService.GetTpBetLimit(tpId, currencyId);
         }
     }
 }
