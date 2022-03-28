@@ -112,6 +112,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public string BannerName { get; set; }
             public BannerStatusEnum Status { get; set; }
         }
+        public class GetHotEventListReq : ApiRequestPageModel
+        {
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<BannerStatusEnum> Statuses { get; set; }
+        }
+        public class GetHotEventreq
+        {
+            public int SiteId { get; set; }
+            public string BannerName { get; set; }
+        }
 
         #endregion
 
@@ -205,7 +215,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management  > [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult SetBanner(SetRequest request)
         {
@@ -276,7 +285,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Status] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult UpdateStatus(UpdateStatusRequest request)
         {
@@ -296,7 +304,78 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
 
+        /// <summary>
+        /// Banner/GetHotEventList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing >  Hot Event Management
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
+        {
+            var apiResult = new ApiListResult<HotEventList>();
+            try
+            {
+                var statusList = req.Statuses.Select(x => (int)x);
 
+
+                apiResult.Data = _bannerManageBll.GetHotEventList(req.SiteIds,
+                    statusList,
+                    req.PageNumber, req.PageSize, out var totalPages, out var rowCount);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.TotalPages = totalPages;
+                apiResult.RowCount = rowCount;
+                apiResult.PageNumber = req.PageNumber;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+
+        /// <summary>
+        /// Banner/GetHotEvent 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing >  Hot Event Management > [Edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<BannerInfo> GetHotEvent(GetHotEventreq req)
+        {
+            var apiResult = new ApiResult<BannerInfo>();
+            try
+            {
+                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName, 0);
+                if (result != null)
+                {
+                    apiResult.Data = result;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
+                    apiResult.Message = "The Hot Event Detail No Data";
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
         #endregion
     }
 }

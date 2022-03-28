@@ -138,5 +138,26 @@ namespace BackendSite.Service.DAL
 
             return errorCode;
         }
+        public IEnumerable<HotEventList> GetHotEventList(string siteIds,
+            string status, int startIndex,
+            int pageSize, out int totalPages, out int rowCount)
+        {
+
+            var props = new DynamicParameters();
+
+            props.Add("_SiteIds", siteIds);
+            props.Add("_Statuses", status);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<HotEventList>("Admin_HotEventList_Get", props);
+
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
     }
 }

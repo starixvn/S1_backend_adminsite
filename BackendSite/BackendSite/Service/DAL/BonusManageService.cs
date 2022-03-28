@@ -519,6 +519,8 @@ namespace BackendSite.Service.DAL
                 {
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
+                    WinOver = specific.WinOver,
+                    FullFillType = specific.WinOver > 0 ? 2 : 1 ,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
                     MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
@@ -784,7 +786,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecificV4_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionSpecific_Set_V5", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
@@ -986,7 +988,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecificDuplicate_Set", p, transaction: transaction,
+            connection.Execute("Admin_PromotionSpecificDuplicate_Set_V2", p, transaction: transaction,
                 commandType: CommandType.StoredProcedure);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");

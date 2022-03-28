@@ -229,6 +229,7 @@ const App = () => {
 						CurrencyId: s,
 						Usage: info.usage ? Number(info.usage) : 0,
 						Rollover: Number(info.rollOver),
+						Winover: Number(info.winOver),
 						Bonus: Number(info.bonus),
 						BonusType: Number(info.bonusAmountType),
 						MaxBonus: maxBonus,

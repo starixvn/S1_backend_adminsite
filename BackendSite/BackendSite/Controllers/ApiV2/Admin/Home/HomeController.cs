@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         /// <returns>結果</returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult> Signin(LoginRequest loginModel)
+        public async Task<ApiResult<string>> Signin(LoginRequest loginModel)
         {
 
             AdminUser adminUser = null;
@@ -124,8 +124,9 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                                  new ClaimsPrincipal(claimsIdentity));
 
-            return new ApiResult
+            return new ApiResult<string>
             {
+                Data = adminUser.UserName,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -142,11 +143,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult CheckSignIn()
+        public ApiResult<string> CheckSignIn()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Success };
+                return new ApiResult<string> { Data = User.Identity.Name, ErrorCode = (int)ErrorCodeEnum.Success };
             }
             else
             {
