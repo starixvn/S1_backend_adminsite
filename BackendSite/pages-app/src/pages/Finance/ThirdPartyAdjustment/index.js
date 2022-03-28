@@ -21,6 +21,7 @@ const AdjustmentOptionData = {
 
 const App = () => {
     const [site, setSite] = useState([]);
+    const [adjustCategoryList, setAdjustCategoryList] = useState([]);
     const [tp, setTp] = useState([]);
     const [custData, setCustData] = useState();
     const [searchData, setSearchData] = useState({ ...initData });
@@ -60,6 +61,7 @@ const App = () => {
             setTp([]);
             setCustData();
             setSearchData({ ...searchData, optTp: 0, userName: "", userTpId: "" });
+            setSendData({...sendData, category: 1})
             api.post('/api/Tp/GetTpBySite', qs.stringify({ 'SiteId': searchData.optSite }))
                 .then(function (response) {
                     if (mounted) {
@@ -77,6 +79,26 @@ const App = () => {
         }
         return () => mounted = false;
     }, [searchData.optSite]);
+
+    useEffect(() => {
+        api.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+            .then(function (response) {
+                if (response.data.errorCode === 0) {
+                    let list = [];
+                    if (response.data.data !== null)
+                    {
+                        response.data.data.map(x => {
+                            list.push({ name: x.description, value: x.reasonId });
+                        })
+                        setAdjustCategoryList(list);
+                    }
+                } else {
+                    alert(!response.message ? 'Get reason list failed.' : response.message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
+    }, []);
 
     const ClickSearch = () => {
         let mounted = true;
@@ -101,6 +123,7 @@ const App = () => {
     }
     const UpdateDate = () => {
         let mounted = true;
+        
         if (sendData.adjustmentOpt && sendData.amount) {
             setStateSend(true);
             if (!stateSend) {
@@ -113,6 +136,7 @@ const App = () => {
                         'Opt': sendData.adjustmentOpt,
                         'Amount': sendData.amount,
                         'Memo': sendData.memo,
+                        'Category': sendData.category
                     }))
                     .then((res) => {
                         if (mounted) {
@@ -227,7 +251,14 @@ const App = () => {
                             : null
                     }
                 </div>
-                <CustInfo CustData={custData} SendFiled={SendFiled} OnPressEnter={UpdateDate} AdjustmentOptionData={AdjustmentOptionData} StateSend={stateSend} SendData={sendData} />
+                <CustInfo
+                    CustData={custData}
+                    SendFiled={SendFiled}
+                    OnPressEnter={UpdateDate}
+                    AdjustmentOptionData={AdjustmentOptionData}
+                    StateSend={stateSend}
+                    SendData={sendData}
+                    AdjustCategory={adjustCategoryList} />
                 <hr />
                 <Log PageInfo={AdjustmentLog.PageInfo} Datas={AdjustmentLog.Datas} AdjustmentOptionData={AdjustmentOptionData} ChangePage={getLog} />
             </div>

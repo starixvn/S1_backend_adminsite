@@ -189,6 +189,7 @@ namespace BackendSite.Service.Model
 
     public class WithdrawalLimitInfoManage
     {
+        private DateTimeOffset _updateTime { set; get; }
         public int SiteId { get; set; }
 
         public int CurrencyId { get; set; }
@@ -198,7 +199,13 @@ namespace BackendSite.Service.Model
         public double WithdrawalMin { get; set; }
 
         public double WithdrawalMax { get; set; }
-        public DateTime UpdateTime { get; set; }
+
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
         public string UpdateOperator { get; set; }
     }
 
@@ -324,6 +331,7 @@ namespace BackendSite.Service.Model
 
     public class USDTWithdrawalLimitInfoManage
     {
+        private DateTimeOffset _updateTime { get; set; }
         public int SiteId { get; set; }
 
         public int CurrencyId { get; set; }
@@ -333,7 +341,11 @@ namespace BackendSite.Service.Model
         public double WithdrawalMin { get; set; }
 
         public double WithdrawalMax { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string UpdateOperator { get; set; }
         public string Network { get; set; }
         public int NetworkType { get; set; }

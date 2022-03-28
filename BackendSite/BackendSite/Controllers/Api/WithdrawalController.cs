@@ -88,6 +88,7 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> LevelStatus { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+            public int PageSize { get; set; }
         }
 
         [HttpPost]
@@ -106,7 +107,7 @@ namespace BackendSite.Controllers.Api
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
                 withdrawalListReq.withdrawalType, startTime, endTime,
                 withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId,
-                withdrawalListReq.status, withdrawalListReq.LevelStatus, 10, withdrawalListReq.AmountType, withdrawalListReq.Amount, pageNumber, out totalPages,
+                withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.PageSize, withdrawalListReq.AmountType, withdrawalListReq.Amount, pageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;

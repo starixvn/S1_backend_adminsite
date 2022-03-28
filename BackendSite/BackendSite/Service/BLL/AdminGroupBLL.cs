@@ -35,6 +35,11 @@ namespace BackendSite.Service.BLL
                out rowCount);
         }
 
+        public IEnumerable<AdminGroup> GetGroupByIdOrAll(int groupId,bool isAll)
+        {
+            return adminGroupService.GetGroupByIdOrAll(groupId,isAll);
+        }
+
         public bool CheckGroupIsExists(string GroupName, int? SEQ)
         {
             var all_groups = adminGroupService.GetGroupList(0, 1000, out _, out _);
