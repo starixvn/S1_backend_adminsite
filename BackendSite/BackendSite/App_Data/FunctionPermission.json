@@ -274,7 +274,18 @@
       {
         "DisplayKey": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Reason",
+            "FuncKey": "rm_edit_reason"
+          },
+          {
+            "DisplayKey": "Edit Memo",
+            "FuncKey": "rm_edit_memo"
+          }
+        ]
       },
       {
         "DisplayKey": "Payment Management",

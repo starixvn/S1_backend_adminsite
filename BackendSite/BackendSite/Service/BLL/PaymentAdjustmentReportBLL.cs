@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -14,12 +17,15 @@ namespace BackendSite.Service.BLL
         private readonly PaymentAdjustmentReportService paymentAdjustmentService;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly SelLangBLL selLangBLL;
+        private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly ILogger<PaymentAdjustmentReportBLL> _logger;
 
-        public PaymentAdjustmentReportBLL(PaymentAdjustmentReportService paymentAdjustmentService, ServerInfoBLL serverInfoBLL, SelLangBLL selLangBLL)
+        public PaymentAdjustmentReportBLL(IServiceProvider provider)
         {
-            this.paymentAdjustmentService = paymentAdjustmentService;
-            this.serverInfoBLL = serverInfoBLL;
-            this.selLangBLL = selLangBLL;
+            this.paymentAdjustmentService = provider.GetRequiredService<PaymentAdjustmentReportService>();
+            this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            this._bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
         public IEnumerable<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport(IEnumerable<int> siteIds,
@@ -86,6 +92,8 @@ namespace BackendSite.Service.BLL
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                        AdjustCategory = row.Category,
+                        AdjustCategoryName = row.CategoryName,
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         Amount = row.Amount,
@@ -154,6 +162,8 @@ namespace BackendSite.Service.BLL
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
                         AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                        AdjustCategory = row.Category,
+                        AdjustCategoryName = row.CategoryName,
                         SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                         UserName = row.UserName,
                         SabaID = row.SabaID,
@@ -182,6 +192,39 @@ namespace BackendSite.Service.BLL
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
 
+        public bool SetAdjustment(SetAdjustment input)
+        {
+            var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+
+            if (reasons == null || !reasons.Any())
+            {
+                _logger.LogError("FuncKey: Finance/PaymentAdjustment, GetReason has no data.");
+                return false;
+            }
+
+            var m = Regex.Match(input.TransId, @"\d+");
+            int.TryParse(m.Value, out var id);
+            
+            var beforeCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.BeforeCategory)?.Description;
+            var afterCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.AfterCategory)?.Description;
+
+            var logDetail = new Dictionary<string, string>
+            {
+                { "TransId", input.TransId },
+                { "BeforeAdjustReason", beforeCategoryName },
+                { "AfterAdjustReason", afterCategoryName },
+                { "BeforeMemo", input.BeforeMemo },
+                { "AfterMemo", input.AfterMemo }
+            };
+
+            var strLogDetail = JsonConvert.SerializeObject(logDetail);
+
+            // 依 prefix 判斷更新哪張表
+            if (input.TransId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+                return paymentAdjustmentService.SetAdjustmentInfo(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
+
+            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
+        }
         #region Private Methods
 
         private bool AdjustTypeCheck(IEnumerable<int> adjustTypes,
