@@ -48,11 +48,11 @@ namespace BackendSite.Service.DAL
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
-
-            return _mainDbClient.Execute("Admin_Banner_Set", p);
+            
+            return _mainDbClient.Execute("Admin_Banner_Set_V2", p);
         }
         public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
-            string statuss,int startIndex,
+            string status,string currencies ,int startIndex,
             int pageSize,out int totalPages,out int rowCount)
         {
 
@@ -60,7 +60,8 @@ namespace BackendSite.Service.DAL
 
             props.Add("_SiteIds", siteIds);
             props.Add("_BannerTypes", bannerTypes);
-            props.Add("_Statuses", statuss);
+            props.Add("_Statuses", status);
+            props.Add("_CurrencyIds", currencies);
             props.Add("_StartIndex", startIndex);
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -73,11 +74,12 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        public BannerInfo GetBanner(int siteId, string bannerName)
+
+        public BannerInfo GetBanner(int siteId, string bannerName , int currency)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = new BannerInfo();
-            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V2", new { SiteId = siteId, BannerName = bannerName }, commandType: CommandType.StoredProcedure);
+            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency }, commandType: CommandType.StoredProcedure);
 
             if (queryResult != null)
             {

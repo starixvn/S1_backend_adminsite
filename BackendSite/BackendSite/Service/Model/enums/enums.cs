@@ -722,7 +722,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
+    
     public enum SettlementType
     {
         UnSettled = 0,
