@@ -266,6 +266,10 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    "Marketing/DeepLinkManagement.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

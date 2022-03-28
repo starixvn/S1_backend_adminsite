@@ -770,6 +770,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "DeepLinkManagement",
+        "Title": "Deep Link Management",
+        "FuncKey": "CMS/DeepLinkManagement",
+        "Controller": "Marketing",
+        "Action": "DeepLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }
