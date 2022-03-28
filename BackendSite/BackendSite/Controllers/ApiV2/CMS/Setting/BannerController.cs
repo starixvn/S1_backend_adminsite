@@ -95,12 +95,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         public class GetListRequest : ApiRequestPageModel
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
 
@@ -131,7 +133,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = _bannerManageBll.GetBanner(request.SiteId, request.BannerName);
+                var result = _bannerManageBll.GetBanner(request.SiteId, request.BannerName , request.CurrencyId);
                 if (result != null)
                 {
                     apiResult.Data = result;
@@ -163,29 +165,36 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetList(GetListRequest request)
+        public ApiListResult<BannerInfoList> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
+            var apiListResult = new ApiListResult<BannerInfoList>();
             try
             {
                 var bannerTypeList = request.BannerTypes.Select(x => (int)x);
                 var statusList = request.Statuses.Select(x => (int)x);
+                var currencyIds = request.CurrencyIds.Select(x => x);
 
-                apiResult.Data = _bannerManageBll.GetBannerList(request.SiteIds,
+                var data = _bannerManageBll.GetBannerList(request.SiteIds,
                     bannerTypeList,
                     statusList,
+                    currencyIds,
                     request.PageNumber,
                     request.PageSize,
-                    out int totalPages, out int pageSize);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    out var totalPages, out var rowCount);
+
+                apiListResult.Data = data;
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiListResult.TotalPages = totalPages;
+                apiListResult.RowCount = rowCount;
+                apiListResult.PageNumber = request.PageNumber;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
+                apiListResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiListResult.Message = ex.Message;
+                apiListResult.RawMessage = ex.ToString();
             }
-            return apiResult;
+            return apiListResult;
         }
 
         /// <summary>

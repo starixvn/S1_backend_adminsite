@@ -5,10 +5,9 @@ import SelectBox from "./Component/SelectBox";
 import RadioBox from "./Component/RadioBox";
 import DateTimePickerElem from "./Component/DateTimePicker";
 import moment from "moment-timezone";
-import { initBannerType, initActionModeType, initShowStatusType } from "./defCols";
+import { initBannerType, initActionModeType, initShowStatusType , initCurrencyLangMap } from "./defCols";
 
-export default ({ state, action, IsAdd, processing }) => {
-	console.log(state);
+export default ({ state, action, IsAdd, CurrencyId, processing }) => {
 	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
@@ -31,25 +30,44 @@ export default ({ state, action, IsAdd, processing }) => {
 		}).map(i => {
 			return i;
 		});
+	
+	// const currencyList = Object.keys(state.specific);
+	// const currencyOptions = currencyList.map(i => {
+	// 	return {
+	// 		value: Number(i),
+	// 		displayText: window.i18n[`lbl_Currency${i}`]
+	// 	};
+	// });
 
-	console.log(newActionModeType);
-	const currencyList = Object.keys(state.specific);
-	const currencyOptions = currencyList.map(i => {
-		return {
-			value: Number(i),
-			displayText: window.i18n[`lbl_Currency${i}`]
-		};
-	});
-	let tabArr = state.selectedCurrencies.map(item => {
+	const selectedCurrenciesForTab = state.selectedCurrencies.filter(item => item === CurrencyId);
+	state.currentTab = CurrencyId;
+	const currencyOptions = [{
+		value: Number(CurrencyId),
+		displayText: window.i18n[`lbl_Currency${CurrencyId}`]
+	}];
+	
+	// let tabArr = state.selectedCurrencies.map(item => {
+	// 	return (
+	// 		<button
+	// 			key={`${state.siteId}-tab-${item}`}
+	// 			className={`btn btn-add ${state.currentTab === item ? 'active1' : ''}`}
+	// 			onClick={action.EditMainValue.bind(this, item, "currentTab")}>
+	// 			{window.i18n[`lbl_Currency${item}`]}
+	// 		</button>
+	// 	);
+	// });
+	
+	let tabArr = selectedCurrenciesForTab.map(item => {
 		return (
 			<button
-				key={`${state.siteId}-tab-${item}`}
-				className={`btn btn-add ${state.currentTab === item ? 'active1' : ''}`}
-				onClick={action.EditMainValue.bind(this, item, "currentTab")}>
-				{window.i18n[`lbl_Currency${item}`]}
+				key={`${state.siteId}-tab-${CurrencyId}`}
+				className={`btn btn-add ${state.currentTab === CurrencyId ? 'active1' : ''}`}
+				onClick={action.EditMainValue.bind(this, CurrencyId, "currentTab")}>
+				{window.i18n[`lbl_Currency${CurrencyId}`]}
 			</button>
 		);
 	});
+	
 	return (
 		<div className="container-fluid" id="Panel">
 			<div className="filter noBGcolor"></div>
@@ -309,17 +327,18 @@ export default ({ state, action, IsAdd, processing }) => {
 								/>
 							</div>
 							<div className="filter noBGcolor tag">{tabArr}</div>
-							{state.selectedCurrencies.length > 0 &&
+							{selectedCurrenciesForTab.length > 0 &&
 								state.currentTab !== null ? (
 									<div className="filter">
 										<div className="panel level-1 mt-20">
 											<SubPanel
 												state={state}
-												displayText={window.i18n[`lbl_Currency${state.currentTab}`]}
-												EditMainValue={action.EditCurrencyPanel.bind(this, state.currentTab)}
+												displayText={window.i18n[`lbl_Currency${CurrencyId}`]}
+												EditMainValue={action.EditCurrencyPanel.bind(this, CurrencyId)}
 												EditCurrencyLangPanelValue={action.EditCurrencyLangPanelValue}
-												currencyId={state.currentTab}
+												currencyId={CurrencyId}
 												action={action}
+												isAdd = {IsAdd}
 											/>
 										</div>
 									</div>
@@ -348,15 +367,23 @@ export default ({ state, action, IsAdd, processing }) => {
 
 const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bannerName}-${props.currencyId}`;
-	const langList = Object.keys(props.state.specific[props.currencyId].lang);
+	let langList = Object.keys(props.state.specific[props.currencyId].lang);
+	
+	if (props.state.siteId === 1){
+		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
+	}
+	
 	const langOptions = langList.map((lang, i) => {
 		return {
 			value: lang,
 			displayText: lang
 		};
 	});
+	
 	let langId = props.state.specific[props.currencyId].currentLang;
-	let tabArr = props.state.specific[props.currencyId].selectedLang.map(
+	let tabArr = props.state.specific[props.currencyId].selectedLang
+		.filter(item => initCurrencyLangMap[props.currencyId].includes(item))
+		.map(
 		item => {
 			return (
 				<button
@@ -404,7 +431,7 @@ const SubPanel = props => {
 				</div>
 				<div className="filter noBGcolor tag">{tabArr}</div>
 				{props.state.specific[props.currencyId].selectedLang.length >
-					0 &&
+					0 && initCurrencyLangMap[props.currencyId].includes(langId) &&
 					langId !== null &&
 					langId !== "" ? (
 						<div className="filter">
