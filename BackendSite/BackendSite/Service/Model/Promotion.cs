@@ -21,6 +21,7 @@ namespace BackendSite.Service.Model
         public int PeriodTo { get; set; }
         public int CurrencyId { get; set; }
         public int RollOver { get; set; }
+        public int FullFillType { get; set; }
         public decimal Bonus { get; set; }
         public BonusType BonusType { get; set; }
         public decimal MaxBonus { get; set; }
