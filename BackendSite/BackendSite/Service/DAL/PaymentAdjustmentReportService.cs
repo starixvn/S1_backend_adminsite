@@ -153,7 +153,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetLogAdminAdjustWallet(int id, int category, string memo, string logDetail, string userName)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -191,7 +191,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetAdjustmentInfo(int id, int category, string memo, string logDetail, string userName)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
