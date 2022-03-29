@@ -45,7 +45,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public string User { get; set; }
-        public string Menu { get; set; }
+        public IEnumerable<string> Menus { get; set; }
     }
 
     public class GetAdjustmentInfoLogParaOld

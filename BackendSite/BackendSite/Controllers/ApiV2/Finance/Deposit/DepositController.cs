@@ -115,6 +115,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var pageNumber = request.PageNumber;
             var currencyAmount = new List<string>();
 
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var depositList = _depositBll.GetDepositRequestList(request.SiteIds,
                 request.DepositTypes,
                 request.StartDate.DateTime,
@@ -434,6 +437,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+
+        /// <summary>
+        /// Deposit/GetReceiptByTransId 取得存款收據
+        /// </summary>
+        /// <remarks>
+        /// Http Method：GET
+        /// <param name="transId"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
+        [HttpGet]
+        public IActionResult GetReceiptByTransId(string transId)
+        {
+            var depositReceipt = _depositBll.GetDepositReceipt(transId);
+            if (depositReceipt == null)
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            var image = depositReceipt.DepositPic;
+            return File(image, "image/jpeg");
         }
 
         #region Private function

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Service.Model
@@ -46,14 +47,14 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public VerificationRewardStatusEnum Status { get; set; }
     }
 
     public class SetVerificationRewardRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public int VerificationType { get; set; }
+        public VerificationTypeEnum VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
     }

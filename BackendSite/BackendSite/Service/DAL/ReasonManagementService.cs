@@ -1,76 +1,73 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class ReasonManagementService
     {
-        private readonly IConfiguration configuration;
-
-        public ReasonManagementService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
+        
+        public ReasonManagementService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<ReasonManagementFuncKey> GetFuncKey()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<ReasonManagementFuncKey>("Admin_BankFinancialReason_FuncKey_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<ReasonManagementFuncKey>("Admin_BankFinancialReason_FuncKey_Get");
         }
 
         public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
         {
-            var SearchResult = new GetReasonManagementDataResult();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            var searchResult = new GetReasonManagementDataResult();
+            
             var props = new DynamicParameters();
-            props.Add("PageNumber", para.PageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", para.PageSize);
-            props.Add("FuncKey", para.FuncKey == "0" ? null: para.FuncKey);
+            props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKeys));
+            props.Add("_PageSize", Math.Abs(para.PageSize));
+            props.Add("_StartIndex", (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize));
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _reportDbClient.Query<ReasonManagementData>("Admin_BankFinancialReason_Get_V2", props);
 
-            var result = conn.Query<ReasonManagementData>("Admin_BankFinancialReason_Get", props, commandType: CommandType.StoredProcedure);
+            searchResult.ReasonManagementData = result.ToList();
+            searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
-            SearchResult.ReasonManagementData = result.ToList();
-            SearchResult.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            SearchResult.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            SearchResult.RowCount = props.Get<int?>("RowCount") ?? 0;
-
-            return SearchResult;
+            return searchResult;
         }
 
         public int SetReasonManagement(SetReasonManagementPara para,int UserId, DateTime now)
         {
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-
             props.Add("Id", para.Id);
             props.Add("Description", para.Description);
             props.Add("UpdateTime", now);
             props.Add("Updator", UserId);
 
-            return conn.Execute("Admin_BankFinancialReason_Upd", props, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_BankFinancialReason_Upd", props);
         }
-        public int InsertReasonManagement(InsertReasonManagementPara para, int UserId, DateTime now)
+        public int InsertReasonManagement(InsertReasonManagementPara para, int userId, DateTime now)
         {
             var props = new DynamicParameters();
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
 
             props.Add("FuncKey", para.FuncKey);
             props.Add("Description", para.Description);
             props.Add("UpdateTime", now);
-            props.Add("Updator", UserId);
+            props.Add("Updator", userId);
             props.Add("CreateTime", now);
-            props.Add("Creator", UserId);
+            props.Add("Creator", userId);
 
-            return conn.Execute("Admin_BankFinancialReason_Ins", props, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_BankFinancialReason_Ins", props);
         }
     }
 }

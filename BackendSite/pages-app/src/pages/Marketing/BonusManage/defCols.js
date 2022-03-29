@@ -23,6 +23,15 @@ export const defPromotionType = {
   9: "Retention free bet"
 };
 
+export const initCurrencyLangMap = {
+  "2":['en','cs'],
+  "4":['th_en','th'],
+  "13":['cs'],
+  "15":['id_en','id'],
+  "51":['vn','en'],
+  "61":['hi_en','hi'],
+}
+
 export const initPromotionType = [
   { value: 1, displayText: defPromotionType[1] },
   { value: 2, displayText: defPromotionType[2] },
