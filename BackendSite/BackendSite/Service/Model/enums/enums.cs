@@ -633,6 +633,7 @@ namespace BackendSite.Service.Model.enums
     public enum TpEnum
     {
         Saba = 1,
+        Mega = 22,
         PT = 27
     }
     public enum BalanceAdjustmentType

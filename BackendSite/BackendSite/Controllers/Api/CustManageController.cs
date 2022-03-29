@@ -1537,7 +1537,7 @@ namespace BackendSite.Controllers.Api
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
             
             //轉帳制
-            if (data != null && (data.TpId == (int)TpEnum.Saba || data.TpId == (int)TpEnum.PT))
+            if (data != null && Enum.IsDefined(typeof(TpEnum), data.TpId))
             {
                 if( data.Status == (int) BonusStatus.Running )
                 {
