@@ -282,6 +282,10 @@ module.exports = {
       "./src/pages/Marketing/HotEventManagement/index.js",
     ],
     "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
+    "Marketing/DeepLinkManagement.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

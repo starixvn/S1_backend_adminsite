@@ -621,6 +621,11 @@
             "FuncKey": "cms_cm_edit"
           }
         ]
+    },
+    {
+      "DisplayKey": "Deep Link Management",
+      "FuncKey": "CMS/DeepLinkManagement",
+      "Enable": false
     }
   ]
 },
