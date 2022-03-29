@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<GetDeepLinkRep> GetDeepLinkTable(int siteId, int deepLinkId)
         {
-            return _mainDbClient.Query<GetDeepLinkRep>("Admin_DeepLinkTable_Get", new DynamicParameters(new { SiteId = siteId , DeepLinkId = deepLinkId }));
+            return _mainDbClient.Query<GetDeepLinkRep>("Service_DeepLinkTable_Get", new DynamicParameters(new { SiteId = siteId , DeepLinkId = deepLinkId }));
         }
         public int SetDeepLink(int siteId, DeepLinkTableTypeEnum type, string domain, DeepLinkTableProtocolTypeEnum protocolType, int deepLinkId,string lastUpdateUser)
         {
