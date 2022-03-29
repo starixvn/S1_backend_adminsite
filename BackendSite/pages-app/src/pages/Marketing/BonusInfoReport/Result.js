@@ -64,6 +64,15 @@ const dataColumnDefs = () => {
       },
     },
     {
+      dataColumn: "winOver",
+      columnTitle: "WinOver",
+      body: {
+        attr: {
+          class: "text-right",
+        },
+      },
+    },
+    {
       dataColumn: "lockedAmount",
       columnTitle: "LockedAmount",
       header: {

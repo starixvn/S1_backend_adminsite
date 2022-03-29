@@ -27,26 +27,23 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayList> GetPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_PayList_Get";
-            return conn.Query<PayList>(SpName, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<PayList>(SpName);
         }
 
         public IEnumerable<PayChannel> GetPayChannelList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_PayChannel_Get";
-            return conn.Query<PayChannel>(SpName, new { PayId = 0 }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<PayChannel>(SpName, new DynamicParameters(new { PayId = 0 }));
         }
 
         public IEnumerable<PayCurrency> GetPayCurrencyList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_PayCurrency_Get";
-            return conn.Query<PayCurrency>(SpName, new { ChannelId = 0 }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<PayCurrency>(SpName, new DynamicParameters(new { ChannelId = 0 }));
         }
 
-        public void UpdatePayList(int PayId, int Status,string Operator)
+        public void UpdatePayList(int payId, int status,string @operator)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -55,8 +52,8 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("PayId", PayId);
-            props.Add("Status", Status);
+            props.Add("PayId", payId);
+            props.Add("Status", status);
             #endregion
 
             #region propsLog
@@ -69,7 +66,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Menu", "PaymentManagement");
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            propsLog.Add("Operator", @operator);
             #endregion
 
             _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans);
@@ -84,7 +81,7 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int PointLevel, string Operator)
+        public void UpdatePayChannel(int channelId, int sort, int status, int pointLevel, string @operator)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -93,10 +90,10 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("ChannelId", ChannelId);
-            props.Add("Sort", Sort);
-            props.Add("Status", Status);
-            props.Add("PointLevel", PointLevel);
+            props.Add("ChannelId", channelId);
+            props.Add("Sort", sort);
+            props.Add("Status", status);
+            props.Add("PointLevel", pointLevel);
             #endregion
 
             #region propsLog
@@ -109,7 +106,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Menu", "PaymentManagement");
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            propsLog.Add("Operator", @operator);
             #endregion
 
             _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans);
@@ -124,35 +121,37 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow, string Operator)
+        public void UpdatePayCurrency(int channelId, int currencyId, decimal minAmount, decimal maxAmount, int amountRule, string amountShow, string @operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
             var SpName = "Admin_PayCurrency_Set";
-            conn.Execute(SpName, new { ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow }, tran, commandType: CommandType.StoredProcedure);
+            conn.Execute(SpName, new {ChannelId = channelId, CurrencyId = currencyId, MinAmount = minAmount, MaxAmount = maxAmount,
+                AmountRule = amountRule,
+                AmountShow = amountShow }, tran, commandType: CommandType.StoredProcedure);
 
             var list = new Dictionary<string, string>();
 
             var props = new DynamicParameters();
-            props.Add("ChannelId", ChannelId);
-            props.Add("CurrencyId", CurrencyId);
-            props.Add("MinAmount", MinAmount);
-            props.Add("MaxAmount", MaxAmount);
-            props.Add("AmountRule", AmountRule);
-            props.Add("AmountShow", AmountShow);
+            props.Add("ChannelId", channelId);
+            props.Add("CurrencyId", currencyId);
+            props.Add("MinAmount", minAmount);
+            props.Add("MaxAmount", maxAmount);
+            props.Add("AmountRule", amountRule);
+            props.Add("AmountShow", amountShow);
             foreach (var paraName in props.ParameterNames)
             {
                 var value = Convert.ToString(props.Get<dynamic>(paraName));
                 list.Add(paraName, value);
             }
 
-            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu= "PaymentManagement", ActionType = 1, DetailInfo= JsonConvert.SerializeObject(list), Operator }, tran, commandType: CommandType.StoredProcedure);
+            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu= "PaymentManagement", ActionType = 1, DetailInfo= JsonConvert.SerializeObject(list), Operator = @operator }, tran, commandType: CommandType.StoredProcedure);
 
             tran.Commit();
         }
 
-        public void UpdatePayCurrencyAmount(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, string Operator)
+        public void UpdatePayCurrencyAmount(int channelId, int currencyId, decimal minAmount, decimal maxAmount, string @operator)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -161,10 +160,10 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("ChannelId", ChannelId);
-            props.Add("CurrencyId", CurrencyId);
-            props.Add("MinAmount", MinAmount);
-            props.Add("MaxAmount", MaxAmount);
+            props.Add("ChannelId", channelId);
+            props.Add("CurrencyId", currencyId);
+            props.Add("MinAmount", minAmount);
+            props.Add("MaxAmount", maxAmount);
             #endregion
 
             #region propsLog
@@ -177,7 +176,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Menu", "PaymentManagement");
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            propsLog.Add("Operator", @operator);
             #endregion
 
             _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans);
@@ -192,14 +191,14 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
+        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int payId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_BankInfoSys_Get";
-            return conn.Query<PayListBankInfoSys>(SpName, new { PayId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<PayListBankInfoSys>(SpName, new {PayId = payId }, commandType: CommandType.StoredProcedure);
         }
 
-        public void UpdateBankInfo(int PayId, int SysId, int Status, string Operator)
+        public void UpdateBankInfo(int payId, int sysId, int status, string @operator)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -208,9 +207,9 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("PayId", PayId);
-            props.Add("SysId", SysId);
-            props.Add("Status", Status);
+            props.Add("PayId", payId);
+            props.Add("SysId", sysId);
+            props.Add("Status", status);
             #endregion
 
             #region propsLog
@@ -223,7 +222,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Menu", "PaymentManagement");
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            propsLog.Add("Operator", @operator);
             #endregion
 
             _mainDbClient.Execute("Admin_BankInfoPay_Set", props, conn, trans);

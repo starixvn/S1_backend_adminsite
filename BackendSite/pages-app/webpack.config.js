@@ -148,6 +148,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
+    // "BankFinancial/ReasonManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/ReasonManagement/index.js",
+    // ],
     // "Marketing/VipRebateInfoReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
@@ -266,6 +270,18 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
+    "Marketing/HotEventManagement.min": [
+      "./src/pages/Marketing/HotEventManagement/index.js",
+    ],
+    "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     "Marketing/DeepLinkManagement.min": [
     	 '@babel/polyfill',
     	"./src/pages/Marketing/DeepLinkManagement/index.js"

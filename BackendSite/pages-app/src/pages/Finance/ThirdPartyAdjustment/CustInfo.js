@@ -3,6 +3,7 @@ import { number_format } from '../../../module/Formatting/NumberFormat';
 import { RadioBtn } from './component/RadioBox';
 import { InputField } from './component/InputBox';
 import { TextArea } from './component/Textarea';
+import { SelectList } from './component/SelectList';
 
 export const CustInfo = (props) => {
     let optionRadio = Object.keys(props.AdjustmentOptionData).map((key) => {
@@ -42,6 +43,13 @@ export const CustInfo = (props) => {
                     OnChange={props.SendFiled.bind(null, 'amount')}
                     OnPressEnter={props.OnPressEnter}
                     Disabled={props.StateSend}
+                />
+                <SelectList
+                    DisplayText="Adjust Reason"
+                    value={props.SendData.category}
+                    OnChange={props.SendFiled.bind(null, 'category')}
+                    Disabled={props.StateSend}
+                    SelectOptions={props.AdjustCategory}
                 />
                 <TextArea DisplayText="Remarks" OnBlur={props.SendFiled.bind(null, 'memo')} OnPressEnter={props.OnPressEnter} Disabled={props.StateSend} defaultValue={props.SendData.memo} value={props.SendData.memo} />
                 <div className="button-group mt-10">

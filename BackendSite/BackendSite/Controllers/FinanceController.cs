@@ -224,13 +224,18 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
+        {
+            return View();
+        }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
         public IActionResult BonusPayout()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        public IActionResult LineChannel()
         {
             return View();
         }

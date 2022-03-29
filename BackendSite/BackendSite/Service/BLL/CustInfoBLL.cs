@@ -197,7 +197,7 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-                            promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
+                            promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0 ,TurnOver = 0 };
                         };
                     }
                 }
@@ -207,6 +207,7 @@ namespace BackendSite.Service.BLL
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
+            
             return custInfoDetail;
         }
 
@@ -369,7 +370,7 @@ namespace BackendSite.Service.BLL
                     }
                     else
                     {
-                        promotion.custRollOver = new CustRollOver() { RollOver = 0, TurnOver = 0 };
+                        promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0 ,TurnOver = 0 };
                     };
 
                 }

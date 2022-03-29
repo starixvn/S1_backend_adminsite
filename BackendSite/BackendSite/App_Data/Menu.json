@@ -408,6 +408,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "Line Channel Management",
+        "Title": "Line Channel Management",
+        "FuncKey": "Finance/LineChannel",
+        "Controller": "Finance",
+        "Action": "LineChannel",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -712,6 +722,16 @@
         "Childs": null
       },
       {
+        "Key": "HotEventManagement",
+        "Title": "Hot Event Management",
+        "FuncKey": "CMS/HotEventManagement",
+        "Controller": "Marketing",
+        "Action": "HotEventManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "GameCasinoManagement",
         "Title": "Game Casino Management",
         "FuncKey": "CMS/GameCasinoManagement",
@@ -767,6 +787,26 @@
         "FuncKey": "CMS/AppLinkManagement",
         "Controller": "Marketing",
         "Action": "AppLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SlotGamesManagement",
+        "Title": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "SlotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "CategoryManagement",
+        "Title": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Controller": "Marketing",
+        "Action": "CategoryManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
