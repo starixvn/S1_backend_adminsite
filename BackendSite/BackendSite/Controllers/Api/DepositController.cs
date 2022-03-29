@@ -74,6 +74,7 @@ namespace BackendSite.Controllers.Api
             
             var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, depositListReq.PageSize, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
+
             foreach (var data in depositRequestList)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);

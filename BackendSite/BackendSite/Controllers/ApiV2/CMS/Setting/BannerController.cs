@@ -173,6 +173,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiListResult<BannerInfoList> GetList(GetListRequest request)
         {

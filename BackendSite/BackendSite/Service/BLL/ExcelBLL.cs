@@ -119,7 +119,7 @@ namespace BackendSite.Service.BLL
                 }
                 
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
-
+                
                 ExportBody(ws, t, propertyInfo);
                 ExportHeader(ws, propertyInfo);
             }

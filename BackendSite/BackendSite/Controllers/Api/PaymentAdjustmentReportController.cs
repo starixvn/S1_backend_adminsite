@@ -21,8 +21,8 @@ namespace BackendSite.Controllers.Api
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
         private readonly ExcelBLL excelBLL;
-        private readonly ServerInfoBLL serverInfoBLL;
         private readonly PermissionBLL _permissionBll;
+        private readonly ServerInfoBLL serverInfoBLL;
 
         public PaymentAdjustmentReportController(IServiceProvider provider)
         {
