@@ -176,7 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult SetAdjustment([FromForm] SetAdjustmentReq request)
+        public ApiResult SetAdjustment(SetAdjustmentReq request)
         {
             try
             {
