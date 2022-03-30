@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -27,6 +28,7 @@ namespace BackendSite.Controllers.Api
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
         }
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
         {
             var apiResult = new ApiResult<IEnumerable<DeepLink>>
@@ -38,6 +40,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult<IEnumerable<GetDeepLinkRep>> GetDeepLinkTable(GetDeepLinkReq req)
         {
             var apiResult = new ApiResult<IEnumerable<GetDeepLinkRep>>
@@ -49,6 +52,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult SetDeepLink(SetDeepLinkReq req)
         {
             var apiResult = new ApiResult();
