@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<DeepLink> GetDeepLinkList()
         {
-            return _mainDbClient.Query<DeepLink>("Admin_GetDeepLinkList");
+            return _mainDbClient.Query<DeepLink>("Admin_GetDeepLinkList_Get");
         }
         public IEnumerable<GetDeepLinkRep> GetDeepLinkTable(int siteId, int deepLinkId)
         {
