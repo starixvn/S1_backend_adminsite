@@ -104,6 +104,8 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { set; get; }
         public decimal LockedAmount { set; get; }
         public int TpId { set; get; }
+        public int WalletType { set; get; }
+        
     }
     
     public class TpBonusCancelTransfer
