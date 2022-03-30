@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -38,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > Deep Link Management 
         /// </remarks>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
         {
             var apiResult = new ApiResult<IEnumerable<DeepLink>>
@@ -59,6 +61,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         // <param name="req"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult<IEnumerable<GetDeepLinkRep>> GetDeepLinkTable(GetDeepLinkReq req)
         {
             var apiResult = new ApiResult<IEnumerable<GetDeepLinkRep>>
@@ -80,6 +83,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
         public ApiResult SetDeepLink(SetDeepLinkReq req)
         {
             var apiResult = new ApiResult();
