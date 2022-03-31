@@ -66,8 +66,8 @@ namespace BackendSite.Extensions.Middlewares
                 if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0
                     && !_accessController.Any(x => path.Contains(x)))
                 {
-                    _logger.LogInformation("Cannot access apiV2: " + path);
-                    throw new AdminException(ErrorCodeEnum.Fail);
+                    //_logger.LogInformation("Cannot access apiV2: " + path);
+                    //throw new AdminException(ErrorCodeEnum.Fail);
                 }
             }
             
