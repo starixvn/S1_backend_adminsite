@@ -31,7 +31,8 @@ namespace BackendSite.Extensions.Middlewares
         {
             "TpFailRecordReport",
             "WithdrawalLimitCrypto",
-            "GetAllData"
+            "GetAllData",
+            "BaseData"
         };
 
         #endregion

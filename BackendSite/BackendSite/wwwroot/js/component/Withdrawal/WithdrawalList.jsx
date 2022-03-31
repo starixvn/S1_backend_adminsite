@@ -58,6 +58,11 @@ import DateTimePicker from 'react-datetime';
         1: "Amount Greater Than",
         2: "Amount Smaller Than"
     }
+    const PageSize = {
+        10: 10,
+        25: 25,
+        50: 50
+    }
 
     class WithdrawalList extends React.Component {
         constructor(props) {
@@ -739,7 +744,7 @@ import DateTimePicker from 'react-datetime';
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
             this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: [],amountType:0,
-            amount: ""};
+            amount: "",pageSize:25};
             this.searchFilter = {};
         }
 
@@ -761,7 +766,7 @@ import DateTimePicker from 'react-datetime';
             }
             //Loading.OnLoading();
             let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite, 
-                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount};
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize};
 
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
@@ -1154,6 +1159,11 @@ import DateTimePicker from 'react-datetime';
             }.bind(this));
             AmountList = <select onChange={this.onChange.bind(this)} name="amountType" value={this.state.amountType}>{AmountList}</select>
 
+            let PageSizeList = Object.keys(PageSize).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{PageSize[obj]}</option>;
+            }.bind(this));
+            PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
+
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
@@ -1229,7 +1239,13 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">Amount</span>
                                     <div className="field">
-                                        <input type="text" name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
+                                        <input name="amount" value={this.state.amount} type="number" onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Page Size</span>
+                                    <div className="field">
+                                        {PageSizeList}
                                     </div>
                                 </div>
                                 {IsRefresh ?

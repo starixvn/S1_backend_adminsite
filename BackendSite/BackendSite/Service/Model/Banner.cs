@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BackendSite.Service.Model.enums;
+using System;
 using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
@@ -65,7 +66,7 @@ namespace BackendSite.Service.Model
     {
         public int CurrencyId { get; set; }
         public string Details { get; set; }
-        public int Status { get; set; }
+        public BannerStatusEnum Status { get; set; }
     }
     public class BannerInfoList : BannerInfo
     {
@@ -82,5 +83,9 @@ namespace BackendSite.Service.Model
         }
         public string LastUpdateUser { get; set; }
     }
-
+    public class HotEventList : BannerInfoList
+    {
+        public string Away { get; set; }
+        public string Home { get; set; }
+    }
 }

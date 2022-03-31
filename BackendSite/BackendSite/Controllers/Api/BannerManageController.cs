@@ -9,13 +9,13 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
     [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class BannerManageController : Controller
     {
@@ -34,38 +34,28 @@ namespace BackendSite.Controllers.Api
             this.common = common;
         }
 
+        public class GetHotEventListRequest
+        {
+            public int SiteId { get; set; }
+            public int Status { get; set; }
+        }
+        public class GetHotEventRequest
+        {
+            public int SiteId { get; set; }
+            public string BannerName { get; set; }
+        }
+
         [HttpPost]
         public ApiResult SetBanner([FromForm] BannerInfo bannerInfo)
         {
             var apiResult = new ApiResult();
             try
             {
-                var req = new BannerController.SetBannerReq
-                {
-                    SiteId = bannerInfo.SiteId,
-                    BannerName = bannerInfo.BannerName,
-                    BannerType = bannerInfo.BannerType,
-                    ActionMode = bannerInfo.ActionMode,
-                    ShowStatus = bannerInfo.ShowStatus,
-                    UnixStartTime = bannerInfo.UnixStartTime,
-                    UnixEndTime = bannerInfo.UnixEndTime,
-                    BonusCode = bannerInfo.BonusCode,
-                    MatchId = bannerInfo.MatchId,
-                    TpId = bannerInfo.TpId,
-                    GameId = bannerInfo.GameId,
-                    UrlRouter = bannerInfo.UrlRouter,
-                    UnixSportBattleDateTime = bannerInfo.UnixSportBattleDateTime,
-                    SportCategoryId = bannerInfo.SportCategoryId,
-                    SportLeaguesId = bannerInfo.SportLeaguesId,
-                    SportTeamsId = bannerInfo.SportTeamsId,
-                    Specific = bannerInfo.Specific,
-                    Sort = bannerInfo.Sort,
-                    SiteName = bannerInfo.SiteName
-                };
                 var user = authorizeBLL.GetAuthData().UserName;
-                var errorCode = bannerManageBLL.SetBanner(req, user);
-                apiResult.ErrorCode = errorCode;
-                apiResult.Message = errorCode == 1 ? "The Banner Name setting already exists which with same Site." : "";
+                var result = bannerManageBLL.SetBanner(bannerInfo, user);
+                
+                apiResult.ErrorCode = result >=0 ? (int)ErrorCodeEnum.Success :(int) ErrorCodeEnum.Fail;
+                apiResult.Message = apiResult.ErrorCode != 0 ? "Update Failed" : "";
             }
             catch (MySqlException sqlException)
             {
@@ -82,13 +72,48 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Status)
+        public ApiResult<IEnumerable<BannerInfoList>> GetBannerList([FromForm] int SiteId, [FromForm] int BannerTypeId, [FromForm] int Currency ,[FromForm] int Status)
         {
             var apiResult = new ApiResult<IEnumerable<BannerInfoList>>();
             try
             {
-                apiResult.Data = bannerManageBLL.GetBannerList(SiteId, BannerTypeId, Status);
+                var siteList = new List<int> {SiteId};
+                var bannerTypeList = new List<int>(); 
+                var statusList = new List<int>();
+                var currencyList = new List<int> {Currency};
+
+                if (BannerTypeId > 0)
+                {
+                    bannerTypeList.Add(BannerTypeId);
+                }
+                else
+                {
+                    bannerTypeList.Add(1);
+                    bannerTypeList.Add(3);
+                    bannerTypeList.Add(4);
+                    bannerTypeList.Add(5);
+                    bannerTypeList.Add(6);
+                }
+
+                if (Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0);
+                    statusList.Add(1);
+                }
+
+                apiResult.Data = bannerManageBLL.GetBannerList(siteList,
+                    bannerTypeList, statusList,currencyList,
+                    1, 5000, out _, out _);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -99,13 +124,14 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
-        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName)
+        public ApiResult<BannerInfo> GetBanner([FromForm] int SiteId, [FromForm] string BannerName , [FromForm] int Currency)
         {
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = bannerManageBLL.GetBanner(SiteId, BannerName);
+                var result = bannerManageBLL.GetBanner(SiteId, BannerName ,Currency);
                 if (result != null)
                 {
                     apiResult.Data = result;
@@ -143,7 +169,70 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<IEnumerable<HotEventList>> GetHotEventList(GetHotEventListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<HotEventList>>();
+            try
+            {
+                var siteList = new List<int> { request.SiteId };
+                var bannerTypeList = new List<int>();
+                var statusList = new List<int>();
 
+                if (request.Status == 1)
+                {
+                    statusList.Add(1);
+                }
+                else if (request.Status == 2)
+                {
+                    statusList.Add(0);
+                }
+                else
+                {
+                    statusList.Add(0);
+                    statusList.Add(1);
+                }
 
+                apiResult.Data = bannerManageBLL.GetHotEventList(siteList,
+                    statusList,
+                    1, 5000, out _, out _);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
+        [HttpPost]
+        public ApiResult<BannerInfo> GetHotEvent(GetHotEventRequest request)
+        {
+            var apiResult = new ApiResult<BannerInfo>();
+            try
+            {
+                var result = bannerManageBLL.GetBanner(request.SiteId, request.BannerName, 0);
+                if (result != null)
+                {
+                    apiResult.Data = result;
+                    apiResult.ErrorCode = 0;
+                }
+                else
+                {
+                    apiResult.ErrorCode = -1;
+                    apiResult.Message = "The Hot Event Detail No Data";
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+            return apiResult;
+        }
     }
 }

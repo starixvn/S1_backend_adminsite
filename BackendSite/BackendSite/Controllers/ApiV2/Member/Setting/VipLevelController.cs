@@ -21,20 +21,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     public class VipLevelController : ControllerBase
     {
         #region Fields
-        
+
         private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly MessageBLL _messageBll;
-        
+
         #endregion
-        
+
         #region Constructor
-        
+
         public VipLevelController(IServiceProvider provider)
         {
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
+        }
+
+        #endregion
+
+        #region API Model
+
+        public class ChangeVipLevelBatchRequest
+        {
+            public int SiteId { get; set; }
+            public IFormFile ExcelUpload { get; set; }
         }
 
         #endregion
@@ -53,16 +63,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="excelUpload"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
         [HttpPost]
-        public async Task<List<ApiResult>> ChangeVipLevelBatch([FromForm] int siteId, 
-            [FromForm] IFormFile excelUpload)
+        public async Task<List<ApiResult>> ChangeVipLevelBatchAsync([FromForm] ChangeVipLevelBatchRequest request)
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBll.GetAuthData();
             try
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) || excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                if (request.ExcelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase)
+                    || request.ExcelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase)
+                    || request.ExcelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var excelPkg = new ExcelPackage(request.ExcelUpload.OpenReadStream());
                     var sheet = excelPkg.Workbook.Worksheets.First();//取得Sheet1
                     var isLastRow = false;
                     var rowId = 2;   // 因為有標題列，所以從第2列開始讀起
@@ -92,7 +103,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                         }
                         else
                         {
-                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(_custId, custUsername, siteId);
+                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(_custId, custUsername, request.SiteId);
 
                             if (custInfoDetail == null)
                             {
@@ -104,12 +115,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                                 {
                                     if (_messageBll.ChangeVipLevelBatch(custInfoDetail.SiteId, custInfoDetail.CustId, custInfoDetail.UserName, vipLevel, memo, authData.UserName) > 0)
                                     {
-                                        apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
+                                        apiResult.Add(new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
+                                    apiResult.Add(new ApiResult() { ErrorCode = (int)ErrorCodeEnum.SystemException, Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {ex}" });
                                 }
                             }
                             else if (custInfoDetail.Status == (int)CustomerStatusEnum.Suspend)
@@ -131,13 +142,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 }
                 else
                 {
-                    apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.Fail, Message = "File Type Error" });
+                    apiResult.Add(new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "File Type Error" });
                     return apiResult;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.Add(new ApiResult() { ErrorCode = (int) ErrorCodeEnum.SystemException, Message = ex.ToString() });
+                apiResult.Add(new ApiResult() { ErrorCode = (int)ErrorCodeEnum.SystemException, Message = ex.ToString() });
                 return apiResult;
             }
         }

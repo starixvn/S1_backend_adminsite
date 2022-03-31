@@ -1,6 +1,8 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
+@using BackendSite.Service.Model.enums
+@using Newtonsoft.Json
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
@@ -21,9 +23,9 @@
 
 @section Scripts {
     <script>
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        window.i18n = @Html.Raw(JsonConvert.SerializeObject(i18n));
         window.RootUrl = '@Url.Content("~/api")';
-        window.LangCode = 'en'
+        window.LangCode = 'en';
     </script>
     <script src="~/js/component/Finance/BalanceAdjustmentBatch.min.js" asp-append-version="true"></script>
 }

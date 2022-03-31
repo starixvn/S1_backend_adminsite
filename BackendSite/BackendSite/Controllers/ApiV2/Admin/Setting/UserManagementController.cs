@@ -92,18 +92,43 @@ namespace BackendSite.Controllers.ApiV2.Admin.Setting
         /// <exception cref="AdminException"></exception>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/UserAuthoritySetting" })]
         [HttpPost]
-        public ApiListResult<AdminUser> GetList(ApiRequestPageModel request)
+        public ApiListResult<AdminUserWithAllowSite> GetList(ApiRequestPageModel request)
         {
+            var result = new List<AdminUserWithAllowSite>();
             var data = _adminUserBll.GetUserList(request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+            var allSiteList = _serverInfoBll.GetSiteList();
 
-            if (!data.Any())
+            foreach (var user in data)
+            {
+                var newData = new AdminUserWithAllowSite();
+
+                var assignSites = _adminUserBll.GetAssignSiteList(user.UserId).Select(x => x.SiteId);
+
+                var allowSiteList = allSiteList.Where(o => assignSites.Contains(o.SiteId)).Select(t => new { t.SiteId, t.SiteName })
+                   .ToDictionary(t => t.SiteId, t => t.SiteName);
+
+                result.Add(new AdminUserWithAllowSite()
+                {
+                    UserId = user.UserId,
+                    UserName = user.UserName,
+                    Userpwd = user.Userpwd,
+                    IsSuper = user.IsSuper,
+                    Status = user.Status,
+                    CreateTime = user.CreateTime,
+                    GroupSEQ = user.GroupSEQ,
+                    GroupName = user.GroupName,
+                    AllowSiteList = allowSiteList
+                });
+            }
+
+            if (!result.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
 
-            return new ApiListResult<AdminUser>()
+            return new ApiListResult<AdminUserWithAllowSite>()
             {
-                Data = data,
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
