@@ -56,9 +56,10 @@ module.exports = {
     // "Finance/DepositLimitManagement.min": [
     // 	"./src/pages/Finance/DepositLimitManagement/index.js"
     // ],
-    // "Finance/WithdrawalLimitManagement.min": [
-    // 	"./src/pages/Finance/WithdrawalLimitManagement/index.js"
-    // ],
+    "Finance/WithdrawalLimitManagement.min": [
+      "@babel/polyfill",
+      "./src/pages/Finance/WithdrawalLimitManagement/index.js",
+    ],
     // "CSD/WithdrawalKYCControl.min": [
     // 	"./src/pages/CSD/WithdrawalKYCControl/index.js"
     // ],
@@ -181,10 +182,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    "BankFinancial/TransferInfoReport.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    ],
+    // "BankFinancial/TransferInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    // ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
@@ -270,8 +271,21 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
+    // ],
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
     "Marketing/HotEventManagement.min": [
       "./src/pages/Marketing/HotEventManagement/index.js",
+    ],
+    "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
+    "Marketing/DeepLinkManagement.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/DeepLinkManagement/index.js"
     ],
   },
   output: {

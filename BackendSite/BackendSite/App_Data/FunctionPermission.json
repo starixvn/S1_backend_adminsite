@@ -347,6 +347,11 @@
         "DisplayKey": "USDT WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Line Management",
+        "FuncKey": "Finance/LineChannel",
+        "Enable": false
       }
     ]
   },
@@ -591,6 +596,35 @@
     {
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Slot Games Management",
+      "FuncKey": "CMS/SlotGamesManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
+    },
+    {
+      "DisplayKey": "Category Management",
+      "FuncKey": "CMS/CategoryManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
+    },
+    {
+      "DisplayKey": "Deep Link Management",
+      "FuncKey": "CMS/DeepLinkManagement",
       "Enable": false
     }
   ]

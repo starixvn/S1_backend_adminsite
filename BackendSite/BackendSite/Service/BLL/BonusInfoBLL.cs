@@ -93,6 +93,7 @@ namespace BackendSite.Service.BLL
                         LockedAmount = row.LockedAmount,
                         MaxBonus = row.MaxBonus,
                         RollOver = row.RollOver,
+                        WinOver = row.WinOver,
                         CancelBonusAmount = row.CancelBonusAmount,
                         ExpiredCancel = row.ExpiredCancel,
                         Operator = string.IsNullOrWhiteSpace(row.Operator) ? string.Empty : row.Operator.Replace("\"", string.Empty)
@@ -102,7 +103,6 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-
 
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(IEnumerable<int> siteIds,
             string bonusCode,

@@ -573,7 +573,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
 
             switch (custStatusSwitch.Op)
@@ -1537,7 +1537,7 @@ namespace BackendSite.Controllers.Api
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
             
             //轉帳制
-            if (data != null && (data.TpId == (int)TpEnum.Saba || data.TpId == (int)TpEnum.PT))
+            if (data != null && data.WalletType == (int) TpListWalletTypeEnum.FundTransfer)
             {
                 if (data.Status == (int)BonusStatus.Running)
                 {
