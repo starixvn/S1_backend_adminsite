@@ -104,5 +104,12 @@ namespace BackendSite.Service.DAL
 
         #endregion
 
+        public async Task<TpBetLimitData> GetTpBetLimit(int gameTypeId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_GameTypeId", gameTypeId);
+            p.Add("_CurrencyId", currencyId);
+            return await _reportDbClient.QueryFirstAsync<TpBetLimitData>("Admin_TpBetLimit_Get", p);
+        }
     }
 }

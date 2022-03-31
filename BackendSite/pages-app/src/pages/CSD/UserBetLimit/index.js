@@ -34,13 +34,13 @@ const App = () => {
 
     WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
       if (res.data.errorCode === 0) {
-        
+
         let siteTmp = res.data.data.map((item) => {
           return { siteId: item.siteId, siteName: item.siteName, checked: true }
         })
         siteTmp.unshift({ siteId:0, siteName: "All", checked: true })
         setSiteList(siteTmp);
-      } 
+      }
       else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -82,17 +82,15 @@ const App = () => {
   }
 
   const InsertOrUpdate = (userName, siteId, betSetting) => {
-
-    let data = {
-      UserName: userName,
-      SiteId: siteId,
-      BetSetting: betSetting
-    };
     let param = {
       Url: "UserBetLimit/PostUserBetLimit",
-      Data: qs.stringify(data),
+      Data: {
+        UserName: userName,
+        SiteId: siteId,
+        BetSetting: betSetting
+      }
     };
-    
+
     WebAPI.PostData(param).then((res) => {
 
       if (res.data.errorCode === 0) {
@@ -126,7 +124,7 @@ const App = () => {
       Url: "UserBetLimit/Delete",
       Data: `custId=${custId}`,
     };
-    
+
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
@@ -155,7 +153,7 @@ const App = () => {
       Url: "UserBetLimit/UpdateStatus",
       Data: qs.stringify(data),
     };
-    
+
     WebAPI.PostData(param).then((res) => {
       if (res.data.errorCode === 0) {
         alert("success.");
@@ -188,7 +186,7 @@ const App = () => {
       if(a.siteId !=0 && a.checked)
       siteIds.push(a.siteId)
     })
-                  
+
     setFilter({
       ...stateFilter,
       ["SiteId"]: siteIds,
@@ -202,8 +200,8 @@ const App = () => {
 
   return (
     <div className="container-fluid">
-      {eventState.ShowSettingPanel ? 
-        <Edit 
+      {eventState.ShowSettingPanel ?
+        <Edit
           ClickBack={() => {
             updateEvent({
               ...eventState,
@@ -212,12 +210,12 @@ const App = () => {
           }}
           IsAdd={eventState.IsAdd}
           CustId = {eventState.CustId}
-          InsertOrUpdate={InsertOrUpdate} /> : 
+          InsertOrUpdate={InsertOrUpdate} /> :
         <>
         <h4 className="page-name">User Bet Limit</h4>
-          <Filter 
-            siteList={siteList} 
-            filterInfo={stateFilter} 
+          <Filter
+            siteList={siteList}
+            filterInfo={stateFilter}
             onChange={FilterChange}
             siteChecked={SiteChange}
             search={Search} />
