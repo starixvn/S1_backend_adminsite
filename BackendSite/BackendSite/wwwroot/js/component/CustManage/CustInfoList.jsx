@@ -119,7 +119,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
                                     <th scope="col">Vip Level</th>
-                                    <th scope="col">Deposit Limit Level</th>
+                                    <th scope="col">Point Level</th>
                                     <th scope="col">Currency</th>
                                     <th scope="col">Agent</th>
                                     <th scope="col">IsTest</th>
