@@ -25,6 +25,7 @@ const Result = (props) => {
               <td>{number_format(d.bonusAmount)}</td>
               <td>{number_format(d.lockedAmount)}</td>
               <td>{number_format(d.custRollOver.rollOver)}</td>
+              <td>{ d.fullFillType == 2 ? number_format(d.custRollOver.winOver) : 0}</td>
               <td>{number_format(d.custRollOver.turnOver)}</td>
               <td>{number_format(d.cancelBonusAmount)}</td>
               <td>{moment(d.claimDate).format("l LTS")}</td>
@@ -61,7 +62,8 @@ const Result = (props) => {
               <th scope="col">Description</th>
               <th scope="col">Bonus Amount</th>
               <th scope="col">Locked Amount</th>
-              <th scope="col">Rollover</th>
+              <th scope="col">Rollover/Winover</th>
+              <th scope="col">Winover</th>
               <th scope="col">Turnover</th>
               <th scope="col">Cancel Bonus Amount</th>
               <th scope="col">ClaimDate (Adjusted to GMT+8)</th>
