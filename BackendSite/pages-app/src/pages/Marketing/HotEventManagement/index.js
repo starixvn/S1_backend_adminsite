@@ -17,9 +17,9 @@ const App = () => {
     bannerName: "",
     actionMode: 2,
     showStatus: 3,
-    startTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
-    endTime: moment.utc(new Date()).add(10, "hour").format("l LTS"),
-    sportBattledate: moment.utc(new Date()).add(8, "hour").format("l LTS"),
+    startTime: new Date(),
+    endTime: moment(new Date()).add(2, "hour"),
+    sportBattledate: new Date(),
     matchId: "",
     tpId: "",
     gameId: "",
@@ -243,18 +243,9 @@ const App = () => {
             bannerName: bannerdata.bannerName,
             actionMode: bannerdata.actionMode,
             showStatus: bannerdata.showStatus,
-            startTime: moment
-              .utc(bannerdata.startTime)
-              .add(8, "hour")
-              .format("l LTS"),
-            endTime: moment
-              .utc(bannerdata.endTime)
-              .add(8, "hour")
-              .format("l LTS"),
-            sportBattledate: moment
-              .utc(bannerdata.sportBattleDateTime)
-              .add(8, "hour")
-              .format("l LTS"),
+            startTime:moment(bannerdata.startTime),
+            endTime:moment(bannerdata.endTime),
+            sportBattledate:moment(bannerdata.sportBattleDateTime),
             matchId: bannerdata.matchId,
             tpId: bannerdata.tpId,
             gameId: bannerdata.gameId,
@@ -278,7 +269,7 @@ const App = () => {
     if (type == "sportBattledate") {
       setbannerData({
         ...bannerData,
-        endTime: moment(value).add(2, "hour").format("l LTS"),
+        endTime: moment(value).add(2, "hour"),
         sportBattledate: value,
       });
     } else {
@@ -304,9 +295,9 @@ const App = () => {
       bannerName: "",
       actionMode: 2,
       showStatus: 3,
-      startTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
-      endTime: moment.utc(new Date()).add(10, "hour").format("l LTS"),
-      sportBattledate: moment.utc(new Date()).add(8, "hour").format("l LTS"),
+      startTime: new Date(),
+      endTime: moment(new Date()).add(2, "hour"),
+      sportBattledate: new Date(),
       matchId: "",
       tpId: "",
       gameId: "",
