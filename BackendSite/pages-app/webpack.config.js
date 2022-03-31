@@ -270,9 +270,10 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
-    "Marketing/HotEventManagement.min": [
-      "./src/pages/Marketing/HotEventManagement/index.js",
-    ],
+    // "Marketing/HotEventManagement.min": [
+    //   "./src/pages/Marketing/HotEventManagement/index.js",
+    // ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
