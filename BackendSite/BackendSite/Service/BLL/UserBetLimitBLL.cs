@@ -103,7 +103,7 @@ namespace BackendSite.Service.BLL
                         TypeId = gameType.Type,
                         TypeName = gameType.TypeName,
                         Checked = true,
-                        SelectedValue = group.LimitGroup,
+                        SelectedValue = group.DefaultGroup,
                         LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
                     };
                     limitGroups.Add(tpGroup);
