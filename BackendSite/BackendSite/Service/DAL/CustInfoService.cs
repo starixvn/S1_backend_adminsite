@@ -245,7 +245,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V9", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -790,6 +790,12 @@ namespace BackendSite.Service.DAL
             WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
 
             return WithdrawalLimitLogData;
+        }
+
+        public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
         }
     }
 }

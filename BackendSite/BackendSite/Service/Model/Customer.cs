@@ -158,6 +158,7 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
+        public int EnableRebatePayout { get; set; }
     }
 
     public class CustInfoDetailForExport

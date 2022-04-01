@@ -828,5 +828,28 @@ namespace BackendSite.Service.BLL
             }
             return true;
         }
+
+        public int SetEnableRebatePayout(int custId, int enableRebatePayout, string reason, string Operator)
+        {
+            var result = 1;
+
+            using var scope = new TransactionScope();
+            if (!_custInfoService.SetEnableRebatePayout(custId, enableRebatePayout))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+            string DisableOrEnable = enableRebatePayout == 0 ? "Disable Rebate Payout" : "Enable Rebate Payout";
+            if (!_custInfoService.AddCustNote(custId, $"{DisableOrEnable} Reason : {reason}", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
+            return result;
+        }
     }
 }
