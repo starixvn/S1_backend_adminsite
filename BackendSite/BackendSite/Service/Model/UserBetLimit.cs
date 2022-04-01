@@ -64,22 +64,6 @@ namespace BackendSite.Service.Model
         public string LimitGroup { get; set; }
     }
 
-    public class SabaBetSetting
-    {
-        public string sport_type { get; set; }
-        public int min_bet { get; set; }
-        public int max_bet { get; set; }
-        public int max_bet_per_match { get; set; }
-    }
-    
-    public class SabaBetSettingResponse
-    {
-        public string sport_type { get; set; }
-        public decimal min_bet { get; set; }
-        public decimal max_bet { get; set; }
-        public decimal max_bet_per_match { get; set; }
-    }
-
     public class QueryUserBetLimit
     {
         public IEnumerable<int> SiteIds { get; set; }
