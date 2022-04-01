@@ -212,9 +212,9 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
             <h4 className="page-name">Edit</h4>
             {IsAdd ? <CustSearchPanel siteList={siteList} inputSearch={searchState} setSite={selectSite} setUserName={inputUserName} search={searchCustomer} /> : null}
             {customer != null ? <CustInfoPanel custData={customer} /> : null}
-            <div className="filter noBGcolor"><TpCategoryCheckList title="Available Category" tpCategoryList={tpCategories} toggle={TpCategoryCheck} /></div>
+            {customer != null ? <div className="filter noBGcolor"><TpCategoryCheckList title="Available Category" tpCategoryList={tpCategories} toggle={TpCategoryCheck} /></div> : null}
             {currentTab.id !== 0 && currentTab.name !== "" ? <SubPanel tpGames={tpCategories} currentTab={currentTab} clickTab={clickTab} groupChange={groupChange} enableGameType={enableGameType} /> : null}
-            <div className="filter float-btn-group">
+            <div className="filter">
                 <button className="btn btn-back" onClick={ClickBack}>Back</button>
                 <button className="btn btn-add" onClick={Submit}> Submit</button>
             </div>

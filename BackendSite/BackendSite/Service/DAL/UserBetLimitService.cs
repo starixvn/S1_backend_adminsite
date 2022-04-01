@@ -18,8 +18,8 @@ namespace BackendSite.Service.DAL
     {
         #region Fields
 
-        private readonly MySqlClient _mainDbClient;
-        private readonly MySqlClient _reportDbClient;
+        public MySqlClient MainDbClient { get; }
+        public MySqlClient ReportDbClient { get; }
 
         #endregion
 
@@ -27,8 +27,8 @@ namespace BackendSite.Service.DAL
 
         public UserBetLimitService(IServiceProvider provider)
         {
-            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            MainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            ReportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -44,7 +44,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BetSetting", JsonConvert.SerializeObject(betSetting));
             p.Add("_Operator", updateOperator);
 
-            return await _mainDbClient.ExecuteAsync("Admin_CustBetLimit_Set", p);
+            return await MainDbClient.ExecuteAsync("Admin_CustBetLimit_Set", p);
         }
 
         public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
          
-            var result = _reportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V3", p);
+            var result = ReportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V3", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
@@ -71,7 +71,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
-            return await _mainDbClient.ExecuteAsync("Admin_CustBetLimit_Del", p);
+            return await MainDbClient.ExecuteAsync("Admin_CustBetLimit_Del", p);
         }
 
         public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
@@ -80,36 +80,28 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             p.Add("_Status", status);
             p.Add("_Operator", updateOperator);
-            return await _mainDbClient.ExecuteAsync("Admin_CustBetLimitStatus_Set", p);
+            return await MainDbClient.ExecuteAsync("Admin_CustBetLimitStatus_Set", p);
         }
 
         public async Task<CustBetLimitData> UserBetLimitGetByCustId(int custId)
         {
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
-            return await _reportDbClient.QueryFirstAsync<CustBetLimitData>("Admin_CustBetLimitByCustId_Get", p);
+            return await ReportDbClient.QueryFirstAsync<CustBetLimitData>("Admin_CustBetLimitByCustId_Get", p);
         }
 
         public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
         {
             var p = new DynamicParameters();
             p.Add("CategoryId", categoryId);
-            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+            return await ReportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
         }
 
         public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
         {
-            return await _reportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
+            return await ReportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
         }
 
         #endregion
-
-        public async Task<TpBetLimitData> GetTpBetLimit(int gameTypeId, int currencyId)
-        {
-            var p = new DynamicParameters();
-            p.Add("_GameTypeId", gameTypeId);
-            p.Add("_CurrencyId", currencyId);
-            return await _reportDbClient.QueryFirstAsync<TpBetLimitData>("Admin_TpBetLimit_Get", p);
-        }
     }
 }
