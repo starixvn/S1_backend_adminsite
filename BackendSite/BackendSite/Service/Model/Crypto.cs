@@ -8,6 +8,8 @@ namespace BackendSite.Service.Model
 
     public class CryptoWithdrawalLimitInfoManage : USDTWithdrawalLimitInfoManage
     {
+        public string LevelName { get; set; }
+        public int Times { get; set; }
         public int CryptoCurrencyId { get; set; }
     }
 

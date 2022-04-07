@@ -2,18 +2,27 @@ import React, { useState } from "react";
 import { api } from '../../../module/WebAPI';
 export const PopBoxContentAddLevel = (props) => {
     let lastList = props.LevelList.length === 0 ? [] : props.LevelList[props.LevelList.length - 1];
-    let siteId = props.SiteId, currencyId = props.CurrencyId, vipLevel = 1, withdrawalMin = 1, withdrawalMax = 1;
+    let siteId = props.SiteId, currencyId = props.CurrencyId, vipLevel = 1, withdrawalMin = 1, withdrawalMax = 1, times = 0;
 
     if (lastList.length !== 0) {
         vipLevel = parseInt(lastList.vipLevel) + 1;
+        times = parseInt(lastList.times);
         withdrawalMin = parseInt(lastList.withdrawalMin) + 1;
         withdrawalMax = parseInt(lastList.withdrawalMax) + 1;
     }
 
     const [Level, setLevel] = useState(vipLevel);
+    const [Times, setTimes] = useState(times);
     const [WithdrawalMin, setWithdrawalMin] = useState(withdrawalMin);
     const [WithdrawalMax, setWithdrawalMax] = useState(withdrawalMax);
-    let newLevelList = { siteId: siteId, currencyId: currencyId, vipLevel: Level, withdrawalMin: WithdrawalMin, withdrawalMax: WithdrawalMax }
+    let newLevelList = {
+        siteId: siteId,
+        currencyId: currencyId,
+        vipLevel: Level,
+        withdrawalMin: WithdrawalMin,
+        withdrawalMax: WithdrawalMax,
+        times: Times
+    };
     const handleSave = (e) => {
         e.preventDefault();
 
@@ -49,6 +58,11 @@ export const PopBoxContentAddLevel = (props) => {
                     <div className="field">
                         <label>Withdrawal Max</label>
                         <input type="number" defaultValue={withdrawalMax} onChange={(e) => { setWithdrawalMax(parseInt(e.target.value)) }} />
+                        <label>(0 = Unlimited)</label>
+                    </div>
+                    <div className="field">
+                        <label>Withdrawal Frequency</label>
+                        <input type="number" defaultValue={times} onChange={(e) => { setTimes(parseInt(e.target.value)) }} />
                         <label>(0 = Unlimited)</label>
                     </div>
                     <button className="ui right floated primary button" onClick={handleSave} >Save</button>
