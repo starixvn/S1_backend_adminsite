@@ -167,5 +167,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
+        public IActionResult DeepLinkManagement()
+        {
+            return View();
+        }
     }
 }
