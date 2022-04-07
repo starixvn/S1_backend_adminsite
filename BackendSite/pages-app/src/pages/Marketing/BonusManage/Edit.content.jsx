@@ -650,7 +650,15 @@ const SubPanel = props => {
 									dataColumn="rollOver"
 									value={props.state.specific[props.currencyId].rollOver}
 								/>
-								{props.state.promotionType == 7 ? <InputBox
+								{props.state.promotionType == 7 ?
+									<InputBox
+										Title="Winover"
+										OnChange={props.EditMainValue}
+										dataColumn="winOver"
+										value={props.state.specific[props.currencyId].winOver}
+									/> : null}
+								{props.state.promotionType == 7 ? 
+									<InputBox
 										Type="Number"
 										Title="Bonus"
 										OnChange={props.EditMainValue}

@@ -17,9 +17,9 @@ const App = () => {
     bannerName: "",
     actionMode: 2,
     showStatus: 3,
-    startTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
-    endTime: moment.utc(new Date()).add(10, "hour").format("l LTS"),
-    sportBattledate: moment.utc(new Date()).add(8, "hour").format("l LTS"),
+    startTime: new Date(),
+    endTime: moment(new Date()).add(2, "hour"),
+    sportBattledate: new Date(),
     matchId: "",
     tpId: "",
     gameId: "",
@@ -30,6 +30,7 @@ const App = () => {
   });
   const [sportsLeaguesList, setsportsLeaguesList] = useState(null);
   const [sportsTeamsList, setsportsTeamsList] = useState(null);
+  const [initsportsTeamsList, setinitsportsTeamsList] = useState(null);
   useEffect(() => {
     let param = {
       Url: "Common/AdminUserSiteList",
@@ -61,6 +62,22 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    let SportTeamsListParam = {
+      Url: "Sports/GetSportTeamsList",
+      Data: {
+        SportLeaguesId: Number(1),
+      },
+    };
+    WebAPI.PostData(SportTeamsListParam).then((res) => {
+      if (res.data.errorCode === 0) {
+        setinitsportsTeamsList(res.data.data);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  }, []);
+
   const GetSportTeamsList = (leaguesId) => {
     let SportTeamsListParam = {
       Url: "Sports/GetSportTeamsList",
@@ -72,6 +89,21 @@ const App = () => {
       if (res.data.errorCode === 0) {
         setsportsTeamsList(res.data.data);
         setHomeAway(res.data.data, leaguesId);
+      } else {
+        alert(res.data.message ?? "failed to get data.");
+      }
+    });
+  };
+  const EditSportTeamsList = (leaguesId) => {
+    let SportTeamsListParam = {
+      Url: "Sports/GetSportTeamsList",
+      Data: {
+        SportLeaguesId: Number(leaguesId),
+      },
+    };
+    WebAPI.PostData(SportTeamsListParam).then((res) => {
+      if (res.data.errorCode === 0) {
+        setsportsTeamsList(res.data.data);
       } else {
         alert(res.data.message ?? "failed to get data.");
       }
@@ -211,9 +243,9 @@ const App = () => {
             bannerName: bannerdata.bannerName,
             actionMode: bannerdata.actionMode,
             showStatus: bannerdata.showStatus,
-            startTime: moment.utc(bannerdata.startTime).add(8, "hour").format("l LTS"),
-            endTime: moment.utc(bannerdata.endTime).add(8, "hour").format("l LTS"),
-            sportBattledate: moment.utc(bannerdata.sportBattleDateTime).add(8, "hour").format("l LTS"),
+            startTime:moment(bannerdata.startTime),
+            endTime:moment(bannerdata.endTime),
+            sportBattledate:moment(bannerdata.sportBattleDateTime),
             matchId: bannerdata.matchId,
             tpId: bannerdata.tpId,
             gameId: bannerdata.gameId,
@@ -222,6 +254,7 @@ const App = () => {
             away: bannerdata.sportTeamsId[0].away,
             status: bannerList[idx].status,
           });
+          EditSportTeamsList(bannerdata.sportLeaguesId);
           setpageStatus(2);
         } else {
           alert(res.data.message ?? "failed to get data.");
@@ -236,7 +269,7 @@ const App = () => {
     if (type == "sportBattledate") {
       setbannerData({
         ...bannerData,
-        endTime: moment(value).add(2, "hour").format("l LTS"),
+        endTime: moment(value).add(2, "hour"),
         sportBattledate: value,
       });
     } else {
@@ -251,19 +284,20 @@ const App = () => {
     setpageStatus(0);
   };
   const initbannerData = () => {
-    let SportsTeamsList = sportsTeamsList.map((s) => {
+    let SportsTeamsList = initsportsTeamsList.map((s) => {
       return {
         value: s.id,
         displayText: s.name,
       };
     });
+    setsportsTeamsList(initsportsTeamsList);
     setbannerData({
       bannerName: "",
       actionMode: 2,
       showStatus: 3,
-      startTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
-      endTime: moment.utc(new Date()).add(10, "hour").format("l LTS"),
-      sportBattledate: moment.utc(new Date()).add(8, "hour").format("l LTS"),
+      startTime: new Date(),
+      endTime: moment(new Date()).add(2, "hour"),
+      sportBattledate: new Date(),
       matchId: "",
       tpId: "",
       gameId: "",
