@@ -13,7 +13,7 @@ const Panel = (props) => {
           aria-controls="collapseExample"
         >
           {`${
-            item.type === 1 ? "Andriod" : item.type === 2 ? "IOS" : "Desktop"
+            item.type === 1 ? "Android" : item.type === 2 ? "IOS" : "Desktop"
           }`}
         </a>
         <Detail Data={item} />

@@ -988,7 +988,7 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
-        Andriod = 1,
+        Android = 1,
         IOS  = 2,
         Desktop = 3
     }
