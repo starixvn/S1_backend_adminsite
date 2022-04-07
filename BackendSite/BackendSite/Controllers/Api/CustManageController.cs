@@ -1537,15 +1537,14 @@ namespace BackendSite.Controllers.Api
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
             
             //轉帳制
-            if (data != null && (data.TpId == (int)TpEnum.Saba || data.TpId == (int)TpEnum.PT))
+            if (data != null && data.WalletType == (int) TpListWalletTypeEnum.FundTransfer)
             {
-                if( data.Status == (int) BonusStatus.Running )
+                if (data.Status == (int)BonusStatus.Running)
                 {
-                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-                    apiResult.Message = "Bonus is not successfully redeemed, cancellation not eligible to execute";
+                    CancelBonus(bonusReq, data, apiResult);
                     return apiResult;
                 }
-                
+
                 var winLossAmount = _bonusInfoBll.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
                 var transferBonusAmount = data.BonusAmount + data.LockedAmount; 
                 var remainingBonus = transferBonusAmount + winLossAmount;
@@ -1595,22 +1594,8 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
-
-                            if (result > 0)
-                            {
-                                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
-                                var msg = new StringBuilder();
-                                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
-                                var authData = _authorizeBll.GetAuthData();
-                                _messageBll.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
-                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                            }
-                            else
-                            {
-                                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-                                apiResult.Message = "Fail.";
-                            }
+                            CancelBonus(bonusReq, data, apiResult);
+                            return apiResult;
                         } 
                         break; 
                 }
@@ -1645,6 +1630,26 @@ namespace BackendSite.Controllers.Api
             };
             _serverInfoBll.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
             return apiResult;
+        }
+
+        private void CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
+        {
+            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
+
+            if (result > 0)
+            {
+                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                var msg = new StringBuilder();
+                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                var authData = _authorizeBll.GetAuthData();
+                _messageBll.SendMessageToPlayer("Bonus Service", title, msg.ToString(), data.CustId, authData.UserId);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Fail.";
+            }
         }
 
         #endregion

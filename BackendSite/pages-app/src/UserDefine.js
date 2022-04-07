@@ -148,6 +148,10 @@ const CryptoWithdrawalLimitManagement = lazy(() =>
   import("./pages/Finance/CryptoWithdrawalLimitManagement/index")
 );
 
+const LineChannelManagement = lazy(() =>
+  import("./pages/Finance/LineChannel/index")
+);
+
 export const defaultPage = "PersonalMsgBatch";
 
 export const layoutType = {
@@ -842,12 +846,25 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <CryptoWithdrawalLimitManagement />
+        </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+        "./css/css/main.css"
+    ],
+    layout: layoutType.N88,
+  },
+  LineChannelManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <LineChannelManagement />
       </Suspense>
     ),
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
-      "./css/css/main.css"
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
     ],
     layout: layoutType.N88,
-  }
+  },
 };

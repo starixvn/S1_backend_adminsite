@@ -24,6 +24,21 @@ namespace BackendSite.Service.BLL
             };
         }
 
+        public IEnumerable<PayList> GetPayList()
+        {
+            return paymentManageService.GetPayList();
+        }
+
+        public IEnumerable<PayChannel> GetPayChannel()
+        {
+            return paymentManageService.GetPayChannelList();
+        }
+
+        public IEnumerable<PayCurrency> GetPayCurrency()
+        {
+            return paymentManageService.GetPayCurrencyList();
+        }
+
         public void UpdatePayList(int PayId, int Status,string Operator)
         {
             paymentManageService.UpdatePayList(PayId, Status, Operator);

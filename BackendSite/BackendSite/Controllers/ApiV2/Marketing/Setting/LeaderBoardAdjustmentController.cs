@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,112 +36,123 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
         #region Model
 
-        public class LeaderboardExtraPointReq
+        public class GetListRequest : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
+            //TODO：應該要有時區可以轉換，但現在架構傳時區轉換沒有意義
+            //private DateTimeOffset _startDate { get; set; }
+            //private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public int CategoryId { get; set; }
-            public int Currency { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
+            public IEnumerable<int> CategoryIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+
+            //TODO：應該要有時區可以轉換，但現在架構傳時區轉換沒有意義
+            //public DateTimeOffset StartDate
+            //{
+            //    get => _startDate;
+            //    set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            //}
+            //public DateTimeOffset EndDate
+            //{
+            //    get => _endDate;
+            //    set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            //}
+
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+
         }
 
-        public class SetLeaderboardExtraPointReq
+        public class SetExtraPointRequest
         {
-            public long ActiveDate { get; set; }
+            //TODO：應該要有時區可以轉換，但現在架構傳時區轉換沒有意義
+            //private DateTimeOffset _activeDate { get; set; }
             public int SiteId { get; set; }
             public int CategoryId { get; set; }
             public string UserName { get; set; }
             public decimal ExtraPoint { get; set; }
+
+            //TODO：應該要有時區可以轉換，但現在架構傳時區轉換沒有意義
+            //public DateTimeOffset ActiveDate
+            //{
+            //    get => _activeDate;
+            //    set => _activeDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            //}
+            public DateTimeOffset ActiveDate { get; set; }
         }
-        
+
         #endregion
-        
+
         #region API 
-        
+
         /// <summary>
-        /// LeaderBoardAdjustment/SetExtraPoint 
+        /// LeaderBoardAdjustment/GetList 取得排行榜清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > LeaderBoard ExtraPoint > [Submit]
+        ///Func Path：Marketing > LeaderBoard ExtraPoint > [Submit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LeaderBoardExtraPoint" })]
         [HttpPost]
-        public ApiListResult<LeaderboardExtraPointList> GetList(LeaderboardExtraPointReq request)
+        public ApiListResult<LeaderboardExtraPointList> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<LeaderboardExtraPointList>();
 
             var pageNumber = request.PageNumber;
-            var pageSize = 10;
-            if (request.PageSize > 0)
-                pageSize = request.PageSize;
-            
+
             apiResult.Data = _bonusManageBll.GetLeaderboardExtraPointList(request.SiteIds,
-                request.CategoryId, request.Currency, request.StartDate.DateTime,
-                request.EndDate.DateTime, pageSize, ref pageNumber, out var totalPages, out var rowCount);
-            
+                request.CategoryIds, request.CurrencyIds, request.StartDate.DateTime,
+                request.EndDate.DateTime,request.PageNumber, request.PageSize, out var totalPages, out var rowCount);
+
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
             apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
 
         /// <summary>
-        /// LeaderBoardAdjustment/SetExtraPoint 取得清單
+        /// LeaderBoardAdjustment/SetExtraPoint 更新額外點數
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Marketing > LeaderBoard ExtraPoint > [add]
+        /// Func Path：Marketing > LeaderBoard ExtraPoint > [Add ExtraPoint] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LeaderBoardExtraPoint" })]
         [HttpPost]
-        public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq request)
+        public ApiResult SetExtraPoint(SetExtraPointRequest request)
         {
             var apiResult = new ApiResult
             {
                 Message = "Unknown Error"
             };
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _bonusManageBll.SetLeaderboardExtraPoint(request.ActiveDate, request.SiteId, request.CategoryId, request.UserName, request.ExtraPoint, userName);
-            
+            var result = _bonusManageBll.SetLeaderboardExtraPoint(request.ActiveDate.ToUnixTimeSeconds(), request.SiteId, request.CategoryId, request.UserName, request.ExtraPoint, userName);
+
             switch (result)
             {
                 case 0:
-                    apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = "";
                     break;
                 case -2:
-                    apiResult.ErrorCode = result;
-                    apiResult.Message = "User Not Found";
+                    throw new AdminException(ErrorCodeEnum.CustNotFound);
                     break;
                 case -3:
                     apiResult.ErrorCode = result;
                     apiResult.Message = "Can only select the ActiveDate today or after today";
                     break;
                 default:
-                    apiResult.ErrorCode = result;
-                    apiResult.Message = "Unknown Error";
+                    throw new AdminException(ErrorCodeEnum.SystemException);
                     break;
             }
             return apiResult;
         }
-        
+
         #endregion
     }
 }

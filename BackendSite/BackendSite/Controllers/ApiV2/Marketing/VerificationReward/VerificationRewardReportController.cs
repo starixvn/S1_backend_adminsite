@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
@@ -7,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
 {
@@ -21,9 +23,34 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         public VerificationRewardReportController(IServiceProvider provider)
         {
             _verificationRewardBll = provider.GetService<VerificationRewardBLL>();
-            _excelBll = provider.GetService<ExcelBLL>();;
+            _excelBll = provider.GetService<ExcelBLL>(); ;
         }
-        
+
+        #region API Model
+
+        public class ExportRequest
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public string UserName { get; set; }
+
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// VerificationRewardReport/Get 查詢用戶領取驗證獎勵報表
         /// </summary>
@@ -32,26 +59,25 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// 
         /// Func Path：Marketing  > Verification Reward Report > [Submit]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
-        public ApiListResult<CustVerificationRewardModel> Get(QueryVerificationRewardReport req)
+        public ApiListResult<CustVerificationRewardModel> Get(QueryVerificationRewardReport request)
         {
             var apiResult = new ApiListResult<CustVerificationRewardModel>();
 
-            var pageNumber = req.PageNumber;
             apiResult.Data = _verificationRewardBll.GetVerificationRewardReport(
-                req.SiteIds,
-                req.CurrencyId,
-                req.UserName,
-                req.StartDate,
-                req.EndDate,
-                req.PageSize,
-                req.PageNumber,
+                request.SiteIds,
+                request.CurrencyId,
+                request.UserName,
+                request.StartDate,
+                request.EndDate,
+                request.PageSize,
+                request.PageNumber,
                 out var totalPages,
                 out var rowCount);
             apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
+            apiResult.PageNumber = request.PageNumber;
             apiResult.RowCount = rowCount;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
@@ -66,15 +92,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// 
         /// Func Path：Marketing  > Verification Reward Report > [Submit] > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
-        public async Task<IActionResult> Export(ExportVerificationRewardReport req)
+        public async Task<IActionResult> Export(ExportRequest request)
         {
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(req.SiteIds, req.CurrencyId, req.UserName, req.StartDate, req.EndDate);
+            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(JsonConvert.SerializeObject(request.SiteIds),
+                request.CurrencyId,
+                request.UserName,
+                request.StartDate,
+                request.EndDate);
+
             var stream = _excelBll.Export(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"VerificationReward_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
     }
 }

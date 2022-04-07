@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using BackendSite.Extensions;
+using System.Linq;
+using System.Collections;
 
 namespace BackendSite.Controllers.Api
 {
@@ -62,21 +64,27 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<AdjustmentLogReport> GetAdjustmentInfoLog(GetAdjustmentInfoLogParaOld para)
         {
             var startTime = DateTimeExtensions.UnixToDateTimeOffset(para.StartDate);
-            var endTime =DateTimeExtensions.UnixToDateTimeOffset(para.EndDate);
+            var endTime = DateTimeExtensions.UnixToDateTimeOffset(para.EndDate);
+            var menuList = new List<string>();
+            if (para.Menu == "0")
+                menuList = adjustmentLogReportBLL.GetAdjustmentInfoLogMenu().Select(x => x.Menu).ToList();
+            else
+                menuList.Add(para.Menu);
+
             var apiResult = new ApiListResult<AdjustmentLogReport>();
             try
             {
-                var req = new GetAdjustmentInfoLogPara() 
+                var req = new GetAdjustmentInfoLogPara()
                 {
                     StartDate = startTime,
                     EndDate = endTime,
                     User = para.User,
-                    Menu= para.Menu,
-                    PageNumber= para.PageNumber,
-                    PageSize= para.PageSize
+                    Menus = menuList,
+                    PageNumber = para.PageNumber,
+                    PageSize = para.PageSize
                 };
                 var searchResult = adjustmentLogReportBLL.GetAdjustmentInfoLog(req);
-                
+
                 apiResult.Data = searchResult.AdjustmentLogReport;
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;

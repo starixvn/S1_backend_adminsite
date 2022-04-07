@@ -408,6 +408,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "Line Channel Management",
+        "Title": "Line Channel Management",
+        "FuncKey": "Finance/LineChannel",
+        "Controller": "Finance",
+        "Action": "LineChannel",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -707,6 +717,16 @@
         "FuncKey": "CMS/BannerManage",
         "Controller": "Marketing",
         "Action": "BannerManage",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "HotEventManagement",
+        "Title": "Hot Event Management",
+        "FuncKey": "CMS/HotEventManagement",
+        "Controller": "Marketing",
+        "Action": "HotEventManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

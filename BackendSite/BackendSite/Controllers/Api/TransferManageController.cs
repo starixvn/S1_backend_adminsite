@@ -88,16 +88,48 @@ namespace BackendSite.Controllers.Api
 
             try
             {
+                if (string.IsNullOrWhiteSpace(req.FromAccountNo))
+                {
+                    req.FromAccountNo = null;
+                }
+
+                if (string.IsNullOrWhiteSpace(req.FromAccountDisplayName))
+                {
+                    req.FromAccountDisplayName = null;
+                }
+
+                if (string.IsNullOrWhiteSpace(req.ToAccountNo))
+                {
+                    req.ToAccountNo = null;
+                }
+
+                if (string.IsNullOrWhiteSpace(req.ToAccountDisplayName))
+                {
+                    req.ToAccountDisplayName = null;
+                }
+
+                //因為現在資料的transDate是以+8存在DB，固這邊站不轉換時間。
+                var transFromDate = Convert.ToDateTime(req.TransFromDate);
+                var transToDate = Convert.ToDateTime(req.TransToDate);
+
                 apiResult.Data = _bankFinancialBLL.GetTransferInfoList(false,
                                                                        req.TransferType,
-                                                                       req.TransFromDate,
-                                                                       req.TransToDate,
+                                                                       transFromDate,
+                                                                       transToDate,
                                                                        req.FromAccountNo,
                                                                        req.FromAccountDisplayName,
                                                                        req.ToAccountNo,
                                                                        req.ToAccountDisplayName,
                                                                        req.Reason,
                                                                        req.TransferId);
+
+                foreach (var data in apiResult.Data.ToArray())
+                {
+                    data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
+
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -118,10 +150,10 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
-                var dateTime = GetTimeZoneDateTime(1);
+                var dateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 apiResult.Data = new BankFinancialTransferInfoTransDetailModel()
                 {
-                    TransDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                    TransDate = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().Date, new TimeSpan(8, 0, 0)),
 
                     FromAmount = 0,
                     FromFee = 0,
@@ -156,35 +188,35 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var result = _bankFinancialBLL.GetTransferInfoList(true,
-                                                                   req.TransferType,
-                                                                   req.TransFromDate,
-                                                                   req.TransToDate,
-                                                                   req.FromAccountNo,
-                                                                   req.FromAccountDisplayName,
-                                                                   req.ToAccountNo,
-                                                                   req.ToAccountDisplayName,
-                                                                   req.Reason,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                   null,
+                                                                  null,
+                                                                  null,
                                                                    req.TransferId);
+
+                foreach (var data in result.ToArray())
+                {
+                    data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                }
 
                 if (result.Count() == 1)
                 {
                     var data = result.FirstOrDefault();
-
                     var receipt = _bankFinancialBLL.GetTransferIngoReceipt(data.TransferId);
-
                     var authData = _authorizeBLL.GetAuthData();
-                    var dateTime = GetTimeZoneDateTime(1);
-
-                    if(receipt!=null)
+                    if (receipt != null)
                     {
                         data.UploadReceiptName = receipt.PicFileName;
                         data.TransferPic = receipt.TransferPic;
                     }
-
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
-                    data.UpdateTime = dateTime;
-
+                    data.UpdateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                     apiResult.Data = data;
                     apiResult.ErrorCode = 0;
                 }
@@ -214,21 +246,23 @@ namespace BackendSite.Controllers.Api
             {
                 var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(bankFinancialTransferInfoDetailModelForSet.TransferInfoDetails);
 
-                transferInfoDetails.CreateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.CreateTime);
-                transferInfoDetails.UpdateTime = GetTimeZoneZeroDateTimeByDateString(transferInfoDetails.UpdateTime);
+                transferInfoDetails.TransDate = new DateTimeOffset(transferInfoDetails.TransDate.DateTime, TimeSpan.Zero).AddHours(-8);
 
-                var result = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
+                transferInfoDetails.CreateTime = new DateTimeOffset(transferInfoDetails.CreateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+                transferInfoDetails.UpdateTime = new DateTimeOffset(transferInfoDetails.UpdateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
 
-                if (result.Status)
+                var (status, count, message) = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
+
+                if (status)
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 0;
                 }
                 else
                 {
-                    apiResult.Data = result.Count;
-                    apiResult.Message = result.Message;
+                    apiResult.Data = count;
+                    apiResult.Message = message;
                     apiResult.ErrorCode = 500;
                 }
 
@@ -286,16 +320,46 @@ namespace BackendSite.Controllers.Api
                                                     string ToAccountDisplayName,
                                                     int? Reason)
         {
+            if (string.IsNullOrWhiteSpace(FromAccountNo))
+            {
+                FromAccountNo = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(FromAccountDisplayName))
+            {
+                FromAccountDisplayName = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(ToAccountNo))
+            {
+                ToAccountNo = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(ToAccountDisplayName))
+            {
+                ToAccountDisplayName = null;
+            }
+
+            //因為現在資料的transDate是以+8存在DB，固這邊站不轉換時間。
+            var transFromDate = Convert.ToDateTime(TransFromDate);
+            var transToDate = Convert.ToDateTime(TransToDate);
+
             var ExportData = _bankFinancialBLL.GetTransferInfoList(false,
                                                                        TransferType,
-                                                                       TransFromDate,
-                                                                       TransToDate,
+                                                                       transFromDate,
+                                                                       transToDate,
                                                                        FromAccountNo,
                                                                        FromAccountDisplayName,
                                                                        ToAccountNo,
                                                                        ToAccountDisplayName,
                                                                        Reason,
                                                                        null);
+            foreach (var data in ExportData.ToArray())
+            {
+                data.TransDate = new DateTimeOffset(data.TransDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
             var stream = _excelBLL.Export(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -405,21 +469,6 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
-
-        #endregion
-
-        #region Private Methods
-
-        private string GetTimeZoneDateTime(int siteId)
-        {
-            var timeZone = siteId == 1 ? 8 : 7;
-            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        }
-
-        private string GetTimeZoneZeroDateTimeByDateString(string datetime)
-        {
-            return new DateTimeOffset(Convert.ToDateTime(datetime)).ToOffset(new TimeSpan(0, 0, 0)).DateTime.ToString("yyyy-MM-dd HH:mm:ss");
-        }
 
         #endregion
     }

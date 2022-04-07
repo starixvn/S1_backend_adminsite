@@ -132,7 +132,7 @@ namespace BackendSite
                             OpenApiSchema.Https
                         };
                         document.Info.Title = "AdminSite API Document";
-                        document.Info.Version = "2.0.8052.33473";
+                        document.Info.Version = "2.0.8098.34336";
                     };
                 });
 
@@ -154,6 +154,10 @@ namespace BackendSite
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/health", async context =>
+                {
+                    await context.Response.WriteAsync($"{env.EnvironmentName}-{DateTime.Now:yyyy/MM/dd HH:mm:ss}");
+                });
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");

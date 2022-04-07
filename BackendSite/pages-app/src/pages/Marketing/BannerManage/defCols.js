@@ -1,11 +1,19 @@
 export const defBannerType = {
 	1: "Main Banner",
-	2: "HotEvent",
 	3: "Slots",
 	4: "Live Casino",
 	5: "Fishing",
 	6: "Lottery"
 };
+
+export const initCurrencyLangMap = {
+	"2":['en','cs'],
+	"4":['th_en','th'],
+	"13":['cs'],
+	"15":['id_en','id'],
+	"51":['vn','en'],
+	"61":['hi_en','hi'],
+}
 
 export const initBannerType = [
 	{ value: 1, displayText: defBannerType[1] },

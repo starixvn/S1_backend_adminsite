@@ -1,11 +1,12 @@
 ﻿@model IEnumerable<BackendSite.Service.Model.BankDetail>
 @using Microsoft.AspNetCore.Hosting
 @using BackendSite.Service.BLL
+@using BackendSite.Service.Model.enums
+@using Newtonsoft.Json
 @inject IWebHostEnvironment environment
 @inject SelLangBLL selLangBLL
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
-@inject IWebHostEnvironment environment
 @section Style {
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins&display=swap" rel="stylesheet">
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -35,7 +36,7 @@
 <div id="App"></div>
 @section Scripts {
     <script>
-        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        $.extend(i18n, @Html.Raw(JsonConvert.SerializeObject(i18n)));
     </script>
     <script src="~/lib/runtime.min.js"></script>
     <script src="~/js/component/Finance/PaymentAdjustment.min.js" asp-append-version="true"></script>

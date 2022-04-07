@@ -100,6 +100,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string BonusCode { get; set; }
         }
 
+        public class SubmitBatchRequest
+        {
+            public AdjustmentInfoAdjustTypeEnum Option { get; set; }
+            public int SiteId { get; set; }
+            public int WithdrawalLimitOption { get; set; }
+            public IFormFile ExcelUpload { get; set; }
+            public decimal Withdrawal { get; set; }
+            public string BonusCode { get; set; }
+        }
+
         #endregion
 
         #region API
@@ -124,7 +134,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
             var apiResult = new ApiResult<AdjustmentLimitData>
             {
-                Data = _paymentBll.GetAdjustmentData(siteIds, currencyIds,1,1000,out _,out _).FirstOrDefault(),
+                Data = _paymentBll.GetAdjustmentData(siteIds, currencyIds, 1, 1000, out _, out _).FirstOrDefault(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -374,32 +384,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// 
         /// Func Path：Finance > Balance Adjustment Batch > [Submit]
         /// </remarks>
-        /// <param name="option"></param>
-        /// <param name="optSite"></param>
-        /// <param name="withdrawalLimitOption"></param>
-        /// <param name="excelUpload"></param>
-        /// <param name="withdrawal"></param>
-        /// <param name="bonusCode"></param>
+        /// <param name="request"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BalanceAdjustmentBatch" })]
-        public async Task<List<ApiResult>> SubmitBatchAsync(
-            [FromForm] AdjustmentInfoAdjustTypeEnum option,
-            [FromForm] int optSite,
-            [FromForm] int withdrawalLimitOption,
-            [FromForm] IFormFile excelUpload,
-            [FromForm] decimal withdrawal,
-            [FromForm] string bonusCode)
+        public async Task<List<ApiResult>> SubmitBatchAsync([FromForm] SubmitBatchRequest request)
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBll.GetAuthData();
             var bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+                if (request.ExcelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase) ||
+                    request.ExcelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
+                    request.ExcelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
                 {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
+                    var excelPkg = new ExcelPackage(request.ExcelUpload.OpenReadStream());
                     var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
@@ -418,7 +417,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         }
                         else
                         {
-                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, optSite);
+                            var custInfoDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, request.SiteId);
                             if (custInfoDetail == null)
                             {
                                 apiResult.Add(new ApiResult()
@@ -432,10 +431,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                 try
                                 {
                                     //非Retention Bonus
-                                    if (option != AdjustmentInfoAdjustTypeEnum.RetentionBonus
-                                        && option != AdjustmentInfoAdjustTypeEnum.ManualBonus)
+                                    if (request.Option != AdjustmentInfoAdjustTypeEnum.RetentionBonus
+                                        && request.Option != AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
-                                        var withdrawalLimitAmount = (withdrawalLimitOption == 1) ? amount * withdrawal : 0;
+                                        var withdrawalLimitAmount = (request.WithdrawalLimitOption == 1) ? amount * request.Withdrawal : 0;
                                         var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                         {
                                             CustId = custInfoDetail.CustId,
@@ -443,11 +442,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             UserName = custInfoDetail.UserName,
                                             SiteId = custInfoDetail.SiteId,
                                             Amount = amount,
-                                            AdjustType = (int)option,
+                                            AdjustType = (int)request.Option,
                                             SiteName = custInfoDetail.SiteName,
                                             Operator = authData.UserName,
                                             WithdrawalLimitAmount = withdrawalLimitAmount,
-                                            WithdrawalLimitAmountAdjustType = withdrawalLimitOption,
+                                            WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                                             Memo = memo
                                         };
 
@@ -533,11 +532,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                         var setAdjustBonusReq = new SetAdjustBonusReq()
                                         {
                                             CustId = custInfoDetail.CustId,
-                                            BonusCode = bonusCode,
+                                            BonusCode = request.BonusCode,
                                             Memo = memo,
                                             Operator = authData.UserName,
                                             Amount = amount,
-                                            PromotionType = option == AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
+                                            PromotionType = request.Option == AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
                                         };
                                         var apiOnlineResult = await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
                                         if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)

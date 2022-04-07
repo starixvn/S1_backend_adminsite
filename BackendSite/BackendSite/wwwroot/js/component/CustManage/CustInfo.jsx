@@ -1352,7 +1352,16 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     }.bind(this));
             }
         }
-
+        rotate(){
+            let _direction = 90;
+            if(this.state.direction != undefined)
+             _direction = this.state.direction >= 270 ? 0 : this.state.direction + 90;
+            
+            this.setState({
+                ...this.state,
+                direction: _direction
+            })
+        }
         // setTag(){
 
         // }
@@ -1370,7 +1379,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             let tag = "";
             let tagSelectList = null;
             let isTempTPWllet = this.props.isTempTPWallet;
-            console.log(this.props,'props');
+           // console.log(this.props,'props');
 
             if (data != null) {
                 elgibleWithdrawal = data.withdrawalLimit - data.turnOver;
@@ -1855,8 +1864,9 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                             <tr>
                                                 <td>
                                                     <div className="id-image">
-                                                        <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" />
+                                                        <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
                                                     </div>
+                                                    <button onClick={this.rotate.bind(this)}>rotate</button>
                                                 </td>
                                                 <td>
                                                     <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>

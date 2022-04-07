@@ -235,6 +235,7 @@ namespace BackendSite.Service.Model
     public class CustRollOver
     {
         public decimal RollOver { get; set; }
+        public decimal WinOver { get; set; }
         public decimal TurnOver { get; set; }
     }
 

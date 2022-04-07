@@ -54,7 +54,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         public class SetRequest
         {
-            public List<ReferralManagement> ReferralList { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int PeriodDays { get; set; }
+            public decimal BonusAmount { get; set; }
+            public decimal VaildBet { get; set; }
+            public decimal Deposit { get; set; }
         }
 
         #endregion
@@ -136,8 +141,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public ApiResult Set(SetRequest request)
         {
             var apiResult = new ApiResult();
-
-            _referralManagementBll.SetReferral(request.ReferralList);
+            var referralList = new List<ReferralManagement>();
+            referralList.Add(new ReferralManagement()
+            {
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                PeriodDays = request.PeriodDays.ToString(),
+                BonusAmount = request.BonusAmount.ToString(),
+                VaildBet = request.BonusAmount.ToString(),
+                Deposit = request.Deposit.ToString()
+            });
+            _referralManagementBll.SetReferral(referralList);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
