@@ -32,7 +32,7 @@ class TpTransferInfoList extends React.Component {
                 </td>
                 <td className="text-right">{number_format(row.amount)}</td>
                 <td>{row.thirdId}</td>
-                <td>{row.Memo}</td>
+                <td>{row.memo}</td>
                 <td>{TpTransferInfoStatus[row.status]}</td>
             </tr>
         );
