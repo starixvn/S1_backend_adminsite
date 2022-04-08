@@ -422,31 +422,8 @@ namespace BackendSite.Controllers.Api
             var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
-            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
 
-            var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
-                                                                    req.BirDate,
-                                                                    req.BirMonth,
-                                                                    req.BirYear,
-                                                                    req.UserName,
-                                                                    req.AccountName,
-                                                                    req.LoginIp,
-                                                                    req.TransId,
-                                                                    req.TpUserName,
-                                                                    req.Email,
-                                                                    req.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    req.AffCode,
-                                                                    req.SelectCurrency,
-                                                                    req.BankAccountNumber,
-                                                                    req.SelectStatus,
-                                                                    req.SelectTag).ToList();
-
+            var data = GetCustInfoExportList<CustInfoDetailForExport>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
             data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             if (req.ExportTransferWallet)
@@ -469,6 +446,34 @@ namespace BackendSite.Controllers.Api
                 var stream = _excelBll.Export(data, properties);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private List<T> GetCustInfoExportList<T>(CustInfoListReq req, DateTime? startDate, DateTime? endDate, DateTime? tagStartDate,
+            DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate)
+        {
+            var data = _custInfoBll.GetCustInfoExportList<T>(req.SelectSite,
+                req.BirDate,
+                req.BirMonth,
+                req.BirYear,
+                req.UserName,
+                req.AccountName,
+                req.LoginIp,
+                req.TransId,
+                req.TpUserName,
+                req.Email,
+                req.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                req.AffCode,
+                req.SelectCurrency,
+                req.BankAccountNumber,
+                req.SelectStatus,
+                req.SelectTag).ToList();
+            return data;
         }
 
         #endregion
