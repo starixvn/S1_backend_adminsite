@@ -181,7 +181,6 @@ namespace BackendSite.Service.Model
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
         public int CurrencyId { get; set; }
-        //public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public string Agent { get; set; }
         public DateTimeOffset RegTime { get; set; }
@@ -211,7 +210,6 @@ namespace BackendSite.Service.Model
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
         public int CurrencyId { get; set; }
-        //public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public string Agent { get; set; }
         public DateTimeOffset RegTime { get; set; }

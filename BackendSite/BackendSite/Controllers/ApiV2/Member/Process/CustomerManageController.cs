@@ -603,29 +603,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-
-            var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
-                                                                    request.BirDate,
-                                                                    request.BirMonth,
-                                                                    request.BirYear,
-                                                                    request.UserName,
-                                                                    request.AccountName,
-                                                                    request.LoginIp,
-                                                                    request.TransId,
-                                                                    request.TpUserName,
-                                                                    request.Email,
-                                                                    request.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    request.AffCode,
-                                                                    request.CurrencyIds,
-                                                                    request.BankAccountNumber,
-                                                                    request.Statuses,
-                                                                    request.SelectTag);
+            var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExport>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
 
             if (request.ExportTransferWallet)
             {
@@ -647,6 +625,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var stream = _excelBll.Export(exportCustInfo, properties);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private IEnumerable<T> GetCustInfoExportList<T>(CustInfoListRequest request, DateTime? startDate, DateTime? endDate,
+            DateTime? tagStartDate, DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate)
+        {
+            return _custInfoBll.GetCustInfoExportList<T>(request.SiteIds,
+                request.BirDate,
+                request.BirMonth,
+                request.BirYear,
+                request.UserName,
+                request.AccountName,
+                request.LoginIp,
+                request.TransId,
+                request.TpUserName,
+                request.Email,
+                request.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                request.AffCode,
+                request.CurrencyIds,
+                request.BankAccountNumber,
+                request.Statuses,
+                request.SelectTag);
         }
 
         #endregion
