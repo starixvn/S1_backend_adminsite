@@ -7,6 +7,7 @@ using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers
 {
@@ -149,13 +150,13 @@ namespace BackendSite.Controllers
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = excelBLL.Export(exportDatas);
+                var stream = excelBLL.ExportV2(data);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = excelBLL.Export(data, properties);
+                var result = JsonConvert.DeserializeObject<List<CustInfoDetailForExportV2>>(JsonConvert.SerializeObject(data));
+                var stream = excelBLL.ExportV2(result);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
         }
