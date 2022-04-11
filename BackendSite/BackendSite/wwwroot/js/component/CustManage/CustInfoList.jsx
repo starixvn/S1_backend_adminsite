@@ -180,6 +180,7 @@ import * as Loading from '../commJS/Loading.jsx';
         handleSubmit(event) {
             event.preventDefault();
             if(this.state.UserName.indexOf("%") != -1){alert("UserName Can Not Contain %"); return;}
+            if(this.state.AccountName.indexOf("%") != -1){alert("Real Name Can Not Contain %"); return;}
             if ((this.state.BirDate || this.state.BirMonth) && (!this.state.BirDate || !this.state.BirMonth)) { alert("Please fill in at least Date and Month"); return; }
             let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
             let tagEndDate = moment(this.selectTagDate_end.current.value).add(1, 'days').unix() - 1;
