@@ -324,10 +324,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
         }
 
         public class CustIdWithReasonRequest : CustIdRequest
@@ -527,7 +526,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
+        public ApiResult GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -658,6 +657,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region CSD > Customer Administration > CustInfo
 
+        /// <summary>
         /// <summary>
         /// CustomerManage/GetCustInfoDetail 取得客戶資料明細
         /// </summary>
@@ -972,7 +972,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
             }
-
 
             await using var fileStream = file.OpenReadStream();
             using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
@@ -2630,6 +2629,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
         /// </summary>
         /// <remarks>
+        /// Http Method：POST
+        /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
         /// </remarks>
         /// <param name="request"></param>

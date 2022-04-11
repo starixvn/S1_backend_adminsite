@@ -11,8 +11,8 @@
 
     for (var currency = 1; currency <= 61; currency++)
     {
-        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
-            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"CurrencyWithdrawal_{currency}")))
+            i18n.Add($"lbl_CurrencyWithdrawal{currency}", selLangBLL.GetResourceValue($"CurrencyWithdrawal_{currency}"));
     }
 
     var lbl_Txts = new string[]
@@ -42,9 +42,9 @@
 <div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/Finance/CryptoWithdrawalLimitManagement.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        window.RootUrl = '';
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
-    </script>
+            window.RootUrl = '';
+            window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        </script>
+    <script src="~/js/component/Finance/CryptoWithdrawalLimitManagement.min.js" asp-append-version="true"></script>
 }
