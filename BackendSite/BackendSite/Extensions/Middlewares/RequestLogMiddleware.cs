@@ -25,15 +25,6 @@ namespace BackendSite.Extensions.Middlewares
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
         private readonly AuthorizeBLL _authorizeBLL;
-        private readonly ServerInfoBLL _serverInfoBLL;
-        private readonly Tools _tools;
-        private readonly List<string> _accessController = new List<string>
-        {
-            "TpFailRecordReport",
-            "WithdrawalLimitCrypto",
-            "GetAllData",
-            "BaseData"
-        };
 
         #endregion
 
@@ -48,8 +39,6 @@ namespace BackendSite.Extensions.Middlewares
             _next = next;
             _logger = factory.CreateLogger("RequestLog");
             _authorizeBLL = authorizeBLL;
-            _serverInfoBLL = serverInfoBLL;
-            _tools = tools;
         }
 
         #endregion
@@ -60,16 +49,6 @@ namespace BackendSite.Extensions.Middlewares
         {
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
-            
-            if (env.IsProduction())
-            {
-                if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0
-                    && !_accessController.Any(x => path.Contains(x)))
-                {
-                    //_logger.LogInformation("Cannot access apiV2: " + path);
-                    //throw new AdminException(ErrorCodeEnum.Fail);
-                }
-            }
             
             var requestBodyStream = new MemoryStream();
             var originalRequestBody = context.Request.Body;
@@ -106,7 +85,6 @@ namespace BackendSite.Extensions.Middlewares
 
             await _next(context);
             context.Request.Body = originalRequestBody;
-            //}
         }
 
         #endregion
