@@ -31,6 +31,7 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public int RollOver { get; set; }
+        public int WinOver { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
         public string Operator { get; set; }
@@ -45,10 +46,10 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string UserName { get; set; }
         public string CurrencyName { get; set; }
-
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public int RollOver { get; set; }
+        public int WinOver { get; set; }
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
         public DateTimeOffset ExpiryTime { get; set; }
@@ -103,6 +104,8 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { set; get; }
         public decimal LockedAmount { set; get; }
         public int TpId { set; get; }
+        public int WalletType { set; get; }
+        
     }
     
     public class TpBonusCancelTransfer

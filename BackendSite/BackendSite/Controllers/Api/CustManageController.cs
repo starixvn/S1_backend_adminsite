@@ -422,35 +422,11 @@ namespace BackendSite.Controllers.Api
             var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
-            List<Task<CustInfoDetailForExport>> exportData = new List<Task<CustInfoDetailForExport>>();
-
-            var data = _custInfoBll.GetCustInfoExportList(req.SelectSite,
-                                                                    req.BirDate,
-                                                                    req.BirMonth,
-                                                                    req.BirYear,
-                                                                    req.UserName,
-                                                                    req.AccountName,
-                                                                    req.LoginIp,
-                                                                    req.TransId,
-                                                                    req.TpUserName,
-                                                                    req.Email,
-                                                                    req.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    req.AffCode,
-                                                                    req.SelectCurrency,
-                                                                    req.BankAccountNumber,
-                                                                    req.SelectStatus,
-                                                                    req.SelectTag).ToList();
-
-            data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             if (req.ExportTransferWallet)
             {
+                var data = GetCustInfoExportList<CustInfoDetailForExport>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = data.Select(async x =>
                 {
@@ -460,15 +436,44 @@ namespace BackendSite.Controllers.Api
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = _excelBll.Export(exportDatas);
+                var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = _excelBll.Export(data, properties);
+                var data = GetCustInfoExportList<CustInfoDetailForExportV2>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                var stream = _excelBll.ExportV2(data);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private List<T> GetCustInfoExportList<T>(CustInfoListReq req, DateTime? startDate, DateTime? endDate, DateTime? tagStartDate,
+            DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate)
+        {
+            var data = _custInfoBll.GetCustInfoExportList<T>(req.SelectSite,
+                req.BirDate,
+                req.BirMonth,
+                req.BirYear,
+                req.UserName,
+                req.AccountName,
+                req.LoginIp,
+                req.TransId,
+                req.TpUserName,
+                req.Email,
+                req.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                req.AffCode,
+                req.SelectCurrency,
+                req.BankAccountNumber,
+                req.SelectStatus,
+                req.SelectTag).ToList();
+            return data;
         }
 
         #endregion
@@ -1537,15 +1542,14 @@ namespace BackendSite.Controllers.Api
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
             
             //轉帳制
-            if (data != null && (data.TpId == (int)TpEnum.Saba || data.TpId == (int)TpEnum.PT))
+            if (data != null && data.WalletType == (int) TpListWalletTypeEnum.FundTransfer)
             {
-                if( data.Status == (int) BonusStatus.Running )
+                if (data.Status == (int)BonusStatus.Running)
                 {
-                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-                    apiResult.Message = "Bonus is not successfully redeemed, cancellation not eligible to execute";
+                    CancelBonus(bonusReq, data, apiResult);
                     return apiResult;
                 }
-                
+
                 var winLossAmount = _bonusInfoBll.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
                 var transferBonusAmount = data.BonusAmount + data.LockedAmount; 
                 var remainingBonus = transferBonusAmount + winLossAmount;
@@ -1595,22 +1599,8 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
-
-                            if (result > 0)
-                            {
-                                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
-                                var msg = new StringBuilder();
-                                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
-                                var authData = _authorizeBll.GetAuthData();
-                                _messageBll.SendMessageToPlayer("Bonus Service", title,msg.ToString(),data.CustId,authData.UserId);
-                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                            }
-                            else
-                            {
-                                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-                                apiResult.Message = "Fail.";
-                            }
+                            CancelBonus(bonusReq, data, apiResult);
+                            return apiResult;
                         } 
                         break; 
                 }
@@ -1645,6 +1635,26 @@ namespace BackendSite.Controllers.Api
             };
             _serverInfoBll.AdminOperateLog(null, bonusReq.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
             return apiResult;
+        }
+
+        private void CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
+        {
+            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
+
+            if (result > 0)
+            {
+                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                var msg = new StringBuilder();
+                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                var authData = _authorizeBll.GetAuthData();
+                _messageBll.SendMessageToPlayer("Bonus Service", title, msg.ToString(), data.CustId, authData.UserId);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Fail.";
+            }
         }
 
         #endregion

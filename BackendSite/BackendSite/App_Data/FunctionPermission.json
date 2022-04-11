@@ -274,7 +274,18 @@
       {
         "DisplayKey": "Adjustment Report",
         "FuncKey": "Finance/AdjustmentReport",
-        "Enable": false
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Reason",
+            "FuncKey": "rm_edit_reason"
+          },
+          {
+            "DisplayKey": "Edit Memo",
+            "FuncKey": "rm_edit_memo"
+          }
+        ]
       },
       {
         "DisplayKey": "Payment Management",
@@ -335,6 +346,11 @@
       {
         "DisplayKey": "USDT WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Line Management",
+        "FuncKey": "Finance/LineChannel",
         "Enable": false
       }
     ]
@@ -534,6 +550,11 @@
     {
       "DisplayKey": "Banner Management",
       "FuncKey": "CMS/BannerManage",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Hot Event Management",
+      "FuncKey": "CMS/HotEventManagement",
       "Enable": false
     },
     {

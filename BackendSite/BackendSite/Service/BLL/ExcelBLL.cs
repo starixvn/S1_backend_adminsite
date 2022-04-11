@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.BLL
 {
@@ -116,8 +117,44 @@ namespace BackendSite.Service.BLL
                 {
                     propertyInfo = t.FirstOrDefault().GetType().GetProperties();
                 }
+                
+                propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
+                
                 ExportBody(ws, t, propertyInfo);
                 ExportHeader(ws, propertyInfo);
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+        public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add(nameof(t));
+
+            if (t.Any())
+            {
+                if (properties == null)
+                {
+                    properties = t.FirstOrDefault().GetType().GetProperties();
+                }
+
+                var rows = t.Count() + 1;
+                var cols = properties.Count();
+                if (rows > 0 && cols > 0)
+                {
+                    ws.Cells[1, 1].LoadFromCollection(t, true);
+
+                    using (var range = ws.Cells[1, 1, rows, cols])
+                    {
+                        // 標題列
+                        var title = ws.Cells[1, 1, 1, cols];
+                        title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                    }
+                }
             }
             p.Save();
             return ms.ToArray();

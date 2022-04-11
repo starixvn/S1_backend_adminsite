@@ -9,8 +9,8 @@ const StatusData = {
 }
 const Panel = (props) => {
     let dataRows = props.Datas.length === 0 ? <tr></tr> : props.Datas.map((data, idx) => {
-        console.log(data);
-        console.log(idx);
+        //console.log(data);
+        //console.log(idx);
         return (
             <tr key={`result-body-${idx}`}>
                 <td>{data.siteName}</td>
@@ -19,6 +19,7 @@ const Panel = (props) => {
                 <td>{props.AdjustmentOptionData[data.direction]}</td>
                 <td>{number_format(number_toFixed(data.amount, 2))}</td>
                 <td>{StatusData[data.status]}</td>
+                <td>{data.categoryName}</td>
                 <td>{data.memo}</td>
                 <td>{data.operator}</td>
                 <td>{data.remarks}</td>
@@ -35,6 +36,7 @@ const Panel = (props) => {
             <th scope="col">Adjust Type</th>
             <th scope="col">Adjust Amount</th>
             <th scope="col">Status</th>
+            <th scope="col">Adjust Reason</th>
             <th scope="col">Trans Memo</th>
             <th scope="col">Operator</th>
             <th scope="col">Remarks</th>

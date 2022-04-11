@@ -135,7 +135,7 @@ export default props => {
 							else if (
 								(column === null ||
 								column === undefined ||
-								column === "") && f_key !== "affid"
+								column === "") && f_key !== "affid" && f_key !=='rollOver'  && f_key !=='winOver'
 							) {
 								alert(
 									`${window.i18n[`lbl_Currency${c_key}`]
@@ -152,6 +152,12 @@ export default props => {
 								checked = false;
 								break;
 							}
+						}
+						
+						if( state[key][c_key].rollOver > 0 && state[key][c_key].winOver > 0){
+							alert(`Please choose one of Rollover and WinOver`);
+							checked = false;
+							break;
 						}
 					}
 

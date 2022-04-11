@@ -351,7 +351,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// <summary>
             /// 手動否
             /// </summary>
-            public int Manually { get; set; }
+            public ManuallyEnum Manually { get; set; }
         }
 
         public class DeleteMessageRequest
@@ -367,9 +367,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
 
             /// <summary>
-            /// 異動資訊(1=IsKyc, 2=IsRisk, 3=PhoneVerified, 4=EmailVerified)
+            /// 異動資訊
             /// </summary>
-            public int Option { get; set; }
+            public CustStatusSwitchOptionEnum Option { get; set; }
 
             /// <summary>
             /// 狀態(0=未驗證, 1=已驗證)
@@ -412,16 +412,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string EMail { get; set; }
         }
-        public class VerificationRewardReq
+        public class VerificationRewardReq : CustIdRequest
         {
-            /// <summary>
-            /// 客戶ID
-            /// </summary>
-            public int CustId { get; set; }
-            /// <summary>
-            /// OTPType (0=SMS, 1=Email)
-            /// </summary>
-            public int OTPType { get; set; }
+            public OTPTypeEnum OTPType { get; set; }
         }
 
         public class AddCustNoteRequest : CustIdRequest
@@ -431,10 +424,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class SetCustNoteRequest : CustIdRequest
         {
-            /// <summary>
-            /// 異動類型(1=更新, 2=刪除)
-            /// </summary>
-            public int Type { get; set; }
+            public SetCustNoteTypeEnum Type { get; set; }
 
             public int NoteId { get; set; }
 
@@ -482,10 +472,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class SetEnableDisableBonusRequest : CustIdRequest
         {
-            /// <summary>
-            /// 開關(0=Disble,1=Enable)
-            /// </summary>
-            public int Status { get; set; }
+            public EnablePromotionEnum Status { get; set; }
         }
 
         public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -516,13 +503,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
-        public class CustInfoReq
-        {
-            public int CustId { get; set; }
-            public string UserName { get; set; }
-            public string Reason { get; set; }
-        }
-
         public class GetCustDetailRequest
         {
             public int SiteId { get; set; }
@@ -547,7 +527,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetCustInfoList(CustInfoListRequest request)
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -555,7 +535,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-            
+
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
             var pageNumber = request.PageNumber;
             var data = _custInfoBll.GetCustInfoList(request.SiteIds,
                 request.BirDate,
@@ -620,32 +603,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-
-            var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
-                                                                    request.BirDate,
-                                                                    request.BirMonth,
-                                                                    request.BirYear,
-                                                                    request.UserName,
-                                                                    request.AccountName,
-                                                                    request.LoginIp,
-                                                                    request.TransId,
-                                                                    request.TpUserName,
-                                                                    request.Email,
-                                                                    request.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    request.AffCode,
-                                                                    request.CurrencyIds,
-                                                                    request.BankAccountNumber,
-                                                                    request.Statuses,
-                                                                    request.SelectTag);
-
+            
             if (request.ExportTransferWallet)
             {
+                var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExport>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
                 List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = exportCustInfo.Select(async x =>
                 {
@@ -655,15 +616,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = _excelBll.Export(exportDatas);
+                var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = exportCustInfo.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = _excelBll.Export(exportCustInfo, properties);
+                var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExportV2>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                var stream = _excelBll.ExportV2(exportCustInfo);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private IEnumerable<T> GetCustInfoExportList<T>(CustInfoListRequest request, DateTime? startDate, DateTime? endDate,
+            DateTime? tagStartDate, DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate)
+        {
+            return _custInfoBll.GetCustInfoExportList<T>(request.SiteIds,
+                request.BirDate,
+                request.BirMonth,
+                request.BirYear,
+                request.UserName,
+                request.AccountName,
+                request.LoginIp,
+                request.TransId,
+                request.TpUserName,
+                request.Email,
+                request.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                request.AffCode,
+                request.CurrencyIds,
+                request.BankAccountNumber,
+                request.Statuses,
+                request.SelectTag);
         }
 
         #endregion
@@ -721,7 +709,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiResult GetBonusByCustId(CustIdRequest request)
+        public ApiResult<IEnumerable<CustBonus>> GetBonusByCustId(CustIdRequest request)
         {
             var data = _custInfoBll.GetCustBonus(request.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
@@ -774,37 +762,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
             switch (request.Option)
             {
-                case 1:
+                case CustStatusSwitchOptionEnum.IsKyc:
                     if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isKyc"))
                     {
                         throw new AdminException(ErrorCodeEnum.PermissionDenied);
                     }
                     OldStatus = custSwitchInfo.IsKyc;
                     break;
-                case 2:
+                case CustStatusSwitchOptionEnum.IsRisk:
                     if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isRisk"))
                     {
                         throw new AdminException(ErrorCodeEnum.PermissionDenied);
                     }
                     OldStatus = custSwitchInfo.IsRisk;
                     break;
-                case 3:
+                case CustStatusSwitchOptionEnum.PhoneVerified:
                     if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_phoneVerified"))
                     {
                         throw new AdminException(ErrorCodeEnum.PermissionDenied);
                     }
                     OldStatus = custSwitchInfo.PhoneVerified;
                     break;
-                default:
+                case CustStatusSwitchOptionEnum.EmailVerified:
                     if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_emailVerified"))
                     {
                         throw new AdminException(ErrorCodeEnum.PermissionDenied);
                     }
                     OldStatus = custSwitchInfo.EmailVerified;
                     break;
+                default:
+                    throw new AdminException(ErrorCodeEnum.Fail);
+                    break;
             }
             NewStatus = request.Status;
-            var data = _custInfoBll.SetCustStatusSwitch(request.CustId, request.Option) > 0;
+            var data = _custInfoBll.SetCustStatusSwitch(request.CustId, (int)request.Option) > 0;
 
             if (!data)
             {
@@ -814,25 +805,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var Menu = "CustManage/CustInfoList";
             var Info = new Dictionary<string, dynamic>();
             Info.Add("MenuName", "Customer Info");
-            if (request.Option == 1)
+            if (request.Option == CustStatusSwitchOptionEnum.IsKyc)
             {
                 Info.Add("Action", "Change IsKyc Status");
                 Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
                 Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
             }
-            else if (request.Option == 2)
+            else if (request.Option == CustStatusSwitchOptionEnum.IsRisk)
             {
                 Info.Add("Action", "Change IsRisk Status");
                 Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
                 Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
             }
-            else if (request.Option == 3)
+            else if (request.Option == CustStatusSwitchOptionEnum.PhoneVerified)
             {
                 Info.Add("Action", "Change PhoneVerified Status");
                 Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
                 Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
             }
-            else if (request.Option == 4)
+            else if (request.Option == CustStatusSwitchOptionEnum.EmailVerified)
             {
                 Info.Add("Action", "Change EmailVerified Status");
                 Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
@@ -858,7 +849,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var apiResult = new ApiResult();
 
-            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, verificationRewardReq.OTPType);
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, (int)verificationRewardReq.OTPType);
 
             return apiResult;
         }
@@ -1304,7 +1295,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult SetEnablePromotionStatus(SetEnableDisableBonusRequest request)
         {
-            if (_custInfoBll.SetEnableDisablePromotion(request.CustId, request.Status, User.Identity.Name) > 0)
+            if (_custInfoBll.SetEnableDisablePromotion(request.CustId, (int)request.Status, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1930,32 +1921,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult SetCustNote(SetCustNoteRequest request)
         {
-            if (request.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (request.Type == 2 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
             else
             {
-                var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, request.Type, User.Identity.Name);
+                var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
 
                 if (data)
                 {
                     var Menu = "CustManage/CustInfoList";
                     var Info = new Dictionary<string, dynamic>();
                     Info.Add("MenuName", "Customer Info");
-                    if (request.Type == 1)
+                    if (request.Type == SetCustNoteTypeEnum.Update)
                     {
                         Info.Add("Action", "Edit Note");
                     }
-                    else if (request.Type == 1)
+                    else if (request.Type == SetCustNoteTypeEnum.Delete)
                     {
                         Info.Add("Action", "Delete Note");
                     }
@@ -2420,7 +2411,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
                 var authData = _authorizeBll.GetAuthData();
                 var result = _vipLevelBll.SetVipLevelManually(custInfo.SiteId, custInfo.CustId, custInfo.UserName,
-                    request.Manually, authData.UserName);
+                    (int)request.Manually, authData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -2643,7 +2634,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList"})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
         {

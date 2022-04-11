@@ -148,6 +148,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/TransferAccountManage/index.jsx",
     // ],
+    // "BankFinancial/ReasonManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/ReasonManagement/index.js",
+    // ],
     // "Marketing/VipRebateInfoReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
@@ -177,10 +181,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    // "BankFinancial/TransferInfoReport.min": [
-    //   "@babel/polyfill",
-    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    // ],
+    "BankFinancial/TransferInfoReport.min": [
+      "@babel/polyfill",
+      "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
@@ -266,6 +270,10 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    // "Marketing/HotEventManagement.min": [
+    //   "./src/pages/Marketing/HotEventManagement/index.js",
+    // ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

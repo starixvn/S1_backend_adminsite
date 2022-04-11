@@ -11,6 +11,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {
@@ -23,12 +24,14 @@ namespace BackendSite.Controllers.Api
         private readonly TpBLL tpBLL;
         private readonly Common common;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly SelLangBLL _selLangBLL;
 
-        public TpController(TpBLL tpBLL, Common common, CustInfoBLL custInfoBLL)
+        public TpController(IServiceProvider provider)
         {
-            this.tpBLL = tpBLL;
-            this.common = common;
-            this.custInfoBLL = custInfoBLL;
+            this.tpBLL = provider.GetRequiredService<TpBLL>();
+            this.common = provider.GetRequiredService<Common>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this._selLangBLL = provider.GetRequiredService<SelLangBLL>();
         }
 
         public class TransferInfoReq
@@ -162,13 +165,22 @@ namespace BackendSite.Controllers.Api
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
-        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] decimal Amount, [FromForm] string Memo)
+        public async Task<ApiResult> SetAdjustmentTpCustInfo([FromForm] int SiteId, [FromForm] int TpId, [FromForm] string UserName, [FromForm] string UserTpId, [FromForm] int Opt, [FromForm] decimal Amount, [FromForm] string Memo, [FromForm] int Category)
         {
             var apiResult = new ApiResult();
             var custId = (string.IsNullOrEmpty(UserTpId)) ? null : common.TpIdToCustId(UserTpId);
             var custInfosDetail = custInfoBLL.GetCustInfoDetails(custId, UserName, SiteId);
             
-            var inTpTransfer = new AdminTpTransfer() { TpId = TpId, CustId = custInfosDetail.CustId, Amount = Amount, direction = (TpDirection)Opt, Operator = User.Identity.Name, Remarks = Memo };
+            var inTpTransfer = new AdminTpTransfer()
+            {
+                TpId = TpId,
+                CustId = custInfosDetail.CustId,
+                Amount = Amount,
+                direction = (TpDirection)Opt,
+                Operator = User.Identity.Name,
+                Remarks = Memo,
+                Category = Category
+            };
 
             var result = await tpBLL.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
