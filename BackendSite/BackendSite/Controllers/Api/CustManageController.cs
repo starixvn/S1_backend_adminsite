@@ -423,11 +423,10 @@ namespace BackendSite.Controllers.Api
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
 
-            var data = GetCustInfoExportList<CustInfoDetailForExport>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
-            data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-
             if (req.ExportTransferWallet)
             {
+                var data = GetCustInfoExportList<CustInfoDetailForExport>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
                 List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = data.Select(async x =>
                 {
@@ -437,13 +436,14 @@ namespace BackendSite.Controllers.Api
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = _excelBll.Export(exportDatas);
+                var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = _excelBll.Export(data, properties);
+                var data = GetCustInfoExportList<CustInfoDetailForExportV2>(req, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                data.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                var stream = _excelBll.ExportV2(data);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
         }
