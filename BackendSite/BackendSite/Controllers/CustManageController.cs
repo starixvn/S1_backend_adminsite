@@ -7,6 +7,7 @@ using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers
 {
@@ -113,34 +114,12 @@ namespace BackendSite.Controllers
             var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
             var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
 
-
-            var data = custInfoBLL.GetCustInfoExportList(selectSite,
-                                                                    req.BirDate,
-                                                                    req.BirMonth,
-                                                                    req.BirYear,
-                                                                    req.UserName,
-                                                                    req.AccountName,
-                                                                    req.LoginIp,
-                                                                    req.TransId,
-                                                                    req.TpUserName,
-                                                                    req.Email,
-                                                                    req.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    req.AffCode,
-                                                                    selectCurrency,
-                                                                    req.BankAccountNumber,
-                                                                    selectStatus,
-                                                                    selectTag);
-
-            data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            
             if (req.ExportTransferWallet)
             {
-                List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
+                var data = GetCustInfoExportList<CustInfoDetailForExport>(req, selectSite, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate, selectCurrency, selectStatus, selectTag);
+                data.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                var exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = data.Select(async x =>
                 {
                     var exprotdata = await custInfoBLL.GetTransferWalletAsync(x);
@@ -149,15 +128,45 @@ namespace BackendSite.Controllers
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = excelBLL.Export(exportDatas);
+                var stream = excelBLL.ExportV2(exportDatas);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = data.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = excelBLL.Export(data, properties);
+                var result = GetCustInfoExportList<CustInfoDetailForExportV2>(req, selectSite, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate, selectCurrency, selectStatus, selectTag);
+                result.ToList().ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+                var stream = excelBLL.ExportV2(result);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private IEnumerable<T> GetCustInfoExportList<T>(CustInfoReq req, IEnumerable<int> selectSite, DateTime? startDate, DateTime? endDate,
+            DateTime? tagStartDate, DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate,
+            IEnumerable<int> selectCurrency, IEnumerable<int> selectStatus, IEnumerable<int> selectTag)
+        {
+            var data = custInfoBLL.GetCustInfoExportList<T>(selectSite,
+                req.BirDate,
+                req.BirMonth,
+                req.BirYear,
+                req.UserName,
+                req.AccountName,
+                req.LoginIp,
+                req.TransId,
+                req.TpUserName,
+                req.Email,
+                req.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                req.AffCode,
+                selectCurrency,
+                req.BankAccountNumber,
+                selectStatus,
+                selectTag);
+            return data;
         }
 
         #endregion
