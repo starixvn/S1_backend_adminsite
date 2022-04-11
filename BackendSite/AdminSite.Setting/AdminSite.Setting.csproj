@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="BusinessLogicLayer\Interface\" />
+    <Folder Include="DataAccessLayer\Interface\" />
+    <Folder Include="Entities\Dtos\" />
+    <Folder Include="Entities\Models\" />
+  </ItemGroup>
+
+</Project>
