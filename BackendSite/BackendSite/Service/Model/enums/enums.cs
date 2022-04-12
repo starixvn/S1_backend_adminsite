@@ -777,7 +777,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-
+    
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
