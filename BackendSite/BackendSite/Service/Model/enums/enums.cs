@@ -90,6 +90,36 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region AdminModule
+
+    public enum AdminModuleStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminFunction
+
+    public enum AdminFunctionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminPermission
+
+    public enum AdminPermissionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
     #region Customer
 
     public enum IsKycEnum
@@ -777,7 +807,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-    
+
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
