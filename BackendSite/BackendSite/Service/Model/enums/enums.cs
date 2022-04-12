@@ -322,6 +322,14 @@ namespace BackendSite.Service.Model.enums
         BTC = 4
     }
 
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
+    }
+
     #endregion
 
     #region OTPVerifyinfo
@@ -744,14 +752,6 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
 
-    public enum CryptoCurrencyEnum
-    {
-        USDT = 96,
-        USDC = 97,
-        ETH = 98,
-        BTC = 99
-    }
-
     public enum SendMessageStatus
     {
         Pending = 0,
@@ -782,7 +782,7 @@ namespace BackendSite.Service.Model.enums
     {
         DG_LiveCasino = 10
     }
-
+    
     public enum TpCategoryEnum
     {
         Sports = 1,
@@ -864,7 +864,6 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-
     #region Banner
 
     public enum BannerTypeEnum
@@ -927,6 +926,39 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region SlotGame
+    public enum SlotGameCategoryEnum
+    {
+        All = 0,
+        Jackpot = 1,
+        New = 2,
+        Feature = 3,
+        Favourite = 4
+    }
+    #endregion
+
+    #region SlotGameStatus
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+    #endregion
+
+    #region SlotGameDetail
+    public enum SlotGameDetailStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+    #endregion
+
     #region TpCustInfo
 
     public enum TpCustInfoStatusEnum
@@ -934,6 +966,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Locked = 2
     }
+
     #endregion
 
     #region TpTransferInfo
@@ -946,10 +979,23 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-
     public enum TpListWalletTypeEnum
     {
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    #region DeepLink
+    public enum DeepLinkTableTypeEnum
+    {
+        Android = 1,
+        IOS  = 2,
+        Desktop = 3
+    }
+    public enum DeepLinkTableProtocolTypeEnum
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
+    #endregion
 }
