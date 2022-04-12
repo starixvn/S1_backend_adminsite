@@ -63,26 +63,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <summary>
         /// Permission/GetAllPermission 取得所有的權限
         /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Sample request:(舊選單)
-        ///
-        ///     {
-        ///        "lang": null
-        ///     }
-        ///
-        /// Sample request:(新選單)
-        ///
-        ///     {
-        ///        "lang": ""
-        ///     }
-        ///     
-        ///     {
-        ///        "lang": "en"
-        ///     }
-        /// </remarks>
         [HttpPost]
         public ApiResult GetAllPermission()
         {
@@ -127,7 +107,24 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// Permission/GetAllMenu 取得主選單所有資料
         /// </summary>
         /// <remarks>
+        /// 
         /// Http Method：POST
+        /// 
+        /// Sample request:(舊選單)
+        ///
+        ///     {
+        ///        "lang": null
+        ///     }
+        ///
+        /// Sample request:(新選單)
+        ///
+        ///     {
+        ///        "lang": ""
+        ///     }
+        ///     
+        ///     {
+        ///        "lang": "en"
+        ///     }
         /// </remarks>
         [HttpPost]
         public async Task<ApiResult> GetAllMenuAsync(GetAllMenuRequestModel request)
