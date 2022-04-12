@@ -179,5 +179,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
             };
         }
+        
+        /// <summary>
+        /// UserBetLimit/GetTpBetLimit 取得指定第三方投注限額
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Enable TpGame
+        /// 
+        /// </remarks>
+        /// <param name="categoryId"></param>
+        /// <param name="currencyId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
+        {
+            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(categoryId, currencyId);
+            var apiResult = new ApiResult<IEnumerable<TpBetLimitGroup>>
+            {
+                Data = data,
+                ErrorCode = 0
+            };
+            return apiResult;
+        }
     }
 }

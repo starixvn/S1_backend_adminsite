@@ -2,13 +2,20 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -29,14 +36,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
 
         #region Constructors
 
-        public HomeController(AuthorizeBLL authorizeBll,
-                              Tools tools,
-                              AdminBLL adminBll)
+        public HomeController(IServiceProvider provider)
         {
-            _authorizeBll = authorizeBll;
-            _tools = tools;
-            _adminBll = adminBll;
+            _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _tools = provider.GetService<Tools>();
+            _adminBll = provider.GetService<AdminBLL>();
         }
+
 
         #endregion
 
