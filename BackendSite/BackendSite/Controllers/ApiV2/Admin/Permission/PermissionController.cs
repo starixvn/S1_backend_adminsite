@@ -55,10 +55,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             /// <summary>
             /// 語系
             /// </summary>
-            /// <remarks>
-            /// null=舊選單
-            /// 空白or有直=新選單
-            /// </remarks>
             public string Lang { get; set; }
         }
 
@@ -68,7 +64,24 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// Permission/GetAllPermission 取得所有的權限
         /// </summary>
         /// <remarks>
+        /// 
         /// Http Method：POST
+        /// 
+        /// Sample request:(舊選單)
+        ///
+        ///     {
+        ///        "lang": null
+        ///     }
+        ///
+        /// Sample request:(新選單)
+        ///
+        ///     {
+        ///        "lang": ""
+        ///     }
+        ///     
+        ///     {
+        ///        "lang": "en"
+        ///     }
         /// </remarks>
         [HttpPost]
         public ApiResult GetAllPermission()
