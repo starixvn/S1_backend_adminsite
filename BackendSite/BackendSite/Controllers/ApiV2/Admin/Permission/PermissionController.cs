@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +48,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         {
             public bool IsSuper { get; set; }
             public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
+        }
+
+        public class GetAllMenuRequestModel
+        {
+            public string Lang { get; set; }
         }
 
         #endregion
@@ -103,29 +110,49 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// Http Method：POST
         /// </remarks>
         [HttpPost]
-        public ApiResult GetAllMenu()
+        public async Task<ApiResult> GetAllMenuAsync(GetAllMenuRequestModel request)
         {
-            var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
-
-            if (errorCodeEnum == ErrorCodeEnum.Fail)
+            if (request.Lang == null)
             {
-                return new ApiResult
+                //old Menu
+                var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
+
+                if (errorCodeEnum == ErrorCodeEnum.Fail)
                 {
-                    ErrorCode = (int)errorCodeEnum,
-                    Message = "Missing cookies"
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)errorCodeEnum,
+                        Message = "Missing cookies"
+                    };
+                }
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<IEnumerable<MenuItem>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-
-            if (data.Count == 0)
+            else
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
+                //New Menu
+                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<List<AdminMenuModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
-
-            return new ApiResult<IEnumerable<MenuItem>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
         }
 
         /// <summary>
@@ -286,5 +313,28 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
             return apiResult;
         }
+
+        #region New AdminSite Menu
+
+        /// <summary>
+        ///  Permission/GetAllMenu 取得主選單所有資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public async Task<ApiResult<List<AdminMenuModel>>> GetMenuAsync(GetAllMenuRequestModel request)
+        {
+            var result = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+            return new ApiResult<List<AdminMenuModel>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
     }
 }
