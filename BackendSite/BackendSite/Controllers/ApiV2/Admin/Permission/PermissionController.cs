@@ -52,6 +52,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         public class GetAllMenuRequestModel
         {
+            /// <summary>
+            /// 語系
+            /// </summary>
+            /// <remarks>
+            /// null=舊選單
+            /// 空白or有直=新選單
+            /// </remarks>
             public string Lang { get; set; }
         }
 
