@@ -142,7 +142,8 @@ namespace BackendSite.Service.BLL
                 }
                 result.Add(new AdminMenuModel()
                 {
-                    ModuleId = funcData.Id,
+                    ModuleId = null,
+                    FunctionId = funcData.Id,
                     Name = funcData.Name,
                     Permission = permissionData
                 });
@@ -189,9 +190,6 @@ namespace BackendSite.Service.BLL
 
                 foreach (var funcData in assignFuncDatas)
                 {
-                    //if (heirIdList.Contains(funcData.Id))
-                    //    continue;
-
                     var permissionData = new List<AdminPermissionModel>();
                     if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
                     {
@@ -219,7 +217,7 @@ namespace BackendSite.Service.BLL
                     SubLayerDatas.AddRange(subLayerDatas);
                 }
 
-                if(FunctionDatas.Any() || SubLayerDatas.Any())
+                if (FunctionDatas.Any() || SubLayerDatas.Any())
                 {
                     result.Add(new AdminMenuModel()
                     {
