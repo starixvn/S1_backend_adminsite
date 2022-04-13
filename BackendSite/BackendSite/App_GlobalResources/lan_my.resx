@@ -1,0 +1,684 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Currency_1" xml:space="preserve">
+    <value>SGD</value>
+  </data>
+  <data name="Currency_12" xml:space="preserve">
+    <value>GBP</value>
+  </data>
+  <data name="Currency_13" xml:space="preserve">
+    <value>RMB</value>
+  </data>
+  <data name="Currency_15" xml:space="preserve">
+    <value>IDR</value>
+  </data>
+  <data name="Currency_2" xml:space="preserve">
+    <value>MYR</value>
+  </data>
+  <data name="Currency_20" xml:space="preserve">
+    <value>UUS</value>
+  </data>
+  <data name="Currency_3" xml:space="preserve">
+    <value>USD</value>
+  </data>
+  <data name="Currency_32" xml:space="preserve">
+    <value>JPY</value>
+  </data>
+  <data name="Currency_4" xml:space="preserve">
+    <value>THB</value>
+  </data>
+  <data name="Currency_40" xml:space="preserve">
+    <value>WON</value>
+  </data>
+  <data name="Currency_41" xml:space="preserve">
+    <value>CHF</value>
+  </data>
+  <data name="Currency_45" xml:space="preserve">
+    <value>WON</value>
+  </data>
+  <data name="Currency_51" xml:space="preserve">
+    <value>VND</value>
+  </data>
+  <data name="Currency_6" xml:space="preserve">
+    <value>EURO</value>
+  </data>
+  <data name="Currency_9" xml:space="preserve">
+    <value>AUD</value>
+  </data>
+  <data name="Currency_96" xml:space="preserve">
+    <value>USDT</value>
+  </data>
+  <data name="Currency_61" xml:space="preserve">
+    <value>INR</value>
+  </data>
+  <data name="lbl_AccountList" xml:space="preserve">
+    <value>Account List</value>
+  </data>
+  <data name="lbl_AccountName" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="lbl_AccountNo" xml:space="preserve">
+    <value>Account No</value>
+  </data>
+  <data name="lbl_Action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="lbl_ActStatus1" xml:space="preserve">
+    <value>Non Deposit Customer</value>
+  </data>
+  <data name="lbl_ActStatus2" xml:space="preserve">
+    <value>Deposit Customer</value>
+  </data>
+  <data name="lbl_ActualDeposit" xml:space="preserve">
+    <value>Actual Deposit</value>
+  </data>
+  <data name="lbl_AddAccount" xml:space="preserve">
+    <value>Add Account</value>
+  </data>
+  <data name="lbl_AddBank" xml:space="preserve">
+    <value>Add New Bank Card</value>
+  </data>
+  <data name="lbl_AddBankCard" xml:space="preserve">
+    <value>Add Bank Card</value>
+  </data>
+  <data name="lbl_Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="lbl_Administration" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="lbl_Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="lbl_Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="lbl_Approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="lbl_BankCardList" xml:space="preserve">
+    <value>Bank Card Management</value>
+  </data>
+  <data name="lbl_BankName" xml:space="preserve">
+    <value>Bank Name</value>
+  </data>
+  <data name="lbl_BankSlip" xml:space="preserve">
+    <value>Bank Slip</value>
+  </data>
+  <data name="lbl_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="lbl_Canceled" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="lbl_ChangePwd" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="lbl_ChangeUserpwd" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="lbl_ChangeUserPwdAlert" xml:space="preserve">
+    <value>Are you sure to change user password?</value>
+  </data>
+  <data name="lbl_ChargeFee" xml:space="preserve">
+    <value>ChargeFee</value>
+  </data>
+  <data name="lbl_Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="lbl_Comment" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="lbl_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="lbl_ConfirmPwd" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="lbl_Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="lbl_CreateTime" xml:space="preserve">
+    <value>Create Time</value>
+  </data>
+  <data name="lbl_CSD" xml:space="preserve">
+    <value>CSD</value>
+  </data>
+  <data name="lbl_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="lbl_CurrentPwd" xml:space="preserve">
+    <value>Current Password</value>
+  </data>
+  <data name="lbl_CustomerAdministration" xml:space="preserve">
+    <value>Customer Administration</value>
+  </data>
+  <data name="lbl_CustStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_CustStatus2" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="lbl_CustStatus3" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="lbl_DepositApproval" xml:space="preserve">
+    <value>Deposit Approval</value>
+  </data>
+  <data name="lbl_DepositRequest" xml:space="preserve">
+    <value>Deposit Request</value>
+  </data>
+  <data name="lbl_DepositStatus0" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="lbl_DepositStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_DepositStatus2" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="lbl_DepositStatus3" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_DepositStatus4" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_DepositStatus5" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="lbl_DepositStatus6" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="lbl_DepositStatus7" xml:space="preserve">
+    <value>On Hold</value>
+  </data>
+  <data name="lbl_DepositStatus99" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="lbl_DepositTime" xml:space="preserve">
+    <value>Deposit Time</value>
+  </data>
+  <data name="lbl_DepositType" xml:space="preserve">
+    <value>Deposit Type</value>
+  </data>
+  <data name="lbl_DepositType1" xml:space="preserve">
+    <value>Online Banking</value>
+  </data>
+  <data name="lbl_DepositType2" xml:space="preserve">
+    <value>Mobile Payment</value>
+  </data>
+  <data name="lbl_DepositType3" xml:space="preserve">
+    <value>Local Bank</value>
+  </data>
+  <data name="lbl_DepositType4" xml:space="preserve">
+    <value>Crypto</value>
+  </data>
+  <data name="lbl_DepositType5" xml:space="preserve">
+    <value>Load Card</value>
+  </data>
+  <data name="lbl_DepositType6" xml:space="preserve">
+    <value>QRPay Payment</value>
+  </data>
+  <data name="lbl_DepositType7" xml:space="preserve">
+    <value>Bank Auto Channel</value>
+  </data>
+  <data name="lbl_Direction1" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="lbl_Direction2" xml:space="preserve">
+    <value>Debeit</value>
+  </data>
+  <data name="lbl_Disable" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="lbl_Draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="lbl_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="lbl_EditAccount" xml:space="preserve">
+    <value>Edit Account</value>
+  </data>
+  <data name="lbl_Enable" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="lbl_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="lbl_Expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="lbl_Finance" xml:space="preserve">
+    <value>Finance</value>
+  </data>
+  <data name="lbl_Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="lbl_MaxAmount" xml:space="preserve">
+    <value>Max Amount</value>
+  </data>
+  <data name="lbl_MessageDepositWithdrawalSender" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="lbl_MessageDepositTitle" xml:space="preserve">
+    <value>Your Deposit {0} has been {1}</value>
+  </data>
+  <data name="lbl_MessageWithdrawalTitle" xml:space="preserve">
+    <value>Your Withdrawal {0}  has been {1}</value>
+  </data>
+  <data name="lbl_MinAmount" xml:space="preserve">
+    <value>Min Amount</value>
+  </data>
+  <data name="lbl_MobilePayment" xml:space="preserve">
+    <value>Mobile Payment</value>
+  </data>
+  <data name="lbl_NewPwd" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="lbl_No" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="lbl_OnlineBanking" xml:space="preserve">
+    <value>Online Banking</value>
+  </data>
+  <data name="lbl_Paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="lbl_Pending" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_PendingList" xml:space="preserve">
+    <value>Fund Pending List</value>
+  </data>
+  <data name="lbl_PointLevel" xml:space="preserve">
+    <value>Point Level</value>
+  </data>
+  <data name="lbl_Postscript" xml:space="preserve">
+    <value>Postscript</value>
+  </data>
+  <data name="lbl_Process" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="lbl_RefNo" xml:space="preserve">
+    <value>Ref No.</value>
+  </data>
+  <data name="lbl_Reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="lbl_Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="lbl_Running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="lbl_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="lbl_Suspend" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="lbl_TransId" xml:space="preserve">
+    <value>Transation ID</value>
+  </data>
+  <data name="lbl_UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="lbl_Userpwd" xml:space="preserve">
+    <value>User Password</value>
+  </data>
+  <data name="lbl_UserStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_UserStatus2" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="lbl_UserStatus3" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="lbl_WireTransfer" xml:space="preserve">
+    <value>Wire Transfer</value>
+  </data>
+  <data name="lbl_WithdrawalApproval" xml:space="preserve">
+    <value>Withdrawal Approval</value>
+  </data>
+  <data name="lbl_WithdrawalId" xml:space="preserve">
+    <value>Withdrawal ID</value>
+  </data>
+  <data name="lbl_WithdrawalRequest" xml:space="preserve">
+    <value>Withdrawal Request</value>
+  </data>
+  <data name="lbl_WithdrawalStatus0" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="lbl_WithdrawalStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_WithdrawalStatus2" xml:space="preserve">
+    <value>OnHold</value>
+  </data>
+  <data name="lbl_WithdrawalStatus3" xml:space="preserve">
+    <value>Verify</value>
+  </data>
+  <data name="lbl_WithdrawalStatus4" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="lbl_WithdrawalStatus5" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="lbl_WithdrawalStatus6" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_WithdrawalStatus7" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_WithdrawalStatus99" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="lbl_WithdrawalType" xml:space="preserve">
+    <value>Withdrawal Type</value>
+  </data>
+  <data name="lbl_WithdrawalType0" xml:space="preserve">
+    <value>Undefined</value>
+  </data>
+  <data name="lbl_WithdrawalType1" xml:space="preserve">
+    <value>Online Payment</value>
+  </data>
+  <data name="lbl_WithdrawalType2" xml:space="preserve">
+    <value>Local Bank</value>
+  </data>
+  <data name="lbl_WithdrawalType4" xml:space="preserve">
+    <value>Crypto Payment</value>
+  </data>
+  <data name="lbl_SelectSite" xml:space="preserve">
+    <value>Select site</value>
+  </data>
+  <data name="lbl_Point" xml:space="preserve">
+    <value>Point</value>
+  </data>
+  <data name="lbl_DepositLeast" xml:space="preserve">
+    <value>Deposit least</value>
+  </data>
+  <data name="lbl_BetLeast" xml:space="preserve">
+    <value>Bet least</value>
+  </data>
+  <data name="lbl_AddPointLevel" xml:space="preserve">
+    <value>Add point level</value>
+  </data>
+  <data name="lbl_AddNewPointLevel" xml:space="preserve">
+    <value>Add new point level</value>
+  </data>
+  <data name="lbl_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="lbl_AreYouSure" xml:space="preserve">
+    <value>Are you sure?</value>
+  </data>
+  <data name="lbl_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="lbl_Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="lbl_DepositApprovedContent" xml:space="preserve">
+    <value>Congratulation! Your deposit {0} has been approved! Amount is now credited to your account. Wish you best of the luck in your betting!</value>
+  </data>
+  <data name="lbl_DepositApprovedTitle" xml:space="preserve">
+    <value>Your deposit {0} has been approved!</value>
+  </data>
+  <data name="lbl_DepositRejectContent" xml:space="preserve">
+    <value>Sorry to inform that your deposit {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+  </data>
+  <data name="lbl_DepositRejectTitle" xml:space="preserve">
+    <value>Your deposit {0} has been rejected!</value>
+  </data>
+  <data name="lbl_WithdrawalApprovedContent" xml:space="preserve">
+    <value>Thank you for playing with us! Your withdrawal {0} has been approved, we hope to see you again next time!</value>
+  </data>
+  <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
+    <value>Your withdrawal {0} has been approved!</value>
+  </data>
+  <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
+    <value>Sorry to inform that your withdrawal {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+  </data>
+  <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
+    <value>Your withdrawal {0} has been rejected!</value>
+  </data>
+  <data name="lbl_AdjustmentStatus1" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="lbl_AdjustmentStatus2" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="lbl_AdjustmentStatus3" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="lbl_AdjustmentType1" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="lbl_AdjustmentType2" xml:space="preserve">
+    <value>Debit</value>
+  </data>
+  <data name="lbl_AdjustmentType3" xml:space="preserve">
+    <value>Increase Bonus</value>
+  </data>
+  <data name="lbl_AdjustmentType4" xml:space="preserve">
+    <value>Reduce Bonus</value>
+  </data>
+  <data name="lbl_AdjustmentType5" xml:space="preserve">
+    <value>3RD Add</value>
+  </data>
+  <data name="lbl_AdjustmentType6" xml:space="preserve">
+    <value>3RD Minus</value>
+  </data>
+  <data name="lbl_AdjustCategory1" xml:space="preserve">
+    <value>None - (Default)</value>
+  </data>
+  <data name="lbl_AdjustCategory2" xml:space="preserve">
+    <value>Retention Bonus</value>
+  </data>
+  <data name="lbl_AdjustCategory3" xml:space="preserve">
+    <value>Manual Bonus(Special Bonus)</value>
+  </data>
+  <data name="lbl_AdjustCategory4" xml:space="preserve">
+    <value>Vip Upgrade Reward</value>
+  </data>
+  <data name="lbl_AdjustCategory5" xml:space="preserve">
+    <value>Prize Drop</value>
+  </data>
+  <data name="lbl_AdjustCategory6" xml:space="preserve">
+    <value>Tech Issue None Affected</value>
+  </data>
+  <data name="lbl_AdjustCategory7" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="lbl_AdjustCategory8" xml:space="preserve">
+    <value>Vendor Mistake</value>
+  </data>
+  <data name="lbl_AdjustCategory9" xml:space="preserve">
+    <value>Deposit</value>
+  </data>
+  <data name="lbl_AdjustCategory10" xml:space="preserve">
+    <value>Withdrawal</value>
+  </data>
+  <data name="lbl_AdjustCategory11" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="lbl_BonusStatus1" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="lbl_BonusStatus2" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="lbl_BonusStatus3" xml:space="preserve">
+    <value>Expiry</value>
+  </data>
+  <data name="lbl_BonusStatus4" xml:space="preserve">
+    <value>Fulfill</value>
+  </data>
+  <data name="lbl_PromotionType1" xml:space="preserve">
+    <value>First Deposit</value>
+  </data>
+  <data name="lbl_PromotionType2" xml:space="preserve">
+    <value>Re-Deposit</value>
+  </data>
+  <data name="lbl_PromotionType3" xml:space="preserve">
+    <value>FreeBet</value>
+  </data>
+  <data name="lbl_PromotionType4" xml:space="preserve">
+    <value>Special</value>
+  </data>
+  <data name="lbl_WithdrawalStatus8" xml:space="preserve">
+    <value>To KYC</value>
+  </data>
+  <data name="lbl_PromotionType5" xml:space="preserve">
+    <value>Wallet Bonus</value>
+  </data>
+  <data name="lbl_PromotionType6" xml:space="preserve">
+    <value>Rebate</value>
+  </data>
+  <data name="lbl_PromotionType7" xml:space="preserve">
+    <value>CashBack</value>
+  </data>
+  <data name="lbl_PromotionType8" xml:space="preserve">
+    <value>Manual Bonus(Static Page)</value>
+  </data>
+  <data name="lbl_PromotionType9" xml:space="preserve">
+    <value>Retention Bonus</value>
+  </data>
+  <data name="lbl_DepositSubmission" xml:space="preserve">
+    <value>Deposit Submission</value>
+  </data>
+  <data name="lbl_CancelBonus1" xml:space="preserve">
+    <value>Your bonus promotion has been canceled.</value>
+  </data>
+  <data name="lbl_CancelBonusTitle" xml:space="preserve">
+    <value>Promotion expiration notice.</value>
+  </data>
+</root>
