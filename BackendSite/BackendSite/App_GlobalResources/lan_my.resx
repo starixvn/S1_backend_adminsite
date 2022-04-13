@@ -136,7 +136,7 @@
     <value>UUS</value>
   </data>
   <data name="Currency_3" xml:space="preserve">
-    <value>USD</value>
+    <value>Dolar Amerika</value>
   </data>
   <data name="Currency_32" xml:space="preserve">
     <value>JPY</value>
@@ -547,28 +547,28 @@
     <value>Success</value>
   </data>
   <data name="lbl_DepositApprovedContent" xml:space="preserve">
-    <value>Congratulation! Your deposit {0} has been approved! Amount is now credited to your account. Wish you best of the luck in your betting!</value>
+    <value>Tahniah! Deposit anda {0} telah diluluskan!Jumlah kini dikreditkan ke akaun anda. Semoga anda berjaya dalam pertaruhan anda!</value>
   </data>
   <data name="lbl_DepositApprovedTitle" xml:space="preserve">
-    <value>Your deposit {0} has been approved!</value>
+    <value>Deposit and {0} telah diluluskan!</value>
   </data>
   <data name="lbl_DepositRejectContent" xml:space="preserve">
-    <value>Sorry to inform that your deposit {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+    <value>Maaf untuk memaklumkan bahawa deposit anda {0} telah ditolak. Sekiranya anda mempunyai pertanyaan lanjut, sila hubungi CSD until butiran lanjut.</value>
   </data>
   <data name="lbl_DepositRejectTitle" xml:space="preserve">
-    <value>Your deposit {0} has been rejected!</value>
+    <value>Deposit anda {0} telah ditolak!</value>
   </data>
   <data name="lbl_WithdrawalApprovedContent" xml:space="preserve">
-    <value>Thank you for playing with us! Your withdrawal {0} has been approved, we hope to see you again next time!</value>
+    <value>Terima kasih kerana bermain dengan kami! Pengeluaran {0} anda telah diluluskan, kami berharap berjumpa lagi pada masa akan datang!</value>
   </data>
   <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
-    <value>Your withdrawal {0} has been approved!</value>
+    <value>Pengeluaran {0} anda telah diluluskan！</value>
   </data>
   <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
-    <value>Sorry to inform that your withdrawal {0} has been rejected. Should you have further query, kindly contact CSD for more details.</value>
+    <value>Maaf untuk memaklumkan bahawa pengeluaran anda {0} telah ditolak. Sekirany anda mempunyai pertanyaan lanjut, sila hubungi CSD until butiran lanjut.</value>
   </data>
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
-    <value>Your withdrawal {0} has been rejected!</value>
+    <value>Pengeluaran {0} anda telah ditolak!</value>
   </data>
   <data name="lbl_AdjustmentStatus1" xml:space="preserve">
     <value>Pending</value>
