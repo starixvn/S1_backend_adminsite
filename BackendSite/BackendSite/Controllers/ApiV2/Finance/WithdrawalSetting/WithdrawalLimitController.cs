@@ -51,6 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public int VipLevel { get; set; }
             public int WithdrawalMin { get; set; }
             public int WithdrawalMax { get; set; }
+            public int Times { get; set; }
         }
 
         public class DeleteRequest
@@ -116,6 +117,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
                 VipLevel = request.VipLevel,
                 WithdrawalMax = request.WithdrawalMax,
                 WithdrawalMin = request.WithdrawalMin,
+                Times = request.Times
             };
 
             var result = _withdrawalBll.AddWithdrawalLimit(data,
@@ -156,6 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
                 VipLevel = request.VipLevel,
                 WithdrawalMax = request.WithdrawalMax,
                 WithdrawalMin = request.WithdrawalMin,
+                Times = request.Times
             };
 
             var result = _withdrawalBll.EditWithdrawalLimit(data,
