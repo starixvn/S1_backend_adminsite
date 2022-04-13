@@ -95,14 +95,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SpecialPassword_Set", props);
         }
 
-        public async Task<IEnumerable<AdminModuleDto>> GetAllAdminModule()
+        public async Task<IEnumerable<AdminMenuDto>> GetAllAdminMenu()
         {
-            return await _reportDbClient.QueryAsync<AdminModuleDto>("Admin_AdminModule_GetAll");
-        }
-
-        public async Task<IEnumerable<AdminFunctionDto>> GetAllAdminFunction()
-        {
-            return await _reportDbClient.QueryAsync<AdminFunctionDto>("Admin_AdminFunction_GetAll");
+            return await _reportDbClient.QueryAsync<AdminMenuDto>("Admin_AdminMenu_GetAll");
         }
 
         public async Task<IEnumerable<AdminPermissionDto>> GetAllAdminPermission()

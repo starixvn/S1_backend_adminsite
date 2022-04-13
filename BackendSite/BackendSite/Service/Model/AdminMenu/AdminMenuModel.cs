@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.AdminMenu
 
         public string Name { get; set; }
 
+        public IEnumerable<AdminPermissionModel> Permission { get; set; }
         public IEnumerable<AdminMenuFuncModel> FunctionDatas { get; set; }
         public IEnumerable<AdminMenuModel> SubLayerDatas { get; set; }
     }

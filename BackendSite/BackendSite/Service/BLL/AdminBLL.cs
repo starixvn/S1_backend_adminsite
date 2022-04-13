@@ -113,22 +113,42 @@ namespace BackendSite.Service.BLL
 
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang)
         {
-            var moduleList = await adminService.GetAllAdminModule();
-            var functionList = await adminService.GetAllAdminFunction();
+            var result = new List<AdminMenuModel>();
+            var menuList = await adminService.GetAllAdminMenu();
             var permissionList = await adminService.GetAllAdminPermission();
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
-                var moduleMappingList = ProcessTranslation(lang, moduleList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));
-                moduleList = moduleList.Select(c => { c.Name = moduleMappingList[c.Id]; return c; });
-                var functionMappingList = ProcessTranslation(lang, functionList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));
-                functionList = functionList.Select(c => { c.Name = functionMappingList[c.Id]; return c; });
+                var functionMappingList = ProcessTranslation(lang, menuList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));
+                menuList = menuList.Select(c => { c.Name = functionMappingList[c.Id]; return c; });
                 var permissionMappingList = ProcessTranslation(lang, permissionList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));
                 permissionList = permissionList.Select(c => { c.Name = permissionMappingList[c.Id]; return c; });
             }
 
-            var heirIdList = moduleList.Where(x => x.Layer != 0).Select(x => x.HeirId).Distinct();
-            var result = await GetAllMenu(0, heirIdList, moduleList, functionList, permissionList);
+            var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
+            var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
+
+            foreach (var funcData in assignFuncDatas)
+            {
+                var permissionData = new List<AdminPermissionModel>();
+                if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                {
+                    var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                    foreach (var permission in assignFuncAdditionalSetting.Permission)
+                    {
+                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                        permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
+                    }
+                }
+                result.Add(new AdminMenuModel()
+                {
+                    ModuleId = funcData.Id,
+                    Name = funcData.Name,
+                    Permission = permissionData
+                });
+            }
+
+            result.AddRange(await GetAllMenu(0, heirIdList, menuList, permissionList));
 
             return result;
         }
@@ -154,50 +174,61 @@ namespace BackendSite.Service.BLL
 
         private async Task<List<AdminMenuModel>> GetAllMenu(int moduleIId,
             IEnumerable<int> heirIdList,
-            IEnumerable<AdminModuleDto> moduleList,
-            IEnumerable<AdminFunctionDto> functionList,
+            IEnumerable<AdminMenuDto> menuList,
             IEnumerable<AdminPermissionDto> permissionList)
         {
             var result = new List<AdminMenuModel>();
-            var assignModuleList = moduleList.Where(x => x.HeirId == moduleIId);
+            var assignModuleList = menuList.Where(x => x.HeirId == moduleIId);
 
             foreach (var moduleData in assignModuleList)
             {
                 var FunctionDatas = new List<AdminMenuFuncModel>();
                 var SubLayerDatas = new List<AdminMenuModel>();
 
-                var assignFuncDatas = functionList.Where(x => x.ModuleId == moduleData.Id);
+                var assignFuncDatas = menuList.Where(x => x.HeirId == moduleData.Id);
 
                 foreach (var funcData in assignFuncDatas)
                 {
+                    //if (heirIdList.Contains(funcData.Id))
+                    //    continue;
+
                     var permissionData = new List<AdminPermissionModel>();
-                    var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
-                    foreach (var permission in assignFuncAdditionalSetting.Permission)
+                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
                     {
-                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
-                        permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
+                        {
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
+                        }
+                        FunctionDatas.Add(new AdminMenuFuncModel()
+                        {
+                            FunctionId = funcData.Id,
+                            Name = funcData.Name,
+                            Permission = permissionData
+                        });
                     }
-                    FunctionDatas.Add(new AdminMenuFuncModel()
-                    {
-                        FunctionId = funcData.Id,
-                        Name = funcData.Name,
-                        Permission = permissionData
-                    });
+                    else
+                        continue;
+
                 }
 
                 if (heirIdList.Contains(moduleData.Id))
                 {
-                    var subLayerDatas = await GetAllMenu(moduleData.Id, heirIdList, moduleList, functionList, permissionList);
+                    var subLayerDatas = await GetAllMenu(moduleData.Id, heirIdList, menuList, permissionList);
                     SubLayerDatas.AddRange(subLayerDatas);
                 }
 
-                result.Add(new AdminMenuModel()
+                if(FunctionDatas.Any() || SubLayerDatas.Any())
                 {
-                    ModuleId = moduleData.Id,
-                    Name = moduleData.Name,
-                    FunctionDatas = FunctionDatas,
-                    SubLayerDatas = SubLayerDatas
-                });
+                    result.Add(new AdminMenuModel()
+                    {
+                        ModuleId = moduleData.Id,
+                        Name = moduleData.Name,
+                        FunctionDatas = FunctionDatas,
+                        SubLayerDatas = SubLayerDatas
+                    });
+                }
             }
 
             return result;
