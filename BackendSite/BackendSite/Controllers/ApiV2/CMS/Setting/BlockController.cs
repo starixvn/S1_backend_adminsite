@@ -36,6 +36,42 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public string Memo { get; set; }
         }
+        public class GetBlockBankAccRequest
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public string AccountNum { get; set; }
+            public string UserName { get; set; }
+            public int Status { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    if (value != null)
+                        _startDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    if (value != null)
+                        _endDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+                }
+            }
+        }
+        public class BlockBankAccRequest
+        {
+            public int SysId { get; set; }
+            public string AccountNum { get; set; }
+        }
+        public class BlockAccountSetRequest : BlockBankAccRequest
+        {
+            public int Status { get; set; }
+            public string Memo { get; set; }   
+        }
         #endregion
 
         #region Action
@@ -57,8 +93,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        #endregion
-
         /// <summary>
         /// Block/SetBlockIP 新增Block的IP
         /// </summary>
@@ -67,12 +101,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        
+
         [HttpPost]
         public ApiResult SetBlockIP(SetBlockIPRequest request)
         {
             var result = _blockBLL.SetBlockIP(request.IP, request.Memo, User.Identity.Name);
-            if(result > 0)
+            if (result > 0)
             {
                 return new ApiResult
                 {
@@ -120,5 +154,75 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 };
             }
         }
+
+        /// <summary>
+        /// Block/GetBlockBankAcc 取得BlockBankAccount List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<BlockBankAcc> GetBlockBankAcc(GetBlockBankAccRequest request)
+        {
+            var blockBankAcc = _blockBLL.GetBlockBankAcc(request.StartDate.DateTime, request.EndDate.DateTime, request.Status,request.AccountNum,request.UserName);
+            return new ApiListResult<BlockBankAcc>
+            {
+                Data = blockBankAcc,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Block/GetBlockBankAccBlockList 取得blockBankList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<BlockList> GetBlockBankAccBlockList(BlockBankAccRequest request)
+        {
+            var blockBankList = _blockBLL.GetBlockBankAccBlockList(request.SysId, request.AccountNum);
+            return new ApiListResult<BlockList>
+            {
+                Data = blockBankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Block/GetBlockBankAccBlockList 針對Acoount做lock OR unlock
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult BlockAccountSet(BlockAccountSetRequest request)
+        {
+            var result = _blockBLL.BlockAccountSet(request.SysId, request.AccountNum, request.Status, User.Identity.Name, request.Memo);
+            if (result > 0)
+            {
+                _blockBLL.SetCustBankInfoLog(request.SysId, request.AccountNum, request.Status);
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Update Fail."
+                };
+            }
+        }
+        #endregion
     }
 }

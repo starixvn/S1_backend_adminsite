@@ -265,6 +265,7 @@ namespace BackendSite.Service.Model
         public string AccountNum { set; get; }
         public string IFSCCode { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { get; set; }
     }
     public class CustCryptoWalletLog
     {
@@ -527,4 +528,38 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class CustBankInfo
+    {
+        public string AccountName { set; get; }
+        public string BankInfo { set; get; }
+        public string USDTInfo { set; get; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<BankInfoDetail> bankInfoDetail { set; get; }
+        public IEnumerable<USDTDetail> usdtDetail { set; get; }
+    }
+    public class BankLockInfoDetail : BankInfoDetail
+    {
+        public int Status { get; set; }
+        public string UpdateOperator { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string AccountName { get; set; }
+        public string BankName { get; set; }
+    }
+
 }

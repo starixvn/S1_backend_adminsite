@@ -33,6 +33,7 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly BlockService _blockService;
 
         public CustInfoBLL(IServiceProvider provider)
         {
@@ -51,6 +52,7 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _blockService = provider.GetRequiredService<BlockService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -850,6 +852,52 @@ namespace BackendSite.Service.BLL
 
             scope.Complete();
             return result;
+        }
+        public IEnumerable<BankLockInfoDetail> GetBankLockInfoDetail(int custId, int siteId)
+        {
+            var custBankInfo = _custInfoService.GetCustBankInfo(custId, siteId);
+            List<BankLockInfoDetail> result = new List<BankLockInfoDetail>();
+            if (!string.IsNullOrWhiteSpace(custBankInfo.BankInfo))
+            {
+                var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custBankInfo.BankInfo).ToList();
+                bankInfoDetailList.ForEach(x =>
+                {
+                    var blockAccount = _custInfoService.GetBlockAccount(x.SysId, x.AccountNo);
+                    blockAccount.SysId = x.SysId;
+                    blockAccount.AccountNo = x.AccountNo;
+                    blockAccount.IFSCCode = x.IFSCCode;
+                    blockAccount.CreateTime = custBankInfo.CreateTime;
+                    blockAccount.AccountName = custBankInfo.AccountName;
+                    result.Add(blockAccount);
+                });
+            }
+            return result;
+        }
+        public int LockAllBankAccount(int custId, int siteId, string Operator)
+        {
+            var result = 1;
+            var custBankInfo = _custInfoService.GetCustBankInfo(custId, siteId);
+            if (!string.IsNullOrWhiteSpace(custBankInfo.BankInfo))
+            {
+                var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custBankInfo.BankInfo).ToList();
+                bankInfoDetailList.ForEach(x =>
+                {
+                    var setResult = _blockService.BlockAccountSet(x.SysId, x.AccountNo, 2, Operator);
+                    if(setResult > 0)
+                    {
+                        SetCustBankInfoLog(custId, siteId, x.SysId, x.AccountNo, x.IFSCCode, custBankInfo.AccountName, 3);
+                    }
+                });
+            }
+            else
+            {
+                result = 0;
+            }
+            return result;
+        }
+        public int SetCustBankInfoLog(int custId, int siteId,int SysId,string accountNum,string iFSCCode,string accountName,int status)
+        {
+            return _custInfoService.SetCustBankInfoLog(custId, siteId, SysId, accountNum, iFSCCode, accountName, status);
         }
     }
 }

@@ -2732,6 +2732,60 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        #region CSD > Customer Administration > Block Bank
+        /// <summary>
+        /// CustomerManage/GetBankLockInfoDetail 取得客戶現在的BankLockInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankLockInfoDetail>> GetBankLockInfoDetail(CustIdRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var bankLockInfoDetail = _custInfoBll.GetBankLockInfoDetail(custInfo.CustId, custInfo.SiteId);
+            return new ApiResult<IEnumerable<BankLockInfoDetail>>
+            {
+                Data = bankLockInfoDetail,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustomerManage/LockAllBankAccount 針對客戶Lock他現在所使用的所有BankAccount
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult LockAllBankAccount(CustIdRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            if (_custInfoBll.LockAllBankAccount(custInfo.CustId,
+                                          custInfo.SiteId,
+                                          User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Lock All Bank Account Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Lock All Bank Account Fail.Please Contact admin.");
+            }
+        }
+        #endregion
+
         #region Private Methods
 
         /// <summary>
