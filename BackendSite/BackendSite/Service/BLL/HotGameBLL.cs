@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -25,7 +26,8 @@ namespace BackendSite.Service.BLL
         
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
         {
-            return await _hotGameService.Get(siteId, currencyId);
+            var hotGames = await _hotGameService.Get(siteId, currencyId);
+            return hotGames.ToList().OrderBy(a => a.Sort);
         }
         
         public async Task<GetHotGameDetailResponse> Get(int id)

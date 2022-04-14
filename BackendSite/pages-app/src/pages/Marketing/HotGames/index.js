@@ -72,6 +72,14 @@ const App = () => {
         setCurrent({ ...current, currencyId: id, currencyName: name })
     }
 
+    const editHotGame = (id) => {
+        console.log(id)
+    }
+
+    const deleteHotGame = (id) => {
+        console.log(id)
+    }
+
     const mapSite = siteList => {
         return siteList.map((item) => {
             return { value: item.siteId, displayText: item.siteName }
@@ -95,7 +103,7 @@ const App = () => {
                 <TabButtonGroup currencyOptions={currencyOptions} activeTab={current} clickTab={clickTab} />
             </div>
             {datas.Datas === null ? null : (
-                <Result {...datas} />
+                <Result {...datas} ClickEdit={editHotGame} ClickDelete={deleteHotGame} />
             )}
         </div>
     )

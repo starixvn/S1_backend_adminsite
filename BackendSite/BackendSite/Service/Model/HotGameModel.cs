@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using System;
+
+namespace BackendSite.Service.Model
 {
     public class GetHotGameListRequest
     {
@@ -9,13 +11,13 @@
     public class GetHotGameListResponse
     {
         public int Id { get; set; }
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
-        public string IsoCode { get; set; }
         public string TpName { get; set; }
         public string TpGameType { get; set; }
         public string TpCategory { get; set; }
         public string GameName { get; set; }
+        public int Sort { get; set; }
+        public DateTime LastUpdateTime { get; set; }
+        public string LastUpdateUser { get; set; }
     }
 
     public class SetHotGameRequest
