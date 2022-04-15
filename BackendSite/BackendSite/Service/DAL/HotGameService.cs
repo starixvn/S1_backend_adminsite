@@ -48,7 +48,6 @@ namespace BackendSite.Service.DAL
             p.Add("_GameLogo", JsonConvert.SerializeObject(request.GameLogo));
             p.Add("_TpName", request.TpName);
             p.Add("_TpLogo", request.TpLogo);
-            p.Add("_Sort", request.Sort);
             p.Add("_Operator", updateOperator);
             return await _mainDbClient.ExecuteAsync("Admin_HotGames_Set", p);
         }

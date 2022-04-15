@@ -9,6 +9,7 @@ namespace BackendSite.Service.BLL
     public class HotGameBLL
     {
         private readonly HotGameService _hotGameService;
+        private readonly ThirdPartyService _thirdPartyService;
 
         private Dictionary<int, string> CurrencyLangIdMap = new Dictionary<int, string>()
         {
@@ -19,9 +20,10 @@ namespace BackendSite.Service.BLL
             { 61, "hi" }
         };
 
-        public HotGameBLL(HotGameService hotGameService)
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService)
         {
             _hotGameService = hotGameService;
+            _thirdPartyService = thirdPartyService;
         }
         
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
@@ -44,6 +46,11 @@ namespace BackendSite.Service.BLL
         public async Task<int> Delete(int id)
         {
             return await _hotGameService.Delete(id);
+        }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameType()
+        {
+            return await _thirdPartyService.GetTpGameType();
         }
     }
 }

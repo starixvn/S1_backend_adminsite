@@ -104,5 +104,10 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId", new DynamicParameters(new { _CustId = custId }));
         }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameType()
+        {
+            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameType_Get");
+        }
     }
 }

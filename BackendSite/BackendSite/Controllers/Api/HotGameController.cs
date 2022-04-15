@@ -97,7 +97,7 @@ namespace BackendSite.Controllers.Api
         /// 
         /// Http Method：POST
         /// 
-        ///  Func Path：CMS > HotGame > [Submit] > Click[Delete]
+        /// Func Path：CMS > HotGame > [Submit] > Click[Delete]
         /// 
         /// </remarks>
         /// <param name="custId"></param>
@@ -109,6 +109,27 @@ namespace BackendSite.Controllers.Api
             return new ApiResult
             {
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+
+        /// <summary>
+        /// HotGame/GetTpGameType 取得遊戲類型
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：GET
+        /// 
+        /// Func Path：CMS > HotGame > [Submit]
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameType()
+        {
+            return new ApiResult<IEnumerable<TpGameType>>()
+            {
+                ErrorCode = 0,
+                Data = await _hotGame.GetTpGameType()
             };
         }
     }
