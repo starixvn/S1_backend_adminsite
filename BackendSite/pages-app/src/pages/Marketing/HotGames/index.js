@@ -72,14 +72,21 @@ const App = () => {
     }
 
     const deleteHotGame = (id) => {
-        console.log(id)
+        WebAPI.PostData({ Url: "HotGame/Delete", Data: `id=${id}` }).then((res) => {
+            if (res.data.errorCode === 0) {
+                alert("success.");
+                getHotGames(current.siteId, current.currencyId)
+            } else {
+                alert(res.data.message);
+            }
+        });
     }
 
     const back = () => {
         setFlag(false)
     }
 
-    const insertOrUpdate = (hotGame) => {
+    const Set = (hotGame) => {
         let param = {
             Url: "HotGame/Set",
             Data: {
@@ -136,7 +143,7 @@ const App = () => {
             </div>
 
             {isEdit ?
-                <Edit current={current} back={back} insertOrUpdate={insertOrUpdate} /> :
+                <Edit current={current} back={back} Set={Set} /> :
                 <>
                     {datas.Datas !== null ?
                         <>
@@ -147,8 +154,6 @@ const App = () => {
                     }
                 </>
             }
-
-
         </div>
     )
 

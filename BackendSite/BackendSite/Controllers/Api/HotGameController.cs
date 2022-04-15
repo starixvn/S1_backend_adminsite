@@ -100,10 +100,10 @@ namespace BackendSite.Controllers.Api
         /// Func Path：CMS > HotGame > [Submit] > Click[Delete]
         /// 
         /// </remarks>
-        /// <param name="custId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> Delete(int id)
+        public async Task<ApiResult> Delete([FromForm]int id)
         {
             var result = await _hotGame.Delete(id);
             return new ApiResult
