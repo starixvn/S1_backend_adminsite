@@ -106,5 +106,10 @@ namespace BackendSite.Service.BLL
         {
             return adminService.SetSpecialPasswordData(SiteId, Password, Operator);
         }
+
+        public AdminUserV2 GetUserV2(int userId)
+        {
+            return adminUserService.GetUserV2(userId);
+        }
     }
 }

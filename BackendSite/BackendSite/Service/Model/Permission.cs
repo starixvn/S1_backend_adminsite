@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -55,5 +56,54 @@ namespace BackendSite.Service.Model
     {
         public string FuncKey { get; set; }
         public string SubFuncKeys { get; set; }
+    }
+
+    public class NewPermission
+    {
+        public IEnumerable<int> CurrencyList { get; set; }
+        public List<Permission> Permission { get; set; }
+    }
+    public class Permission
+    {
+        public String DisPlayKey { get; set; }
+        public List<PermissionSettings> Settings { get; set; }
+    }
+    public class PermissionSettings
+    {
+        public String DisPlayKey { get; set; }
+        public int FunKey { get; set; }
+        public List<PermissionSubFuncKeys> SubFuncKeys { get; set; }
+
+    }
+    public class PermissionSubFuncKeys
+    {
+        public int PermissionId { get; set; }
+        public String Name { get; set; }
+        public bool CanUse { get; set; }
+        public bool Enable { get; set; } = true;
+    }
+
+    public class AdminMenuDtoV2
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int HeirId { get; set; }
+        public int Sort { get; set; }
+        public string AdditionalSetting { get; set; }
+        public string Translation { get; set; }
+        public AdminFunctionStatusV2Enum Status { get; set; }
+    }
+
+    public class AdminPermissionDtoV2
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Sort { get; set; }
+        public string Translation { get; set; }
+        public AdminPermissionStatusV2Enum Status { get; set; }
+    }
+    public class AdditionalSetting
+    {
+        public IEnumerable<int> Permission { get; set; }
     }
 }

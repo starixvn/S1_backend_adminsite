@@ -13,13 +13,15 @@ namespace BackendSite.Service.BLL
         private readonly PermissionService permissionService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminUserService adminUserService;
+        private readonly ServerInfoService serverInfoService;
 
-        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
+        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService, ServerInfoService serverInfoService)
         {
             this.permissionService = permissionService;
             this.adminGroupService = adminGroupService;
             this.authorizeBLL = authorizeBLL;
             this.adminUserService = adminUserService;
+            this.serverInfoService = serverInfoService;
         }
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
@@ -318,6 +320,72 @@ namespace BackendSite.Service.BLL
             }
 
             return result;
+        }
+
+        public NewPermission GetNewPermission(AdminUserV2 loginUser)
+        {
+            NewPermission result = new NewPermission();
+            if (loginUser.IsSuper)
+            {
+                var userSiteList = serverInfoService.GetSiteList().ToList();
+                result.CurrencyList = userSiteList.FirstOrDefault(x=> x.SiteId == loginUser.SiteId).ICurrencyList;
+
+                var allMenu = GetAdminMenuDtoV2().ToList();
+                var allPermission  = GetAdminPermissionDtoV2().ToList();
+
+                List<Permission> permissions = new List<Permission>();
+                var menu = allMenu.Where(x => x.HeirId == 0).Select(y => y).ToList();
+                menu.ForEach(x =>
+                {
+                    List<PermissionSettings> settings = new List<PermissionSettings>();
+                    allMenu.Where(y => y.HeirId == x.Id).Select(z => z).ToList().ForEach(t =>
+                    {
+                        var additionalSetting =  JsonConvert.DeserializeObject<AdditionalSetting>(t.AdditionalSetting);
+                        if(additionalSetting != null)
+                        {
+                            PermissionSettings permissionSettings = new PermissionSettings();
+                            List<PermissionSubFuncKeys> permissionSubFuncKeysList = new List<PermissionSubFuncKeys>();
+                            additionalSetting.Permission.ToList().ForEach(u =>
+                            {
+                                var permissionName = allPermission.Where(i => i.Id == u).FirstOrDefault().Name;
+                                PermissionSubFuncKeys permissionSubFuncKeys = new PermissionSubFuncKeys() 
+                                {
+                                    Name = permissionName,
+                                    PermissionId = u
+                                };
+                                permissionSubFuncKeysList.Add(permissionSubFuncKeys);
+                            });
+                            permissionSettings.SubFuncKeys = permissionSubFuncKeysList;
+                            permissionSettings.DisPlayKey = t.Name;
+                            permissionSettings.FunKey = t.Id;
+                            settings.Add(permissionSettings);
+                        }
+                    });
+
+                    Permission permission = new Permission()
+                    {
+                        DisPlayKey = x.Name,
+                        Settings = settings
+                    };
+                    permissions.Add(permission);
+                });
+
+                result.Permission = permissions;
+            }
+            else
+            {
+                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+            }
+
+            return result;
+        }
+        public IEnumerable<AdminMenuDtoV2> GetAdminMenuDtoV2()
+        {
+            return permissionService.GetAdminMenuDtoV2();
+        }
+        public IEnumerable<AdminPermissionDtoV2> GetAdminPermissionDtoV2()
+        {
+            return permissionService.GetAdminPermissionDtoV2();
         }
     }
 }

@@ -49,4 +49,17 @@ namespace BackendSite.Service.Model
         public int UserId { get; set; }
         public int GroupSEQ { get; set; }
     }
+
+    public class AdminUserV2
+    {
+        public int UserId { set; get; }
+        public string UserName { set; get; }
+        public string Userpwd { set; get; }
+        public bool IsSuper { set; get; }
+        public int Status { set; get; }
+        public DateTime CreateTime { set; get; }
+        public string Role { get; set; }
+        public string CurrencyList { get; set; }
+        public int SiteId { get; set; }
+    }
 }

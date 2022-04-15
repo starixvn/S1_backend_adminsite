@@ -476,7 +476,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-    
+
     #endregion
 
     #region Referral
@@ -488,7 +488,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -777,7 +777,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-    
+
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
@@ -952,4 +952,16 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    public enum AdminPermissionStatusV2Enum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+    public enum AdminFunctionStatusV2Enum 
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
 }

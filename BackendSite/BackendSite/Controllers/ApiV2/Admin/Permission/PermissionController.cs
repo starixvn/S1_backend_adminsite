@@ -286,5 +286,52 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
             return apiResult;
         }
+
+        [HttpPost]
+        public ApiResult GetNewPermission()
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            //var loginUser = _adminBll.GetUser(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+
+            var result = _permissionBll.GetNewPermission(loginUser);
+
+
+
+
+
+            //var permissionData = _permissionBll.GetPermissionJSONData();
+
+            //if (!permissionData.Any())
+            //{
+            //    throw new AdminException(ErrorCodeEnum.NoData);
+            //}
+
+            return new ApiResult<NewPermission>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+        }
     }
 }
