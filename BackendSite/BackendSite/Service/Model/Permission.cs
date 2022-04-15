@@ -65,7 +65,15 @@ namespace BackendSite.Service.Model
     }
     public class Permission
     {
-        public String DisPlayKey { get; set; }
+        public int DisPlayKey { get; set; }
+        public String Name { get; set; }
+        public List<PermissionSettings> Settings { get; set; }
+        public List<FunctionDatas> FunctionDatas { get; set; }
+    }
+    public class FunctionDatas
+    {
+        public int DisPlayKey { get; set; }
+        public String Name { get; set; }
         public List<PermissionSettings> Settings { get; set; }
     }
     public class PermissionSettings

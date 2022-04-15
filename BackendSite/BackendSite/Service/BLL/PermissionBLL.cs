@@ -338,34 +338,70 @@ namespace BackendSite.Service.BLL
                 menu.ForEach(x =>
                 {
                     List<PermissionSettings> settings = new List<PermissionSettings>();
+                    List<FunctionDatas> functionDatas = new List<FunctionDatas>();
                     allMenu.Where(y => y.HeirId == x.Id).Select(z => z).ToList().ForEach(t =>
                     {
-                        var additionalSetting =  JsonConvert.DeserializeObject<AdditionalSetting>(t.AdditionalSetting);
-                        if(additionalSetting != null)
+                        if (!String.IsNullOrWhiteSpace(t.AdditionalSetting))
                         {
-                            PermissionSettings permissionSettings = new PermissionSettings();
-                            List<PermissionSubFuncKeys> permissionSubFuncKeysList = new List<PermissionSubFuncKeys>();
-                            additionalSetting.Permission.ToList().ForEach(u =>
+                            var additionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(t.AdditionalSetting);
+                            if (additionalSetting != null)
                             {
-                                var permissionName = allPermission.Where(i => i.Id == u).FirstOrDefault().Name;
-                                PermissionSubFuncKeys permissionSubFuncKeys = new PermissionSubFuncKeys() 
+                                PermissionSettings permissionSettings = new PermissionSettings();
+                                List<PermissionSubFuncKeys> permissionSubFuncKeysList = new List<PermissionSubFuncKeys>();
+                                additionalSetting.Permission.ToList().ForEach(u =>
                                 {
-                                    Name = permissionName,
-                                    PermissionId = u
-                                };
-                                permissionSubFuncKeysList.Add(permissionSubFuncKeys);
+                                    var permissionName = allPermission.Where(i => i.Id == u).FirstOrDefault().Name;
+                                    PermissionSubFuncKeys permissionSubFuncKeys = new PermissionSubFuncKeys()
+                                    {
+                                        Name = permissionName,
+                                        PermissionId = u
+                                    };
+                                    permissionSubFuncKeysList.Add(permissionSubFuncKeys);
+                                });
+                                permissionSettings.SubFuncKeys = permissionSubFuncKeysList;
+                                permissionSettings.DisPlayKey = t.Name;
+                                permissionSettings.FunKey = t.Id;
+                                settings.Add(permissionSettings);
+                            }
+                        }
+                        else
+                        {
+                            FunctionDatas functionData = new FunctionDatas();
+                            List<PermissionSettings> subSettings = new List<PermissionSettings>();
+                            var subMenu = allMenu.Where(s => s.HeirId == t.Id).Select(d => d).ToList();
+                            subMenu.ForEach(f =>
+                            {
+                                var additionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(f.AdditionalSetting);
+                                PermissionSettings permissionSettings = new PermissionSettings();
+                                List<PermissionSubFuncKeys> permissionSubFuncKeysList = new List<PermissionSubFuncKeys>();
+                                additionalSetting.Permission.ToList().ForEach(u =>
+                                {
+                                    var permissionName = allPermission.Where(i => i.Id == u).FirstOrDefault().Name;
+                                    PermissionSubFuncKeys permissionSubFuncKeys = new PermissionSubFuncKeys()
+                                    {
+                                        Name = permissionName,
+                                        PermissionId = u
+                                    };
+                                    permissionSubFuncKeysList.Add(permissionSubFuncKeys);
+                                });
+                                permissionSettings.SubFuncKeys = permissionSubFuncKeysList;
+                                permissionSettings.DisPlayKey = t.Name;
+                                permissionSettings.FunKey = t.Id;
+                                subSettings.Add(permissionSettings);
                             });
-                            permissionSettings.SubFuncKeys = permissionSubFuncKeysList;
-                            permissionSettings.DisPlayKey = t.Name;
-                            permissionSettings.FunKey = t.Id;
-                            settings.Add(permissionSettings);
+                            functionData.DisPlayKey = t.Id;
+                            functionData.Name = t.Name;
+                            functionData.Settings = subSettings;
+                            functionDatas.Add(functionData);
                         }
                     });
 
                     Permission permission = new Permission()
                     {
-                        DisPlayKey = x.Name,
-                        Settings = settings
+                        DisPlayKey = x.Id,
+                        Name = x.Name,
+                        Settings = settings,
+                        FunctionDatas = functionDatas
                     };
                     permissions.Add(permission);
                 });
