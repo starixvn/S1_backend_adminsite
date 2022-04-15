@@ -11,8 +11,8 @@
 
     for (var currency = 1; currency <= 61; currency++)
     {
-        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
-            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"CurrencyWithdrawal_{currency}")))
+        i18n.Add($"lbl_CurrencyWithdrawal{currency}", selLangBLL.GetResourceValue($"CurrencyWithdrawal_{currency}"));
     }
 
     var lbl_Txts = new string[] { "lbl_Save", "lbl_Success", "lbl_Action", "lbl_SelectSite", "lbl_Point", "lbl_DepositLeast", "lbl_BetLeast", "lbl_AddPointLevel", "lbl_AddNewPointLevel", "lbl_Delete", "lbl_AreYouSure", "lbl_OK", "lbl_Cancel", "lbl_Error" };
@@ -25,9 +25,9 @@
 <div id="content">
 </div>
 @section Scripts {
-    <script src="~/js/component/Finance/WithdrawalLimitManagement.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        //$('.collapse').collapse();
-        window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
-    </script>
+            //$('.collapse').collapse();
+            window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
+        </script>
+    <script src="~/js/component/Finance/WithdrawalLimitManagement.min.js" asp-append-version="true"></script>
 }

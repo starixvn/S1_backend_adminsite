@@ -66,7 +66,7 @@ const CurrencyLimitSetting = (props) => {
           aria-expanded="true"
           aria-controls="collapseExample"
         >
-          {window.i18n["lbl_Currency" + value]}
+          {window.i18n["lbl_CurrencyWithdrawal" + value]}
         </a>
         <Result siteId={props.siteId}
           currencyId={value}
