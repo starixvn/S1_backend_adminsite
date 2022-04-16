@@ -27,10 +27,10 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<GetHotGameListResponse>("Admin_HotGames_Get", p);
         }
 
-        public async Task<GetHotGameDetailResponse> Get(int id)
+        public async Task<GetHotGameDetailDto> Get(int id)
         {
             var p = new DynamicParameters(new { _id = id });
-            return await _reportDbClient.QueryFirstAsync<GetHotGameDetailResponse>("Admin_HotGamesById_Get", p);
+            return await _reportDbClient.QueryFirstAsync<GetHotGameDetailDto>("Admin_HotGamesById_Get", p);
         }
         
         public async Task<int> CreateOrUpdate(SetHotGameRequest request, string updateOperator)

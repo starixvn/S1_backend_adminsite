@@ -9,7 +9,7 @@ function Edit({ id, current, back = f => f, Set = g => g }) {
     const [gameTypeList, setGameTypeList] = useState([]);
 
     const [hotGame, setHotGame] = useState({
-        id: 0,
+        id: id,
         siteId: current.siteId,
         currencyId: current.currencyId,
         gameName: "",
@@ -25,7 +25,7 @@ function Edit({ id, current, back = f => f, Set = g => g }) {
     });
 
     useEffect(() => {
-        WebAPI.PostData({ Url: "TpMaintain/GetCommonTpList" }).then((res) => {
+        WebAPI.fetchData({ Url: "HotGame/GetCommonTpList" }).then((res) => {
             if (res.data.errorCode === 0) {
                 setTpList(res.data.data);
             } else {
@@ -40,6 +40,16 @@ function Edit({ id, current, back = f => f, Set = g => g }) {
                 alert(res.data.message ?? "failed to get data.");
             }
         });
+
+        if (id !== 0) {
+            WebAPI.PostData({ Url: "HotGame/GetDetail", Data: `id=${id}` }).then((res) => {
+                if (res.data.errorCode === 0) {
+                    setHotGame(res.data.data);
+                } else {
+                    alert(res.data.message ?? "failed to get data.");
+                }
+            });
+        }
 
     }, [])
 

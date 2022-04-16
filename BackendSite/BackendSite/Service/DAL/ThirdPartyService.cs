@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.TpMaintain;
 using static BackendSite.Controllers.Api.TpController;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.DAL
 {
@@ -105,6 +107,11 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId", new DynamicParameters(new { _CustId = custId }));
         }
 
+        public async Task<IEnumerable<CommonTpInfo>> GetCommonTpList()
+        {
+            return await _reportDbClient.QueryAsync<CommonTpInfo>("Common_TpList_Get");
+        }
+        
         public async Task<IEnumerable<TpGameType>> GetTpGameType()
         {
             return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameType_Get");

@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.Api
 {
@@ -56,7 +59,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<GetHotGameDetailResponse>> GetDetail(int id)
+        public async Task<ApiResult<GetHotGameDetailResponse>> GetDetail([FromForm]int id)
         {
             var apiResult = new ApiResult<GetHotGameDetailResponse>
             {
@@ -113,7 +116,28 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// HotGame/GetTpGameType 取得遊戲類型
+        /// HotGame/GetCommonTpList 取得遊戲第三方清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：GET
+        /// 
+        /// Func Path：CMS > HotGame > [Submit]
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<CommonTpInfo>>> GetCommonTpList()
+        {
+            return new ApiResult<IEnumerable<CommonTpInfo>>
+            {
+                Data = await _hotGame.GetCommonTpList(),
+                ErrorCode = 0
+            };
+        }
+        
+        /// <summary>
+        /// HotGame/GetTpGameType 取得第三方遊戲類型
         /// </summary>
         /// <remarks>
         /// 

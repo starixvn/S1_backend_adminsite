@@ -43,9 +43,20 @@ namespace BackendSite.Service.Model
         public string HotGameMobileUrl { get; set; }
     }
 
-    public class GetHotGameDetailRequest
+    public class GetHotGameDetailDto
     {
         public int Id { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string GameName { get; set; }
+        public string GameId { get; set; }
+        public int TpId { get; set; }
+        public string TpName { get; set; }
+        public int TpGameType { get; set; }
+        public string TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
+        public string TpLogo { get; set; }
+        public string GameLogo { get; set; }
     }
     
     public class GetHotGameDetailResponse
@@ -53,15 +64,15 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public string IsoCode { get; set; }
+        public string GameName { get; set; }
+        public string GameId { get; set; }
         public int TpId { get; set; }
         public string TpName { get; set; }
         public int TpGameType { get; set; }
-        public string GameTypeName { get; set; }
         public string TpCategory { get; set; }
-        public string GameName { get; set; }
-        public GameLogo GameLogo { get; set; }
+        public string TpCategoryName { get; set; }
         public string TpLogo { get; set; }
-        public int Sort { get; set; }
+        public string HotGamePcUrl { get; set; }
+        public string HotGameMobileUrl { get; set; }
     }
 }

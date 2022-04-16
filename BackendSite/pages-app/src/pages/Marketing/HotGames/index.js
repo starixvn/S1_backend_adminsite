@@ -13,6 +13,7 @@ const App = () => {
     const [isEdit, setFlag] = useState(false);
     const [datas, setDatas] = useState({ Datas: null });
     const [current, setCurrent] = useState({ siteId: 0, currencyId: 0, currencyName: "" });
+    const [id, setId] = useState(0);
 
     useEffect(() => {
         WebAPI.PostData({ Url: "Common/AdminUserSiteList" }).then((res) => {
@@ -68,7 +69,8 @@ const App = () => {
         setFlag(true)
     }
     const editHotGame = (id) => {
-        console.log(id)
+        setId(id)
+        setFlag(true)
     }
 
     const deleteHotGame = (id) => {
@@ -143,7 +145,7 @@ const App = () => {
             </div>
 
             {isEdit ?
-                <Edit current={current} back={back} Set={Set} /> :
+                <Edit id={id} current={current} back={back} Set={Set} /> :
                 <>
                     {datas.Datas !== null ?
                         <>
