@@ -77,5 +77,25 @@ namespace BackendSite.Service.BLL
         {
             return await _thirdPartyService.GetCommonTpList();
         }
+
+        public async Task<int> Sorting(IEnumerable<HotGameSortingRequest> request)
+        {
+            var result = 1;
+            await _hotGameService.BeginTransaction();
+            foreach (var hotGame in request)
+            {
+                var dbResult = await _hotGameService.Sorting(hotGame.Id, hotGame.Sort);
+                result *= dbResult;
+            }
+
+            if (result == 1)
+            {
+                await _hotGameService.Commit();
+                return 1;
+            }
+
+            await _hotGameService.RollBack();
+            return 0;
+        }
     }
 }

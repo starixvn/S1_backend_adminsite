@@ -114,6 +114,28 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
             };
         }
+        
+        /// <summary>
+        /// HotGame/Sorting 排序
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS > HotGame > [Submit] > Click[Sorting]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> Sorting(IEnumerable<HotGameSortingRequest> request)
+        {
+            var result = await _hotGame.Sorting(request);
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
 
         /// <summary>
         /// HotGame/GetCommonTpList 取得遊戲第三方清單

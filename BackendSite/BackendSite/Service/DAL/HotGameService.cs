@@ -5,6 +5,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -13,14 +14,23 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-
+        private MySqlConnection _connection;
+        private MySqlTransaction _transaction;
+        
         public HotGameService(IEnumerable<MySqlClient> dbClient)
         {
             var mySqlClients = dbClient.ToList();
             _mainDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Main);
             _reportDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
-        
+
+        public async Task BeginTransaction()
+        {
+            _connection = _mainDbClient.GetMySqlConnection();
+            await _connection.OpenAsync();
+            _transaction = await _connection.BeginTransactionAsync();
+        }
+
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId });
@@ -57,6 +67,26 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_Id", id);
             return await _mainDbClient.ExecuteAsync("Admin_HotGames_Del", p);
+        }
+
+        public async Task<int> Sorting(int id, int sort)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id", id);
+            p.Add("_Sort", sort);
+            return await _mainDbClient.ExecuteAsync("Admin_HotGamesSort_Set", p, _connection, _transaction);
+        }
+
+        public async Task Commit()
+        {
+            await _transaction.CommitAsync();
+            await _connection.CloseAsync();
+        }
+
+        public async Task RollBack()
+        {
+            await _transaction.RollbackAsync();
+            await _connection.CloseAsync();
         }
     }
 }

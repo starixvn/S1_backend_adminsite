@@ -75,4 +75,10 @@ namespace BackendSite.Service.Model
         public string HotGamePcUrl { get; set; }
         public string HotGameMobileUrl { get; set; }
     }
+
+    public class HotGameSortingRequest
+    {
+        public int Id { get; set; }
+        public int Sort { get; set; }
+    }
 }
