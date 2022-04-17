@@ -65,16 +65,19 @@ namespace BackendSite.Service.Model
     }
     public class Permission
     {
+        public int? ModuleId { get; set; }
         public int DisPlayKey { get; set; }
         public String Name { get; set; }
-        public List<PermissionSettings> Settings { get; set; }
+        //public List<PermissionSettings> Settings { get; set; }
+        public List<PermissionSubFuncKeys> Settings { get; set; }
         public List<FunctionDatas> FunctionDatas { get; set; }
+        public List<Permission> SubLayerDatas { get; set; }
     }
     public class FunctionDatas
     {
         public int DisPlayKey { get; set; }
         public String Name { get; set; }
-        public List<PermissionSettings> Settings { get; set; }
+        public List<PermissionSubFuncKeys> Settings { get; set; }
     }
     public class PermissionSettings
     {
@@ -113,5 +116,10 @@ namespace BackendSite.Service.Model
     public class AdditionalSetting
     {
         public IEnumerable<int> Permission { get; set; }
+    }
+    public class AdminRole
+    {
+        public int MenuId { get; set; }
+        public string Permission { get; set; }
     }
 }

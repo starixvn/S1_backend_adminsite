@@ -313,18 +313,14 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var result = _permissionBll.GetNewPermission(loginUser);
-
-
-
-
+            var result = _permissionBll.GetNewPermissionV2(loginUser);
 
             //var permissionData = _permissionBll.GetPermissionJSONData();
 
-            //if (!permissionData.Any())
-            //{
-            //    throw new AdminException(ErrorCodeEnum.NoData);
-            //}
+            if (!result.Permission.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
 
             return new ApiResult<NewPermission>
             {

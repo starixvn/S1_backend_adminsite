@@ -43,5 +43,10 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminPermissionDtoV2>("Admin_AdminPermission_GetAll");
         }
+
+        public IEnumerable<AdminRole> GetRolePermission(int role)
+        {
+            return _reportDbClient.Query<AdminRole>("RolePermission_Get", new DynamicParameters(new { Role = role }));
+        }
     }
 }
