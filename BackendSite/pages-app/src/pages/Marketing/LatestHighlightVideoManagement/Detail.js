@@ -59,6 +59,16 @@ const Panel = (props) => {
           Size={500}
         />
       </div>
+      <div className="row-flex">
+        <font color="red">
+          Youtube video need use embed url. <br></br>
+          Sample:
+          https://www.youtube.com/embed/m5_QAn0fHzY?start=2 (start=2 means the
+          video will start from 2s.) <br></br>
+          Refer:
+          https://support.google.com/youtube/answer/171780?hl=en
+        </font>
+      </div>
       <div className="button-group">
         <button
           className="btn btn-search"
