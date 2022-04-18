@@ -87,6 +87,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -121,6 +123,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -161,6 +165,8 @@ namespace BackendSite.Service.Model
     {
         public string SiteName { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public string Currency { get; set; }
         public string VerificationType { get; set; }
         public decimal RewardAmount { get; set; }
