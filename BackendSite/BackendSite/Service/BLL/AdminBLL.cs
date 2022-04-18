@@ -111,5 +111,9 @@ namespace BackendSite.Service.BLL
         {
             return adminUserService.GetUserV2(userId);
         }
+        public IEnumerable<AdminUserV2> GetAllUserV2()
+        {
+            return adminUserService.GetAllUserV2();
+        }
     }
 }

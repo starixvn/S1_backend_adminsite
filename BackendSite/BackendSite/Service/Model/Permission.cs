@@ -117,9 +117,27 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> Permission { get; set; }
     }
-    public class AdminRole
+    public class RolePermission
     {
         public int MenuId { get; set; }
         public string Permission { get; set; }
     }
+    public class UserPermissionData
+    {
+        public int MenuId { get; set; }
+        public string Permission { get; set; }
+    }
+    public class AdminRole
+    {
+        public int Role { get; set; }
+        public string RoleName { get; set; }
+        public string Remark { get; set; }
+        public string CurrencyList { get; set; }
+    }
+    public class UserAllPremission 
+    { 
+        public int MenuId { get; set; }
+        public List<int> Permission { get; set; }
+    }
+
 }

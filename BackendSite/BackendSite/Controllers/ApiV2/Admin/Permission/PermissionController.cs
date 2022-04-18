@@ -48,6 +48,25 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
         }
 
+        public class SetRolePermissionReq
+        {
+            public string Name { get; set; }
+            public string Mark { get; set; }
+            public int? Role { get; set; }
+            public List<int> CurrencyList { get; set; }
+            public List<SetRolePermission> Permission { get; set; }
+        }
+
+        public class SetRolePermission
+        {
+            public int DisPlayKey { get; set; }
+            public List<int> PermissionIdList { get; set; }
+        }
+
+        public class DeleteRolePermissionReq
+        {
+            public int Role { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -315,8 +334,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
             var result = _permissionBll.GetNewPermissionV2(loginUser);
 
-            //var permissionData = _permissionBll.GetPermissionJSONData();
-
             if (!result.Permission.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
@@ -327,7 +344,96 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
 
+        [HttpPost]
+        public ApiResult AddRolePermission(SetRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+
+            if (result.Exists(x => x.RoleName == request.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role Name is Exists"
+                };
+            }
+            if (_permissionBll.AddAdminRole(request.Name, request.Mark, request.CurrencyList, request.Permission) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Add Role Fail"
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult UpdateRolePermission(SetRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+
+            if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role) )
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Role Name is Exists"
+                };
+            }
+            if (!result.Exists(x => x.Role == request.Role))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Role is Not Exists"
+                };
+            }
+            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Update Role Fail"
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult DeleteRolePermission(DeleteRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+            if (!result.Exists(x => x.Role == request.Role))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role is Not Exists"
+                };
+            }
+            var allUser = _adminBll.GetAllUserV2();
+
+            _permissionBll.DeleteAdminRole(request.Role, allUser);
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
     }
 }
