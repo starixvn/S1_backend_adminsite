@@ -185,5 +185,11 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotGamesManagement" })]
+        public IActionResult HotGamesManagement()
+        {
+            return View();
+        }
     }
 }
