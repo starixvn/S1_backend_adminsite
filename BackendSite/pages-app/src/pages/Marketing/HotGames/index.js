@@ -10,7 +10,8 @@ const App = () => {
     const [siteList, setSiteList] = useState([]);
     const [siteOptions, setSiteOptions] = useState([]);
     const [currencyOptions, setCurrencyOptions] = useState([]);
-    const [isEdit, setFlag] = useState(false);
+    const [isEditDetail, setEditFlag] = useState(false);
+    const [isEditSort, setSortFlag] = useState(false);
     const [datas, setDatas] = useState({ Datas: null });
     const [current, setCurrent] = useState({ siteId: 0, currencyId: 0, currencyName: "" });
     const [id, setId] = useState(0);
@@ -39,19 +40,20 @@ const App = () => {
         let currencyOpts = mapCurrency(site.iCurrencyList)
         setCurrencyOptions(currencyOpts)
         setCurrent({ siteId: id, currencyId: currencyOpts[0].value, currencyName: currencyOpts[0].displayText })
-
+        setSortFlag(false)
         getHotGames(id, currencyOpts[0].value)
     }
 
     const getHotGames = (siteId, currencyId) => {
-        if (isEdit === true) {
-            setFlag(false)
+        if (isEditDetail === true) {
+            setEditFlag(false)
         }
         WebAPI.PostData({ Url: "HotGame/GetList", Data: { SiteId: siteId, CurrencyId: currencyId } }).then((res) => {
             if (res.data.errorCode === 0) {
                 if (res.data.data !== null) {
+                    let hotGameData = res.data.data;
                     setDatas({
-                        Datas: [...res.data.data]
+                        Datas: [...hotGameData]
                     });
                 }
             } else {
@@ -66,11 +68,70 @@ const App = () => {
     }
 
     const addHotGame = () => {
-        setFlag(true)
+        setEditFlag(true)
     }
     const editHotGame = (id) => {
         setId(id)
-        setFlag(true)
+        setEditFlag(true)
+    }
+
+    const clickSort = () => {
+        setSortFlag(true)
+    }
+
+    const sortingCancel = () => {
+        setSortFlag(false)
+        getHotGames(current.siteId, current.currencyId)
+    }
+
+    const sortingSave = () => {
+        let sorting = datas.Datas.map(i => {
+            return {
+                Id: i.id,
+                Sort: i.sort
+            }
+        })
+
+        WebAPI.PostData({ Url: "HotGame/Sorting", Data: sorting }).then((res) => {
+            if (res.data.errorCode === 0) {
+                alert("success.");
+                getHotGames(current.siteId, current.currencyId)
+            } else {
+                alert(res.data.message);
+            }
+        });
+        setSortFlag(false)
+    }
+
+    const sortListChanged = (id, targetSort) => {
+        let originSort = datas.Datas.find(a => {
+            return a.id === parseInt(id)
+        }).sort;
+
+        if (originSort > targetSort) {
+            datas.Datas.forEach(h => {
+                if (h.sort >= parseInt(targetSort) && h.sort < parseInt(originSort)) {
+                    h.sort = parseInt(h.sort) + 1
+                }
+                if (h.id === id) {
+                    h.sort = targetSort
+                }
+            });
+        } else {
+            datas.Datas.forEach(h => {
+                if (h.sort > parseInt(originSort) && h.sort <= parseInt(targetSort)) {
+                    h.sort = parseInt(h.sort) - 1
+                }
+                if (h.id === id) {
+                    h.sort = targetSort
+                }
+            });
+        }
+        datas.Datas.sort(function(a, b) {
+            return a.sort - b.sort;
+        });
+
+        setDatas({ ...datas, Datas: datas.Datas })
     }
 
     const deleteHotGame = (id) => {
@@ -85,7 +146,7 @@ const App = () => {
     }
 
     const back = () => {
-        setFlag(false)
+        setEditFlag(false)
     }
 
     const Set = (hotGame) => {
@@ -113,7 +174,7 @@ const App = () => {
 
             if (res.data.errorCode === 0) {
                 alert("success.");
-                setFlag(false)
+                setEditFlag(false)
                 getHotGames(current.siteId, current.currencyId)
             } else {
                 alert(res.data.message);
@@ -140,17 +201,24 @@ const App = () => {
         <div className="container-fluid">
             <h4 className="page-name">HotGames</h4>
             <div className="filter">
-                <div className="filter noBGcolor"><RadioGroup title="Available Sites" options={siteOptions} toggle={selectSite} selected={current.siteId} disabled={isEdit} /></div>
-                {current.currencyId !== 0 ? <div className="filter noBGcolor"><RadioGroup title="Available Currency" options={currencyOptions} toggle={clickTab} selected={current.currencyId} disabled={isEdit} /></div> : null}
+                <div className="filter noBGcolor"><RadioGroup title="Available Sites" options={siteOptions} toggle={selectSite} selected={current.siteId} disabled={isEditDetail} /></div>
+                {current.currencyId !== 0 ? <div className="filter noBGcolor"><RadioGroup title="Available Currency" options={currencyOptions} toggle={clickTab} selected={current.currencyId} disabled={isEditDetail} /></div> : null}
             </div>
 
-            {isEdit ?
+            {isEditDetail ?
                 <Edit id={id} current={current} back={back} Set={Set} /> :
                 <>
                     {datas.Datas !== null ?
                         <>
-                            <button className="btn btn-add" style={{ marginBottom: "20px" }} onClick={addHotGame}>Create Banner</button>
-                            <Result {...datas} ClickEdit={editHotGame} ClickDelete={deleteHotGame} />
+                            <button className="btn btn-add" style={{ marginBottom: "20px" }} onClick={addHotGame}>Create HotGame</button>
+                            {isEditSort ?
+                                <>
+                                    <button className="btn btn-add mx-3" style={{ marginBottom: "20px" }} onClick={sortingSave}>Save</button>
+                                    <button className="btn btn-add mx-3" style={{ marginBottom: "20px" }} onClick={sortingCancel}>Cancel</button>
+                                </> :
+                                <button className="btn btn-add mx-3" style={{ marginBottom: "20px" }} onClick={clickSort}>EditSort</button>
+                            }
+                            <Result {...datas} isEditSort={isEditSort} sortList={[...Array(datas.Datas.length).keys()]} sortListChanged={sortListChanged} ClickEdit={editHotGame} ClickDelete={deleteHotGame} />
                         </> :
                         null
                     }

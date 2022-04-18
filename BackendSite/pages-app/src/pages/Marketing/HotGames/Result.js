@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment-timezone";
 import ActionButtons from "./Components/ActionButton";
+import DropDownBox from "./Components/DropDownBox"
 
 const SpecialItemType = {
     actionBtn: "actionBtn",
@@ -38,9 +39,17 @@ const dataColumnDefs = () => {
 };
 
 export default function Result(hotGames) {
+    const mapOptions = (sortList) => {
+        return sortList.map(i => {
+            return {
+                value: i,
+                displayText: i
+            };
+        });
+    };
+
     const columnDefs = dataColumnDefs();
     let headerRows = [];
-
     columnDefs.forEach((element, idx) => {
         headerRows.push(
             <th
@@ -65,13 +74,23 @@ export default function Result(hotGames) {
                     });
                 }
                 body_content = element.body.format(data[element.dataColumn], subData)
-
             }
             else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
                 body_content = <ActionButtons
                     ClickEdit={hotGames.ClickEdit.bind(this, data["id"])}
                     ClickDelete={hotGames.ClickDelete.bind(this, data["id"])} />
+            }
+            else if (element.dataColumn === "sort") {
 
+                if (hotGames.isEditSort) {
+                    body_content = <DropDownBox
+                        options={mapOptions(hotGames.sortList)}
+                        dataColumn="tpId"
+                        onChange={hotGames.sortListChanged.bind(this, data["id"])}
+                        value={data["sort"]} />
+                } else {
+                    body_content = data["sort"]
+                }
             }
             else {
                 body_content = data[element.dataColumn]
