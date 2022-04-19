@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.TpMaintain;
 using Newtonsoft.Json;
@@ -13,6 +14,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly HotGameService _hotGameService;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly ICacheHelper _cacheHelper;
 
         private Dictionary<int, string> CurrencyLangIdMap = new Dictionary<int, string>()
         {
@@ -23,16 +25,35 @@ namespace BackendSite.Service.BLL
             { 61, "hi" }
         };
 
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService)
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, ICacheHelper cacheHelper)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
+            _cacheHelper = cacheHelper;
         }
         
-        public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
+        public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId, bool refreshCache)
         {
             var hotGames = await _hotGameService.Get(siteId, currencyId);
-            return hotGames.Select(a=> new GetHotGameListResponse()
+            var listHotGames = hotGames.ToList();
+            if (refreshCache)
+            {
+                var key = $"GetHotGames_{siteId}_{currencyId}";
+                var cacheHotGames = listHotGames.Select(a => new HotGameData()
+                {
+                    TpId = a.TpId,
+                    GameId = a.GameId,
+                    TpGameType = a.TpGameType,
+                    TpCategory = a.TpCategory,
+                    GameName = a.GameName,
+                    GameLogo = a.GameLogo,
+                    TpName = a.TpName,
+                    TpLogo = a.TpLogo
+                });
+                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames));
+            }
+
+            return listHotGames.Select(a=>new GetHotGameListResponse()
             {
                 Id = a.Id,
                 TpName = a.TpName,
