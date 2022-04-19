@@ -104,7 +104,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(IEnumerable<int> siteIds,
             string bonusCode,
             string transId,
