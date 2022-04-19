@@ -63,6 +63,14 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyList { get; set; }
         public List<Permission> Permission { get; set; }
     }
+    public class RoleData
+    {
+        public IEnumerable<int> CurrencyList { get; set; }
+        public IEnumerable<int> SelectCurrencyList { get; set; }
+        public string Name { get; set; }
+        public string Mark { get; set; }
+        public List<Permission> Permission { get; set; }
+    }
     public class Permission
     {
         public int? ModuleId { get; set; }
@@ -133,11 +141,22 @@ namespace BackendSite.Service.Model
         public string RoleName { get; set; }
         public string Remark { get; set; }
         public string CurrencyList { get; set; }
+        public int UserId { get; set; }
     }
     public class UserAllPremission 
     { 
         public int MenuId { get; set; }
         public List<int> Permission { get; set; }
     }
-
+    public class RoleList
+    {
+        public int Role { get; set; }
+        public string RoleName { get; set; }
+        public string Remark { get; set; }
+        public int UserId { get; set; }
+        public string CurrencyList { get; set; }
+        public string UserList { get; set; }
+        public List<int> icurrencyList { get; set; }
+        public List<string> iuserList { get; set; }
+    }
 }

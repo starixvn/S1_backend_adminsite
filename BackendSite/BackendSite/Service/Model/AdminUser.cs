@@ -62,4 +62,9 @@ namespace BackendSite.Service.Model
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
     }
+    public class UpdataAdminUserV2Role
+    {
+        public int UserId { set; get; }
+        public List<int> Role { get; set; }
+    }
 }

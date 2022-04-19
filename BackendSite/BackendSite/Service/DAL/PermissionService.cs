@@ -63,7 +63,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminRole>("Admin_AdminRole_Get");
         }
-        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetRolePermission> permission)
+        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetRolePermission> permission,int userId)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -74,6 +74,7 @@ namespace BackendSite.Service.DAL
             props.Add("RoleName", roleName);
             props.Add("Remark", remark);
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+            props.Add("UserId", userId);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             result = _mainDbClient.Execute("Admin_AdminRole_Ins", props, conn, trans);
@@ -129,7 +130,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public void DeleteAdminRole(int role, List<int> updateRoleList)
+        public void DeleteAdminRole(int role, List<UpdataAdminUserV2Role> updateRoleList)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -138,11 +139,17 @@ namespace BackendSite.Service.DAL
             _mainDbClient.Execute("Admin_AdminRole_Del", new DynamicParameters(new { Id = role }), conn, trans);
             _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
 
-            foreach (int userId in updateRoleList)
+            foreach (var updateRole in updateRoleList)
             {
-                _mainDbClient.Execute("Admin_UserRole_Set", new DynamicParameters(new { Role = role, UserId = userId }), conn, trans);
+                _mainDbClient.Execute("Admin_UserRole_Set", new DynamicParameters(new { Role = JsonConvert.SerializeObject(updateRole.Role), UserId = updateRole.UserId }), conn, trans);
             }
             trans.Commit();
+        }
+
+        public IEnumerable<RoleList> GetRoleList(string roleName)
+        {
+            return _reportDbClient.Query<RoleList>("Admin_RoleList_Get", 
+                new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null: roleName }));
         }
     }
 }
