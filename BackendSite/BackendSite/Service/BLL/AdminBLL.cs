@@ -117,6 +117,10 @@ namespace BackendSite.Service.BLL
             var menuList = await adminService.GetAllAdminMenu();
             var permissionList = await adminService.GetAllAdminPermission();
 
+            //Sort
+            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+
             if (!string.IsNullOrWhiteSpace(lang))
             {
                 var functionMappingList = ProcessTranslation(lang, menuList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));
