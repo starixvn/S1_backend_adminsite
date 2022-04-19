@@ -127,7 +127,7 @@ const App = () => {
                 }
             });
         }
-        datas.Datas.sort(function(a, b) {
+        datas.Datas.sort(function (a, b) {
             return a.sort - b.sort;
         });
 
@@ -135,10 +135,26 @@ const App = () => {
     }
 
     const deleteHotGame = (id) => {
+
+        let originSort = datas.Datas.find(a => {
+            return a.id === parseInt(id)
+        }).sort;
+        datas.Datas.forEach(h => {
+            if (h.sort > parseInt(originSort)) {
+                h.sort = parseInt(h.sort) - 1
+            }
+        });
+        let index = datas.Datas.findIndex(b => {
+            return b.id === id
+        });
+        if (index > -1) {
+            datas.Datas.splice(index, 1);
+        }
+        setDatas({ ...datas, Datas: datas.Datas })
+
         WebAPI.PostData({ Url: "HotGame/Delete", Data: `id=${id}` }).then((res) => {
             if (res.data.errorCode === 0) {
-                alert("success.");
-                getHotGames(current.siteId, current.currencyId, true)
+                sortingSave();
             } else {
                 alert(res.data.message);
             }
