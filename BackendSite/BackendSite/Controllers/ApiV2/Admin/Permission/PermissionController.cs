@@ -11,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
@@ -58,6 +59,35 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string Lang { get; set; }
         }
 
+        public class SetRolePermissionReq
+        {
+            public string Name { get; set; }
+            public string Mark { get; set; }
+            public int? Role { get; set; }
+            public List<int> CurrencyList { get; set; }
+            public List<SetRolePermission> Permission { get; set; }
+        }
+
+        public class GetRolePermissionReq
+        {
+            public int Role { get; set; }
+        }
+
+        public class SetRolePermission
+        {
+            public int DisPlayKey { get; set; }
+            public List<int> PermissionIdList { get; set; }
+        }
+
+        public class DeleteRolePermissionReq
+        {
+            public int Role { get; set; }
+        }
+
+        public class GetRoleListReq
+        {
+            public string RoleName { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -369,5 +399,216 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiResult GetAllRolePermission()
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            //var loginUser = _adminBll.GetUser(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+
+            var result = _permissionBll.GetAllRolePermission(loginUser);
+
+            if (!result.Permission.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+
+            return new ApiResult<NewPermission>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        [HttpPost]
+        public ApiResult GetRolePermission(GetRolePermissionReq request)
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            var adminRole = _permissionBll.GetAdminRole().ToList();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var roleData = adminRole.Find(x => x.Role == request.Role);
+            if (roleData == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role is not exists"
+                };
+            }
+
+            if (!loginUser.IsSuper && roleData.UserId != authInfo.UserId)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "You can not update this role"
+                };
+            }
+
+            var result = _permissionBll.GetRolePermission(request.Role,loginUser);
+            result.Name = roleData.RoleName;
+            result.Mark = roleData.Remark;
+            result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+
+            return new ApiResult<RoleData>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        [HttpPost]
+        public ApiResult AddRolePermission(SetRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+
+            var authInfo = _authorizeBll.GetAuthData();
+            if (result.Exists(x => x.RoleName == request.Name))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role name is exists"
+                };
+            }
+            if (_permissionBll.AddAdminRole(request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Add role fail"
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult UpdateRolePermission(SetRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+
+            if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role) )
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Role name is exists"
+                };
+            }
+            if (!result.Exists(x => x.Role == request.Role))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Role is not exists"
+                };
+            }
+            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Update role fail"
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult DeleteRolePermission(DeleteRolePermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+            if (!result.Exists(x => x.Role == request.Role))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role is not exists"
+                };
+            }
+            var allUser = _adminBll.GetAllUserV2();
+
+            _permissionBll.DeleteAdminRole(request.Role, allUser);
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<RoleList>> GetRoleList(GetRoleListReq request)
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            if (authInfo == null)
+            {
+                return new ApiResult<IEnumerable<RoleList>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var loginUser = _adminBll.GetUser(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult<IEnumerable<RoleList>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+            var result = _permissionBll.GetRoleList(request.RoleName).ToList();
+
+            if (!loginUser.IsSuper)
+            {
+                result.RemoveAll(x => x.UserId != loginUser.UserId);
+            }
+            return new ApiResult<IEnumerable<RoleList>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }
