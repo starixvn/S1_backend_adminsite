@@ -32,7 +32,17 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
         {
             var hotGames = await _hotGameService.Get(siteId, currencyId);
-            return hotGames.ToList().OrderBy(a => a.Sort);
+            return hotGames.Select(a=> new GetHotGameListResponse()
+            {
+                Id = a.Id,
+                TpName = a.TpName,
+                TpGameType = a.GameTypeName,
+                TpCategory = a.CategoryName,
+                GameName = a.GameName,
+                Sort = a.Sort,
+                LastUpdateUser = a.LastUpdateUser,
+                LastUpdateTime = a.LastUpdateTime
+            });
         }
         
         public async Task<GetHotGameDetailResponse> Get(int id)
