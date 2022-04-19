@@ -44,11 +44,11 @@ const App = () => {
         getHotGames(id, currencyOpts[0].value)
     }
 
-    const getHotGames = (siteId, currencyId) => {
+    const getHotGames = (siteId, currencyId, refreshCache = false) => {
         if (isEditDetail === true) {
             setEditFlag(false)
         }
-        WebAPI.PostData({ Url: "HotGame/GetList", Data: { SiteId: siteId, CurrencyId: currencyId } }).then((res) => {
+        WebAPI.PostData({ Url: "HotGame/GetList", Data: { SiteId: siteId, CurrencyId: currencyId, RefreshCache: refreshCache } }).then((res) => {
             if (res.data.errorCode === 0) {
                 if (res.data.data !== null) {
                     let hotGameData = res.data.data;
@@ -95,7 +95,7 @@ const App = () => {
         WebAPI.PostData({ Url: "HotGame/Sorting", Data: sorting }).then((res) => {
             if (res.data.errorCode === 0) {
                 alert("success.");
-                getHotGames(current.siteId, current.currencyId)
+                getHotGames(current.siteId, current.currencyId, true)
             } else {
                 alert(res.data.message);
             }
@@ -191,7 +191,7 @@ const App = () => {
             if (res.data.errorCode === 0) {
                 alert("success.");
                 setEditFlag(false)
-                getHotGames(current.siteId, current.currencyId)
+                getHotGames(current.siteId, current.currencyId, true)
             } else {
                 alert(res.data.message);
             }
