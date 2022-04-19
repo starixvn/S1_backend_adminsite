@@ -31,10 +31,10 @@ namespace BackendSite.Service.DAL
             _transaction = await _connection.BeginTransactionAsync();
         }
 
-        public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
+        public async Task<IEnumerable<GetHotGameListDto>> Get(int siteId, int currencyId)
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId });
-            return await _reportDbClient.QueryAsync<GetHotGameListResponse>("Admin_HotGames_Get", p);
+            return await _reportDbClient.QueryAsync<GetHotGameListDto>("Admin_HotGames_Get", p);
         }
 
         public async Task<GetHotGameDetailDto> Get(int id)
