@@ -128,6 +128,8 @@ namespace BackendSite.Service.Model
         public int WithdrawalType { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
+        public string NetWork { set; get; }
+        public decimal CryptoAmount { set; get; }
         public int CurrencyId { set; get; }
         public bool IsTest { set; get; }
         public decimal Amount { set; get; }
