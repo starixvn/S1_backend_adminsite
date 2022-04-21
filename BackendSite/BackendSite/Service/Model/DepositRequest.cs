@@ -74,6 +74,8 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int CustId { set; get; }
         public string UserName { set; get; }
+        public string NetWork { set; get; }
+        public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
         public string SiteName { set; get; }
         public bool IsTest { set; get; }
