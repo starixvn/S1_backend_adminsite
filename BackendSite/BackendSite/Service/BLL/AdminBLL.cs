@@ -117,9 +117,9 @@ namespace BackendSite.Service.BLL
             var menuList = await adminService.GetAllAdminMenu();
             var permissionList = await adminService.GetAllAdminPermission();
 
-            //Sort
-            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
-            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            //Enable & Sort
+            menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
