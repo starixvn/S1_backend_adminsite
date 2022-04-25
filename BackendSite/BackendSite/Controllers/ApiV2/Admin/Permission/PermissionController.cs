@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string Mark { get; set; }
             public int? Role { get; set; }
             public List<int> CurrencyList { get; set; }
-            public List<SetRolePermission> Permission { get; set; }
+            public List<SetPermission> Permission { get; set; }
         }
 
         public class GetRolePermissionReq
@@ -63,7 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public int Role { get; set; }
         }
 
-        public class SetRolePermission
+        public class SetPermission
         {
             public int DisPlayKey { get; set; }
             public List<int> PermissionIdList { get; set; }
@@ -77,6 +77,27 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public class GetRoleListReq
         {
             public string RoleName { get; set; }
+        }
+        public class GetUserListReq
+        {
+            public string UserName { get; set; }
+        }
+        public class DeleteAdminUserReq
+        {
+            public int UserId { get; set; }
+        }
+        public class GetAllUserPermissionReq
+        {
+            public int Role { get; set; }
+        }
+        public class SetUserPermissionReq
+        {
+            public int SiteId { get; set; }
+            public string UserName { get; set; }
+            public string Password { get; set; }
+            public int Role { get; set; }
+            public List<int> CurrencyList { get; set; }
+            public List<SetPermission> Permission { get; set; }
         }
         #endregion
 
@@ -506,7 +527,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUser(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
 
             if (loginUser == null)
             {
@@ -527,6 +548,126 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<UserList>> GetUserList(GetUserListReq request)
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            if (authInfo == null)
+            {
+                return new ApiResult<IEnumerable<UserList>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+            var result = _permissionBll.GetUserList(request.UserName).ToList();
+            return new ApiResult<IEnumerable<UserList>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        [HttpPost]
+        public ApiResult DeleteAdminUser(DeleteAdminUserReq request)
+        {
+            _permissionBll.DeleteAdminUser(request.UserId);
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        [HttpPost]
+        public ApiResult<IEnumerable<int>> GetUserPermissionCurrency() 
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            if (authInfo == null)
+            {
+                return new ApiResult<IEnumerable<int>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+
+            if (loginUser == null)
+            {
+                return new ApiResult<IEnumerable<int>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies.LoginUser is null."
+                };
+            }
+
+            var result = _permissionBll.GetUserPermissionCurrency(loginUser).ToList();
+
+            return new ApiResult<IEnumerable<int>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        [HttpPost]
+        public ApiResult GetAllUserPermission(GetAllUserPermissionReq request)
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            var adminRole = _permissionBll.GetAdminRole().ToList();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var roleData = adminRole.Find(x => x.Role == request.Role);
+            if (roleData == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Role is not exists"
+                };
+            }
+
+            var result = _permissionBll.GetAddUserPermission(request.Role, loginUser);
+
+            return new ApiResult<AddUserPremission>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        [HttpPost]
+        public ApiResult AddUserPermission(SetUserPermissionReq request)
+        {
+            var result = _permissionBll.GetAdminRole().ToList();
+
+            var authInfo = _authorizeBll.GetAuthData();
+
+            if (_permissionBll.AddUserPermission(request.SiteId, request.Role, request.UserName, request.Password,request.CurrencyList, request.Permission) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Add role fail"
+                };
+            }
         }
     }
 }

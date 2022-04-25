@@ -159,4 +159,18 @@ namespace BackendSite.Service.Model
         public List<int> icurrencyList { get; set; }
         public List<string> iuserList { get; set; }
     }
+    public class UserList
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public string CurrencyList { get; set; }
+        public string SiteName { get; set; }
+        public string RoleName { get; set; }
+        public List<int> icurrencyList { get; set; }
+    }
+    public class AddUserPremission
+    {
+        public List<Permission> Permission { get; set; }
+    }
+
 }
