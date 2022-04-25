@@ -128,6 +128,8 @@ namespace BackendSite.Service.Model
         public int Usage { get; set; }
         public int? BeenUsed { get; set; }
         public int RollOver { get; set; }
+        public int WinOver { get; set; }
+        public int FullFillType { get; set; }
         public decimal Bonus { get; set; }
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
@@ -145,6 +147,7 @@ namespace BackendSite.Service.Model
 
     public class TpGameType
     {
+        public int TpId { get; set; }
         public int Type { get; set; }
         public string TypeName { get; set; }
     }

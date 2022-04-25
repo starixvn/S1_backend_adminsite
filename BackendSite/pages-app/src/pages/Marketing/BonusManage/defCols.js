@@ -23,6 +23,15 @@ export const defPromotionType = {
   9: "Retention free bet"
 };
 
+export const initCurrencyLangMap = {
+  "2":['en','cs'],
+  "4":['th_en','th'],
+  "13":['cs'],
+  "15":['id_en','id'],
+  "51":['vn','en'],
+  "61":['hi_en','hi'],
+}
+
 export const initPromotionType = [
   { value: 1, displayText: defPromotionType[1] },
   { value: 2, displayText: defPromotionType[2] },
@@ -51,12 +60,14 @@ export const periodType = {
   1: "Daily",
   2: "Weekly",
   3: "Monthly",
+  4: "Unlimited",
 };
 
 export const initPeriodType = [
   { value: 1, displayText: periodType[1] },
   { value: 2, displayText: periodType[2] },
   { value: 3, displayText: periodType[3] },
+  { value: 4, displayText: periodType[4] },
 ];
 
 export const weekOptions = {

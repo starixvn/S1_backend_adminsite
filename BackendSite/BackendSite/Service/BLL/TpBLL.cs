@@ -60,7 +60,7 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 var tasks = tpWalletList.Select(async x =>
                 {
-                    if(x.WalletType == (int)WalletTypeEnum.FundTransfer) 
+                    if(x.WalletType == (int)TpListWalletTypeEnum.FundTransfer) 
                     {
                         var tpInfo = new TpInfo
                         {
@@ -169,7 +169,8 @@ namespace BackendSite.Service.BLL
                 direction = inAdminTpTransfer.direction,
                 inputs = null,
                 Operator = inAdminTpTransfer.Operator,
-                Remarks = inAdminTpTransfer.Remarks
+                Remarks = inAdminTpTransfer.Remarks,
+                Category = inAdminTpTransfer.Category
             };
             var myUrl = $"{_apiUrl}AdjustWallet";
             var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, adminTpTransfer);
@@ -196,107 +197,6 @@ namespace BackendSite.Service.BLL
             _thirdPartyService.SetAdjustmentTpCustInfoLog(menu, actionType, detailInfo, @operator);
         }
 
-        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, int minBet, int maxBet)
-        {
-            var sportType = new List<string>()
-            {
-                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
-            };
-            var betSetting = sportType.Select(type => new SabaBetSetting()
-            {
-                sport_type = type,
-                min_bet = minBet,
-                max_bet = maxBet,
-                max_bet_per_match = maxBet
-            }).ToList();
-            var myUrl = $"{_apiUrl}SetBetLimit";
-            var setBetLimit = new SetBetLimit()
-            {
-                TpId = tpId,
-                CustId = custId,
-                BetSetting = JsonConvert.SerializeObject(betSetting)
-            };
-
-            try
-            {
-                var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
-        }
-
-        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, List<SabaBetSettingResponse> betSettings)
-        {
-            var sportType = new List<string>()
-            {
-                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
-            };
-
-            var tempSetting = betSettings
-                .Where(a => sportType.Contains(a.sport_type))
-                .Select(b => new SabaBetSetting()
-                {
-                    sport_type = b.sport_type,
-                    min_bet = decimal.ToInt32(b.min_bet),
-                    max_bet = decimal.ToInt32(b.max_bet),
-                    max_bet_per_match = decimal.ToInt32(b.max_bet_per_match)
-                });
-
-            var myUrl = $"{_apiUrl}SetBetLimit";
-            var setBetLimit = new SetBetLimit()
-            {
-                TpId = tpId,
-                CustId = custId,
-                BetSetting = JsonConvert.SerializeObject(tempSetting)
-            };
-
-            try
-            {
-                var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
-        }
-
-        public async Task<ApiResult<List<SabaBetSettingResponse>>> GetBetLimitAsync(int tpId, int custId)
-        {
-            var myUrl = $"{_apiUrl}GetBetLimit";
-            var setBetLimit = new GetBetLimitReq()
-            {
-                TpId = tpId,
-                CustId = custId
-            };
-
-            try
-            {
-                var apiResult =
-                    await _courierAdapter.MyPostAsync<List<SabaBetSettingResponse>, GetBetLimitReq>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<List<SabaBetSettingResponse>>()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
-        }
-
         public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
         {
             var myUrl = $"{_apiUrl}GetBetDetail";
@@ -313,6 +213,41 @@ namespace BackendSite.Service.BLL
                     Message = "AdminSite Error: " + ex.Message
                 };
             }
+        }
+
+        public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
+        {
+            return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
+        }
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
+        {
+            var sKey = $"TpWallet_{custId}";
+            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
+            if (tpWalletList == null)
+            {
+                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)TpListWalletTypeEnum.FundTransfer);
+                var tasks = tpWalletList.Select(async x =>
+                {
+                    var tpInfo = new TpInfo
+                    {
+                        TpId = x.TpId,
+                        CustId = custId,
+                    };
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    if (apiResult.ErrorCode == 0)
+                    {
+                        x.Balance = apiResult.Data.balance;
+                    }
+                });
+                await Task.WhenAll(tasks);
+
+                if (tpWalletList != null)
+                {
+                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
+                }
+            }
+            return tpWalletList;
         }
     }
 }

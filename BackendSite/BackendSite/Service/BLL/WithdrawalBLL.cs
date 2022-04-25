@@ -337,7 +337,9 @@ namespace BackendSite.Service.BLL
 
         public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0
+                || withdrawalLimitInfoManage.WithdrawalMin < 0
+                || withdrawalLimitInfoManage.Times < 0)
             {
                 return false;
             }
@@ -347,7 +349,9 @@ namespace BackendSite.Service.BLL
 
         public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0 || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0
+                || withdrawalLimitInfoManage.WithdrawalMin < 0
+                || withdrawalLimitInfoManage.Times < 0)
             {
                 return false;
             }

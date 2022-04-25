@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
         public string Memo { set; get; }
         public string Comment { set; get; }
         public int Status { set; get; }
+        public int Category { set; get; }
     }
     public class AdjustmentAndWithdrawalLimit : AdjustmentInfo
     {
@@ -43,6 +44,16 @@ namespace BackendSite.Service.Model
     {
         public int CustId { get; set; }
         public int OTPType { get; set; }
+    }
+
+    public class SetAdjustment
+    {
+        public string Operator { get; set; }
+        public string TransId { get; set; }
+        public int BeforeCategory { get; set; }
+        public int AfterCategory { get; set; }
+        public string BeforeMemo { get; set; }
+        public string AfterMemo { get; set; }
     }
 }
 

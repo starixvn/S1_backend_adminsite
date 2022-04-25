@@ -49,6 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public int CurrencyId { get; set; }
             public double WithdrawalMin { get; set; }
             public double WithdrawalMax { get; set; }
+            public int Times { get; set; }
             public NetworkTypeEnum NetworkType { get; set; }
             public CryptoCurrencyEnum CryptoCurrency { get; set; }
         }
@@ -58,6 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public int VipLevel { get; set; }
+            public int Times { get; set; }
             public double WithdrawalMin { get; set; }
             public double WithdrawalMax { get; set; }
             public NetworkTypeEnum NetworkType { get; set; }
@@ -134,7 +136,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
                 WithdrawalMin = request.WithdrawalMin,
                 NetworkType = (int)request.NetworkType,
                 CryptoCurrencyId = (int)request.CryptoCurrency,
-                UpdateOperator = User.Identity.Name
+                UpdateOperator = User.Identity.Name,
+                Times = request.Times
             };
 
             var success = _withdrawalBll.AddCryptoWithdrawalLimit(data);
@@ -164,6 +167,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
                 SiteId = request.SiteId,
                 CurrencyId = request.CurrencyId,
                 VipLevel = request.VipLevel,
+                Times = request.Times,
                 WithdrawalMax = request.WithdrawalMax,
                 WithdrawalMin = request.WithdrawalMin,
                 NetworkType = (int)request.NetworkType,

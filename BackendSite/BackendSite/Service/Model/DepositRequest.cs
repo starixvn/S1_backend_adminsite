@@ -74,6 +74,8 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int CustId { set; get; }
         public string UserName { set; get; }
+        public string NetWork { set; get; }
+        public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
         public string SiteName { set; get; }
         public bool IsTest { set; get; }
@@ -286,8 +288,8 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public IEnumerable<int> SiteIds { get; set; }
-        public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public IEnumerable<int> CurrencyId { get; set; }
+        public IEnumerable<DepositStatusEnum> Status { get; set; }
     }
 
     public class DepositTimeExportData

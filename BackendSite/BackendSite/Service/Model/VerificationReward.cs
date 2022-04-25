@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Service.Model
@@ -46,14 +47,14 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public VerificationRewardStatusEnum Status { get; set; }
     }
 
     public class SetVerificationRewardRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public int VerificationType { get; set; }
+        public VerificationTypeEnum VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
     }
@@ -107,6 +108,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -141,6 +144,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -181,6 +186,8 @@ namespace BackendSite.Service.Model
     {
         public string SiteName { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public string Currency { get; set; }
         public string VerificationType { get; set; }
         public decimal RewardAmount { get; set; }

@@ -8,6 +8,7 @@ import RadioBox from "./Component/RadioBox";
 import RichText from "./Component/RichText.jsx";
 import { initWalletType, initPromotionType, initWeekOptions, initPeriodType, weekOptions, initSpecialBonusPromotionType, specialBonusOptions, onlyRegisteredBonusOptions, initPromotionDeviceType, initPromotionAction, AutoExtendOptions,VipLevelOptions } from "./defCols";
 import { defActionType } from "./Edit.reducer";
+import { initCurrencyLangMap } from "./defCols";
 
 const initBonusAmountType = promoType => {
 	return Number(promoType) === 3 || Number(promoType) === 9
@@ -504,7 +505,10 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 
 const SubPanel = props => {
 	const currencySwitch = `${props.state.siteId}-${props.state.bonusCode}-${props.currencyId}`;
-	const langList = Object.keys(props.state.specific[props.currencyId].lang);
+	let langList = Object.keys(props.state.specific[props.currencyId].lang);
+	if (props.state.siteId === 1){
+		langList = langList.filter(item => initCurrencyLangMap[props.currencyId].includes(item));
+	}
 	const langOptions = langList.map((lang, i) => {
 		return {
 			value: lang,
@@ -512,7 +516,8 @@ const SubPanel = props => {
 		};
 	});
 	let langId = props.state.specific[props.currencyId].currentLang;
-	let tabArr = props.state.specific[props.currencyId].selectedLang.map(
+	let tabArr = props.state.specific[props.currencyId].selectedLang
+		.filter(item => initCurrencyLangMap[props.currencyId].includes(item)).map(
 		item => {
 			return (
 				<button
@@ -645,7 +650,15 @@ const SubPanel = props => {
 									dataColumn="rollOver"
 									value={props.state.specific[props.currencyId].rollOver}
 								/>
-								{props.state.promotionType == 7 ? <InputBox
+								{props.state.promotionType == 7 ?
+									<InputBox
+										Title="Winover"
+										OnChange={props.EditMainValue}
+										dataColumn="winOver"
+										value={props.state.specific[props.currencyId].winOver}
+									/> : null}
+								{props.state.promotionType == 7 ? 
+									<InputBox
 										Type="Number"
 										Title="Bonus"
 										OnChange={props.EditMainValue}
@@ -752,16 +765,22 @@ const SubPanel = props => {
 										value={props.state.specific[props.currencyId].usage}
 									/>
 									<InputBox
+										Title="Total Usage Limit"
+										OnChange={props.EditMainValue}
+										dataColumn="totalUsageLimit"
+										value={props.state.specific[props.currencyId].totalUsageLimit}
+									/>
+									<InputBox
 										Title="Rollover"
 										OnChange={props.EditMainValue}
 										dataColumn="rollOver"
 										value={props.state.specific[props.currencyId].rollOver}
 									/>
 									<InputBox
-										Title="Total Usage Limit"
+										Title="Winover"
 										OnChange={props.EditMainValue}
-										dataColumn="totalUsageLimit"
-										value={props.state.specific[props.currencyId].totalUsageLimit}
+										dataColumn="winOver"
+										value={props.state.specific[props.currencyId].winOver}
 									/>
 									<div>(0 = Unlimited)</div>
 								</div>
@@ -833,7 +852,7 @@ const SubPanel = props => {
 						</div>
 						<div className="filter noBGcolor tag">{tabArr}</div>
 						{props.state.specific[props.currencyId].selectedLang.length >
-							0 &&
+							0 && initCurrencyLangMap[props.currencyId].includes(langId) &&
 							langId !== null &&
 							langId !== "" ? (
 							<div className="filter">
