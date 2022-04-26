@@ -540,6 +540,23 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
+    
+    public enum AdminAdjustmentLogMenuEnum
+    {
+        Undefined = 0,
+        BankCardManagement = 1,
+        SetDepositRequestAmount = 2,
+        WithdrawalAccounting = 3,
+        BalanceAdjustment = 4,
+        ThirdPartyAdjustment = 5,
+        IssueBonusManagement = 6,
+        PaymentGateway = 7,
+        DepositLimitation = 8,
+        WithdrawalLimitation = 9,
+        CryptoWithdrawalLimitation = 10,
+        AdjustmentLimitation = 11,
+        LineDepositChannel = 12
+    }
 
     #region BankFinancialTransferInfoLog
 
