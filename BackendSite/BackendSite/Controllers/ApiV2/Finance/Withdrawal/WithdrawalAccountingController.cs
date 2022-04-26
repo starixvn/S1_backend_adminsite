@@ -36,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly ExcelBLL _excelBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         private readonly string _awsKey;
         private readonly string _awsSecretKey;
@@ -55,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBankAccountingController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
 
             _awsKey = configuration.GetValue<string>("AWSKey");
             _awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
@@ -125,11 +127,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         public class DeleteWithdrawalAccountingRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string TransId { get; set; }
             public int Id { get; set; }
         }
 
         public class UploadAccountingPictureRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public string Picture { get; set; }
             public int Id { get; set; }
             public string TransId { get; set; }
@@ -452,8 +459,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public ApiResult Delete(DeleteWithdrawalAccountingRequest request)
         {
+            var authData = _authorizeBll.GetAuthData();
             var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
-                out var uploadPicTimes);
+                out var uploadPicTimes, out var details);
+           
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = authData.UserName,
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                ActionType = ActionType.Delete,
+                MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                BeforeDetailInfo = details,
+                AfterDetailInfo = null,
+                RefTransId = request.TransId
+            });
 
             if (!result)
             {
@@ -485,7 +505,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
-            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id, out var newUploadPictureTimes);
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id , out var newUploadPictureTimes);
             if (result)
             {
                 var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
@@ -494,13 +515,37 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 if (await UploadAccountPictureAsync(stream, request.TransId, request.Seq, newUploadPictureTimes))
                 {
+                    var beforeDetailInfo = new
+                    {
+                        request.Seq,
+                        UploadPictureTimes = newUploadPictureTimes - 1
+                    };
+                
+                    var afterDetailInfo = new
+                    {
+                        request.Seq,
+                        UploadPictureTimes = newUploadPictureTimes
+                    };
+            
+                    var _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = authData.UserName,
+                        SiteId = request.SiteId,
+                        CurrencyId = request.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(beforeDetailInfo),
+                        AfterDetailInfo = JsonConvert.SerializeObject(afterDetailInfo),
+                        RefTransId = request.TransId
+                    });
+                    
                     return new ApiResult()
                     {
                         ErrorCode = (int)ErrorCodeEnum.Success
                     };
                 }
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Fail,
@@ -552,7 +597,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     Message = "Delete Fail."
                 };
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,

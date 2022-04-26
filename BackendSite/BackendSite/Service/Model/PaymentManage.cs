@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -53,5 +54,51 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
 
         public int CurrencyId { get; set; }
+    }
+    
+    public class UpdatePayInfo
+    {
+        public int PayId { get; set; }
+
+        /// <summary>
+        /// 狀態(1=Enable、2=Disable)
+        /// </summary>
+        public PayListStatusEnum Status { get; set; }
+
+        public string StatusName => Status.ToString();
+    }
+    
+    public class UpdatePayChannel
+    {
+        public int ChannelId { get; set; }
+        public int ChannelName { get; set; }
+
+        public int Sort { get; set; }
+
+        /// <summary>
+        /// 狀態(1=Enable、2=Disable)
+        /// </summary>
+        public PayChannelStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
+
+        public int PointLevel { get; set; }
+    }
+
+    public class UpdatePayCurrency
+    {
+        public int ChannelId { get; set; }
+        public int ChannelName { get; set; }
+
+        public decimal MinAmount { get; set; }
+
+        public decimal MaxAmount { get; set; }
+
+        /// <summary>
+        /// 數字規則(1=Integer、2=Decimal、3=Fixed)
+        /// </summary>
+        public AmountRuleEnum AmountRule { get; set; }
+        public string AmountRuleName => AmountRule.ToString();
+
+        public IEnumerable<decimal> FixedAmountList { get; set; }
     }
 }

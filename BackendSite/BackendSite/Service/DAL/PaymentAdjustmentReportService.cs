@@ -151,31 +151,34 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public bool SetLogAdminAdjustWallet(int id, int category, string memo, string logDetail, string userName)
+        public bool SetLogAdminAdjustWallet(ParamsWithLog<SetAdjustment> input, int transferId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
-            p.Add("_TransferId", id);
-            p.Add("_Category", category);
-            p.Add("_Memo", memo ?? string.Empty);
+            p.Add("_TransferId", transferId);
+            p.Add("_Category", input.After.Category);
+            p.Add("_Memo", input.After.Memo ?? string.Empty);
 
             var success = conn
                 .Execute("Admin_LogAdminAdjustWallet_Set", p, commandType: CommandType.StoredProcedure) > 0;
 
             if (success)
             {
-                p = new DynamicParameters();
-                p.Add("Menu", "EditAdjustmentInfo");
-                p.Add("ActionType", 1);
-                p.Add("DetailInfo", logDetail);
-                p.Add("Operator", userName);
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyAdjustment);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", input.TransId);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn
-                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
-                
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            
                 if (logSuccess)
                 {
                     trans.Commit();
@@ -189,30 +192,33 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
-        public bool SetAdjustmentInfo(int id, int category, string memo, string logDetail, string userName)
+        public bool SetAdjustmentInfo(ParamsWithLog<SetAdjustment> input, int adjustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
-            p.Add("_AdjustId", id);
-            p.Add("_Category", category);
-            p.Add("_Memo", memo);
+            p.Add("_AdjustId", adjustId);
+            p.Add("_Category", input.After.Category);
+            p.Add("_Memo", input.After.Memo);
 
             var success = conn
                 .Execute("Admin_AdjustmentInfo_Set", p, commandType: CommandType.StoredProcedure) > 0;
 
             if (success)
             {
-                p = new DynamicParameters();
-                p.Add("Menu", "EditAdjustmentInfo");
-                p.Add("ActionType", 1);
-                p.Add("DetailInfo", logDetail);
-                p.Add("Operator", userName);
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BalanceAdjustment);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", input.TransId);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn
-                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
 
                 if (logSuccess)
                 {

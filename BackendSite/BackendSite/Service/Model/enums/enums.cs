@@ -207,6 +207,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
+        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
@@ -555,7 +556,8 @@ namespace BackendSite.Service.Model.enums
         WithdrawalLimitation = 9,
         CryptoWithdrawalLimitation = 10,
         AdjustmentLimitation = 11,
-        LineDepositChannel = 12
+        LineDepositChannel = 12,
+        DepositSubmission = 13
     }
 
     #region BankFinancialTransferInfoLog

@@ -12,6 +12,7 @@ using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.BLL
 {
@@ -272,24 +273,25 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
 
-        public bool AddDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
+        public bool AddDepositLimit(ParamsWithLog<DepositLimitInfo> input)
         {
-            return depositService.AddDepositLimitInfo(depositLimitInfo, Operator);
+            return depositService.AddDepositLimitInfo(input);
         }
 
-        public bool EditDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
+        public bool EditDepositLimit(ParamsWithLog<DepositLimitInfo> input)
         {
-            return depositService.EditDepositLimitInfo(depositLimitInfo, Operator);
+            return depositService.EditDepositLimitInfo(input);
         }
 
-        public int DeleteDepositLimit(DepositLimitInfo depositLimitInfo, string Operator)
+        public bool DeleteDepositLimit(ParamsWithLog<DepositLimitInfo> input)
         {
-            var currentUpperPoint = depositService.GetDepositLimitInfo(depositLimitInfo.SiteId, depositLimitInfo.DepositType, depositLimitInfo.CurrencyId, depositLimitInfo.VipLevel + 1);
+            var currentUpperPoint =
+                depositService.GetDepositLimitInfo(input.SiteId, input.Before.DepositType, input.CurrencyId, input.Before.VipLevel + 1);
 
             if (currentUpperPoint != null)
-                return 0;
+                return false;
 
-            return depositService.DeleteDepositLimitInfo(depositLimitInfo, Operator);
+            return depositService.DeleteDepositLimitInfo(input);
         }
 
         private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
@@ -410,19 +412,19 @@ namespace BackendSite.Service.BLL
         }
 
 
-        public int SetDepositRequestAmount(string transId, decimal amount, string @operator, int custId)
+        public int SetDepositRequestAmount(ParamsWithLog<SetAmountRequest> input, int custId)
         {
             var result = 1;
-
             using var scope = new TransactionScope();
 
-            if (!depositService.SetDepositRequestAmount(transId, amount, @operator))
+            if (!depositService.SetDepositRequestAmount(input))
             {
                 scope.Dispose();
 
                 return 0;
             }
-            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{amount}", @operator))
+            
+            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
             {
                 scope.Dispose();
 

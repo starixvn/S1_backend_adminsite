@@ -4,15 +4,56 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
-
-
-    public class CryptoWithdrawalLimitInfoManage : USDTWithdrawalLimitInfoManage
+    public class CryptoWithdrawalLimitInfoManage
     {
+        public int VipLevel { get; set; }
+        public int Times { get; set; }
+        public double WithdrawalMin { get; set; }
+        public double WithdrawalMax { get; set; }
+        public NetworkTypeEnum NetworkType { get; set; }
+        public CryptoCurrencyEnum CryptoCurrency { get; set; }
+    }
+    
+    public class CryptoWithdrawalLimitInfo
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public int Times { get; set; }
+        public double WithdrawalMin { get; set; }
+        public double WithdrawalMax { get; set; }
+        public NetworkTypeEnum Network { get; set; }
+        public int NetworkType => (int) Network;
         public int CryptoCurrencyId { get; set; }
     }
-
+    
+    public class CreateCryptoWithdrawalLimitInfo
+    {
+        public double WithdrawalMin { get; set; }
+        public double WithdrawalMax { get; set; }
+        public int Times { get; set; }
+        public NetworkTypeEnum NetworkType { get; set; }
+        public CryptoCurrencyEnum CryptoCurrency { get; set; }
+    }
+    
+    public class DeleteCryptoWithdrawalLimitInfo
+    {
+        public int VipLevel { get; set; }
+        public NetworkTypeEnum NetworkType { get; set; }
+        public CryptoCurrencyEnum CryptoCurrency { get; set; }
+    }
+    
+    public class UpdateCryptoWithdrawalLimitInfo
+    {
+        public int VipLevel { get; set; }
+        public int Times { get; set; }
+        public double WithdrawalMin { get; set; }
+        public double WithdrawalMax { get; set; }
+        public NetworkTypeEnum NetworkType { get; set; }
+        public CryptoCurrencyEnum CryptoCurrency { get; set; }
+    }
+    
     public class CryptoInfo
     {
         public int CurrencyId { get; set; }
@@ -66,4 +107,6 @@ namespace BackendSite.Service.Model
         public string Network { get; set; }
         public int NetworkType;
     }
+    
+    
 }

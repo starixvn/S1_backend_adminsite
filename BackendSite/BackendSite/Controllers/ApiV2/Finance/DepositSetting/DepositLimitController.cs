@@ -110,9 +110,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Create(DepositLimitInfo req)
+        public ApiResult Create(ApiRequestWithLog<DepositLimitInfo> req)
         {
-            var result = _depositBll.AddDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.AddDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -138,9 +139,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Update(DepositLimitInfo req)
+        public ApiResult Update(ApiRequestWithLog<DepositLimitInfo> req)
         {
-            var result = _depositBll.EditDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.EditDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -166,11 +168,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Delete(DepositLimitInfo req)
+        public ApiResult Delete(ApiRequestWithLog<DepositLimitInfo> req)
         {
-            var result = _depositBll.DeleteDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.DeleteDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");

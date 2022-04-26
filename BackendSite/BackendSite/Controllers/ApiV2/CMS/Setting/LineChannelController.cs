@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -40,16 +39,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public class GetByIdRequest
         {
             public int Id { get; set; }
-        }
-
-        public class SetRequest
-        {
-            public bool IsAdd { get; set; }
-            public int Id { get; set; }
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public string Link { get; set; }
-            public int Status { get; set; }
         }
 
         #endregion
@@ -110,21 +99,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public ApiResult Set(ApiRequestWithLog<SetLineChannel> request)
         {
             var updator = _authorizeBll.GetAuthData().UserName;
-
-            var setData = new LineChannelDto()
-            {
-                Id = request.IsAdd ? 0 : request.Id,
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                Link = request.Link,
-                Status = request.Status,
-                LastOperator = updator
-            };
-
-            _lineChannelBll.Set(setData);
+            _lineChannelBll.Set(new ParamsWithLog<SetLineChannel>(request, updator));
 
             return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
         }
@@ -138,11 +116,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
         [HttpPost]
-        public ApiResult Delete(GetByIdRequest request)
+        public ApiResult Delete(ApiRequestWithLog<DeleteLineChannel> request)
         {
             var updator = _authorizeBll.GetAuthData().UserName;
-
-            _lineChannelBll.Delete(request.Id);
+            _lineChannelBll.Delete(new ParamsWithLog<DeleteLineChannel>(request, updator));
 
             return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
         }

@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
+using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace BackendSite.Service.DAL
 {
@@ -49,7 +52,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
+        public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -58,34 +61,33 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("SiteId", siteId);
-            props.Add("SysId", SysId);
-            props.Add("BankAccountName", BankAccountName);
-            props.Add("BankAccountNo", BankAccountNo);
-            props.Add("MinAmount", MinAmount);
-            props.Add("MaxAmount", MaxAmount);
-            props.Add("DailyLimitAmount", DailyLimitAmount);
-            props.Add("PointLevel", PointLevel);
-            props.Add("Purpose", Purpose);
-            props.Add("Status", Status);
-            props.Add("Sort", Sort);
+            props.Add("SiteId", input.SiteId);
+            props.Add("SysId", input.After.BankId);
+            props.Add("BankAccountName", input.After.BankAccountName);
+            props.Add("BankAccountNo", input.After.BankAccountNo);
+            props.Add("MinAmount", input.After.MinAmount);
+            props.Add("MaxAmount", input.After.MaxAmount);
+            props.Add("DailyLimitAmount", input.After.DailyLimitAmount);
+            props.Add("PointLevel", input.After.PointLevel);
+            props.Add("Purpose", input.After.Purpose);
+            props.Add("Status", input.After.Status);
+            props.Add("Sort", input.After.Sort);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "BankCardManagement");
-            propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            var isCreate = input.Before.BankId == 0;
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null : JsonConvert.SerializeObject(input.Before));
+            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            propsLog.Add("_Operator", input.Operator);
             #endregion
 
             _mainDbClient.Execute("BankCard_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();
@@ -97,7 +99,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
+        public int SetBankCardwithIFSC(ParamsWithLog<SetBankCard> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -106,35 +108,34 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("SiteId", siteId);
-            props.Add("SysId", SysId);
-            props.Add("BankAccountName", BankAccountName);
-            props.Add("BankAccountNo", BankAccountNo);
-            props.Add("IFSCCode", IFSC);
-            props.Add("MinAmount", MinAmount);
-            props.Add("MaxAmount", MaxAmount);
-            props.Add("DailyLimitAmount", DailyLimitAmount);
-            props.Add("PointLevel", PointLevel);
-            props.Add("Purpose", Purpose);
-            props.Add("Status", Status);
-            props.Add("Sort", Sort);
+            props.Add("SiteId", input.SiteId);
+            props.Add("SysId", input.After.BankId);
+            props.Add("BankAccountName", input.After.BankAccountName);
+            props.Add("BankAccountNo", input.After.BankAccountNo);
+            props.Add("IFSCCode", input.After.IFSCCode);
+            props.Add("MinAmount", input.After.MinAmount);
+            props.Add("MaxAmount", input.After.MaxAmount);
+            props.Add("DailyLimitAmount", input.After.DailyLimitAmount);
+            props.Add("PointLevel", input.After.PointLevel);
+            props.Add("Purpose", input.After.Purpose);
+            props.Add("Status", input.After.Status);
+            props.Add("Sort", input.After.Sort);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "BankCardManagement");
-            propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            var isCreate = input.Before.BankId == 0;
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null : JsonConvert.SerializeObject(input.Before), DbType.String);
+            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            propsLog.Add("_Operator", input.Operator);
             #endregion
 
             _mainDbClient.Execute("BankCardwithIFSC_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();
@@ -145,7 +146,7 @@ namespace BackendSite.Service.DAL
             }
             return result;
         }
-        public int DelBankCard(int siteId, int bankId, string Operator)
+        public int DelBankCard(ParamsWithLog<DeleteBankCard> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -154,25 +155,23 @@ namespace BackendSite.Service.DAL
             var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("SiteId", siteId);
-            props.Add("BankId", bankId);
+            props.Add("SiteId", input.SiteId);
+            props.Add("BankId", input.Before.BankId);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "BankCardManagement");
-            propsLog.Add("ActionType", 2);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", Operator);
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int) ActionType.Delete);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            propsLog.Add("_AfterDetailInfo", null, DbType.String);
+            propsLog.Add("_Operator", input.Operator);
             #endregion
 
             _mainDbClient.Execute("BankCard_Del", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {
                 trans.Commit();

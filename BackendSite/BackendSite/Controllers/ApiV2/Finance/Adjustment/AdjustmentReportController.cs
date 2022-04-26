@@ -176,7 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult SetAdjustment(SetAdjustmentReq request)
+        public ApiResult SetAdjustment(ApiRequestWithLog<SetAdjustment> request)
         {
             try
             {
@@ -191,15 +191,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 }
 
                 var success =
-                    _paymentAdjustmentBll.SetAdjustment(new SetAdjustment
-                    {
-                        TransId = request.TransId,
-                        BeforeCategory = request.BeforeCategory,
-                        AfterCategory = request.AfterCategory,
-                        BeforeMemo = request.BeforeMemo,
-                        AfterMemo = request.AfterMemo,
-                        Operator = User.Identity.Name
-                    });
+                    _paymentAdjustmentBll.SetAdjustment(new ParamsWithLog<SetAdjustment>(request, User.Identity.Name));
 
                 return new ApiResult
                 {
