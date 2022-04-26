@@ -99,6 +99,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<int> CurrencyList { get; set; }
             public List<SetPermission> Permission { get; set; }
         }
+        public class GetUpdateUserPermissionReq
+        {
+            public int UserId { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -612,7 +616,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
         [HttpPost]
-        public ApiResult GetAllUserPermission(GetAllUserPermissionReq request)
+        public ApiResult GetAddUserPermission(GetAllUserPermissionReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
@@ -668,6 +672,46 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Add role fail"
                 };
             }
+        }
+
+        [HttpPost]
+        public ApiResult GetUpdateUserPermission(GetUpdateUserPermissionReq request)
+        {
+            var authInfo = _authorizeBll.GetAuthData();
+            var adminRole = _permissionBll.GetAdminRole().ToList();
+
+            if (authInfo == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+            var User = _adminBll.GetUserV2(request.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+
+            if (User == null)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "User is not exists"
+                };
+            }
+            var roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
+            
+            var result = _permissionBll.GetUpdateUserPermission(roleList.Count > 0 ? roleList.FirstOrDefault() : 0, request.UserId,loginUser);
+            //var result = _permissionBll.GetRolePermission(request.Role, loginUser);
+            //result.Name = roleData.RoleName;
+            //result.Mark = roleData.Remark;
+            //result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+
+            //return new ApiResult<RoleData>
+            //{
+            //    Data = result,
+            //    ErrorCode = (int)ErrorCodeEnum.Success
+            //};
         }
     }
 }
