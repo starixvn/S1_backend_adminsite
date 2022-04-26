@@ -982,4 +982,18 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    #region DeepLink
+    public enum DeepLinkTableTypeEnum
+    {
+        Android = 1,
+        IOS  = 2,
+        Desktop = 3
+    }
+    public enum DeepLinkTableProtocolTypeEnum
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
+    #endregion
 }
