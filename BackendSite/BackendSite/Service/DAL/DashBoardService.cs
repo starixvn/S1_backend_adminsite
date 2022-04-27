@@ -24,22 +24,18 @@ namespace BackendSite.Service.DAL
 
         public DashBoardData GetDashBoardData(int siteId,
             int currencyId,
-            int baseCurrencyId,
             DateTime startDate,
             DateTime endDate,
-            List<int> canSearchSite,
-            int timeZone)
+            List<int> canSearchSite)
         {
             var siteList = new List<int> { siteId };
             var props = new DynamicParameters();
             props.Add("_CurrencyId", currencyId);
-            //props.Add("_BaseCurrencyId", baseCurrencyId); //根本就沒有用到阿...傳進來好看的嗎
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            //props.Add("_TimeZone", timeZone);
             props.Add("_SiteIds", siteId != 0 ? JsonConvert.SerializeObject(siteList) : JsonConvert.SerializeObject(canSearchSite));
 
-            return _reportDbClient.Query<DashBoardData>("Admin_DashBoard_Get_V2", props).FirstOrDefault();
+            return _reportDbClient.QueryFirst<DashBoardData>("Admin_DashBoard_Get_V2", props);
         }
 
         public DashBoardDetailData GetDashBoardTodayData(int siteId,
@@ -47,8 +43,7 @@ namespace BackendSite.Service.DAL
             int baseCurrencyId,
             DateTime startDate,
             DateTime endDate,
-            List<int> canSearchSite,
-            int timeZone)
+            List<int> canSearchSite)
         {
             var siteList = new List<int> { siteId };
             var props = new DynamicParameters();
@@ -56,10 +51,9 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            //props.Add("_TimeZone", timeZone);
             props.Add("_SiteIds", siteId != 0 ? JsonConvert.SerializeObject(siteList) : JsonConvert.SerializeObject(canSearchSite));
 
-            return _reportDbClient.Query<DashBoardDetailData>("Admin_DashBoard_Today_Get_V2", props).FirstOrDefault();
+            return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_Today_Get_V2", props);
         }
         public DashBoardDetailData GetDashBoardTodayExtraData(int siteId,
             int currencyId,
@@ -67,8 +61,7 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             List<int> canSearchSite,
-            int tempTableType,
-            int timeZone)
+            int tempTableType)
         {
             var siteList = new List<int> { siteId };
             var props = new DynamicParameters();
@@ -76,11 +69,10 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            //props.Add("_TimeZone", timeZone);
             props.Add("_SiteIds", siteId != 0 ? JsonConvert.SerializeObject(siteList) : JsonConvert.SerializeObject(canSearchSite));
             props.Add("_Type", tempTableType);
 
-            return _reportDbClient.Query<DashBoardDetailData>("Admin_DashBoard_TodayExtra_Get_V2", props).FirstOrDefault();
+            return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_TodayExtra_Get_V2", props);
         }
     }
 }
