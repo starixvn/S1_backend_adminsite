@@ -187,7 +187,7 @@ namespace BackendSite.Service.DAL
             props.Add("Role", JsonConvert.SerializeObject(roleList));
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminUserV2_Ins", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Ins", props, conn, trans);
 
             if (result <= 0)
             {
@@ -226,7 +226,7 @@ namespace BackendSite.Service.DAL
             props.Add("Role", JsonConvert.SerializeObject(roleList));
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
 
-            result = _mainDbClient.Execute("Admin_AdminUserV2_Set", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Set", props, conn, trans);
 
             if (result <= 0)
             {
