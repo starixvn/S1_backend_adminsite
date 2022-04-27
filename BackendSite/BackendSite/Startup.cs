@@ -17,6 +17,7 @@ using BackendSite.ExceptionHandling;
 using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
+using BackendSite.Service.Model;
 using NSwag.Generation.AspNetCore;
 
 namespace BackendSite
@@ -44,6 +45,7 @@ namespace BackendSite
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
             services.AddDatabaseConnection(Configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();

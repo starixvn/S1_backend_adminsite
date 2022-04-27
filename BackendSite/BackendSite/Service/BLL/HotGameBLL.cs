@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.TpMaintain;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
@@ -11,22 +12,30 @@ namespace BackendSite.Service.BLL
 {
     public class HotGameBLL
     {
+        private const string TpLogoPath = "/img/hotgames";
+        
         private readonly HotGameService _hotGameService;
         private readonly ThirdPartyService _thirdPartyService;
-
-        private Dictionary<int, string> CurrencyLangIdMap = new Dictionary<int, string>()
+        private readonly ServerInfoBLL _serverInfo;
+        private readonly Dictionary<int, string> CurrencyLangIdMap = new Dictionary<int, string>()
         {
             { 2, "en" },
+            { 3, "en" },
             { 4, "th" },
+            { 13, "cs" },
             { 15, "id" },
             { 51, "vn" },
-            { 61, "hi" }
+            { 61, "hi" },
+            { 74, "bn" },
         };
-
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService)
+        private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
+        
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
+            _siteConfig = siteConfig;
+            _serverInfo = serverInfo;
         }
         
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId)
@@ -70,6 +79,8 @@ namespace BackendSite.Service.BLL
         public async Task<int> CreateOrUpdate(SetHotGameRequest request, string updateOperator)
         {
             request.LangId = CurrencyLangIdMap[request.CurrencyId];
+            var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
+            request.TpLogo = $"{_siteConfig.Value[site.SiteName].BannerURL}{TpLogoPath}/{request.TpId}.png";
             return await _hotGameService.CreateOrUpdate(request, updateOperator);
         }
 
