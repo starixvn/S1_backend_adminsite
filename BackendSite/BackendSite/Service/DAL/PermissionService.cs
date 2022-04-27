@@ -23,14 +23,16 @@ namespace BackendSite.Service.DAL
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly string _connectionString;
+        private readonly Tools tools;
 
-        public PermissionService(IWebHostEnvironment env, IConfiguration configuration, IServiceProvider provider)
+        public PermissionService(IWebHostEnvironment env, IConfiguration configuration, IServiceProvider provider, Tools tools)
         {
             this.env = env;
             this.configuration = configuration;
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _connectionString = configuration.GetConnectionString("ConnectionString");
+            this.tools = tools;
         }
 
         public string GetPermissionJSONData()
@@ -63,7 +65,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminRole>("Admin_AdminRole_Get");
         }
-        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetRolePermission> permission,int userId)
+        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -100,7 +102,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetRolePermission> permission)
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -150,6 +152,96 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<RoleList>("Admin_RoleList_Get", 
                 new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null: roleName }));
+        }
+        public IEnumerable<UserList> GetAdminUserList(string userName)
+        {
+            return _reportDbClient.Query<UserList>("Admin_UserList_Get",
+                new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName }));
+        }
+
+        public void DeleteAdminUser(int userId)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var props = new DynamicParameters();
+            _mainDbClient.Execute("Admin_AdminUser_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
+            _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
+
+            trans.Commit();
+        }
+
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            var result = 1;
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var props = new DynamicParameters();
+            List<int> roleList = new List<int>();
+            roleList.Add(role);
+            props.Add("SiteId", siteId);
+            props.Add("UserName", userName);
+            props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+            props.Add("Role", JsonConvert.SerializeObject(roleList));
+            props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result = _mainDbClient.Execute("Admin_AdminUserV2_Ins", props, conn, trans);
+
+            if (result <= 0)
+            {
+                trans.Rollback();
+                return result;
+            }
+            var SEQ = props.Get<int?>("@SEQ");
+
+            if (SEQ == null)
+            {
+                trans.Rollback();
+                result = 0;
+                return result;
+            }
+            foreach (var data in permission)
+            {
+                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+            }
+            trans.Commit();
+            return result;
+        }
+
+        public int UpdateAdminUser(int siteId, int userId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            var result = 1;
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            List<int> roleList = new List<int>();
+            roleList.Add(role);
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            props.Add("SiteId", siteId);
+            props.Add("UserName", userName);
+            props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("Role", JsonConvert.SerializeObject(roleList));
+            props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+
+            result = _mainDbClient.Execute("Admin_AdminUserV2_Set", props, conn, trans);
+
+            if (result <= 0)
+            {
+                trans.Rollback();
+                return result;
+            }
+
+            _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
+
+            foreach (var data in permission)
+            {
+                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = userId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+            }
+            trans.Commit();
+            return result;
         }
     }
 }
