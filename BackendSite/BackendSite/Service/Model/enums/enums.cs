@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
 
 namespace BackendSite.Service.Model.enums
 {
@@ -15,10 +14,10 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum DataBase
     {
-        Main,   //ConnectionString
+        Main, //ConnectionString
         Report, //ConnectionStringReport
-        Wager,  //ConnectionStringWager
-        Log,    //ConnectionStringLog
+        Wager, //ConnectionStringWager
+        Log, //ConnectionStringLog
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -86,6 +85,36 @@ namespace BackendSite.Service.Model.enums
         IsRisk = 2,
         PhoneVerified = 3,
         EmailVerified = 4
+    }
+
+    #endregion
+
+    #region AdminModule
+
+    public enum AdminModuleStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminFunction
+
+    public enum AdminFunctionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminPermission
+
+    public enum AdminPermissionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
@@ -181,20 +210,20 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5  //No Use
+        LoadCard = 5 //No Use
     }
 
     public enum DepositStatusEnum
     {
-        Draft = 0,    //No Use
+        Draft = 0, //No Use
         Pending = 1,
-        Paid = 2,     //No Use
+        Paid = 2, //No Use
         Approved = 3,
         Rejected = 4,
         Canceled = 5,
-        Expired = 6,  //No Use
-        OnHold = 7,   //No Use
-        Error = 99    //No Use
+        Expired = 6, //No Use
+        OnHold = 7, //No Use
+        Error = 99 //No Use
     }
 
     #endregion
@@ -271,7 +300,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalTypeEnum
     {
-        Undefine = 0,  //No Use
+        Undefine = 0, //No Use
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
@@ -279,7 +308,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalStatusEnum
     {
-        Draft = 0,  //No Use
+        Draft = 0, //No Use
         Pending = 1,
         OnHold = 2,
         Verify = 3,
@@ -288,7 +317,7 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Rejected = 7,
         ToKyc = 8,
-        Error = 99  //No Use
+        Error = 99 //No Use
     }
 
     #endregion
@@ -443,12 +472,14 @@ namespace BackendSite.Service.Model.enums
         Disable = 1,
         Enable = 2
     }
+
     public enum ReferralCustStatusEnum
     {
         Approved = 0,
         Running = 1,
         Expired = 2
     }
+
     #endregion
 
     #region PromotionRebate
@@ -474,7 +505,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-
+    
     #endregion
 
     #region Referral
@@ -486,7 +517,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
+    
     public enum BonusStatus
     {
         Running = 1,
@@ -494,6 +525,7 @@ namespace BackendSite.Service.Model.enums
         Expiry = 3,
         Fulfill = 4
     }
+
     public enum RollOverStatus
     {
         Running = 1,
@@ -652,20 +684,17 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 只有加項
         /// </summary>
-        [Description("只有加項")]
-        OnlyPlus = 1,
+        [Description("只有加項")] OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
-        [Description("只有減項")]
-        OnlyMinus = 2,
+        [Description("只有減項")] OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
-        [Description("一加一減")]
-        PlusAndMinus = 3
+        [Description("一加一減")] PlusAndMinus = 3
     }
 
     /// <summary>
@@ -731,11 +760,13 @@ namespace BackendSite.Service.Model.enums
         SettledForValidNotRollover = 3,
         Cheating = 4
     }
+
     public enum AppLinkAppType
     {
         Andriod = 1,
         IOS = 2
     }
+
     public enum AppLinkProtocolType
     {
         HTTP = 1,
@@ -758,12 +789,14 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
+
     public enum TpEnum
     {
         Saba = 1,
         Mega = 22,
         PT = 27
     }
+
     public enum BalanceAdjustmentType
     {
         BalancePlus = 1,
@@ -773,7 +806,23 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
+    
+    public enum TpGameTypeEnum
+    {
+        DG_LiveCasino = 10
+    }
 
+    public enum TpCategoryEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        LiveCasino = 3,
+        Fishing = 4,
+        Cockfighting = 5,
+        Lottery = 6,
+        VirtualSports = 7,
+        Poker = 8
+    }
     #region VerificationReward
 
     public enum VerificationTypeEnum
@@ -932,4 +981,18 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    #region DeepLink
+    public enum DeepLinkTableTypeEnum
+    {
+        Android = 1,
+        IOS  = 2,
+        Desktop = 3
+    }
+    public enum DeepLinkTableProtocolTypeEnum
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
+    #endregion
 }

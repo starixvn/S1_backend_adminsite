@@ -66,7 +66,7 @@ const CurrencyLimitSetting = (props) => {
           aria-expanded="true"
           aria-controls="collapseExample"
         >
-          {window.i18n["lbl_Currency" + value]}
+          {window.i18n["lbl_CurrencyWithdrawal" + value]}
         </a>
         <Result siteId={props.siteId}
           currencyId={value}
@@ -106,7 +106,7 @@ const Result = (props) => {
     });
   };
 
-  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax) => {
+  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax, times) => {
     let tmp = [...levelList];
     if (status === "Delete") {
       tmp.splice(idx, 1);
@@ -114,6 +114,7 @@ const Result = (props) => {
     } else if (status === "Update") {
       tmp[idx].withdrawalMin = withdrawalMin;
       tmp[idx].withdrawalMax = withdrawalMax;
+      tmp[idx].times = times;
       levelList = tmp;
     }
   };
@@ -156,6 +157,10 @@ const Result = (props) => {
         typeof editValue.withdrawalMax === "undefined"
           ? levelList[idx].withdrawalMax
           : editValue.withdrawalMax;
+      let times =
+        typeof editValue.times === "undefined"
+          ? levelList[idx].times
+          : editValue.times;
       let param = {
         Url: "apiV2/WithdrawalLimitCrypto/Update",
         Data: {
@@ -166,12 +171,13 @@ const Result = (props) => {
           networkType: levelList[idx].networkType,
           withdrawalMin: parseInt(withdrawalMin),
           withdrawalMax: parseInt(withdrawalMax),
+          times: times * 1
         }
       };
       WebAPI.PostData(param)
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax);
+            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);
             alert(response.data.message || "Update successful.");
             handleEdit(idx);
           } else {

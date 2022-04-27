@@ -1,7 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -603,32 +602,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-
-            var exportCustInfo = _custInfoBll.GetCustInfoExportList(request.SiteIds,
-                                                                    request.BirDate,
-                                                                    request.BirMonth,
-                                                                    request.BirYear,
-                                                                    request.UserName,
-                                                                    request.AccountName,
-                                                                    request.LoginIp,
-                                                                    request.TransId,
-                                                                    request.TpUserName,
-                                                                    request.Email,
-                                                                    request.PhoneNo,
-                                                                    startDate,
-                                                                    endDate,
-                                                                    tagStartDate,
-                                                                    tagEndDate,
-                                                                    statusStartDate,
-                                                                    statusEndDate,
-                                                                    request.AffCode,
-                                                                    request.CurrencyIds,
-                                                                    request.BankAccountNumber,
-                                                                    request.Statuses,
-                                                                    request.SelectTag);
-
+            
             if (request.ExportTransferWallet)
             {
+                var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExport>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
                 List<CustInfoDetailForExport> exportDatas = new List<CustInfoDetailForExport>();
                 var tasks = exportCustInfo.Select(async x =>
                 {
@@ -638,15 +615,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 await Task.WhenAll(tasks);
                 //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
                 exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
-                var stream = _excelBll.Export(exportDatas);
+                var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
             else
             {
-                var properties = exportCustInfo.First().GetType().GetProperties().Where(p => !p.Name.Equals("SabaWallet") && !p.Name.Equals("PTWallet"));
-                var stream = _excelBll.Export(exportCustInfo, properties);
+                var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExportV2>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
+                var stream = _excelBll.ExportV2(exportCustInfo);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
+        }
+
+        private IEnumerable<T> GetCustInfoExportList<T>(CustInfoListRequest request, DateTime? startDate, DateTime? endDate,
+            DateTime? tagStartDate, DateTime? tagEndDate, DateTime? statusStartDate, DateTime? statusEndDate)
+        {
+            return _custInfoBll.GetCustInfoExportList<T>(request.SiteIds,
+                request.BirDate,
+                request.BirMonth,
+                request.BirYear,
+                request.UserName,
+                request.AccountName,
+                request.LoginIp,
+                request.TransId,
+                request.TpUserName,
+                request.Email,
+                request.PhoneNo,
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                request.AffCode,
+                request.CurrencyIds,
+                request.BankAccountNumber,
+                request.Statuses,
+                request.SelectTag);
         }
 
         #endregion

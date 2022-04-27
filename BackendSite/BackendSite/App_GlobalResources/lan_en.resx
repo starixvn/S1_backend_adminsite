@@ -126,11 +126,20 @@
   <data name="Currency_13" xml:space="preserve">
     <value>RMB</value>
   </data>
+  <data name="CurrencyWithdrawal_13" xml:space="preserve">
+    <value>RMB GMT({0})</value>
+  </data>
   <data name="Currency_15" xml:space="preserve">
     <value>IDR</value>
   </data>
+  <data name="CurrencyWithdrawal_15" xml:space="preserve">
+    <value>IDR GMT({0})</value>
+  </data>
   <data name="Currency_2" xml:space="preserve">
     <value>MYR</value>
+  </data>
+  <data name="CurrencyWithdrawal_2" xml:space="preserve">
+    <value>MYR GMT ({0})</value>
   </data>
   <data name="Currency_20" xml:space="preserve">
     <value>UUS</value>
@@ -144,6 +153,9 @@
   <data name="Currency_4" xml:space="preserve">
     <value>THB</value>
   </data>
+  <data name="CurrencyWithdrawal_4" xml:space="preserve">
+    <value>THB GMT({0})</value>
+  </data>
   <data name="Currency_40" xml:space="preserve">
     <value>WON</value>
   </data>
@@ -156,6 +168,9 @@
   <data name="Currency_51" xml:space="preserve">
     <value>VND</value>
   </data>
+  <data name="CurrencyWithdrawal_51" xml:space="preserve">
+    <value>VND GMT({0})</value>
+  </data>
   <data name="Currency_6" xml:space="preserve">
     <value>EURO</value>
   </data>
@@ -167,6 +182,9 @@
   </data>
   <data name="Currency_61" xml:space="preserve">
     <value>INR</value>
+  </data>
+  <data name="CurrencyWithdrawal_61" xml:space="preserve">
+    <value>INR GMT({0})</value>
   </data>
   <data name="lbl_AccountList" xml:space="preserve">
     <value>Account List</value>

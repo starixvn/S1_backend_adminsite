@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,14 +49,19 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
         }
 
+        public class GetMenuRequestModel
+        {
+            /// <summary>
+            /// 語系
+            /// </summary>
+            public string Lang { get; set; }
+        }
+
         #endregion
 
         /// <summary>
         /// Permission/GetAllPermission 取得所有的權限
         /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
         [HttpPost]
         public ApiResult GetAllPermission()
         {
@@ -100,32 +106,69 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// Permission/GetAllMenu 取得主選單所有資料
         /// </summary>
         /// <remarks>
+        /// 
         /// Http Method：POST
+        /// 
+        /// Sample request:(舊選單)
+        ///
+        ///     {
+        ///        "lang": null
+        ///     }
+        ///
+        /// Sample request:(新選單)
+        ///
+        ///     {
+        ///        "lang": ""
+        ///     }
+        ///     
+        ///     {
+        ///        "lang": "en"
+        ///     }
         /// </remarks>
         [HttpPost]
-        public ApiResult GetAllMenu()
+        public async Task<ApiResult> GetAllMenuAsync(GetMenuRequestModel request)
         {
-            var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
-
-            if (errorCodeEnum == ErrorCodeEnum.Fail)
+            if (request.Lang == null)
             {
-                return new ApiResult
+                //old Menu
+                var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
+
+                if (errorCodeEnum == ErrorCodeEnum.Fail)
                 {
-                    ErrorCode = (int)errorCodeEnum,
-                    Message = "Missing cookies"
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)errorCodeEnum,
+                        Message = "Missing cookies"
+                    };
+                }
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<IEnumerable<MenuItem>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-
-            if (data.Count == 0)
+            else
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
+                //New Menu
+                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<List<AdminMenuModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
-
-            return new ApiResult<IEnumerable<MenuItem>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
         }
 
         /// <summary>
@@ -228,32 +271,70 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// Permission/GetUserMenu 取得使用者主選單
         /// </summary>
         /// <remarks>
+        /// 
         /// Http Method：POST
+        /// 
+        /// Sample request:(舊選單)
+        ///
+        ///     {
+        ///        "lang": null
+        ///     }
+        ///
+        /// Sample request:(新選單)
+        ///
+        ///     {
+        ///        "lang": ""
+        ///     }
+        ///     
+        ///     {
+        ///        "lang": "en"
+        ///     }
         /// </remarks>
         [HttpPost]
-        public ApiResult GetUserMenu()
+        public async Task<ApiResult> GetUserMenuAsync(GetMenuRequestModel request)
         {
-            var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
-
-            if (errorCodeEnum == ErrorCodeEnum.Fail)
+            if (request.Lang == null)
             {
-                return new ApiResult
+                //old menu
+                var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
+
+                if (errorCodeEnum == ErrorCodeEnum.Fail)
                 {
-                    ErrorCode = (int)errorCodeEnum,
-                    Message = "Missing Cookie."
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)errorCodeEnum,
+                        Message = "Missing Cookie."
+                    };
+                }
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<IEnumerable<MenuItem>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-
-            if (!data.Any())
+            else
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
+                //new menu(only for super)
+                //New Menu
+                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+                if (!data.Any())
+                {
+                    throw new AdminException(ErrorCodeEnum.NoData);
+                }
+
+                return new ApiResult<List<AdminMenuModel>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
-
-            return new ApiResult<IEnumerable<MenuItem>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
         }
 
         /// <summary>
@@ -286,5 +367,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
             return apiResult;
         }
+
     }
 }

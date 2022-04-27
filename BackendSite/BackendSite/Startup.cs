@@ -14,10 +14,8 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
-using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
-using NSwag.Generation.AspNetCore;
 
 namespace BackendSite
 {
@@ -43,6 +41,7 @@ namespace BackendSite
             services.AddSingleton<Common>();
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
+            services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
 
             /*DAL*/

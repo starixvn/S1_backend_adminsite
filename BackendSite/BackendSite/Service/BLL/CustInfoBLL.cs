@@ -7,11 +7,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using Amazon.S3.Model.Internal.MarshallTransformations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -135,7 +133,7 @@ namespace BackendSite.Service.BLL
             return custInfoList;
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite,
+        public IEnumerable<T> GetCustInfoExportList<T>(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
             int? birYear,
@@ -170,7 +168,7 @@ namespace BackendSite.Service.BLL
             var dTransId = IsDepositInfoTransId(transId) ? transId : null;
             var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
 
-            var result = _custInfoService.GetCustInfoExportList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
+            var result = _custInfoService.GetCustInfoExportList<T>(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
 
 
             return result;
