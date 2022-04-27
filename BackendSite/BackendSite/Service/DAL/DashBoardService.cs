@@ -1,10 +1,7 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;

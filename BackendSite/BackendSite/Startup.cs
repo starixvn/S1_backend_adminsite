@@ -14,10 +14,8 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
-using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
-using NSwag.Generation.AspNetCore;
 
 namespace BackendSite
 {
