@@ -49,6 +49,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public IEnumerable<GroupPermisison> PermissionDatas { get; set; }
         }
 
+        public class PermissionReq
+        {
+            public int Role { get; set; }
+        }
+
+        public class GetRoleListReq
+        {
+            public string RoleName { get; set; }
+        }
+
         public class SetRolePermissionReq
         {
             public string Name { get; set; }
@@ -58,9 +68,14 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<SetPermission> Permission { get; set; }
         }
 
-        public class GetRolePermissionReq
+        public class AdminUserReq
         {
-            public int Role { get; set; }
+            public int UserId { get; set; }
+        }
+
+        public class GetAdminUserListReq
+        {
+            public string UserName { get; set; }
         }
 
         public class SetPermission
@@ -69,44 +84,9 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<int> PermissionIdList { get; set; }
         }
 
-        public class DeleteRolePermissionReq
-        {
-            public int Role { get; set; }
-        }
-
-        public class GetRoleListReq
-        {
-            public string RoleName { get; set; }
-        }
-        public class GetUserListReq
-        {
-            public string UserName { get; set; }
-        }
-        public class DeleteAdminUserReq
-        {
-            public int UserId { get; set; }
-        }
-        public class GetAllUserPermissionReq
-        {
-            public int Role { get; set; }
-        }
-        public class SetUserPermissionReq
+        public class SetAdminUserReq : AdminUserReq
         {
             public int SiteId { get; set; }
-            public string UserName { get; set; }
-            public string Password { get; set; }
-            public int Role { get; set; }
-            public List<int> CurrencyList { get; set; }
-            public List<SetPermission> Permission { get; set; }
-        }
-        public class GetUpdateUserPermissionReq
-        {
-            public int UserId { get; set; }
-        }
-        public class UpdateUserPermissionReq
-        {
-            public int SiteId { get; set; }
-            public int UserId { get; set; }
             public string UserName { get; set; }
             public string Password { get; set; }
             public int Role { get; set; }
@@ -393,7 +373,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult GetUpdateRolePermission(GetRolePermissionReq request)
+        public ApiResult GetUpdateRolePermission(PermissionReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
@@ -507,7 +487,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult DeleteRolePermission(DeleteRolePermissionReq request)
+        public ApiResult DeleteRolePermission(PermissionReq request)
         {
             var result = _permissionBll.GetAdminRole().ToList();
             if (!result.Exists(x => x.Role == request.Role))
@@ -570,7 +550,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         #region AdminUser
         [HttpPost]
-        public ApiResult GetAddAdminUser(GetAllUserPermissionReq request)
+        public ApiResult GetAddAdminUser(PermissionReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
@@ -605,7 +585,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult GetUpdateAdminUser(GetUpdateUserPermissionReq request)
+        public ApiResult GetUpdateAdminUser(AdminUserReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
@@ -648,7 +628,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<UserList>> GetAdminUserList(GetUserListReq request)
+        public ApiResult<IEnumerable<UserList>> GetAdminUserList(GetAdminUserListReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             if (authInfo == null)
@@ -701,7 +681,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult AddAdminUser(SetUserPermissionReq request)
+        public ApiResult AddAdminUser(SetAdminUserReq request)
         {
             var result = _permissionBll.GetAdminRole().ToList();
 
@@ -725,7 +705,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult DeleteAdminUser(DeleteAdminUserReq request)
+        public ApiResult DeleteAdminUser(AdminUserReq request)
         {
             _permissionBll.DeleteAdminUser(request.UserId);
 
@@ -736,7 +716,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult UpdateAdminUser(UpdateUserPermissionReq request)
+        public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
             if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
             {
