@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;

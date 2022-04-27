@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.BetLimit;
 using BackendSite.Service.Model;
