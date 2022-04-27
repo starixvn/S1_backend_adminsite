@@ -172,5 +172,15 @@ namespace BackendSite.Service.Model
     {
         public List<Permission> Permission { get; set; }
     }
+    public class UpdateUserPermission
+    {
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public int? Role { get; set; }
+        public List<Permission> Permission { get; set; }
+        public IEnumerable<int> CurrencyList { get; set; }
+        public IEnumerable<int> SelectCurrencyList { get; set; }
+    }
 
 }

@@ -153,7 +153,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<RoleList>("Admin_RoleList_Get", 
                 new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null: roleName }));
         }
-        public IEnumerable<UserList> GetUserList(string userName)
+        public IEnumerable<UserList> GetAdminUserList(string userName)
         {
             return _reportDbClient.Query<UserList>("Admin_UserList_Get",
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName }));
@@ -171,7 +171,7 @@ namespace BackendSite.Service.DAL
             trans.Commit();
         }
 
-        public int AddUserPermission(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -205,6 +205,40 @@ namespace BackendSite.Service.DAL
             foreach (var data in permission)
             {
                 _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+            }
+            trans.Commit();
+            return result;
+        }
+
+        public int UpdateAdminUser(int siteId, int userId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            var result = 1;
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            List<int> roleList = new List<int>();
+            roleList.Add(role);
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            props.Add("SiteId", siteId);
+            props.Add("UserName", userName);
+            props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("Role", JsonConvert.SerializeObject(roleList));
+            props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+
+            result = _mainDbClient.Execute("Admin_AdminUserV2_Set", props, conn, trans);
+
+            if (result <= 0)
+            {
+                trans.Rollback();
+                return result;
+            }
+
+            _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
+
+            foreach (var data in permission)
+            {
+                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = userId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
             }
             trans.Commit();
             return result;
