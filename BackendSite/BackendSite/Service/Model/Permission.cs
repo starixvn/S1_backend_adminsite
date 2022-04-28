@@ -182,5 +182,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyList { get; set; }
         public IEnumerable<int> SelectCurrencyList { get; set; }
     }
-
+    public class SetPermission
+    {
+        public int DisPlayKey { get; set; }
+        public List<int> PermissionIdList { get; set; }
+    }
 }

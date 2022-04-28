@@ -78,11 +78,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string UserName { get; set; }
         }
 
-        public class SetPermission
-        {
-            public int DisPlayKey { get; set; }
-            public List<int> PermissionIdList { get; set; }
-        }
+        //public class SetPermission
+        //{
+        //    public int DisPlayKey { get; set; }
+        //    public List<int> PermissionIdList { get; set; }
+        //}
 
         public class SetAdminUserReq : AdminUserReq
         {
