@@ -359,7 +359,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
 
-        public bool DeleteWithdrawalLimit(ParamsWithLog<DeleteWithdrawalLimitInfo> input)
+        public bool DeleteWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
             var currentUpperPoint = 
                 _withdrawalLimitService.GetWithdrawalLimitInfo(input.SiteId,

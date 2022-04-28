@@ -174,7 +174,7 @@ import { Dropdown } from 'semantic-ui-react';
                 return;
             }
 
-            let deposit = {
+            /*let deposit = {
                 SiteId: this.state.SiteId,
                 UserName: this.state.UserName,
                 Amount: parseFloat(this.state.Amount) || 0,
@@ -187,15 +187,26 @@ import { Dropdown } from 'semantic-ui-react';
                 SysId: this.state.SysId,
                 CurrencyId: this.state.CurrencyId,
                 SabaId: this.state.SabaId
-            };
+            };*/
 
             var bodyFormData = new FormData();
-            bodyFormData.append("DepositDetails", JSON.stringify(deposit));
+            bodyFormData.append("Detail[SiteId]", this.state.SiteId);
+            bodyFormData.append("Detail[UserName]", this.state.UserName);
+            bodyFormData.append("Detail[Amount]", parseFloat(this.state.Amount) || 0);
+            bodyFormData.append("Detail[Comment]", this.state.Remark);
+            bodyFormData.append("Detail[RefId]", this.state.ReferenceNumber);
+            bodyFormData.append("Detail[DepositTime]", moment(this.DepositTime.current.state.inputValue).unix());
+            bodyFormData.append("Detail[BankName]", this.state.BankName);
+            bodyFormData.append("Detail[AccountHolderName]", this.state.AccountName);
+            bodyFormData.append("Detail[AccountNumber]", this.state.AccountNo);
+            bodyFormData.append("Detail[SysId]", this.state.SysId);
+            bodyFormData.append("Detail[CurrencyId]", this.state.CurrencyId);
+            bodyFormData.append("Detail[SabaId]", this.state.SabaId);
             bodyFormData.append("Receipt", this.state.File);
 
             axios({
                     method: "post",
-                    url: "/api/Deposit/DepositSubmission",
+                    url: "/apiv2/DepositSubmission/Submit",
                     data: bodyFormData,
                     headers: { 'Content-Type': "multipart/form-data" }
                 })

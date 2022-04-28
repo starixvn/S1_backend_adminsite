@@ -56,10 +56,28 @@ const Result = (props) => {
         }
         setstatusValue({ [idx]: _newData });
         let tmp = [...levelList], status = (_newData) ? 1 : 0;
-        tmp[idx].depositStatus = status;
+        tmp[idx].depositStatus;
         setLevelList(tmp);
+        let data = {
+            siteId: levelList[idx].siteId,
+            currencyId: levelList[idx].currencyId,
+            before: {
+                depositType: levelList[idx].depositType,
+                vipLevel: levelList[idx].vipLevel,
+                depositMin: parseInt(levelList[idx].depositMin),
+                depositMax: parseInt(levelList[idx].depositMax),
+                depositStatus: levelList[idx].depositStatus
+            },
+            after:{
+                depositType: levelList[idx].depositType,
+                vipLevel: levelList[idx].vipLevel,
+                depositMin: parseInt(levelList[idx].depositMin),
+                depositMax: parseInt(levelList[idx].depositMax),
+                depositStatus: status
+            }
+        };
 
-        api.post('/api/Deposit/EditDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel, depositMin: parseInt(levelList[idx].depositMin), depositMax: parseInt(levelList[idx].depositMax), depositStatus: status })
+        api.post('/apiv2/DepositLimit/Update', data)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     alert(response.data.message);
@@ -85,8 +103,19 @@ const Result = (props) => {
     }
 
     const handleDelete = (idx) => {
+        let data = {
+            siteId: levelList[idx].siteId,
+            currencyId: levelList[idx].currencyId,
+            before: {
+                depositType: levelList[idx].depositType,
+                vipLevel: levelList[idx].vipLevel,
+                depositMin: parseInt(levelList[idx].depositMin),
+                depositMax: parseInt(levelList[idx].depositMax),
+                depositStatus: levelList[idx].depositStatus
+            }
+        };
         if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
-            api.post('/api/Deposit/DeleteDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel })
+            api.post('/apiv2/DepositLimit/Delete', data)
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Delete");
@@ -104,8 +133,26 @@ const Result = (props) => {
         if (editValue !== null) {
             let depositMin = typeof editValue.depositMin === "undefined" ? levelList[idx].depositMin : editValue.depositMin;
             let depositMax = typeof editValue.depositMax === "undefined" ? levelList[idx].depositMax : editValue.depositMax;
+            let data = {
+                siteId: levelList[idx].siteId,
+                currencyId: levelList[idx].currencyId,
+                before: {
+                    depositType: levelList[idx].depositType,
+                    vipLevel: levelList[idx].vipLevel,
+                    depositMin: parseInt(levelList[idx].depositMin),
+                    depositMax: parseInt(levelList[idx].depositMax),
+                    depositStatus: levelList[idx].depositStatus
+                },
+                after:{
+                    depositType: levelList[idx].depositType,
+                    vipLevel: levelList[idx].vipLevel,
+                    depositMin: parseInt(depositMin),
+                    depositMax: parseInt(depositMax),
+                    depositStatus: levelList[idx].depositStatus
+                }
+            };
 
-            api.post('/api/Deposit/EditDepositLimitInfo', { siteId: levelList[idx].siteId, depositType: levelList[idx].depositType, currencyId: levelList[idx].currencyId, vipLevel: levelList[idx].vipLevel, depositMin: parseInt(depositMin), depositMax: parseInt(depositMax), depositStatus: levelList[idx].depositStatus })
+            api.post('/apiv2/DepositLimit/Update', data)
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Update", depositMin, depositMax);

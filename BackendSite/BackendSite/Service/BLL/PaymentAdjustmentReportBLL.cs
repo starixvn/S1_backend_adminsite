@@ -88,6 +88,8 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new PaymentAdjustmentFrontEnd
                     {
+                        SiteId = row.SiteId,
+                        CurrencyId = row.CurrencyId,
                         CustId = row.CustId,
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
@@ -194,6 +196,16 @@ namespace BackendSite.Service.BLL
 
         public bool SetAdjustment(ParamsWithLog<SetAdjustment> input)
         {
+            var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+
+            if (reasons == null || !reasons.Any())
+            {
+                _logger.LogError("FuncKey: Finance/PaymentAdjustment, GetReason has no data.");
+                return false;
+            }
+            input.Before.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.Before.Category)?.Description;
+            input.After.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.After.Category)?.Description;
+            
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);
             

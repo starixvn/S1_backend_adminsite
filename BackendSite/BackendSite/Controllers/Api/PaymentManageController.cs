@@ -50,12 +50,12 @@ namespace BackendSite.Controllers.Api
             
             if (success)
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
             }
             return result;
         }
@@ -69,12 +69,12 @@ namespace BackendSite.Controllers.Api
             
             if (success)
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
             }
             return result;
         }
@@ -88,12 +88,12 @@ namespace BackendSite.Controllers.Api
             
             if (success)
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
             }
             return result;
         }
@@ -107,12 +107,12 @@ namespace BackendSite.Controllers.Api
             
             if (success)
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
             }
             return result;
         }

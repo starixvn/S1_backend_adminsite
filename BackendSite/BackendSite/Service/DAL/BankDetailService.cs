@@ -112,7 +112,7 @@ namespace BackendSite.Service.DAL
             props.Add("SysId", input.After.BankId);
             props.Add("BankAccountName", input.After.BankAccountName);
             props.Add("BankAccountNo", input.After.BankAccountNo);
-            props.Add("IFSCCode", input.After.IFSCCode);
+            props.Add("IFSCCode", input.After.IFSCCode ?? string.Empty);
             props.Add("MinAmount", input.After.MinAmount);
             props.Add("MaxAmount", input.After.MaxAmount);
             props.Add("DailyLimitAmount", input.After.DailyLimitAmount);
@@ -123,7 +123,7 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            var isCreate = input.Before.BankId == 0;
+            var isCreate = input.Before == null || input.Before.BankId == 0;
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
             propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);

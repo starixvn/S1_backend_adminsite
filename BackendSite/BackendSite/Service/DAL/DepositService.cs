@@ -375,16 +375,16 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public bool AddDepositLimitInfo(ParamsWithLog<DepositLimitInfo> input)
+        public bool AddDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
             {
-                input.After.SiteId,
+                input.SiteId,
                 input.After.DepositType,
-                input.After.CurrencyId,
+                input.CurrencyId,
                 input.After.VipLevel,
                 input.After.DepositMin,
                 input.After.DepositMax
@@ -415,7 +415,7 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
-        public bool EditDepositLimitInfo(ParamsWithLog<DepositLimitInfo> input)
+        public bool EditDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -460,7 +460,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.QueryFirst<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = vipLevel }));
         }
 
-        public bool DeleteDepositLimitInfo(ParamsWithLog<DepositLimitInfo> input)
+        public bool DeleteDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -546,41 +546,12 @@ namespace BackendSite.Service.DAL
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var depositId);
             
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            var propsLog = new DynamicParameters();
-
-            #region props
             props.Add("_DepositId", depositId);
             props.Add("_Amount", input.After.Amount);
             props.Add("_Operator", input.Operator);
-            #endregion
 
-            #region propsLog
-            propsLog.Add("_SiteId", input.SiteId);
-            propsLog.Add("_CurrencyId", input.CurrencyId);
-            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.SetDepositRequestAmount);
-            propsLog.Add("_ActionType", (int) ActionType.Update);
-            propsLog.Add("_RefTransId", input.TransId);
-            propsLog.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-            propsLog.Add("_Operator", input.Operator);
-            #endregion
-            
-            _mainDbClient.Execute("Admin_DepositRequestAmountV2_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
-            if (result > 0)
-            {
-                trans.Commit();
-            }
-            else
-            {
-                trans.Rollback();
-            }
-            
-            return result > 0;
+            return _mainDbClient.Execute("Admin_DepositRequestAmountV2_Set", props) > 0;
         }
     }
 }

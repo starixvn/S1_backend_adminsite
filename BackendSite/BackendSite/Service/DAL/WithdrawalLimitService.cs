@@ -149,7 +149,7 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
         }
 
-        public bool DeleteWithdrawalLimitInfo(ParamsWithLog<DeleteWithdrawalLimitInfo> input)
+        public bool DeleteWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();

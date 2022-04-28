@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
-                    Operator = request.Detail.Operator,
+                    Operator = User.Identity.Name,
                     SiteId = request.Detail.SiteId,
                     CurrencyId = request.Detail.CurrencyId,
                     ActionType = ActionType.Create,

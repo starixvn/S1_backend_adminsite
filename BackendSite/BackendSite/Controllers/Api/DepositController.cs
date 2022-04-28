@@ -375,10 +375,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult AddDepositLimitInfo(ApiRequestWithLog<DepositLimitInfo> req)
+        public ApiResult AddDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
             var result =
-                depositBLL.AddDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
+                depositBLL.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -395,10 +395,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult EditDepositLimitInfo(ApiRequestWithLog<DepositLimitInfo> req)
+        public ApiResult EditDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
             var result =
-                depositBLL.EditDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
+                depositBLL.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -415,10 +415,10 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult DeleteDepositLimitInfo(ApiRequestWithLog<DepositLimitInfo> req)
+        public ApiResult DeleteDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
             var result =
-                depositBLL.DeleteDepositLimit(new ParamsWithLog<DepositLimitInfo>(req, User.Identity.Name));
+                depositBLL.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

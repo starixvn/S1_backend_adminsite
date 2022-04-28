@@ -152,10 +152,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(ApiRequestWithLog<DeleteWithdrawalLimitInfo> request)
+        public ApiResult Delete(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
             var result = _withdrawalBll.DeleteWithdrawalLimit(
-                new ParamsWithLog<DeleteWithdrawalLimitInfo>(request, User.Identity.Name));
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

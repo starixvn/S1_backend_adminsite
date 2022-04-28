@@ -12,7 +12,7 @@ using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
-using BackendSite.Service.Model.ApiModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,30 +20,23 @@ namespace BackendSite.Service.BLL
     {
         private readonly DepositService depositService;
         private readonly ServerInfoService serverInfoService;
-        private readonly AdjustmentService adjustmentService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly CustInfoBLL custInfoBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
         private readonly CustInfoService custInfoService;
         private readonly ImageEditorBLL _imageEditorBll;
 
-        public DepositBLL(DepositService depositService,
-            ServerInfoService serverInfoService,
-            AdjustmentService adjustmentService,
-            CustInfoBLL custInfoBLL,
-            AuthorizeBLL authorizeBLL,
-            Common common,
-            CustInfoService custInfoService,
-            ImageEditorBLL imageEditorBll)
+        public DepositBLL(IServiceProvider provider)
         {
-            this.depositService = depositService;
-            this.serverInfoService = serverInfoService;
-            this.adjustmentService = adjustmentService;
-            this.custInfoBLL = custInfoBLL;
-            this.authorizeBLL = authorizeBLL;
-            this.common = common;
-            this.custInfoService = custInfoService;
-            _imageEditorBll = imageEditorBll;
+            this.depositService = provider.GetRequiredService<DepositService>();
+            this.serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            this._adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this.authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            this.common = provider.GetRequiredService<Common>();
+            this.custInfoService = provider.GetRequiredService<CustInfoService>();
+            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, DateTime startDate, DateTime endDate, string depositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
@@ -273,20 +266,20 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
 
-        public bool AddDepositLimit(ParamsWithLog<DepositLimitInfo> input)
+        public bool AddDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             return depositService.AddDepositLimitInfo(input);
         }
 
-        public bool EditDepositLimit(ParamsWithLog<DepositLimitInfo> input)
+        public bool EditDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             return depositService.EditDepositLimitInfo(input);
         }
 
-        public bool DeleteDepositLimit(ParamsWithLog<DepositLimitInfo> input)
+        public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             var currentUpperPoint =
-                depositService.GetDepositLimitInfo(input.SiteId, input.Before.DepositType, input.CurrencyId, input.Before.VipLevel + 1);
+                depositService.GetDepositLimitInfo(input.SiteId, (int)input.Before.DepositType, input.CurrencyId, input.Before.VipLevel + 1);
 
             if (currentUpperPoint != null)
                 return false;
@@ -418,6 +411,25 @@ namespace BackendSite.Service.BLL
             using var scope = new TransactionScope();
 
             if (!depositService.SetDepositRequestAmount(input))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                RefTransId = input.TransId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetDepositRequestAmount,
+                BeforeDetailInfo = JsonConvert.SerializeObject(input.Before),
+                AfterDetailInfo = JsonConvert.SerializeObject(input.After)
+            };
+            
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
 

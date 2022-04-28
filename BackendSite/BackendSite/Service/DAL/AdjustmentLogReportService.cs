@@ -82,9 +82,9 @@ namespace BackendSite.Service.DAL
             props.Add("_CurrencyId", input.CurrencyId);
             props.Add("_Menu", (int) input.MenuEnum);
             props.Add("_ActionType", (int) input.ActionType);
-            props.Add("_RefTransId", input.RefTransId);
-            props.Add("_BeforeDetailInfo", input.BeforeDetailInfo);
-            props.Add("_AfterDetailInfo", input.AfterDetailInfo);
+            props.Add("_RefTransId", input.RefTransId ?? string.Empty);
+            props.Add("_BeforeDetailInfo", input.BeforeDetailInfo, DbType.String);
+            props.Add("_AfterDetailInfo", input.AfterDetailInfo, DbType.String);
             props.Add("_Operator", input.Operator);
             
             var result =

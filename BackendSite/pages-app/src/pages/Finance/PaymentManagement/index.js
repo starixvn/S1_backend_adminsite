@@ -109,14 +109,24 @@ const PayInfoList = props => {
 	}, []);
 
 	const UpdatePayInfoStatus = idx => {
+		let data = stateDatas[idx];
 		let status = stateDatas[idx].status === 1 ? 2 : 1;
-		stateDatas[idx].status = status;
+		
 		let param = {
 			Url: webAPIUrl.UpdatePayList,
-			Data: qs.stringify({
-				PayId: stateDatas[idx].id,
-				Status: status
-			})
+			Data: {
+				SiteId: 0,
+				CurrencyId: 0,
+				Before: {
+					PayId: data.id,
+					Status: data.status
+				},
+				After: {
+					PayId: data.id,
+					Status: status
+				}
+				
+			}
 		};
 
 		WebAPI.PostData(param).then(res => {

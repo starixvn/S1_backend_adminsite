@@ -601,10 +601,10 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult DeleteWithdrawalLimitInfo(ApiRequestWithLog<DeleteWithdrawalLimitInfo> request)
+        public ApiResult DeleteWithdrawalLimitInfo(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
             var result = withdrawalBLL.DeleteWithdrawalLimit(
-                new ParamsWithLog<DeleteWithdrawalLimitInfo>(request, User.Identity.Name));
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

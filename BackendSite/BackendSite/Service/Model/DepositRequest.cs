@@ -225,10 +225,19 @@ namespace BackendSite.Service.Model
         public double DepositMax { get; set; }
 
         public int DepositStatus { get; set; }
+    }
+    
+    public class DepositLimitModel
+    {
+        public int VipLevel { get; set; }
 
-        public string DepositTypeName => ((DepositTypeEnum) DepositType).ToString();
+        public double DepositMin { get; set; }
 
-        public string DepositStatusName => ((DepositStatusEnum) DepositStatus).ToString();
+        public double DepositMax { get; set; }
+        public DepositTypeEnum DepositType { get; set; }
+        public DepositStatusEnum DepositStatus { get; set; }
+        public string DepositTypeName => DepositType.ToString();
+        public string DepositStatusName => DepositStatus.ToString();
     }
 
     public class DepositLimitCurrencyInfo
