@@ -33,10 +33,11 @@ namespace BackendSite.Service.BLL
 
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
         
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo)
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
+            _cacheHelper = cacheHelper;
             _siteConfig = siteConfig;
             _serverInfo = serverInfo;
         }
