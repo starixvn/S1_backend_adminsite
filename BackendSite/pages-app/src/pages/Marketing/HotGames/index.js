@@ -181,8 +181,7 @@ const App = () => {
                 GameLogo: {
                     HotGamePcUrl: hotGame.hotGamePcUrl,
                     HotGameMobileUrl: hotGame.hotGameMobileUrl
-                },
-                TpLogo: hotGame.tpLogo
+                }
             }
         };
 
