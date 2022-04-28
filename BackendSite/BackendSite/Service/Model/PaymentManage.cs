@@ -71,7 +71,7 @@ namespace BackendSite.Service.Model
     public class UpdatePayChannel
     {
         public int ChannelId { get; set; }
-        public int ChannelName { get; set; }
+        public string ChannelName { get; set; }
 
         public int Sort { get; set; }
 
@@ -87,7 +87,7 @@ namespace BackendSite.Service.Model
     public class UpdatePayCurrency
     {
         public int ChannelId { get; set; }
-        public int ChannelName { get; set; }
+        public string ChannelName { get; set; }
 
         public decimal MinAmount { get; set; }
 
