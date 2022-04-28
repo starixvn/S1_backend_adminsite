@@ -732,6 +732,16 @@
         "Childs": null
       },
       {
+        "Key": "HotGamesManagement",
+        "Title": "Hot Games Management",
+        "FuncKey": "CMS/HotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "HotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "GameCasinoManagement",
         "Title": "Game Casino Management",
         "FuncKey": "CMS/GameCasinoManagement",
