@@ -19,7 +19,6 @@ function Edit({ id, current, back = f => f, Set = g => g }) {
         tpGameType: 1,
         tpCategory: 1,
         tpCategoryName: "Sports",
-        tpLogo: "",
         hotGamePcUrl: "",
         hotGameMobileUrl: ""
     });
@@ -116,7 +115,6 @@ function Edit({ id, current, back = f => f, Set = g => g }) {
                         value={hotGame.tpId}
                     />
                 </div>
-                <InputBox title="Tp Logo" value={hotGame.tpLogo} dataColumn="tpLogo" onChange={textInput} />
                 <div className="row-flex">
                     <DropDownBox
                         columnTitle="Tp GameType"

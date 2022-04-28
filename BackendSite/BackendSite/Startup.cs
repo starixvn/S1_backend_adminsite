@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using BackendSite.Service.Model;
 using StackExchange.Redis;
 
 namespace BackendSite
@@ -45,6 +46,7 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
