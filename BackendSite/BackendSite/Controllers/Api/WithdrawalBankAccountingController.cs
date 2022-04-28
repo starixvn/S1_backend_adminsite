@@ -345,7 +345,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
             var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
-                out var uploadPicTimes);
+                out var uploadPicTimes, out var detailInfo);
 
             if (!result)
             {

@@ -226,6 +226,19 @@ namespace BackendSite.Service.Model
 
         public int DepositStatus { get; set; }
     }
+    
+    public class DepositLimitModel
+    {
+        public int VipLevel { get; set; }
+
+        public double DepositMin { get; set; }
+
+        public double DepositMax { get; set; }
+        public DepositTypeEnum DepositType { get; set; }
+        public DepositStatusEnum DepositStatus { get; set; }
+        public string DepositTypeName => DepositType.ToString();
+        public string DepositStatusName => DepositStatus.ToString();
+    }
 
     public class DepositLimitCurrencyInfo
     {
@@ -307,9 +320,8 @@ namespace BackendSite.Service.Model
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
     }
-    public class DepositRequestAmountPara
+    public class SetAmountRequest
     {
-        public string TransId { get; set; }
         public decimal Amount { get; set; }
     }
 

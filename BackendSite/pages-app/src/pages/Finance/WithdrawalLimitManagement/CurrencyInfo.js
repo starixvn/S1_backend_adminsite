@@ -103,10 +103,15 @@ const Result = (props) => {
   const handleDelete = (idx) => {
     if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
       api
-        .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
+        .post("/apiv2/WithdrawalLimit/Delete", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
+          before:{
+            vipLevel: levelList[idx].vipLevel,
+            withdrawalMin: levelList[idx].withdrawalMin,
+            withdrawalMax: levelList[idx].withdrawalMax,
+            times: levelList[idx].times
+          }
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
@@ -136,15 +141,25 @@ const Result = (props) => {
         typeof editValue.times === "undefined"
           ? levelList[idx].times
           : editValue.times;
-      api
-        .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
+      let level = levelList[idx].vipLevel;
+      var data = {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          times: times,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
-        })
+          before: {
+              vipLevel: level,
+              withdrawalMin: levelList[idx].withdrawalMin,
+              withdrawalMax: levelList[idx].withdrawalMax,
+              times: levelList[idx].times
+          },
+          after: {
+              vipLevel: level,
+              withdrawalMin: parseInt(withdrawalMin),
+              withdrawalMax: parseInt(withdrawalMax),
+              times: times
+          }
+      };
+      api
+        .post("/apiv2/WithdrawalLimit/Update", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
             handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);

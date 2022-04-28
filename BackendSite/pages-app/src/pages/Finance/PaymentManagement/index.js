@@ -109,14 +109,24 @@ const PayInfoList = props => {
 	}, []);
 
 	const UpdatePayInfoStatus = idx => {
+		let data = stateDatas[idx];
 		let status = stateDatas[idx].status === 1 ? 2 : 1;
-		stateDatas[idx].status = status;
+		
 		let param = {
 			Url: webAPIUrl.UpdatePayList,
-			Data: qs.stringify({
-				PayId: stateDatas[idx].id,
-				Status: status
-			})
+			Data: {
+				SiteId: 0,
+				CurrencyId: 0,
+				Before: {
+					PayId: data.id,
+					Status: data.status
+				},
+				After: {
+					PayId: data.id,
+					Status: status
+				}
+				
+			}
 		};
 
 		WebAPI.PostData(param).then(res => {
@@ -176,16 +186,29 @@ const PayInfoList = props => {
 			elem = level[idx] ? elem[level[idx]][ArrIdx] : elem[ArrIdx];
 		});
 
+		let data = {
+			siteId: 0,
+			currencyId: 0,
+			before: {
+				channelId: elem.id,
+				sort: elem.sort,
+				status: elem.status,
+				channelName: elem.channelName,
+				pointLevel: elem.pointLevel
+			},
+			after: {
+				channelId: elem.id,
+				sort: elem.sort,
+				status: value,
+				channelName: elem.channelName,
+				pointLevel: elem.pointLevel
+			}
+		}
+
 		if (dataColumn === "status" && !elem.editValue) {
 			let param = {
 				Url: webAPIUrl.UpdatePayChannel,
-				Data: qs.stringify({
-					ChannelId: elem.id,
-					Sort: elem.sort,
-					Status: value,
-					Mode: elem.mode,
-					PointLevel: elem.pointLevel
-				})
+				Data: data
 			};
 
 			WebAPI.PostData(param).then(res => {
@@ -206,40 +229,64 @@ const PayInfoList = props => {
 
 	const ClickSave = idxArr => {
 		if (idxArr.length === 3) {
+			let channelElem = stateDatas[idxArr[0]].channelList[idxArr[1]];
 			let elem =
 				stateDatas[idxArr[0]].channelList[idxArr[1]].currencyList[
 					idxArr[2]
 				];
+
 			let param =
 				window.subFuncKeys &&
 				window.subFuncKeys.includes("f_pm_editAmountRule")
 					? {
 							Url: webAPIUrl.UpdatePayCurrency,
-							Data: qs.stringify({
-								ChannelId: elem.channelId,
-								CurrencyId: elem.currencyId,
-								MinAmount: elem.editValue.minAmount,
-								MaxAmount: elem.editValue.maxAmount,
-								AmountRule: elem.editValue.amountRule,
-								AmountShow: elem.editValue.amountShow
-									? JSON.stringify(
-											elem.editValue.amountShow
-												.split(",")
-												.map(v => {
-													return Number(v);
-												})
-									  )
-									: elem.editValue.amountShow
-							})
+							Data: {
+								siteId: 0,
+								currencyId: elem.currencyId,
+								before: {
+									channelId: elem.channelId,
+									channelName: channelElem.channelName,
+									minAmount: elem.minAmount,
+									maxAmount: elem.maxAmount,
+									amountRule: elem.amountRule,
+									amountShow: elem.amountShow
+								},
+								after: {
+									channelId: elem.channelId,
+									channelName: channelElem.channelName,
+									minAmount: elem.editValue.minAmount,
+									maxAmount: elem.editValue.maxAmount,
+									amountRule: elem.editValue.amountRule,
+									amountShow: elem.editValue.amountShow ? JSON.stringify(
+										elem.editValue.amountShow
+											.split(",")
+											.map(v => {
+												return Number(v);
+											})
+									) : elem.editValue.amountShow
+								}
+							}
 					  }
 					: {
 							Url: webAPIUrl.UpdatePayCurrencyAmount,
-							Data: qs.stringify({
-								ChannelId: elem.channelId,
-								CurrencyId: elem.currencyId,
-								MinAmount: elem.editValue.minAmount,
-								MaxAmount: elem.editValue.maxAmount
-							})
+							Data: {
+								siteId: 0,
+								currencyId: elem.currencyId,
+								before: {
+									channelId: elem.id,
+									channelName: elem.channelName,
+									minAmount: elem.minAmount,
+									maxAmount: elem.maxAmount,
+									amountRule: elem.amountRule
+								},
+								after: {
+									channelId: elem.id,
+									channelName: elem.channelName,
+									minAmount: elem.editValue.minAmount,
+									maxAmount: elem.editValue.maxAmount,
+									amountRule: elem.editValue.amountRule
+								}
+							}
 					  };
 
 			WebAPI.PostData(param).then(res => {
@@ -263,14 +310,28 @@ const PayInfoList = props => {
 		} else if (idxArr.length === 2) {
 			let elem = stateDatas[idxArr[0]].channelList[idxArr[1]];
 
+			let data = {
+				siteId: 0,
+				currencyId: 0,
+				before: {
+					channelId: elem.id,
+					sort: elem.sort,
+					status: elem.status,
+					channelName: elem.channelName,
+					pointLevel: elem.pointLevel
+				},
+				after: {
+					channelId: elem.id,
+					sort: elem.editValue.sort,
+					status: elem.editValue.status,
+					channelName: elem.editValue.channelName,
+					pointLevel: elem.editValue.pointLevel
+				}
+			}
+			
 			let param = {
 				Url: webAPIUrl.UpdatePayChannel,
-				Data: qs.stringify({
-					ChannelId: elem.id,
-					Sort: elem.editValue.sort,
-					Status: elem.editValue.status,
-					PointLevel: elem.editValue.pointLevel
-				})
+				Data: data
 			};
 
 			WebAPI.PostData(param).then(res => {

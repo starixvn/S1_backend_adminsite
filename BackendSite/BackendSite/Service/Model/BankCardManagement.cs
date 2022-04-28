@@ -24,5 +24,7 @@ namespace BackendSite.Service.Model
         public int BankId { get; set; }
         // Log記錄用
         public string BankName { get; set; }
+        public string BankAccountNo { get; set; }
+        
     }
 }

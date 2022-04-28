@@ -334,39 +334,40 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
 
-        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0
-                || withdrawalLimitInfoManage.WithdrawalMin < 0
-                || withdrawalLimitInfoManage.Times < 0)
+            if (input.After.WithdrawalMax < 0
+                || input.After.WithdrawalMin < 0
+                || input.After.Times < 0)
             {
                 return false;
             }
 
-            return _withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.AddWithdrawalLimitInfo(input);
         }
 
-        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool EditWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0
-                || withdrawalLimitInfoManage.WithdrawalMin < 0
-                || withdrawalLimitInfoManage.Times < 0)
+            if (input.After.WithdrawalMax < 0
+                || input.After.WithdrawalMin < 0
+                || input.After.Times < 0)
             {
                 return false;
             }
 
-            return _withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
 
-        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string Operator)
+        public bool DeleteWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId,
-                withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
+            var currentUpperPoint = 
+                _withdrawalLimitService.GetWithdrawalLimitInfo(input.SiteId,
+                    input.CurrencyId, input.Before.VipLevel + 1);
 
             if (currentUpperPoint != null)
-                return 0;
+                return false;
 
-            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
+            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(input);
         }
 
         public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int siteId)
@@ -587,7 +588,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.EditUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
         }
 
-        public IEnumerable<CryptoWithdrawalLimitInfoManage> GetCryptoWithdrawalLimitInfos(IEnumerable<int> siteIds,
+        public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
             int cryptoCurrencyId,
             string network,
@@ -607,54 +608,46 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount).ToList();
 
-            result.ForEach(x =>
-            {
-                x.NetworkType = (int)(NetworkTypeEnum)Enum.Parse(typeof(NetworkTypeEnum), x.Network);
-            });
-
             return result;
         }
 
-        public bool AddCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool AddCryptoWithdrawalLimit(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
                 return false;
             }
-                
 
             return _withdrawalLimitService.AddCryptoWithdrawalLimitInfo(input);
         }
 
-        public bool DeleteCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool DeleteCryptoWithdrawalLimit(ParamsWithLog<DeleteCryptoWithdrawalLimitInfo> input)
         {
             var currentUpperPointInput = new CryptoWithdrawalLimitInfoManage
             {
-                SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
-                NetworkType = input.NetworkType,
-                CryptoCurrencyId = input.CryptoCurrencyId,
-                VipLevel = input.VipLevel + 1
+                NetworkType = input.Before.NetworkType,
+                CryptoCurrency = input.Before.CryptoCurrency,
+                VipLevel = input.Before.VipLevel + 1
             };
 
             var currentUpperPoint =
-                _withdrawalLimitService.GetCryptoWithdrawalLimitInfo(currentUpperPointInput);
+                _withdrawalLimitService.GetCryptoWithdrawalLimitInfo(currentUpperPointInput, input.SiteId, input.CurrencyId);
 
             if (currentUpperPoint != null)
             {
-                _logger.LogInformation($"Current upper point is not null. Current VIP level: { input.VipLevel}");
+                _logger.LogInformation($"Current upper point is not null. Current VIP level: { input.Before.VipLevel }");
                 return false;
             }
 
             return _withdrawalLimitService.DeleteCryptoWithdrawalLimitInfo(input);
         }
 
-        public bool EditCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool EditCryptoWithdrawalLimit(ParamsWithLog<UpdateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
                 return false;
             }
 
@@ -849,16 +842,17 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes)
+        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes, out string details)
         {
             transId = string.Empty;
             seq = 0;
             uploadPicTimes = 0;
+            details = string.Empty;
 
             try
             {
                 var item = GetAccountingById(id);
-
+                details = JsonConvert.SerializeObject(item);
                 if (DeleteWithdrawalBankAccounting(item))
                 {
                     transId = item.TransId;

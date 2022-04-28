@@ -214,6 +214,14 @@ namespace BackendSite.Service.Model
 
         public int Times { get; set; }
     }
+    
+    public class SetWithdrawalLimitInfo
+    {
+        public int VipLevel { get; set; }
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+        public int Times { get; set; }
+    }
 
     public class WithdrawalKYC
     {
