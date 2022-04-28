@@ -602,6 +602,11 @@
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Deep Link Management",
+      "FuncKey": "CMS/DeepLinkManagement",
+      "Enable": false
     }
   ]
 },

@@ -87,7 +87,7 @@ const Result = (props) => {
     });
   };
 
-  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax) => {
+  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax, times) => {
     let tmp = [...levelList];
     if (status === "Delete") {
       tmp.splice(idx, 1);
@@ -95,6 +95,7 @@ const Result = (props) => {
     } else if (status === "Update") {
       tmp[idx].withdrawalMin = withdrawalMin;
       tmp[idx].withdrawalMax = withdrawalMax;
+      tmp[idx].times = times;
       setLevelList(tmp);
     }
   };
@@ -131,17 +132,22 @@ const Result = (props) => {
         typeof editValue.withdrawalMax === "undefined"
           ? levelList[idx].withdrawalMax
           : editValue.withdrawalMax;
+      let times =
+        typeof editValue.times === "undefined"
+          ? levelList[idx].times
+          : editValue.times;
       api
         .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           vipLevel: levelList[idx].vipLevel,
+          times: times,
           withdrawalMin: parseInt(withdrawalMin),
           withdrawalMax: parseInt(withdrawalMax),
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax);
+            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);
             alert(response.data.message);
             handleEdit(idx);
           } else {
