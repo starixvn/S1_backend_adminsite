@@ -117,9 +117,9 @@ namespace BackendSite.Service.BLL
             var menuList = await adminService.GetAllAdminMenu();
             var permissionList = await adminService.GetAllAdminPermission();
 
-            //Sort
-            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
-            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            //Enable & Sort
+            menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
@@ -237,5 +237,13 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+        public AdminUserV2 GetUserV2(int userId)
+        {
+            return adminUserService.GetUserV2(userId);
+        }
+        public IEnumerable<AdminUserV2> GetAllUserV2()
+        {
+            return adminUserService.GetAllUserV2();
+        }
     }
 }

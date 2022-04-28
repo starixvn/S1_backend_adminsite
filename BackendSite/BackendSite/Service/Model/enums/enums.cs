@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
 
 namespace BackendSite.Service.Model.enums
 {
@@ -514,7 +513,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-    
+
     #endregion
 
     #region Referral
@@ -526,7 +525,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -547,6 +546,23 @@ namespace BackendSite.Service.Model.enums
         Read = 2,
         Update = 3,
         Delete = 4
+    }
+    
+    public enum AdminAdjustmentLogMenuEnum
+    {
+        Undefined = 0,
+        BankCardManagement = 1,
+        SetDepositRequestAmount = 2,
+        WithdrawalAccounting = 3,
+        BalanceAdjustment = 4,
+        ThirdPartyAdjustment = 5,
+        IssueBonusManagement = 6,
+        PaymentGateway = 7,
+        DepositLimitation = 8,
+        WithdrawalLimitation = 9,
+        CryptoWithdrawalLimitation = 10,
+        AdjustmentLimitation = 11,
+        LineDepositChannel = 12
     }
 
     #region BankFinancialTransferInfoLog
@@ -1028,4 +1044,16 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
     #endregion
+
+    public enum AdminPermissionStatusV2Enum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+    public enum AdminFunctionStatusV2Enum 
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
 }

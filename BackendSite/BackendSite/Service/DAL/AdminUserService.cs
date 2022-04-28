@@ -9,7 +9,6 @@ using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.DAL
 {
@@ -154,6 +153,14 @@ namespace BackendSite.Service.DAL
         public AdminUser GetUser(int userId)
         {
             return _mainDbClient.QueryFirst<AdminUser>("Admin_User_Get", new DynamicParameters(new { UserId = userId }));
+        }
+        public AdminUserV2 GetUserV2(int userId)
+        {
+            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUser_Get", new DynamicParameters(new { UserId = userId }));
+        }
+        public IEnumerable<AdminUserV2> GetAllUserV2()
+        {
+            return _mainDbClient.Query<AdminUserV2>("Admin_AllAdminUser_Get");
         }
     }
 }

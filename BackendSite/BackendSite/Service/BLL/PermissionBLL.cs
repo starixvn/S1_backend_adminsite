@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
 
 namespace BackendSite.Service.BLL
 {
@@ -13,13 +14,15 @@ namespace BackendSite.Service.BLL
         private readonly PermissionService permissionService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminUserService adminUserService;
+        private readonly ServerInfoService serverInfoService;
 
-        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService)
+        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService, ServerInfoService serverInfoService)
         {
             this.permissionService = permissionService;
             this.adminGroupService = adminGroupService;
             this.authorizeBLL = authorizeBLL;
             this.adminUserService = adminUserService;
+            this.serverInfoService = serverInfoService;
         }
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
@@ -31,7 +34,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GroupPermisison> GetAllPermission()
         {
             var result = new List<GroupPermisison>();
-            
+
             var permissionDatas = GetPermissionJSONData();
             foreach (var func in permissionDatas)
             {
@@ -319,5 +322,1125 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        #region New Admin-Administration
+
+        #region RolePermission
+        public IEnumerable<RolePermission> GetRolePermission(int role)
+        {
+            return permissionService.GetRolePermission(role);
+        }
+        public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId)
+        {
+            List<UserAllPremission> userAllPremission = new List<UserAllPremission>();
+            if (role != null)
+            {
+                var rolePermission = permissionService.GetRolePermission(role.Value).ToList();
+                rolePermission.ForEach(x =>
+                {
+                    var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
+                    userAllPremission.Add(new UserAllPremission() { MenuId = x.MenuId, Permission = permission });
+                });
+            }
+
+            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            Permission.ForEach(x =>
+            {
+                var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
+                if (userAllPremission.Exists(y => y.MenuId == x.MenuId))
+                {
+                    var tempPremission = userAllPremission.Find(z => z.MenuId == x.MenuId).Permission;
+                    permission.ForEach(y =>
+                    {
+                        if (!tempPremission.Exists(s => s == y))
+                        {
+                            tempPremission.Add(y);
+                        }
+                    });
+                    userAllPremission.Find(z => z.MenuId == x.MenuId).Permission = tempPremission;
+                }
+                else
+                {
+                    userAllPremission.Add(new UserAllPremission() { MenuId = x.MenuId, Permission = permission });
+                }
+            });
+
+            return userAllPremission;
+        }
+        public NewPermission GetAddRolePermission(AdminUserV2 loginUser)
+        {
+            NewPermission result = new NewPermission();
+            List<Permission> permissionReslut = new List<Permission>();
+            var menuList = GetAdminMenuDtoV2().ToList();
+            var permissionList = GetAdminPermissionDtoV2().ToList();
+            var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
+            var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
+            if (loginUser.IsSuper)
+            {
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                    {
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
+                        {
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = false });
+                        }
+                    }
+                    permissionReslut.Add(new Permission()
+                    {
+                        ModuleId = null,
+                        DisPlayKey = funcData.Id,
+                        Name = funcData.Name,
+                        Settings = permissionData
+                    });
+                }
+                permissionReslut.AddRange(GetAllRolePermissionMenu(0, heirIdList, menuList, permissionList));
+
+                var userSiteList = serverInfoService.GetSiteList().ToList();
+                result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
+                result.Permission = permissionReslut;
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
+                    if (userPermission != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                if (userPermission.Permission.Exists(x => x == permission))
+                                {
+                                    var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                    permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = false });
+                                }
+                            }
+                        }
+                        permissionReslut.Add(new Permission()
+                        {
+                            ModuleId = null,
+                            DisPlayKey = funcData.Id,
+                            Name = funcData.Name,
+                            Settings = permissionData
+                        });
+                    }
+                }
+                permissionReslut.AddRange(GetAllRolePermissionMenu(0, heirIdList, menuList, permissionList, userAllPremission));
+
+                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                result.Permission = permissionReslut;
+            }
+            return result;
+        }
+        public RoleData GetUpdateRolePermission(int role, AdminUserV2 loginUser)
+        {
+            RoleData result = new RoleData();
+            List<Permission> permissionReslut = new List<Permission>();
+            var menuList = GetAdminMenuDtoV2().ToList();
+            var permissionList = GetAdminPermissionDtoV2().ToList();
+            var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
+            var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
+            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            if (loginUser.IsSuper)
+            {
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                    {
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
+                        {
+                            var canUse = false;
+                            bool roolhasPermission = false;
+                            if (rolePermission != null)
+                            {
+                                roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                            }
+                            if (roolhasPermission)
+                            {
+                                canUse = true;
+                            }
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse });
+                        }
+                    }
+                    permissionReslut.Add(new Permission()
+                    {
+                        ModuleId = null,
+                        DisPlayKey = funcData.Id,
+                        Name = funcData.Name,
+                        Settings = permissionData
+                    });
+                }
+                permissionReslut.AddRange(GetRolePermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions));
+
+                var userSiteList = serverInfoService.GetSiteList().ToList();
+                result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
+                result.Permission = permissionReslut;
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    if (userPermission != null || rolePermission != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                bool userhasPermission = false;
+                                bool roolhasPermission = false;
+                                if (userPermission != null)
+                                {
+                                    userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                }
+                                if (rolePermission != null)
+                                {
+                                    roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                }
+                                if (userhasPermission || roolhasPermission)
+                                {
+                                    var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                    var enable = true;
+                                    var canUse = true;
+                                    if (!userhasPermission)
+                                    {
+                                        enable = false;
+                                    }
+                                    if (!roolhasPermission)
+                                    {
+                                        canUse = false;
+                                    }
+                                    permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                }
+                            }
+                        }
+                        permissionReslut.Add(new Permission()
+                        {
+                            ModuleId = null,
+                            DisPlayKey = funcData.Id,
+                            Name = funcData.Name,
+                            Settings = permissionData
+                        });
+                    }
+                }
+                permissionReslut.AddRange(GetRolePermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
+                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                result.Permission = permissionReslut;
+            }
+            return result;
+        }
+
+        private List<Permission> GetAllRolePermissionMenu(int moduleIId,
+           IEnumerable<int> heirIdList,
+           IEnumerable<AdminMenuDtoV2> menuList,
+           IEnumerable<AdminPermissionDtoV2> permissionList,
+           IEnumerable<UserAllPremission> userPermissionList = null)
+        {
+            var result = new List<Permission>();
+            var assignModuleList = menuList.Where(x => x.HeirId == moduleIId);
+
+            foreach (var moduleData in assignModuleList)
+            {
+                var FunctionDatas = new List<FunctionDatas>();
+                var SubLayerDatas = new List<Permission>();
+
+                var assignFuncDatas = menuList.Where(x => x.HeirId == moduleData.Id);
+
+                foreach (var funcData in assignFuncDatas)
+                {
+                    if (userPermissionList != null)
+                    {
+                        var userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+
+                        if (userPermission != null)
+                        {
+                            var permissionData = new List<PermissionSubFuncKeys>();
+                            if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                            {
+                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                                foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                {
+                                    if (userPermission.Permission.Exists(x => x == permission))
+                                    {
+                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                        permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = false });
+                                    }
+                                }
+                                FunctionDatas.Add(new FunctionDatas()
+                                {
+                                    DisPlayKey = funcData.Id,
+                                    Name = funcData.Name,
+                                    Settings = permissionData
+                                });
+                            }
+                            else
+                                continue;
+                        }
+                    }
+                    else
+                    {
+                        var permissionData = new List<PermissionSubFuncKeys>();
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = false });
+                            }
+                            FunctionDatas.Add(new FunctionDatas()
+                            {
+                                DisPlayKey = funcData.Id,
+                                Name = funcData.Name,
+                                Settings = permissionData
+                            });
+                        }
+                        else
+                            continue;
+                    }
+                }
+
+                if (heirIdList.Contains(moduleData.Id))
+                {
+                    var subLayerDatas = GetAllRolePermissionMenu(moduleData.Id, heirIdList, menuList, permissionList, userPermissionList);
+                    SubLayerDatas.AddRange(subLayerDatas);
+                }
+
+                if (FunctionDatas.Any() || SubLayerDatas.Any())
+                {
+                    result.Add(new Permission()
+                    {
+                        ModuleId = moduleData.Id,
+                        Name = moduleData.Name,
+                        FunctionDatas = FunctionDatas,
+                        SubLayerDatas = SubLayerDatas
+                    });
+                }
+            }
+            return result;
+        }
+        private List<Permission> GetRolePermissionMenu(int moduleIId,
+           IEnumerable<int> heirIdList,
+           IEnumerable<AdminMenuDtoV2> menuList,
+           IEnumerable<AdminPermissionDtoV2> permissionList,
+           IEnumerable<RolePermission> rolePermissionsList,
+           IEnumerable<UserAllPremission> userPermissionList = null
+           )
+        {
+            var result = new List<Permission>();
+            var assignModuleList = menuList.Where(x => x.HeirId == moduleIId);
+
+            foreach (var moduleData in assignModuleList)
+            {
+                var FunctionDatas = new List<FunctionDatas>();
+                var SubLayerDatas = new List<Permission>();
+
+                var assignFuncDatas = menuList.Where(x => x.HeirId == moduleData.Id);
+
+                foreach (var funcData in assignFuncDatas)
+                {
+
+                    if (userPermissionList != null)
+                    {
+                        var userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (userPermission != null || rolePermission != null)
+                        {
+                            var permissionData = new List<PermissionSubFuncKeys>();
+                            if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                            {
+                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                                foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                {
+                                    bool userhasPermission = false;
+                                    bool roolhasPermission = false;
+                                    if (userPermission != null)
+                                    {
+                                        userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                    }
+                                    if (rolePermission != null)
+                                    {
+                                        roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                    }
+                                    if (userhasPermission || roolhasPermission)
+                                    {
+                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                        var enable = true;
+                                        var canUse = true;
+                                        if (!userhasPermission)
+                                        {
+                                            enable = false;
+                                        }
+                                        if (!roolhasPermission)
+                                        {
+                                            canUse = false;
+                                        }
+                                        permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                    }
+                                }
+                                FunctionDatas.Add(new FunctionDatas()
+                                {
+                                    DisPlayKey = funcData.Id,
+                                    Name = funcData.Name,
+                                    Settings = permissionData
+                                });
+                            }
+                            else
+                                continue;
+                        }
+                    }
+                    else
+                    {
+                        var permissionData = new List<PermissionSubFuncKeys>();
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                var canUse = true;
+                                if (rolePermission == null)
+                                {
+                                    canUse = false;
+                                }
+                                else
+                                {
+                                    bool roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                    if (!roolhasPermission)
+                                    {
+                                        canUse = false;
+                                    }
+                                }
+                                var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse });
+                            }
+                            FunctionDatas.Add(new FunctionDatas()
+                            {
+                                DisPlayKey = funcData.Id,
+                                Name = funcData.Name,
+                                Settings = permissionData
+                            });
+                        }
+                        else
+                            continue;
+                    }
+                }
+
+                if (heirIdList.Contains(moduleData.Id))
+                {
+                    var subLayerDatas = GetRolePermissionMenu(moduleData.Id, heirIdList, menuList, permissionList, rolePermissionsList, userPermissionList);
+                    SubLayerDatas.AddRange(subLayerDatas);
+                }
+
+                if (FunctionDatas.Any() || SubLayerDatas.Any())
+                {
+                    result.Add(new Permission()
+                    {
+                        ModuleId = moduleData.Id,
+                        Name = moduleData.Name,
+                        FunctionDatas = FunctionDatas,
+                        SubLayerDatas = SubLayerDatas
+                    });
+                }
+            }
+            return result;
+        }
+
+        private List<Permission> GetAddUserPermissionMenu(int moduleIId,
+           IEnumerable<int> heirIdList,
+           IEnumerable<AdminMenuDtoV2> menuList,
+           IEnumerable<AdminPermissionDtoV2> permissionList,
+           IEnumerable<RolePermission> rolePermissionsList,
+           IEnumerable<UserAllPremission> userPermissionList = null
+           )
+        {
+            var result = new List<Permission>();
+            var assignModuleList = menuList.Where(x => x.HeirId == moduleIId);
+
+            foreach (var moduleData in assignModuleList)
+            {
+                var FunctionDatas = new List<FunctionDatas>();
+                var SubLayerDatas = new List<Permission>();
+
+                var assignFuncDatas = menuList.Where(x => x.HeirId == moduleData.Id);
+
+                foreach (var funcData in assignFuncDatas)
+                {
+
+                    if (userPermissionList != null)
+                    {
+                        var userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (userPermission != null || rolePermission != null)
+                        {
+                            var permissionData = new List<PermissionSubFuncKeys>();
+                            if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                            {
+                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                                foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                {
+                                    bool userhasPermission = false;
+                                    bool roolhasPermission = false;
+                                    if (userPermission != null)
+                                    {
+                                        userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                    }
+                                    if (rolePermission != null)
+                                    {
+                                        roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                    }
+                                    if (userhasPermission || roolhasPermission)
+                                    {
+                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                        var enable = true;
+                                        var canUse = true;
+
+                                        if (roolhasPermission)
+                                        {
+                                            enable = false;
+                                        }
+                                        else
+                                        {
+                                            canUse = false;
+                                        }
+
+                                        permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                    }
+                                }
+                                FunctionDatas.Add(new FunctionDatas()
+                                {
+                                    DisPlayKey = funcData.Id,
+                                    Name = funcData.Name,
+                                    Settings = permissionData
+                                });
+                            }
+                            else
+                                continue;
+                        }
+                    }
+                    else
+                    {
+                        var permissionData = new List<PermissionSubFuncKeys>();
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                var canUse = true;
+                                var enable = true;
+                                if (rolePermission == null)
+                                {
+                                    canUse = false;
+                                }
+                                else
+                                {
+                                    bool roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                    if (!roolhasPermission)
+                                    {
+                                        canUse = false;
+                                    }
+                                    else
+                                    {
+                                        enable = false;
+                                    }
+                                }
+                                var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse ,Enable = enable });
+                            }
+                            FunctionDatas.Add(new FunctionDatas()
+                            {
+                                DisPlayKey = funcData.Id,
+                                Name = funcData.Name,
+                                Settings = permissionData
+                            });
+                        }
+                        else
+                            continue;
+                    }
+                }
+
+                if (heirIdList.Contains(moduleData.Id))
+                {
+                    var subLayerDatas = GetAddUserPermissionMenu(moduleData.Id, heirIdList, menuList, permissionList, rolePermissionsList, userPermissionList);
+                    SubLayerDatas.AddRange(subLayerDatas);
+                }
+
+                if (FunctionDatas.Any() || SubLayerDatas.Any())
+                {
+                    result.Add(new Permission()
+                    {
+                        ModuleId = moduleData.Id,
+                        Name = moduleData.Name,
+                        FunctionDatas = FunctionDatas,
+                        SubLayerDatas = SubLayerDatas
+                    });
+                }
+            }
+            return result;
+        }
+
+        private List<Permission> GetUpdateUserPermissionMenu(int moduleIId,
+           IEnumerable<int> heirIdList,
+           IEnumerable<AdminMenuDtoV2> menuList,
+           IEnumerable<AdminPermissionDtoV2> permissionList,
+           IEnumerable<RolePermission> rolePermissionsList,
+           IEnumerable<UserPermissionData> updateUserPermissionList,
+           IEnumerable<UserAllPremission> userPermissionList = null
+           )
+        {
+            var result = new List<Permission>();
+            var assignModuleList = menuList.Where(x => x.HeirId == moduleIId);
+
+            foreach (var moduleData in assignModuleList)
+            {
+                var FunctionDatas = new List<FunctionDatas>();
+                var SubLayerDatas = new List<Permission>();
+
+                var assignFuncDatas = menuList.Where(x => x.HeirId == moduleData.Id);
+
+                foreach (var funcData in assignFuncDatas)
+                {
+
+                    if (userPermissionList != null)
+                    {
+                        var userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        var updateUserPermission = updateUserPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (userPermission != null || rolePermission != null)
+                        {
+                            var permissionData = new List<PermissionSubFuncKeys>();
+                            if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                            {
+                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                                foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                {
+                                    bool userhasPermission = false;
+                                    bool rolehasPermission = false;
+                                    bool updateUserhasPermission = false;
+                                    if (userPermission != null)
+                                    {
+                                        userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                    }
+                                    if (rolePermission != null)
+                                    {
+                                        rolehasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                    }
+                                    if (updateUserPermission != null)
+                                    {
+                                        updateUserhasPermission = JsonConvert.DeserializeObject<List<int>>(updateUserPermission.Permission).Exists(x => x == permission);
+                                    }
+                                    if (userhasPermission || rolehasPermission || updateUserhasPermission)
+                                    {
+                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                        var enable = true;
+                                        var canUse = false;
+                                        if (rolehasPermission || updateUserhasPermission)
+                                        {
+                                            canUse = true;
+                                        }
+                                        if (rolehasPermission)
+                                        {
+                                            enable = false;
+                                        }
+                                        if (updateUserhasPermission && !userhasPermission)
+                                        {
+                                            enable = false;
+                                        }
+
+                                        permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                    }
+                                }
+                                FunctionDatas.Add(new FunctionDatas()
+                                {
+                                    DisPlayKey = funcData.Id,
+                                    Name = funcData.Name,
+                                    Settings = permissionData
+                                });
+                            }
+                            else
+                                continue;
+                        }
+                    }
+                    else
+                    {
+                        var permissionData = new List<PermissionSubFuncKeys>();
+                        var rolePermission = rolePermissionsList.ToList().Find(x => x.MenuId == funcData.Id);
+                        var updateUserPermission = updateUserPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                var enable = true;
+                                var canUse = false;
+                                bool rolehasPermission = false;
+                                bool updateUserhasPermission = false;
+                                if (rolePermission != null)
+                                {
+                                    rolehasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                }
+                                if (updateUserPermission != null)
+                                {
+                                    updateUserhasPermission = JsonConvert.DeserializeObject<List<int>>(updateUserPermission.Permission).Exists(x => x == permission);
+                                }
+
+                                if (rolehasPermission || updateUserhasPermission)
+                                {
+                                    canUse = true;
+                                }
+                                if (rolehasPermission)
+                                {
+                                    enable = false;
+                                }
+                                var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                            }
+                            FunctionDatas.Add(new FunctionDatas()
+                            {
+                                DisPlayKey = funcData.Id,
+                                Name = funcData.Name,
+                                Settings = permissionData
+                            });
+                        }
+                        else
+                            continue;
+                    }
+                }
+
+                if (heirIdList.Contains(moduleData.Id))
+                {
+                    var subLayerDatas = GetUpdateUserPermissionMenu(moduleData.Id, heirIdList, menuList, permissionList, rolePermissionsList, updateUserPermissionList,userPermissionList);
+                    SubLayerDatas.AddRange(subLayerDatas);
+                }
+
+                if (FunctionDatas.Any() || SubLayerDatas.Any())
+                {
+                    result.Add(new Permission()
+                    {
+                        ModuleId = moduleData.Id,
+                        Name = moduleData.Name,
+                        FunctionDatas = FunctionDatas,
+                        SubLayerDatas = SubLayerDatas
+                    });
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<AdminRole> GetAdminRole()
+        {
+            return permissionService.GetAdminRole();
+        }
+        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId)
+        {
+            return permissionService.AddAdminRole(roleName, remark, currencyList, permission, userId);
+        }
+
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission);
+        }
+        public void DeleteAdminRole(int role, IEnumerable<AdminUserV2> allUser)
+        {
+            List<UpdataAdminUserV2Role> updateRoleList = new List<UpdataAdminUserV2Role>();
+            allUser.ToList().ForEach(x =>
+            {
+                var roleList = JsonConvert.DeserializeObject<List<int>>(x.Role);
+                if (roleList.Exists(y => y == role))
+                {
+                    //updateRoleList.Add(x.UserId);
+                    updateRoleList.Add(new UpdataAdminUserV2Role()
+                    {
+                        UserId = x.UserId,
+                        Role = roleList.Where(z => z != role).ToList()
+                    });
+                }
+            });
+            permissionService.DeleteAdminRole(role, updateRoleList);
+        }
+        public IEnumerable<RoleList> GetRoleList(string roleName)
+        {
+            var result = permissionService.GetRoleList(roleName).ToList();
+            result.ForEach(x =>
+            {
+                if (x.CurrencyList != null)
+                {
+                    x.icurrencyList = JsonConvert.DeserializeObject<List<int>>(x.CurrencyList);
+                }
+                if (x.UserList != null)
+                {
+                    x.iuserList = JsonConvert.DeserializeObject<List<string>>(x.UserList);
+                }
+            });
+            return result;
+        }
+        #endregion
+
+        #region UserPermission
+        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId)
+        {
+            return permissionService.GetUserPermissionData(userId);
+        }
+        public IEnumerable<UserList> GetAdminUserList(string userName)
+        {
+            var result = permissionService.GetAdminUserList(userName).ToList();
+            result.ForEach(x =>
+            {
+                if (x.CurrencyList != null)
+                {
+                    x.icurrencyList = JsonConvert.DeserializeObject<List<int>>(x.CurrencyList);
+                }
+            });
+            return result;
+        }
+        public void DeleteAdminUser(int userId)
+        {
+            permissionService.DeleteAdminUser(userId);
+        }
+        public IEnumerable<int> GetAddAdminUserCurrency(AdminUserV2 loginUser)
+        {
+            if (loginUser.IsSuper)
+            {
+                var userSiteList = serverInfoService.GetSiteList().ToList();
+                return userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+            }
+        }
+        public AddUserPremission GetAddAdminUser(int role, AdminUserV2 loginUser)
+        {
+            AddUserPremission result = new AddUserPremission();
+            List<Permission> permissionReslut = new List<Permission>();
+            var menuList = GetAdminMenuDtoV2().ToList();
+            var permissionList = GetAdminPermissionDtoV2().ToList();
+            var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
+            var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
+            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            if (loginUser.IsSuper)
+            {
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                    {
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
+                        {
+                            var canUse = false;
+                            var enable = true;
+                            bool roolhasPermission = false;
+                            if (rolePermission != null)
+                            {
+                                roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                            }
+                            if (roolhasPermission)
+                            {
+                                canUse = true;
+                                enable = false;
+                            }
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse ,Enable = enable });
+                        }
+                    }
+                    permissionReslut.Add(new Permission()
+                    {
+                        ModuleId = null,
+                        DisPlayKey = funcData.Id,
+                        Name = funcData.Name,
+                        Settings = permissionData
+                    });
+                }
+                permissionReslut.AddRange(GetAddUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions));
+                result.Permission = permissionReslut;
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    if (userPermission != null || rolePermission != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                bool userhasPermission = false;
+                                bool roolhasPermission = false;
+                                if (userPermission != null)
+                                {
+                                    userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                }
+                                if (rolePermission != null)
+                                {
+                                    roolhasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                }
+                                if (userhasPermission || roolhasPermission)
+                                {
+                                    var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                    var enable = true;
+                                    var canUse = true;
+                                    if (roolhasPermission)
+                                    {
+                                        enable = false;
+                                    }
+                                    if (!roolhasPermission)
+                                    {
+                                        canUse = false;
+                                    }
+                                    permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                }
+                            }
+                        }
+                        permissionReslut.Add(new Permission()
+                        {
+                            ModuleId = null,
+                            DisPlayKey = funcData.Id,
+                            Name = funcData.Name,
+                            Settings = permissionData
+                        });
+                    }
+                }
+                permissionReslut.AddRange(GetAddUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
+                result.Permission = permissionReslut;
+            }
+
+            return result;
+        }
+
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            List<SetPermission> userPermission = new List<SetPermission>();
+            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            permission.ForEach(x =>
+            {
+                if(rolePermissions.Exists(y=> y.MenuId == x.DisPlayKey))
+                {
+                    var rolePermission = rolePermissions.Find(t => t.MenuId == x.DisPlayKey);
+                    var permissionIdList = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission);
+                    List<int> tempPermissionIdList = new List<int>();
+                    x.PermissionIdList.ForEach(z =>
+                    {
+                        if(!JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(s => s == z))
+                        {
+                            tempPermissionIdList.Add(z);
+                        }
+                    });
+                    if(tempPermissionIdList.Count > 0)
+                    {
+                        userPermission.Add(new SetPermission() { DisPlayKey = x.DisPlayKey, PermissionIdList  = tempPermissionIdList });
+                    }
+                }
+                else
+                {
+                    userPermission.Add(x);
+                }
+            });
+            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission);
+        }
+
+        public UpdateUserPermission GetUpdateAdminUser(int role, int userId, AdminUserV2 loginUser)
+        {
+            UpdateUserPermission result = new UpdateUserPermission();
+            List<Permission> permissionReslut = new List<Permission>();
+            var menuList = GetAdminMenuDtoV2().ToList();
+            var permissionList = GetAdminPermissionDtoV2().ToList();
+            var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
+            var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
+            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            if (loginUser.IsSuper)
+            {
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    var updateUserPermission = Permission.Find(x => x.MenuId == funcData.Id);
+                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                    {
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
+                        {
+                            var enable = true;
+                            var canUse = false;
+                            bool rolehasPermission = false;
+                            bool updateUserhasPermission = false;
+                            if (rolePermission != null)
+                            {
+                                rolehasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                            }
+                            if (updateUserPermission != null)
+                            {
+                                updateUserhasPermission = JsonConvert.DeserializeObject<List<int>>(updateUserPermission.Permission).Exists(x => x == permission);
+                            }
+                            if (rolehasPermission || updateUserhasPermission)
+                            {
+                                canUse = true;
+                            }
+                            if (rolehasPermission)
+                            {
+                                enable = false;
+                            }
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                        }
+                    }
+                    permissionReslut.Add(new Permission()
+                    {
+                        ModuleId = null,
+                        DisPlayKey = funcData.Id,
+                        Name = funcData.Name,
+                        Settings = permissionData
+                    });
+                }
+                permissionReslut.AddRange(GetUpdateUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, Permission));
+                var userSiteList = serverInfoService.GetSiteList().ToList();
+                result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
+                result.Permission = permissionReslut;
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+
+                foreach (var funcData in assignFuncDatas)
+                {
+                    var permissionData = new List<PermissionSubFuncKeys>();
+                    var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
+                    var rolePermission = rolePermissions.Find(x => x.MenuId == funcData.Id);
+                    var updateUserPermission = Permission.Find(x => x.MenuId == funcData.Id);
+                    if (userPermission != null || rolePermission != null || updateUserPermission != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                        {
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSetting>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
+                            {
+                                bool userhasPermission = false;
+                                bool rolehasPermission = false;
+                                bool updateUserhasPermission = false;
+                                if (userPermission != null)
+                                {
+                                    userhasPermission = userPermission.Permission.Exists(x => x == permission);
+                                }
+                                if (rolePermission != null)
+                                {
+                                    rolehasPermission = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(x => x == permission);
+                                }
+                                if(updateUserPermission != null)
+                                {
+                                    updateUserhasPermission = JsonConvert.DeserializeObject<List<int>>(updateUserPermission.Permission).Exists(x => x == permission);
+                                }
+                                if (userhasPermission || rolehasPermission || updateUserhasPermission)
+                                {
+                                    var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                    var enable = true;
+                                    var canUse = false;
+                                    if(rolehasPermission || updateUserhasPermission)
+                                    {
+                                        canUse = true;
+                                    }
+                                    if (rolehasPermission)
+                                    {
+                                        enable = false;
+                                    }
+                                    if(updateUserhasPermission && !userhasPermission)
+                                    {
+                                        enable = false;
+                                    }
+                                    permissionData.Add(new PermissionSubFuncKeys() { PermissionId = permission, Name = permissionName, CanUse = canUse, Enable = enable });
+                                }
+                            }
+                        }
+                        permissionReslut.Add(new Permission()
+                        {
+                            ModuleId = null,
+                            DisPlayKey = funcData.Id,
+                            Name = funcData.Name,
+                            Settings = permissionData
+                        });
+                    }
+                }
+                permissionReslut.AddRange(GetUpdateUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, Permission,userAllPremission));
+                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                result.Permission = permissionReslut;
+            }
+
+            return result;
+        }
+
+        public int UpdateAdminUser(int siteId, int userId, int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        {
+            List<SetPermission> userPermission = new List<SetPermission>();
+            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            permission.ForEach(x =>
+            {
+                if (rolePermissions.Exists(y => y.MenuId == x.DisPlayKey))
+                {
+                    var rolePermission = rolePermissions.Find(t => t.MenuId == x.DisPlayKey);
+                    var permissionIdList = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission);
+                    List<int> tempPermissionIdList = new List<int>();
+                    x.PermissionIdList.ForEach(z =>
+                    {
+                        if (!JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(s => s == z))
+                        {
+                            tempPermissionIdList.Add(z);
+                        }
+                    });
+                    if (tempPermissionIdList.Count > 0)
+                    {
+                        userPermission.Add(new SetPermission() { DisPlayKey = x.DisPlayKey, PermissionIdList = tempPermissionIdList });
+                    }
+                }
+                else
+                {
+                    userPermission.Add(x);
+                }
+            });
+            return permissionService.UpdateAdminUser(siteId, userId, role, userName, password, currencyList, userPermission);
+        }
+        #endregion
+
+        #region Common
+        public IEnumerable<AdminMenuDtoV2> GetAdminMenuDtoV2()
+        {
+            return permissionService.GetAdminMenuDtoV2();
+        }
+        public IEnumerable<AdminPermissionDtoV2> GetAdminPermissionDtoV2()
+        {
+            return permissionService.GetAdminPermissionDtoV2();
+        }
+        #endregion
+
+        #endregion   
     }
 }

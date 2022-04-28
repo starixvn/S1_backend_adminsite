@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Service.Model
 {
