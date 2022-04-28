@@ -162,6 +162,7 @@ const App = () => {
     }
 
     const back = () => {
+        setId(0);
         setEditFlag(false)
     }
 
@@ -189,6 +190,7 @@ const App = () => {
 
             if (res.data.errorCode === 0) {
                 alert("success.");
+                setId(0);
                 setEditFlag(false)
                 getHotGames(current.siteId, current.currencyId, true)
             } else {
