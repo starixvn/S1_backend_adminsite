@@ -62,4 +62,8 @@ namespace BackendSite.Service.Model
         public long endDate { get; set; }
         public int PageNumber { get; set; }
     }
+    public class SiteConfig
+    {
+        public string BannerURL { get; set; }
+    }
 }

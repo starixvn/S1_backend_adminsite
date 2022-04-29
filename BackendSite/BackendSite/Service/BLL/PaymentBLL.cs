@@ -3,11 +3,9 @@ using BackendSite.Service.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Configuration;
-using BackendSite.Service.Library;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

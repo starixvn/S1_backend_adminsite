@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -29,14 +31,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
 
         #region Constructors
 
-        public HomeController(AuthorizeBLL authorizeBll,
-                              Tools tools,
-                              AdminBLL adminBll)
+        public HomeController(IServiceProvider provider)
         {
-            _authorizeBll = authorizeBll;
-            _tools = tools;
-            _adminBll = adminBll;
+            _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _tools = provider.GetService<Tools>();
+            _adminBll = provider.GetService<AdminBLL>();
         }
+
 
         #endregion
 

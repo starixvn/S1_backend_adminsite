@@ -48,8 +48,6 @@ namespace BackendSite.Service.Model
         public DateTime LastUpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
-
-    
     public class SetHotGameRequest
     {
         public int Id { get; set; }

@@ -8,7 +8,6 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
