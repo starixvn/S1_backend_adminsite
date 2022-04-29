@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -75,7 +76,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     ActionType = ActionType.Create,
                     MenuEnum = AdminAdjustmentLogMenuEnum.DepositSubmission,
                     BeforeDetailInfo = null,
-                    AfterDetailInfo = JsonConvert.SerializeObject(request.Detail)
+                    AfterDetailInfo = request.Detail.ToLog()
                 });
                 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

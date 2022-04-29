@@ -1015,4 +1015,11 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
     #endregion
+
+    public enum LineChannelStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
 }

@@ -128,6 +128,7 @@ const Result = (props) => {
           currencyId: levelList[idx].currencyId,
           before: {
             vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
             cryptoCurrency: levelList[idx].cryptoCurrencyId,
             networkType: levelList[idx].networkType
           }
@@ -171,6 +172,7 @@ const Result = (props) => {
           currencyId: levelList[idx].currencyId,
           before:{
             vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
             cryptoCurrency: levelList[idx].cryptoCurrencyId,
             networkType: levelList[idx].networkType,
             withdrawalMin: levelList[idx].withdrawalMin,
@@ -179,6 +181,7 @@ const Result = (props) => {
           },
           after:{
             vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
             cryptoCurrency: levelList[idx].cryptoCurrencyId,
             networkType: levelList[idx].networkType,
             withdrawalMin: parseInt(withdrawalMin),

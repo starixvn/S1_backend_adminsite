@@ -108,6 +108,7 @@ const Result = (props) => {
           currencyId: levelList[idx].currencyId,
           before:{
             vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
             withdrawalMin: levelList[idx].withdrawalMin,
             withdrawalMax: levelList[idx].withdrawalMax,
             times: levelList[idx].times
@@ -142,17 +143,20 @@ const Result = (props) => {
           ? levelList[idx].times
           : editValue.times;
       let level = levelList[idx].vipLevel;
+      let levelName = levelList[idx].levelName;
       var data = {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           before: {
               vipLevel: level,
+              vipLevelName: levelName,
               withdrawalMin: levelList[idx].withdrawalMin,
               withdrawalMax: levelList[idx].withdrawalMax,
               times: levelList[idx].times
           },
           after: {
               vipLevel: level,
+              vipLevelName: levelName,
               withdrawalMin: parseInt(withdrawalMin),
               withdrawalMax: parseInt(withdrawalMax),
               times: times
