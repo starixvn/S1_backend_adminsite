@@ -78,20 +78,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public ApiResult<IEnumerable<ReferralList>> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<ReferralList>>();
-
-            var datas = _referralManagementBll.GetReferralBySiteId(request.SiteId);
-            var currencyList = _reportBll.GetCurrency().ToList();
-            var result = new List<ReferralManagement>();
-
-            foreach (var data in datas)
+            var apiResult = new ApiResult<IEnumerable<ReferralList>>
             {
-                var isoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
-                data.IsoCode = isoCode;
-            }
-
-            apiResult.Data = datas;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = _referralManagementBll.GetReferralBySiteId(request.SiteId)
+            };
             return apiResult;
 
         }
