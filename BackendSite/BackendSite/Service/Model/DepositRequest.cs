@@ -123,6 +123,7 @@ namespace BackendSite.Service.Model
 
     public class DepositDetailInfo
     {
+        private DateTimeOffset _depositTime { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
@@ -132,7 +133,11 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
         public string Comment { get; set; }
         public string RefId { get; set; }
-        public long DepositTime { get; set; }
+        public DateTimeOffset DepositTime
+        {
+            get => _depositTime;
+            set => _depositTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Operator { get; set; }
         public string BankName { get; set; }
         public string AccountHolderName { get; set; }

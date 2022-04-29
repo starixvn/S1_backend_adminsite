@@ -195,7 +195,7 @@ import { Dropdown } from 'semantic-ui-react';
             bodyFormData.append("Detail[Amount]", parseFloat(this.state.Amount) || 0);
             bodyFormData.append("Detail[Comment]", this.state.Remark);
             bodyFormData.append("Detail[RefId]", this.state.ReferenceNumber);
-            bodyFormData.append("Detail[DepositTime]", moment(this.DepositTime.current.state.inputValue).unix());
+            bodyFormData.append("Detail[DepositTime]", moment(this.DepositTime.current.state.inputValue).format());
             bodyFormData.append("Detail[BankName]", this.state.BankName);
             bodyFormData.append("Detail[AccountHolderName]", this.state.AccountName);
             bodyFormData.append("Detail[AccountNumber]", this.state.AccountNo);
