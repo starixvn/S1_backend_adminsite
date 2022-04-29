@@ -111,6 +111,7 @@ const PayInfoList = props => {
 	const UpdatePayInfoStatus = idx => {
 		let data = stateDatas[idx];
 		let status = stateDatas[idx].status === 1 ? 2 : 1;
+		stateDatas[idx].status = status;
 		
 		let param = {
 			Url: webAPIUrl.UpdatePayList,
