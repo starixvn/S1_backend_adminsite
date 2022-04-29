@@ -13,6 +13,19 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public bool Status { get; set; }
     }
+    
+    public class SetReferralRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string PeriodDays { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public decimal VaildBet { get; set; }
+        public decimal Deposit { get; set; }
+    }
+    
     public class ReferralList
     {
         public int SiteId { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -125,23 +126,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// 
         /// Func Path：Marketing > Referral Management > [Search] > [Edit] > [Save]
         /// </remarks>
-        /// <param name="request"></param>
+        /// <param name="setReferral"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
             var apiResult = new ApiResult();
-            var referral = new ReferralManagement()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                PeriodDays = request.PeriodDays.ToString(),
-                BonusAmount = request.BonusAmount.ToString(),
-                VaildBet = request.BonusAmount.ToString(),
-                Deposit = request.Deposit.ToString()
-            };
-            var result = _referralManagementBll.SetReferral(referral);
-
+            var result = await _referralManagementBll.SetReferralAsync(setReferral);
             apiResult.ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result;
             return apiResult;
         }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,21 +63,24 @@ namespace BackendSite.Service.DAL
                 //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
-        public int SetReferral(ReferralManagement referral)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
         {
             var p = new DynamicParameters();
-            p.Add("SiteId", referral.SiteId);
-            p.Add("CurrencyId", referral.CurrencyId);
-            p.Add("PeriodDays", referral.PeriodDays);
-            p.Add("BonusAmount", referral.BonusAmount);
-            p.Add("VaildBet", referral.VaildBet);
-            p.Add("Deposit", referral.Deposit);
+            p.Add("SiteId", setReferralRequest.SiteId);
+            p.Add("CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("BonusAmount", setReferralRequest.BonusAmount);
+            p.Add("InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
+            p.Add("VaildBet", setReferralRequest.VaildBet);
+            p.Add("Deposit", setReferralRequest.Deposit);
 
-            return _mainDbClient.Execute("Admin_Referral_Set", p);
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set", p);
         }
-        public void SetReferralStatus(int siteId, int currencyId, int status)
+        
+        public int SetReferralStatus(int siteId, int currencyId, int status)
         {
-            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+            return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
