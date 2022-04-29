@@ -940,7 +940,7 @@ namespace BackendSite.Service.BLL
                     SiteId = trans.SiteId,
                     CurrencyId = trans.CurrencyId,
                     RefTransId = trans.TransId,
-                    ActionType = ActionType.Create,
+                    ActionType = ActionType.Delete,
                     MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
                     BeforeDetailInfo = JsonConvert.SerializeObject(item),
                     AfterDetailInfo = null
