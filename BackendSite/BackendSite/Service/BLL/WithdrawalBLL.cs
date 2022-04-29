@@ -853,10 +853,28 @@ namespace BackendSite.Service.BLL
                     SiteId = trans.SiteId,
                     CurrencyId = trans.CurrencyId,
                     RefTransId = trans.TransId,
-                    ActionType = ActionType.Create,
+                    ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
-                    BeforeDetailInfo = JsonConvert.SerializeObject(item),
-                    AfterDetailInfo = JsonConvert.SerializeObject(data)
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        item.Id,
+                        item.Seq,
+                        item.BankAccountNo,
+                        item.Amount,
+                        item.ChargeFee,
+                        item.UploadPicTimes,
+                        item.Memo
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        data.Id,
+                        data.Seq,
+                        data.BankAccountNo,
+                        data.Amount,
+                        data.ChargeFee,
+                        data.UploadPicTimes,
+                        data.Memo
+                    })
                 };
                 
                 if (!UpdateWithdrawalBankAccounting(data))
@@ -884,12 +902,9 @@ namespace BackendSite.Service.BLL
             {
                 var data = GetAccountingById(id);
                 var trans = GetWithdrawalRequest(data.TransId);
-                var before = JsonConvert.SerializeObject(data);
                 
                 data.UploadPicTimes += 1;
                 newUploadPicTimes = data.UploadPicTimes;
-                
-                var after = JsonConvert.SerializeObject(data);
                 
                 var logParam = new CreateAdminAdjustmentInfoLogInput
                 {
@@ -899,8 +914,8 @@ namespace BackendSite.Service.BLL
                     RefTransId = trans.TransId,
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
-                    BeforeDetailInfo = before,
-                    AfterDetailInfo = after
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new {UploadPicTimes = data.UploadPicTimes - 1}),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new {data.UploadPicTimes})
                 };
                 
                 

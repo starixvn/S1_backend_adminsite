@@ -163,7 +163,7 @@ namespace BackendSite.Service.DAL
                 deposit.Amount,
                 deposit.Comment,
                 deposit.RefId,
-                deposit.DepositTime,
+                DepositTime = deposit.DepositTime.ToUnixTimeSeconds(),
                 deposit.Operator,
                 Prefix = $"D{common.GetEnv()}"
             });
@@ -179,7 +179,7 @@ namespace BackendSite.Service.DAL
                 deposit.Amount,
                 deposit.Comment,
                 deposit.RefId,
-                deposit.DepositTime,
+                DepositTime = deposit.DepositTime.ToUnixTimeSeconds(),
                 deposit.Operator,
                 Prefix = $"D{common.GetEnv()}"
             };
