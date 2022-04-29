@@ -18,11 +18,15 @@ namespace BackendSite.Service.Library
         private readonly string _connectionString;
 
         private readonly ILogger<MySqlClient> _logger;
-
         public MySqlClient(string connectionString, ILogger<MySqlClient> logger)
         {
             _connectionString = connectionString;
             _logger = logger;
+        }
+
+        public MySqlConnection GetMySqlConnection()
+        {
+            return new MySqlConnection(_connectionString);
         }
 
         public async Task<T> QueryFirstAsync<T>(string name, DynamicParameters parameters)
@@ -136,6 +140,26 @@ namespace BackendSite.Service.Library
             {
                 await using var connection = new MySqlConnection(_connectionString);
                 result = await connection.ExecuteAsync(name, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        
+        public async Task <int> ExecuteAsync(string name, DynamicParameters parameters, MySqlConnection connection, MySqlTransaction trans)
+        {
+            var result = 0;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                result = await connection.ExecuteAsync(name, parameters, commandType: CommandType.StoredProcedure,
+                    transaction: trans);
             }
             catch (Exception e)
             {
