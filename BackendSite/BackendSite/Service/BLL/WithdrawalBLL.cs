@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -23,6 +22,7 @@ namespace BackendSite.Service.BLL
         private readonly WithdrawalLimitService _withdrawalLimitService;
         private readonly ReportService _reportService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<WithdrawalBLL> _logger;
 
         #endregion
@@ -37,6 +37,7 @@ namespace BackendSite.Service.BLL
             _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
             _reportService = provider.GetRequiredService<ReportService>();
             _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
         }
 
@@ -803,11 +804,35 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
-        public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
             {
-                return InsertWithdrawalBankAccounting(data);
+                var trans = GetWithdrawalRequest(data.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = JsonConvert.SerializeObject(data)
+                };
+                
+                if (!InsertWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            
+                return true;
             }
             catch (Exception)
             {
@@ -815,11 +840,36 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool UpdateWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        public bool UpdateWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
             {
-                return UpdateWithdrawalBankAccounting(data);
+                var item = GetAccountingById(data.Id);
+                var trans = GetWithdrawalRequest(data.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(item),
+                    AfterDetailInfo = JsonConvert.SerializeObject(data)
+                };
+                
+                if (!UpdateWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            
+                return true;
             }
             catch (Exception)
             {
@@ -827,15 +877,43 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool UpdateWithdrawalAccountingForUploadPicture(int id, out int newUploadPicTimes)
+        public bool UpdateWithdrawalAccountingForUploadPicture(int id, string @operator, out int newUploadPicTimes)
         {
             newUploadPicTimes = 0;
             try
             {
                 var data = GetAccountingById(id);
+                var trans = GetWithdrawalRequest(data.TransId);
+                var before = JsonConvert.SerializeObject(data);
+                
                 data.UploadPicTimes += 1;
                 newUploadPicTimes = data.UploadPicTimes;
-                return UpdateWithdrawalBankAccounting(data);
+                
+                var after = JsonConvert.SerializeObject(data);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = before,
+                    AfterDetailInfo = after
+                };
+                
+                
+                if (!UpdateWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+                return true;
             }
             catch (Exception)
             {
@@ -843,7 +921,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes, out string details)
+        public bool DeleteWithdrawalAccounting(int id, string @operator, out string transId, out int seq, out int uploadPicTimes, out string details)
         {
             transId = string.Empty;
             seq = 0;
@@ -854,17 +932,36 @@ namespace BackendSite.Service.BLL
             {
                 var item = GetAccountingById(id);
                 details = JsonConvert.SerializeObject(item);
-                if (DeleteWithdrawalBankAccounting(item))
+                var trans = GetWithdrawalRequest(item.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
                 {
-                    transId = item.TransId;
-                    seq = item.Seq;
-                    uploadPicTimes = item.UploadPicTimes;
-                    return true;
-                }
-                else
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(item),
+                    AfterDetailInfo = null
+                };
+                
+                
+                if (!DeleteWithdrawalBankAccounting(item))
                 {
                     return false;
                 }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+
+                transId = item.TransId;
+                seq = item.Seq;
+                uploadPicTimes = item.UploadPicTimes;
+                
+                return true;
             }
             catch (Exception)
             {
