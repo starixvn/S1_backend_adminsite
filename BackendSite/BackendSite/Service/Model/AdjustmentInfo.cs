@@ -1,4 +1,5 @@
 ﻿using System;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -48,7 +49,10 @@ namespace BackendSite.Service.Model
 
     public class SetAdjustment
     {
+        [LogIgnore]
         public int Category { get; set; }
+        
+        [LogPropertyName("AdjustReason")]
         public string CategoryName { get; set; }
         public string Memo { get; set; }
     }

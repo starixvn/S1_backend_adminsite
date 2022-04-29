@@ -10,6 +10,11 @@ import { number_format } from '../commJS/common';
         2: <span>Withdrawal</span>,
         3: <span>Deposit & Withdrawal</span>
     };
+    const PurposeDesc = {
+        1: "Deposit",
+        2: "Withdrawal",
+        3: "Deposit & Withdrawal"
+    };
     const defStatus = {
         0: "Initial",
         1: "Open(Active)",
@@ -46,7 +51,7 @@ import { number_format } from '../commJS/common';
                 currencyId: this.props.CurrencyId,
                 siteId: this.props.SiteId,
                 before:{
-                    BankId: thisRow.sysId,
+                    SysId: thisRow.sysId,
                     BankName: thisRow.bankName,
                     BankAccountName: thisRow.accountName,
                     BankAccountNo: thisRow.accountNo,
@@ -56,7 +61,9 @@ import { number_format } from '../commJS/common';
                     DailyLimitAmount: thisRow.dailyLimitAmount,
                     PointLevel: thisRow.pointLevel,
                     Purpose: thisRow.purpose,
+                    PurposeDescription: PurposeDesc[thisRow.purpose],
                     Status: thisRow.status,
+                    StatusName: defStatus[thisRow.status],
                     Sort: thisRow.bSort
                 },
                 after:{
@@ -70,7 +77,9 @@ import { number_format } from '../commJS/common';
                     DailyLimitAmount: parseFloat(thisState.dailyLimitAmount),
                     PointLevel: parseInt(thisState.pointLevel),
                     Purpose: parseInt(thisState.purpose),
+                    PurposeDescription: PurposeDesc[thisState.purpose * 1],
                     Status: thisState.status * 1,
+                    StatusName: defStatus[thisState.status * 1],
                     Sort: thisState.bSort * 1
                 }
             };
@@ -212,7 +221,7 @@ import { number_format } from '../commJS/common';
                     currencyId: detail.currencyId,
                     siteId: this.props.SiteId,
                     before:{
-                        BankId: detail.sysId,
+                        BankId: detail.bankId,
                         BankName: detail.bankName,
                         BankAccountNo: detail.accountNo,
                     }
@@ -333,7 +342,7 @@ import { number_format } from '../commJS/common';
             event.preventDefault();
             let SelSite = this.props.SelSite;
             let thisState = this.state;
-
+            
             if (SelSite == null) {
                 alert('Please Select Site');
                 return;
@@ -378,14 +387,14 @@ import { number_format } from '../commJS/common';
                 alert('Please Select Purpose');
                 return;
             }
+            let BankList = this.props.SysBankList;
             
-
             let data = {
                 currencyId: thisState.SelCcyId,
                 siteId: SelSite.siteId,
                 after:{
-                    BankId: thisState.SelSysId,
-                    BankName: thisState.SelBank,
+                    SysId: thisState.SelSysId,
+                    BankName: BankList.find(x => x.sysId === thisState.SelSysId).bankName,
                     BankAccountName: thisState.BankAccountName,
                     BankAccountNo: thisState.BankAccountNo,
                     IFSCCode: thisState.IFSCCode,
@@ -394,7 +403,9 @@ import { number_format } from '../commJS/common';
                     DailyLimitAmount: parseFloat(thisState.DailyLimitAmount),
                     PointLevel: parseInt(thisState.PointLevel),
                     Purpose: parseInt(thisState.Purpose),
+                    PurposeDescription: PurposeDesc[thisState.Purpose * 1],
                     Status: thisState.Status,
+                    StatusName: defStatus[thisState.status * 1],
                     Sort: thisState.Sort
                 }
             }
@@ -407,7 +418,7 @@ import { number_format } from '../commJS/common';
         }
 
         onSelSysId(e) {
-            this.setState({ SelSysId: parseInt(event.target.value) });
+            this.setState({ SelSysId: parseInt(event.target.value)});
         }
 
         getSiteList() {

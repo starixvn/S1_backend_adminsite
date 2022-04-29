@@ -59,6 +59,8 @@ namespace BackendSite.Service.Model
     public class UpdatePayInfo
     {
         public int PayId { get; set; }
+        // log用
+        public string PayName { get; set; }
 
         /// <summary>
         /// 狀態(1=Enable、2=Disable)

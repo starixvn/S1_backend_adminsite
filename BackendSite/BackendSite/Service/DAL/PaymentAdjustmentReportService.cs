@@ -6,6 +6,7 @@ using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -173,8 +174,8 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyAdjustment);
                 logParam.Add("_ActionType", (int) ActionType.Update);
                 logParam.Add("_RefTransId", input.TransId);
-                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
                 var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
