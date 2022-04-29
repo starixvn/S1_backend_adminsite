@@ -62,8 +62,8 @@ namespace BackendSite.Service.BLL
                 });
                 await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames));
             }
-
-            return listHotGames.Select(a=>new GetHotGameListResponse()
+            
+            return listHotGames.Select(a=> new GetHotGameListResponse()
             {
                 Id = a.Id,
                 TpName = a.TpName,
