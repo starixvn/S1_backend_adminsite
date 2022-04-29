@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
@@ -62,7 +63,7 @@ namespace BackendSite.Service.DAL
 
             #region props
             props.Add("SiteId", input.SiteId);
-            props.Add("SysId", input.After.BankId);
+            props.Add("SysId", input.After.SysId);
             props.Add("BankAccountName", input.After.BankAccountName);
             props.Add("BankAccountNo", input.After.BankAccountNo);
             props.Add("MinAmount", input.After.MinAmount);
@@ -75,18 +76,18 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            var isCreate = input.Before.BankId == 0;
+            var isCreate = input.Before.SysId == 0;
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
             propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
             propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", isCreate ? null : JsonConvert.SerializeObject(input.Before));
-            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null :input.Before.ToLog());
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            _mainDbClient.Execute("BankCard_Set", props, conn, trans);
+            var r = _mainDbClient.Execute("BankCard_Set", props, conn, trans);
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {
@@ -109,7 +110,7 @@ namespace BackendSite.Service.DAL
 
             #region props
             props.Add("SiteId", input.SiteId);
-            props.Add("SysId", input.After.BankId);
+            props.Add("SysId", input.After.SysId);
             props.Add("BankAccountName", input.After.BankAccountName);
             props.Add("BankAccountNo", input.After.BankAccountNo);
             props.Add("IFSCCode", input.After.IFSCCode ?? string.Empty);
@@ -123,18 +124,18 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            var isCreate = input.Before == null || input.Before.BankId == 0;
+            var isCreate = input.Before == null || input.Before.SysId == 0;
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
             propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
             propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", isCreate ? null : JsonConvert.SerializeObject(input.Before), DbType.String);
-            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog(), DbType.String);
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            _mainDbClient.Execute("BankCardwithIFSC_Set", props, conn, trans);
+            var r = _mainDbClient.Execute("BankCardwithIFSC_Set", props, conn, trans);
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {
@@ -165,12 +166,12 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
             propsLog.Add("_ActionType", (int) ActionType.Delete);
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
             propsLog.Add("_AfterDetailInfo", null, DbType.String);
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            _mainDbClient.Execute("BankCard_Del", props, conn, trans);
+            var r =  _mainDbClient.Execute("BankCard_Del", props, conn, trans);
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
             if (result > 0)
             {

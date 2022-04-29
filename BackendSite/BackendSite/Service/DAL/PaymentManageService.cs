@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Org.BouncyCastle.Utilities.Zlib;
 
@@ -65,8 +66,8 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
             logParam.Add("_ActionType", (int) ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion
@@ -108,8 +109,8 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
             logParam.Add("_ActionType", (int) ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion
@@ -153,8 +154,8 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
             logParam.Add("_ActionType", (int) ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion
@@ -196,8 +197,8 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
             logParam.Add("_ActionType", (int) ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion

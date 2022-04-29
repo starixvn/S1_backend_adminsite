@@ -1,4 +1,5 @@
 ﻿using System;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {
@@ -7,6 +8,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
         private DateTimeOffset _createTime { get; set; }
         private DateTimeOffset _operateTime { get; set; }
         
+        [LogIgnore]
         public string BankCode
         {
             get; set;
@@ -27,6 +29,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
             get; set;
         }
         
+        [LogIgnore]
         public int Operator
         {
             get;

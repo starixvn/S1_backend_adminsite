@@ -34,7 +34,9 @@ namespace BackendSite.Service.Model
         public double WithdrawalMax { get; set; }
         public int Times { get; set; }
         public NetworkTypeEnum NetworkType { get; set; }
+        public string NetworkTypeName => NetworkType.ToString();
         public CryptoCurrencyEnum CryptoCurrency { get; set; }
+        public string CryptoCurrencyName => CryptoCurrency.ToString();
     }
     
     public class DeleteCryptoWithdrawalLimitInfo

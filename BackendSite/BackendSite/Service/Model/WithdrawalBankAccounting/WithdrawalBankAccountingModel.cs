@@ -1,13 +1,17 @@
-﻿namespace BackendSite.Service.Model.WithdrawalBankAccounting
+﻿using BackendSite.Attributes;
+
+namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {
     public class WithdrawalBankAccountingModel
     {
+        [LogIgnore]
         public int Id
         {
             get;
             set;
         }
 
+        [LogIgnore]
         public string TransId
         {
             get;
@@ -49,6 +53,7 @@
             set;
         }
 
+        [LogIgnore]
         public int Creator
         {
             get;

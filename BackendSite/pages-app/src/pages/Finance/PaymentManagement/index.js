@@ -120,10 +120,12 @@ const PayInfoList = props => {
 				CurrencyId: 0,
 				Before: {
 					PayId: data.id,
+					PayName: data.payName,
 					Status: data.status
 				},
 				After: {
 					PayId: data.id,
+					PayName: data.payName,
 					Status: status
 				}
 				

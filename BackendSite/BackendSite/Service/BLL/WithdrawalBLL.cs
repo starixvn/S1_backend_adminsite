@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -819,7 +820,7 @@ namespace BackendSite.Service.BLL
                     ActionType = ActionType.Create,
                     MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
                     BeforeDetailInfo = null,
-                    AfterDetailInfo = JsonConvert.SerializeObject(data)
+                    AfterDetailInfo = data.ToLog()
                 };
                 
                 if (!InsertWithdrawalBankAccounting(data))
@@ -957,7 +958,7 @@ namespace BackendSite.Service.BLL
                     RefTransId = trans.TransId,
                     ActionType = ActionType.Delete,
                     MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
-                    BeforeDetailInfo = JsonConvert.SerializeObject(item),
+                    BeforeDetailInfo = item.ToLog(),
                     AfterDetailInfo = null
                 };
                 
