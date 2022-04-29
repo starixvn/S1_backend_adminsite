@@ -71,6 +71,11 @@ namespace BackendSite.Service.Model
         public string HotGameMobileUrl { get; set; }
     }
 
+    public class GetHotGameDetailRequest
+    {
+        public int Id { get; set; }
+    }
+    
     public class GetHotGameDetailDto
     {
         public int Id { get; set; }
@@ -104,6 +109,11 @@ namespace BackendSite.Service.Model
         public string HotGameMobileUrl { get; set; }
     }
 
+    public class DeleteHotGameRequest
+    {
+        public int Id { get; set; }
+    }
+    
     public class HotGameSortingRequest
     {
         public int Id { get; set; }
