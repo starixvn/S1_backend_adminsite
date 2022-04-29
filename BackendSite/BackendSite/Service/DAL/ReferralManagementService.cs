@@ -62,6 +62,18 @@ namespace BackendSite.Service.DAL
                 //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
+        public int SetReferral(ReferralManagement referral)
+        {
+            var p = new DynamicParameters();
+            p.Add("SiteId", referral.SiteId);
+            p.Add("CurrencyId", referral.CurrencyId);
+            p.Add("PeriodDays", referral.PeriodDays);
+            p.Add("BonusAmount", referral.BonusAmount);
+            p.Add("VaildBet", referral.VaildBet);
+            p.Add("Deposit", referral.Deposit);
+
+            return _mainDbClient.Execute("Admin_Referral_Set", p);
+        }
         public void SetReferralStatus(int siteId, int currencyId, int status)
         {
             _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));

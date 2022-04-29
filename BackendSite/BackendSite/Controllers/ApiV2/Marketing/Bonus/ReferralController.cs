@@ -140,8 +140,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public ApiResult Set(SetRequest request)
         {
             var apiResult = new ApiResult();
-            var referralList = new List<ReferralManagement>();
-            referralList.Add(new ReferralManagement()
+            var referral = new ReferralManagement()
             {
                 SiteId = request.SiteId,
                 CurrencyId = request.CurrencyId,
@@ -149,10 +148,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 BonusAmount = request.BonusAmount.ToString(),
                 VaildBet = request.BonusAmount.ToString(),
                 Deposit = request.Deposit.ToString()
-            });
-            _referralManagementBll.SetReferral(referralList);
+            };
+            var result = _referralManagementBll.SetReferral(referral);
 
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result;
             return apiResult;
         }
 

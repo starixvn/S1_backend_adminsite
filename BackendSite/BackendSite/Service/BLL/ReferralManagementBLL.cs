@@ -23,6 +23,10 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
+        public int SetReferral(ReferralManagement referral)
+        {
+            return referralManagementService.SetReferral(referral);
+        }
         public void SetReferralStatus(int siteId, int currencyId,int status)
         {
             referralManagementService.SetReferralStatus(siteId, currencyId, status);
