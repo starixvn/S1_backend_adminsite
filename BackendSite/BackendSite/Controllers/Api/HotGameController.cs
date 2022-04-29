@@ -12,6 +12,7 @@ using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.Api
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
