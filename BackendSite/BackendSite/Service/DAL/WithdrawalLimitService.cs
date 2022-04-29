@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -76,7 +77,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_ActionType", (int) ActionType.Create);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", null, DbType.String);
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
@@ -120,8 +121,8 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalLimitation);
             logParam.Add("_ActionType", (int) ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
@@ -167,7 +168,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalLimitation);
             logParam.Add("_ActionType", (int) ActionType.Delete);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
@@ -343,7 +344,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_ActionType", (int) ActionType.Create);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", null, DbType.String);
-            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
@@ -402,7 +403,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.CryptoWithdrawalLimitation);
             logParam.Add("_ActionType", (int) ActionType.Delete);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
@@ -453,8 +454,8 @@ namespace BackendSite.Service.DAL
                 _Menu = (int) AdminAdjustmentLogMenuEnum.CryptoWithdrawalLimitation,
                 _ActionType = (int) ActionType.Update,
                 _RefTransId = string.Empty,
-                _BeforeDetailInfo = JsonConvert.SerializeObject(input.Before),
-                _AfterDetailInfo = JsonConvert.SerializeObject(input.After),
+                _BeforeDetailInfo = input.Before.ToLog(),
+                _AfterDetailInfo = input.After.ToLog(),
                 _Operator = input.Operator
             };
 

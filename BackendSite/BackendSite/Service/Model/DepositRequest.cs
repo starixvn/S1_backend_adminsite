@@ -2,6 +2,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
 
@@ -124,14 +125,20 @@ namespace BackendSite.Service.Model
     public class DepositDetailInfo
     {
         private DateTimeOffset _depositTime { get; set; }
+        [LogIgnore]
         public int CustId { get; set; }
         public string UserName { get; set; }
+        [LogIgnore]
         public int CurrencyId { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
+        [LogIgnore]
         public int SysId { get; set; }
+        [LogIgnore]
         public string DepositInfo { get; set; }
         public decimal Amount { get; set; }
         public string Comment { get; set; }
+        [LogPropertyName("ReferenceNo")]
         public string RefId { get; set; }
         public DateTimeOffset DepositTime
         {

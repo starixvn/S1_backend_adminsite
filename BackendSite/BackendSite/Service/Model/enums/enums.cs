@@ -1057,5 +1057,10 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
+    
+	public enum LineChannelStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 }
