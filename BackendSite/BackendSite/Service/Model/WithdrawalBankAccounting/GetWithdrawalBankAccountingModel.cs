@@ -1,7 +1,12 @@
-﻿namespace BackendSite.Service.Model.WithdrawalBankAccounting
+﻿using System;
+
+namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {
     public class GetWithdrawalBankAccountingModel : WithdrawalBankAccountingModel
     {
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset _operateTime { get; set; }
+        
         public string BankCode
         {
             get; set;
@@ -20,6 +25,24 @@
         public string OperatorName
         {
             get; set;
+        }
+        
+        public int Operator
+        {
+            get;
+            set;
+        }
+        
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
+        public DateTimeOffset OperateTime
+        {
+            get => _operateTime;
+            set => _operateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
 }
