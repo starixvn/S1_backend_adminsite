@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;

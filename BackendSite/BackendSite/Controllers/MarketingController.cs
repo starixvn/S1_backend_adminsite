@@ -180,14 +180,15 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
-        public IActionResult DeepLinkManagement()
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotGamesManagement" })]
+        public IActionResult HotGamesManagement()
         {
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotGamesManagement" })]
-        public IActionResult HotGamesManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
+        public IActionResult DeepLinkManagement()
         {
             return View();
         }

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using BackendSite.Controllers.ApiV2.CMS.Setting;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;

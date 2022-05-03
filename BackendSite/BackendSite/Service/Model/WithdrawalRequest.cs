@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -212,6 +213,17 @@ namespace BackendSite.Service.Model
         
         public string LevelName { get; set; }
 
+        public int Times { get; set; }
+    }
+    
+    public class SetWithdrawalLimitInfo
+    {
+        [LogIgnore]
+        public int VipLevel { get; set; }
+        public string VipLevelName { get; set; }
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+        [LogPropertyName("WithdrawalFrequency")]
         public int Times { get; set; }
     }
 

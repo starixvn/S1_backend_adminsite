@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
 
 namespace BackendSite.Service.Model.enums
 {
@@ -207,6 +206,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
+        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
@@ -563,7 +563,13 @@ namespace BackendSite.Service.Model.enums
         WithdrawalLimitation = 9,
         CryptoWithdrawalLimitation = 10,
         AdjustmentLimitation = 11,
-        LineDepositChannel = 12
+        LineDepositChannel = 12,
+        DepositSubmission = 13,
+        ResetCustomerBankInfo = 14,
+        ResetCustomerUSDTInfo = 15,
+        SetCustomerStatus = 16,
+        KickOutCustomer = 17,
+        SetCustomerPromotionStatus = 18
     }
 
     #region BankFinancialTransferInfoLog
@@ -1052,6 +1058,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
     public enum AdminFunctionStatusV2Enum 
+    {
+        Disable = 0,
+        Enable = 1
+    }
+    
+	public enum LineChannelStatusEnum
     {
         Disable = 0,
         Enable = 1

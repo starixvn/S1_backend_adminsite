@@ -10,7 +10,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -125,11 +124,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         public class DeleteWithdrawalAccountingRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string TransId { get; set; }
             public int Id { get; set; }
         }
 
         public class UploadAccountingPictureRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public string Picture { get; set; }
             public int Id { get; set; }
             public string TransId { get; set; }
@@ -380,7 +384,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -421,7 +425,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -452,9 +456,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public ApiResult Delete(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
-                out var uploadPicTimes);
-
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, authData.UserName,
+                out var transId, out var seq,
+                out var uploadPicTimes, out var details);
+           
             if (!result)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "delete fail.");
@@ -485,7 +491,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
-            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id, out var newUploadPictureTimes);
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id, authData.UserName,
+                out var newUploadPictureTimes);
             if (result)
             {
                 var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
@@ -500,7 +508,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     };
                 }
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Fail,
@@ -552,7 +560,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     Message = "Delete Fail."
                 };
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,

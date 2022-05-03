@@ -13,8 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TpCategory = BackendSite.Service.Model.TpMaintain.TpCategory;
-using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
