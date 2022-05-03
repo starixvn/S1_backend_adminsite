@@ -165,8 +165,10 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string CurrencyList { get; set; }
         public string SiteName { get; set; }
+        public int SiteId { get; set; }
         public string RoleName { get; set; }
         public List<int> icurrencyList { get; set; }
+        public int Status { get; set; }
     }
     public class AddUserPremission
     {
@@ -182,5 +184,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyList { get; set; }
         public IEnumerable<int> SelectCurrencyList { get; set; }
     }
-
+    public class SetPermission
+    {
+        public int DisPlayKey { get; set; }
+        public List<int> PermissionIdList { get; set; }
+    }
 }
