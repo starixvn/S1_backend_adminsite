@@ -16,7 +16,6 @@ using Amazon.S3.Model;
 using System.IO;
 using System.Net;
 using Amazon;
-using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using Microsoft.Extensions.DependencyInjection;
