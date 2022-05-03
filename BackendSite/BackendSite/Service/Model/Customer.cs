@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -523,6 +524,7 @@ namespace BackendSite.Service.Model
     }
     public class BankInfoDetail
     {
+        [LogIgnore]
         public int SysId { set; get; }
         public string AccountNo { set; get; }
         public string IFSCCode { set; get; }

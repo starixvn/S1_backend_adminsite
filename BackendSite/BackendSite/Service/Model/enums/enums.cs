@@ -556,7 +556,12 @@ namespace BackendSite.Service.Model.enums
         CryptoWithdrawalLimitation = 10,
         AdjustmentLimitation = 11,
         LineDepositChannel = 12,
-        DepositSubmission = 13
+        DepositSubmission = 13,
+        ResetCustomerBankInfo = 14,
+        ResetCustomerUSDTInfo = 15,
+        SetCustomerStatus = 16,
+        KickOutCustomer = 17,
+        SetCustomerPromotionStatus = 18
     }
 
     #region BankFinancialTransferInfoLog
