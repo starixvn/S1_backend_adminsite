@@ -243,5 +243,21 @@ namespace BackendSite.Service.DAL
             trans.Commit();
             return result;
         }
+        public int SetAdminUserPassword(int siteId, int userId, string password)
+        {
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            props.Add("SiteId", siteId);
+            props.Add("Userpwd", tools.MD5Encrypt(password));
+            return  _mainDbClient.Execute("Admin_UserPassword_Set", props);
+        }
+        public int SetAdminUserStatus(int siteId, int userId, int status)
+        {
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            props.Add("SiteId", siteId);
+            props.Add("Status", status);
+            return _mainDbClient.Execute("Admin_UserStatus_Set", props);
+        }
     }
 }

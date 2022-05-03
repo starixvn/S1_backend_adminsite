@@ -1068,4 +1068,11 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    public enum PermissionTypeEnum
+    {
+        AddRole = 0,
+        UpdateRole = 1,
+        AddUser = 2,
+        UpdateUser = 3
+    }
 }
