@@ -19,6 +19,9 @@ namespace BackendSite.Service.Model
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        public string UserName { get; set; }
+        public IEnumerable<string> iUserList { get; set; }
+        public string Location { get; set; }
     }
     public class BlockBankAcc
     {
@@ -48,5 +51,13 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public string AccountName { get; set; }
         public string IFSCCode { get; set; }
+    }
+    public class IPCountry
+    {
+        public int id { get; set; }
+        public int IPFrom { get; set; }
+        public int IPTo { get; set; }
+        public string Code { get; set; }
+        public string Country { get; set; }
     }
 }

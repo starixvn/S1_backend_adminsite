@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,19 +18,36 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _ipTableClient;
         public BlockService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip)
+        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
+            DateTime endDate, int startIndex,
+            int pageSize, out int totalPages,out int rowCount)
         {
             var p = new DynamicParameters(new
             {
-                IP = string.IsNullOrWhiteSpace(ip) ? null : ip
+                IP = string.IsNullOrWhiteSpace(ip) ? null : ip,
+                StartDate = startDate,
+                EndDate = endDate,
+                StartIndex = startIndex,
+                PageSize = pageSize,
             });
-            return _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", p);
+
+            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result =  _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", p);
+
+            totalPages = p.Get<int?>("TotalPages") ?? 0;
+            rowCount = p.Get<int?>("RowCount") ?? 0;
+
+            return result;
         }
 
         public int SetBlockIP(string ip,string memo,string Operator)
@@ -121,6 +139,10 @@ namespace BackendSite.Service.DAL
             });
             var result = _mainDbClient.Execute("Admin_BlockAccount_Set", p);
             return result;
+        }
+        public IEnumerable<IPCountry> GetIPCountryList()
+        {
+            return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
         }
     }
 }

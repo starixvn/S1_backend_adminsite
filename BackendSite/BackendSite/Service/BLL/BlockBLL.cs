@@ -1,6 +1,8 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +14,32 @@ namespace BackendSite.Service.BLL
     {
         private readonly BlockService _blockService;
         private readonly CustInfoService _custInfoService;
+        private readonly Tools _tools;
         public BlockBLL(IServiceProvider provider)
         {
             _blockService  = provider.GetRequiredService<BlockService>();
             _custInfoService = provider.GetRequiredService<CustInfoService>();
+            _tools = provider.GetRequiredService<Tools>();
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip)
+        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
+            DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
         {
-            return _blockService.GetBlockIPList(ip);
+            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), pageNumber, out totalPages, out rowCount);
+            if(result != null)
+            {
+                var ipCountryList = GetIPCountryList().ToList();
+                result.ToList().ForEach(x =>
+                {
+                    x.iUserList = JsonConvert.DeserializeObject<IEnumerable<string>>(x.UserName);
+                    var ip = _tools.getIpNum(x.IP);
+                    var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
+                    if(location != null)
+                    {
+                        x.Location = location.Country;
+                    }
+                });
+            }
+            return result;
         }
         public int SetBlockIP(string ip, string memo, string Operator)
         {
@@ -50,6 +70,10 @@ namespace BackendSite.Service.BLL
             {
                 _custInfoService.SetCustBankInfoLog(x.CustId, x.SiteId, sysId, accountNum, x.IFSCCode, x.AccountName, status == 2 ? 3 : 4);
             });
+        }
+        private IEnumerable<IPCountry> GetIPCountryList()
+        {
+            return _blockService.GetIPCountryList();
         }
     }
 }

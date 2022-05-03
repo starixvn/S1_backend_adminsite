@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public class SetBlockIPRequest: BlockIPRequest
         {
             public string Memo { get; set; }
+        }
+        public class GetBlockIPListRequest : ApiRequestPageModel
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public String IP { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
         }
         public class GetBlockBankAccRequest
         {
@@ -84,13 +101,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<BlockIP> GetBlockIPList(BlockIPRequest request)
+        public ApiListResult<BlockIP> GetBlockIPList(GetBlockIPListRequest request)
         {
-            var blockIPList = _blockBLL.GetBlockIPList(request.IP);
+            var blockIPList = _blockBLL.GetBlockIPList(request.IP, request.StartDate.DateTime, request.EndDate.DateTime, request.PageSize, request.PageNumber
+                ,out int totalPages,out int rowCount);
             return new ApiListResult<BlockIP>
             {
                 Data = blockIPList,
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                TotalPages = totalPages,
+                RowCount = rowCount
             };
         }
         /// <summary>
