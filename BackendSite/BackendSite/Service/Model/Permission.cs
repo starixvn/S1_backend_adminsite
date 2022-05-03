@@ -165,8 +165,10 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string CurrencyList { get; set; }
         public string SiteName { get; set; }
+        public int SiteId { get; set; }
         public string RoleName { get; set; }
         public List<int> icurrencyList { get; set; }
+        public int Status { get; set; }
     }
     public class AddUserPremission
     {

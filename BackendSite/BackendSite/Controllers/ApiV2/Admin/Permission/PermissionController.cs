@@ -93,6 +93,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<int> CurrencyList { get; set; }
             public List<SetPermission> Permission { get; set; }
         }
+
+        public class SetAdminUserPasswordReq : AdminUserReq
+        {
+            public int SiteId { get; set; }
+            public string Password { get; set; }
+        }
+
+        public class SetAdminUserStatusReq : AdminUserReq
+        {
+            public int SiteId { get; set; }
+            public int Status { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -731,6 +743,47 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 {
                     ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
                     Message = "Update user fail"
+                };
+            }
+        }
+
+        [HttpPost]
+
+        public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
+        {
+            if (_permissionBll.SetAdminUserPassword(request.SiteId, request.UserId, request.Password) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Set user password fail"
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
+        {
+            if (_permissionBll.SetAdminUserStatus(request.SiteId, request.UserId, request.Status) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Set user status fail"
                 };
             }
         }

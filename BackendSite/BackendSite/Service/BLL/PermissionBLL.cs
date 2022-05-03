@@ -941,6 +941,14 @@ namespace BackendSite.Service.BLL
             var userPermission = GetUserPermission(role, permission);
             return permissionService.UpdateAdminUser(siteId, userId, role, userName, password, currencyList, userPermission);
         }
+        public int SetAdminUserPassword(int siteId, int userId, string password)
+        {
+            return permissionService.SetAdminUserPassword(siteId, userId, password);
+        }
+        public int SetAdminUserStatus(int siteId, int userId, int status)
+        {
+            return permissionService.SetAdminUserStatus(siteId, userId, status);
+        }
         #endregion
 
         #region Common
