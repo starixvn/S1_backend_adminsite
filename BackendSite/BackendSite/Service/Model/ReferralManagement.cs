@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -13,15 +14,40 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public bool Status { get; set; }
     }
+    
+    public class SetReferralRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string PeriodDays { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public decimal VaildBet { get; set; }
+        public decimal Deposit { get; set; }
+        public IEnumerable<ReferralContent> ReferralContent { get; set; }
+    }
+
+    public class ReferralContent
+    {
+        public string LangId { get; set; }
+        public string BannerUrl { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Detail { get; set; }
+    }
+
     public class ReferralList
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
-        public int PeriodDays { get; set; }
         public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
+        public int PeriodDays { get; set; }
         public bool Status { get; set; }
     }
     public class ReferralCustList
