@@ -25,7 +25,7 @@ namespace BackendSite.Service.Model
         public decimal ReferralFreeCredit { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
-        public IEnumerable<ReferralContent> ReferralContent { get; set; }
+        public IEnumerable<ReferralContent> SpecificList { get; set; }
     }
 
     public class ReferralContent

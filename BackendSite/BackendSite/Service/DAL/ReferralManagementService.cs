@@ -74,7 +74,7 @@ namespace BackendSite.Service.DAL
             p.Add("_VaildBet", setReferralRequest.VaildBet);
             p.Add("_Deposit", setReferralRequest.Deposit);
             p.Add("_PeriodDays", setReferralRequest.PeriodDays);
-            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.Deposit));
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
 
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
