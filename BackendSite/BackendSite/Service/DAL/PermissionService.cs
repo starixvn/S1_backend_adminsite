@@ -222,7 +222,7 @@ namespace BackendSite.Service.DAL
             props.Add("UserId", userId);
             props.Add("SiteId", siteId);
             props.Add("UserName", userName);
-            props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("Userpwd", string.IsNullOrWhiteSpace(password) ? null : tools.MD5Encrypt(password));
             props.Add("Role", JsonConvert.SerializeObject(roleList));
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
 
