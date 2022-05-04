@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -134,8 +135,16 @@ namespace BackendSite.Service.Model
         public ActionType ActionType { get; set; }
         public string ActionTypeName => ActionType.ToString();
         public string RefTransId { get; set; }
+        [JsonIgnore]
         public string BeforeDetailInfo { get; set; }
+        [JsonIgnore]
         public string AfterDetailInfo { get; set; }
+        public object BeforeDetailInfoObject => 
+            string.IsNullOrEmpty(BeforeDetailInfo)
+                ? null : JsonConvert.DeserializeObject(BeforeDetailInfo);
+        public object AfterDetailInfoObject => 
+            string.IsNullOrEmpty(AfterDetailInfo)
+                ? null : JsonConvert.DeserializeObject(AfterDetailInfo);
         public string Operator { get; set; }
     }
     
