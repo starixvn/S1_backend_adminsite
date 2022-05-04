@@ -1120,8 +1120,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
                 
-                var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo);
-                before = bankInfoDetailList.ToLog();
+                before = new
+                {
+                    AccountName = custProfile.AccountName,
+                    BankInfo = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo),
+                    USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
+                }.ToLog();
             }
             
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
