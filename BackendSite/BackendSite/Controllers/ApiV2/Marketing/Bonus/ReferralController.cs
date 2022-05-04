@@ -85,7 +85,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 Data = _referralManagementBll.GetReferralBySiteId(request.SiteId)
             };
             return apiResult;
-
         }
 
         /// <summary>

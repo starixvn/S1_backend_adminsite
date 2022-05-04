@@ -66,16 +66,17 @@ namespace BackendSite.Service.DAL
         public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
         {
             var p = new DynamicParameters();
-            p.Add("SiteId", setReferralRequest.SiteId);
-            p.Add("CurrencyId", setReferralRequest.CurrencyId);
-            p.Add("PeriodDays", setReferralRequest.PeriodDays);
-            p.Add("BonusAmount", setReferralRequest.BonusAmount);
-            p.Add("InvitationLimit", setReferralRequest.InvitationLimit);
-            p.Add("ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
-            p.Add("VaildBet", setReferralRequest.VaildBet);
-            p.Add("Deposit", setReferralRequest.Deposit);
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_BonusAmount", setReferralRequest.BonusAmount);
+            p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
+            p.Add("_VaildBet", setReferralRequest.VaildBet);
+            p.Add("_Deposit", setReferralRequest.Deposit);
+            p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.Deposit));
 
-            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set", p);
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
         
         public int SetReferralStatus(int siteId, int currencyId, int status)

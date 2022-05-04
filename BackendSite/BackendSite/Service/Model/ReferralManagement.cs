@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -24,8 +25,18 @@ namespace BackendSite.Service.Model
         public decimal ReferralFreeCredit { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
+        public IEnumerable<ReferralContent> ReferralContent { get; set; }
     }
-    
+
+    public class ReferralContent
+    {
+        public string LangId { get; set; }
+        public string BannerUrl { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Detail { get; set; }
+    }
+
     public class ReferralList
     {
         public int SiteId { get; set; }
