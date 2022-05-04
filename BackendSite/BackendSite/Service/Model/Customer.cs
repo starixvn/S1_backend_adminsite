@@ -531,6 +531,8 @@ namespace BackendSite.Service.Model
     }
     public class USDTDetail
     {
+        public string Network { set; get; }
+        public string CurrencyName { set; get; }
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }
