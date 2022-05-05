@@ -257,6 +257,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
+                    <td>{row.bonusId}</td>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
@@ -277,6 +278,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">BonusId</th>
                                 <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
