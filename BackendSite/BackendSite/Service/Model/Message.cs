@@ -33,16 +33,20 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public GeneralStatusEnum Status { get; set; }
         public string StatusName => Status.ToString();
+        [LogIgnore]
         public string Creator { get; set; }
+        [LogIgnore]
         public DateTimeOffset CreateTime { 
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        [LogIgnore]
         public DateTimeOffset LastUpdateTime
         {
             get => _lastUpdateTime;
             set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        [LogIgnore]
         public string LastUpdater { get; set; }
         public int IsTest { get; set; }
         [LogIgnore]
