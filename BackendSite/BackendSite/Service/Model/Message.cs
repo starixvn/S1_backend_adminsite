@@ -11,8 +11,11 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _endDate { get;set;}
         private DateTimeOffset _createTime { get;set;}
         private DateTimeOffset _lastUpdateTime { get;set;}
+        [LogIgnore]
         public int Id { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
+        [LogIgnore]
         public string SiteName { get; set; }
         public DateTimeOffset StartTime
         {
@@ -27,7 +30,9 @@ namespace BackendSite.Service.Model
         }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { 
             get => _createTime;
@@ -40,6 +45,7 @@ namespace BackendSite.Service.Model
         }
         public string LastUpdater { get; set; }
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     public class AddAnnouncementModel
