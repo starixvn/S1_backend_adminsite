@@ -1863,7 +1863,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         {data.hasPhotoId ?
                                             <tr>
                                                 <td>
-                                                    <div className="id-image">
+                                                    <div className="id-image" style={{margin:"0 auto"}}>
                                                         <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
                                                     </div>
                                                     <button onClick={this.rotate.bind(this)}>rotate</button>
