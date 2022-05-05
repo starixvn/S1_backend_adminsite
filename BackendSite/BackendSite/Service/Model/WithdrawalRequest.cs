@@ -234,6 +234,10 @@ namespace BackendSite.Service.Model
         public double Amount { get; set; }
 
     }
+    public class WithdrawalKYCAmount
+    {
+        public double Amount { get; set; }
+    }
     public class WithdrawalData
     {
         public bool HasDetail { get; set; }
