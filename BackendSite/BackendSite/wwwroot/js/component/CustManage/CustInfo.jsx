@@ -1202,7 +1202,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     siteId: data.siteId,
                     currencyId: data.currencyId,
                     CustId: data.custId,
-                    status: data.status,
+                    currentStatus: data.status,
                     Reason:this.state.reason
                 })
                     .then(function (response) {
@@ -1229,7 +1229,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 axios.post('/apiv2/CustomerManage/SetLock', { 
                     CustId: data.custId,
                     siteId: data.siteId,
-                    status: data.status,
+                    currentStatus: data.status,
                     currencyId: data.currencyId,
                     Reason:this.state.reason
                 })
@@ -1330,7 +1330,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 axios.post('/apiv2/CustomerManage/SetClose', {
                     CustId: data.custId,
                     siteId: data.siteId,
-                    status: data.status,
+                    currentStatus: data.status,
                     currencyId: data.currencyId,
                     Reason:this.state.reason
                 })
