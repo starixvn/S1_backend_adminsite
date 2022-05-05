@@ -44,6 +44,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         #region API Model
 
+        public class GetAddRolePermissionReq
+        {
+            public int SiteId { get; set; }
+        }
         public class GetUserPermissionResponseModel
         {
             public bool IsSuper { get; set; }
@@ -61,11 +65,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public class PermissionReq
         {
             public int Role { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class GetRoleListReq
         {
             public string RoleName { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class SetRolePermissionReq
@@ -75,16 +81,19 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public int? Role { get; set; }
             public List<int> CurrencyList { get; set; }
             public List<SetPermission> Permission { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class AdminUserReq
         {
             public int UserId { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class GetAdminUserListReq
         {
             public string UserName { get; set; }
+            public int SiteId { get; set; }
         }
 
         //public class SetPermission
@@ -95,7 +104,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         public class SetAdminUserReq : AdminUserReq
         {
-            public int SiteId { get; set; }
             public string UserName { get; set; }
             public string Password { get; set; }
             public int Role { get; set; }
@@ -105,14 +113,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         public class SetAdminUserPasswordReq : AdminUserReq
         {
-            public int SiteId { get; set; }
             public string Password { get; set; }
         }
 
         public class SetAdminUserStatusReq : AdminUserReq
         {
-            public int SiteId { get; set; }
             public int Status { get; set; }
+        }
+        public class GetAddAdminUserCurrencyReq
+        {
+            public int SiteId { get; set; }
         }
         #endregion
 
@@ -427,7 +437,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         #region RolePermission
         [HttpPost]
-        public ApiResult GetAddRolePermission()
+        public ApiResult GetAddRolePermission(GetAddRolePermissionReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
 
@@ -440,7 +450,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId,request.SiteId);
 
             if (loginUser == null)
             {
@@ -480,8 +490,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
-            var roleData = adminRole.Find(x => x.Role == request.Role);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
+            var roleData = adminRole.Find(x => x.Role == request.Role && x.SiteId == request.SiteId);
             if (roleData == null)
             {
                 return new ApiResult
@@ -525,7 +535,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
 
             if (loginUser == null)
             {
@@ -535,7 +545,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Missing cookies.LoginUser is null."
                 };
             }
-            var result = _permissionBll.GetRoleList(request.RoleName).ToList();
+            var result = _permissionBll.GetRoleList(request.RoleName, request.SiteId).ToList();
 
             if (!loginUser.IsSuper)
             {
@@ -562,7 +572,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role name is exists"
                 };
             }
-            if (_permissionBll.AddAdminRole(request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId) > 0)
+            if (_permissionBll.AddAdminRole(request.SiteId, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId) > 0)
             {
                 return new ApiResult
                 {
@@ -657,8 +667,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
-            var roleData = adminRole.Find(x => x.Role == request.Role);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
+            var roleData = adminRole.Find(x => x.Role == request.Role && x.SiteId == request.SiteId);
             if (roleData == null)
             {
                 return new ApiResult
@@ -691,8 +701,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Missing cookies"
                 };
             }
-            var User = _adminBll.GetUserV2(request.UserId);
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var User = _adminBll.GetUserV2(request.UserId, request.SiteId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
 
             if (User == null)
             {
@@ -704,7 +714,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
             var roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
 
-            var result = _permissionBll.GetUpdateAdminUser(roleList.Count > 0 ? roleList.FirstOrDefault() : 0, request.UserId, loginUser);
+            var result = _permissionBll.GetUpdateAdminUser(roleList.Count > 0 ? roleList.FirstOrDefault() : 0, request.UserId, request.SiteId, loginUser);
             result.UserName = User.UserName;
             result.Password = User.Userpwd;
             if (roleList.Count > 0)
@@ -732,7 +742,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Missing cookies"
                 };
             }
-            var result = _permissionBll.GetAdminUserList(request.UserName).ToList();
+            var result = _permissionBll.GetAdminUserList(request.UserName, request.SiteId).ToList();
             return new ApiResult<IEnumerable<UserList>>
             {
                 Data = result,
@@ -741,7 +751,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<int>> GetAddAdminUserCurrency()
+        public ApiResult<IEnumerable<int>> GetAddAdminUserCurrency(GetAddAdminUserCurrencyReq request)
         {
             var authInfo = _authorizeBll.GetAuthData();
             if (authInfo == null)
@@ -753,7 +763,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
 
             if (loginUser == null)
             {
@@ -832,7 +842,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
 
         public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
         {
-            if (_permissionBll.SetAdminUserPassword(request.SiteId, request.UserId, request.Password) > 0)
+            if (_permissionBll.SetAdminUserPassword(request.UserId, request.Password) > 0)
             {
                 return new ApiResult
                 {
@@ -852,7 +862,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
         {
-            if (_permissionBll.SetAdminUserStatus(request.SiteId, request.UserId, request.Status) > 0)
+            if (_permissionBll.SetAdminUserStatus(request.UserId, request.Status) > 0)
             {
                 return new ApiResult
                 {

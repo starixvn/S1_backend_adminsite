@@ -142,6 +142,7 @@ namespace BackendSite.Service.Model
         public string Remark { get; set; }
         public string CurrencyList { get; set; }
         public int UserId { get; set; }
+        public int SiteId { get; set; }
     }
     public class UserAllPremission 
     { 
