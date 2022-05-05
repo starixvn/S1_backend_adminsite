@@ -1,4 +1,6 @@
 ﻿using System;
+using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
@@ -42,22 +44,31 @@ namespace BackendSite.Service.Model
     }
     public class AddAnnouncementModel
     {
+        [LogIgnore]
         public int SiteId { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     
     public class UpdateAnnouncementModel
     {
+        [LogIgnore]
         public int Id { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     

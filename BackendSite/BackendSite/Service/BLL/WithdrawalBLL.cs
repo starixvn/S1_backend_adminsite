@@ -378,9 +378,9 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalKYC(siteId);
         }
 
-        public bool EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        public bool EditWithdrawalKYCList(ParamsWithLog<WithdrawalKYCAmount> input)
         {
-            return _withdrawalService.EditWithdrawalKYC(withdrawalKYC);
+            return _withdrawalService.EditWithdrawalKYC(input);
         }
 
         public List<WithdrawalData> GetWithdrawalLimitData(int siteId)

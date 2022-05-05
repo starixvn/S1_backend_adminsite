@@ -561,7 +561,9 @@ namespace BackendSite.Service.Model.enums
         ResetCustomerUSDTInfo = 15,
         SetCustomerStatus = 16,
         KickOutCustomer = 17,
-        SetCustomerPromotionStatus = 18
+        SetCustomerPromotionStatus = 18,
+        Announcement = 19,
+        WithdrawalKycControl = 20
     }
 
     #region BankFinancialTransferInfoLog
@@ -1025,5 +1027,10 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
+    
+    public enum GeneralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 }
