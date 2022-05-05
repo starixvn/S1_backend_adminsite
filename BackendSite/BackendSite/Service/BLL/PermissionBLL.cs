@@ -330,7 +330,7 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetRolePermission(role);
         }
-        public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId)
+        public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId, int siteId)
         {
             List<UserAllPremission> userAllPremission = new List<UserAllPremission>();
             if (role != null)
@@ -343,7 +343,7 @@ namespace BackendSite.Service.BLL
                 });
             }
 
-            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
             Permission.ForEach(x =>
             {
                 var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
@@ -609,13 +609,13 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region UserPermission
-        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId)
+        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId,int siteId)
         {
-            return permissionService.GetUserPermissionData(userId);
+            return permissionService.GetUserPermissionData(userId, siteId);
         }
-        public IEnumerable<UserList> GetAdminUserList(string userName)
+        public IEnumerable<UserList> GetAdminUserList(string userName,int siteId)
         {
-            var result = permissionService.GetAdminUserList(userName).ToList();
+            var result = permissionService.GetAdminUserList(userName, siteId).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
@@ -691,7 +691,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -741,7 +741,7 @@ namespace BackendSite.Service.BLL
                         });
                     }
                 }
-                permissionReslut.AddRange(GetAddUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
+                permissionReslut.AddRange(GetAddUserPermissionMenu(0 ,heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
                 result.Permission = permissionReslut;
             }
 
@@ -780,7 +780,7 @@ namespace BackendSite.Service.BLL
             return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission);
         }
 
-        public UpdateUserPermission GetUpdateAdminUser(int role, int userId, AdminUserV2 loginUser)
+        public UpdateUserPermission GetUpdateAdminUser(int role, int userId,int siteId, AdminUserV2 loginUser)
         {
             UpdateUserPermission result = new UpdateUserPermission();
             List<Permission> permissionReslut = new List<Permission>();
@@ -789,7 +789,7 @@ namespace BackendSite.Service.BLL
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             var rolePermissions = permissionService.GetRolePermission(role).ToList();
-            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
             if (loginUser.IsSuper)
             {
                 foreach (var funcData in assignFuncDatas)
@@ -842,7 +842,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {

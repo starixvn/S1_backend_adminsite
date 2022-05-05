@@ -56,9 +56,9 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<RolePermission>("Admin_RolePermission_Get", new DynamicParameters(new { Role = role }));
         }
-        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId)
+        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId,int siteId)
         {
-            return _reportDbClient.Query<UserPermissionData>("Admin_UserPermission_Get", new DynamicParameters(new { UserId = userId }));
+            return _reportDbClient.Query<UserPermissionData>("Admin_UserPermission_Get", new DynamicParameters(new { UserId = userId, SiteId = siteId }));
         }
 
         public IEnumerable<AdminRole> GetAdminRole()
@@ -153,10 +153,10 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<RoleList>("Admin_RoleList_Get", 
                 new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null: roleName }));
         }
-        public IEnumerable<UserList> GetAdminUserList(string userName)
+        public IEnumerable<UserList> GetAdminUserList(string userName, int siteId)
         {
             return _reportDbClient.Query<UserList>("Admin_UserList_Get",
-                new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName }));
+                new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
         }
 
         public void DeleteAdminUser(int userId)

@@ -155,9 +155,9 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.QueryFirst<AdminUser>("Admin_User_Get", new DynamicParameters(new { UserId = userId }));
         }
-        public AdminUserV2 GetUserV2(int userId)
+        public AdminUserV2 GetUserV2(int userId,int sitId)
         {
-            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUser_Get", new DynamicParameters(new { UserId = userId }));
+            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUser_Get", new DynamicParameters(new { UserId = userId, SiteId = sitId }));
         }
         public IEnumerable<AdminUserV2> GetAllUserV2()
         {
