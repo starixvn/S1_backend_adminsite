@@ -330,7 +330,7 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetRolePermission(role);
         }
-        public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId)
+        public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId, int siteId)
         {
             List<UserAllPremission> userAllPremission = new List<UserAllPremission>();
             if (role != null)
@@ -343,7 +343,7 @@ namespace BackendSite.Service.BLL
                 });
             }
 
-            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
             Permission.ForEach(x =>
             {
                 var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
@@ -406,7 +406,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -493,7 +493,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -555,9 +555,9 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetAdminRole();
         }
-        public int AddAdminRole(string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId)
         {
-            return permissionService.AddAdminRole(roleName, remark, currencyList, permission, userId);
+            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId);
         }
         public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
@@ -581,9 +581,9 @@ namespace BackendSite.Service.BLL
             });
             permissionService.DeleteAdminRole(role, updateRoleList);
         }
-        public IEnumerable<RoleList> GetRoleList(string roleName)
+        public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
         {
-            var result = permissionService.GetRoleList(roleName).ToList();
+            var result = permissionService.GetRoleList(roleName, siteId).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
@@ -609,13 +609,13 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region UserPermission
-        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId)
+        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId,int siteId)
         {
-            return permissionService.GetUserPermissionData(userId);
+            return permissionService.GetUserPermissionData(userId, siteId);
         }
-        public IEnumerable<UserList> GetAdminUserList(string userName)
+        public IEnumerable<UserList> GetAdminUserList(string userName,int siteId)
         {
-            var result = permissionService.GetAdminUserList(userName).ToList();
+            var result = permissionService.GetAdminUserList(userName, siteId).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
@@ -691,7 +691,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -741,7 +741,7 @@ namespace BackendSite.Service.BLL
                         });
                     }
                 }
-                permissionReslut.AddRange(GetAddUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
+                permissionReslut.AddRange(GetAddUserPermissionMenu(0 ,heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
                 result.Permission = permissionReslut;
             }
 
@@ -750,37 +750,11 @@ namespace BackendSite.Service.BLL
 
         public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
-            //List<SetPermission> userPermission = new List<SetPermission>();
-            //var rolePermissions = permissionService.GetRolePermission(role).ToList();
-            //permission.ForEach(x =>
-            //{
-            //    if(rolePermissions.Exists(y=> y.MenuId == x.DisPlayKey))
-            //    {
-            //        var rolePermission = rolePermissions.Find(t => t.MenuId == x.DisPlayKey);
-            //        var permissionIdList = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission);
-            //        List<int> tempPermissionIdList = new List<int>();
-            //        x.PermissionIdList.ForEach(z =>
-            //        {
-            //            if(!JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(s => s == z))
-            //            {
-            //                tempPermissionIdList.Add(z);
-            //            }
-            //        });
-            //        if(tempPermissionIdList.Count > 0)
-            //        {
-            //            userPermission.Add(new SetPermission() { DisPlayKey = x.DisPlayKey, PermissionIdList  = tempPermissionIdList });
-            //        }
-            //    }
-            //    else
-            //    {
-            //        userPermission.Add(x);
-            //    }
-            //});
             var userPermission = GetUserPermission(role, permission);
             return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission);
         }
 
-        public UpdateUserPermission GetUpdateAdminUser(int role, int userId, AdminUserV2 loginUser)
+        public UpdateUserPermission GetUpdateAdminUser(int role, int userId,int siteId, AdminUserV2 loginUser)
         {
             UpdateUserPermission result = new UpdateUserPermission();
             List<Permission> permissionReslut = new List<Permission>();
@@ -789,7 +763,7 @@ namespace BackendSite.Service.BLL
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             var rolePermissions = permissionService.GetRolePermission(role).ToList();
-            var Permission = permissionService.GetUserPermissionData(userId).ToList();
+            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
             if (loginUser.IsSuper)
             {
                 foreach (var funcData in assignFuncDatas)
@@ -842,7 +816,7 @@ namespace BackendSite.Service.BLL
             else
             {
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId).ToList();
+                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -912,42 +886,16 @@ namespace BackendSite.Service.BLL
 
         public int UpdateAdminUser(int siteId, int userId, int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
-            //List<SetPermission> userPermission = new List<SetPermission>();
-            //var rolePermissions = permissionService.GetRolePermission(role).ToList();
-            //permission.ForEach(x =>
-            //{
-            //    if (rolePermissions.Exists(y => y.MenuId == x.DisPlayKey))
-            //    {
-            //        var rolePermission = rolePermissions.Find(t => t.MenuId == x.DisPlayKey);
-            //        var permissionIdList = JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission);
-            //        List<int> tempPermissionIdList = new List<int>();
-            //        x.PermissionIdList.ForEach(z =>
-            //        {
-            //            if (!JsonConvert.DeserializeObject<List<int>>(rolePermission.Permission).Exists(s => s == z))
-            //            {
-            //                tempPermissionIdList.Add(z);
-            //            }
-            //        });
-            //        if (tempPermissionIdList.Count > 0)
-            //        {
-            //            userPermission.Add(new SetPermission() { DisPlayKey = x.DisPlayKey, PermissionIdList = tempPermissionIdList });
-            //        }
-            //    }
-            //    else
-            //    {
-            //        userPermission.Add(x);
-            //    }
-            //});
             var userPermission = GetUserPermission(role, permission);
             return permissionService.UpdateAdminUser(siteId, userId, role, userName, password, currencyList, userPermission);
         }
-        public int SetAdminUserPassword(int siteId, int userId, string password)
+        public int SetAdminUserPassword(int userId, string password)
         {
-            return permissionService.SetAdminUserPassword(siteId, userId, password);
+            return permissionService.SetAdminUserPassword(userId, password);
         }
-        public int SetAdminUserStatus(int siteId, int userId, int status)
+        public int SetAdminUserStatus(int userId, int status)
         {
-            return permissionService.SetAdminUserStatus(siteId, userId, status);
+            return permissionService.SetAdminUserStatus(userId, status);
         }
         #endregion
 
