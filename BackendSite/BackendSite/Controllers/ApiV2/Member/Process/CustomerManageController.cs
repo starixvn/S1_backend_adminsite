@@ -344,7 +344,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class SetCustomerStatusRequest : CustIdWithReasonRequest
         {
 
-            public CustomerStatusEnum Status { get; set; }
+            public CustomerStatusEnum CurrentStatus { get; set; }
         }
 
         public class CustIdWithVipLevelRequest : CustIdRequest
@@ -1222,7 +1222,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
                     BeforeDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Status = request.Status.ToString()
+                        Status = request.CurrentStatus.ToString()
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -1272,7 +1272,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
                     BeforeDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Status = request.Status.ToString()
+                        Status = request.CurrentStatus.ToString()
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -1323,7 +1323,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
                     BeforeDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Status = request.Status.ToString()
+                        Status = request.CurrentStatus.ToString()
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {

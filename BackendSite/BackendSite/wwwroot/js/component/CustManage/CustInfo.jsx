@@ -257,6 +257,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
+                    <td>{row.bonusId}</td>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
@@ -277,6 +278,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">BonusId</th>
                                 <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
@@ -1202,7 +1204,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     siteId: data.siteId,
                     currencyId: data.currencyId,
                     CustId: data.custId,
-                    status: data.status,
+                    currentStatus: data.status,
                     Reason:this.state.reason
                 })
                     .then(function (response) {
@@ -1229,7 +1231,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 axios.post('/apiv2/CustomerManage/SetLock', { 
                     CustId: data.custId,
                     siteId: data.siteId,
-                    status: data.status,
+                    currentStatus: data.status,
                     currencyId: data.currencyId,
                     Reason:this.state.reason
                 })
@@ -1330,7 +1332,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 axios.post('/apiv2/CustomerManage/SetClose', {
                     CustId: data.custId,
                     siteId: data.siteId,
-                    status: data.status,
+                    currentStatus: data.status,
                     currencyId: data.currencyId,
                     Reason:this.state.reason
                 })
@@ -1901,7 +1903,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         {data.hasPhotoId ?
                                             <tr>
                                                 <td>
-                                                    <div className="id-image">
+                                                    <div className="id-image" style={{margin:"0 auto"}}>
                                                         <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
                                                     </div>
                                                     <button onClick={this.rotate.bind(this)}>rotate</button>

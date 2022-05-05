@@ -661,9 +661,10 @@ namespace BackendSite.Controllers.Api
         /// <returns>是否成功</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
         [HttpPost]
-        public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        public ApiResult EditWithdrawalKYCList(ApiRequestWithLog<WithdrawalKYCAmount> req)
         {
-            var result = withdrawalBLL.EditWithdrawalKYCList(withdrawalKYC);
+            var result = withdrawalBLL.EditWithdrawalKYCList(new ParamsWithLog<WithdrawalKYCAmount>(
+                req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
