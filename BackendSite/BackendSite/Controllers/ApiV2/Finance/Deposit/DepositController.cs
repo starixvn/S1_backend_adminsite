@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
             }
 
-            var stream = _excelBll.Export(exportDeposit);
+            var stream = _excelBll.ExportV2(exportDeposit);
             return _excelBll.ExcelFile(stream, "DepositRequestList");
         }
 
