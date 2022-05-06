@@ -43,6 +43,7 @@ namespace BackendSite.Service.Model
             set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public string UpdateOperator { get; set; }
+        public int Status { get; set; }
     }
     public class BlockList 
     {

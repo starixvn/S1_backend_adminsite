@@ -195,7 +195,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         /// <summary>
-        /// Block/GetBlockBankAccBlockList 取得blockBankList
+        /// Block/GetBlockBankAccList 取得BankAccList
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -203,9 +203,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<BlockList> GetBlockBankAccBlockList(BlockBankAccRequest request)
+        public ApiListResult<BlockList> GetBlockBankAccList(BlockBankAccRequest request)
         {
-            var blockBankList = _blockBLL.GetBlockBankAccBlockList(request.SysId, request.AccountNum);
+            var blockBankList = _blockBLL.GetBlockBankAccList(request.SysId, request.AccountNum);
             return new ApiListResult<BlockList>
             {
                 Data = blockBankList,

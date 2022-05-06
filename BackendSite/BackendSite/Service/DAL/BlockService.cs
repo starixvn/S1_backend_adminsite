@@ -116,7 +116,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
         }
 
-        public IEnumerable<BlockList> GetBlockBankAccBlockList(int sysId, string accountNum)
+        public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
         {
             var p = new DynamicParameters(new
             {
@@ -124,7 +124,7 @@ namespace BackendSite.Service.DAL
                 AccountNum = accountNum
             });
 
-            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccBlockList_Get", p);
+            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
         }
 
         public int BlockAccountSet(int sysId, string accountNum,int status,string Operator, string memo = "")

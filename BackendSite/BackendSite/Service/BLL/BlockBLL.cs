@@ -53,9 +53,9 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.GetBlockBankAcc(startDate, endDate, status, accountNum, userName);
         }
-        public IEnumerable<BlockList> GetBlockBankAccBlockList(int sysId, string accountNum)
+        public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
         {
-            return _blockService.GetBlockBankAccBlockList(sysId, accountNum);
+            return _blockService.GetBlockBankAccList(sysId, accountNum);
         }
 
         public int BlockAccountSet(int sysId, string accountNum, int status, string Operator, string memo)
@@ -64,7 +64,7 @@ namespace BackendSite.Service.BLL
         }
         public void SetCustBankInfoLog(int sysId, string accountNum,int status)
         {
-            var blockBankAccBlockList  = _blockService.GetBlockBankAccBlockList(sysId, accountNum).ToList();
+            var blockBankAccBlockList  = _blockService.GetBlockBankAccList(sysId, accountNum).ToList();
 
             blockBankAccBlockList.ForEach(x =>
             {
