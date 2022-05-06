@@ -8,9 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -22,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
         private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
         #endregion
@@ -31,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
         }
@@ -44,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string Memo { set; get; }
             public string BounsCode { get; set; }
             public int RollOver { get; set; }
-            public int PromotionType { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
         }
         #endregion
 
@@ -68,6 +69,35 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var authData = _authorizeBll.GetAuthData();
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
+                var detailInfo = new
+                {
+                    UserName = custInfo.UserName,
+                    BonusCode = request.BounsCode,
+                    Memo = request.Memo,
+                    Amount = request.Amount,
+                    PromotionType = request.PromotionType.ToString()
+                };
+                
+                var logResult =
+                    _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = authData.UserName,
+                        SiteId = custInfo.SiteId,
+                        CurrencyId = custInfo.CurrencyId,
+                        ActionType = ActionType.Create,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.IssueBonusManagement,
+                        BeforeDetailInfo = null,
+                        AfterDetailInfo = JsonConvert.SerializeObject(detailInfo),
+                        RefTransId = string.Empty
+                    });
+                
+                if (!logResult)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Insert log error.";
+                    return apiResult;
+                }
+                
                 var setAdjustBonusReq = new SetAdjustBonusReq()
                 {
                     CustId = custInfo.CustId,
@@ -75,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     Memo = request.Memo,
                     Operator = authData.UserName,
                     Amount = request.Amount,
-                    PromotionType = request.PromotionType
+                    PromotionType = (int) request.PromotionType
                 };
                 var apiOnlineResult =
                     await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);

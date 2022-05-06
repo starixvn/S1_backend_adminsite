@@ -16,7 +16,6 @@ using Amazon.S3.Model;
 using System.IO;
 using System.Net;
 using Amazon;
-using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using Microsoft.Extensions.DependencyInjection;
@@ -559,9 +558,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
-        public ApiResult AddWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult AddWithdrawalLimitInfo(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var result = withdrawalBLL.AddWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
+            var result = withdrawalBLL.AddWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -579,9 +579,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
-        public ApiResult EditWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult EditWithdrawalLimitInfo(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var result = withdrawalBLL.EditWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
+            var result = withdrawalBLL.EditWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -599,11 +600,12 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult DeleteWithdrawalLimitInfo(WithdrawalLimitInfoManage withdrawalLimitInfoManage)
+        public ApiResult DeleteWithdrawalLimitInfo(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var result = withdrawalBLL.DeleteWithdrawalLimit(withdrawalLimitInfoManage, User.Identity.Name);
+            var result = withdrawalBLL.DeleteWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
@@ -659,9 +661,10 @@ namespace BackendSite.Controllers.Api
         /// <returns>是否成功</returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/WithdrawalKYCControl" })]
         [HttpPost]
-        public ApiResult EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        public ApiResult EditWithdrawalKYCList(ApiRequestWithLog<WithdrawalKYCAmount> req)
         {
-            var result = withdrawalBLL.EditWithdrawalKYCList(withdrawalKYC);
+            var result = withdrawalBLL.EditWithdrawalKYCList(new ParamsWithLog<WithdrawalKYCAmount>(
+                req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

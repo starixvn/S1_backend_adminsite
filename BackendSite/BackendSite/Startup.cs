@@ -14,10 +14,10 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
-using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
-using NSwag.Generation.AspNetCore;
+using BackendSite.Service.Model;
+using StackExchange.Redis;
 
 namespace BackendSite
 {
@@ -34,7 +34,8 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
 
@@ -43,7 +44,9 @@ namespace BackendSite
             services.AddSingleton<Common>();
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
+            services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();

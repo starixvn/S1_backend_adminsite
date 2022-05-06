@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -142,7 +141,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<CustInfoDetailForExport> GetCustInfoExportList(IEnumerable<int> selectSite,
+        public IEnumerable<T> GetCustInfoExportList<T>(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
             int? birYear,
@@ -233,7 +232,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<CustInfoDetailForExport>("Admin_CustInfoSearchForExport_Get_V9", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = conn.Query<T>("Admin_CustInfoSearchForExport_Get_V9", p, commandType: CommandType.StoredProcedure);
             return custInfoDetailList;
         }
 

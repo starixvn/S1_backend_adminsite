@@ -66,7 +66,7 @@ const CurrencyLimitSetting = (props) => {
           aria-expanded="true"
           aria-controls="collapseExample"
         >
-          {window.i18n["lbl_Currency" + value]}
+          {window.i18n["lbl_CurrencyWithdrawal" + value]}
         </a>
         <Result siteId={props.siteId}
           currencyId={value}
@@ -106,7 +106,7 @@ const Result = (props) => {
     });
   };
 
-  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax) => {
+  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax, times) => {
     let tmp = [...levelList];
     if (status === "Delete") {
       tmp.splice(idx, 1);
@@ -114,6 +114,7 @@ const Result = (props) => {
     } else if (status === "Update") {
       tmp[idx].withdrawalMin = withdrawalMin;
       tmp[idx].withdrawalMax = withdrawalMax;
+      tmp[idx].times = times;
       levelList = tmp;
     }
   };
@@ -125,9 +126,12 @@ const Result = (props) => {
         Data: {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          cryptoCurrency: levelList[idx].cryptoCurrencyId,
-          networkType: levelList[idx].networkType
+          before: {
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType
+          }
         }
       };
       WebAPI.PostData(param)
@@ -156,22 +160,40 @@ const Result = (props) => {
         typeof editValue.withdrawalMax === "undefined"
           ? levelList[idx].withdrawalMax
           : editValue.withdrawalMax;
+      let times =
+        typeof editValue.times === "undefined"
+          ? levelList[idx].times
+          : editValue.times;
+      
       let param = {
         Url: "apiV2/WithdrawalLimitCrypto/Update",
         Data: {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          cryptoCurrency: levelList[idx].cryptoCurrencyId,
-          networkType: levelList[idx].networkType,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
+          before:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType,
+            withdrawalMin: levelList[idx].withdrawalMin,
+            withdrawalMax: levelList[idx].withdrawalMax,
+            times: levelList[idx].times
+          },
+          after:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType,
+            withdrawalMin: parseInt(withdrawalMin),
+            withdrawalMax: parseInt(withdrawalMax),
+            times: times * 1
+          }
         }
       };
       WebAPI.PostData(param)
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax);
+            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);
             alert(response.data.message || "Update successful.");
             handleEdit(idx);
           } else {

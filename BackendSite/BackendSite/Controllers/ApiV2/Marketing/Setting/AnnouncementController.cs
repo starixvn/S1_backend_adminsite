@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
@@ -249,7 +248,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
             try
             {
-                var result = _messageBll.DeleteAnnouncement(para.Id);
+                var result = _messageBll.DeleteAnnouncement(para.Id, User.Identity.Name);
                 if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

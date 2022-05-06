@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -289,7 +288,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                messageBLL.DeleteAnnouncement(Id);
+                messageBLL.DeleteAnnouncement(Id, User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
