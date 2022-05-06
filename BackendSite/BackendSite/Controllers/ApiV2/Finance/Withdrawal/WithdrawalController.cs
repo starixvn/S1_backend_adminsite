@@ -223,7 +223,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             //        item.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
             //}
 
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "WithdrawalRequestList");
         }
 
