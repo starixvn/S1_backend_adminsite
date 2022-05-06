@@ -549,9 +549,9 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region TagMamagement
-        public int EditTagManagement(int id, string tagName, string tagColour, string description, string @operator)
+        public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
         {
-            return _custInfoService.EditTagManagement(id, tagName, tagColour, description, @operator);
+            return _custInfoService.EditTagManagement(input);
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -559,9 +559,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetTagData(status, pageNumber, pageSize);
         }
 
-        public int SetTagStatus(int id, string @operator)
+        public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            return _custInfoService.SetTagStatus(id, @operator);
+            return _custInfoService.SetTagStatus(input);
         }
 
         public IEnumerable<TagData> GetAllTag()

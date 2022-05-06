@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -579,16 +580,48 @@ namespace BackendSite.Service.DAL
         }
 
         #region Tag
-        public int EditTagManagement(int id, string tagName, string tagColour, string description, string Operator)
+        public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
         {
-            var props = new DynamicParameters();
-            props.Add("Id", id);
-            props.Add("TagName", tagName);
-            props.Add("TagColour", tagColour);
-            props.Add("Description", description);
-            props.Add("Operator", Operator);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
 
-            return _mainDbClient.Execute("Admin_Tag_Set", props);
+            var props = new DynamicParameters();
+            props.Add("Id", input.After.Id);
+            props.Add("TagName", input.After.TagName);
+            props.Add("TagColour", input.After.TagColour);
+            props.Add("Description", input.After.Description);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_Tag_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var isCreate = input.After.Id == 0;
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog(), DbType.String);
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -612,13 +645,43 @@ namespace BackendSite.Service.DAL
             return searchResult;
         }
 
-        public int SetTagStatus(int id, string @operator)
+        public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            var props = new DynamicParameters();
-            props.Add("Id", id);
-            props.Add("Operator", @operator);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
 
-            return _mainDbClient.Execute("Admin_TagStatus_Set", props);
+            var props = new DynamicParameters();
+            props.Add("Id", input.After.Id);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_TagStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<TagData> GetAllTag()

@@ -11,6 +11,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -1868,9 +1869,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult EditTagManagement(EditTagManagementpara para)
+        public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
-            if (_custInfoBll.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (_custInfoBll.EditTagManagement(new ParamsWithLog<EditTagManagement>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -1937,9 +1938,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult SetTagStatus(SetTagStatuspara para)
+        public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
-            if (_custInfoBll.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            if (_custInfoBll.SetTagStatus(new ParamsWithLog<SetTagStatus>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {

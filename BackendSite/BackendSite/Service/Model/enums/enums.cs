@@ -563,7 +563,8 @@ namespace BackendSite.Service.Model.enums
         KickOutCustomer = 17,
         SetCustomerPromotionStatus = 18,
         Announcement = 19,
-        WithdrawalKycControl = 20
+        WithdrawalKycControl = 20,
+        TagManagement = 21
     }
 
     #region BankFinancialTransferInfoLog
