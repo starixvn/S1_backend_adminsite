@@ -144,5 +144,15 @@ namespace BackendSite.Service.DAL
         {
             return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
         }
+
+        public IEnumerable<IPUser> GetIPUserList(string ip)
+        {
+            var p = new DynamicParameters(new
+            {
+                LoginIp = ip
+            });
+
+            return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
+        }
     }
 }
