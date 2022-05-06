@@ -243,6 +243,25 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 };
             }
         }
+
+        /// <summary>
+        /// Block/GetIPUserList 取得某個IP曾經有哪些user使用過
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<IPUser> GetIPUserList(BlockIPRequest request)
+        {
+            var IPUserList = _blockBLL.GetIPUserList(request.IP);
+            return new ApiListResult<IPUser>
+            {
+                Data = IPUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
         #endregion
     }
 }

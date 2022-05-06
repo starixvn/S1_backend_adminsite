@@ -30,7 +30,6 @@ namespace BackendSite.Service.BLL
                 var ipCountryList = GetIPCountryList().ToList();
                 result.ToList().ForEach(x =>
                 {
-                    x.iUserList = JsonConvert.DeserializeObject<IEnumerable<string>>(x.UserName);
                     var ip = _tools.getIpNum(x.IP);
                     var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
                     if(location != null)
@@ -74,6 +73,10 @@ namespace BackendSite.Service.BLL
         private IEnumerable<IPCountry> GetIPCountryList()
         {
             return _blockService.GetIPCountryList();
+        }
+        public IEnumerable<IPUser> GetIPUserList(string ip)
+        {
+            return _blockService.GetIPUserList(ip);
         }
     }
 }
