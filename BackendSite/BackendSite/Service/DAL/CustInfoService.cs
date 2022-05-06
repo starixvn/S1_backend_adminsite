@@ -244,7 +244,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V9", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -411,7 +411,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_StartIndex", startIndex);
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V2", parameter, commandType: CommandType.StoredProcedure);
+            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V3", parameter, commandType: CommandType.StoredProcedure);
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
@@ -789,6 +789,32 @@ namespace BackendSite.Service.DAL
             WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
 
             return WithdrawalLimitLogData;
+        }
+
+        public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public CustBankInfo GetCustBankInfo(int custId,int siteId)
+        {
+            return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId , SiteId  = siteId }));
+        }
+        public BankLockInfoDetail GetBlockAccount(int SysId, string accountNum)
+        {
+            return _reportDbClient.QueryFirst<BankLockInfoDetail>("Admin_BlockAccount_Get", new DynamicParameters(new { SysId = SysId, AccountNum = accountNum }));
+        }
+        public int SetCustBankInfoLog(int custId, int siteId, int sysId, string accountNum, string iFSCCode, string accountName, int status)
+        {
+            return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new { CustId = custId,
+                SiteId = siteId,
+                SysId = sysId,
+                AccountNum = accountNum,
+                IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "": iFSCCode,
+                AccountName = accountName,
+                Status = status
+            }));
         }
     }
 }

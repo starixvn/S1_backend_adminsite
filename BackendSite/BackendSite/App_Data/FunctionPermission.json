@@ -118,6 +118,10 @@
           {
             "DisplayKey": "Set Add/Remove CustTag",
             "FuncKey": "ca_setCustTag"
+          },
+          {
+            "DisplayKey": "Disable Rebate Payout",
+            "FuncKey": "ca_rebatePayout"
           }
         ]
       },
