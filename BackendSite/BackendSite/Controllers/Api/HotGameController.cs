@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<GetHotGameListResponse>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _hotGame.Get(request.SiteId, request.CurrencyId)
+                Data = await _hotGame.Get(request.SiteId, request.CurrencyId, request.RefreshCache)
             };
             return apiResult;
         }

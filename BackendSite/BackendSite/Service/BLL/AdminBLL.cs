@@ -237,5 +237,13 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+        public AdminUserV2 GetUserV2(int userId, int sitId)
+        {
+            return adminUserService.GetUserV2(userId, sitId);
+        }
+        public IEnumerable<AdminUserV2> GetAllUserV2()
+        {
+            return adminUserService.GetAllUserV2();
+        }
     }
 }

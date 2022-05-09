@@ -802,6 +802,26 @@
         "Childs": null
       },
       {
+        "Key": "SlotGamesManagement",
+        "Title": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "SlotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "CategoryManagement",
+        "Title": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Controller": "Marketing",
+        "Action": "CategoryManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
         "Key": "DeepLinkManagement",
         "Title": "Deep Link Management",
         "FuncKey": "CMS/DeepLinkManagement",

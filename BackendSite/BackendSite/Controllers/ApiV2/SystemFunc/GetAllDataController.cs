@@ -31,11 +31,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly AdminGroupBLL _adminGroupBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
+        private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly WithdrawalBLL _withdrawalBll;
 
         #endregion
 
@@ -52,11 +52,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
+            _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
-            _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
         }
 
         #endregion
@@ -178,15 +178,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
+        /// Func Path：Administration > Activity Log Report > DropDownList[Function]
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
+        public ApiResult<IEnumerable<SelectListItem>> GetAdjustmentInfoLogMenu()
         {
-            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>
+            var apiResult = new ApiResult<IEnumerable<SelectListItem>>
             {
-                Data = _adjustmentLogReportBll.GetAdjustmentInfoLogMenu(),
+                Data = _adjustmentLogReportBll.GetAdminAdjustmentInfoLogMenu(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetActionTypeList 取得調整資料記錄類型清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Administration > Activity Log Report > DropDownList[Type]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<SelectListItem>> GetActionTypeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<SelectListItem>>
+            {
+                Data = _adjustmentLogReportBll.GetActionTypeList(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -271,6 +291,23 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<CryptoInfoData> GetCryptoInfoData()
+        {
+
+            var result = _withdrawalBll.GetCryptoInfoData();
+
+            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
+        }
+
         /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
         /// </summary>
         /// <remarks>
@@ -456,24 +493,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
 
             return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<CryptoInfoData> GetCryptoInfoData()
-        {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
-
-            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }
 
         /// <summary>

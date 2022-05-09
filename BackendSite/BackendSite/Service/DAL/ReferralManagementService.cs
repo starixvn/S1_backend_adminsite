@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,9 +63,25 @@ namespace BackendSite.Service.DAL
                 //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
-        public void SetReferralStatus(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
         {
-            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+            var p = new DynamicParameters();
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_BonusAmount", setReferralRequest.BonusAmount);
+            p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
+            p.Add("_VaildBet", setReferralRequest.VaildBet);
+            p.Add("_Deposit", setReferralRequest.Deposit);
+            p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
+
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
+        }
+        
+        public int SetReferralStatus(int siteId, int currencyId, int status)
+        {
+            return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
