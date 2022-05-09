@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency6: "EURO",
     lbl_Currency9: "AUD",
     lbl_Currency12: "GBP",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency20: "UUS",
     lbl_Currency32: "JPY",

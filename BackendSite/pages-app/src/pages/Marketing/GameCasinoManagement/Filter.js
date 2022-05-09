@@ -6,7 +6,7 @@ const defCurrencyType = {
   0: "",
   2: "MYR",
   4: "THB",
-  13: "RMB",
+  13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",

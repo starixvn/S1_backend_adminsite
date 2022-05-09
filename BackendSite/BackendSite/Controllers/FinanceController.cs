@@ -113,7 +113,7 @@ namespace BackendSite.Controllers
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = excelBLL.Export(exportDeposit);
+            var stream = excelBLL.ExportV2(exportDeposit);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         public class WithdrawalListReq
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = excelBLL.Export(exportWithdrawal);
+            var stream = excelBLL.ExportV2(exportWithdrawal);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
