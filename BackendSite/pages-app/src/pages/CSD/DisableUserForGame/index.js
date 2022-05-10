@@ -4,7 +4,7 @@ import Edit from "./Edit"
 import Result from "./Result";
 import Filter from "./Filter";
 import qs from "qs";
-import WebAPI from "../../../module//WebAPI";
+import WebAPI, { api } from "../../../module//WebAPI";
 import moment from "moment";
 
 const App = () => {
@@ -109,32 +109,43 @@ const App = () => {
     });
     GetDisableUserList(stateFilter);
   }
-  const SwitchStatus = (custId, status) => {
-    datas.Datas.forEach(a => {
-      if(a.custId === custId) {
-        a.status ^= 1
+  const SwitchStatus = (data) => {
+    let status = data.status ^ 1;
+    let p = {
+      siteId: data.siteId,
+      currencyId: data.currencyId,
+      before: {
+        UserName: data.userName,
+        CustId: data.custId,
+        Status: data.status
+      },
+      after: {
+        UserName: data.userName,
+        CustId: data.custId,
+        Status: status
       }
-    });
-    setDatas({
-      ...datas,
-    });
+    };
 
-    let data = {
-      CustId: custId,
-      Status: status ^= 1,
-    };
-    let param = {
-      Url: "Risk/UpdateStatus",
-      Data: qs.stringify(data),
-    };
-    
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        alert("success.");
-      } else {
-        alert(res.data.message);
-      }
-    });
+    api
+      .post("/apiv2/TpDisable/UpdateStatus", p)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+            alert("success.");
+            datas.Datas.forEach(a => {
+              if(a.custId === data.custId) {
+                a.status ^= 1
+              }
+            });
+            setDatas({
+              ...datas,
+            });
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   }
 
   const FilterChange = (v, dataColumn) => {
