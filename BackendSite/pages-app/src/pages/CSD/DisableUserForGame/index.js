@@ -93,21 +93,29 @@ const App = () => {
       CustId: custId
     });
   }
-  const DeleteDisableUser = (custId) => {
-
-    let param = {
-      Url: "Risk/Delete",
-      Data: `custId=${custId}`,
+  const DeleteDisableUser = (data) => {
+    let p = {
+      siteId: data.siteId,
+      currencyId: data.currencyId,
+      before: {
+        UserName: data.userName,
+        CustId: data.custId
+      }
     };
     
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        alert("success.");
-      } else {
-        alert(res.data.message);
-      }
-    });
-    GetDisableUserList(stateFilter);
+    api
+      .post("/apiv2/TpDisable/Delete", p)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+            alert("success.");
+            GetDisableUserList(stateFilter);
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   }
   const SwitchStatus = (data) => {
     let status = data.status ^ 1;

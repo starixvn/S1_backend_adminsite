@@ -22,6 +22,13 @@ namespace BackendSite.Service.Model
 
         public string StatusName => Status.ToString();
     }
+    
+    public class DeleteDisableUser
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+    }
 
     public class DisableTpGame
     {

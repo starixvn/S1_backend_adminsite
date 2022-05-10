@@ -212,7 +212,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 new ParamsWithLog<DisableDisableUser>(req, updateOperator));
             return new ApiResult
             {
-                ErrorCode = result ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail,
+                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
 
@@ -227,13 +227,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> Delete(DeleteReq req)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
         {
-
-            var result = await _riskBll.DeleteTpDisableUser(req.CustId);
+            var result = await _riskBll.DeleteTpDisableUser(
+                new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
             return new ApiResult
             {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
 
         }
