@@ -251,14 +251,15 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> Delete([FromForm] int custId)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
         {
             try
             {
-                var result = await _riskBll.DeleteTpDisableUser(custId);
+                var result = await _riskBll.DeleteTpDisableUser(
+                    new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? 0 : result,
+                    ErrorCode = result ? 0 : 1
                 };
             }
             catch (Exception ex)
