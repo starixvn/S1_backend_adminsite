@@ -97,7 +97,7 @@ export default function Result (tpDisableUser) {
                 body_content =  <StatusButton 
                                   mainKey={data["custId"]} 
                                   checked={data["status"] === 1} 
-                                  onChange={tpDisableUser.UpdateStatus.bind(this, data["custId"], data["status"])}
+                                  onChange={tpDisableUser.UpdateStatus.bind(this, data)}
                                 />
             }
             else {

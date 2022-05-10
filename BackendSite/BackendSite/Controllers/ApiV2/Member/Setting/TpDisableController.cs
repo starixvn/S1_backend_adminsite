@@ -204,16 +204,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="disable"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> UpdateStatus(DisableDisableUser disable)
+        public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {
 
             var updateOperator = User.Identity.Name;
-            var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+            var result = await _riskBll.UpdateStatus(
+                new ParamsWithLog<DisableDisableUser>(req, updateOperator));
             return new ApiResult
             {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+                ErrorCode = result ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail,
             };
-
         }
 
         /// <summary>
