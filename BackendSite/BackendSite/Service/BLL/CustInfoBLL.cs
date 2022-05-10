@@ -618,9 +618,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
+        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
         {
-            return _custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
+            return _custInfoService.SetRegLiveStatus(input);
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -628,19 +628,19 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
         {
-            return _custInfoService.AddRegLiveStatusNote(custId, note, @operator);
+            return _custInfoService.AddRegLiveStatusNote(input);
         }
 
-        public int DeleteRegLiveStatusNote(int custId, int id)
+        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
         {
-            return _custInfoService.DeleteRegLiveStatusNote(custId, id);
+            return _custInfoService.DeleteRegLiveStatusNote(input);
         }
 
-        public int EditRegLiveStatusNote(int custId, int id, string note, string @operator)
+        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
         {
-            return _custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
+            return _custInfoService.EditRegLiveStatusNote(input);
         }
 
         public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
@@ -659,7 +659,7 @@ namespace BackendSite.Service.BLL
                     Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
+                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });

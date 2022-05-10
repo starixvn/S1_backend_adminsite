@@ -748,9 +748,45 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
+        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
         {
-            return _mainDbClient.Execute("Admin_RegLiveStatus_Set", new DynamicParameters(new { CustId = custId, Status = status, SiteId = siteId, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Status", (int)input.After.Status);
+            props.Add("SiteId", input.SiteId);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_RegLiveStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -758,19 +794,124 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get_V2", new DynamicParameters(new { CustId = custId }));
         }
 
-        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Ins", new DynamicParameters(new { CustId = custId, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Note",  string.IsNullOrWhiteSpace(input.After.Note) ? "" : input.After.Note);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Ins", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", null, DbType.String);
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
-        public int DeleteRegLiveStatusNote(int custId, int id)
+        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Del", new DynamicParameters(new { CustId = custId, Id = id }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.Before.CustId);
+            props.Add("Id",  input.Before.Id);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Del", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", null, DbType.String);
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
-        public int EditRegLiveStatusNote(int custid, int id, string note, string @operator)
+        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Set", new DynamicParameters(new { CustId = custid, Id = id, Note = note, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Id",  input.After.Id);
+            props.Add("Note",  input.After.Note);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
         public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {

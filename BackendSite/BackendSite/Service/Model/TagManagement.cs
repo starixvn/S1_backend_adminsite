@@ -21,11 +21,4 @@ namespace BackendSite.Service.Model
         public string StatusName => Status.ToString();
         public string TagName { get; set; }
     }
-    
-    public class SetCustTag
-    {
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public IEnumerable<int> SelectTag { get; set; }
-    }
 }
