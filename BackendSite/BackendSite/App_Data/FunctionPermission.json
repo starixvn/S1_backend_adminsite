@@ -252,6 +252,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Deposit Accounting",
+        "FuncKey": "Finance/DepositAccountingList",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false
