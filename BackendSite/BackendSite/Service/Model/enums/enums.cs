@@ -575,7 +575,8 @@ namespace BackendSite.Service.Model.enums
         WithdrawalKycControl = 20,
         TagManagement = 21,
         LiveRegistrationStatistics = 22,
-        GameExclusion = 23
+        GameExclusion = 23,
+        BetLimit = 24
     }
 
     #region BankFinancialTransferInfoLog
