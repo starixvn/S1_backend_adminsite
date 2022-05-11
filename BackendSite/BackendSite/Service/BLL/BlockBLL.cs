@@ -24,7 +24,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
             DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
         {
-            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), pageNumber, out totalPages, out rowCount);
+            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), Math.Abs(pageSize), out totalPages, out rowCount);
             if(result != null)
             {
                 var ipCountryList = GetIPCountryList().ToList();
