@@ -42,7 +42,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result =  _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", p);
+            var result =  _reportDbClient.Query<BlockIP>("Admin_BlockIPList_Get", p);
 
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;

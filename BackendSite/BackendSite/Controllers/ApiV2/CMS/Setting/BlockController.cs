@@ -110,7 +110,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 Data = blockIPList,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
-                RowCount = rowCount
+                RowCount = rowCount,
+                PageNumber = request.PageNumber
             };
         }
         /// <summary>
