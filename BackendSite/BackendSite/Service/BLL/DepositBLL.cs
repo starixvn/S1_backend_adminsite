@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly DepositService depositService;
         private readonly ServerInfoService serverInfoService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly DepositAccountingService _depositAccountingService;
         private readonly CustInfoBLL custInfoBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
@@ -36,6 +37,7 @@ namespace BackendSite.Service.BLL
             this.authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             this.common = provider.GetRequiredService<Common>();
             this.custInfoService = provider.GetRequiredService<CustInfoService>();
+            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
         }
 
@@ -191,6 +193,66 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var depositId);
             return depositService.GetDepositRequest(depositId, serverInfo.SiteId/*Not require*/);/*Check SiteID By Permission*/
+        }
+
+        public GetDepositAccountingListModel GetDepositAccountingList(
+            IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            string transId,
+            string userName,
+            int pageNumber,
+            int pageSize)
+        {
+            var result = _depositAccountingService.GetDepositAccountingList(
+                JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIds),
+                startDate,
+                endDate,
+                string.IsNullOrEmpty(transId) ? null : transId,
+                string.IsNullOrEmpty(userName) ? null : userName,
+                Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out var totalPages,
+                out var rowCount);
+            
+            return new GetDepositAccountingListModel()
+            {
+                Datas = result.ToList(),
+                PageNumber = Math.Abs(pageNumber),
+                RowCount = rowCount,
+                TotalPages = totalPages
+            };
+        }
+        
+        public DepositAccountingModel GetDepositAccountingByTransId(string transId)
+        {
+            return _depositAccountingService.GetDepositAccountingByTransId(transId);
+        }
+        
+        public int EditDepositAccounting(string transId, string accountNo ,string memo ,string Operator)
+        {
+            return _depositAccountingService.EditDepositAccounting(transId,accountNo,memo,Operator);
+        }
+        
+        public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(
+            string siteIds,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            string transId,
+            string userName)
+        {
+            var result = _depositAccountingService.ExportDepositAccountingList(
+                siteIds,
+                currencyIds,
+                startDate,
+                endDate,
+                string.IsNullOrEmpty(transId) ? null : transId,
+                string.IsNullOrEmpty(userName) ? null : userName);
+
+            return result;
         }
 
         public IEnumerable<Comments> GetDepositRequestComment(string transId)
