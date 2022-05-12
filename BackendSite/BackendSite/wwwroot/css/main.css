@@ -913,6 +913,38 @@ body {
     .status.status-closed {
         background-color: #616161;
     }
+    
+    .status.status-withdrawal-rejected {
+        background-color: #C70707;
+    }
+    
+    .status.status-withdrawal-cancelled {
+        background-color: #F97C08;
+    }
+    
+    .status.status-withdrawal-kyc {
+        background-color: #9957EC;
+    }
+    
+    .status.status-withdrawal-verified {
+        background-color: #2DA7EC;
+    }
+
+    .status.status-withdrawal-pending {
+        background-color: #38425B;
+    }
+    
+    .status.status-withdrawal-process {
+        background-color: #13BBB1;
+    }
+    
+    .status.status-withdrawal-hold {
+        background-color: #F4B30B;
+    }
+
+    .status.status-withdrawal-approved {
+        background-color: #3EA62E;
+    }
 
 .action-draft {
     color: #005EA2;
