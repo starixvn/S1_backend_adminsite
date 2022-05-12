@@ -70,6 +70,8 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", setReferralRequest.CurrencyId);
             p.Add("_BonusAmount", setReferralRequest.BonusAmount);
             p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("_AgentVaildBet", setReferralRequest.AgentVaildBet);
+            p.Add("_AgentDeposit", setReferralRequest.AgentDeposit);
             p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
             p.Add("_VaildBet", setReferralRequest.VaildBet);
             p.Add("_Deposit", setReferralRequest.Deposit);
