@@ -19,12 +19,14 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public string PeriodDays { get; set; }
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
+        public decimal AgentVaildBet { get; set; }
+        public decimal AgentDeposit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
+        public string PeriodDays { get; set; }
         public IEnumerable<ReferralContent> SpecificList { get; set; }
     }
 
