@@ -354,6 +354,78 @@
     border-color: #D70404;
 }
 
+.btn-withdrawal-rejected {
+    background-color: #C70707;
+    color: #fff;
+}
+    .btn-withdrawal-rejected:hover {
+        background-color: #be0303;
+    }
+    
+.btn-withdrawal-cancelled {
+    background-color: #F97C08;
+    color: #fff;
+}
+    .btn-withdrawal-cancelled:hover {
+        background-color: #ef7402;
+    }
+
+.btn-withdrawal-kyc {
+    background-color: #9957EC;
+    color: #fff;
+}
+    .btn-withdrawal-kyc:hover {
+        background-color: #9150e3;
+    }
+
+.btn-withdrawal-verified {
+    background-color: #2DA7EC;
+    color: #fff;
+}
+    .btn-withdrawal-verified:hover {
+        background-color: #269fe3;
+    }
+
+.btn-withdrawal-pending {
+    background-color: #38425B;
+    color: #fff;
+}
+    .btn-withdrawal-pending:hover {
+        background-color: #323c54;
+    }
+
+.btn-withdrawal-process {
+    background-color: #13BBB1;
+    color: #fff;
+}
+    .btn-withdrawal-process:hover {
+        background-color: #0eafa5;
+    }
+
+.btn-withdrawal-hold {
+    background-color: #F4B30B;
+    color: #fff;
+}
+    .btn-withdrawal-hold:hover {
+        background-color: #e8a905;
+    }
+
+.btn-withdrawal-approved {
+    background-color: #3EA62E;
+    color: #fff;
+}
+    .btn-withdrawal-approved:hover {
+        background-color: #369b27;
+    }
+
+.btn-withdrawal-draft {
+    background-color: #8B8B8B;
+    color: #fff;
+}
+    .btn-withdrawal-draft:hover {
+        background-color: #808080;
+    }
+
 .btn.disabled, .btn:disabled {
     background: #6c757d;
     border-color: #6c757d;
