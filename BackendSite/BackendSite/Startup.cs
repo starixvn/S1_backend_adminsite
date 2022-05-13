@@ -88,12 +88,20 @@ namespace BackendSite
             });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(option =>
             {
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
+                option.Cookie.SameSite = SameSiteMode.Unspecified;
+            })
+            .AddCookie("newbackend", "newbackend", option =>
+            {
+                option.LoginPath = "/Home/Signin";
+                option.Cookie.Name = ".newbackend";
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();

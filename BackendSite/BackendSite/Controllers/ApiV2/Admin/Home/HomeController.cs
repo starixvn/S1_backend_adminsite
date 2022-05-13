@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         private readonly AuthorizeBLL _authorizeBll;
         private readonly Tools _tools;
         private readonly AdminBLL _adminBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -36,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             _authorizeBll = provider.GetService<AuthorizeBLL>();
             _tools = provider.GetService<Tools>();
             _adminBll = provider.GetService<AdminBLL>();
+            _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
         }
 
 
@@ -98,9 +100,9 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public async Task<ApiResult<string>> Signin(LoginRequest loginModel)
         {
 
-            AdminUser adminUser = null;
+            NewAdminUser adminUser = null;
 
-            var userLoginResult = _authorizeBll.UserLogin(loginModel.UserName,
+            var userLoginResult = _newAuthorizeBLL.UserLogin(loginModel.UserName,
                                                           loginModel.UserPwd,
                                                           _tools.GetClientIP(HttpContext),
                                                           _tools.GetFromUrl(HttpContext),
@@ -112,7 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 throw new AdminException(userLoginResult);
             }
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("newbackend");
 
             var claims = new List<Claim>
                 {
@@ -122,7 +124,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            await HttpContext.SignInAsync("newbackend",
                                  new ClaimsPrincipal(claimsIdentity));
 
             return new ApiResult<string>
