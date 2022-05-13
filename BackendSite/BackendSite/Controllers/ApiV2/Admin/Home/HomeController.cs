@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "newbackend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase
@@ -123,7 +123,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                     //new Claim("LangId",? ),
                 };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsIdentity = new ClaimsIdentity(claims, "newbackend");
             await HttpContext.SignInAsync("newbackend",
                                  new ClaimsPrincipal(claimsIdentity));
 
@@ -173,7 +173,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public async Task<ApiResult> Signout()
         {
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("newbackend");
 
             return new ApiResult
             {

@@ -88,8 +88,11 @@ namespace BackendSite
             });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(option =>
+            services.AddAuthentication(option => 
+            {
+                option.DefaultScheme = "backend";
+            })
+            .AddCookie("backend", "backend", option =>
             {
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
