@@ -65,6 +65,7 @@ namespace BackendSite.Service.Model
         public int ConditionCount { get; set; }
         public int AmountCount { get; set; }
         public decimal AmountSum { get; set; }
+        public decimal FreeCreditSum { get; set; }
         public int PendingCount { get; set; }
         public int ExpiredCount { get; set; }
 
@@ -81,6 +82,7 @@ namespace BackendSite.Service.Model
         public decimal TotalBet { get; set; }
         public decimal VaildBetC { get; set; }
         public decimal BonusAmount { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
         public DateTime? RewardTime { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
