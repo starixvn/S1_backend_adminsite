@@ -99,6 +99,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td>{row.withdrawalType === 4 ? row.channelName : "" }</td>
                         <td>{JSON.parse(row.withdrawalInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
@@ -110,7 +111,6 @@ import DateTimePicker from 'react-datetime';
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
                         <td>{row.status ==5 || row.status==6 || row.status==7 ? moment(row.flowEndTime).format('l LTS') : null}</td>
-                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.withdrawlCnt}</td>
                     </tr>
                 )
@@ -144,6 +144,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col">NetWork</th>
                                 <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
@@ -154,7 +155,6 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Flow End Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Withdrawl Count</th>
                             </tr>
                         </thead>
