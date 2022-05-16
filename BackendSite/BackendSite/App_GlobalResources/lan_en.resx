@@ -502,7 +502,7 @@
     <value>OnHold</value>
   </data>
   <data name="lbl_WithdrawalStatus3" xml:space="preserve">
-    <value>Verify</value>
+    <value>Verified</value>
   </data>
   <data name="lbl_WithdrawalStatus4" xml:space="preserve">
     <value>Process</value>
