@@ -8,7 +8,7 @@ import DateTimePicker from 'react-datetime';
         Pending: 1,
         ToKyc: 8,
         OnHold: 2,
-        Verify: 3,
+        Verified: 3,
         Process: 4,
         Cancelled: 5,
         Approved: 6,
@@ -16,14 +16,14 @@ import DateTimePicker from 'react-datetime';
     };
 
     const WithdrawalStatusOp = {
-        1: <span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
-        2: <span className="status status-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
-        3: <span className="status status-verify">{i18n["lbl_WithdrawalStatus3"]}</span>,
-        4: <span className="status status-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
-        5: <span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
-        6: <span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
-        7: <span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
-        8: <span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
+        1: <span className="status status-withdrawal-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
+        2: <span className="status status-withdrawal-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
+        3: <span className="status status-withdrawal-verified">{i18n["lbl_WithdrawalStatus3"]}</span>,
+        4: <span className="status status-withdrawal-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
+        5: <span className="status status-withdrawal-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
+        6: <span className="status status-withdrawal-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
+        7: <span className="status status-withdrawal-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
+        8: <span className="status status-withdrawal-kyc">{i18n["lbl_WithdrawalStatus8"]}</span>,
     }
 
     const TypeSelectOp = {
@@ -37,7 +37,7 @@ import DateTimePicker from 'react-datetime';
         1: "Pending",
         8: "To KYC",
         2: "On Hold",
-        3: "Verify",
+        3: "Verified",
         4: "Process",
         5: "Cancelled",
         6: "Approved",
@@ -93,10 +93,13 @@ import DateTimePicker from 'react-datetime';
                             {(subFuncKeys.indexOf("f_wd_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
                         {/* <td>{row.calCode}</td> */}
+                        <td>{row.operator}</td>
+                        <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                         <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td>{row.withdrawalType === 4 ? row.channelName : "" }</td>
                         <td>{JSON.parse(row.withdrawalInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
@@ -108,9 +111,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
                         <td>{row.status ==5 || row.status==6 || row.status==7 ? moment(row.flowEndTime).format('l LTS') : null}</td>
-                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.withdrawlCnt}</td>
-                        <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                     </tr>
                 )
             }
@@ -137,10 +138,13 @@ import DateTimePicker from 'react-datetime';
                             <tr>
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
+                                <th scope="col">Operator</th>
+                                <th scope="col">{i18n.lbl_Status}</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col">NetWork</th>
                                 <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
@@ -151,9 +155,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Flow End Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Withdrawl Count</th>
-                                <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,7 +305,7 @@ import DateTimePicker from 'react-datetime';
                     confirmstring += " On Hold(Risk Check) ?";
                     break;
                 case 3:
-                    confirmstring += " Verify ?";
+                    confirmstring += " Verified ?";
                     break;
                 case 4:
                     confirmstring += " Process ?";
@@ -490,23 +492,23 @@ import DateTimePicker from 'react-datetime';
             let PayFrom = [];
             if (data != null) {
                 // if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4 || data.status == 8)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                    btnGroup.push(<button key={0} type="button" className="btn btn-withdrawal-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
+                    btnGroup.push(<button key={2} type="button" className="btn btn-withdrawal-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
                 if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
+                    btnGroup.push(<button key={3} type="button" className="btn btn-withdrawal-verified" onClick={this.onConfirm.bind(this, 3)}>Verified</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
+                    btnGroup.push(<button key={4} type="button" className="btn btn-withdrawal-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
                 if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
-                    btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
+                    btnGroup.push(<button key={6} type="button" className="btn btn-withdrawal-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+                    btnGroup.push(<button key={7} type="button" className="btn btn-withdrawal-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
                 if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
-                    btnGroup.push(<button key={1} type="button" className="btn btn-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                    btnGroup.push(<button key={1} type="button" className="btn btn-withdrawal-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
                 if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={8} type="button" className="btn btn-tokyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
+                    btnGroup.push(<button key={8} type="button" className="btn btn-withdrawal-kyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
 
                 selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
 
