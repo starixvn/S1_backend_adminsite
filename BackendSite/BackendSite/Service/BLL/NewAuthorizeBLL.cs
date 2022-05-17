@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
@@ -57,6 +58,22 @@ namespace BackendSite.Service.BLL
             {
                 return ErrorCodeEnum.Success;
             }
+        }
+
+        public AuthData GetAuthData()
+        {
+            AuthData authData = null;
+            if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+            {
+                authData = new AuthData();
+                int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out var userId);
+                authData.UserId = userId;
+                authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
+                //authData.Token = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "Token").Value;
+                //authData.LangId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
+            }
+
+            return authData;
         }
     }
 }

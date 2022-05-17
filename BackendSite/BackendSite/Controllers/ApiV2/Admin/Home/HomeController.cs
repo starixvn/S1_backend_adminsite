@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
-    [Authorize(AuthenticationSchemes = "newbackend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase
@@ -114,7 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 throw new AdminException(userLoginResult);
             }
 
-            await HttpContext.SignOutAsync("newbackend");
+            await HttpContext.SignOutAsync("backendV2");
 
             var claims = new List<Claim>
                 {
@@ -123,8 +123,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                     //new Claim("LangId",? ),
                 };
 
-            var claimsIdentity = new ClaimsIdentity(claims, "newbackend");
-            await HttpContext.SignInAsync("newbackend",
+            var claimsIdentity = new ClaimsIdentity(claims, "backendV2");
+            await HttpContext.SignInAsync("backendV2",
                                  new ClaimsPrincipal(claimsIdentity));
 
             return new ApiResult<string>
@@ -173,7 +173,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public async Task<ApiResult> Signout()
         {
 
-            await HttpContext.SignOutAsync("newbackend");
+            await HttpContext.SignOutAsync("backendV2");
 
             return new ApiResult
             {

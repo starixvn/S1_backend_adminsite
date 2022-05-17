@@ -100,10 +100,10 @@ namespace BackendSite
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             })
-            .AddCookie("newbackend", "newbackend", option =>
+            .AddCookie("backendV2", "backendV2", option =>
             {
-                option.LoginPath = "/Home/Signin";
-                option.Cookie.Name = ".newbackend";
+                //option.LoginPath = "/Home/Signin";
+                option.Cookie.Name = ".backendV2";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
