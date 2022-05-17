@@ -36,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly AdminBLL _adminBll;
 
         #endregion
 
@@ -57,6 +58,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
+
         }
 
         #endregion
@@ -147,6 +150,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
 
+        }
+
+        /// <summary>
+        ///  GetAllData/GetPermissionList 取得所有權限清單(新權限)
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<AdminPermissionDto>>> GetPermissionList()
+        {
+            var data = await _adminBll.GetAllAdminPermissionAsync();
+
+            var apiResult = new ApiResult<IEnumerable<AdminPermissionDto>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
         }
 
         //==============================================================================================================================================
