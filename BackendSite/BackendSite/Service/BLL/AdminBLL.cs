@@ -111,6 +111,12 @@ namespace BackendSite.Service.BLL
 
         #region New AdminSite Menu Structure
 
+        public async Task<IEnumerable<AdminPermissionDto>> GetAllAdminPermissionAsync()
+        {
+         return await adminService.GetAllAdminPermission();
+        }
+
+
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang)
         {
             var result = new List<AdminMenuModel>();
