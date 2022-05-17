@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -73,8 +74,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            public string SiteIds { get; set; }
-            public string CurrencyIds { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public string TransId { get; set; }
             public string UserName { get; set; }
         }
@@ -182,8 +183,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             request.StartDate = new DateTimeOffset(request.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero);
             request.EndDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
 
-            var data = _depositBll.ExportDepositAccountingList(request.SiteIds,
-                request.CurrencyIds,
+            var data = _depositBll.ExportDepositAccountingList(JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.CurrencyIds),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.TransId,
