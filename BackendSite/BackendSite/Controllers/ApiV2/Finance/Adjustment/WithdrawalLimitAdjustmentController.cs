@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
     //目的：該程式主要目的是限制Member的可提款限額，實際上異動的是RollOver數字。
     //公式：Balance-(Withdrawal Limit - RollOver)=可提款金額。
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitAdjustmentController : ControllerBase

@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankTransferController : ControllerBase
