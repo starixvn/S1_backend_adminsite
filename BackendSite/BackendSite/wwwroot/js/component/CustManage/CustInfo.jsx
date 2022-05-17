@@ -1397,11 +1397,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                             {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
                             {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
-                            {wallet.tpId == 1 && wallet.balance < 0 ?
+                            {/* {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
                                 </div>
-                                : null}
+                                : null} */}
                         </li>;
                     }.bind(this))}</ul>;
 
