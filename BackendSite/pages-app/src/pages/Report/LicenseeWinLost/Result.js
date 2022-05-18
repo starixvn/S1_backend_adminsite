@@ -5,7 +5,7 @@ import "@ag-grid-community/all-modules/dist/styles/ag-grid.css";
 import "@ag-grid-community/all-modules/dist/styles/ag-theme-blue.css";
 
 if(process.env.NODE_ENV!=='production'){
-    window.i18n = {"lbl_Currency2":"MYR","lbl_Currency4":"THB","lbl_Currency13":"RMB","lbl_Currency15":"IDR","lbl_Currency51":"VND","lbl_Currency61":"INR"};
+    window.i18n = {"lbl_Currency2":"MYR","lbl_Currency4":"THB","lbl_Currency13":"CNY","lbl_Currency15":"IDR","lbl_Currency51":"VND","lbl_Currency61":"INR"};
 }
 
 const defaultColDef = {

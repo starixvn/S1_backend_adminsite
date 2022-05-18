@@ -118,6 +118,10 @@
           {
             "DisplayKey": "Set Add/Remove CustTag",
             "FuncKey": "ca_setCustTag"
+          },
+          {
+            "DisplayKey": "Disable Rebate Payout",
+            "FuncKey": "ca_rebatePayout"
           }
         ]
       },
@@ -249,6 +253,11 @@
       {
         "DisplayKey": "Withdrawal Accounting",
         "FuncKey": "Finance/WithdrawalAccountingList",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Accounting",
+        "FuncKey": "Finance/DepositAccountingList",
         "Enable": false
       },
       {
@@ -602,6 +611,30 @@
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Slot Games Management",
+      "FuncKey": "CMS/SlotGamesManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
+    },
+    {
+      "DisplayKey": "Category Management",
+      "FuncKey": "CMS/CategoryManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
     },
     {
       "DisplayKey": "Deep Link Management",

@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== "production") {
   window.i18n = {
     lbl_Currency2: "MYR",
     lbl_Currency4: "THB",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
@@ -21,7 +21,7 @@ const defRebateType = {
 const defCurrencyType = {
   2: "MYR",
   4: "THB",
-  13: "RMB",
+  13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
@@ -49,7 +49,7 @@ const defBaseCurrencyType = {
   0: "Original Currency",
   2: "MYR",
   4: "THB",
-  13: "RMB",
+  13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",

@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -23,10 +24,15 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
+        {
+            return await referralManagementService.SetReferralAsync(setReferralRequest);
+        }
         public void SetReferralStatus(int siteId, int currencyId,int status)
         {
             referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
+
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);

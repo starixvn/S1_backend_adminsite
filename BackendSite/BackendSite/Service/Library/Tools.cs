@@ -115,7 +115,7 @@ namespace BackendSite.Service.Library
             isInnerIp = isInner(ipNum, aBegin, aEnd) || isInner(ipNum, bBegin, bEnd) || isInner(ipNum, cBegin, cEnd) || ipAddress == "127.0.0.1";
             return isInnerIp;
         }
-        private long getIpNum(string ipAddress)
+        public long getIpNum(string ipAddress)
         {
             var ip = ipAddress.Split('.');
             long a = Convert.ToInt32(ip[0]);

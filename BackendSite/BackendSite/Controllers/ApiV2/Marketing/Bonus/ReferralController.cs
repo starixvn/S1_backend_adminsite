@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -78,22 +79,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public ApiResult<IEnumerable<ReferralList>> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<ReferralList>>();
-
-            var datas = _referralManagementBll.GetReferralBySiteId(request.SiteId);
-            var currencyList = _reportBll.GetCurrency().ToList();
-            var result = new List<ReferralManagement>();
-
-            foreach (var data in datas)
+            var apiResult = new ApiResult<IEnumerable<ReferralList>>
             {
-                var isoCode = currencyList.Where(x => x.CurrencyId == data.CurrencyId).Select(x => x.IsoCode).FirstOrDefault();
-                data.IsoCode = isoCode;
-            }
-
-            apiResult.Data = datas;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = _referralManagementBll.GetReferralBySiteId(request.SiteId)
+            };
             return apiResult;
-
         }
 
         /// <summary>
@@ -134,25 +125,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// 
         /// Func Path：Marketing > Referral Management > [Search] > [Edit] > [Save]
         /// </remarks>
-        /// <param name="request"></param>
+        /// <param name="setReferral"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
             var apiResult = new ApiResult();
-            var referralList = new List<ReferralManagement>();
-            referralList.Add(new ReferralManagement()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                PeriodDays = request.PeriodDays.ToString(),
-                BonusAmount = request.BonusAmount.ToString(),
-                VaildBet = request.BonusAmount.ToString(),
-                Deposit = request.Deposit.ToString()
-            });
-            _referralManagementBll.SetReferral(referralList);
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            var result = await _referralManagementBll.SetReferralAsync(setReferral);
+            apiResult.ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result;
             return apiResult;
         }
 
