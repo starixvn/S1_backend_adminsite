@@ -76,7 +76,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             [Required]
             public string txtPW { set; get; }
-            public string redirecturl { set; get; }
+            public string redirectUrl { set; get; }
         }
 
         public class DashBoardPara
@@ -145,13 +145,13 @@ namespace BackendSite.Controllers.Api
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                                  new ClaimsPrincipal(claimsIdentity));
 
-            if (string.IsNullOrWhiteSpace(loginModel.redirecturl))
-                loginModel.redirecturl = Url.Action("Index", "Home");
+            if (string.IsNullOrWhiteSpace(loginModel.redirectUrl))
+                loginModel.redirectUrl = Url.Action("Index", "Home");
 
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = loginModel.redirecturl
+                Message = loginModel.redirectUrl
             };
         }
 
