@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AnnouncementController : ControllerBase

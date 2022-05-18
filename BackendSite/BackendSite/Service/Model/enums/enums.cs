@@ -572,7 +572,11 @@ namespace BackendSite.Service.Model.enums
         KickOutCustomer = 17,
         SetCustomerPromotionStatus = 18,
         Announcement = 19,
-        WithdrawalKycControl = 20
+        WithdrawalKycControl = 20,
+        TagManagement = 21,
+        LiveRegistrationStatistics = 22,
+        GameExclusion = 23,
+        BetLimit = 24
     }
 
     #region BankFinancialTransferInfoLog
@@ -778,7 +782,7 @@ namespace BackendSite.Service.Model.enums
 
     #region Customer_RegLiveStatus
 
-    public enum Customer_RegLiveStatusStatusEnum
+    public enum CustomerRegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,

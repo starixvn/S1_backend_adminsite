@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BlockController : ControllerBase
@@ -110,7 +110,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 Data = blockIPList,
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 TotalPages = totalPages,
-                RowCount = rowCount
+                RowCount = rowCount,
+                PageNumber = request.PageNumber
             };
         }
         /// <summary>

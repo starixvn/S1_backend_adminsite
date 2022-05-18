@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
-{ 
-    [Authorize]
+{
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TagManagementController : ControllerBase
@@ -37,18 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int Status { get; set; }
         }
-        public class EditTagManagementReq
-        {
-            public int Id { get; set; }
-            public string TagName { get; set; }
-            public string TagColour { get; set; }
-            public string Description { get; set; }
-        }
-        public class SetTagStatusReq
-        {
-            public int Id { get; set; }
-        }
-
+        
         #endregion
 
         #region CSD > TagMamagement
@@ -100,9 +89,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult EditTagManagement(EditTagManagementReq req)
+        public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
-            if (_custInfoBll.EditTagManagement(req.Id, req.TagName, req.TagColour, req.Description, User.Identity.Name) > 0)
+            if (_custInfoBll.EditTagManagement(new ParamsWithLog<EditTagManagement>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -125,9 +114,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult SetTagStatus(SetTagStatusReq req)
+        public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
-            if (_custInfoBll.SetTagStatus(req.Id, User.Identity.Name) > 0)
+            if (_custInfoBll.SetTagStatus(new ParamsWithLog<SetTagStatus>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {

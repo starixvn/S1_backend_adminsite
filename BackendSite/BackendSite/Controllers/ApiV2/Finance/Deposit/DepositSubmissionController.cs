@@ -13,7 +13,7 @@ using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositSubmissionController : ControllerBase

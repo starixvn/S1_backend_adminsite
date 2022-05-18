@@ -116,6 +116,7 @@ import { number_format } from '../commJS/common';
                     </td>
                     <td>
                         <select className="custom-select" name="status" onChange={this.onChange.bind(this)} value={row.status}>
+                            {row.status===0 ? <option value={0}>Initial</option> : null}
                             <option value={1}>Active</option>
                             <option value={2}>Suspend</option>
                             <option value={3}>Closed</option>

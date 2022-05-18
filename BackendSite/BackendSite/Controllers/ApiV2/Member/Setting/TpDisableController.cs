@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpDisableController : ControllerBase
@@ -204,16 +204,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="disable"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> UpdateStatus(DisableDisableUser disable)
+        public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {
 
             var updateOperator = User.Identity.Name;
-            var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+            var result = await _riskBll.UpdateStatus(
+                new ParamsWithLog<DisableDisableUser>(req, updateOperator));
             return new ApiResult
             {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
-
         }
 
         /// <summary>
@@ -227,13 +227,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> Delete(DeleteReq req)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
         {
-
-            var result = await _riskBll.DeleteTpDisableUser(req.CustId);
+            var result = await _riskBll.DeleteTpDisableUser(
+                new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
             return new ApiResult
             {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
 
         }
