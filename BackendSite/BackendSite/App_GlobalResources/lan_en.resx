@@ -702,4 +702,10 @@
   <data name="Currency_74" xml:space="preserve">
     <value>BDT</value>
   </data>
+  <data name="CurrencyWithdrawal_3" xml:space="preserve">
+    <value>USD GMT({0})</value>
+  </data>
+  <data name="CurrencyWithdrawal_74" xml:space="preserve">
+    <value>BDT GMT({0})</value>
+  </data>
 </root>
