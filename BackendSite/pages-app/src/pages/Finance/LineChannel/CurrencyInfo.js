@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency45: "WON",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
     lbl_Save: "Save",
     lbl_Success: "Success",
     lbl_Action: "Action",

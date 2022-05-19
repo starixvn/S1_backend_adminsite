@@ -4,11 +4,13 @@ import DateTimePicker from "react-datetime";
 
 const defCurrencyType = {
   2: "MYR",
+  3: "USD",
   4: "THB",
   13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
+  74: "BDT",
 };
 const defDateType = {
   0: "",
@@ -22,11 +24,13 @@ const defDateType = {
 const defBaseCurrencyType = {
   0: "Original Currency",
   2: "MYR",
+  3: "USD",
   4: "THB",
   13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
+  74: "BDT",
 };
 
 const Panel = (props) => {
