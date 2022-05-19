@@ -16,12 +16,15 @@
             return;
         }
 
-        var data = {txtID:$("#txtID").val(),txtPW:$("#txtPW").val()};
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirectUrl');
+     
+        var data = {txtID:$("#txtID").val(),txtPW:$("#txtPW").val(),redirectUrl:redirectUrl};
         axios.post('/api/Home/Signin',data)
         .then(function (response) {
             let result = response.data;
             if (result.errorCode == 0) {
-                window.top.location.replace(result.message);
+                window.location.href=`${window.location.origin}/${result.message==='/' ? '' :result.message }`
             } else {
                 alert(result.message);
             }
