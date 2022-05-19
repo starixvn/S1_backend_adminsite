@@ -3,14 +3,16 @@ import moment from "moment";
 import DateTimePicker from "react-datetime";
 
 if (process.env.NODE_ENV !== "production") {
-  window.gCurrencyList = [2, 4, 13, 15, 51, 61];
+  window.gCurrencyList = [2, 3, 4, 13, 15, 51, 61, 74];
   window.i18n = {
     lbl_Currency2: "MYR",
+    lbl_Currency3: "USD",
     lbl_Currency4: "THB",
     lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
   };
 }
 
@@ -20,11 +22,13 @@ const defRebateType = {
 };
 const defCurrencyType = {
   2: "MYR",
+  3: "USD",
   4: "THB",
   13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
+  74: "BDT",
 };
 const defCategoryType = {
   1: "Sports",
@@ -48,11 +52,13 @@ const defDateType = {
 const defBaseCurrencyType = {
   0: "Original Currency",
   2: "MYR",
+  3: "USD",
   4: "THB",
   13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
+  74: "BDT",
 };
 const Panel = (props) => {
   let siteListOptions = "";
