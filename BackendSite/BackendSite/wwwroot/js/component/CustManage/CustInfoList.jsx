@@ -434,11 +434,13 @@ import * as Loading from '../commJS/Loading.jsx';
                 },
                 onInitialized: function () {
                     state.selectCurrency.push(2);
+                    state.selectCurrency.push(3);
                     state.selectCurrency.push(4);
                     state.selectCurrency.push(13);
                     state.selectCurrency.push(15);
                     state.selectCurrency.push(51);
                     state.selectCurrency.push(61);
+                    state.selectCurrency.push(74);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');
