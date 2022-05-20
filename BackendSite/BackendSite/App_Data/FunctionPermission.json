@@ -558,6 +558,11 @@
       "Enable": false
     },
     {
+      "DisplayKey": "Hot Games Management",
+      "FuncKey": "CMS/HotGamesManagement",
+      "Enable": false
+    },
+    {
       "DisplayKey": "Game Casino Management",
       "FuncKey": "CMS/GameCasinoManagement",
       "Enable": false,
@@ -596,6 +601,11 @@
     {
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Deep Link Management",
+      "FuncKey": "CMS/DeepLinkManagement",
       "Enable": false
     }
   ]

@@ -233,7 +233,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
             }
             
-            var stream = _excelBll.Export(searchResult.VipRebateInfoList);
+            var stream = _excelBll.ExportV2(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "RebateReportForVip");
         }
 
@@ -278,7 +278,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public IActionResult ExportForBonus(ExportForBonusRequest request)
         {
             var exportData = _paymentBll.GetRebateInfoExport(JsonConvert.SerializeObject(request.SiteIds), request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.LocalDateTime);
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream,"BonusRebateReport");
         }
 
@@ -343,7 +343,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 request.BaseCurrencyId, 
                 request.RebateCategoriesId);
             
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "BonusRebateLog"); ;
         }
         

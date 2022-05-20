@@ -257,6 +257,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
+                    <td>{row.bonusId}</td>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
@@ -277,6 +278,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">BonusId</th>
                                 <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
@@ -1395,11 +1397,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                             {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
                             {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
-                            {wallet.tpId == 1 && wallet.balance < 0 ?
+                            {/* {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
                                 </div>
-                                : null}
+                                : null} */}
                         </li>;
                     }.bind(this))}</ul>;
 
@@ -1863,7 +1865,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         {data.hasPhotoId ?
                                             <tr>
                                                 <td>
-                                                    <div className="id-image">
+                                                    <div className="id-image" style={{margin:"0 auto"}}>
                                                         <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
                                                     </div>
                                                     <button onClick={this.rotate.bind(this)}>rotate</button>

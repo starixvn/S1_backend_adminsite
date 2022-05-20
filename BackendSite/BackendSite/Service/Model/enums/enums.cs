@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
 
 namespace BackendSite.Service.Model.enums
 {
@@ -86,6 +85,36 @@ namespace BackendSite.Service.Model.enums
         IsRisk = 2,
         PhoneVerified = 3,
         EmailVerified = 4
+    }
+
+    #endregion
+
+    #region AdminModule
+
+    public enum AdminModuleStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminFunction
+
+    public enum AdminFunctionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    #endregion
+
+    #region AdminPermission
+
+    public enum AdminPermissionStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
     }
 
     #endregion
@@ -952,6 +981,20 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    #region DeepLink
+    public enum DeepLinkTableTypeEnum
+    {
+        Android = 1,
+        IOS  = 2,
+        Desktop = 3
+    }
+    public enum DeepLinkTableProtocolTypeEnum
+    {
+        HTTP = 1,
+        HTTPS = 2
+    }
+    #endregion
 
     public enum AdminPermissionStatusV2Enum
     {

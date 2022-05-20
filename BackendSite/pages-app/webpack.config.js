@@ -56,10 +56,10 @@ module.exports = {
     // "Finance/DepositLimitManagement.min": [
     // 	"./src/pages/Finance/DepositLimitManagement/index.js"
     // ],
-    "Finance/WithdrawalLimitManagement.min": [
-      "@babel/polyfill",
-      "./src/pages/Finance/WithdrawalLimitManagement/index.js",
-    ],
+    // "Finance/WithdrawalLimitManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Finance/WithdrawalLimitManagement/index.js",
+    // ],
     // "CSD/WithdrawalKYCControl.min": [
     // 	"./src/pages/CSD/WithdrawalKYCControl/index.js"
     // ],
@@ -268,6 +268,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
+    "Marketing/HotGames.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/HotGames/index.js",
+    ],
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
@@ -275,6 +279,10 @@ module.exports = {
     //   "./src/pages/Marketing/HotEventManagement/index.js",
     // ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
+    "Marketing/DeepLinkManagement.min": [
+    	 '@babel/polyfill',
+    	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),
