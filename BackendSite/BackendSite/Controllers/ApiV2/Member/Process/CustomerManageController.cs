@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerManageController : ControllerBase
