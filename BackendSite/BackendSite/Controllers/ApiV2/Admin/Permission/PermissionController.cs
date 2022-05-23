@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         private readonly PermissionBLL _permissionBll;
         private readonly MenuBLL _menuBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -38,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _menuBll = provider.GetRequiredService<MenuBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -60,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             /// 語系
             /// </summary>
             public string Lang { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class PermissionReq
@@ -360,48 +363,73 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public async Task<ApiResult> GetUserMenuAsync(GetMenuRequestModel request)
         {
-            if (request.Lang == null)
+            //if (request.Lang == null)
+            //{
+            //    //old menu
+            //    var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
+
+            //    if (errorCodeEnum == ErrorCodeEnum.Fail)
+            //    {
+            //        return new ApiResult
+            //        {
+            //            ErrorCode = (int)errorCodeEnum,
+            //            Message = "Missing Cookie."
+            //        };
+            //    }
+
+            //    if (!data.Any())
+            //    {
+            //        throw new AdminException(ErrorCodeEnum.NoData);
+            //    }
+
+            //    return new ApiResult<IEnumerable<MenuItem>>
+            //    {
+            //        Data = data,
+            //        ErrorCode = (int)ErrorCodeEnum.Success
+            //    };
+            //}
+            //else
+            //{
+            //    //new menu(only for super)
+            //    //New Menu
+            //    var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+            //    if (!data.Any())
+            //    {
+            //        throw new AdminException(ErrorCodeEnum.NoData);
+            //    }
+
+            //    return new ApiResult<List<AdminMenuModel>>
+            //    {
+            //        Data = data,
+            //        ErrorCode = (int)ErrorCodeEnum.Success
+            //    };
+            //}
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+
+            if (authInfo == null)
             {
-                //old menu
-                var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
-
-                if (errorCodeEnum == ErrorCodeEnum.Fail)
+                return new ApiResult
                 {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)errorCodeEnum,
-                        Message = "Missing Cookie."
-                    };
-                }
-
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
-
-                return new ApiResult<IEnumerable<MenuItem>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
                 };
             }
-            else
+
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
+
+            var data = await _adminBll.GetAllAdminMenuAsync(request.Lang, loginUser);
+
+            if (!data.Any())
             {
-                //new menu(only for super)
-                //New Menu
-                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
-
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
-
-                return new ApiResult<List<AdminMenuModel>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
+
+            return new ApiResult<List<AdminMenuModel>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
