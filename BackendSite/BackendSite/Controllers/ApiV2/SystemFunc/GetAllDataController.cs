@@ -36,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly AdminBLL _adminBll;
 
         #endregion
 
@@ -57,6 +58,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
+
         }
 
         #endregion

@@ -60,27 +60,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string AffiliatesCode { get; set; }
             public int AgentCodeType { get; set; }
         }
-        public class SetRegLiveStatusReq
-        {
-            public int SiteId { get; set; }
-            public int CustId { get; set; }
-            public int Status { get; set; }
-        }
-        public class AddRegLiveStatusNotesReq
+        public class GetRegLiveStatusNotesReq
         {
             public int CustId { get; set; }
-            public string Note { get; set; }
-        }
-        public class DeleteRegLiveStatusNotesReq
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-        }
-        public class EditRegLiveStatusNotesReq
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-            public string Note { get; set; }
         }
         public class ExportRegLiveStatusListReq
         {
@@ -148,10 +130,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
-        public ApiResult SetRegLiveStatus(SetRegLiveStatusReq para)
+        public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
+            if (_custInfoBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -174,9 +156,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="addCustNoteReq"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotesReq addCustNoteReq)
+        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
         {
-            var result = _custInfoBll.GetRegLiveStatusNotes(addCustNoteReq.CustId).ToList();
+            var result = _custInfoBll.GetRegLiveStatusNotes(req.CustId).ToList();
             foreach (var data in result)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
@@ -203,10 +185,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="addCustNoteReq"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
         [HttpPost]
-        public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotesReq addCustNoteReq)
+        public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.AddRegLiveStatusNote(new ParamsWithLog<AddRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -229,10 +211,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="deleteCustNoteReq"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
         [HttpPost]
-        public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotesReq deleteCustNoteReq)
+        public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            if (_custInfoBll.DeleteRegLiveStatusNote(
+                    new ParamsWithLog<DeleteRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -255,10 +238,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="editRegLiveStatusNote"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
         [HttpPost]
-        public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotesReq editRegLiveStatusNote)
+        public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.EditRegLiveStatusNote(editRegLiveStatusNote.CustId, editRegLiveStatusNote.Id, editRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.EditRegLiveStatusNote(new ParamsWithLog<EditRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
