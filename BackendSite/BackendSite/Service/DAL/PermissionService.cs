@@ -43,15 +43,6 @@ namespace BackendSite.Service.DAL
             return initPermissionData;
         }
 
-        public IEnumerable<AdminMenuDtoV2> GetAdminMenuDtoV2()
-        {
-            return _reportDbClient.Query<AdminMenuDtoV2>("Admin_AdminMenu_GetAll");
-        }
-        public IEnumerable<AdminPermissionDtoV2> GetAdminPermissionDtoV2()
-        {
-            return _reportDbClient.Query<AdminPermissionDtoV2>("Admin_AdminPermission_GetAll");
-        }
-
         public IEnumerable<RolePermission> GetRolePermission(int role)
         {
             return _reportDbClient.Query<RolePermission>("Admin_RolePermission_Get", new DynamicParameters(new { Role = role }));

@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankTransferAccountController : ControllerBase

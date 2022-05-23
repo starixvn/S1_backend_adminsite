@@ -12,7 +12,7 @@ using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class ThirdPartyManagementController : ControllerBase

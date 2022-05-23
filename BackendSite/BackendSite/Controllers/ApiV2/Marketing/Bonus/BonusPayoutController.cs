@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BonusPayoutController : ControllerBase

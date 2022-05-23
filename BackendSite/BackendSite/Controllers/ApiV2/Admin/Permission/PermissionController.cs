@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PermissionController : ControllerBase
@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         private readonly PermissionBLL _permissionBll;
         private readonly MenuBLL _menuBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -38,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _menuBll = provider.GetRequiredService<MenuBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -60,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             /// 語系
             /// </summary>
             public string Lang { get; set; }
+            public int SiteId { get; set; }
         }
 
         public class PermissionReq
@@ -360,48 +363,73 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public async Task<ApiResult> GetUserMenuAsync(GetMenuRequestModel request)
         {
-            if (request.Lang == null)
+            //if (request.Lang == null)
+            //{
+            //    //old menu
+            //    var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
+
+            //    if (errorCodeEnum == ErrorCodeEnum.Fail)
+            //    {
+            //        return new ApiResult
+            //        {
+            //            ErrorCode = (int)errorCodeEnum,
+            //            Message = "Missing Cookie."
+            //        };
+            //    }
+
+            //    if (!data.Any())
+            //    {
+            //        throw new AdminException(ErrorCodeEnum.NoData);
+            //    }
+
+            //    return new ApiResult<IEnumerable<MenuItem>>
+            //    {
+            //        Data = data,
+            //        ErrorCode = (int)ErrorCodeEnum.Success
+            //    };
+            //}
+            //else
+            //{
+            //    //new menu(only for super)
+            //    //New Menu
+            //    var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+
+            //    if (!data.Any())
+            //    {
+            //        throw new AdminException(ErrorCodeEnum.NoData);
+            //    }
+
+            //    return new ApiResult<List<AdminMenuModel>>
+            //    {
+            //        Data = data,
+            //        ErrorCode = (int)ErrorCodeEnum.Success
+            //    };
+            //}
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+
+            if (authInfo == null)
             {
-                //old menu
-                var data = _menuBll.GetMenuData(false, out var errorCodeEnum);
-
-                if (errorCodeEnum == ErrorCodeEnum.Fail)
+                return new ApiResult
                 {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)errorCodeEnum,
-                        Message = "Missing Cookie."
-                    };
-                }
-
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
-
-                return new ApiResult<IEnumerable<MenuItem>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
                 };
             }
-            else
+
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
+
+            var data = await _adminBll.GetAllAdminMenuAsync(request.Lang, loginUser);
+
+            if (!data.Any())
             {
-                //new menu(only for super)
-                //New Menu
-                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
-
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
-
-                return new ApiResult<List<AdminMenuModel>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
+                throw new AdminException(ErrorCodeEnum.NoData);
             }
+
+            return new ApiResult<List<AdminMenuModel>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -436,10 +464,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         #region RolePermission
+
+        /// <summary>
+        /// Permission/GetAddRolePermission 取得新增Role的權限內容
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult GetAddRolePermission(GetAddRolePermissionReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
 
             if (authInfo == null)
             {
@@ -475,10 +510,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/GetUpdateRolePermission 取得更新Role的權限內容
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult GetUpdateRolePermission(PermissionReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
 
             if (authInfo == null)
@@ -522,10 +563,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/GetRoleList 取得RoleList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult<IEnumerable<RoleList>> GetRoleList(GetRoleListReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (authInfo == null)
             {
                 return new ApiResult<IEnumerable<RoleList>>
@@ -558,12 +605,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/AddRolePermission 新增Role
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult AddRolePermission(SetRolePermissionReq request)
         {
             var result = _permissionBll.GetAdminRole().ToList();
 
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (result.Exists(x => x.RoleName == request.Name))
             {
                 return new ApiResult
@@ -589,6 +642,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
+        /// <summary>
+        /// Permission/DeleteRolePermission 刪除Role
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult DeleteRolePermission(PermissionReq request)
         {
@@ -611,6 +670,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/UpdateRolePermission 更新Role
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult UpdateRolePermission(SetRolePermissionReq request)
         {
@@ -652,10 +717,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         #endregion
 
         #region AdminUser
+
+        /// <summary>
+        /// Permission/GetAddAdminUser 取得新增AdminUser資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult GetAddAdminUser(PermissionReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             var adminRole = _permissionBll.GetAdminRole().ToList();
 
             if (authInfo == null)
@@ -687,11 +759,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/GetUpdateAdminUser 取得更新AdminUser資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult GetUpdateAdminUser(AdminUserReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
-            var adminRole = _permissionBll.GetAdminRole().ToList();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            //var adminRole = _permissionBll.GetAdminRole().ToList();
 
             if (authInfo == null)
             {
@@ -730,10 +808,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/GetAdminUserList 取得AdminUserList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult<IEnumerable<UserList>> GetAdminUserList(GetAdminUserListReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (authInfo == null)
             {
                 return new ApiResult<IEnumerable<UserList>>
@@ -750,10 +834,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/GetAddAdminUserCurrency 取得新增AdminUser可以選擇的Currency List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult<IEnumerable<int>> GetAddAdminUserCurrency(GetAddAdminUserCurrencyReq request)
         {
-            var authInfo = _authorizeBll.GetAuthData();
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (authInfo == null)
             {
                 return new ApiResult<IEnumerable<int>>
@@ -783,13 +873,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/AddAdminUser 新增AdminUser
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            var result = _permissionBll.GetAdminRole().ToList();
-
-            var authInfo = _authorizeBll.GetAuthData();
-
+            //var result = _permissionBll.GetAdminRole().ToList();
             if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
             {
                 return new ApiResult
@@ -807,6 +900,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
+        /// <summary>
+        /// Permission/DeleteAdminUser 刪除AdminUser
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult DeleteAdminUser(AdminUserReq request)
         {
@@ -818,6 +917,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             };
         }
 
+        /// <summary>
+        /// Permission/UpdateAdminUser 更新AdminUser
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
@@ -838,8 +943,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
+        /// <summary>
+        /// Permission/SetAdminUserPassword 更新AdminUser密碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
-
         public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
         {
             if (_permissionBll.SetAdminUserPassword(request.UserId, request.Password) > 0)
@@ -859,6 +969,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
+        /// <summary>
+        /// Permission/SetAdminUserPassword 更新AdminUser狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
         [HttpPost]
         public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
         {
