@@ -43,6 +43,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int SiteId { get; set; }
         }
+        
+        public class GetRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
 
         public class SetStatusRequest
         {
@@ -83,6 +89,27 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = _referralManagementBll.GetReferralBySiteId(request.SiteId)
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// ReferralManagement/GetList 取得推薦資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Referral Management > [Search]
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [HttpPost]
+        public async Task<ApiResult<ReferralDetail>> Get(GetRequest request)
+        {
+            var apiResult = new ApiResult<ReferralDetail>
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _referralManagementBll.GetReferralDetail(request.SiteId, request.CurrencyId)
             };
             return apiResult;
         }

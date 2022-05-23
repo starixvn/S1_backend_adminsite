@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,6 +21,28 @@ namespace BackendSite.Service.BLL
         {
             return referralManagementService.GetReferralBySiteId(siteId);
         }
+
+        public async Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId)
+        {
+            var data = await referralManagementService.GetReferralDetail(siteId, currencyId);
+            var referralDetail = new ReferralDetail()
+            {
+                SiteId = data.SiteId,
+                CurrencyId = data.CurrencyId,
+                BonusAmount = data.BonusAmount,
+                InvitationLimit = data.InvitationLimit,
+                AgentVaildBet = data.AgentVaildBet,
+                AgentDeposit = data.AgentDeposit,
+                ReferralFreeCredit = data.ReferralFreeCredit,
+                VaildBet = data.VaildBet,
+                Deposit = data.Deposit,
+                PeriodDays = data.PeriodDays,
+                SpecificList = JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
+                Status = data.Status
+            };
+            return referralDetail;
+        }
+
         public void SetReferral(List<ReferralManagement> referralList)
         {
             referralManagementService.SetReferral(referralList);
