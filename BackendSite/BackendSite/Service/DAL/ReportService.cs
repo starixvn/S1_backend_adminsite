@@ -232,5 +232,36 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
+        {
+            var parameters = new DynamicParameters(input);
+            parameters.AddDynamicParams(new
+            {
+                SiteIds = JsonConvert.SerializeObject(input.SiteIds),
+                CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                StartIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize)
+            });
+            parameters.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<BetListReport>("Admin_TpBetRecordExtend_Get", parameters);
+            rowCount = parameters.Get<int>("RowCount");
+            totalPages = parameters.Get<int>("TotalPages");
+
+            return result;
+        }
+
+        public IEnumerable<BetListReport> GetBetListReportForExport(GetBetListRequest input)
+        {
+            var parameters = new DynamicParameters(input);
+            parameters.AddDynamicParams(new
+            {
+                SiteIds = JsonConvert.SerializeObject(input.SiteIds),
+                CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+            });
+            var result = _reportDbClient.Query<BetListReport>("Admin_TpBetRecordExtendForExport_Get", parameters);
+            return result;
+        }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static BackendSite.Controllers.ApiV2.Report.BetListReportController;
 
 namespace BackendSite.Service.BLL
 {
@@ -927,5 +928,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
+
+        public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
+            => reportService.GetBetListReport(input, out totalPages, out rowCount);
+
+        public IEnumerable<BetListReport> GetBetListReportForExport(GetBetListRequest input)
+            => reportService.GetBetListReportForExport(input);
+
     }
 }
