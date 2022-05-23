@@ -52,6 +52,39 @@ namespace BackendSite.Service.Model
         public int PeriodDays { get; set; }
         public bool Status { get; set; }
     }
+    
+    public class ReferralDetail
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal AgentVaildBet { get; set; }
+        public decimal AgentDeposit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public decimal VaildBet { get; set; }
+        public decimal Deposit { get; set; }
+        public string PeriodDays { get; set; }
+        public IEnumerable<ReferralContent> SpecificList { get; set; }
+        public int Status { get; set; }
+    }
+    
+    public class ReferralDetailData
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal AgentVaildBet { get; set; }
+        public decimal AgentDeposit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public decimal VaildBet { get; set; }
+        public decimal Deposit { get; set; }
+        public string PeriodDays { get; set; }
+        public string Details { get; set; }
+        public int Status { get; set; }
+    }
+    
     public class ReferralCustList
     {
         public int SiteId { get; set; }
