@@ -152,26 +152,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         }
 
-        /// <summary>
-        ///  GetAllData/GetPermissionList 取得所有權限清單(新權限)
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<AdminPermissionDto>>> GetPermissionList()
-        {
-            var data = await _adminBll.GetAllAdminPermissionAsync();
-
-            var apiResult = new ApiResult<IEnumerable<AdminPermissionDto>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
-        }
-
         //==============================================================================================================================================
         // Finance 相關：Payment, Bank
         //==============================================================================================================================================
