@@ -101,26 +101,6 @@ namespace BackendSite.Service.Model
         public bool CanUse { get; set; }
         public bool Enable { get; set; } = true;
     }
-
-    public class AdminMenuDtoV2
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int HeirId { get; set; }
-        public int Sort { get; set; }
-        public string AdditionalSetting { get; set; }
-        public string Translation { get; set; }
-        public AdminFunctionStatusV2Enum Status { get; set; }
-    }
-
-    public class AdminPermissionDtoV2
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Sort { get; set; }
-        public string Translation { get; set; }
-        public AdminPermissionStatusV2Enum Status { get; set; }
-    }
     public class AdditionalSetting
     {
         public IEnumerable<int> Permission { get; set; }

@@ -996,16 +996,6 @@ namespace BackendSite.Service.Model.enums
     }
     #endregion
 
-    public enum AdminPermissionStatusV2Enum
-    {
-        Disable = 0,
-        Enable = 1
-    }
-    public enum AdminFunctionStatusV2Enum 
-    {
-        Disable = 0,
-        Enable = 1
-    }
     public enum PermissionTypeEnum
     {
         AddRole = 0,

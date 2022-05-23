@@ -117,8 +117,8 @@ namespace BackendSite.Service.BLL
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser = null)
         {
             var result = new List<AdminMenuModel>();
-            var menuList = await adminService.GetAllAdminMenu();
-            var permissionList = await adminService.GetAllAdminPermission();
+            var menuList =  adminService.GetAllAdminMenu();
+            var permissionList =  adminService.GetAllAdminPermission();
 
             //Enable & Sort
             menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
