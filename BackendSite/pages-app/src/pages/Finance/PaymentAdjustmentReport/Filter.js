@@ -2,8 +2,8 @@ import React, {forwardRef} from "react";
 import moment from 'moment';
 
 if(process.env.NODE_ENV!=='production'){
-    window.gCurrencyList = [2,4,13,15,51,61];
-    window.i18n = {"lbl_Currency2":"MYR","lbl_Currency4":"THB","lbl_Currency13":"CNY","lbl_Currency15":"IDR","lbl_Currency51":"VND","lbl_Currency61":"INR"};
+    window.gCurrencyList = [2,3,4,13,15,51,61,74];
+    window.i18n = {"lbl_Currency2":"MYR", "lbl_Currency3": "USD","lbl_Currency4":"THB","lbl_Currency13":"CNY","lbl_Currency15":"IDR","lbl_Currency51":"VND","lbl_Currency61":"INR","lbl_Currency74": "BDT"};
     window.gAdjustTypeList = {"1":"Debit","2":"Credit","3":"Increase Bonus","4":"Reduce Bonus","5":"3RD Add","6":"3RD Minus"};
 }
 
