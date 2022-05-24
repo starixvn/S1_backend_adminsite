@@ -140,26 +140,28 @@ namespace BackendSite.Service.BLL
             foreach (var funcData in assignFuncDatas)
             {
                 var permissionData = new List<AdminPermissionModel>();
+                var cnaUse = false;
                 var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
                 if (userPermission != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                    cnaUse = true;
+                }
+                if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
+                {
+                    var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                    foreach (var permission in assignFuncAdditionalSetting.Permission)
                     {
-                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
-                        foreach (var permission in assignFuncAdditionalSetting.Permission)
-                        {
-                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
-                            permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
-                        }
+                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                        permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = cnaUse });
                     }
-                    result.Add(new AdminMenuModel()
-                    {
-                        ModuleId = null,
-                        FunctionId = funcData.Id,
-                        Name = funcData.Name,
-                        Permission = permissionData
-                    });
-                }           
+                }
+                result.Add(new AdminMenuModel()
+                {
+                    ModuleId = null,
+                    FunctionId = funcData.Id,
+                    Name = funcData.Name,
+                    Permission = permissionData
+                });
             }
 
             result.AddRange(await GetAllMenu(0, heirIdList, menuList, permissionList, userAllPremission));
@@ -207,29 +209,31 @@ namespace BackendSite.Service.BLL
                     var permissionData = new List<AdminPermissionModel>();
                     if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
                     {
+                        UserAllPremission userPermission = new UserAllPremission();
                         if (userPermissionList != null)
+                        {     
+                            userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);                                                 
+                        }
+                        var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                        foreach (var permission in assignFuncAdditionalSetting.Permission)
                         {
-                            UserAllPremission userPermission = new UserAllPremission();
-                            userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                            var canUse = false;
                             if (userPermission != null)
                             {
-                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
-                                foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                if (userPermission.Permission.Exists(x => x == permission))
                                 {
-                                    if (userPermission.Permission.Exists(x => x == permission))
-                                    {
-                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
-                                        permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
-                                    }                              
+                                    canUse = true;
                                 }
-                                FunctionDatas.Add(new AdminMenuFuncModel()
-                                {
-                                    FunctionId = funcData.Id,
-                                    Name = funcData.Name,
-                                    Permission = permissionData
-                                });
-                            }                         
-                        }                      
+                            }
+                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                            permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = canUse });
+                        }
+                        FunctionDatas.Add(new AdminMenuFuncModel()
+                        {
+                            FunctionId = funcData.Id,
+                            Name = funcData.Name,
+                            Permission = permissionData
+                        });
                     }
                     else
                         continue;
