@@ -31,6 +31,13 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
+        
+        public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
+        {
+            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
+                new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
+        }
+        
         public void SetReferral(List<ReferralManagement> referralList)
         {
             var para = new List<ReferralList>();
