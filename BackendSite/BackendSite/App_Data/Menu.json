@@ -92,6 +92,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet List Report",
+        "FuncKey": "Report/BetListReport",
+        "Controller": "Report",
+        "Action": "BetListReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
