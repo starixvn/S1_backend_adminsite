@@ -1,29 +1,45 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackendSite.Service.Model
 {
-    public class GetBetListRequest : ApiRequestPageModel
+    public class GetBetListRequest
     {
+        /// <summary>
+        /// 頁數, -1 = export all
+        /// </summary>
+        [Required]
+        public int PageNumber { get; set; } = 1;
+
+        /// <summary>
+        /// 每頁資料筆數
+        /// </summary>
+        public int PageSize { get; set; } = 25;
+
+        [Required]
         public IEnumerable<int> SiteIds { get; set; }
+        [Required]
         public IEnumerable<int> CurrencyIds { get; set; }
-        public int TpId { get; set; }
-        public string UserName { get; set; }
-        public string TpUserName { get; set; }
-        public string RefNo { get; set; }
-        public string Provider { get; set; }
-        public string Product { get; set; }
-        public string Category { get; set; }
-        public string Game { get; set; }
-        public string Title { get; set; }
-        public string MatchID { get; set; }
-        public string BetType { get; set; }
-        public string IP { get; set; }
-        public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset EndDate { get; set; }
-        public decimal Stake { get; set; }
-        public decimal WinlostAmount { get; set; }
+        public IEnumerable<int> Tags { get; set; } = new List<int>();
+        public int VIPlevel { get; set; } = 0;
+        public int TpId { get; set; } = 0;
+        public string UserName { get; set; } = string.Empty;
+        public string TpUserName { get; set; } = string.Empty;
+        public string RefNo { get; set; } = string.Empty;
+        public string Provider { get; set; } = string.Empty;
+        public string Product { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Game { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string MatchID { get; set; } = string.Empty;
+        public string BetType { get; set; } = string.Empty;
+        public string IP { get; set; } = string.Empty;
+        public DateTimeOffset? StartDate { get; set; } = null;
+        public DateTimeOffset? EndDate { get; set; } = null;
+        public decimal Stake { get; set; } = 0;
+        public decimal WinlostAmount { get; set; } = 0;
     }
 
     public class BetListReport
@@ -42,8 +58,6 @@ namespace BackendSite.Service.Model
         public decimal WinlostAmount { get; set; }
         public string ProviderID { get; set; }
         public string Currency { get; set; }
-        public string VIPlevel { get; set; }
-        public string Tag { get; set; }
         public string RefNo { get; set; }
         public string GameID { get; set; }
         public string Provider { get; set; }
@@ -60,5 +74,8 @@ namespace BackendSite.Service.Model
         public string Platform { get; set; }
         public string Live { get; set; }
         public string IP { get; set; }
+        public string TagList { get; set; }
+        public int VipLevel { get; set; }
+        public string LevelName { get; set; }      
     }
 }

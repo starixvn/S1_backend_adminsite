@@ -931,9 +931,5 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
             => reportService.GetBetListReport(input, out totalPages, out rowCount);
-
-        public IEnumerable<BetListReport> GetBetListReportForExport(GetBetListRequest input)
-            => reportService.GetBetListReportForExport(input);
-
     }
 }

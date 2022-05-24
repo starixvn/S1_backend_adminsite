@@ -70,11 +70,12 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
         public IActionResult Export(GetBetListRequest request)
         {
-            var data = _reportBll.GetBetListReportForExport(request);
+            request.PageNumber = -1; //export all
+            var data = _reportBll.GetBetListReport(request, out var _, out var _);
 
             if (!data.Any())
                 throw new AdminException(ErrorCodeEnum.NoData);
-
+        
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
