@@ -546,6 +546,48 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        /// <summary>
+        /// 刪除使用者Line資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int LineUnbind(string menu, int custId, string user)
+        {
+            var result = 0;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
+            mainInfo.Add("MenuName", "Customer Info");
+            mainInfo.Add("Action", "Line Inbind");
+            noteInfo.Add("MenuName", "Customer Info");
+            noteInfo.Add("Action", "Add Note");
+
+            using var scope = new TransactionScope();
+
+            #region Kick Out User
+
+            result = _custInfoService.DeleteLineProfile(custId);
+
+            if (result <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            };
+
+            if (_serverInfoBll.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            #endregion
+
+            scope.Complete();
+
+            return result;
+        }
+
         #endregion
 
         #region TagMamagement

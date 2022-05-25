@@ -1181,6 +1181,24 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onUnbindLine() {
+            if (confirm('Are you sure to Unbind Line Profile ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/apiV2/CustomerManage/LineUnbind', { CustId: data.custId })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onUnlock() {
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
@@ -1450,6 +1468,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
                             {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
                             {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
+                            {subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-primary" onClick={this.onUnbindLine.bind(this)}>Line Unbind</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">

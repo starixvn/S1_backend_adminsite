@@ -578,6 +578,25 @@ namespace BackendSite.Service.DAL
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
+        /// <summary>
+        /// 刪除使用者Line資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int DeleteLineProfile(int custId)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _CustId = custId
+                });
+
+            var SpName = "Admin_CustLineProfile_Del";
+            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+        }
+
+
         #region Tag
         public int EditTagManagement(int id, string tagName, string tagColour, string description, string Operator)
         {
