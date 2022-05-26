@@ -1003,4 +1003,10 @@ namespace BackendSite.Service.Model.enums
         AddUser = 2,
         UpdateUser = 3
     }
+
+    public enum AdminBrandTypeEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 }

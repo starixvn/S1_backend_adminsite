@@ -75,5 +75,10 @@ namespace BackendSite.Service.BLL
 
             return authData;
         }
+
+        public int SetLoginTime(int userId)
+        {
+            return newAdminUserService.SetLoginTime(userId);
+        }
     }
 }

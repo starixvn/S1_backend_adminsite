@@ -170,4 +170,34 @@ namespace BackendSite.Service.Model
         public int DisPlayKey { get; set; }
         public List<int> PermissionIdList { get; set; }
     }
+    public class AdminBrandRole
+    {
+        public int UserId { get; set; }
+        public int SiteId { get; set; }
+        public string CurrencyList { get; set; }
+        public string Role { get; set; }
+        public int Status { get; set; }
+    }
+    public class AdminBrand
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public DateTime? LoginTime { get; set; }
+    }
+    public class AdminBrandData
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public IEnumerable<UserBrand> Brand { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public DateTime? LoginTime { get; set; }
+    }
+    public class UserBrand
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+    }
 }
