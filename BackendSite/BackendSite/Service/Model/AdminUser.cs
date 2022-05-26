@@ -61,6 +61,7 @@ namespace BackendSite.Service.Model
         public string Role { get; set; }
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
+        public DateTime? LoginTime { set; get; }
     }
     public class UpdataAdminUserV2Role
     {

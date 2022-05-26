@@ -28,5 +28,12 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<NewAdminUser>("LoginNewAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
         }
+
+        public int SetLoginTime(int userId)
+        {
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            return _mainDbClient.Execute("Admin_LoginTime_Set", props);
+        }
     }
 }

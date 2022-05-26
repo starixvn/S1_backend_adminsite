@@ -127,6 +127,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         {
             public int SiteId { get; set; }
         }
+        public class GetAssignBrandReq
+        {
+            public string MemberId { get; set; }
+            public IEnumerable<int> SelectSite { get; set; }
+        }
+        public class SetAdminBrandReq
+        {
+            public int SiteId { get; set; }
+            public AdminBrandTypeEnum Status { get; set; }
+            public int UserId { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -660,9 +671,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            var allUser = _adminBll.GetAllUserV2();
+            // var allUser = _adminBll.GetAllUserV2();
+            var adminBrandRole = _permissionBll.GetAdminBrandRole(request.Role).ToList();
+            if(adminBrandRole.Count > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "This role is still in use"
+                };
+            }
 
-            _permissionBll.DeleteAdminRole(request.Role, allUser);
+            _permissionBll.DeleteAdminRole(request.Role);
 
             return new ApiResult
             {
@@ -906,16 +926,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
-        [HttpPost]
-        public ApiResult DeleteAdminUser(AdminUserReq request)
-        {
-            _permissionBll.DeleteAdminUser(request.UserId);
+        //[HttpPost]
+        //public ApiResult DeleteAdminUser(AdminUserReq request)
+        //{
+        //    _permissionBll.DeleteAdminUser(request.UserId);
 
-            return new ApiResult
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
+        //    return new ApiResult
+        //    {
+        //        ErrorCode = (int)ErrorCodeEnum.Success
+        //    };
+        //}
 
         /// <summary>
         /// Permission/UpdateAdminUser 更新AdminUser
@@ -991,6 +1011,79 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 {
                     ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
                     Message = "Set user status fail"
+                };
+            }
+        }
+        #endregion
+
+        #region Assign Brand
+
+        /// <summary>
+        /// Permission/GetAssignBrand 取得AssignBrand資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<AdminBrandData>> GetAssignBrand(GetAssignBrandReq request)
+        {
+            var result = _permissionBll.GetAssignBrand(request.SelectSite, request.MemberId).ToList();
+            return new ApiResult<IEnumerable<AdminBrandData>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Permission/GetUserBrand 取得User有哪些Brand權限
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<UserBrand>> GetUserBrand()
+        {
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (authInfo == null)
+            {
+                return new ApiResult<IEnumerable<UserBrand>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
+            return new ApiResult<IEnumerable<UserBrand>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Permission/SetAdminBrand 調整User的Brand
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult SetAdminBrand(SetAdminBrandReq request)
+        {
+            if (_permissionBll.SetAdminBrand(request.UserId, request.SiteId, request.Status) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Set user brand fail"
                 };
             }
         }
