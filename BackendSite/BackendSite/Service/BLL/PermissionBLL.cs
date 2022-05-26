@@ -407,9 +407,18 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-
+                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                var userAllPremission = new List<UserAllPremission>();
+                if (loginUser.Role == null)
+                {
+                    userAllPremission = GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                }
+                else
+                {
+                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                    userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                }
                 foreach (var funcData in assignFuncDatas)
                 {
                     var permissionData = new List<PermissionSubFuncKeys>();
@@ -494,8 +503,18 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                var userAllPremission = new List<UserAllPremission>();
+                if (loginUser.Role == null)
+                {
+                    userAllPremission = GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                }
+                else
+                {
+                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                    userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                }
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -685,8 +704,19 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+
+                var userAllPremission = new List<UserAllPremission>();
+                if (loginUser.Role == null)
+                {
+                    userAllPremission = GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                }
+                else
+                {
+                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                    userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                }
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -810,8 +840,19 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+
+                var userAllPremission = new List<UserAllPremission>();
+                if (loginUser.Role == null)
+                {
+                    userAllPremission = GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                }
+                else
+                {
+                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                    userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                }
 
                 foreach (var funcData in assignFuncDatas)
                 {
@@ -899,9 +940,9 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetAdminBrandRole(role);
         }
-        public IEnumerable<AdminBrandData> GetAssignBrand(IEnumerable<int> selectSite, string memberId)
+        public IEnumerable<AdminBrandData> GetAssignBrand(IEnumerable<int> selectSite, string userName)
         {
-            var assignBrand = permissionService.GetAssignBrand(selectSite, memberId).ToList();
+            var assignBrand = permissionService.GetAssignBrand(selectSite, userName).ToList();
 
             var assignBrandData = assignBrand.GroupBy(x => (x.UserId, x.UserName), (key, value) =>
              new AdminBrandData { UserId = key.UserId,

@@ -129,7 +129,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
         public class GetAssignBrandReq
         {
-            public string MemberId { get; set; }
+            public string UserName { get; set; }
             public IEnumerable<int> SelectSite { get; set; }
         }
         public class SetAdminBrandReq
@@ -1027,7 +1027,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult<IEnumerable<AdminBrandData>> GetAssignBrand(GetAssignBrandReq request)
         {
-            var result = _permissionBll.GetAssignBrand(request.SelectSite, request.MemberId).ToList();
+            var result = _permissionBll.GetAssignBrand(request.SelectSite, request.UserName).ToList();
             return new ApiResult<IEnumerable<AdminBrandData>>
             {
                 Data = result,

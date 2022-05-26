@@ -289,11 +289,11 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { Role = role }));
         }
 
-        public IEnumerable<AdminBrand> GetAssignBrand(IEnumerable<int> selectSite, string memberId)
+        public IEnumerable<AdminBrand> GetAssignBrand(IEnumerable<int> selectSite, string userName)
         {
             return _reportDbClient.Query<AdminBrand>("Admin_AdminBrand_Get",
                 new DynamicParameters(
-                    new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = string.IsNullOrWhiteSpace(memberId) ? null : memberId }));
+                    new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = string.IsNullOrWhiteSpace(userName) ? null : userName }));
         }
 
         public IEnumerable<UserBrand> GetUserBrand(int userId)
