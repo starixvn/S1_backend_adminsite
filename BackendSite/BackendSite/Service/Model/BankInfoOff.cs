@@ -1,7 +1,10 @@
-﻿namespace BackendSite.Service.Model
+﻿using System.Collections.Generic;
+
+namespace BackendSite.Service.Model
 {
     public class BankInfoOff
     {
+        public int SiteId { get; set; }
         public int BankId { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
@@ -21,5 +24,24 @@
         public string BankSite { get; set; }
         public int Sort { get; set; }
         public int Ver { get; set; }
+    }
+    
+    public class BankCodeModel
+    {
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+    }
+    
+    public class BankCodeModelComparer : IEqualityComparer<BankCodeModel>
+    {
+        public bool Equals(BankCodeModel t1, BankCodeModel t2)
+        {
+            return (t1.BankCode == t2.BankCode && t1.BankName == t2.BankName);
+        }
+
+        public int GetHashCode(BankCodeModel t)
+        {
+            return t.ToString().GetHashCode();
+        }
     }
 }

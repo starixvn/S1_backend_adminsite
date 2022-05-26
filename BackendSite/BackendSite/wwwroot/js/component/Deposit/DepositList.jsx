@@ -33,6 +33,35 @@ import DateTimePicker from 'react-datetime';
         6: "QRPay",
         7: "BankAutoChannel"
     };
+    
+    const BankCodeSelectInt = {
+            "AMB" :"AMB",
+            "CIMB":"CIMB",
+            "HLB":"HLB",
+            "MBB":"MBB",
+            "PBB":"PBB",
+            "RHB":"RHB",
+            "BBL" :"BBL",
+            "HSBC":"HSBC",
+            "KBANK":"KBANK",
+            "KTB":"KTB",
+            "SCB":"SCB",
+            "TBK":"TBK",
+            "BCA" :"BCA",
+            "BNI":"BNI",
+            "BRI":"BRI",
+            "CIMBN":"CIMBN",
+            "MDR":"MDR",
+            "UOB":"UOB",
+            "ACB" :"ACB",
+            "BIDV":"BIDV",
+            "DAB":"DAB",
+            "GAB":"GAB",
+            "TCB":"TCB",
+            "VCB":"UOB",
+            "VTB":"VTB"
+    };
+    
     const StatusSelectOp = {
         1: "Pending",
         7: "On Hold",
@@ -40,6 +69,7 @@ import DateTimePicker from 'react-datetime';
         4: "Rejected",
         5: "Cancelled"
     }
+    
     const LevelStatus = {
         0: 0,
         1: 1,
@@ -49,17 +79,20 @@ import DateTimePicker from 'react-datetime';
         5: 5,
         6: 6
     }
+    
     const AmountStatus = {
         0: "",
         1: "Amount Greater Than",
         2: "Amount Smaller Than"
     }
+    
     const PageSize = {
         10: 10,
         25: 25,
         50: 50
     }
 
+    
     class DepositList extends React.Component {
         constructor(props) {
             super(props);
@@ -77,9 +110,11 @@ import DateTimePicker from 'react-datetime';
         onExport() {
             this.props.onExport();
         }
+        
         onRejectMultiple() {
             this.props.onRejectMultiple();
         }
+        
         render() {
             let rows = this.props.searchData.data.map((row, idx) => {
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
@@ -528,7 +563,7 @@ import DateTimePicker from 'react-datetime';
             )
         }
     }
-
+    
     class DepositPanel extends React.Component {
         _myTimer;
         _timeInterval = 15;
@@ -539,9 +574,11 @@ import DateTimePicker from 'react-datetime';
             this.ExportForm = React.createRef();
             this.state = {
                 SiteList: [],
+                BankList: [],
                 selectSite: [],
                 selectType: [],
                 selectCurrency: [],
+                selectBankCode: [],
                 selectStatus: [],
                 SelectUser: "",
                 SelectDepositID: "",
@@ -557,7 +594,7 @@ import DateTimePicker from 'react-datetime';
             };
             this.searchFilter = {};
         }
-
+        
         onRefresh() {
             let searchData = this.state.searchData;
             this.onSearch(searchData.pageNumber);
@@ -575,9 +612,16 @@ import DateTimePicker from 'react-datetime';
                 clearTimeout(this._myTimer);
             }
             //Loading.OnLoading();
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite,
-                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize
-                        };
+            let data = { 
+                StartDate: this.searchFilter.StartDate, 
+                EndDate: this.searchFilter.EndDate, 
+                PageNumber: pageNumber,
+                SelectSite: this.searchFilter.selectSite,
+                SelectBankCode: this.searchFilter.selectBankCode,
+                AmountType: parseInt(this.searchFilter.amountType),
+                Amount:this.searchFilter.amount,
+                PageSize:this.searchFilter.pageSize
+            };
 
             if (this.searchFilter.SelectDepositID != "") {
                 data.DepositId = this.searchFilter.SelectDepositID;
@@ -589,6 +633,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectStatus.length != 0) {
                 data.status = this.searchFilter.selectStatus;
+            }
+
+            if (this.searchFilter.selectBankCode.length != 0) {
+                data.SelectBankCode = this.searchFilter.selectBankCode;
             }
 
             if (this.searchFilter.SelectUser != "") {
@@ -606,7 +654,6 @@ import DateTimePicker from 'react-datetime';
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
-                    console.log(result);
                     if (result.errorCode == 0) {
                         this.setState({
                             searchData: result,
@@ -803,6 +850,24 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));
         }
 
+        getBankInfoList() {
+            let state = this.state;
+            axios.post('/api/BankList/GetAllBankCodeList')
+                .then(function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        state.selectBankCode.length = 0;
+                        this.setState({ BankList: result.data });
+                        this.buildSelectBankCode();
+
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                alert(error);
+            }.bind(this));
+        }
+        
         buildSelectSite = () => {
             let state = this.state, searchFilter = this.searchFilter;
             $("#selectSite").multiselect({
@@ -836,7 +901,7 @@ import DateTimePicker from 'react-datetime';
             (state.MutiSelRefresh) ? $('#selectSite').multiselect('select', searchFilter.selectSite) : $('#selectSite').multiselect('selectAll', false);
             $('#selectSite').multiselect('updateButtonText');
         }
-
+        
         buildTypeSite = () => {
             let state = this.state, searchFilter = this.searchFilter;
             $("#selectType").multiselect({
@@ -870,7 +935,7 @@ import DateTimePicker from 'react-datetime';
             (state.MutiSelRefresh) ? $('#selectType').multiselect('select', searchFilter.selectType) : $('#selectType').multiselect('selectAll', false);
             $('#selectType').multiselect('updateButtonText');
         }
-
+        
         buildCurrencySite = () => {
             let state = this.state, searchFilter = this.searchFilter;
             $("#selectCurrency").multiselect({
@@ -904,7 +969,45 @@ import DateTimePicker from 'react-datetime';
             (state.MutiSelRefresh) ? $('#selectCurrency').multiselect('select', searchFilter.selectCurrency) : $('#selectCurrency').multiselect('selectAll', false);
             $('#selectCurrency').multiselect('updateButtonText');
         }
-        //levelStatus
+        
+        buildSelectBankCode = () => {
+            let state = this.state, searchFilter = this.searchFilter;
+            $("#selectBankCode").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectBankCode.length = 0;
+                    state.BankList.forEach(function (obj) {
+                        state.selectBankCode.push(obj.bankCode);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectBankCode.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = $(option).val(), index = state.selectBankCode.indexOf(val);
+                    (checked) ? state.selectBankCode.push(val) : (index > -1) ? state.selectBankCode.splice(index, 1) : state.selectBankCode;
+                    state.selectBankCode.sort();
+                },
+                onInitialized: function () {
+                    state.selectBankCode.length = 0;
+                    (searchFilter.selectBankCode) ?
+                        searchFilter.selectBankCode.forEach(function (obj) {
+                            state.selectBankCode.push(obj);
+                        })
+                        :  state.BankList.forEach(function (obj) {
+                            state.selectBankCode.push(obj.bankCode);
+                        });
+                }
+            });
+            (state.MutiSelRefresh) ? $('#selectBankCode').multiselect('select', searchFilter.selectBankCode) 
+                : 
+                Object.keys(BankCodeSelectInt).forEach((key) => {
+                    $('#selectBankCode').multiselect('select', key);
+                    });
+            $('#selectBankCode').multiselect('updateButtonText');
+        }
+        
         buildLevel = () => {
             let state = this.state, searchFilter = this.searchFilter;
             $("#levelStatus").multiselect({
@@ -975,6 +1078,7 @@ import DateTimePicker from 'react-datetime';
         componentDidUpdate() {
             if (this.state.MutiSelRefresh) {
                 this.buildSelectSite();
+                this.buildSelectBankCode();
                 this.buildTypeSite();
                 this.buildCurrencySite();
                 this.buildStatusSite();
@@ -985,6 +1089,7 @@ import DateTimePicker from 'react-datetime';
 
         componentDidMount() {
             this.getSiteList();
+            this.getBankInfoList();
             this.buildTypeSite();
             this.buildCurrencySite();
             this.buildStatusSite();
@@ -1015,6 +1120,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`currency-list-${obj}`} value={obj}>{i18n["lbl_Currency" + obj]}</option>;
             }.bind(this));
             currencyList = <select id="selectCurrency" name="selectCurrency[]" multiple="multiple">{currencyList}</select>;
+            
+            let bankCodeList = this.state.BankList.map(function (item) {
+                return <option key={`bank-list-${item.bankCode}`} value={item.bankCode}>{item.bankName}</option>;
+            }.bind(this));
+            bankCodeList = <select id="selectBankCode" name="selectBankCode[]" multiple="multiple">{bankCodeList}</select>
 
             let statusList = Object.keys(StatusSelectOp).map(function (obj) {
                 return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
@@ -1038,7 +1148,6 @@ import DateTimePicker from 'react-datetime';
             
 
             let searchData = this.state.searchData;
-
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
             let rejectChecks = this.state.rejectChecks;
@@ -1076,6 +1185,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Currency</span>
                                     <div className="field">
                                         {currencyList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">BankCode</span>
+                                    <div className="field">
+                                        {bankCodeList}
                                     </div>
                                 </div>
                                 <div className="input-item">
@@ -1157,5 +1272,6 @@ import DateTimePicker from 'react-datetime';
             )
         }
     }
+    
     ReactDOM.render(<DepositPanel />, document.getElementById('searchForm'));
 })(jQuery, React, ReactDOM, i18n, axios, moment);

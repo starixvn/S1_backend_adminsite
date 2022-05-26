@@ -65,12 +65,24 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        [HttpGet]
+        [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetAllBankInfoOffList()
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
             apiResult.Data = bankInfoOff;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
+            var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
+            var data = bankInfoOff
+                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
