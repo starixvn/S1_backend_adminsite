@@ -691,6 +691,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                    custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
                 }
 
                 return new ApiResult<CustInfoDetail>
@@ -2942,6 +2943,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// LineUserId遮罩
+        /// </summary>
+        /// <param name="data">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskLineId(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(data, pattern, m => new string('*', m.Length));
         }
 
         #endregion
