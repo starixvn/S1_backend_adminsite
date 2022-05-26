@@ -1488,7 +1488,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-
+            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -1506,7 +1506,6 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
                             {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
                             {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
-                            {subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-primary" onClick={this.onUnbindLine.bind(this)}>Line Unbind</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1682,6 +1681,14 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                                     {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
                                                 </td>
                                         }
+                                    </tr>
+                                    <tr>
+                                        {data.custLineProfile === null ? <th scope="row">Line UserId</th> : <th scope="row">Line UserId{subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-copy js-copy" onClick={this.onUnbindLine.bind(this)}>Unbind</button> : null}</th>}
+                                        {data.custLineProfile === null ? <td></td> : <td>{data.custLineProfile.userId}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.custLineProfile.userId}>Copy</button></td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Line Binding Time (Adjusted to GMT+8)</th>
+                                        {data.custLineProfile === null ? <td></td> : <td>{moment.utc(data.custLineProfile.createTime).add(8,'hour').format('l LTS')}</td>}
                                     </tr>
                                     <tr>
                                         <th scope="row">Act Status</th>
