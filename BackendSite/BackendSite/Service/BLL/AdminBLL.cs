@@ -134,9 +134,17 @@ namespace BackendSite.Service.BLL
 
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
-            var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-            var userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-
+            var userAllPremission = new List<UserAllPremission>();
+            if (loginUser.Role == null)
+            {
+                userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+            
             foreach (var funcData in assignFuncDatas)
             {
                 var permissionData = new List<AdminPermissionModel>();
