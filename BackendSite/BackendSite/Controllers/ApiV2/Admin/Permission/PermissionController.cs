@@ -461,7 +461,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             var apiResult = new ApiResult<IEnumerable<ServerInfo>>();
             try
             {
-                apiResult.Data = _serverInfoBll.GetSiteListByLoginUser();
+                apiResult.Data = _serverInfoBll.GetSiteListByLoginUserV2();
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

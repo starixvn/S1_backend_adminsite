@@ -68,4 +68,11 @@ namespace BackendSite.Service.Model
         public int UserId { set; get; }
         public List<int> Role { get; set; }
     }
+
+    public class AssignBrand
+    {
+        public int UserId { get; set; }
+        public int SiteId { set; get; }
+        public string CurrencyList { get; set; }
+    }
 }
