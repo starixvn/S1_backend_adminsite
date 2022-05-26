@@ -160,7 +160,16 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<AdminUserV2> GetAllUserV2()
         {
-            return _mainDbClient.Query<AdminUserV2>("Admin_AllAdminUser_Get");
+            return _reportDbClient.Query<AdminUserV2>("Admin_AllAdminUser_Get");
+        }
+        public AdminUserV2 GetUserV2(int userId)
+        {
+            return _reportDbClient.QueryFirst<AdminUserV2>("Admin_AllAdminUserData_Get", new DynamicParameters(new { UserId = userId}));
+        }
+
+        public List<AssignBrand> GetAssignSiteListV2(int userId)
+        {
+            return _reportDbClient.Query<AssignBrand>("Admin_AuthorBrand_Get", new DynamicParameters(new { UserId = userId })).ToList();
         }
     }
 }

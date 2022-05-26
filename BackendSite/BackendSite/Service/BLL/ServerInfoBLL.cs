@@ -18,8 +18,9 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly PermissionBLL permissionBLL;
+        private readonly NewAuthorizeBLL newAuthorizeBLL;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
@@ -27,6 +28,7 @@ namespace BackendSite.Service.BLL
             this.adminUserService = adminUserService;
             this.authorizeBLL = authorizeBLL;
             this.permissionBLL = permissionBLL;
+            this.newAuthorizeBLL = newAuthorizeBLL;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -187,6 +189,59 @@ namespace BackendSite.Service.BLL
                     dictKeys.Add(s.FuncKey, s.DisplayKey);
                     permissionLoop(s.FuncKeys, ref dictKeys);
                 }
+            }
+        }
+
+        public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
+        {
+            List<AssignBrand> assignSites = new List<AssignBrand>();
+            var authData = newAuthorizeBLL.GetAuthData();
+            if (authData != null)
+            {
+                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}V2";
+                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
+                if (userSiteList == null)
+                {
+                    var loginUser = adminUserService.GetUserV2(authData.UserId);
+                    if (loginUser.IsSuper)
+                    {
+                        userSiteList = serverInfoService.GetSiteList();
+                    }
+                    else
+                    {
+                        assignSites = adminUserService.GetAssignSiteListV2(authData.UserId);
+                        if (assignSites !=  null)
+                        {
+                            List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
+                            assignSites.ToList().ForEach(x =>
+                            {
+                                var siteData = serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId))?.FirstOrDefault();
+                                if (siteData != null)
+                                {
+                                    tmepuserSiteList.Add(new ServerInfo()
+                                    {
+                                        SiteId = x.SiteId,
+                                        SiteName = siteData.SiteName,
+                                        LangList = siteData.LangList,
+                                        CurrencyList = x.CurrencyList,
+                                        DefLang = siteData.DefLang
+                                    });
+                                }
+                            });
+                            userSiteList = tmepuserSiteList;
+                        }
+                    }
+
+                    if (userSiteList != null)
+                    {
+                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                    }
+                }
+                return userSiteList;
+            }
+            else
+            {
+                return null;
             }
         }
     }
