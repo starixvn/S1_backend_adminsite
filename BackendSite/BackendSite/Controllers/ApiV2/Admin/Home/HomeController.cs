@@ -72,6 +72,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             public string NewPwd { set; get; }
         }
 
+        public class GetUserDataReq
+        {
+            public int SiteId { get; set; }
+        }
         #endregion
 
         #region Actions
@@ -216,6 +220,25 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         //        Message = "Update Success."
         //    };
         //}
+
+        /// <summary>
+        /// Home/GetUserData 取得LoginUser的資訊
+        /// </summary>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public ApiResult<AdminUserV2> GetUserData(GetUserDataReq request)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var authInfo = _newAuthorizeBLL.GetAuthData();
+                var data = _adminBll.GetUserV2(authInfo.UserId,request.SiteId);
+                return new ApiResult<AdminUserV2> { Data = data, ErrorCode = (int)ErrorCodeEnum.Success };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+        }
 
         #endregion
     }
