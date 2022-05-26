@@ -565,23 +565,24 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission);
         }
-        public void DeleteAdminRole(int role, IEnumerable<AdminUserV2> allUser)
+        public void DeleteAdminRole(int role)
         {
-            List<UpdataAdminUserV2Role> updateRoleList = new List<UpdataAdminUserV2Role>();
-            allUser.ToList().ForEach(x =>
-            {
-                var roleList = JsonConvert.DeserializeObject<List<int>>(x.Role);
-                if (roleList.Exists(y => y == role))
-                {
-                    //updateRoleList.Add(x.UserId);
-                    updateRoleList.Add(new UpdataAdminUserV2Role()
-                    {
-                        UserId = x.UserId,
-                        Role = roleList.Where(z => z != role).ToList()
-                    });
-                }
-            });
-            permissionService.DeleteAdminRole(role, updateRoleList);
+            //List<UpdataAdminUserV2Role> updateRoleList = new List<UpdataAdminUserV2Role>();
+            //allUser.ToList().ForEach(x =>
+            //{
+            //    var roleList = JsonConvert.DeserializeObject<List<int>>(x.Role);
+            //    if (roleList.Exists(y => y == role))
+            //    {
+            //        //updateRoleList.Add(x.UserId);
+            //        updateRoleList.Add(new UpdataAdminUserV2Role()
+            //        {
+            //            UserId = x.UserId,
+            //            Role = roleList.Where(z => z != role).ToList()
+            //        });
+            //    }
+            //});
+
+            permissionService.DeleteAdminRole(role);
         }
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
         {
@@ -890,6 +891,35 @@ namespace BackendSite.Service.BLL
         public int SetAdminUserStatus(int userId, int status)
         {
             return permissionService.SetAdminUserStatus(userId, status);
+        }
+        #endregion
+
+        #region AssignBrand
+        public IEnumerable<AdminBrandRole> GetAdminBrandRole(int role)
+        {
+            return permissionService.GetAdminBrandRole(role);
+        }
+        public IEnumerable<AdminBrandData> GetAssignBrand(IEnumerable<int> selectSite, string memberId)
+        {
+            var assignBrand = permissionService.GetAssignBrand(selectSite, memberId).ToList();
+
+            var assignBrandData = assignBrand.GroupBy(x => (x.UserId, x.UserName), (key, value) =>
+             new AdminBrandData { UserId = key.UserId,
+                 UserName = key.UserName,
+                 Brand = value.Select(y => new UserBrand { SiteName = y.SiteName, SiteId = y.SiteId }),
+                 UpdateTime = value.Max(y => y.UpdateTime),
+                 LoginTime = value.Max(y => y.LoginTime)
+             }).ToList();
+
+            return assignBrandData;
+        }
+        public IEnumerable<UserBrand> GetUserBrand(int userId)
+        {
+            return permissionService.GetUserBrand(userId);
+        }
+        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        {
+            return permissionService.SetAdminBrand(userId, siteId, status);
         }
         #endregion
 

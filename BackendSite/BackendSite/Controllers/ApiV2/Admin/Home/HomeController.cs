@@ -114,6 +114,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 throw new AdminException(userLoginResult);
             }
 
+            _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
+
             await HttpContext.SignOutAsync("backendV2");
 
             var claims = new List<Claim>
@@ -181,6 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             };
         }
 
+        //此為舊後台的邏輯
         /// <summary>
         /// Home/ChangePwd 使用者密碼變更
         /// </summary>
@@ -193,26 +196,26 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         /// </remarks>
         /// <param name="changePwd">參數</param>
         /// <returns>結果</returns>
-        [HttpPost]
-        public ApiResult ChangePwd(ChangePwdReqest changePwd)
-        {
+        //[HttpPost]
+        //public ApiResult ChangePwd(ChangePwdReqest changePwd)
+        //{
 
-            var result = _adminBll.ChangePwd(new Service.Model.ChangePwd { OldPwd = changePwd.OldPwd, NewPwd = changePwd.NewPwd });
+        //    var result = _adminBll.ChangePwd(new Service.Model.ChangePwd { OldPwd = changePwd.OldPwd, NewPwd = changePwd.NewPwd });
 
-            if (result != ErrorCodeEnum.Success)
-            {
-                if (result == ErrorCodeEnum.Fail)
-                    throw new AdminException(result, "Update Fail.");
-                else
-                    throw new AdminException(result);
-            }
+        //    if (result != ErrorCodeEnum.Success)
+        //    {
+        //        if (result == ErrorCodeEnum.Fail)
+        //            throw new AdminException(result, "Update Fail.");
+        //        else
+        //            throw new AdminException(result);
+        //    }
 
-            return new ApiResult
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."
-            };
-        }
+        //    return new ApiResult
+        //    {
+        //        ErrorCode = (int)ErrorCodeEnum.Success,
+        //        Message = "Update Success."
+        //    };
+        //}
 
         #endregion
     }

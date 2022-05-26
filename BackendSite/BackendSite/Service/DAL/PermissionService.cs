@@ -124,7 +124,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public void DeleteAdminRole(int role, List<UpdataAdminUserV2Role> updateRoleList)
+        public void DeleteAdminRole(int role)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -133,10 +133,10 @@ namespace BackendSite.Service.DAL
             _mainDbClient.Execute("Admin_AdminRole_Del", new DynamicParameters(new { Id = role }), conn, trans);
             _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
 
-            foreach (var updateRole in updateRoleList)
-            {
-                _mainDbClient.Execute("Admin_UserRole_Set", new DynamicParameters(new { Role = JsonConvert.SerializeObject(updateRole.Role), UserId = updateRole.UserId }), conn, trans);
-            }
+            //foreach (var updateRole in updateRoleList)
+            //{
+            //    _mainDbClient.Execute("Admin_UserRole_Set", new DynamicParameters(new { Role = JsonConvert.SerializeObject(updateRole.Role), UserId = updateRole.UserId }), conn, trans);
+            //}
             trans.Commit();
         }
 
@@ -177,7 +177,7 @@ namespace BackendSite.Service.DAL
             props.Add("UserName", userName);
             props.Add("Userpwd", tools.MD5Encrypt(password));
             //props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
-            props.Add("Role", JsonConvert.SerializeObject(roleList));
+            //props.Add("Role", JsonConvert.SerializeObject(roleList));
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             result = _mainDbClient.Execute("Admin_AdminUser_Ins", props, conn, trans);
@@ -196,7 +196,8 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", new DynamicParameters(new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", new DynamicParameters
+                (new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
 
             if (result <= 0)
             {
@@ -220,23 +221,37 @@ namespace BackendSite.Service.DAL
             using var trans = conn.BeginTransaction();
             List<int> roleList = new List<int>();
             roleList.Add(role);
-            var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            //props.Add("SiteId", siteId);
-            props.Add("UserName", userName);
-            props.Add("Userpwd", string.IsNullOrWhiteSpace(password) ? null : tools.MD5Encrypt(password));
-            props.Add("Role", JsonConvert.SerializeObject(roleList));
-            //props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+            //var props = new DynamicParameters();
+            //props.Add("UserId", userId);
+            ////props.Add("SiteId", siteId);
+            //props.Add("UserName", userName);
+            //props.Add("Userpwd", string.IsNullOrWhiteSpace(password) ? null : tools.MD5Encrypt(password));
+            //props.Add("Role", JsonConvert.SerializeObject(roleList));
+            ////props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Set", props, conn, trans);
+            //result = _mainDbClient.Execute("Admin_AdminUser_Set", props, conn, trans);
 
-            if (result <= 0)
+            //if (result <= 0)
+            //{
+            //    trans.Rollback();
+            //    return result;
+            //}
+
+            if (!string.IsNullOrWhiteSpace(password))
             {
-                trans.Rollback();
-                return result;
+                var props = new DynamicParameters();
+                props.Add("Userpwd", tools.MD5Encrypt(password));
+                result = _mainDbClient.Execute("Admin_AdminUser_Set", props, conn, trans);
+
+                if (result <= 0)
+                {
+                    trans.Rollback();
+                    return result;
+                }
             }
 
-            result = _mainDbClient.Execute("Admin_AdminBrand_Set", new DynamicParameters(new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", new DynamicParameters
+                (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
 
             if (result <= 0)
             {
@@ -266,6 +281,35 @@ namespace BackendSite.Service.DAL
             props.Add("UserId", userId);
             props.Add("Status", status);
             return _mainDbClient.Execute("Admin_UserStatus_Set", props);
+        }
+
+        public IEnumerable<AdminBrandRole> GetAdminBrandRole(int role)
+        {
+            return _reportDbClient.Query<AdminBrandRole>("Admin_AdminBrandRole_Get",
+                new DynamicParameters(new { Role = role }));
+        }
+
+        public IEnumerable<AdminBrand> GetAssignBrand(IEnumerable<int> selectSite, string memberId)
+        {
+            return _reportDbClient.Query<AdminBrand>("Admin_AdminBrand_Get",
+                new DynamicParameters(
+                    new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = string.IsNullOrWhiteSpace(memberId) ? null : memberId }));
+        }
+
+        public IEnumerable<UserBrand> GetUserBrand(int userId)
+        {
+            return _reportDbClient.Query<UserBrand>("Admin_UserBrand_Get",
+                new DynamicParameters(
+                    new { UserId = userId }));
+        }
+
+        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        {
+            var props = new DynamicParameters();
+            props.Add("UserId", userId);
+            props.Add("SiteId", siteId);
+            props.Add("Status", status);
+            return _mainDbClient.Execute("Admin_AdminBrand_Set", props);
         }
     }
 }
