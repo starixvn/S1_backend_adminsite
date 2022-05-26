@@ -596,6 +596,15 @@ namespace BackendSite.Service.DAL
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
+        public CustLineProfileModel GetCustLineProfile(int custId, string lineUserId)
+        {
+            return _reportDbClient.QueryFirst<CustLineProfileModel>("Member_CustLineProfile_Get", new DynamicParameters(new
+            {
+                _CustId = custId,
+                _userId = lineUserId
+            }));
+        }
+
 
         #region Tag
         public int EditTagManagement(int id, string tagName, string tagColour, string description, string Operator)
