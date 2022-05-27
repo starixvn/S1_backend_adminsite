@@ -156,15 +156,15 @@ namespace BackendSite.Service.DAL
         }
         public AdminUserV2 GetUserV2(int userId,int sitId)
         {
-            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUser_Get", new DynamicParameters(new { UserId = userId, SiteId = sitId }));
+            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUserBySite_Get", new DynamicParameters(new { UserId = userId, SiteId = sitId }));
         }
         public IEnumerable<AdminUserV2> GetAllUserV2()
         {
             return _reportDbClient.Query<AdminUserV2>("Admin_AllAdminUser_Get");
         }
-        public AdminUserV2 GetUserV2(int userId)
+        public AdminUserData GetUserV2(int userId)
         {
-            return _reportDbClient.QueryFirst<AdminUserV2>("Admin_AllAdminUserData_Get", new DynamicParameters(new { UserId = userId}));
+            return _reportDbClient.QueryFirst<AdminUserData>("Admin_AllAdminUserData_Get", new DynamicParameters(new { UserId = userId}));
         }
 
         public List<AssignBrand> GetAssignSiteListV2(int userId)
