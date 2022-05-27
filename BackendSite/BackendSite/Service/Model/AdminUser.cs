@@ -75,4 +75,14 @@ namespace BackendSite.Service.Model
         public int SiteId { set; get; }
         public string CurrencyList { get; set; }
     }
+
+    public class AdminUserData
+    {
+        public int UserId { set; get; }
+        public string UserName { set; get; }
+        public string Userpwd { set; get; }
+        public bool IsSuper { set; get; }
+        public DateTime? LoginTime { set; get; }
+        public int Status { set; get; }
+    }
 }

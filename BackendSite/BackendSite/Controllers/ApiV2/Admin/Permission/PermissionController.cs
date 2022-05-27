@@ -789,6 +789,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public ApiResult GetUpdateAdminUser(AdminUserReq request)
         {
             var authInfo = _newAuthorizeBLL.GetAuthData();
+            var roleList = new List<int>();
             //var adminRole = _permissionBll.GetAdminRole().ToList();
 
             if (authInfo == null)
@@ -810,7 +811,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "User is not exists"
                 };
             }
-            var roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
+
+            if(User.Role != null)
+            {
+                roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
+            }
 
             var result = _permissionBll.GetUpdateAdminUser(roleList.Count > 0 ? roleList.FirstOrDefault() : 0, request.UserId, request.SiteId, loginUser);
             result.UserName = User.UserName;
@@ -1071,6 +1076,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult SetAdminBrand(SetAdminBrandReq request)
         {
+            if (AdminBrandTypeEnum.Disable == request.Status)
+            {
+                var userBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
+                if (userBrands.Count <= 1)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                        Message = "Set user brand fail"
+                    };
+                }
+            }
             if (_permissionBll.SetAdminBrand(request.UserId, request.SiteId, request.Status) > 0)
             {
                 return new ApiResult

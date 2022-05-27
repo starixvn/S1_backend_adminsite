@@ -294,5 +294,9 @@ namespace BackendSite.Service.BLL
         {
             return adminUserService.GetAllUserV2();
         }
+        public AdminUserData GetUserV2(int userId)
+        {
+            return adminUserService.GetUserV2(userId);
+        }
     }
 }
