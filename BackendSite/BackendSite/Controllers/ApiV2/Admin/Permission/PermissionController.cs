@@ -206,51 +206,51 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         ///        "lang": "en"
         ///     }
         /// </remarks>
-        [HttpPost]
-        public async Task<ApiResult> GetAllMenuAsync(GetMenuRequestModel request)
-        {
-            if (request.Lang == null)
-            {
-                //old Menu
-                var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
+        //[HttpPost]
+        //public async Task<ApiResult> GetAllMenuAsync(GetMenuRequestModel request)
+        //{
+        //    if (request.Lang == null)
+        //    {
+        //        //old Menu
+        //        var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
 
-                if (errorCodeEnum == ErrorCodeEnum.Fail)
-                {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)errorCodeEnum,
-                        Message = "Missing cookies"
-                    };
-                }
+        //        if (errorCodeEnum == ErrorCodeEnum.Fail)
+        //        {
+        //            return new ApiResult
+        //            {
+        //                ErrorCode = (int)errorCodeEnum,
+        //                Message = "Missing cookies"
+        //            };
+        //        }
 
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
+        //        if (!data.Any())
+        //        {
+        //            throw new AdminException(ErrorCodeEnum.NoData);
+        //        }
 
-                return new ApiResult<IEnumerable<MenuItem>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-            else
-            {
-                //New Menu
-                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+        //        return new ApiResult<IEnumerable<MenuItem>>
+        //        {
+        //            Data = data,
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //    else
+        //    {
+        //        //New Menu
+        //        var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
 
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
+        //        if (!data.Any())
+        //        {
+        //            throw new AdminException(ErrorCodeEnum.NoData);
+        //        }
 
-                return new ApiResult<List<AdminMenuModel>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
+        //        return new ApiResult<List<AdminMenuModel>>
+        //        {
+        //            Data = data,
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //}
 
         /// <summary>
         /// Permission/GetAllSiteList 取得所有品牌清單
