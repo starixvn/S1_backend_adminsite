@@ -13,7 +13,6 @@ namespace BackendSite.Service.Model
         public bool IsSuper { set; get; }
         public int Status { set; get; }
         public DateTime CreateTime { get; set; }
-        public string Role { get; set; }
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
     }

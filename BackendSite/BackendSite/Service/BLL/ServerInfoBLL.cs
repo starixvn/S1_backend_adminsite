@@ -213,17 +213,18 @@ namespace BackendSite.Service.BLL
                         if (assignSites !=  null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
-                            assignSites.ToList().ForEach(x =>
+                            assignSites.ToList().ForEach(z =>
                             {
-                                var siteData = serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId))?.FirstOrDefault();
+                                var siteList = serverInfoService.GetSiteList().ToList();
+                                var siteData = siteList.Find(x => x.SiteId == z.SiteId);
                                 if (siteData != null)
                                 {
                                     tmepuserSiteList.Add(new ServerInfo()
                                     {
-                                        SiteId = x.SiteId,
+                                        SiteId = z.SiteId,
                                         SiteName = siteData.SiteName,
                                         LangList = siteData.LangList,
-                                        CurrencyList = x.CurrencyList,
+                                        CurrencyList = z.CurrencyList,
                                         DefLang = siteData.DefLang
                                     });
                                 }

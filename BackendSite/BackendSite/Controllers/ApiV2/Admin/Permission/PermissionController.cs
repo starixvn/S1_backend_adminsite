@@ -907,7 +907,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            //var result = _permissionBll.GetAdminRole().ToList();
+            var allUserList = _adminBll.GetAllUserV2().ToList();
+
+            if(allUserList.Any(x=> x.UserName == request.UserName)){
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.DuplicateData,
+                    Message = "Duplicate UserName"
+                };
+            }
+
             if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
             {
                 return new ApiResult
@@ -951,7 +960,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
-            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission) > 0)
             {
                 return new ApiResult
                 {
