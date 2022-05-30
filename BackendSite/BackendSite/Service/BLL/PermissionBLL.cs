@@ -639,10 +639,10 @@ namespace BackendSite.Service.BLL
             });
             return result;
         }
-        public void DeleteAdminUser(int userId)
-        {
-            permissionService.DeleteAdminUser(userId);
-        }
+        //public void DeleteAdminUser(int userId)
+        //{
+        //    permissionService.DeleteAdminUser(userId);
+        //}
         public IEnumerable<int> GetAddAdminUserCurrency(AdminUserV2 loginUser)
         {
             if (loginUser.IsSuper)
@@ -704,9 +704,6 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-
                 var userAllPremission = new List<UserAllPremission>();
                 if (loginUser.Role == null)
                 {
@@ -840,9 +837,6 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                //var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                //var userAllPremission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-
                 var userAllPremission = new List<UserAllPremission>();
                 if (loginUser.Role == null)
                 {
@@ -920,10 +914,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId, int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.UpdateAdminUser(siteId, userId, role, userName, password, currencyList, userPermission);
+            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission);
         }
         public int SetAdminUserPassword(int userId, string password)
         {
