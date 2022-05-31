@@ -40,11 +40,12 @@ namespace BackendSite.Service.DAL
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType,IEnumerable<string> selectBankCode, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType,IEnumerable<string> selectBankCode, IEnumerable<int> selectCalCode, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
             var SelectBankCode = JsonConvert.SerializeObject(selectBankCode);
+            var SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null ;
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelStatus);
@@ -60,12 +61,13 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-
+            
             var p = new DynamicParameters(new
             {
                 SelectSite,
                 DepositType,
                 SelectBankCode,
+                SelectCalCode,
                 StartDate = startDate,
                 EndDate = endDate,
                 SiteId = siteId,
@@ -320,7 +322,7 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode,string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -333,9 +335,12 @@ namespace BackendSite.Service.DAL
             {
                 tempAmount = Convert.ToDecimal(amount);
             }
+            
             var p = new DynamicParameters(new
             {
                 selectSite,
+                selectBankCode,
+                selectCalCode,
                 depositType,
                 StartDate = startDate,
                 EndDate = endDate,
@@ -348,7 +353,7 @@ namespace BackendSite.Service.DAL
                 AmountType = amountType,
                 Amount = tempAmount
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V8", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V9", p);
             return depositList;
         }
 
