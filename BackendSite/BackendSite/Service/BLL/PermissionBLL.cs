@@ -566,7 +566,15 @@ namespace BackendSite.Service.BLL
                 }
                 //permissionReslut.AddRange(GetRolePermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
                 permissionReslut.AddRange(GerPermission(PermissionTypeEnum.UpdateRole, 0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission));
-                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                if(loginUser.CurrencyList != null)
+                {
+                    result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                }
+                else
+                {
+                    result.CurrencyList = new List<int>();
+                }
+
                 result.Permission = permissionReslut;
             }
             return result;
@@ -907,7 +915,15 @@ namespace BackendSite.Service.BLL
                     }
                 }
                 permissionReslut.AddRange(GetUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions, userAllPremission, Permission));
-                result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                if(loginUser.CurrencyList != null)
+                {
+                    result.CurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.CurrencyList);
+                }
+                else
+                {
+                    result.CurrencyList = new List<int>();
+                }
+                
                 result.Permission = permissionReslut;
             }
 

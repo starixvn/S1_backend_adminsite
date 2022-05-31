@@ -567,7 +567,15 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             var result = _permissionBll.GetUpdateRolePermission(request.Role,loginUser);
             result.Name = roleData.RoleName;
             result.Mark = roleData.Remark;
-            result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+
+            if(roleData.CurrencyList != null)
+            {
+                result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+            }
+            else
+            {
+                result.SelectCurrencyList = new List<int>();
+            }
 
             return new ApiResult<RoleData>
             {
@@ -826,7 +834,15 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             {
                 result.Role = roleList.FirstOrDefault();
             }
-            result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(User.CurrencyList);
+            if(User.CurrencyList != null)
+            {
+                result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(User.CurrencyList);
+            }
+            else
+            {
+                result.SelectCurrencyList = new List<int>();
+            }
+ 
 
             return new ApiResult<UpdateUserPermission>
             {
