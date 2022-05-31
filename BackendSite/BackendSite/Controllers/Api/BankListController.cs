@@ -87,6 +87,27 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             return apiResult;
         }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
+            var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
+            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
+            var data = bankInfoOff
+                .Select(x => new CalCodeModel
+                {
+                    Id = x.Id,
+                    SysId = x.SysId,
+                    AccountName = x.AccountName,
+                    AccountNo = x.AccountNo,
+                    BankCode = x.BankCode , 
+                    SiteName = x.SiteName
+                });
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
 
         [HttpPost]
         public ApiResult<IEnumerable<BankInfoSys>> GetSysBankList()
