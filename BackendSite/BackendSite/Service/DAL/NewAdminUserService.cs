@@ -8,6 +8,7 @@ using System;
 using System.Data;
 using System.Linq;
 using Dapper;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.DAL
 {
@@ -34,6 +35,11 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("UserId", userId);
             return _mainDbClient.Execute("Admin_LoginTime_Set", props);
+        }
+
+        public List<AssignBrand> GetAssignSiteListV2(int userId)
+        {
+            return _reportDbClient.Query<AssignBrand>("Admin_AuthorBrand_Get", new DynamicParameters(new { UserId = userId })).ToList();
         }
     }
 }

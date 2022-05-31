@@ -1,11 +1,15 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace BackendSite.Attributes
 {
@@ -17,17 +21,13 @@ namespace BackendSite.Attributes
         private readonly NewAuthorizeBLL newAuthorizeBLL;
         private readonly PermissionBLL permissionBLL;
         private readonly AdminUserService adminUserService;
+        private readonly AdminBLL adminBll;
 
-        enum PageStatus
-        {
-            Allow = 0,
-            DeniedReturnResult = 1,
-            DeniedGoLoginPage = 2
-        }
-
-        public AuthorizeByPermissionAttribute(NewAuthorizeBLL newAuthorizeBLL, AdminUserService adminUserService, int MenuId,int PermissionId)
+        public AuthorizeByPermissionAttribute(NewAuthorizeBLL newAuthorizeBLL, PermissionBLL permissionBLL, AdminBLL adminBll, AdminUserService adminUserService, int MenuId,int PermissionId)
         {
             this.newAuthorizeBLL = newAuthorizeBLL;
+            this.permissionBLL = permissionBLL;
+            this.adminBll = adminBll;
             this.adminUserService = adminUserService;
             this.MenuId = MenuId;
             this.PermissionId = PermissionId;
@@ -36,28 +36,53 @@ namespace BackendSite.Attributes
         {
             if(MenuId != 0 && PermissionId != 0)
             {
-                var pageStatus = PageStatus.Allow;
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
                     var authInfo = newAuthorizeBLL.GetAuthData();
-                    var loginUser = adminUserService.GetUserV2(authInfo.UserId);
+                    var brand = newAuthorizeBLL.CheckBrand();
+                    var loginUser = adminBll.GetUserV2(authInfo.UserId, brand);
                     if (!loginUser.IsSuper)
                     {
                         if (loginUser.Status == 0)
                         {
-                            filterContext.HttpContext.SignOutAsync("backendV2");
-                            pageStatus = PageStatus.DeniedGoLoginPage;
+                            filterContext.Result = new UnauthorizedResult();
                         }
                         else
                         {
+                            var userAllPremission = new List<UserAllPremission>();
+                            if (loginUser.Role == null)
+                            {
+                                userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                            }
+                            else
+                            {
+                                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                                userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                            }
 
+                            var premissionList = userAllPremission.Find(x => x.MenuId == MenuId);
+                            if(premissionList == null)
+                            {
+                                filterContext.Result =  new UnauthorizedResult();
+                            }
+                            else
+                            {
+                                if(!premissionList.Permission.Exists(x=> x == PermissionId))
+                                {
+                                    filterContext.Result = new UnauthorizedResult();
+                                }
+                            }
                         }
                     }
                 }
                 else
                 {
-                    pageStatus = PageStatus.DeniedGoLoginPage;
+                    filterContext.Result = new UnauthorizedResult();
                 }
+            }
+            else
+            {
+                filterContext.Result = new UnauthorizedResult();
             }
         }
     }

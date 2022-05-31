@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -15,6 +16,7 @@ using Newtonsoft.Json;
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PermissionController : ControllerBase
@@ -1009,6 +1011,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
         public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
         {

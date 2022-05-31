@@ -11,12 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase
@@ -72,6 +74,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             public string NewPwd { set; get; }
         }
 
+        public class ChangeBrandRequest
+        {
+            public int SiteId { get; set; }
+        }
         #endregion
 
         #region Actions
@@ -114,20 +120,39 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 throw new AdminException(userLoginResult);
             }
 
+            var siteList = _newAuthorizeBLL.GetAssignSiteListV2(adminUser.UserId);
+
+            if(siteList.Count == 0)
+            {
+                throw new AdminException(ErrorCodeEnum.AccountError);
+            }
+
+
             _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
 
             await HttpContext.SignOutAsync("backendV2");
+            await HttpContext.SignOutAsync("brand");
 
             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name,adminUser.UserName ),
-                    new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
-                    //new Claim("LangId",? ),
-                };
+            {
+                new Claim(ClaimTypes.Name,adminUser.UserName ),
+                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
+                //new Claim("LangId",? ),
+            };
+
+            var claimsV2 = new List<Claim>
+            {
+                new Claim(ClaimTypes.Thumbprint, siteList.FirstOrDefault().SiteId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
+                //new Claim("LangId",? ),
+            };
 
             var claimsIdentity = new ClaimsIdentity(claims, "backendV2");
+            var claimsIdentityV2 = new ClaimsIdentity(claimsV2, "brand");
             await HttpContext.SignInAsync("backendV2",
                                  new ClaimsPrincipal(claimsIdentity));
+            await HttpContext.SignInAsync("brand",
+                                 new ClaimsPrincipal(claimsIdentityV2));
 
             return new ApiResult<string>
             {
@@ -235,6 +260,50 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             }
         }
 
+        /// <summary>
+        /// Home/CheckBrand 從cookie 取得brand
+        /// </summary>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public ApiResult<int> CheckBrand()
+        {
+            var brand = _newAuthorizeBLL.CheckBrand();
+            if (User.Identity.IsAuthenticated)
+            {
+                return new ApiResult<int> { Data = brand, ErrorCode = (int)ErrorCodeEnum.Success };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+        }
+
+        /// <summary>
+        /// Home/ChangeBrand 異動brand回傳新的cookie
+        /// </summary>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public async Task<ApiResult<int>> ChangeBrand(ChangeBrandRequest request)
+        {
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            await HttpContext.SignOutAsync("brand");
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Thumbprint, request.SiteId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier,authInfo.UserId.ToString())
+            };
+
+            var claimsIdentityV2 = new ClaimsIdentity(claims, "brand");
+
+            await HttpContext.SignInAsync("brand",
+                                 new ClaimsPrincipal(claimsIdentityV2));
+
+            return new ApiResult<int>
+            {
+                Data = request.SiteId,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
         #endregion
     }
 }
