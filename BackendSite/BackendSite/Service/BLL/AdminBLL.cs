@@ -298,5 +298,24 @@ namespace BackendSite.Service.BLL
         {
             return adminUserService.GetUserV2(userId);
         }
+
+        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd,string NewPwd)
+        {
+            string Md5Userpwd = null;
+            OldPwd = tools.MD5Encrypt(OldPwd);
+            NewPwd = tools.MD5Encrypt(NewPwd);
+
+            if (adminService.ChangePwdV2(userId, OldPwd, NewPwd, out Md5Userpwd))
+            {
+                return ErrorCodeEnum.Success;
+            }
+            else
+            {
+                if (Md5Userpwd != OldPwd)
+                    return ErrorCodeEnum.OldpwdNotMatch;
+                else
+                    return ErrorCodeEnum.Fail;
+            }
+        }
     }
 }
