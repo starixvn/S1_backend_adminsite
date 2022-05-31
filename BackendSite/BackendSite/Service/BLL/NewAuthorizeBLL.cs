@@ -80,5 +80,16 @@ namespace BackendSite.Service.BLL
         {
             return newAdminUserService.SetLoginTime(userId);
         }
+
+        public List<AssignBrand> GetAssignSiteListV2(int userId)
+        {
+            return newAdminUserService.GetAssignSiteListV2(userId);
+        }
+
+        public int CheckBrand()
+        {
+            int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint).Value, out var brand);
+            return brand;
+        }
     }
 }
