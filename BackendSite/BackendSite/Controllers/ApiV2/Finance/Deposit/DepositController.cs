@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
@@ -71,6 +72,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> LevelStatuses { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
+            public IEnumerable<int> SelectCalCode { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
         }
@@ -122,6 +124,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var depositList = _depositBll.GetDepositRequestList(request.SiteIds,
                 request.DepositTypes,
                 request.SelectBankCode,
+                request.SelectCalCode,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.DepositId,
@@ -168,6 +171,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         {
             var exportDeposit = _depositBll.GetDepositExportList(
                 JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(request.SelectBankCode),
+                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null ,
                 JsonConvert.SerializeObject(request.DepositTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
