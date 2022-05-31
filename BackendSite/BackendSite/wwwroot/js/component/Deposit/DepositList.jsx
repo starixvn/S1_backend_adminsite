@@ -883,7 +883,7 @@ import DateTimePicker from 'react-datetime';
 
         getBankInfoList() {
             let state = this.state;
-            axios.post('/apiV2/GetAllData/GetAllBankCodeList')
+            axios.post('/api/BankList/GetAllBankCodeList')
                 .then(function (response) {
                     let result = response.data;
                     if (result.errorCode == 0) {
@@ -900,7 +900,7 @@ import DateTimePicker from 'react-datetime';
         
         getCalCodeList() {
             let state = this.state;
-            axios.post('/apiV2/GetAllData/GetAllCalCodeList')
+            axios.post('/api/BankList/GetAllCalCodeList')
                 .then(function (response) {
                     let result = response.data;
                     if (result.errorCode == 0) {
