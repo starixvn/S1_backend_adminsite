@@ -36,8 +36,8 @@ namespace BackendSite.Service.Model
         public string MatchID { get; set; } = string.Empty;
         public string BetType { get; set; } = string.Empty;
         public string IP { get; set; } = string.Empty;
-        public DateTimeOffset? StartDate { get; set; } = null;
-        public DateTimeOffset? EndDate { get; set; } = null;
+        public DateTimeOffset? StartTime { get; set; } = null;
+        public DateTimeOffset? EndTime { get; set; } = null;
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
     }
