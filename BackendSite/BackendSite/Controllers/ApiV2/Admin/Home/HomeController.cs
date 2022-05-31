@@ -201,6 +201,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         {
 
             await HttpContext.SignOutAsync("backendV2");
+            await HttpContext.SignOutAsync("brand");
 
             return new ApiResult
             {
