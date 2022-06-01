@@ -31,7 +31,7 @@ namespace BackendSite.Service.BLL
                 CurrencyId = data.CurrencyId,
                 BonusAmount = data.BonusAmount,
                 InvitationLimit = data.InvitationLimit,
-                AgentVaildBet = data.AgentVaildBet,
+                AgentValidBet = data.AgentValidBet,
                 AgentDeposit = data.AgentDeposit,
                 ReferralFreeCredit = data.ReferralFreeCredit,
                 VaildBet = data.VaildBet,
