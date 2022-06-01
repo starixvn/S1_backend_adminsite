@@ -1,4 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,6 +42,14 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? EndTime { get; set; } = null;
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
+
+        public string GetRedisKey()
+        {
+            var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
+            jObject.Remove("PageNumber");
+            jObject.Remove("PageSize");
+            return jObject.ToString().ToLower(); 
+        }
     }
 
     public class BetListReport

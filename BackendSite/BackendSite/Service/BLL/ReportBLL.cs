@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static BackendSite.Controllers.ApiV2.Report.BetListReportController;
+
 
 namespace BackendSite.Service.BLL
 {
@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly SelLangBLL selLangBLL;
         private readonly Common _common;
         private readonly PartitionService _partitionService;
+        private readonly RedisHelper _redisHelper;
 
         #endregion
 
@@ -32,6 +33,7 @@ namespace BackendSite.Service.BLL
             selLangBLL = provider.GetRequiredService<SelLangBLL>();
             _common = provider.GetRequiredService<Common>();
             _partitionService = provider.GetRequiredService<PartitionService>();
+            _redisHelper = provider.GetRequiredService<RedisHelper>();
         }
 
         #endregion
@@ -931,32 +933,40 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
 
-        public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
+        public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
         {
-            var isExport = input.PageNumber == -1;
-            input.PageSize = isExport ? 99999 : input.PageSize;
-            var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            
             totalPages = 0;
-            rowCount = 0;                    
+            rowCount = 0;
 
-            var startIndex = isExport ? 0 : (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
-
-            var parameters = new DynamicParameters(input);
-            parameters.AddDynamicParams(new
+            var data = _redisHelper.TryGetOrCreate(input.GetRedisKey(), TimeSpan.FromMinutes(15), i =>
             {
-                SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                StartDate = StartDate.DateTime,
-                EndDate = EndDate.DateTime,
+                var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                var parameters = new DynamicParameters(input);
+                parameters.AddDynamicParams(new
+                {
+                    SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                    CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                    TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                    StartDate = StartDate.DateTime,
+                    EndDate = EndDate.DateTime,
+                });
+                var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+                return result.OrderByDescending(i => i.SettledTime).ToList();
             });
-            
-            var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
 
-            return result;
+            //Export
+            if (input.PageNumber == -1)
+            {
+                return data;
+            }
+
+            //Pagination
+            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
+            rowCount = data.Count;
+            var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+            var endIndex = startIndex + input.PageSize <= data.Count ? input.PageSize : data.Count - startIndex;
+            return data.GetRange(startIndex, endIndex);
         }
-
     }
 }

@@ -21,7 +21,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<TResult> Query<TResult>(DateTimeOffset StartDate, DateTimeOffset endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        public List<TResult> Query<TResult>(DateTimeOffset StartDate, DateTimeOffset endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
             var tasks = new List<Task<IEnumerable<TResult>>>();
             foreach (var partitionKey in StartDate.GetPartitionRange(endDate))
