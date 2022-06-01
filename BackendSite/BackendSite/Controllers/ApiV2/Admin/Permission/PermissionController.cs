@@ -833,6 +833,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             if (roleList.Count > 0)
             {
                 result.Role = roleList.FirstOrDefault();
+                var allRoleData = _permissionBll.GetAdminRole().ToList();
+                var roleData = allRoleData.Find(x => x.Role == result.Role);
+                if(roleData != null)
+                {
+                    result.RoleName = roleData.RoleName;
+                }
             }
             if(User.CurrencyList != null)
             {
@@ -843,7 +849,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 result.SelectCurrencyList = new List<int>();
             }
  
-
             return new ApiResult<UpdateUserPermission>
             {
                 Data = result,
