@@ -47,6 +47,8 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
+        public decimal AgentVaildBet { get; set; }
+        public decimal AgentDeposit { get; set; }
         public decimal VaildBet { get; set; }
         public decimal Deposit { get; set; }
         public int PeriodDays { get; set; }
