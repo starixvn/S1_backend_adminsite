@@ -34,7 +34,7 @@ namespace BackendSite.Service.BLL
                 AgentValidBet = data.AgentValidBet,
                 AgentDeposit = data.AgentDeposit,
                 ReferralFreeCredit = data.ReferralFreeCredit,
-                VaildBet = data.VaildBet,
+                ValidBet = data.ValidBet,
                 Deposit = data.Deposit,
                 PeriodDays = data.PeriodDays,
                 SpecificList = JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),

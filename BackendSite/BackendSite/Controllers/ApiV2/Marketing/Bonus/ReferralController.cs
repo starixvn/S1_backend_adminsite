@@ -57,17 +57,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             public ReferralStatusEnum Status { get; set; }
         }
-
-        public class SetRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int PeriodDays { get; set; }
-            public decimal BonusAmount { get; set; }
-            public decimal VaildBet { get; set; }
-            public decimal Deposit { get; set; }
-        }
-
         #endregion
 
         #region Action
