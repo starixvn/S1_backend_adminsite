@@ -11,6 +11,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -302,16 +303,6 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
         }
 
-        public class AddRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public string Note { get; set; }
-        }
-        public class DeleteRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-        }
         public class EditRegLiveStatusNotes
         {
             public int CustId { get; set; }
@@ -1869,9 +1860,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult EditTagManagement(EditTagManagementpara para)
+        public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
-            if (_custInfoBll.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (_custInfoBll.EditTagManagement(new ParamsWithLog<EditTagManagement>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -1938,9 +1929,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult SetTagStatus(SetTagStatuspara para)
+        public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
-            if (_custInfoBll.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            if (_custInfoBll.SetTagStatus(new ParamsWithLog<SetTagStatus>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -2114,10 +2105,10 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
-        public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
+        public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
+            if (_custInfoBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2143,11 +2134,11 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
+        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
-                Data = _custInfoBll.GetRegLiveStatusNotes(addCustNoteReq.CustId),
+                Data = _custInfoBll.GetRegLiveStatusNotes(custId),
                 ErrorCode = 0
             };
 
@@ -2174,10 +2165,10 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
         [HttpPost]
-        public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
+        public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.AddRegLiveStatusNote(new ParamsWithLog<AddRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2203,10 +2194,11 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
         [HttpPost]
-        public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
+        public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            if (_custInfoBll.DeleteRegLiveStatusNote(
+                    new ParamsWithLog<DeleteRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2232,10 +2224,10 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
         [HttpPost]
-        public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
+        public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.EditRegLiveStatusNote(new ParamsWithLog<EditRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }

@@ -4,6 +4,8 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
@@ -41,78 +43,77 @@ namespace BackendSite.Controllers.Api
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        public ApiResult UpdatePayList([FromForm]int PayId, [FromForm]int Status)
+        public ApiResult UpdatePayList(ApiRequestWithLog<UpdatePayInfo> request)
         {
             var result = new ApiResult();
-            try
+            var success = paymentManageBLL.UpdatePayList(new ParamsWithLog<UpdatePayInfo>(request, User.Identity.Name));
+            
+            if (success)
             {
-                paymentManageBLL.UpdatePayList(PayId, Status,User.Identity.Name);
-                result.ErrorCode = 0;
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
             }
-            catch (Exception ex)
+            else
             {
-                result.ErrorCode = 999;
-                result.Message = "something went wrong.";
-                result.RawMessage = ex.ToString();
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
             }
-
             return result;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        public ApiResult UpdatePayChannel([FromForm]int ChannelId, [FromForm]int Sort, [FromForm]int Status, [FromForm]int PointLevel)
+        public ApiResult UpdatePayChannel(ApiRequestWithLog<UpdatePayChannel> request)
         {
             var result = new ApiResult();
-            try
-            {
-                paymentManageBLL.UpdatePayChannel(ChannelId, Sort, Status, PointLevel,User.Identity.Name);
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.Message = "something went wrong.";
-                result.RawMessage = ex.ToString();
-            }
 
+            var success = paymentManageBLL.UpdatePayChannel(new ParamsWithLog<UpdatePayChannel>(request, User.Identity.Name));
+            
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage", "f_pm_editAmountRule" })]
-        public ApiResult UpdatePayCurrency([FromForm]int ChannelId, [FromForm]int CurrencyId, [FromForm]decimal MinAmount, [FromForm]decimal MaxAmount, [FromForm]int AmountRule, [FromForm]string AmountShow)
+        public ApiResult UpdatePayCurrency(ApiRequestWithLog<UpdatePayCurrency> request)
         {
             var result = new ApiResult();
-            try
-            {
-                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow,User.Identity.Name);
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.Message = "something went wrong.";
-                result.RawMessage = ex.ToString();
-            }
 
+            var success = paymentManageBLL.UpdatePayCurrency(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
+            
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        public ApiResult UpdatePayCurrencyAmount([FromForm]int ChannelId, [FromForm]int CurrencyId, [FromForm]decimal MinAmount, [FromForm]decimal MaxAmount)
+        public ApiResult UpdatePayCurrencyAmount(ApiRequestWithLog<UpdatePayCurrency> request)
         {
             var result = new ApiResult();
-            try
-            {
-                paymentManageBLL.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount,User.Identity.Name);
-                result.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                result.ErrorCode = 999;
-                result.Message = "something went wrong.";
-                result.RawMessage = ex.ToString();
-            }
 
+            var success = paymentManageBLL.UpdatePayCurrencyAmount(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
+            
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 
