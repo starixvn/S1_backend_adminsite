@@ -41,5 +41,24 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AssignBrand>("Admin_AuthorBrand_Get", new DynamicParameters(new { UserId = userId })).ToList();
         }
+
+        public AdminUserV2 GetUserV2(int userId, int sitId)
+        {
+            return _mainDbClient.QueryFirst<AdminUserV2>("Admin_AdminUserBySite_Get", new DynamicParameters(new { UserId = userId, SiteId = sitId }));
+        }
+        public AdminUserData GetUserV2(int userId)
+        {
+            return _reportDbClient.QueryFirst<AdminUserData>("Admin_AdminUserData_Get", new DynamicParameters(new { UserId = userId }));
+        }
+        public bool ChangePwdV2(int userId, string oldPwd, string newPwd, out string Md5Userpwd)
+        {
+            Md5Userpwd = null;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var p = new DynamicParameters(new { UserId = userId, Md5OldPassword = oldPwd, Md5NewPassword = newPwd });
+            p.Add("Md5Userpwd", dbType: DbType.String, direction: ParameterDirection.Output);
+            var result = conn.Execute("Admin_AccountChangeSelfPwd_Set", p, commandType: CommandType.StoredProcedure);
+            Md5Userpwd = p.Get<string>("Md5Userpwd");
+            return result > 0;
+        }
     }
 }

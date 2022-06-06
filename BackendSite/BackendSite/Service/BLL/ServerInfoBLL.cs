@@ -19,8 +19,9 @@ namespace BackendSite.Service.BLL
         private readonly AuthorizeBLL authorizeBLL;
         private readonly PermissionBLL permissionBLL;
         private readonly NewAuthorizeBLL newAuthorizeBLL;
+        private readonly NewAdminUserService newAdminUserService;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
@@ -29,6 +30,7 @@ namespace BackendSite.Service.BLL
             this.authorizeBLL = authorizeBLL;
             this.permissionBLL = permissionBLL;
             this.newAuthorizeBLL = newAuthorizeBLL;
+            this.newAdminUserService = newAdminUserService;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -202,14 +204,14 @@ namespace BackendSite.Service.BLL
                 var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
                 if (userSiteList == null)
                 {
-                    var loginUser = adminUserService.GetUserV2(authData.UserId);
+                    var loginUser = newAdminUserService.GetUserV2(authData.UserId);
                     if (loginUser.IsSuper)
                     {
                         userSiteList = serverInfoService.GetSiteList();
                     }
                     else
                     {
-                        assignSites = adminUserService.GetAssignSiteListV2(authData.UserId);
+                        assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
                         if (assignSites !=  null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();

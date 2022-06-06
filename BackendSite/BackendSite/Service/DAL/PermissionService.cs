@@ -132,11 +132,6 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             _mainDbClient.Execute("Admin_AdminRole_Del", new DynamicParameters(new { Id = role }), conn, trans);
             _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
-
-            //foreach (var updateRole in updateRoleList)
-            //{
-            //    _mainDbClient.Execute("Admin_UserRole_Set", new DynamicParameters(new { Role = JsonConvert.SerializeObject(updateRole.Role), UserId = updateRole.UserId }), conn, trans);
-            //}
             trans.Commit();
         }
 
@@ -150,19 +145,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<UserList>("Admin_UserList_Get",
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
         }
-
-        //public void DeleteAdminUser(int userId)
-        //{
-        //    using var conn = new MySqlConnection(_connectionString);
-        //    conn.Open();
-        //    using var trans = conn.BeginTransaction();
-        //    var props = new DynamicParameters();
-        //    _mainDbClient.Execute("Admin_AdminUser_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
-        //    _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId, SiteId = 0 }), conn, trans);
-        //    _mainDbClient.Execute("Admin_AdminBrand_Del", new DynamicParameters(new { UserId = userId }), conn, trans);
-
-        //    trans.Commit();
-        //}
 
         public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
         {
