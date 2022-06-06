@@ -18,6 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly AdminService adminService;
         private readonly AdminUserService adminUserService;
         private readonly ServerInfoService serverInfoService;
+        private readonly NewAdminUserService newAdminUserService;
         private readonly PermissionBLL permissionBLL;
         private readonly IHttpContextAccessor httpContextAccessor;
 
@@ -25,6 +26,7 @@ namespace BackendSite.Service.BLL
             AdminService adminService,
             ServerInfoService serverInfoService,
             AdminUserService adminUserService,
+            NewAdminUserService newAdminUserService,
             PermissionBLL permissionBLL,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -32,6 +34,7 @@ namespace BackendSite.Service.BLL
             this.adminService = adminService;
             this.serverInfoService = serverInfoService;
             this.adminUserService = adminUserService;
+            this.newAdminUserService = newAdminUserService;
             this.permissionBLL = permissionBLL;
             this.httpContextAccessor = httpContextAccessor;
         }
@@ -288,15 +291,15 @@ namespace BackendSite.Service.BLL
 
         public AdminUserV2 GetUserV2(int userId, int sitId)
         {
-            return adminUserService.GetUserV2(userId, sitId);
+            return newAdminUserService.GetUserV2(userId, sitId);
         }
-        public IEnumerable<AdminUserV2> GetAllUserV2()
+        public bool CheckAdminUserDuplicate(string userName)
         {
-            return adminUserService.GetAllUserV2();
+            return  newAdminUserService.GetAdminUserByUserName(userName) != null;
         }
         public AdminUserData GetUserV2(int userId)
         {
-            return adminUserService.GetUserV2(userId);
+            return newAdminUserService.GetUserV2(userId);
         }
 
         public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd,string NewPwd)
@@ -305,7 +308,7 @@ namespace BackendSite.Service.BLL
             OldPwd = tools.MD5Encrypt(OldPwd);
             NewPwd = tools.MD5Encrypt(NewPwd);
 
-            if (adminService.ChangePwdV2(userId, OldPwd, NewPwd, out Md5Userpwd))
+            if (newAdminUserService.ChangePwdV2(userId, OldPwd, NewPwd, out Md5Userpwd))
             {
                 return ErrorCodeEnum.Success;
             }

@@ -594,21 +594,6 @@ namespace BackendSite.Service.BLL
         }
         public void DeleteAdminRole(int role)
         {
-            //List<UpdataAdminUserV2Role> updateRoleList = new List<UpdataAdminUserV2Role>();
-            //allUser.ToList().ForEach(x =>
-            //{
-            //    var roleList = JsonConvert.DeserializeObject<List<int>>(x.Role);
-            //    if (roleList.Exists(y => y == role))
-            //    {
-            //        //updateRoleList.Add(x.UserId);
-            //        updateRoleList.Add(new UpdataAdminUserV2Role()
-            //        {
-            //            UserId = x.UserId,
-            //            Role = roleList.Where(z => z != role).ToList()
-            //        });
-            //    }
-            //});
-
             permissionService.DeleteAdminRole(role);
         }
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
