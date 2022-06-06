@@ -681,7 +681,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            // var allUser = _adminBll.GetAllUserV2();
             var adminBrandRole = _permissionBll.GetAdminBrandRole(request.Role).ToList();
             if(adminBrandRole.Count > 0)
             {
@@ -930,9 +929,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            var allUserList = _adminBll.GetAllUserV2().ToList();
-
-            if(allUserList.Any(x=> x.UserName == request.UserName)){
+            if(_adminBll.CheckAdminUserDuplicate(request.UserName))
+            {
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.DuplicateData,
@@ -957,29 +955,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
-        /// <summary>
-        /// Permission/DeleteAdminUser 刪除AdminUser
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        //[HttpPost]
-        //public ApiResult DeleteAdminUser(AdminUserReq request)
-        //{
-        //    _permissionBll.DeleteAdminUser(request.UserId);
-
-        //    return new ApiResult
-        //    {
-        //        ErrorCode = (int)ErrorCodeEnum.Success
-        //    };
-        //}
-
-        /// <summary>
-        /// Permission/UpdateAdminUser 更新AdminUser
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
