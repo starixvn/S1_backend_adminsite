@@ -48,7 +48,7 @@ namespace BackendSite.Attributes
                         {
                             if (loginUser.Status == 0)
                             {
-                                filterContext.Result = new UnauthorizedResult();
+                                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                             }
                             else
                             {
@@ -66,13 +66,13 @@ namespace BackendSite.Attributes
                                 var premissionList = userAllPremission.Find(x => x.MenuId == MenuId);
                                 if (premissionList == null)
                                 {
-                                    filterContext.Result = new UnauthorizedResult();
+                                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                                 }
                                 else
                                 {
                                     if (!premissionList.Permission.Exists(x => x == PermissionId))
                                     {
-                                        filterContext.Result = new UnauthorizedResult();
+                                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                                     }
                                 }
                             }
@@ -80,18 +80,18 @@ namespace BackendSite.Attributes
                     }
                     else
                     {
-                        filterContext.Result = new UnauthorizedResult();
+                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                     }
                 }
                 else
                 {
-                    filterContext.Result = new UnauthorizedResult();
+                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                 }
 
             }
             else
             {
-                filterContext.Result = new UnauthorizedResult();
+                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
             }
         }
     }
