@@ -88,7 +88,7 @@ namespace BackendSite.Service.BLL
 
         public int CheckBrand()
         {
-            int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint).Value, out var brand);
+            int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var brand);
             return brand;
         }
     }

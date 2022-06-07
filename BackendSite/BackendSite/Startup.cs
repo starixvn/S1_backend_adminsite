@@ -102,14 +102,14 @@ namespace BackendSite
             })
             .AddCookie("backendV2", "backendV2", option =>
             {
-                //option.LoginPath = "/Home/Signin";
+                option.LoginPath = "/Home/AuthorizedFailed";
                 option.Cookie.Name = ".backendV2";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             })
             .AddCookie("brand", "brand", option =>
             {
-                //option.LoginPath = "/Home/Signin";
+                option.LoginPath = "/Home/AuthorizedFailed";
                 option.Cookie.Name = ".brand";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
