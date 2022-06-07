@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +28,8 @@ namespace BackendSite.Controllers.Api
         {
             this.paymentAdjustmentBLL = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             this.excelBLL = provider.GetRequiredService<ExcelBLL>();
-            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
             this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)
@@ -195,17 +196,8 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        public class SetAdjustmentReq
-        {
-            public string TransId { get; set; }
-            public int BeforeCategory { get; set; }
-            public int AfterCategory { get; set; }
-            public string BeforeMemo { get; set; }
-            public string AfterMemo { get; set; }
-        }
-
         [HttpPost]
-        public ApiResult SetAdjustment([FromForm] SetAdjustmentReq req)
+        public ApiResult SetAdjustment(ApiRequestWithLog<SetAdjustment> req)
         {
             try
             {
@@ -220,15 +212,7 @@ namespace BackendSite.Controllers.Api
                 }
 
                 var success =
-                    paymentAdjustmentBLL.SetAdjustment(new SetAdjustment
-                    {
-                        TransId = req.TransId,
-                        BeforeCategory = req.BeforeCategory,
-                        AfterCategory = req.AfterCategory,
-                        BeforeMemo = req.BeforeMemo,
-                        AfterMemo = req.AfterMemo,
-                        Operator = User.Identity.Name
-                    });
+                    paymentAdjustmentBLL.SetAdjustment(new ParamsWithLog<SetAdjustment>(req, User.Identity.Name));
 
                 return new ApiResult
                 {

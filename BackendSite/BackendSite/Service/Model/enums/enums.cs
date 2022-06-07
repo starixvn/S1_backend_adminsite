@@ -206,6 +206,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
+        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
@@ -539,6 +540,35 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
+    
+    public enum AdminAdjustmentLogMenuEnum
+    {
+        Undefined = 0,
+        BankCardManagement = 1,
+        SetDepositRequestAmount = 2,
+        WithdrawalAccounting = 3,
+        BalanceAdjustment = 4,
+        ThirdPartyAdjustment = 5,
+        IssueBonusManagement = 6,
+        PaymentGateway = 7,
+        DepositLimitation = 8,
+        WithdrawalLimitation = 9,
+        CryptoWithdrawalLimitation = 10,
+        AdjustmentLimitation = 11,
+        LineDepositChannel = 12,
+        DepositSubmission = 13,
+        ResetCustomerBankInfo = 14,
+        ResetCustomerUSDTInfo = 15,
+        SetCustomerStatus = 16,
+        KickOutCustomer = 17,
+        SetCustomerPromotionStatus = 18,
+        Announcement = 19,
+        WithdrawalKycControl = 20,
+        TagManagement = 21,
+        LiveRegistrationStatistics = 22,
+        GameExclusion = 23,
+        BetLimit = 24
+    }
 
     #region BankFinancialTransferInfoLog
 
@@ -743,7 +773,7 @@ namespace BackendSite.Service.Model.enums
 
     #region Customer_RegLiveStatus
 
-    public enum Customer_RegLiveStatusStatusEnum
+    public enum CustomerRegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
@@ -995,6 +1025,18 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
     #endregion
+
+    public enum LineChannelStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+    
+    public enum GeneralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 
     public enum PermissionTypeEnum
     {

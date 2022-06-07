@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -62,6 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int Opt { get; set; }
             public decimal Amount { get; set; }
             public string Memo { get; set; }
+            public int Category { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -69,6 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int SiteId { get; set; }
             public int TpId { get; set; }
             public int CustId { get; set; }
+            public string UserName { get; set; }
         }
 
         #endregion
@@ -187,7 +190,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 Amount = request.Amount,
                 direction = (TpDirection)request.Opt,
                 Operator = User.Identity.Name,
-                Remarks = request.Memo
+                Remarks = request.Memo,
+                Category = request.Category
             };
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
@@ -198,7 +202,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     custInfosDetail.CustId,
                     request.Amount,
                     request.Opt,
-                    Remarks = request.Memo
+                    Memo = request.Memo,
+                    Category = request.Category
                 };
                 _tpBll.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
             }
@@ -225,6 +230,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var rowCount = 0;
             var pageNumber = request.PageNumber;
             var result = new ApiListResult<AdminTpTransferInfo>();
+
+            if (request.CustId <= 0 && !string.IsNullOrEmpty(request.UserName))
+            {
+                var custInfo = _custInfoBll.GetCustInfoDetails(null, request.UserName, request.SiteId);
+                if (custInfo == null)
+                {
+                    throw new AdminException(ErrorCodeEnum.CustNotFound);
+                }
+
+                request.CustId = custInfo.CustId;
+            }
+            
             try
             {
                 result.Data = _tpBll.GetAdjustmentTpLog(request.SiteId, request.TpId, request.CustId, request.PageSize, ref pageNumber, ref totalPages, ref rowCount);

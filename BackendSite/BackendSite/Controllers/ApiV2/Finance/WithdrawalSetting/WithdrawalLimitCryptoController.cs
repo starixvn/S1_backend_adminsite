@@ -43,38 +43,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
             public CryptoCurrencyEnum CryptoCurrency { get; set; }
         }
 
-        public class CreateRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public double WithdrawalMin { get; set; }
-            public double WithdrawalMax { get; set; }
-            public int Times { get; set; }
-            public NetworkTypeEnum NetworkType { get; set; }
-            public CryptoCurrencyEnum CryptoCurrency { get; set; }
-        }
-
-        public class UpdateRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-            public int Times { get; set; }
-            public double WithdrawalMin { get; set; }
-            public double WithdrawalMax { get; set; }
-            public NetworkTypeEnum NetworkType { get; set; }
-            public CryptoCurrencyEnum CryptoCurrency { get; set; }
-        }
-
-        public class DeleteRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-            public NetworkTypeEnum NetworkType { get; set; }
-            public CryptoCurrencyEnum CryptoCurrency { get; set; }
-        }
-
         #endregion
 
         #region Actions
@@ -91,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiListResult<CryptoWithdrawalLimitInfoManage> GetList(GetListRequest request)
+        public ApiListResult<CryptoWithdrawalLimitInfo> GetList(GetListRequest request)
         {
             var result = _withdrawalBll.GetCryptoWithdrawalLimitInfos(request.SiteIds,
                 request.CurrencyIds,
@@ -102,7 +70,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
                 out int totalPages,
                 out int rowCount);
 
-            var apiResult = new ApiListResult<CryptoWithdrawalLimitInfoManage>
+            var apiResult = new ApiListResult<CryptoWithdrawalLimitInfo>
             {
                 Data = result,
                 PageNumber = request.PageNumber,
@@ -126,21 +94,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(CreateRequest request)
+        public ApiResult Create(ApiRequestWithLog<CreateCryptoWithdrawalLimitInfo> request)
         {
-            var data = new CryptoWithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-                NetworkType = (int)request.NetworkType,
-                CryptoCurrencyId = (int)request.CryptoCurrency,
-                UpdateOperator = User.Identity.Name,
-                Times = request.Times
-            };
-
-            var success = _withdrawalBll.AddCryptoWithdrawalLimit(data);
+            var success = _withdrawalBll.AddCryptoWithdrawalLimit(
+                new ParamsWithLog<CreateCryptoWithdrawalLimitInfo>(request, User.Identity.Name));
 
             if (success)
                 return new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
@@ -160,22 +117,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(UpdateRequest request)
+        public ApiResult Update(ApiRequestWithLog<UpdateCryptoWithdrawalLimitInfo> request)
         {
-            var data = new CryptoWithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                Times = request.Times,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-                NetworkType = (int)request.NetworkType,
-                CryptoCurrencyId = (int)request.CryptoCurrency,
-                UpdateOperator = User.Identity.Name
-            };
-
-            var success = _withdrawalBll.EditCryptoWithdrawalLimit(data);
+            var success = _withdrawalBll.EditCryptoWithdrawalLimit(
+                new ParamsWithLog<UpdateCryptoWithdrawalLimitInfo>(request, User.Identity.Name));
 
             if (success)
                 return new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
@@ -195,19 +140,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(DeleteRequest request)
+        public ApiResult Delete(ApiRequestWithLog<DeleteCryptoWithdrawalLimitInfo> request)
         {
-            var data = new CryptoWithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                NetworkType = (int)request.NetworkType,
-                CryptoCurrencyId = (int)request.CryptoCurrency,
-                UpdateOperator = User.Identity.Name
-            };
-
-            var success = _withdrawalBll.DeleteCryptoWithdrawalLimit(data);
+            var success = _withdrawalBll.DeleteCryptoWithdrawalLimit(
+                new ParamsWithLog<DeleteCryptoWithdrawalLimitInfo>(request, User.Identity.Name));
 
             if (success)
                 return new ApiResult((int)ErrorCodeEnum.Success, string.Empty);

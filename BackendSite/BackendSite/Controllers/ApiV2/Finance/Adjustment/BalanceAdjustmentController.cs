@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
@@ -30,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly AuthorizeBLL _authorizeBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
+        private readonly ILogger<BalanceAdjustmentController> _logger;
 
         private readonly int _mainWalletType;
         private readonly string _bonusApiUrl;
@@ -46,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _logger = provider.GetRequiredService<ILogger<BalanceAdjustmentController>>();
 
             _mainWalletType = provider.GetRequiredService<IConfiguration>().GetValue<int>("MainWalletType"); //1=主錢包,2=體育錢包
             _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
@@ -64,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int WithdrawalLimitOption { get; set; }
             public string Memo { set; get; }
             public string BonusCode { get; set; }
-            public int RollOver { get; set; }
+            public int Category { get; set; }
         }
 
         public class GetAdjustmentLimitInfoRequest
@@ -108,6 +111,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public IFormFile ExcelUpload { get; set; }
             public decimal Withdrawal { get; set; }
             public string BonusCode { get; set; }
+            public int Category { get; set; }
         }
 
         #endregion
@@ -298,7 +302,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         Operator = authData.UserName,
                         WithdrawalLimitAmount = request.WithdrawalLimitAmount,
                         WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
-                        Memo = request.Memo
+                        Memo = request.Memo,
+                        Category = request.Category
                     };
 
                     if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name, out var transId) > 0)
@@ -417,6 +422,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         }
                         else
                         {
+                            _logger.LogInformation($"UserName: {custUsername}, SabaId: {sabaId}, CustId: {custId}, SiteId: {request.SiteId}");
                             var custInfoDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, request.SiteId);
                             if (custInfoDetail == null)
                             {
@@ -447,7 +453,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             Operator = authData.UserName,
                                             WithdrawalLimitAmount = withdrawalLimitAmount,
                                             WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
-                                            Memo = memo
+                                            Memo = memo,
+                                            Category = request.Category
                                         };
 
                                         if (adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalanceMinus)

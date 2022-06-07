@@ -288,7 +288,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                messageBLL.DeleteAnnouncement(Id);
+                messageBLL.DeleteAnnouncement(Id, User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)

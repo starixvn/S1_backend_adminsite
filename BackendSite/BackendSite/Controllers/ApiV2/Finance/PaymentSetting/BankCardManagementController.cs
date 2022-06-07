@@ -46,29 +46,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public List<BankDetailOffStatusEnum> Statuses { get; set; }
         }
 
-        public class SetRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int SysId { get; set; }
-            public string BankAccountName { get; set; }
-            public string BankAccountNo { get; set; }
-            public string IFSCCode { get; set; }
-            public decimal MinAmount { get; set; }
-            public decimal MaxAmount { get; set; }
-            public decimal DailyLimitAmount { get; set; }
-            public int PointLevel { get; set; }
-            public int Purpose { get; set; }
-            public int Status { get; set; }
-            public int Sort { get; set; }
-        }
-
-        public class DeleteRequest
-        {
-            public int SiteId { get; set; }
-            public int BankId { get; set; }
-        }
-
         #endregion
 
         #region Actions
@@ -101,38 +78,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             return apiListResult;
         }
 
-        //重複的邏輯...
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
-        //[HttpPost]
-        //public ApiResult SetBankCard(bankCardReq bankCardReq)
-        //{
-        //    var result = _bankDetailBll.SetBankCard(bankCardReq.SiteId,
-        //        bankCardReq.SysId,
-        //        bankCardReq.BankAccountName,
-        //        bankCardReq.BankAccountNo,
-        //        bankCardReq.MinAmount,
-        //        bankCardReq.MaxAmount,
-        //        bankCardReq.DailyLimitAmount,
-        //        bankCardReq.PointLevel,
-        //        bankCardReq.Purpose,
-        //        bankCardReq.Status,
-        //        bankCardReq.Sort,
-        //        User.Identity.Name);
-
-        //    var apiResult = new ApiResult();
-        //    if (result > 0)
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //        apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
-        //    }
-        //    else
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-        //        apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-        //    }
-        //    return apiResult;
-        //}
-
         /// <summary>
         /// BankCardManagement/Set 設定銀行卡(新增/更新)
         /// </summary>
@@ -147,26 +92,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public ApiResult Set(ApiRequestWithLog<SetBankCard> request)
         {
-            if (request.CurrencyId != 61)
-            {
-                request.IFSCCode = "";
-            }
-
-            var result = _bankDetailBll.SetBankCardwithIFSC(request.SiteId,
-                request.SysId,
-                request.BankAccountName,
-                request.BankAccountNo,
-                request.IFSCCode,
-                request.MinAmount,
-                request.MaxAmount,
-                request.DailyLimitAmount,
-                request.PointLevel,
-                request.Purpose,
-                request.Status,
-                request.Sort,
-                User.Identity.Name);
+            // if (request.CurrencyId != 61)
+            // {
+            //     request.Before.IFSCCode = "";
+            //     request.After.IFSCCode = "";
+            // }
+            var result = _bankDetailBll.SetBankCardwithIFSC(
+                new ParamsWithLog<SetBankCard>(request, User.Identity.Name));
 
             var apiResult = new ApiResult();
             if (result > 0)
@@ -196,11 +130,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult Delete(DeleteRequest request)
+        public ApiResult Delete(ApiRequestWithLog<DeleteBankCard> request)
         {
-            var result = _bankDetailBll.DelBankCard(request.SiteId,
-                request.BankId,
-                User.Identity.Name);
+            var result = _bankDetailBll.DelBankCard(
+                new ParamsWithLog<DeleteBankCard>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result > 0)
             {

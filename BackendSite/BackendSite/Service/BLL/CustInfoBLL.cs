@@ -122,7 +122,7 @@ namespace BackendSite.Service.BLL
             var dTransId = IsDepositInfoTransId(transId) ? transId : null;
             var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
 
-            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate, statusStartDate,statusEndDate, pageSize, affCode, selectCurrency, bankAccountNumber, selectStatus, selectTag,ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
+            var custInfoList = _custInfoService.GetCustInfoList(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate, pageSize, affCode, selectCurrency, bankAccountNumber, selectStatus, selectTag, ref pageNumber, out totalPages, out rowCount, JsonConvert.SerializeObject(siteList), JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList())).ToList();
             if (custInfoList.Count > 0)
             {
                 custInfoList.ForEach(x =>
@@ -168,7 +168,7 @@ namespace BackendSite.Service.BLL
             var dTransId = IsDepositInfoTransId(transId) ? transId : null;
             var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
 
-            var result = _custInfoService.GetCustInfoExportList<T>(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate,tagStartDate, tagEndDate,statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus , selectTag);
+            var result = _custInfoService.GetCustInfoExportList<T>(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus, selectTag);
 
 
             return result;
@@ -195,7 +195,7 @@ namespace BackendSite.Service.BLL
                         }
                         else
                         {
-                            promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0 ,TurnOver = 0 };
+                            promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0, TurnOver = 0 };
                         };
                     }
                 }
@@ -205,7 +205,9 @@ namespace BackendSite.Service.BLL
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
             }
-            
+
+            custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
+
             return custInfoDetail;
         }
 
@@ -213,7 +215,7 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCustInfos(custId, userName, siteId);
         }
-        
+
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
             return _custInfoService.SendMessageBatch(req);
@@ -368,7 +370,7 @@ namespace BackendSite.Service.BLL
                     }
                     else
                     {
-                        promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0 ,TurnOver = 0 };
+                        promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0, TurnOver = 0 };
                     };
 
                 }
@@ -438,7 +440,7 @@ namespace BackendSite.Service.BLL
 
             #region Update Status
 
-            result = _custInfoService.SetCustStatus(custId, status ,(int)CustTaskType.LastStatusUpdateTime);
+            result = _custInfoService.SetCustStatus(custId, status, (int)CustTaskType.LastStatusUpdateTime);
 
             if (!result)
             {
@@ -546,12 +548,54 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        /// <summary>
+        /// 刪除使用者Line資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int LineUnbind(string menu, int custId, string user)
+        {
+            var result = 0;
+            var mainInfo = new Dictionary<string, dynamic>();
+            var noteInfo = new Dictionary<string, dynamic>();
+            mainInfo.Add("MenuName", "Customer Info");
+            mainInfo.Add("Action", "Line Inbind");
+            noteInfo.Add("MenuName", "Customer Info");
+            noteInfo.Add("Action", "Add Note");
+
+            using var scope = new TransactionScope();
+
+            #region Kick Out User
+
+            result = _custInfoService.DeleteLineProfile(custId);
+
+            if (result <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            };
+
+            if (_serverInfoBll.AdminOperateLog(null, custId, menu, ActionType.Delete, mainInfo, user) <= 0)
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            #endregion
+
+            scope.Complete();
+
+            return result;
+        }
+
         #endregion
 
         #region TagMamagement
-        public int EditTagManagement(int id, string tagName, string tagColour, string description, string @operator)
+        public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
         {
-            return _custInfoService.EditTagManagement(id, tagName, tagColour, description, @operator);
+            return _custInfoService.EditTagManagement(input);
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -559,9 +603,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetTagData(status, pageNumber, pageSize);
         }
 
-        public int SetTagStatus(int id, string @operator)
+        public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            return _custInfoService.SetTagStatus(id, @operator);
+            return _custInfoService.SetTagStatus(input);
         }
 
         public IEnumerable<TagData> GetAllTag()
@@ -618,9 +662,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
+        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
         {
-            return _custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
+            return _custInfoService.SetRegLiveStatus(input);
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -628,19 +672,19 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
         {
-            return _custInfoService.AddRegLiveStatusNote(custId, note, @operator);
+            return _custInfoService.AddRegLiveStatusNote(input);
         }
 
-        public int DeleteRegLiveStatusNote(int custId, int id)
+        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
         {
-            return _custInfoService.DeleteRegLiveStatusNote(custId, id);
+            return _custInfoService.DeleteRegLiveStatusNote(input);
         }
 
-        public int EditRegLiveStatusNote(int custId, int id, string note, string @operator)
+        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
         {
-            return _custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
+            return _custInfoService.EditRegLiveStatusNote(input);
         }
 
         public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
@@ -659,14 +703,14 @@ namespace BackendSite.Service.BLL
                     Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
+                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
             });
             return list;
         }
-        
+
         public IEnumerable<RegLiveStatusForMarketingExport> GetExportRegLiveStatusForMarketing(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
             var list = new List<RegLiveStatusForMarketingExport>();
@@ -710,13 +754,13 @@ namespace BackendSite.Service.BLL
             switch (custInfoDetail.VerificationType)
             {
                 case 0:
-                {
-                    if (custInfoDetail.CustPhoneReward.HasValue)
-                        rewardMessage += $"Phone: {custInfoDetail.CustPhoneReward.Value:0.00} ";
-                    if (custInfoDetail.CustEmailReward.HasValue)
-                        rewardMessage += $"Email : {custInfoDetail.CustEmailReward.Value:0.00}";
-                    break;
-                }
+                    {
+                        if (custInfoDetail.CustPhoneReward.HasValue)
+                            rewardMessage += $"Phone: {custInfoDetail.CustPhoneReward.Value:0.00} ";
+                        if (custInfoDetail.CustEmailReward.HasValue)
+                            rewardMessage += $"Email : {custInfoDetail.CustEmailReward.Value:0.00}";
+                        break;
+                    }
                 case 1:
                     rewardMessage = $"Phone & Email: {custInfoDetail.CustPhoneReward:0.00}";
                     break;
@@ -724,7 +768,7 @@ namespace BackendSite.Service.BLL
 
             return rewardMessage;
         }
-        public ApiResult SetVerificationReward(int custId,int OTPType)
+        public ApiResult SetVerificationReward(int custId, int OTPType)
         {
             var apiResult = new ApiResult();
             var myUrl = $"{_bonusApiUrl}SetVerificationReward";
@@ -735,7 +779,7 @@ namespace BackendSite.Service.BLL
                 OTPType = OTPType
             };
 
-                apiResult =  _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
+            apiResult = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
 
             return apiResult;
         }
@@ -750,7 +794,7 @@ namespace BackendSite.Service.BLL
                 OTPType = OTPType
             };
             var data = _courierAdapter.MyPostAsync<ApiResult, SetVerificationReq>(myUrl, verificationReq).Result;
-            
+
             return data;
         }
 
@@ -775,7 +819,7 @@ namespace BackendSite.Service.BLL
             var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if(sabaWallet != null)
+            if (sabaWallet != null)
             {
                 result.SabaWallet = sabaWallet.Balance;
             }
