@@ -16,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     public class RebateForVipController : ControllerBase
     {
         #region Fields
-        
+
         private readonly RebateManageBLL _rebateManageBll;
         private readonly AuthorizeBLL _authorizeBll;
 
@@ -33,7 +33,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #endregion
 
         #region API Model
-        
+
         public class GetPeriodRequest
         {
             public int SiteId { get; set; }
@@ -46,20 +46,20 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int PeriodDay { get; set; }
             public int RedeemHours { get; set; }
         }
-        
+
         public class GetRebateInfoRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
-        
+
         public class GetRebateInfoByGameTypeRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public int GameType { get; set; }
         }
-        
+
         public class SetCategoryRequest
         {
             public int SiteId { get; set; }
@@ -68,7 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int Level { get; set; }
             public decimal Percentage { get; set; }
         }
-        
+
         public class SetGameTypeRequest
         {
             public int SiteId { get; set; }
@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int Level { get; set; }
             public decimal Percentage { get; set; }
         }
-        
+
         public class SetPayoutLimitRequest
         {
             public int SiteId { get; set; }
@@ -102,17 +102,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public ApiResult<RebatePeriod> GetPeriod(GetPeriodRequest request)
         {
-            var apiResult = new ApiResult<RebatePeriod>
+            return new ApiResult<RebatePeriod>
             {
-                Data = new RebatePeriod()
+                Data = _rebateManageBll.GetRebatePeriod(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
-            
-            _rebateManageBll.GetRebatePeriod(request.SiteId, out var periodType, out var periodDay, out var redeemHours);
-            apiResult.Data.PeriodType = periodType;
-            apiResult.Data.PeriodDay = periodDay;
-            apiResult.Data.RedeemHours = redeemHours;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
         }
 
         /// <summary>
@@ -124,21 +118,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Period Type [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" , "f_vrm_edit" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         [HttpPost]
         public ApiResult SetPeriod(SetPeriodRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
             var result = _rebateManageBll.SetRebatePeriod(request.SiteId, (int)request.PeriodType, request.PeriodDay, request.RedeemHours, userName);
-            
+
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
             return apiResult;
         }
@@ -158,10 +152,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var apiResult = new ApiResult<RebateCurrencyData>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = _rebateManageBll.GeRebateInfo(request.SiteId, request.CurrencyId)
             };
-            
+
             return apiResult;
         }
 
@@ -180,10 +174,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = _rebateManageBll.GetRebateDataByGameType(request.SiteId, request.GameType, request.CurrencyId)
             };
-            
+
             return apiResult;
         }
 
@@ -203,16 +197,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
             var result = _rebateManageBll.SetRebateCategory(request.SiteId, request.CurrencyId, request.CategoryId, request.Level, request.Percentage, userName);
-           
+
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
 
@@ -234,13 +228,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var result = _rebateManageBll.SetRebateGameType(request.SiteId, request.CurrencyId, request.GameType, request.Level, request.Percentage, userName);
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
 
@@ -262,15 +256,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var result = _rebateManageBll.SetRebatePayoutLimit(request.SiteId, request.CurrencyId, request.CategoryId, request.MaxPayout, request.MinPayout, userName);
             if (result)
             {
-                apiResult.ErrorCode =(int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
-    
+
     }
 }
