@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
-    [Authorize(AuthenticationSchemes = "brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase
