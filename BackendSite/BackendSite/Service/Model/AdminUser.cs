@@ -49,4 +49,10 @@ namespace BackendSite.Service.Model
         public int UserId { get; set; }
         public int GroupSEQ { get; set; }
     }
+    
+    public class GetLanguageListRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+    }
 }
