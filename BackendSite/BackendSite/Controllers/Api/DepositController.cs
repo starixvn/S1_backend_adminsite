@@ -611,5 +611,16 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
         }
+
+        [HttpPost]
+        public ApiResult DepositRequestManualApproval(DepositRequestManualApprovalPara para)
+        {
+
+
+
+
+
+            return null;
+        }
     }
 }
