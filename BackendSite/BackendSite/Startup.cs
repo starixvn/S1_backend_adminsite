@@ -47,6 +47,8 @@ namespace BackendSite
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
             services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
+            services.AddRedisConnection(Configuration);
+            services.AddSingleton<RedisHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();

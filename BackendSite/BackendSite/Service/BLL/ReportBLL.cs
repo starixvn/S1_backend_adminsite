@@ -2,11 +2,14 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace BackendSite.Service.BLL
 {
@@ -17,18 +20,20 @@ namespace BackendSite.Service.BLL
         private readonly ReportService reportService;
         private readonly SelLangBLL selLangBLL;
         private readonly Common _common;
+        private readonly PartitionService _partitionService;
+        private readonly RedisHelper _redisHelper;
 
         #endregion
 
         #region Constructors
 
-        public ReportBLL(ReportService reportService,
-                         SelLangBLL selLangBLL,
-                         Common common)
+        public ReportBLL(IServiceProvider provider)
         {
-            this.reportService = reportService;
-            this.selLangBLL = selLangBLL;
-            _common = common;
+            reportService = provider.GetRequiredService<ReportService>();
+            selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            _common = provider.GetRequiredService<Common>();
+            _partitionService = provider.GetRequiredService<PartitionService>();
+            _redisHelper = provider.GetRequiredService<RedisHelper>();
         }
 
         #endregion
@@ -927,5 +932,41 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
+
+        public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
+        {
+            totalPages = 0;
+            rowCount = 0;
+
+            var data = _redisHelper.TryGetOrCreate(input.GetRedisKey(), TimeSpan.FromMinutes(15), i =>
+            {
+                var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                var parameters = new DynamicParameters(input);
+                parameters.AddDynamicParams(new
+                {
+                    SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                    CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                    TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                    StartDate = StartDate.DateTime,
+                    EndDate = EndDate.DateTime,
+                });
+                var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+                return result.OrderByDescending(i => i.SettledTime).ToList();
+            });
+
+            //Export
+            if (input.PageNumber == -1)
+            {
+                return data;
+            }
+
+            //Pagination
+            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
+            rowCount = data.Count;
+            var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+            var endIndex = startIndex + input.PageSize <= data.Count ? input.PageSize : data.Count - startIndex;
+            return data.GetRange(startIndex, endIndex);
+        }
     }
 }
