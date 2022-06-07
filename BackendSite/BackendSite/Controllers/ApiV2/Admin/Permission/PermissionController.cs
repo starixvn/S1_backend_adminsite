@@ -16,7 +16,6 @@ using Newtonsoft.Json;
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
-    [Authorize(AuthenticationSchemes = "brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PermissionController : ControllerBase

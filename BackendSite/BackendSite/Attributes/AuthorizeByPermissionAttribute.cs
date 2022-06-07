@@ -36,49 +36,58 @@ namespace BackendSite.Attributes
         {
             if(MenuId != 0 && PermissionId != 0)
             {
-                if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+                var brand = newAuthorizeBLL.CheckBrand();
+                if (brand != 0)
                 {
-                    var authInfo = newAuthorizeBLL.GetAuthData();
-                    var brand = newAuthorizeBLL.CheckBrand();
-                    var loginUser = adminBll.GetUserV2(authInfo.UserId, brand);
-                    if (!loginUser.IsSuper)
+                    if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                     {
-                        if (loginUser.Status == 0)
-                        {
-                            filterContext.Result = new UnauthorizedResult();
-                        }
-                        else
-                        {
-                            var userAllPremission = new List<UserAllPremission>();
-                            if (loginUser.Role == null)
-                            {
-                                userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
-                            }
-                            else
-                            {
-                                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                                userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-                            }
+                        var authInfo = newAuthorizeBLL.GetAuthData();
 
-                            var premissionList = userAllPremission.Find(x => x.MenuId == MenuId);
-                            if(premissionList == null)
+                        var loginUser = adminBll.GetUserV2(authInfo.UserId, brand);
+                        if (!loginUser.IsSuper)
+                        {
+                            if (loginUser.Status == 0)
                             {
-                                filterContext.Result =  new UnauthorizedResult();
+                                filterContext.Result = new UnauthorizedResult();
                             }
                             else
                             {
-                                if(!premissionList.Permission.Exists(x=> x == PermissionId))
+                                var userAllPremission = new List<UserAllPremission>();
+                                if (loginUser.Role == null)
+                                {
+                                    userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+                                }
+                                else
+                                {
+                                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                                    userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+                                }
+
+                                var premissionList = userAllPremission.Find(x => x.MenuId == MenuId);
+                                if (premissionList == null)
                                 {
                                     filterContext.Result = new UnauthorizedResult();
                                 }
+                                else
+                                {
+                                    if (!premissionList.Permission.Exists(x => x == PermissionId))
+                                    {
+                                        filterContext.Result = new UnauthorizedResult();
+                                    }
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        filterContext.Result = new UnauthorizedResult();
                     }
                 }
                 else
                 {
                     filterContext.Result = new UnauthorizedResult();
                 }
+
             }
             else
             {
