@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2,brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PermissionController : ControllerBase
@@ -483,6 +483,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 5 })]
         [HttpPost]
         public ApiResult GetAddRolePermission(GetAddRolePermissionReq request)
         {
@@ -528,6 +529,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 3 })]
         [HttpPost]
         public ApiResult GetUpdateRolePermission(PermissionReq request)
         {
@@ -589,6 +591,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<RoleList>> GetRoleList(GetRoleListReq request)
         {
@@ -631,6 +634,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 5 })]
         [HttpPost]
         public ApiResult AddRolePermission(SetRolePermissionReq request)
         {
@@ -668,6 +672,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 4 })]
         [HttpPost]
         public ApiResult DeleteRolePermission(PermissionReq request)
         {
@@ -704,6 +709,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 3 })]
         [HttpPost]
         public ApiResult UpdateRolePermission(SetRolePermissionReq request)
         {
@@ -752,6 +758,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult GetAddAdminUser(PermissionReq request)
         {
@@ -793,6 +800,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult GetUpdateAdminUser(AdminUserReq request)
         {
@@ -860,6 +868,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<UserList>> GetAdminUserList(GetAdminUserListReq request)
         {
@@ -886,6 +895,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult<IEnumerable<int>> GetAddAdminUserCurrency(GetAddAdminUserCurrencyReq request)
         {
@@ -925,6 +935,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
@@ -954,6 +965,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
 
+        /// <summary>
+        /// Permission/UpdateAdminUser 更新AdminUser
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
@@ -980,6 +998,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
         public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
         {
