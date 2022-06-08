@@ -313,7 +313,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
     }
 
-    public class DepositRequestManualApprovalPara
+    public class DepositManualRequest
     {
         public string TransId { get; set; }
         public decimal Amount { get; set; }

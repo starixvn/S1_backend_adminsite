@@ -613,14 +613,21 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult DepositRequestManualApproval(DepositRequestManualApprovalPara para)
+        public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
         {
-
-
-
-
-
-            return null;
+            try
+            {
+                await depositBLL.DepositManual(para);
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"ManualApproval Fail. {ex.Message}");
+            }
         }
     }
 }
