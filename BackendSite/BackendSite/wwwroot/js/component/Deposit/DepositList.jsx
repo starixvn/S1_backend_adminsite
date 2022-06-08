@@ -393,10 +393,10 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={7} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
                 if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
                     btnGroup.push(<button key={3} type="button" className="btn btn-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
-                if (data.status == dS.Pending)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
                 if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕 */
                     btnGroup.push(<button type="button" className="btn btn-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
+                if (data.status == dS.Pending)
+                    btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
 
                 let payK = 0;
                 PayFrom.push(<tr key={payK++}>
