@@ -84,7 +84,7 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V3", p).ToList();
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V4", p).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.ForEach(x =>
