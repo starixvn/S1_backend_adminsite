@@ -612,17 +612,16 @@ namespace BackendSite.Controllers.Api
             }
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_editAmount" })]
         [HttpPost]
         public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
         {
             try
             {
-                await depositBLL.DepositManual(para);
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Edit Success."
-                };
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response =  await depositBLL.DepositManual(para);
+                return response;
             }
             catch (Exception ex)
             {

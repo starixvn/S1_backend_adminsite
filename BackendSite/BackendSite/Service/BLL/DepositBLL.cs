@@ -443,10 +443,11 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task DepositManual(DepositManualRequest depositManualRequest)
+        public async Task<ApiResult<DepositManualResponse>> DepositManual(DepositManualRequest depositManualRequest)
         {
             var url = $"{payApiUrl}DepositManual";
-            var response = await _courierAdapter.MyPostAsync<bool, DepositManualRequest>(url, depositManualRequest);
+            var response = await _courierAdapter.MyPostAsync<DepositManualResponse, DepositManualRequest>(url, depositManualRequest);
+            return response;
         }
     }
 }

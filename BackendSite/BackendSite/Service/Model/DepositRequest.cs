@@ -320,4 +320,13 @@ namespace BackendSite.Service.Model
         public string ThirdId { get; set; }
         public string Operator { get; set; }
     }
+
+    public class DepositManualResponse
+    {
+        public int ErrorCode { get; set; }
+
+        public string Message { get; set; }
+
+        public decimal Amount { get; set; }
+    }
 }
