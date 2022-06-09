@@ -31,7 +31,7 @@ namespace BackendSite.Service.DAL
         //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
         //    return conn.Query<VipLevel>("Admin_VipLevel_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         //}
-        private void SetRebateSettingHistory(AdjustmentInfoLogParam adjustmentInfoLogParam) 
+        private void SetRebateSettingHistory(AdjustmentInfoLogParam adjustmentInfoLogParam)
         {
             _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", new DynamicParameters(adjustmentInfoLogParam));
         }
@@ -43,32 +43,50 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<TpGameType>("Admin_TpGameTypebyCategory_Get", new DynamicParameters(new { CategoryId = categoryId }));
         }
-        public int GetRebatePeriod(int siteId, out int periodType, out int periodDay, out int redeemHours)
+        public IEnumerable<RebatePeriod> GetRebatePeriod(int siteId)
         {
-            var p = new DynamicParameters(new { SiteId = siteId});
-            p.Add("PeriodType", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("PeriodDay", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RedeemHours", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var p = new DynamicParameters(new { _SiteId = siteId });
 
-            var result = _mainDbClient.Execute("Admin_RebatePeriod_Get", p);
-            periodType = p.Get<int?>("PeriodType") ?? 0;
-            periodDay = p.Get<int?>("PeriodDay") ?? 0;
-            redeemHours = p.Get<int?>("RedeemHours") ?? 0;
-            
-            return result;
+            return _reportDbClient.Query<RebatePeriod>("Admin_RebatePeriod_Get_V2", p);
         }
-        public bool SetRebatePeriod(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
+        public bool SetRebatePeriod(int siteId, IEnumerable<int> currencyList, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
         {
-            var parameters = new { SiteId = siteId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours, LastUpdateUser = lastUpdateUser };
-            var logParam = new AdjustmentInfoLogParam
+            var result = true;
+
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            foreach (var currencyId in currencyList)
             {
-                Menu = "SetRebatePeriod",
-                ActionType = 1,
-                DetailInfo = JsonConvert.SerializeObject(parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebatePeriod_Set", new DynamicParameters(parameters)) > 0;
+                var parameters = new { SiteId = siteId, CurrencyId = currencyId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours, LastUpdateUser = lastUpdateUser };
+
+                if (_mainDbClient.Execute("Admin_RebatePeriod_Set_V2", new DynamicParameters(parameters)) == 0)
+                    result = false ;
+            }
+
+            if(result)
+            {
+                var logParameters = new { SiteId = siteId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours, LastUpdateUser = lastUpdateUser };
+                var logParam = new AdjustmentInfoLogParam
+                {
+                    Menu = "SetRebatePeriod",
+                    ActionType = 1,
+                    DetailInfo = JsonConvert.SerializeObject(logParameters),
+                    Operator = lastUpdateUser
+                };
+                SetRebateSettingHistory(logParam);
+
+                trans.Commit();
+                conn.Close();
+                return true;
+            }
+            else
+            {
+                trans.Rollback();
+                conn.Close();
+                return false;
+            }
         }
         public bool DelRebatePeriod(int siteId, string lastUpdateUser)
         {
@@ -88,17 +106,17 @@ namespace BackendSite.Service.DAL
         public IEnumerable<RebateLevelData> GetRebateDataByCategory(int siteId, int categoryId, int currencyId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<RebateLevelData>("Admin_RebateCategory_Get", new { SiteId = siteId, CategoryId= categoryId, CurrencyId  = currencyId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<RebateLevelData>("Admin_RebateCategory_Get", new { SiteId = siteId, CategoryId = categoryId, CurrencyId = currencyId }, commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)
         {
             return _mainDbClient.Query<RebateLevelData>("Admin_RebateGameType_Get", new DynamicParameters(new { SiteId = siteId, GameType = gameType, CurrencyId = currencyId }));
         }
-        public IEnumerable<RebatePayoutLimitData> GetRebatePayoutLimit(int siteId, int currencyId,int? categoryId)
+        public IEnumerable<RebatePayoutLimitData> GetRebatePayoutLimit(int siteId, int currencyId, int? categoryId)
         {
             return _mainDbClient.Query<RebatePayoutLimitData>("Admin_RebatePayoutLimit_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId }));
         }
-        public bool SetRebatePayoutLimit(int siteId, int currencyId, int categoryId, decimal maxPayout , decimal minPayout, string lastUpdateUser)
+        public bool SetRebatePayoutLimit(int siteId, int currencyId, int categoryId, decimal maxPayout, decimal minPayout, string lastUpdateUser)
         {
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId, MaxPayout = maxPayout, MinPayout = minPayout, LastUpdateUser = lastUpdateUser };
             var logParam = new AdjustmentInfoLogParam
@@ -109,7 +127,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebatePayoutLimit_Set", new DynamicParameters(parameters)) >0;
+            return _mainDbClient.Execute("Admin_RebatePayoutLimit_Set", new DynamicParameters(parameters)) > 0;
         }
         public bool SetRebatePayoutLimitBatch(int siteId, int currencyId, string levelPayout, string lastUpdateUser)
         {
@@ -150,7 +168,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebateCategory_Set", new DynamicParameters(parameters)) >0;
+            return _mainDbClient.Execute("Admin_RebateCategory_Set", new DynamicParameters(parameters)) > 0;
         }
         public bool SetRebateCategoryBatch(int siteId, int CurrencyId, int categoryId, string levelPercentage, string lastUpdateUser)
         {
@@ -164,7 +182,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateCategoryBatch_Set", Parameters, commandType: CommandType.StoredProcedure) >0;
+            return conn.Execute("Admin_RebateCategoryBatch_Set", Parameters, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level, string lastUpdateUser)
         {
@@ -178,7 +196,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateCategory_Del", Parameters, commandType: CommandType.StoredProcedure) >0;
+            return conn.Execute("Admin_RebateCategory_Del", Parameters, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool SetRebateGameType(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
         {
@@ -191,7 +209,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebateGameType_Set", new DynamicParameters(parameters)) >0;
+            return _mainDbClient.Execute("Admin_RebateGameType_Set", new DynamicParameters(parameters)) > 0;
         }
         public bool SetRebateGameTypeBatch(int siteId, int currencyId, int gameType, string levelPercentage, string lastUpdateUser)
         {
@@ -205,7 +223,7 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateGameTypeBatch_Set", Parameters, commandType: CommandType.StoredProcedure)>0;
+            return conn.Execute("Admin_RebateGameTypeBatch_Set", Parameters, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level, string lastUpdateUser)
         {
@@ -219,8 +237,8 @@ namespace BackendSite.Service.DAL
                 Operator = lastUpdateUser
             };
             SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateGameType_Del", Parameters, commandType: CommandType.StoredProcedure) >0;
+            return conn.Execute("Admin_RebateGameType_Del", Parameters, commandType: CommandType.StoredProcedure) > 0;
         }
-       
+
     }
 }
