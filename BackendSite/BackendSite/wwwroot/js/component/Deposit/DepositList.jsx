@@ -317,7 +317,7 @@ import DateTimePicker from 'react-datetime';
         }
 
         depositManualApproval() {
-            let confirmString = "Are you sure deposit Manual Approval ?";
+            let confirmString = "Are you sure deposit Manual Approval?";
             if (confirm(confirmString)) {
                 Loading.OnLoading();
                 let data = { TransId: this.props.transId, Amount: this.state.Data.amount };
