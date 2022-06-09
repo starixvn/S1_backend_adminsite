@@ -326,6 +326,7 @@ import DateTimePicker from 'react-datetime';
                         Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
+                            alert(result.message);
                             this.onBack();
                         } else {
                             alert(result.message);
