@@ -43,18 +43,8 @@ namespace BackendSite.Service.DAL
             var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
-                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
+                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.ValidBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
-                    //原本的寫法改用新的連線方式會有問題，先用迴圈Set
-                    //para.Add(new ReferralList
-                    //{
-                    //    SiteId = x.SiteId,
-                    //    CurrencyId = x.CurrencyId,
-                    //    PeriodDays = int.Parse(x.PeriodDays),
-                    //    BonusAmount = decimal.Parse(x.BonusAmount),
-                    //    VaildBet = decimal.Parse(x.VaildBet),
-                    //    Deposit = decimal.Parse(x.Deposit)
-                    //});
                     var param = new DynamicParameters(
                     new
                     {
@@ -62,12 +52,11 @@ namespace BackendSite.Service.DAL
                         CurrencyId = x.CurrencyId,
                         PeriodDays = int.Parse(x.PeriodDays),
                         BonusAmount = decimal.Parse(x.BonusAmount),
-                        VaildBet = decimal.Parse(x.VaildBet),
+                        ValidBet = decimal.Parse(x.ValidBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
                     _mainDbClient.Execute("Admin_Referral_Set", param);
                 }
-                //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
         public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
@@ -77,10 +66,10 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", setReferralRequest.CurrencyId);
             p.Add("_BonusAmount", setReferralRequest.BonusAmount);
             p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
-            p.Add("_AgentVaildBet", setReferralRequest.AgentVaildBet);
+            p.Add("_AgentValidBet", setReferralRequest.AgentValidBet);
             p.Add("_AgentDeposit", setReferralRequest.AgentDeposit);
             p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
-            p.Add("_VaildBet", setReferralRequest.VaildBet);
+            p.Add("_ValidBet", setReferralRequest.ValidBet);
             p.Add("_Deposit", setReferralRequest.Deposit);
             p.Add("_PeriodDays", setReferralRequest.PeriodDays);
             p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));

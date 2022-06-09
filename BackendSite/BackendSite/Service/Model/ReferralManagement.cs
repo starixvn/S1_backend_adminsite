@@ -9,7 +9,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string PeriodDays { get; set; }
         public string BonusAmount { get; set; }
-        public string VaildBet { get; set; }
+        public string ValidBet { get; set; }
         public string Deposit { get; set; }
         public string IsoCode { get; set; }
         public bool Status { get; set; }
@@ -21,10 +21,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
-        public decimal AgentVaildBet { get; set; }
+        public decimal AgentValidBet { get; set; }
         public decimal AgentDeposit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
-        public decimal VaildBet { get; set; }
+        public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public string PeriodDays { get; set; }
         public IEnumerable<ReferralContent> SpecificList { get; set; }
@@ -47,7 +47,9 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
-        public decimal VaildBet { get; set; }
+        public decimal AgentValidBet { get; set; }
+        public decimal AgentDeposit { get; set; }
+        public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public int PeriodDays { get; set; }
         public bool Status { get; set; }
@@ -59,10 +61,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
-        public decimal AgentVaildBet { get; set; }
+        public decimal AgentValidBet { get; set; }
         public decimal AgentDeposit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
-        public decimal VaildBet { get; set; }
+        public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public string PeriodDays { get; set; }
         public IEnumerable<ReferralContent> SpecificList { get; set; }
@@ -75,10 +77,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public decimal BonusAmount { get; set; }
         public int InvitationLimit { get; set; }
-        public decimal AgentVaildBet { get; set; }
+        public decimal AgentValidBet { get; set; }
         public decimal AgentDeposit { get; set; }
         public decimal ReferralFreeCredit { get; set; }
-        public decimal VaildBet { get; set; }
+        public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public string PeriodDays { get; set; }
         public string Details { get; set; }
@@ -113,7 +115,7 @@ namespace BackendSite.Service.Model
         public decimal TotalDeposit { get; set; }
         public decimal DepositC { get; set; }
         public decimal TotalBet { get; set; }
-        public decimal VaildBetC { get; set; }
+        public decimal ValidBetC { get; set; }
         public decimal BonusAmount { get; set; }
         public decimal ReferralFreeCredit { get; set; }
         public DateTime? RewardTime { get; set; }

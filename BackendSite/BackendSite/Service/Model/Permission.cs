@@ -150,6 +150,18 @@ namespace BackendSite.Service.Model
         public string RoleName { get; set; }
         public List<int> icurrencyList { get; set; }
         public int Status { get; set; }
+        private DateTimeOffset? _loginTime { get; set; }
+        public DateTimeOffset? LoginTime
+        {
+            get => _loginTime;
+            set => _loginTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
     public class AddUserPremission
     {
@@ -161,6 +173,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string Password { get; set; }
         public int? Role { get; set; }
+        public string RoleName { get; set; }
         public List<Permission> Permission { get; set; }
         public IEnumerable<int> CurrencyList { get; set; }
         public IEnumerable<int> SelectCurrencyList { get; set; }
@@ -169,5 +182,45 @@ namespace BackendSite.Service.Model
     {
         public int DisPlayKey { get; set; }
         public List<int> PermissionIdList { get; set; }
+    }
+    public class AdminBrandRole
+    {
+        public int UserId { get; set; }
+        public int SiteId { get; set; }
+        public string CurrencyList { get; set; }
+        public string Role { get; set; }
+        public int Status { get; set; }
+    }
+    public class AdminBrand
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        private DateTimeOffset? _loginTime { get; set; }
+        public DateTimeOffset? LoginTime
+        {
+            get => _loginTime;
+            set => _loginTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+    public class AdminBrandData
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public IEnumerable<UserBrand> Brand { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public DateTimeOffset? LoginTime { get; set; }
+    }
+    public class UserBrand
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
     }
 }

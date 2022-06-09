@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -14,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2,brand")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PermissionController : ControllerBase
@@ -127,6 +128,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         {
             public int SiteId { get; set; }
         }
+        public class GetAssignBrandReq
+        {
+            public string UserName { get; set; }
+            public IEnumerable<int> SelectSite { get; set; }
+        }
+        public class SetAdminBrandReq
+        {
+            public int SiteId { get; set; }
+            public AdminBrandTypeEnum Status { get; set; }
+            public int UserId { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -195,51 +207,51 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         ///        "lang": "en"
         ///     }
         /// </remarks>
-        [HttpPost]
-        public async Task<ApiResult> GetAllMenuAsync(GetMenuRequestModel request)
-        {
-            if (request.Lang == null)
-            {
-                //old Menu
-                var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
+        //[HttpPost]
+        //public async Task<ApiResult> GetAllMenuAsync(GetMenuRequestModel request)
+        //{
+        //    if (request.Lang == null)
+        //    {
+        //        //old Menu
+        //        var data = _menuBll.GetMenuData(true, out var errorCodeEnum);
 
-                if (errorCodeEnum == ErrorCodeEnum.Fail)
-                {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)errorCodeEnum,
-                        Message = "Missing cookies"
-                    };
-                }
+        //        if (errorCodeEnum == ErrorCodeEnum.Fail)
+        //        {
+        //            return new ApiResult
+        //            {
+        //                ErrorCode = (int)errorCodeEnum,
+        //                Message = "Missing cookies"
+        //            };
+        //        }
 
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
+        //        if (!data.Any())
+        //        {
+        //            throw new AdminException(ErrorCodeEnum.NoData);
+        //        }
 
-                return new ApiResult<IEnumerable<MenuItem>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-            else
-            {
-                //New Menu
-                var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
+        //        return new ApiResult<IEnumerable<MenuItem>>
+        //        {
+        //            Data = data,
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //    else
+        //    {
+        //        //New Menu
+        //        var data = await _adminBll.GetAllAdminMenuAsync(request.Lang);
 
-                if (!data.Any())
-                {
-                    throw new AdminException(ErrorCodeEnum.NoData);
-                }
+        //        if (!data.Any())
+        //        {
+        //            throw new AdminException(ErrorCodeEnum.NoData);
+        //        }
 
-                return new ApiResult<List<AdminMenuModel>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
+        //        return new ApiResult<List<AdminMenuModel>>
+        //        {
+        //            Data = data,
+        //            ErrorCode = (int)ErrorCodeEnum.Success
+        //        };
+        //    }
+        //}
 
         /// <summary>
         /// Permission/GetAllSiteList 取得所有品牌清單
@@ -450,7 +462,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             var apiResult = new ApiResult<IEnumerable<ServerInfo>>();
             try
             {
-                apiResult.Data = _serverInfoBll.GetSiteListByLoginUser();
+                apiResult.Data = _serverInfoBll.GetSiteListByLoginUserV2();
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -471,6 +483,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 5 })]
         [HttpPost]
         public ApiResult GetAddRolePermission(GetAddRolePermissionReq request)
         {
@@ -516,6 +529,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 3 })]
         [HttpPost]
         public ApiResult GetUpdateRolePermission(PermissionReq request)
         {
@@ -554,7 +568,15 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             var result = _permissionBll.GetUpdateRolePermission(request.Role,loginUser);
             result.Name = roleData.RoleName;
             result.Mark = roleData.Remark;
-            result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+
+            if(roleData.CurrencyList != null)
+            {
+                result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
+            }
+            else
+            {
+                result.SelectCurrencyList = new List<int>();
+            }
 
             return new ApiResult<RoleData>
             {
@@ -569,6 +591,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<RoleList>> GetRoleList(GetRoleListReq request)
         {
@@ -611,6 +634,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 5 })]
         [HttpPost]
         public ApiResult AddRolePermission(SetRolePermissionReq request)
         {
@@ -648,6 +672,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 4 })]
         [HttpPost]
         public ApiResult DeleteRolePermission(PermissionReq request)
         {
@@ -660,9 +685,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            var allUser = _adminBll.GetAllUserV2();
+            var adminBrandRole = _permissionBll.GetAdminBrandRole(request.Role).ToList();
+            if(adminBrandRole.Count > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "This role is still in use"
+                };
+            }
 
-            _permissionBll.DeleteAdminRole(request.Role, allUser);
+            _permissionBll.DeleteAdminRole(request.Role);
 
             return new ApiResult
             {
@@ -676,6 +709,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 90, 3 })]
         [HttpPost]
         public ApiResult UpdateRolePermission(SetRolePermissionReq request)
         {
@@ -724,6 +758,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult GetAddAdminUser(PermissionReq request)
         {
@@ -765,10 +800,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult GetUpdateAdminUser(AdminUserReq request)
         {
             var authInfo = _newAuthorizeBLL.GetAuthData();
+            var roleList = new List<int>();
             //var adminRole = _permissionBll.GetAdminRole().ToList();
 
             if (authInfo == null)
@@ -790,7 +827,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "User is not exists"
                 };
             }
-            var roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
+
+            if(User.Role != null)
+            {
+                roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
+            }
 
             var result = _permissionBll.GetUpdateAdminUser(roleList.Count > 0 ? roleList.FirstOrDefault() : 0, request.UserId, request.SiteId, loginUser);
             result.UserName = User.UserName;
@@ -798,9 +839,22 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             if (roleList.Count > 0)
             {
                 result.Role = roleList.FirstOrDefault();
+                var allRoleData = _permissionBll.GetAdminRole().ToList();
+                var roleData = allRoleData.Find(x => x.Role == result.Role);
+                if(roleData != null)
+                {
+                    result.RoleName = roleData.RoleName;
+                }
             }
-            result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(User.CurrencyList);
-
+            if(User.CurrencyList != null)
+            {
+                result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(User.CurrencyList);
+            }
+            else
+            {
+                result.SelectCurrencyList = new List<int>();
+            }
+ 
             return new ApiResult<UpdateUserPermission>
             {
                 Data = result,
@@ -814,6 +868,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<UserList>> GetAdminUserList(GetAdminUserListReq request)
         {
@@ -840,6 +895,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult<IEnumerable<int>> GetAddAdminUserCurrency(GetAddAdminUserCurrencyReq request)
         {
@@ -879,10 +935,19 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 5 })]
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            //var result = _permissionBll.GetAdminRole().ToList();
+            if(_adminBll.CheckAdminUserDuplicate(request.UserName))
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.DuplicateData,
+                    Message = "Duplicate UserName"
+                };
+            }
+
             if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
             {
                 return new ApiResult
@@ -901,32 +966,16 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         }
 
         /// <summary>
-        /// Permission/DeleteAdminUser 刪除AdminUser
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        [HttpPost]
-        public ApiResult DeleteAdminUser(AdminUserReq request)
-        {
-            _permissionBll.DeleteAdminUser(request.UserId);
-
-            return new ApiResult
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
         /// Permission/UpdateAdminUser 更新AdminUser
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
-            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission) > 0)
             {
                 return new ApiResult
                 {
@@ -949,6 +998,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
         public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
         {
@@ -975,6 +1025,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
         public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
         {
@@ -995,5 +1046,121 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
         #endregion
+
+        #region Assign Brand
+
+        /// <summary>
+        /// Permission/GetAssignBrand 取得AssignBrand資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<AdminBrandData>> GetAssignBrand(GetAssignBrandReq request)
+        {
+            var result = _permissionBll.GetAssignBrand(request.SelectSite, request.UserName).ToList();
+            return new ApiResult<IEnumerable<AdminBrandData>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Permission/GetUserBrand 取得User有哪些Brand權限
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<UserBrand>> GetUserBrand()
+        {
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (authInfo == null)
+            {
+                return new ApiResult<IEnumerable<UserBrand>>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Missing cookies"
+                };
+            }
+
+            var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
+            return new ApiResult<IEnumerable<UserBrand>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Permission/SetAdminBrand 調整User的Brand
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        [HttpPost]
+        public ApiResult SetAdminBrand(SetAdminBrandReq request)
+        {
+            if (AdminBrandTypeEnum.Disable == request.Status)
+            {
+                var userBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
+                if (userBrands.Count <= 1)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                        Message = "Set user brand fail"
+                    };
+                }
+            }
+            if (_permissionBll.SetAdminBrand(request.UserId, request.SiteId, request.Status) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                    Message = "Set user brand fail"
+                };
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Permission/GetLanguageList 取得指定站台幣別對應語系列表
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 取得指定站台幣別對應語系列表。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<string>>> GetLanguageList(GetLanguageListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<string>>();
+            try
+            {
+                apiResult.Data = await _serverInfoBll.GetLanguageList(request.SiteId, request.CurrencyId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
     }
 }

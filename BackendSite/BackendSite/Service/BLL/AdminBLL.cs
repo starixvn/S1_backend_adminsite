@@ -18,6 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly AdminService adminService;
         private readonly AdminUserService adminUserService;
         private readonly ServerInfoService serverInfoService;
+        private readonly NewAdminUserService newAdminUserService;
         private readonly PermissionBLL permissionBLL;
         private readonly IHttpContextAccessor httpContextAccessor;
 
@@ -25,6 +26,7 @@ namespace BackendSite.Service.BLL
             AdminService adminService,
             ServerInfoService serverInfoService,
             AdminUserService adminUserService,
+            NewAdminUserService newAdminUserService,
             PermissionBLL permissionBLL,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -32,6 +34,7 @@ namespace BackendSite.Service.BLL
             this.adminService = adminService;
             this.serverInfoService = serverInfoService;
             this.adminUserService = adminUserService;
+            this.newAdminUserService = newAdminUserService;
             this.permissionBLL = permissionBLL;
             this.httpContextAccessor = httpContextAccessor;
         }
@@ -114,7 +117,7 @@ namespace BackendSite.Service.BLL
 
         #region New AdminSite Menu Structure
 
-        public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser = null)
+        public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser)
         {
             var result = new List<AdminMenuModel>();
             var menuList =  adminService.GetAllAdminMenu();
@@ -134,14 +137,22 @@ namespace BackendSite.Service.BLL
 
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
-            var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-            var userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-
+            var userAllPremission = new List<UserAllPremission>();
+            if (loginUser.Role == null)
+            {
+                userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+            
             foreach (var funcData in assignFuncDatas)
             {
                 var permissionData = new List<AdminPermissionModel>();
                 var userPermission = userAllPremission.Find(x => x.MenuId == funcData.Id);
-                if (userPermission != null)
+                if (userPermission != null || loginUser.IsSuper)
                 {
                     if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
                     {
@@ -162,7 +173,7 @@ namespace BackendSite.Service.BLL
                 }          
             }
 
-            result.AddRange(await GetAllMenu(0, heirIdList, menuList, permissionList, userAllPremission));
+            result.AddRange(await GetAllMenu(0, loginUser, heirIdList, menuList, permissionList, userAllPremission));
 
             return result;
         }
@@ -187,6 +198,7 @@ namespace BackendSite.Service.BLL
         }
 
         private async Task<List<AdminMenuModel>> GetAllMenu(int moduleIId,
+            AdminUserV2 loginUser,
             IEnumerable<int> heirIdList,
             IEnumerable<AdminMenuDto> menuList,
             IEnumerable<AdminPermissionDto> permissionList,
@@ -207,29 +219,47 @@ namespace BackendSite.Service.BLL
                     var permissionData = new List<AdminPermissionModel>();
                     if (!string.IsNullOrWhiteSpace(funcData.AdditionalSetting))
                     {
-                        if (userPermissionList != null)
+                        if (loginUser.IsSuper)
                         {
-                            UserAllPremission userPermission = new UserAllPremission();
-                            userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
-                            if (userPermission != null)
+                            var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                            foreach (var permission in assignFuncAdditionalSetting.Permission)
                             {
-                                var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
-                                foreach (var permission in assignFuncAdditionalSetting.Permission)
-                                {
-                                    if (userPermission.Permission.Exists(x => x == permission))
-                                    {
-                                        var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
-                                        permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
-                                    }
-                                }
-                                FunctionDatas.Add(new AdminMenuFuncModel()
-                                {
-                                    FunctionId = funcData.Id,
-                                    Name = funcData.Name,
-                                    Permission = permissionData
-                                });
+                                var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
                             }
-                        }                    
+                            FunctionDatas.Add(new AdminMenuFuncModel()
+                            {
+                                FunctionId = funcData.Id,
+                                Name = funcData.Name,
+                                Permission = permissionData
+                            });
+                        }
+                        else
+                        {
+                            if (userPermissionList != null)
+                            {
+                                UserAllPremission userPermission = new UserAllPremission();
+                                userPermission = userPermissionList.ToList().Find(x => x.MenuId == funcData.Id);
+                                if (userPermission != null)
+                                {
+                                    var assignFuncAdditionalSetting = JsonConvert.DeserializeObject<AdditionalSettingModel>(funcData.AdditionalSetting);
+                                    foreach (var permission in assignFuncAdditionalSetting.Permission)
+                                    {
+                                        if (userPermission.Permission.Exists(x => x == permission))
+                                        {
+                                            var permissionName = permissionList.Where(x => x.Id == permission).Select(x => x.Name).FirstOrDefault();
+                                            permissionData.Add(new AdminPermissionModel() { PermissionId = permission, Name = permissionName, CanUse = true });
+                                        }
+                                    }
+                                    FunctionDatas.Add(new AdminMenuFuncModel()
+                                    {
+                                        FunctionId = funcData.Id,
+                                        Name = funcData.Name,
+                                        Permission = permissionData
+                                    });
+                                }
+                            }
+                        }                               
                     }
                     else
                         continue;
@@ -238,7 +268,7 @@ namespace BackendSite.Service.BLL
 
                 if (heirIdList.Contains(moduleData.Id))
                 {
-                    var subLayerDatas = await GetAllMenu(moduleData.Id, heirIdList, menuList, permissionList, userPermissionList);
+                    var subLayerDatas = await GetAllMenu(moduleData.Id, loginUser, heirIdList, menuList, permissionList, userPermissionList);
                     SubLayerDatas.AddRange(subLayerDatas);
                 }
 
@@ -261,11 +291,34 @@ namespace BackendSite.Service.BLL
 
         public AdminUserV2 GetUserV2(int userId, int sitId)
         {
-            return adminUserService.GetUserV2(userId, sitId);
+            return newAdminUserService.GetUserV2(userId, sitId);
         }
-        public IEnumerable<AdminUserV2> GetAllUserV2()
+        public bool CheckAdminUserDuplicate(string userName)
         {
-            return adminUserService.GetAllUserV2();
+            return  newAdminUserService.GetAdminUserByUserName(userName) != null;
+        }
+        public AdminUserData GetUserV2(int userId)
+        {
+            return newAdminUserService.GetUserV2(userId);
+        }
+
+        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd,string NewPwd)
+        {
+            string Md5Userpwd = null;
+            OldPwd = tools.MD5Encrypt(OldPwd);
+            NewPwd = tools.MD5Encrypt(NewPwd);
+
+            if (newAdminUserService.ChangePwdV2(userId, OldPwd, NewPwd, out Md5Userpwd))
+            {
+                return ErrorCodeEnum.Success;
+            }
+            else
+            {
+                if (Md5Userpwd != OldPwd)
+                    return ErrorCodeEnum.OldpwdNotMatch;
+                else
+                    return ErrorCodeEnum.Fail;
+            }
         }
     }
 }
