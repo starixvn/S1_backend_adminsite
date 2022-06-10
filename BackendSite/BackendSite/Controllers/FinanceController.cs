@@ -4,6 +4,7 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers
 {
@@ -79,6 +80,8 @@ namespace BackendSite.Controllers
         public class DepositListReq
         {
             public string SelectSite { get; set; }
+            public string SelectBankCode { get; set; }
+            public string SelectCalCode { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
             public string DepositType { get; set; }
@@ -97,12 +100,26 @@ namespace BackendSite.Controllers
             var startTime = DateTimeExtensions.UnixToDateTime(depositListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             depositListReq.SelectSite = $"[{depositListReq.SelectSite}]";
+            var selectBankCode = depositListReq.SelectBankCode.Split(',').ToList();
+            depositListReq.SelectCalCode = $"[{depositListReq.SelectCalCode}]";
             depositListReq.DepositType = $"[{depositListReq.DepositType}]";
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
             depositListReq.Status = $"[{depositListReq.Status}]";
             depositListReq.LevelStatus = $"[{depositListReq.LevelStatus}]";
 
-            var exportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.Status, depositListReq.LevelStatus, depositListReq.AmountType, depositListReq.Amount);
+            var exportDeposit = depositBLL.GetDepositExportList(
+                depositListReq.SelectSite,
+                selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
+                depositListReq.SelectCalCode, 
+                depositListReq.DepositType,
+                startTime, endTime, 
+                depositListReq.DepositId, 
+                depositListReq.UserName,
+                depositListReq.CurrencyId,
+                depositListReq.Status, 
+                depositListReq.LevelStatus,
+                depositListReq.AmountType, 
+                depositListReq.Amount);
 
             foreach (var data in exportDeposit)
             {
@@ -224,13 +241,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }

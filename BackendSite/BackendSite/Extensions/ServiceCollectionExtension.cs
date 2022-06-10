@@ -3,6 +3,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 
 namespace BackendSite.Extensions
 {
@@ -30,7 +31,17 @@ namespace BackendSite.Extensions
                 .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_LogDB"), logger)
                 {
                     DataBase = DataBase.Log
+                }).AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_IPTable"), logger)
+                {
+                    DataBase = DataBase.IP
                 });
+        }
+
+        public static IServiceCollection AddRedisConnection(this IServiceCollection services, IConfiguration config)
+        {
+            var conn = config.GetValue<string>("RedisConnection");
+            services.AddSingleton(param => ConnectionMultiplexer.Connect(conn).GetDatabase());
+            return services;
         }
     }
 }

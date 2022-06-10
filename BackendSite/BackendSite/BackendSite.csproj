@@ -99,6 +99,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
     <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
+    <PackageReference Include="StackExchange.Redis" Version="2.5.61" />
   </ItemGroup>
 
   <ItemGroup>
@@ -123,7 +124,6 @@
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
-    <Folder Include="Controllers\ApiV2\Report\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

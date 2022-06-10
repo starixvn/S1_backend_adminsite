@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency6: "EURO",
     lbl_Currency9: "AUD",
     lbl_Currency12: "GBP",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency20: "UUS",
     lbl_Currency32: "JPY",
@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency45: "WON",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
     lbl_Save: "Save",
     lbl_Success: "Success",
     lbl_Action: "Action",
@@ -82,6 +83,7 @@ const Result = (props) => {
   const [currnecyData, setcurrnecyData] = useState(null);
   const [isOpen, setOpen] = useState(false);
   const [editValue, setEditValue] = useState(null);
+  const [origValue, setOrigValue] = useState(null);
   const [isEdit, setEdit] = useState(false);
   let row = "";
 
@@ -105,6 +107,7 @@ const Result = (props) => {
           if (mounted) {
             if (response.data.data) {
               setcurrnecyData(response.data.data);
+              setOrigValue(response.data.data.adjustmentMax);
             }
           }
         } else {
@@ -148,10 +151,15 @@ const Result = (props) => {
   const EditSubmit = () => {
     if (editValue !== null) {
       api
-        .post("/api/Payment/AddAdjustmentLimitInfo", {
-          SiteId: props.siteId,
-          CurrencyId: props.currId,
-          AdjustmentMax: parseFloat(editValue),
+        .post("/apiV2/AdjustmentLimit/Set", {
+          siteId: props.siteId,
+          currencyId: props.currId,
+          before:{
+            adjustmentMax: origValue
+          },
+          after:{
+            adjustmentMax: parseFloat(editValue)
+          }
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {

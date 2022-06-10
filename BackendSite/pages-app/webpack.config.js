@@ -157,10 +157,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    // "Marketing/VipRebateMangetment.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
-    // ],
+    "Marketing/VipRebateMangetment.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
+    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
@@ -182,10 +182,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    "BankFinancial/TransferInfoReport.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    ],
+    // "BankFinancial/TransferInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    // ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
@@ -268,21 +268,29 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
-    "Marketing/HotGames.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/HotGames/index.js",
-    ],
+    // "Marketing/HotGames.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/HotGames/index.js",
+    // ],
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
-    // "Marketing/HotEventManagement.min": [
-    //   "./src/pages/Marketing/HotEventManagement/index.js",
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
     // ],
-    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
-    "Marketing/DeepLinkManagement.min": [
-    	 '@babel/polyfill',
-    	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
+    "Marketing/HotEventManagement.min": [
+      "./src/pages/Marketing/HotEventManagement/index.js",
     ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
+    // "Marketing/DeepLinkManagement.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

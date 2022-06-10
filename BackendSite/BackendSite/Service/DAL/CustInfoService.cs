@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -244,7 +245,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V9", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -411,7 +412,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_StartIndex", startIndex);
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V2", parameter, commandType: CommandType.StoredProcedure);
+            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V3", parameter, commandType: CommandType.StoredProcedure);
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
@@ -578,17 +579,77 @@ namespace BackendSite.Service.DAL
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
 
-        #region Tag
-        public int EditTagManagement(int id, string tagName, string tagColour, string description, string Operator)
+        /// <summary>
+        /// 刪除使用者Line資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int DeleteLineProfile(int custId)
         {
-            var props = new DynamicParameters();
-            props.Add("Id", id);
-            props.Add("TagName", tagName);
-            props.Add("TagColour", tagColour);
-            props.Add("Description", description);
-            props.Add("Operator", Operator);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _CustId = custId
+                });
 
-            return _mainDbClient.Execute("Admin_Tag_Set", props);
+            var SpName = "Admin_CustLineProfile_Del";
+            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+        }
+
+        public CustLineProfileModel GetCustLineProfile(int custId, string lineUserId)
+        {
+            return _reportDbClient.QueryFirst<CustLineProfileModel>("Member_CustLineProfile_Get", new DynamicParameters(new
+            {
+                _CustId = custId,
+                _userId = lineUserId
+            }));
+        }
+
+
+        #region Tag
+        public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var props = new DynamicParameters();
+            props.Add("Id", input.After.Id);
+            props.Add("TagName", input.After.TagName);
+            props.Add("TagColour", input.After.TagColour);
+            props.Add("Description", input.After.Description);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_Tag_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var isCreate = input.After.Id == 0;
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog(), DbType.String);
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -612,13 +673,43 @@ namespace BackendSite.Service.DAL
             return searchResult;
         }
 
-        public int SetTagStatus(int id, string @operator)
+        public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            var props = new DynamicParameters();
-            props.Add("Id", id);
-            props.Add("Operator", @operator);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
 
-            return _mainDbClient.Execute("Admin_TagStatus_Set", props);
+            var props = new DynamicParameters();
+            props.Add("Id", input.After.Id);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_TagStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<TagData> GetAllTag()
@@ -685,9 +776,45 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
+        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
         {
-            return _mainDbClient.Execute("Admin_RegLiveStatus_Set", new DynamicParameters(new { CustId = custId, Status = status, SiteId = siteId, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Status", (int)input.After.Status);
+            props.Add("SiteId", input.SiteId);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_RegLiveStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -695,19 +822,124 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get_V2", new DynamicParameters(new { CustId = custId }));
         }
 
-        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Ins", new DynamicParameters(new { CustId = custId, Note = string.IsNullOrWhiteSpace(note) ? "" : note, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Note",  string.IsNullOrWhiteSpace(input.After.Note) ? "" : input.After.Note);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Ins", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", null, DbType.String);
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
-        public int DeleteRegLiveStatusNote(int custId, int id)
+        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Del", new DynamicParameters(new { CustId = custId, Id = id }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.Before.CustId);
+            props.Add("Id",  input.Before.Id);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Del", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", null, DbType.String);
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
-        public int EditRegLiveStatusNote(int custid, int id, string note, string @operator)
+        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
         {
-            return _mainDbClient.Execute("Admin_CustRegLiveStatusNotes_Set", new DynamicParameters(new { CustId = custid, Id = id, Note = note, Operator = @operator }));
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var props = new DynamicParameters();
+            props.Add("CustId", input.After.CustId);
+            props.Add("Id",  input.After.Id);
+            props.Add("Note",  input.After.Note);
+            props.Add("Operator", input.Operator);
+
+            var success = conn
+                .Execute("Admin_CustRegLiveStatusNotes_Set", props, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
         public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
         {
@@ -789,6 +1021,32 @@ namespace BackendSite.Service.DAL
             WithdrawalLimitLogData.RowCount = parameter.Get<int?>("RowCount") ?? 0;
 
             return WithdrawalLimitLogData;
+        }
+
+        public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
+        }
+
+        public CustBankInfo GetCustBankInfo(int custId,int siteId)
+        {
+            return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId , SiteId  = siteId }));
+        }
+        public BankLockInfoDetail GetBlockAccount(int SysId, string accountNum)
+        {
+            return _reportDbClient.QueryFirst<BankLockInfoDetail>("Admin_BlockAccount_Get", new DynamicParameters(new { SysId = SysId, AccountNum = accountNum }));
+        }
+        public int SetCustBankInfoLog(int custId, int siteId, int sysId, string accountNum, string iFSCCode, string accountName, int status)
+        {
+            return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new { CustId = custId,
+                SiteId = siteId,
+                SysId = sysId,
+                AccountNum = accountNum,
+                IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "": iFSCCode,
+                AccountName = accountName,
+                Status = status
+            }));
         }
     }
 }

@@ -92,6 +92,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet List Report",
+        "FuncKey": "Report/BetListReport",
+        "Controller": "Report",
+        "Action": "BetListReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -797,6 +807,26 @@
         "FuncKey": "CMS/AppLinkManagement",
         "Controller": "Marketing",
         "Action": "AppLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SlotGamesManagement",
+        "Title": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Controller": "Marketing",
+        "Action": "SlotGamesManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "CategoryManagement",
+        "Title": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Controller": "Marketing",
+        "Action": "CategoryManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -65,19 +65,11 @@ namespace BackendSite.Controllers.Api
         }
         public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
         {
-            var apiResult = new ApiResult<RebatePeriod>
+            return new ApiResult<RebatePeriod>
             {
-                Data = new RebatePeriod()
+                Data = rebateManageBLL.GetRebatePeriod(rebatePeriodReq.SiteId),
+                ErrorCode = 0
             };
-            var periodType = 0;
-            var periodDay = 0;
-            var redeemHours = 0;
-            apiResult.ErrorCode = 0;
-            rebateManageBLL.GetRebatePeriod(rebatePeriodReq.SiteId, out periodType, out periodDay, out redeemHours);
-            apiResult.Data.PeriodType = periodType;
-            apiResult.Data.PeriodDay = periodDay;
-            apiResult.Data.RedeemHours = redeemHours;
-            return apiResult;
         }
 
         public class SetRebatePeriodReq

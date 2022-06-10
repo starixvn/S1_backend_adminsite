@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,8 +19,10 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly PermissionBLL permissionBLL;
+        private readonly NewAuthorizeBLL newAuthorizeBLL;
+        private readonly NewAdminUserService newAdminUserService;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
@@ -27,6 +30,8 @@ namespace BackendSite.Service.BLL
             this.adminUserService = adminUserService;
             this.authorizeBLL = authorizeBLL;
             this.permissionBLL = permissionBLL;
+            this.newAuthorizeBLL = newAuthorizeBLL;
+            this.newAdminUserService = newAdminUserService;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -188,6 +193,67 @@ namespace BackendSite.Service.BLL
                     permissionLoop(s.FuncKeys, ref dictKeys);
                 }
             }
+        }
+
+        public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
+        {
+            List<AssignBrand> assignSites = new List<AssignBrand>();
+            var authData = newAuthorizeBLL.GetAuthData();
+            if (authData != null)
+            {
+                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}V2";
+                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
+                if (userSiteList == null)
+                {
+                    var loginUser = newAdminUserService.GetUserV2(authData.UserId);
+                    if (loginUser.IsSuper)
+                    {
+                        userSiteList = serverInfoService.GetSiteList();
+                    }
+                    else
+                    {
+                        assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
+                        if (assignSites != null)
+                        {
+                            List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
+                            assignSites.ToList().ForEach(z =>
+                            {
+                                var siteList = serverInfoService.GetSiteList().ToList();
+                                var siteData = siteList.Find(x => x.SiteId == z.SiteId);
+                                if (siteData != null)
+                                {
+                                    tmepuserSiteList.Add(new ServerInfo()
+                                    {
+                                        SiteId = z.SiteId,
+                                        SiteName = siteData.SiteName,
+                                        LangList = siteData.LangList,
+                                        CurrencyList = z.CurrencyList,
+                                        DefLang = siteData.DefLang
+                                    });
+                                }
+                            });
+                            userSiteList = tmepuserSiteList;
+                        }
+                    }
+
+                    if (userSiteList != null)
+                    {
+                        cache.Set(sServerInfoListKey, userSiteList,
+                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                    }
+                }
+
+                return userSiteList;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
     }
 }

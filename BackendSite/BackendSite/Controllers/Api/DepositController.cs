@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -57,6 +57,8 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> status { get; set; }
             public IEnumerable<int> LevelStatus { get; set; }
             public int AmountType { get; set; }
+            public IEnumerable<string> SelectBankCode { get; set; }
+            public IEnumerable<int> SelectCalCode { get; set; }
             public string Amount { get; set; }
             public int PageSize { get; set; }
         }
@@ -72,7 +74,22 @@ namespace BackendSite.Controllers.Api
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
             
-            var depositRequestList = depositBLL.GetDepositRequestList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.status, depositListReq.LevelStatus, depositListReq.PageSize, depositListReq.AmountType, depositListReq.Amount, ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+            var depositRequestList = depositBLL.GetDepositRequestList(
+                depositListReq.SelectSite, 
+                depositListReq.DepositType,
+                depositListReq.SelectBankCode, 
+                depositListReq.SelectCalCode, 
+                startTime, 
+                endTime, 
+                depositListReq.DepositId,
+                depositListReq.UserName, 
+                depositListReq.CurrencyId, 
+                depositListReq.status, 
+                depositListReq.LevelStatus,
+                depositListReq.PageSize, 
+                depositListReq.AmountType, 
+                depositListReq.Amount, 
+                ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
 
             foreach (var data in depositRequestList)
@@ -375,9 +392,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult AddDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.AddDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -394,9 +412,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult EditDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.EditDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -413,11 +432,12 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult DeleteDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.DeleteDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
@@ -591,14 +611,15 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         [HttpPost]
-        public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
+        public ApiResult SetDepositRequestAmount(ApiRequestWithLog<SetAmountRequest> req)
         {
-            var depositRequest = depositBLL.GetDepositRequest(para.TransId);
+            var depositRequest = depositBLL.GetDepositRequest(req.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (depositBLL.SetDepositRequestAmount(para.TransId, para.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (depositBLL.SetDepositRequestAmount(
+                    new ParamsWithLog<SetAmountRequest>(req, User.Identity.Name), depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {
@@ -609,6 +630,23 @@ namespace BackendSite.Controllers.Api
             else
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+            }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_editAmount" })]
+        [HttpPost]
+        public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response =  await depositBLL.DepositManual(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"ManualApproval Fail. {ex.Message}");
             }
         }
     }
