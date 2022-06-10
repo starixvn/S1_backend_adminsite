@@ -15,7 +15,7 @@ using BackendSite.Service.Model.BankFinancial;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class GetAllDataController : ControllerBase
@@ -178,15 +178,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Adjustment Log Report > DropDownList[Menu]
+        /// Func Path：Administration > Activity Log Report > DropDownList[Function]
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<AdjustmentInfoLogMenu>> GetAdjustmentInfoLogMenu()
+        public ApiResult<IEnumerable<SelectListItem>> GetAdjustmentInfoLogMenu()
         {
-            var apiResult = new ApiResult<IEnumerable<AdjustmentInfoLogMenu>>
+            var apiResult = new ApiResult<IEnumerable<SelectListItem>>
             {
-                Data = _adjustmentLogReportBll.GetAdjustmentInfoLogMenu(),
+                Data = _adjustmentLogReportBll.GetAdminAdjustmentInfoLogMenu(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetActionTypeList 取得調整資料記錄類型清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Administration > Activity Log Report > DropDownList[Type]
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<SelectListItem>> GetActionTypeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<SelectListItem>>
+            {
+                Data = _adjustmentLogReportBll.GetActionTypeList(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -291,6 +311,53 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetAllBankCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
+            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
+            var data = bankInfoOff
+                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetAllCalCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
+            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
+            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
+            var data = bankInfoOff
+                .Select(x => new CalCodeModel
+                {
+                    Id = x.Id,
+                    SysId = x.SysId,
+                    AccountName = x.AccountName,
+                    AccountNo = x.AccountNo,
+                    BankCode = x.BankCode , 
+                    SiteName = x.SiteName
+                });
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
             return apiResult;
         }
 

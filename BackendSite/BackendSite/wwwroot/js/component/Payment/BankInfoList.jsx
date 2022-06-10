@@ -10,6 +10,11 @@ import { number_format } from '../commJS/common';
         2: <span>Withdrawal</span>,
         3: <span>Deposit & Withdrawal</span>
     };
+    const PurposeDesc = {
+        1: "Deposit",
+        2: "Withdrawal",
+        3: "Deposit & Withdrawal"
+    };
     const defStatus = {
         0: "Initial",
         1: "Open(Active)",
@@ -36,10 +41,48 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard() {
+            let thisRow = this.props.row;
             let thisState = this.state.row;
+            console.log(thisRow);
+            console.log(thisState);
             let status = parseInt(thisState.status);
             status = status == 0 ? 1 : status;
-            let data = { currencyId: thisState.CurrencyId, siteId: this.props.SiteId, SysId: thisState.sysId, BankAccountName: thisState.accountName, BankAccountNo: thisState.accountNo, IFSCCode: thisState.ifscCode, MaxAmount: parseFloat(thisState.maxAmount), MinAmount: parseFloat(thisState.minAmount), DailyLimitAmount: parseFloat(thisState.dailyLimitAmount), PointLevel: parseInt(thisState.pointLevel), Purpose: parseInt(thisState.purpose), Status: status, Sort: parseInt(thisState.bSort) };
+            let data = {
+                currencyId: this.props.CurrencyId,
+                siteId: this.props.SiteId,
+                before:{
+                    SysId: thisRow.sysId,
+                    BankName: thisRow.bankName,
+                    BankAccountName: thisRow.accountName,
+                    BankAccountNo: thisRow.accountNo,
+                    IFSCCode: thisRow.ifscCode,
+                    MaxAmount: thisRow.maxAmount,
+                    MinAmount: thisRow.minAmount,
+                    DailyLimitAmount: thisRow.dailyLimitAmount,
+                    PointLevel: thisRow.pointLevel,
+                    Purpose: thisRow.purpose,
+                    PurposeDescription: PurposeDesc[thisRow.purpose],
+                    Status: thisRow.status,
+                    StatusName: defStatus[thisRow.status],
+                    Sort: thisRow.bSort
+                },
+                after:{
+                    SysId: thisState.sysId,
+                    BankName: thisState.bankName,
+                    BankAccountName: thisState.accountName,
+                    BankAccountNo: thisState.accountNo,
+                    IFSCCode: thisState.ifscCode,
+                    MaxAmount: parseFloat(thisState.maxAmount),
+                    MinAmount: parseFloat(thisState.minAmount),
+                    DailyLimitAmount: parseFloat(thisState.dailyLimitAmount),
+                    PointLevel: parseInt(thisState.pointLevel),
+                    Purpose: parseInt(thisState.purpose),
+                    PurposeDescription: PurposeDesc[thisState.purpose * 1],
+                    Status: thisState.status * 1,
+                    StatusName: defStatus[thisState.status * 1],
+                    Sort: thisState.bSort * 1
+                }
+            };
             let finishFunc = this.onCancel.bind(this, thisState.bankId);
             this.props.onSaveBankCard(data, finishFunc);
         }
@@ -73,6 +116,7 @@ import { number_format } from '../commJS/common';
                     </td>
                     <td>
                         <select className="custom-select" name="status" onChange={this.onChange.bind(this)} value={row.status}>
+                            {row.status===0 ? <option value={0}>Initial</option> : null}
                             <option value={1}>Active</option>
                             <option value={2}>Suspend</option>
                             <option value={3}>Closed</option>
@@ -101,8 +145,8 @@ import { number_format } from '../commJS/common';
 
         }
 
-        onDelete(binkId) {
-            this.props.onDelete(binkId);
+        onDelete(detail) {
+            this.props.onDelete(detail);
         }
 
         onEdit(binkId) {
@@ -133,7 +177,7 @@ import { number_format } from '../commJS/common';
                                 <button className="btn btn-edit" onClick={this.onEdit.bind(this, row.bankId)}>
                                     <i className="icon-edit" />
                                 </button>
-                                <button className="btn btn-icon-delete" onClick={this.onDelete.bind(this, row.bankId)}>
+                                <button className="btn btn-icon-delete" onClick={this.onDelete.bind(this, row)}>
                                     <i className="icon-delete" />
                                 </button>
                             </div>
@@ -172,11 +216,19 @@ import { number_format } from '../commJS/common';
             this.setState(onEdit);
         }
 
-        onDelete(bankId) {
+        onDelete(detail) {
             if (confirm('Are you sure?')) {
-                axios.post('/api/BankList/DelBankCard', { siteId: this.props.SiteId, bankId: bankId })
+                let data = {
+                    currencyId: detail.currencyId,
+                    siteId: this.props.SiteId,
+                    before:{
+                        BankId: detail.bankId,
+                        BankName: detail.bankName,
+                        BankAccountNo: detail.accountNo,
+                    }
+                };
+                axios.post('/apiv2/BankCardManagement/Delete', data)
                     .then(function (response) {
-                        //Loading.UnLoading();
                         let result = response.data;
                         if (result.errorCode == 0) {
                             alert(result.message);
@@ -185,7 +237,6 @@ import { number_format } from '../commJS/common';
                             alert(result.message);
                         }
                     }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
                         alert(error);
                     }.bind(this));
             }
@@ -292,7 +343,7 @@ import { number_format } from '../commJS/common';
             event.preventDefault();
             let SelSite = this.props.SelSite;
             let thisState = this.state;
-
+            
             if (SelSite == null) {
                 alert('Please Select Site');
                 return;
@@ -337,9 +388,28 @@ import { number_format } from '../commJS/common';
                 alert('Please Select Purpose');
                 return;
             }
+            let BankList = this.props.SysBankList;
             
-
-            let data = { currencyId: thisState.SelCcyId , siteId: SelSite.siteId, SysId: thisState.SelSysId, BankAccountName: thisState.BankAccountName, BankAccountNo: thisState.BankAccountNo, IFSCCode: thisState.IFSCCode, MaxAmount: parseFloat(thisState.MaxAmount), MinAmount: parseFloat(thisState.MinAmount), DailyLimitAmount: parseFloat(thisState.DailyLimitAmount), PointLevel: parseInt(thisState.PointLevel), Purpose: parseInt(thisState.Purpose), Status: thisState.Status, Sort: thisState.Sort }
+            let data = {
+                currencyId: thisState.SelCcyId,
+                siteId: SelSite.siteId,
+                after:{
+                    SysId: thisState.SelSysId,
+                    BankName: BankList.find(x => x.sysId === thisState.SelSysId).bankName,
+                    BankAccountName: thisState.BankAccountName,
+                    BankAccountNo: thisState.BankAccountNo,
+                    IFSCCode: thisState.IFSCCode,
+                    MaxAmount: parseFloat(thisState.MaxAmount),
+                    MinAmount: parseFloat(thisState.MinAmount),
+                    DailyLimitAmount: parseFloat(thisState.DailyLimitAmount),
+                    PointLevel: parseInt(thisState.PointLevel),
+                    Purpose: parseInt(thisState.Purpose),
+                    PurposeDescription: PurposeDesc[thisState.Purpose * 1],
+                    Status: thisState.Status,
+                    StatusName: defStatus[thisState.status * 1],
+                    Sort: thisState.Sort
+                }
+            }
 
             this.props.onSaveBankCard(data);
         }
@@ -349,7 +419,7 @@ import { number_format } from '../commJS/common';
         }
 
         onSelSysId(e) {
-            this.setState({ SelSysId: parseInt(event.target.value) });
+            this.setState({ SelSysId: parseInt(event.target.value)});
         }
 
         getSiteList() {
@@ -627,52 +697,24 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard(data, finishFunc) {
-            if(data.currencyId == 61)
-            {
-                axios.post('/api/BankList/SetBankCardwithIFSC', data)
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            alert(result.message);
-                            if (finishFunc != null) {
-                                finishFunc();
-                                this.onSearch();
-                            } else {
-                                this.setState({ ShowForm: false });
-                                this.onSearch();
-                            }
+            axios.post('/apiv2/BankCardManagement/Set', data)
+                .then(function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                        if (finishFunc != null) {
+                            finishFunc();
+                            this.onSearch();
                         } else {
-                            alert(result.message);
+                            this.setState({ ShowForm: false });
+                            this.onSearch();
                         }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-
-            }else
-            {
-                axios.post('/api/BankList/SetBankCard', data)
-                    .then(function (response) {
-                        //Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            alert(result.message);
-                            if (finishFunc != null) {
-                                finishFunc();
-                                this.onSearch();
-                            } else {
-                                this.setState({ ShowForm: false });
-                                this.onSearch();
-                            }
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        //Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));
         }
 
         componentDidMount() {
@@ -717,7 +759,6 @@ import { number_format } from '../commJS/common';
          let statusList = Object.keys(defStatus).map((key) => {
              if(this.state.SelStatus===undefined)
              {
-                 console.log(123);
                 if(key==1)
                 {               
                    return <option key={key} value={key} selected="selected">{defStatus[key]}</option>;
@@ -729,7 +770,6 @@ import { number_format } from '../commJS/common';
              }
              else
              {
-                console.log(456);
                 if(key==this.state.SelStatus)
                 {               
                    return <option key={key} value={key} selected="selected">{defStatus[key]}</option>;

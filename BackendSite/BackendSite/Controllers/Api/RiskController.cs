@@ -6,6 +6,7 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -214,15 +215,15 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> UpdateStatus([FromForm] DisableDisableUser disable)
+        public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {
             try
             {
                 var updateOperator = User.Identity.Name;
-                var result = await _riskBll.UpdateStatus(disable.CustId, disable.Status, updateOperator);
+                var result = await _riskBll.UpdateStatus(new ParamsWithLog<DisableDisableUser>(req, updateOperator));
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? 0 : result,
+                    ErrorCode = result ? 0 : 1,
                 };
             }
             catch (Exception ex)
@@ -250,14 +251,15 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
         [HttpPost]
-        public async Task<ApiResult> Delete([FromForm] int custId)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
         {
             try
             {
-                var result = await _riskBll.DeleteTpDisableUser(custId);
+                var result = await _riskBll.DeleteTpDisableUser(
+                    new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
                 return new ApiResult
                 {
-                    ErrorCode = result == 1 ? 0 : result,
+                    ErrorCode = result ? 0 : 1
                 };
             }
             catch (Exception ex)

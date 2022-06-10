@@ -1128,7 +1128,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
+                console.log(data);
+                axios.post('/apiv2/CustomerManage/SetEnablePromotionStatus', { 
+                    CustId: data.custId ,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    status: e
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1147,7 +1153,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustBankInfo', { CustId: data.custId })
+                axios.post('/apiv2/CustomerManage/ResetCustBankInfo', { 
+                    
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1165,7 +1176,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustUSDTnfo() {
             if (confirm('Are you sure reset USDT Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustUSDTInfo', { CustId: data.custId })
+                axios.post('/apiv2/CustomerManage/ResetCustUSDTInfo', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1181,11 +1196,35 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onUnbindLine() {
+            if (confirm('Are you sure to Unbind Line Profile ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/apiV2/CustomerManage/LineUnbind', { CustId: data.custId })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onUnlock() {
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetUnlock', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId,
+                    currentStatus: data.status,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1207,7 +1246,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetLock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetLock', { 
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1277,7 +1322,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
             if (confirm('Are you sure kick Out this Customer?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/KickOut', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/KickOut', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1297,7 +1347,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetClose', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetClose', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1397,11 +1453,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                             {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
                             {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
-                            {wallet.tpId == 1 && wallet.balance < 0 ?
+                            {/* {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
                                 </div>
-                                : null}
+                                : null} */}
                         </li>;
                     }.bind(this))}</ul>;
 
@@ -1432,7 +1488,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-
+            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -1625,6 +1681,14 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                                     {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
                                                 </td>
                                         }
+                                    </tr>
+                                    <tr>
+                                        {data.custLineProfile === null ? <th scope="row">Line UserId</th> : <th scope="row">Line UserId{subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-copy js-copy" onClick={this.onUnbindLine.bind(this)}>Unbind</button> : null}</th>}
+                                        {data.custLineProfile === null ? <td></td> : <td>{data.custLineProfile.userId}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.custLineProfile.userId}>Copy</button></td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Line Binding Time (Adjusted to GMT+8)</th>
+                                        {data.custLineProfile === null ? <td></td> : <td>{moment.utc(data.custLineProfile.createTime).add(8,'hour').format('l LTS')}</td>}
                                     </tr>
                                     <tr>
                                         <th scope="row">Act Status</th>
