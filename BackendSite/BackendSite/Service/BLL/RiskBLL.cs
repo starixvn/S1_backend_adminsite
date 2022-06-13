@@ -30,14 +30,14 @@ namespace BackendSite.Service.BLL
             return await _riskService.TpDisableUserGetByCustId(custId);
         }
 
-        public async Task<int> UpdateStatus(int custId, int status, string Operator)
+        public async Task<bool> UpdateStatus(ParamsWithLog<DisableDisableUser> input)
         {
-            return await _riskService.UpdateStatus(custId, status, Operator);
+            return await _riskService.UpdateStatus(input);
         }
 
-        public async Task<int> DeleteTpDisableUser(int custId)
+        public async Task<bool> DeleteTpDisableUser(ParamsWithLog<DeleteDisableUser> input)
         {
-            return await _riskService.DeleteTpDisableUser(custId);
+            return await _riskService.DeleteTpDisableUser(input);
         }
     }
 }

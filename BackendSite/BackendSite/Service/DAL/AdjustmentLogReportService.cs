@@ -14,9 +14,11 @@ namespace BackendSite.Service.DAL
     public class AdjustmentLogReportService
     {
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _mainDbClient;
         public AdjustmentLogReportService(IServiceProvider provider)
         {
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
         public List<AdjustmentInfoLogMenu> GetAdjustmentInfoLogMenu()
         {
@@ -41,6 +43,52 @@ namespace BackendSite.Service.DAL
             searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
             return searchResult;
+        }
+        
+        public AdminAdjustmentLogReportResult GetAdminAdjustmentInfoLog(GetAdminAdjustmentInfoLogInput input)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", JsonConvert.SerializeObject(input.SiteIds));
+            props.Add("_CurrencyIds", JsonConvert.SerializeObject(input.CurrencyIds));
+            props.Add("_Menus", JsonConvert.SerializeObject(input.Menus));
+            props.Add("_ActionTypes", JsonConvert.SerializeObject(input.ActionTypes));
+            props.Add("_StartDate", input.StartDate.DateTime);
+            props.Add("_EndDate", input.EndDate.DateTime);
+            props.Add("_RefTransId", string.IsNullOrEmpty(input.TransId) ? null : input.TransId, DbType.String);
+            props.Add("_Operator", string.IsNullOrEmpty(input.UserName) ? null : input.UserName, DbType.String);
+            props.Add("_PageSize", Math.Abs(input.PageSize));
+            props.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var result =
+                _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get", props);
+
+            var logResult = new AdminAdjustmentLogReportResult
+            {
+                AdminAdjustmentLogReport = result,
+                TotalPages = props.Get<int?>("_TotalPages") ?? 0,
+                RowCount = props.Get<int?>("_RowCount") ?? 0
+            };
+            return logResult;
+        }
+        
+        public bool CreateAdminAdjustmentInfoLog(CreateAdminAdjustmentInfoLogInput input)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", input.SiteId);
+            props.Add("_CurrencyId", input.CurrencyId);
+            props.Add("_Menu", (int) input.MenuEnum);
+            props.Add("_ActionType", (int) input.ActionType);
+            props.Add("_RefTransId", input.RefTransId ?? string.Empty);
+            props.Add("_BeforeDetailInfo", input.BeforeDetailInfo, DbType.String);
+            props.Add("_AfterDetailInfo", input.AfterDetailInfo, DbType.String);
+            props.Add("_Operator", input.Operator);
+            
+            var result =
+                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", props);
+
+            return result > 0;
         }
     }
 }
