@@ -446,7 +446,6 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<DepositManualResponse>> DepositManual(DepositManualRequest depositManualRequest)
         {
             var url = $"{payApiUrl}DepositManual";
-            depositManualRequest.Amount = 0m;
             var response = await _courierAdapter.MyPostAsync<DepositManualResponse, DepositManualRequest>(url, depositManualRequest);
             return response;
         }
