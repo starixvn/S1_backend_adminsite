@@ -45,6 +45,7 @@ namespace BackendSite
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
             services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
+            services.AddSingleton<S3Helper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
