@@ -12,6 +12,7 @@ using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Service.BLL
 {
@@ -25,6 +26,10 @@ namespace BackendSite.Service.BLL
         private readonly Common common;
         private readonly CustInfoService custInfoService;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly IConfiguration _configuration;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string payApiUrl;
+
 
         public DepositBLL(DepositService depositService,
             ServerInfoService serverInfoService,
@@ -33,7 +38,9 @@ namespace BackendSite.Service.BLL
             AuthorizeBLL authorizeBLL,
             Common common,
             CustInfoService custInfoService,
-            ImageEditorBLL imageEditorBll)
+            ImageEditorBLL imageEditorBll,
+            IConfiguration configuration,
+            CourierAdapter courierAdapter)
         {
             this.depositService = depositService;
             this.serverInfoService = serverInfoService;
@@ -42,6 +49,9 @@ namespace BackendSite.Service.BLL
             this.authorizeBLL = authorizeBLL;
             this.common = common;
             this.custInfoService = custInfoService;
+            this._configuration = configuration;
+            this._courierAdapter = courierAdapter;
+            payApiUrl = configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = imageEditorBll;
         }
 
@@ -431,6 +441,13 @@ namespace BackendSite.Service.BLL
 
             scope.Complete();
             return result;
+        }
+
+        public async Task<ApiResult<DepositManualResponse>> DepositManual(DepositManualRequest depositManualRequest)
+        {
+            var url = $"{payApiUrl}DepositManual";
+            var response = await _courierAdapter.MyPostAsync<DepositManualResponse, DepositManualRequest>(url, depositManualRequest);
+            return response;
         }
     }
 }
