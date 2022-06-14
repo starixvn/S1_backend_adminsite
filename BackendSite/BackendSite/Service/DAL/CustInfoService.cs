@@ -817,19 +817,5 @@ namespace BackendSite.Service.DAL
                 Status = status
             }));
         }
-        public int SetCustBankDetail(int custId, int sysId, string accountNum, string iFSCCode, CustBankDetailStatus status, MySqlConnection conn, MySqlTransaction trans)
-        {
-            var result = 0;
-            var parameter = new DynamicParameters(new
-            {
-                CustId = custId,
-                SysId = sysId,
-                AccountNo = accountNum,
-                IFSCCode = iFSCCode,
-                Status = (int)status
-            });
-            result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
-            return result;
-        }
     }
 }

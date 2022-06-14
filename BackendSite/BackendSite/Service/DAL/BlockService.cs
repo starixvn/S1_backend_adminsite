@@ -20,12 +20,14 @@ namespace BackendSite.Service.DAL
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly MySqlClient _ipTableClient;
+        private readonly CustInfoService _custInfoService;
         public BlockService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
         public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
             DateTime endDate, int startIndex,
@@ -217,6 +219,54 @@ namespace BackendSite.Service.DAL
                     }
                 }
                 trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            return result;
+        }
+
+        public int ReleaseAccount(int custId, int sysId, string accountNum)
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                CustId = custId,
+                SysId = sysId,
+                AccountNo = accountNum
+            });
+            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
+            
+            if(result > 0)
+            {
+                var custInfo = _custInfoService.GetCustInfo(custId);
+
+                if(custInfo != null)
+                {
+                    
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+                //var prop = new DynamicParameters(new
+                //{
+                //    CustId = custId,
+                //    SiteId = x.SiteId,
+                //    SysId = sysId,
+                //    AccountNum = accountNum,
+                //    IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
+                //    AccountName = accountNum,
+                //    Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                //});
+
+                result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
             }
             else
             {
