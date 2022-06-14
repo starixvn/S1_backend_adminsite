@@ -466,6 +466,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return File(image, "image/jpeg");
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_editAmount" })]
+        [HttpPost]
+        public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await _depositBll.DepositManual(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"ManualApproval Fail. {ex.Message}");
+            }
+        }
+
         #region Private function
 
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
