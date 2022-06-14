@@ -67,7 +67,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
             return result;
         }
 
