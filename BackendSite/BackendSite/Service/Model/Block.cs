@@ -28,6 +28,7 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNum { get; set; }
         public int SysId { get; set; }
+        public string IFSCCode { get; set; }
         private DateTimeOffset _createTime { get; set; }
         public DateTimeOffset CreateTime
         {

@@ -116,7 +116,7 @@ namespace BackendSite.Service.DAL
                 SelectStatus = jsonSelectStatus,
             });
 
-            return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_GetV2", p);
+            return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
         }
 
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
@@ -127,21 +127,7 @@ namespace BackendSite.Service.DAL
                 AccountNum = accountNum
             });
 
-            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_GetV2", p);
-        }
-
-        public int BlockAccountSet(int sysId, string accountNum,int status,string Operator, string memo = "")
-        {
-            var p = new DynamicParameters(new
-            {
-                _SysId = sysId,
-                _AccountNum = accountNum,
-                _Status = status,
-                _UpdateOperator = Operator,
-                _Memo = memo
-            });
-            var result = _mainDbClient.Execute("Admin_BlockAccount_Set", p);
-            return result;
+            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
         }
         public IEnumerable<IPCountry> GetIPCountryList()
         {
@@ -158,7 +144,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
         }
 
-        public int BlockAccountSetV2(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
+        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -228,7 +214,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int ReleaseAccount(int custId, int sysId, string accountNum)
+        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -249,30 +235,35 @@ namespace BackendSite.Service.DAL
 
                 if(custInfo != null)
                 {
-                    
+                    var prop = new DynamicParameters(new
+                    {
+                        CustId = custId,
+                        SiteId = custInfo.SiteId,
+                        SysId = sysId,
+                        AccountNum = accountNum,
+                        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "" : iFSCCode,
+                        AccountName = accountNum,
+                        Status = CustBankInfoLogStatus.Release
+                    });
+
+                    result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+
+                    if(result <= 0)
+                    {
+                        trans.Rollback();
+                    }
                 }
                 else
                 {
                     trans.Rollback();
                 }
-                //var prop = new DynamicParameters(new
-                //{
-                //    CustId = custId,
-                //    SiteId = x.SiteId,
-                //    SysId = sysId,
-                //    AccountNum = accountNum,
-                //    IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
-                //    AccountName = accountNum,
-                //    Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
-                //});
-
-                result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+                
             }
             else
             {
                 trans.Rollback();
             }
-
+            trans.Commit();
             return result;
         }
     }
