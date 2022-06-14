@@ -499,7 +499,10 @@ namespace BackendSite.Controllers.Api
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
-                    custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                    if (custInfoDetail.CustLineProfile != null)
+                    {
+                        custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                    }
                 }
 
                 return new ApiResult<CustInfoDetail>
