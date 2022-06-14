@@ -1,94 +1,123 @@
-﻿using BackendSite.Service.DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using BackendSite.Service.Model.TpMaintain;
-using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using Amazon.S3.Model;
 using System.Net;
-using Microsoft.Extensions.Options;
-using BackendSite.Service.Model;
 using System.Text;
 using System.IO;
+using BackendSite.Service.Model.enums;
+using Amazon.CloudFront.Model;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using BackendSite.Service.Model;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.BLL
 {
     public class SiteMaintainBLL
     {
-        private readonly S3Helper _s3Helper;
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
-        private readonly ServerInfoBLL _serverInfo;
-
+        private readonly AWSS3Helper _s3Helper;
+        private readonly AWSCloudFrontHelper _cloudFrontHelper;
+   
         public SiteMaintainBLL(IServiceProvider provider)
         {
-            _s3Helper = provider.GetRequiredService<S3Helper>();
             _siteConfig = provider.GetRequiredService<IOptions<Dictionary<string, SiteConfig>>>();
-            _serverInfo = provider.GetRequiredService<ServerInfoBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
         }
 
-        public async Task<SiteMaintainObject> GetSiteMaintainObject(int siteId)
+        public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
         {
-            var site = _serverInfo.GetServerInfoWithSiteId(siteId);
-
             var putRequest = new GetObjectRequest
             {
                 BucketName = "ailab-errorpage",
-                Key = $"{site.SiteName.ToUpper()}/maintain.json"
+                Key = $"{site}/maintain.json"
             };
 
-            var putResponse = await _s3Helper.Get(putRequest);
+            var putResponse = await _s3Helper.GetObjectAsync(putRequest);
             using StreamReader sr = new StreamReader(putResponse.ResponseStream);
             using JsonReader reader = new JsonTextReader(sr);
             JsonSerializer serializer = new JsonSerializer();
-            var response = serializer.Deserialize<SiteMaintainObject>(reader);
+            var response = serializer.Deserialize<SiteMaintainResponse>(reader);
             return response;
         }
 
-        public async Task<bool> UpdateSiteMaintainTime(int siteId, bool maintain, DateTimeOffset begin, DateTimeOffset end)
+        public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request)
         {
-            var site = _serverInfo.GetServerInfoWithSiteId(siteId);
-
-            var siteMaintainObject = new SiteMaintainObject()
+            var siteMaintainObject = new SiteMaintainResponse()
             {
-                Maintain = maintain,
-                DateTimeStart = new DateTimeOffset(begin.ToUniversalTime().DateTime, new TimeSpan(8,0,0)).ToString("yyyy-MM-dd HH:mm:ss"),
-                UTCTimeStart = begin.ToUniversalTime().ToUnixTimeSeconds().ToString(),
-                DateTimeEnd = new DateTimeOffset(end.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
-                UTCTimeEnd = end.ToUniversalTime().ToUnixTimeSeconds().ToString(),
+                Maintain = request.Maintain,
+                DateTimeStart = new DateTimeOffset(request.BeginTime.ToUniversalTime().DateTime, new TimeSpan(8,0,0)).ToString("yyyy-MM-dd HH:mm:ss"),
+                UTCTimeStart = request.BeginTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
+                DateTimeEnd = new DateTimeOffset(request.EndTime.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
+                UTCTimeEnd = request.EndTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
             };
 
+            //update s3
             var putRequest = new PutObjectRequest
             {
                 BucketName = "ailab-errorpage",
                 ContentType = "application/json",
-                InputStream = GetStream(JsonConvert.SerializeObject(siteMaintainObject)),
-                Key = $"{site.SiteName.ToUpper()}/maintain.json"
+                InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
+                Key = $"{request.SiteId}/maintain.json"
             };
+            var putResponse = await _s3Helper.PutObjectAsync(putRequest);      
+            if (!putResponse.HttpStatusCode.IsSuccess())
+            {
+                return false;
+            }
 
-            var putResponse = await _s3Helper.Put(putRequest);
-
-            return putResponse.HttpStatusCode == HttpStatusCode.OK;
+            //clear cache
+            var invalidationRequest = new CreateInvalidationRequest()
+            {
+                DistributionId = _siteConfig.Value[request.SiteId.GetDescription()].AwsCloudFrontErrorDomainID,
+                InvalidationBatch = new InvalidationBatch()
+                {
+                    CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                    Paths = new Paths
+                    {
+                        Quantity = 1,
+                        Items = new List<string> { "/maintain.json" }
+                    }
+                }
+            };
+            var createResponse = await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
+            return createResponse.HttpStatusCode.IsSuccess();
         }
 
-        private Stream GetStream(string content)
+        public class SiteMaintainResponse
         {
-            return new MemoryStream(Encoding.UTF8.GetBytes(content));
-        }
-
-        public class SiteMaintainObject
-        {
+            /// <summary>
+            /// 是否在維護中
+            /// </summary>
             public bool Maintain { get; set; }
+            /// <summary>
+            /// 維護開始時間(+8)
+            /// </summary>
             public string DateTimeStart { get; set; }
+            /// <summary>
+            /// 維護開始時間 UnixTime Seconds (+0)
+            /// </summary>
             public string UTCTimeStart { get; set; }
+            /// <summary>
+            /// 維護結束時間(+8)
+            /// </summary>
             public string DateTimeEnd { get; set; }
+            /// <summary>
+            /// 維護結束時間 UnixTime Seconds (+0)
+            /// </summary>
             public string UTCTimeEnd { get; set; }
         }
 
-
-
+        public class SiteMaintainRequest
+        {
+            public SiteEnum SiteId { get; set; }
+            public bool Maintain { get; set; }
+            public DateTimeOffset BeginTime { get; set; }
+            public DateTimeOffset EndTime { get; set; }
+        }
     }
 }

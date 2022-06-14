@@ -994,5 +994,17 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+
     #endregion
+
+
+    public enum SiteEnum
+    {
+        [Description("Nova88")]
+        NOVA88 = 1,
+        [Description("Goal123")]     
+        GOAL123 = 2,
+        [Description("Bwing")]
+        BWING = 3
+    }
 }

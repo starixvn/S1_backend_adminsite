@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static BackendSite.Service.BLL.SiteMaintainBLL;
 
-namespace BackendSite.Controllers.ApiV2.CMS.Setting
+namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
 {
     [Authorize]
     [Route("apiV2/[controller]/[action]")]
@@ -34,13 +30,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SiteMaintain" })]
-        public async Task<ApiResult> Get(int siteId)
+        public async Task<ApiResult> Get(SiteMaintainRequest request)
         {
             try
             {
-                return new ApiResult<SiteMaintainObject>
+                return new ApiResult<SiteMaintainResponse>
                 {
-                    Data = await _siteMaintainBll.GetSiteMaintainObject(siteId),
+                    Data = await _siteMaintainBll.GetSiteMaintain(request.SiteId),
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
@@ -58,13 +54,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SiteMaintain" })]
-        public async Task<ApiResult> Set(int siteId, bool maintain, DateTimeOffset begin, DateTimeOffset end)
+        public async Task<ApiResult> Update(SiteMaintainRequest request)
         {
             try
             {
                 return new ApiResult
                 {
-                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintainTime(siteId, maintain, begin, end) 
+                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintain(request) 
                     ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.SystemException,
                 };
             }
@@ -80,6 +76,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
         }
 
+        
 
     }
 }
