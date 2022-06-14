@@ -100,8 +100,11 @@ namespace BackendSite.Controllers
             var startTime = DateTimeExtensions.UnixToDateTime(depositListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             depositListReq.SelectSite = $"[{depositListReq.SelectSite}]";
-            var selectBankCode = depositListReq.SelectBankCode.Split(',').ToList();
-            depositListReq.SelectCalCode = $"[{depositListReq.SelectCalCode}]";
+            var selectBankCode = depositListReq.SelectBankCode?.Split(',').ToList();
+            if (depositListReq.SelectCalCode != null)
+            {
+                depositListReq.SelectCalCode = $"[{depositListReq.SelectCalCode}]";
+            }
             depositListReq.DepositType = $"[{depositListReq.DepositType}]";
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
             depositListReq.Status = $"[{depositListReq.Status}]";
@@ -109,8 +112,8 @@ namespace BackendSite.Controllers
 
             var exportDeposit = depositBLL.GetDepositExportList(
                 depositListReq.SelectSite,
-                selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
-                depositListReq.SelectCalCode, 
+                selectBankCode != null ? JsonConvert.SerializeObject(selectBankCode) : null,
+                depositListReq.SelectCalCode,
                 depositListReq.DepositType,
                 startTime, endTime, 
                 depositListReq.DepositId, 
