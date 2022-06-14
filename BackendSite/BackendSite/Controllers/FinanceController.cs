@@ -112,7 +112,7 @@ namespace BackendSite.Controllers
 
             var exportDeposit = depositBLL.GetDepositExportList(
                 depositListReq.SelectSite,
-                selectBankCode != null ? JsonConvert.SerializeObject(selectBankCode) : null,
+                selectBankCode != null ? JsonConvert.SerializeObject(selectBankCode) : "[]",
                 depositListReq.SelectCalCode,
                 depositListReq.DepositType,
                 startTime, endTime, 
