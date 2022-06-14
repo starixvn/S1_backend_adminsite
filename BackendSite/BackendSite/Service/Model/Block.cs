@@ -34,14 +34,21 @@ namespace BackendSite.Service.Model
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        private DateTimeOffset? _updateTime { get; set; }
-        public DateTimeOffset? UpdateTime
+        private DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
-            set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset? _blockUpdateTime { get; set; }
+        public DateTimeOffset? BlockUpdateTime
+        {
+            get => _blockUpdateTime;
+            set => _blockUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public string UpdateOperator { get; set; }
         public int Status { get; set; }
+        public int BlockStatus { get; set; }
     }
     public class BlockList 
     {

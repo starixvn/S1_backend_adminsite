@@ -933,4 +933,23 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
+
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+    public enum CustBankInfoLogStatus
+    {
+        //1: Create, 2: Delete, 3: Lock, 4:Unlock
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4
+    }
 }

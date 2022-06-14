@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -57,9 +58,10 @@ namespace BackendSite.Service.BLL
             return _blockService.GetBlockBankAccList(sysId, accountNum);
         }
 
-        public int BlockAccountSet(int sysId, string accountNum, int status, string Operator, string memo)
+        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo)
         {
-            return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
+            //return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
+            return _blockService.BlockAccountSetV2(sysId, accountNum, status, Operator, memo);
         }
         public void SetCustBankInfoLog(int sysId, string accountNum,int status)
         {

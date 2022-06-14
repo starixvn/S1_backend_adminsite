@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -113,7 +114,7 @@ namespace BackendSite.Service.DAL
                 SelectStatus = jsonSelectStatus,
             });
 
-            return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
+            return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_GetV2", p);
         }
 
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
@@ -124,7 +125,7 @@ namespace BackendSite.Service.DAL
                 AccountNum = accountNum
             });
 
-            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
+            return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_GetV2", p);
         }
 
         public int BlockAccountSet(int sysId, string accountNum,int status,string Operator, string memo = "")
@@ -153,6 +154,76 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
+        }
+
+        public int BlockAccountSetV2(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                _SysId = sysId,
+                _AccountNum = accountNum,
+                _Status = (int)status,
+                _UpdateOperator = Operator,
+                _Memo = memo
+            });
+            result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
+
+            if(result > 0)
+            {
+                var blockBankAccBlockList = GetBlockBankAccList(sysId, accountNum).ToList();
+
+                foreach(var x in blockBankAccBlockList)
+                {
+                    var parameter = new DynamicParameters(new
+                    {
+                        CustId = x.CustId,
+                        SysId = sysId,
+                        AccountNo = accountNum,
+                        IFSCCode = x.IFSCCode,
+                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.Able
+                    });
+
+                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
+
+                    if (result > 0)
+                    {
+                        var prop = new DynamicParameters(new
+                        {
+                            CustId = x.CustId,
+                            SiteId = x.SiteId,
+                            SysId = sysId,
+                            AccountNum = accountNum,
+                            IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
+                            AccountName = accountNum,
+                            Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                        });
+
+                        result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+                        if(result == 0)
+                        {
+                            trans.Rollback();
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                        return result;
+                    }
+                }
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            return result;
         }
     }
 }
