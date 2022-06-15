@@ -59,6 +59,10 @@ namespace BackendSite.Service.BLL
             var siteData = _serverInfoBll.GetSiteList().Where(x => x.SiteId == siteId).FirstOrDefault();
             return _rebateManageService.SetRebatePeriod(siteId, siteData.ICurrencyList, periodType, periodDay, redeemHours, lastUpdateUser);
         }
+        public IEnumerable<RebateGameTypeDetail> GetRebateGameTypeList(int siteId, int currencyId)
+        {
+            return _rebateManageService.GetRebateGameTypeList(siteId,currencyId);
+        }
         public async Task<bool> BatchSetRebateGameTypeAsync(int siteId, int currencyId, IEnumerable<RebateGameTypeDetail> details, string lastUpdateUser)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
