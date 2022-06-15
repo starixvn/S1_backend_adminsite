@@ -123,6 +123,10 @@
           {
             "DisplayKey": "Set Add/Remove CustTag",
             "FuncKey": "ca_setCustTag"
+          },
+          {
+            "DisplayKey": "Line Unbind",
+            "FuncKey": "ca_lineUnbind"
           }
         ]
       },
