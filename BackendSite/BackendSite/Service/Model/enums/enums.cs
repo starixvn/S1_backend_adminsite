@@ -1089,6 +1089,7 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Able = 1,
+        BODelete = 2
     }
     public enum BlockAccountStatus
     {
