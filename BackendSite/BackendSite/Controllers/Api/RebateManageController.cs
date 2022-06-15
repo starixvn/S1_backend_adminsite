@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,7 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
         {
             return new ApiResult<RebatePeriod>
@@ -81,6 +83,7 @@ namespace BackendSite.Controllers.Api
 
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
         {
             var apiResult = new ApiResult();
@@ -102,6 +105,7 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebatePeriod(DelRebatePeriodReq delRebatePeriodReq)
         {
             var apiResult = new ApiResult
@@ -126,6 +130,7 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
@@ -141,6 +146,7 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public int GameType { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq rebateInfoByGameTypeReq)
         {
             var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
@@ -156,6 +162,7 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public int CategoryId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebateCategoryDetail> GeRebateCategoryDetail(RebateCategoryDetailReq rebateCategoryDetailReq)
         {
             var apiResult = new ApiResult<RebateCategoryDetail>
@@ -175,6 +182,7 @@ namespace BackendSite.Controllers.Api
             public decimal percentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
         {
             var apiResult = new ApiResult
@@ -203,6 +211,7 @@ namespace BackendSite.Controllers.Api
             public string levelPercentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
         {
             var apiResult = new ApiResult
@@ -232,6 +241,7 @@ namespace BackendSite.Controllers.Api
             public int level { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
         {
             var apiResult = new ApiResult
@@ -259,6 +269,7 @@ namespace BackendSite.Controllers.Api
             public decimal percentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
         {
             var apiResult = new ApiResult();
@@ -284,6 +295,7 @@ namespace BackendSite.Controllers.Api
             public string levelPercentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateGameTypeBatch(SetRebateGameTypeBatchReq setRebateGameTypeBatchReq)
         {
             var apiResult = new ApiResult();
@@ -308,6 +320,7 @@ namespace BackendSite.Controllers.Api
             public int level { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
         {
             var apiResult = new ApiResult
@@ -335,6 +348,7 @@ namespace BackendSite.Controllers.Api
             public decimal MinPayout { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult();
@@ -358,6 +372,7 @@ namespace BackendSite.Controllers.Api
             public string LevelPayout { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebatePayoutLimitBatch(SetRebatePayoutLimitBatchReq setRebatePayoutLimitBatchReq)
         {
             var apiResult = new ApiResult();
@@ -381,6 +396,7 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebatePayoutLimit(DelRebatePayoutLimitReq delRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult
