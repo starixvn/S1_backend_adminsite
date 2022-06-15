@@ -69,6 +69,7 @@ namespace BackendSite.Service.BLL
             {
                 if (!_rebateManageService.SetRebateGameType(siteId, currencyId, item.GameType, item.Level, item.Percentage, lastUpdateUser))
                 {
+                    _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
                     trans.Rollback();
                     return false;
                 }
