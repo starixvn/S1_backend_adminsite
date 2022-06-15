@@ -44,8 +44,8 @@ namespace BackendSite.Service.DAL
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
-            var SelectBankCode = JsonConvert.SerializeObject(selectBankCode);
-            var SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null ;
+            var SelectBankCode = selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null;
+            var SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null;
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelStatus);
