@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using Amazon.S3.Model;
-using System.Net;
 using System.Text;
 using System.IO;
 using BackendSite.Service.Model.enums;
@@ -13,6 +12,8 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using BackendSite.Service.Model;
 using BackendSite.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace BackendSite.Service.BLL
 {
@@ -21,12 +22,15 @@ namespace BackendSite.Service.BLL
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
         private readonly AWSS3Helper _s3Helper;
         private readonly AWSCloudFrontHelper _cloudFrontHelper;
-   
+        private readonly string _fileName;
+
         public SiteMaintainBLL(IServiceProvider provider)
         {
             _siteConfig = provider.GetRequiredService<IOptions<Dictionary<string, SiteConfig>>>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
+            var env = provider.GetRequiredService<IWebHostEnvironment>();
+            _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
         }
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
@@ -34,7 +38,7 @@ namespace BackendSite.Service.BLL
             var putRequest = new GetObjectRequest
             {
                 BucketName = "ailab-errorpage",
-                Key = $"{site}/maintain.json"
+                Key = $"{site}/{_fileName}"
             };
 
             var putResponse = await _s3Helper.GetObjectAsync(putRequest);
@@ -62,7 +66,7 @@ namespace BackendSite.Service.BLL
                 BucketName = "ailab-errorpage",
                 ContentType = "application/json",
                 InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
-                Key = $"{request.SiteId}/maintain.json"
+                Key = $"{request.SiteId}/{_fileName}"
             };
             var putResponse = await _s3Helper.PutObjectAsync(putRequest);      
             if (!putResponse.HttpStatusCode.IsSuccess())
@@ -80,7 +84,7 @@ namespace BackendSite.Service.BLL
                     Paths = new Paths
                     {
                         Quantity = 1,
-                        Items = new List<string> { "/maintain.json" }
+                        Items = new List<string> { $"/{_fileName}" }
                     }
                 }
             };
