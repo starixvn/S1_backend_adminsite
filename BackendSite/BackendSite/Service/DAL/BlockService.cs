@@ -173,7 +173,7 @@ namespace BackendSite.Service.DAL
                         SysId = sysId,
                         AccountNo = accountNum,
                         IFSCCode = x.IFSCCode,
-                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.Able
+                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
                     result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
