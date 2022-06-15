@@ -14,6 +14,8 @@ namespace BackendSite.Service.BLL
     public class RebateManageBLL
     {
         private readonly RebateManageService _rebateManageService;
+        private readonly UserBetLimitBLL _userBetLimitBLL;
+        private readonly VipLevelBLL _vipLevelBLL;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly MySqlClient _mainDbClient;
         private readonly ILogger<RebateManageBLL> _logger;
@@ -22,8 +24,10 @@ namespace BackendSite.Service.BLL
         {
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _logger  = provider.GetRequiredService<ILogger<RebateManageBLL>>();
+            _logger = provider.GetRequiredService<ILogger<RebateManageBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _userBetLimitBLL = provider.GetRequiredService<UserBetLimitBLL>();
+            _vipLevelBLL = provider.GetRequiredService<VipLevelBLL>();
         }
 
         public IEnumerable<TPCategory> GetTPCategoryList()
@@ -59,9 +63,53 @@ namespace BackendSite.Service.BLL
             var siteData = _serverInfoBll.GetSiteList().Where(x => x.SiteId == siteId).FirstOrDefault();
             return _rebateManageService.SetRebatePeriod(siteId, siteData.ICurrencyList, periodType, periodDay, redeemHours, lastUpdateUser);
         }
-        public IEnumerable<RebateGameTypeDetail> GetRebateGameTypeList(int siteId, int currencyId)
+        public async Task<IEnumerable<RebateGameTypeDetail>> GetRebateGameTypeList(int siteId, int currencyId, int rebateCategoryId)
         {
-            return _rebateManageService.GetRebateGameTypeList(siteId,currencyId);
+            var result = new List<RebateGameTypeDetail>();
+            var tpGameType = await _userBetLimitBLL.GetTpGameTypeListbyCategoryAsync(rebateCategoryId);
+            var vipLevelList = _vipLevelBLL.GetVipLevelSetting(siteId);
+            foreach (var item in tpGameType)
+            {
+                var data = _rebateManageService.GetRebateDataByGameType(siteId, item.TypeId, currencyId);
+                if (data.Any())
+                {
+                    var existLevelData = data.Select(x => x.Level);
+                    foreach (var level in vipLevelList)
+                    {
+                        if (existLevelData.Contains(level.Level))
+                        {
+                            result.Add(new RebateGameTypeDetail()
+                            {
+                                GameType = item.TypeId,
+                                GameTypeName = item.TypeName,
+                                Level = level.Level,
+                                Percentage = data.Where(x => x.Level == level.Level).Select(x => x.Percentage).FirstOrDefault()
+                            });
+                        }
+                        else
+                        {
+                            result.Add(new RebateGameTypeDetail()
+                            {
+                                GameType = item.TypeId,
+                                GameTypeName = item.TypeName,
+                                Level = level.Level,
+                                Percentage = null
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    result.AddRange(vipLevelList.Select(x => new RebateGameTypeDetail()
+                    {
+                        GameType = item.TypeId,
+                        GameTypeName = item.TypeName,
+                        Level = x.Level,
+                        Percentage = null
+                    }));
+                }
+            }
+            return result;
         }
         public async Task<bool> BatchSetRebateGameTypeAsync(int siteId, int currencyId, IEnumerable<RebateGameTypeDetail> details, string lastUpdateUser)
         {
@@ -71,7 +119,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var item in details)
             {
-                if (!_rebateManageService.SetRebateGameType(siteId, currencyId, item.GameType, item.Level, item.Percentage, lastUpdateUser))
+                if (!_rebateManageService.SetRebateGameType(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser))
                 {
                     _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
                     trans.Rollback();
