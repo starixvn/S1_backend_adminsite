@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model
         public string TypeName { get; set; }
         public IEnumerable<RebateLevelData> GameTypeLevelList { get; set; }
     }
-   
+
     public class RebatePeriod
     {
         public int CurrencyId { get; set; }
@@ -50,10 +50,10 @@ namespace BackendSite.Service.Model
 
     public class RebateCurrencyData
     {
-        public int CurrencyId { get; set;}
+        public int CurrencyId { get; set; }
         public IEnumerable<RebatePayoutLimitData> PayoutLimitList { get; set; }
         public IEnumerable<RebateCategoryList> CategoryDataList { get; set; }
-       
+
     }
 
     public class RebateCategoryDetail
@@ -66,8 +66,9 @@ namespace BackendSite.Service.Model
     public class RebateGameTypeDetail
     {
         public int GameType { get; set; }
+        public string GameTypeName { get; set; }
         public int Level { get; set; }
-        public decimal Percentage { get; set; }
+        public decimal? Percentage { get; set; }
     }
 
     public class AdjustmentInfoLogParam

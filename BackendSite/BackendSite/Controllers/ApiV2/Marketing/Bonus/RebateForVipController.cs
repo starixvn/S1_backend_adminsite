@@ -54,6 +54,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int CurrencyId { get; set; }
         }
 
+        public class GetRebateGameTypeListRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int RebateCategoryId { get; set; }
+        }
+
         public class SetCategoryRequest
         {
             public int SiteId { get; set; }
@@ -134,12 +141,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<RebateGameTypeDetail>> GetRebateGameTypeList(GetRebateInfoRequest request)
+        public async Task<ApiResult<IEnumerable<RebateGameTypeDetail>>> GetRebateGameTypeList(GetRebateGameTypeListRequest request)
         {
             return new ApiResult<IEnumerable<RebateGameTypeDetail>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId)
+                Data = await _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId,request.RebateCategoryId)
             };
         }
 
