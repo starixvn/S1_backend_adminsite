@@ -1,9 +1,13 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -11,16 +15,17 @@ namespace BackendSite.Service.BLL
     {
         private readonly RebateManageService _rebateManageService;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly MySqlClient _mainDbClient;
+        private readonly ILogger<RebateManageBLL> _logger;
 
         public RebateManageBLL(IServiceProvider provider)
         {
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _logger  = provider.GetRequiredService<ILogger<RebateManageBLL>>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
-        //public IEnumerable<VipLevel> GetVipLevel(int siteId)
-        //{
-        //    return rebateManageService.GetVipLevel(siteId);
-        //}
+
         public IEnumerable<TPCategory> GetTPCategoryList()
         {
             return _rebateManageService.GetTPCategoryList();
@@ -53,6 +58,29 @@ namespace BackendSite.Service.BLL
         {
             var siteData = _serverInfoBll.GetSiteList().Where(x => x.SiteId == siteId).FirstOrDefault();
             return _rebateManageService.SetRebatePeriod(siteId, siteData.ICurrencyList, periodType, periodDay, redeemHours, lastUpdateUser);
+        }
+        public IEnumerable<RebateGameTypeDetail> GetRebateGameTypeList(int siteId, int currencyId)
+        {
+            return _rebateManageService.GetRebateGameTypeList(siteId,currencyId);
+        }
+        public async Task<bool> BatchSetRebateGameTypeAsync(int siteId, int currencyId, IEnumerable<RebateGameTypeDetail> details, string lastUpdateUser)
+        {
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            foreach (var item in details)
+            {
+                if (!_rebateManageService.SetRebateGameType(siteId, currencyId, item.GameType, item.Level, item.Percentage, lastUpdateUser))
+                {
+                    _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
+                    trans.Rollback();
+                    return false;
+                }
+            }
+
+            trans.Commit();
+            return true;
         }
         public bool DelRebatePeriod(int siteId, string lastUpdateUser)
         {
