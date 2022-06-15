@@ -113,7 +113,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<RebateLevelData>("Admin_RebateGameType_Get", new DynamicParameters(new { SiteId = siteId, GameType = gameType, CurrencyId = currencyId }));
         }
 
-        public IEnumerable<RebateGameTypeDetail> GetRebateGameTypeList(int siteId,int currencyId)
+        public IEnumerable<RebateGameTypeDetail> GetRebateGameTypeList(int siteId,int currencyId,int CategoryId)
         {
             return _mainDbClient.Query<RebateGameTypeDetail>("Admin_RebateGameType_Get", new DynamicParameters(new { SiteId = siteId, GameType = 0, CurrencyId = currencyId }));
         }
