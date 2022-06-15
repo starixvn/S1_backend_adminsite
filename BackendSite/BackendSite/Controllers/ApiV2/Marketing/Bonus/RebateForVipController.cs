@@ -55,13 +55,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int CurrencyId { get; set; }
         }
 
-        public class GetRebateInfoByGameTypeRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int GameType { get; set; }
-        }
-
         public class SetCategoryRequest
         {
             public int SiteId { get; set; }
@@ -142,15 +135,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(GetRebateInfoByGameTypeRequest request)
+        public ApiResult<IEnumerable<RebateGameTypeDetail>> GetRebateGameTypeList(GetRebateInfoRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
+            return new ApiResult<IEnumerable<RebateGameTypeDetail>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = _rebateManageBll.GetRebateDataByGameType(request.SiteId, request.GameType, request.CurrencyId)
+                Data = _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId)
             };
-
-            return apiResult;
         }
 
         /// <summary>
