@@ -23,6 +23,7 @@ namespace BackendSite.Service.Model
     }
     public class BlockBankAcc
     {
+        public int CustId { get; set; }
         public string UserName { get; set; }
         public string BankName { get; set; }
         public string AccountName { get; set; }
