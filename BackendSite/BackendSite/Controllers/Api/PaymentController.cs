@@ -14,10 +14,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
+using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -415,7 +417,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             
-            var stream = _excelBLL.Export(exportData);
+            var stream = _excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -451,7 +453,7 @@ namespace BackendSite.Controllers.Api
             {
                 data.ClaimTime = new DateTimeOffset(data.ClaimTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = _excelBLL.Export(exportData);
+            var stream = _excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -1167,13 +1169,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult AddAdjustmentLimitInfo(AddAdjustmentLimitPara para)
+        public ApiResult AddAdjustmentLimitInfo(ApiRequestWithLog<AdjustmentLimit> para)
         {
             var result =
-                _paymentBLL.AddAdjustmentLimitInfo(para.SiteId, para.CurrencyId, para.AdjustmentMax,
-                    User.Identity.Name);
+                _paymentBLL.SetAdjustmentLimitInfo(new ParamsWithLog<AdjustmentLimit>(para, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = 0;
                 apiResult.Message = _selLangBLL.GetMsg("msg_Updatesuccessful");

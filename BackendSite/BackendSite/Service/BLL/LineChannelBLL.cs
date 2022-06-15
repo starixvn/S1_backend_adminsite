@@ -1,12 +1,10 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -49,14 +47,13 @@ namespace BackendSite.Service.BLL
             return new LineChannelModel(data);
         }
 
-        public bool Set(LineChannelDto newsDatas)
+        public bool Set(ParamsWithLog<SetLineChannel> input)
         {
             try
             {
-                var result = _lineChannelService.Set(newsDatas);
+                var success = _lineChannelService.Set(input);
 
-                if (result != 1)
-                    //Insert Affect Row Should be 1;
+                if (!success)
                     throw new AdminException(ErrorCodeEnum.UpdateFailed);
 
                 return true;
@@ -68,12 +65,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool Delete(int id)
+        public bool Delete(ParamsWithLog<DeleteLineChannel> input)
         {
-            var result = _lineChannelService.Delete(id);
+            var success = _lineChannelService.Delete(input);
 
-            if (result != 1)
-                //Delete Affect Row Should be 1;
+            if (!success)
                 throw new AdminException(ErrorCodeEnum.Fail);
 
             return true;

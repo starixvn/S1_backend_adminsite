@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
     [Route("api/[controller]/[action]")]
     [ApiController]

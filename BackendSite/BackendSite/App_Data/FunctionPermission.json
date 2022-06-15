@@ -31,6 +31,11 @@
         "DisplayKey": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Bet List Report",
+        "FuncKey": "Report/BetListReport",
+        "Enable": false
       }
     ]
   },
@@ -122,6 +127,10 @@
           {
             "DisplayKey": "Disable Rebate Payout",
             "FuncKey": "ca_rebatePayout"
+          },
+          {
+            "DisplayKey": "Line Unbind",
+            "FuncKey": "ca_lineUnbind"
           }
         ]
       },
@@ -253,6 +262,11 @@
       {
         "DisplayKey": "Withdrawal Accounting",
         "FuncKey": "Finance/WithdrawalAccountingList",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Accounting",
+        "FuncKey": "Finance/DepositAccountingList",
         "Enable": false
       },
       {
@@ -549,61 +563,95 @@
     ]
   },
   {
-  "DisplayKey": "CMS",
-  "Settings": [
-    {
-      "DisplayKey": "Banner Management",
-      "FuncKey": "CMS/BannerManage",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "Hot Event Management",
-      "FuncKey": "CMS/HotEventManagement",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "Game Casino Management",
-      "FuncKey": "CMS/GameCasinoManagement",
-      "Enable": false,
-      "InputBoxType": "checkbox",
-      "SubFuncKeys": [
-        {
-          "DisplayKey": "Edit Main",
-          "FuncKey": "gcm_edit_main"
-        },
-        {
-          "DisplayKey": "Edit Detail",
-          "FuncKey": "gcm_edit_detail"
-        }
-      ]
-    },
-    {
-      "DisplayKey": "Latest Highlight Video Management",
-      "FuncKey": "CMS/LatestHighlightVideoManagement",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "Domain Management",
-      "FuncKey": "CMS/DomainManage",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "Venders Maintenance",
-      "FuncKey": "CMS/TpMaintain",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "LeaderBoard ExtraPoint",
-      "FuncKey": "CMS/LeaderBoardExtraPoint",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "App Link Management",
-      "FuncKey": "CMS/AppLinkManagement",
-      "Enable": false
-    }
-  ]
-},
+    "DisplayKey": "CMS",
+    "Settings": [
+      {
+        "DisplayKey": "Banner Management",
+        "FuncKey": "CMS/BannerManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Hot Event Management",
+        "FuncKey": "CMS/HotEventManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Hot Games Management",
+        "FuncKey": "CMS/HotGamesManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Game Casino Management",
+        "FuncKey": "CMS/GameCasinoManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit Main",
+            "FuncKey": "gcm_edit_main"
+          },
+          {
+            "DisplayKey": "Edit Detail",
+            "FuncKey": "gcm_edit_detail"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Latest Highlight Video Management",
+        "FuncKey": "CMS/LatestHighlightVideoManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Domain Management",
+        "FuncKey": "CMS/DomainManage",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Venders Maintenance",
+        "FuncKey": "CMS/TpMaintain",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "LeaderBoard ExtraPoint",
+        "FuncKey": "CMS/LeaderBoardExtraPoint",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "App Link Management",
+        "FuncKey": "CMS/AppLinkManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Slot Games Management",
+        "FuncKey": "CMS/SlotGamesManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Category Management",
+        "FuncKey": "CMS/CategoryManagement",
+        "Enable": false,
+        "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
+      },
+      {
+        "DisplayKey": "Deep Link Management",
+        "FuncKey": "CMS/DeepLinkManagement",
+        "Enable": false
+      }
+    ]
+  },
   {
     "DisplayKey": "Home",
     "Settings": [
@@ -614,5 +662,5 @@
       }
     ]
   }
-  
+
 ]

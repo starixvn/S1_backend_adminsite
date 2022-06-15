@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -32,6 +31,7 @@ namespace BackendSite.Service.Model
    
     public class RebatePeriod
     {
+        public int CurrencyId { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
         public int? RedeemHours { get; set; }

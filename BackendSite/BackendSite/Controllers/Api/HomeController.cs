@@ -6,10 +6,8 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
@@ -18,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -78,6 +76,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             [Required]
             public string txtPW { set; get; }
+            public string redirectUrl { set; get; }
         }
 
         public class DashBoardPara
@@ -131,7 +130,7 @@ namespace BackendSite.Controllers.Api
 
             //if (userLoginResult != 0)
             //{
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
             //   return apiResult;
             //}
 
@@ -142,14 +141,17 @@ namespace BackendSite.Controllers.Api
                     //new Claim("LangId",? ),
                 };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            var claimsIdentity = new ClaimsIdentity(claims, "backend");
+            await HttpContext.SignInAsync("backend",
                                  new ClaimsPrincipal(claimsIdentity));
+
+            if (string.IsNullOrWhiteSpace(loginModel.redirectUrl))
+                loginModel.redirectUrl = Url.Action("Index", "Home");
 
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = Url.Action("Index", "Home")
+                Message = loginModel.redirectUrl
             };
         }
 
@@ -192,7 +194,7 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> Signout()
         {
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
 
             return new ApiResult
             {
@@ -325,7 +327,7 @@ namespace BackendSite.Controllers.Api
             var CanSearchSite = new List<int>();
 
             _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite,8);
+            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite, 8);
 
             return new ApiResult<DashBoardData>
             {

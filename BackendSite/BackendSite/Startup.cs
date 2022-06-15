@@ -14,10 +14,10 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
-using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using System.Collections.Generic;
-using NSwag.Generation.AspNetCore;
+using BackendSite.Service.Model;
+using StackExchange.Redis;
 
 namespace BackendSite
 {
@@ -34,7 +34,8 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
 
@@ -43,7 +44,11 @@ namespace BackendSite
             services.AddSingleton<Common>();
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
+            services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
+            services.AddRedisConnection(Configuration);
+            services.AddSingleton<RedisHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -87,12 +92,30 @@ namespace BackendSite
             });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            services.AddAuthentication(option => 
+            {
+                option.DefaultScheme = "backend";
+            })
+            .AddCookie("backend", "backend", option =>
             {
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
+                option.Cookie.SameSite = SameSiteMode.Unspecified;
+            })
+            .AddCookie("backendV2", "backendV2", option =>
+            {
+                option.LoginPath = "/Home/AuthorizedFailed";
+                option.Cookie.Name = ".backendV2";
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);
+                option.Cookie.SameSite = SameSiteMode.Unspecified;
+            })
+            .AddCookie("brand", "brand", option =>
+            {
+                option.LoginPath = "/Home/AuthorizedFailed";
+                option.Cookie.Name = ".brand";
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();

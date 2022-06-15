@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency6: "EURO",
     lbl_Currency9: "AUD",
     lbl_Currency12: "GBP",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency20: "UUS",
     lbl_Currency32: "JPY",
@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency45: "WON",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
     lbl_Save: "Save",
     lbl_Success: "Success",
     lbl_Action: "Action",
@@ -54,7 +55,7 @@ export const CurrencyInfo = (props) => {
           aria-expanded="true"
           aria-controls="collapseExample"
         >
-          {window.i18n["lbl_Currency" + value]}
+          {window.i18n["lbl_CurrencyWithdrawal" + value]}
         </a>
         <Result siteId={props.optSite.siteId} currId={value} />
       </div>
@@ -87,7 +88,7 @@ const Result = (props) => {
     });
   };
 
-  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax) => {
+  const handleSetLevelList = (idx, status, withdrawalMin, withdrawalMax, times) => {
     let tmp = [...levelList];
     if (status === "Delete") {
       tmp.splice(idx, 1);
@@ -95,6 +96,7 @@ const Result = (props) => {
     } else if (status === "Update") {
       tmp[idx].withdrawalMin = withdrawalMin;
       tmp[idx].withdrawalMax = withdrawalMax;
+      tmp[idx].times = times;
       setLevelList(tmp);
     }
   };
@@ -102,10 +104,16 @@ const Result = (props) => {
   const handleDelete = (idx) => {
     if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
       api
-        .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
+        .post("/apiv2/WithdrawalLimit/Delete", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
+          before:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            withdrawalMin: levelList[idx].withdrawalMin,
+            withdrawalMax: levelList[idx].withdrawalMax,
+            times: levelList[idx].times
+          }
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
@@ -131,17 +139,35 @@ const Result = (props) => {
         typeof editValue.withdrawalMax === "undefined"
           ? levelList[idx].withdrawalMax
           : editValue.withdrawalMax;
-      api
-        .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
+      let times =
+        typeof editValue.times === "undefined"
+          ? levelList[idx].times
+          : editValue.times;
+      let level = levelList[idx].vipLevel;
+      let levelName = levelList[idx].levelName;
+      var data = {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
-        })
+          before: {
+              vipLevel: level,
+              vipLevelName: levelName,
+              withdrawalMin: levelList[idx].withdrawalMin,
+              withdrawalMax: levelList[idx].withdrawalMax,
+              times: levelList[idx].times
+          },
+          after: {
+              vipLevel: level,
+              vipLevelName: levelName,
+              withdrawalMin: parseInt(withdrawalMin),
+              withdrawalMax: parseInt(withdrawalMax),
+              times: times
+          }
+      };
+      api
+        .post("/apiv2/WithdrawalLimit/Update", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
-            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax);
+            handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);
             alert(response.data.message);
             handleEdit(idx);
           } else {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace BackendSite.Service.Model
 {
@@ -79,28 +78,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-    
-    public class ExportVerificationRewardReport
-    {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
-        public string SiteIds { get; set; }
-        public string UserName { get; set; }
-        public int CurrencyId { get; set; }
 
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-    }
-    
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -108,6 +86,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -133,7 +113,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -142,6 +122,8 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public bool PhoneVerified { get; set; }
@@ -182,6 +164,8 @@ namespace BackendSite.Service.Model
     {
         public string SiteName { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public string Agent { get; set; }
         public string Currency { get; set; }
         public string VerificationType { get; set; }
         public decimal RewardAmount { get; set; }

@@ -10,11 +10,13 @@ import * as Loading from '../commJS/Loading.jsx';
 
     const defCurrencyType = {
         2: "MYR",
+        3: "USD",
         4: "THB",
-        13: "RMB",
+        13: "CNY",
         15: "IDR",
         51: "VND",
         61: "INR",
+        74: "BDT"
     };
     const defStatusType = {
         1: "Running",
@@ -179,6 +181,8 @@ import * as Loading from '../commJS/Loading.jsx';
 
         handleSubmit(event) {
             event.preventDefault();
+            if(this.state.UserName && this.state.UserName.indexOf("%") != -1){alert("UserName Can Not Contain %"); return;}
+            if(this.state.AccountName && this.state.AccountName.indexOf("%") != -1){alert("Real Name Can Not Contain %"); return;}
             if ((this.state.BirDate || this.state.BirMonth) && (!this.state.BirDate || !this.state.BirMonth)) { alert("Please fill in at least Date and Month"); return; }
             let endDate = moment(this.selectdate_end.current.value).add(1, 'days').unix() - 1;
             let tagEndDate = moment(this.selectTagDate_end.current.value).add(1, 'days').unix() - 1;
@@ -430,11 +434,13 @@ import * as Loading from '../commJS/Loading.jsx';
                 },
                 onInitialized: function () {
                     state.selectCurrency.push(2);
+                    state.selectCurrency.push(3);
                     state.selectCurrency.push(4);
                     state.selectCurrency.push(13);
                     state.selectCurrency.push(15);
                     state.selectCurrency.push(51);
                     state.selectCurrency.push(61);
+                    state.selectCurrency.push(74);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');
