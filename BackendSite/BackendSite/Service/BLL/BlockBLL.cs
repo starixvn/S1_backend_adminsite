@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -57,7 +58,7 @@ namespace BackendSite.Service.BLL
             return _blockService.GetBlockBankAccList(sysId, accountNum);
         }
 
-        public int BlockAccountSet(int sysId, string accountNum, int status, string Operator, string memo)
+        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo)
         {
             return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
         }
@@ -77,6 +78,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {
             return _blockService.GetIPUserList(ip);
+        }
+
+        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
+        {
+            return _blockService.ReleaseAccount(custId, sysId, accountNum, iFSCCode);
         }
     }
 }
