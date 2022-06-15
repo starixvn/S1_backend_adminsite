@@ -313,4 +313,20 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
     }
 
+    public class DepositManualRequest
+    {
+        public string TransId { get; set; }
+        public decimal Amount { get; set; }
+        public string ThirdId { get; set; }
+        public string Operator { get; set; }
+    }
+
+    public class DepositManualResponse
+    {
+        public int ErrorCode { get; set; }
+
+        public string Message { get; set; }
+
+        public decimal Amount { get; set; }
+    }
 }
