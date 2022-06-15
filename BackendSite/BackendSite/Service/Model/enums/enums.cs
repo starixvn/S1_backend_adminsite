@@ -995,4 +995,10 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
     #endregion
+    
+    public enum GeneralStatusEnum
+    {
+        Enabled = 1,
+        Disabled = 0
+    }
 }
