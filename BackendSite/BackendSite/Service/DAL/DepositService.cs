@@ -74,8 +74,7 @@ namespace BackendSite.Service.DAL
                 UserName = userName,
                 CurrencyId,
                 Status,
-                VipStatus = VipStatus,
-                PageSize = pageSize,
+                VipStatus,
                 AmountType = amountType,
                 Amount = tempAmount
             });
@@ -94,6 +93,7 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
+            p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("PageNumber", pageNumber, DbType.Int32, ParameterDirection.InputOutput);
             p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -336,17 +336,17 @@ namespace BackendSite.Service.DAL
             
             var p = new DynamicParameters(new
             {
-                selectSite,
-                selectBankCode,
-                selectCalCode,
-                depositType,
+                SelectSite = selectSite,
+                SelectBankCode = selectBankCode,
+                SelectCalCode = selectCalCode,
+                DepositType = depositType,
                 StartDate = startDate,
                 EndDate = endDate,
                 DepositId = depositId,
                 TransId = DepositId,
                 UserName = userName,
-                currencyId,
-                status,
+                CurrencyId = currencyId,
+                Status = status,
                 VipStatus = levelStatus,
                 AmountType = amountType,
                 Amount = tempAmount
