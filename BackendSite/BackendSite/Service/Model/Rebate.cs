@@ -55,11 +55,19 @@ namespace BackendSite.Service.Model
         public IEnumerable<RebateCategoryList> CategoryDataList { get; set; }
        
     }
+
     public class RebateCategoryDetail
     {
         public int CategoryId { get; set; }
         public IEnumerable<RebateGameTypeList> GameTypeList { get; set; }
 
+    }
+
+    public class RebateGameTypeDetail
+    {
+        public int GameType { get; set; }
+        public int Level { get; set; }
+        public decimal Percentage { get; set; }
     }
 
     public class AdjustmentInfoLogParam

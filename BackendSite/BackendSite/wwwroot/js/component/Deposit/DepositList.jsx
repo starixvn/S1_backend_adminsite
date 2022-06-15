@@ -351,8 +351,9 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
+        /* Fatty pay 手動 Approval  */
         depositManualApproval() {
-            let confirmString = "Are you sure deposit Manual Approval?";
+            let confirmString = "Are you sure deposit Manual Approval ?";
             if (confirm(confirmString)) {
                 Loading.OnLoading();
                 let data = { TransId: this.props.transId, Amount: this.state.Data.amount };
@@ -360,9 +361,11 @@ import DateTimePicker from 'react-datetime';
                     .then(function (response) {
                         Loading.UnLoading();
                         let result = response.data;
-                        if (result.errorCode == 0) {
+                        if (result.errorCode == 0)
+                        {
                             alert(result.message);
                             this.onBack();
+                            console.log(result);
                         } else {
                             alert(result.message);
                             this.onGetComment();
@@ -436,7 +439,7 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={7} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
                 if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
                     btnGroup.push(<button key={3} type="button" className="btn btn-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
-                if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕 */
+                if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕。 */
                     btnGroup.push(<button type="button" className="btn btn-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
                 if (data.status == dS.Pending)
                     btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
