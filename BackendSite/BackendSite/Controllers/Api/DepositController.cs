@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.Api
                 depositListReq.AmountType, 
                 depositListReq.Amount,
                 depositListReq.SelectPayId,
-                ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+                pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
 
             foreach (var data in depositRequestList)
