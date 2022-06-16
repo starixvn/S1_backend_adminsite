@@ -30,7 +30,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int ShowStock { get; set; }
         public int Stock { get; set; }
         public int Sort { get; set; }
-        public IEnumerable<LangInfoModel> Infos { get; set; }
+        public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
     }
 
@@ -60,7 +60,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int ShowStock { get; set; }
         public int Stock { get; set; }
         public int Sort { get; set; }
-        public IEnumerable<LangInfoModel> Infos { get; set; }
+        public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
     }
 
@@ -78,5 +78,12 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int Status { get; set; }
         public int Limit { get; set; }
         public string Operator { get; set; }
+    }
+    
+    public class CreateGiftInfo : LangNameModel
+    {
+        public string Description { get; set; }
+    
+        public string PictureUrl { get; set; }
     }
 }
