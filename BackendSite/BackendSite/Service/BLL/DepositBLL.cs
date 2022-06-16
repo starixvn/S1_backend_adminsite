@@ -68,10 +68,9 @@ namespace BackendSite.Service.BLL
             int amountType, 
             string amount,
             IEnumerable<int> payIds,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+            int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
-            var serverInfo = serverInfoService.GetModel();/*Check SiteID By Permission*/
-            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, serverInfo.SiteId/*Not require*/, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,

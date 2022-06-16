@@ -138,7 +138,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.AmountType,
                 request.Amount,
                 request.SelectPayId,
-                ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
+                pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
 
             foreach (var data in depositList)
             {
