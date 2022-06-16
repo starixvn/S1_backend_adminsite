@@ -82,6 +82,7 @@ namespace BackendSite.Controllers
             public string SelectSite { get; set; }
             public string SelectBankCode { get; set; }
             public string SelectCalCode { get; set; }
+            public string SelectPayId { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
             public string DepositType { get; set; }
@@ -109,6 +110,7 @@ namespace BackendSite.Controllers
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
             depositListReq.Status = $"[{depositListReq.Status}]";
             depositListReq.LevelStatus = $"[{depositListReq.LevelStatus}]";
+            depositListReq.SelectPayId = depositListReq.SelectPayId != "[]" ? $"[{depositListReq.SelectPayId}]" : null;
 
             var exportDeposit = depositBLL.GetDepositExportList(
                 depositListReq.SelectSite,
@@ -122,7 +124,8 @@ namespace BackendSite.Controllers
                 depositListReq.Status, 
                 depositListReq.LevelStatus,
                 depositListReq.AmountType, 
-                depositListReq.Amount);
+                depositListReq.Amount,
+                depositListReq.SelectPayId);
 
             foreach (var data in exportDeposit)
             {

@@ -40,7 +40,7 @@ namespace BackendSite.Service.DAL
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType,IEnumerable<string> selectBankCode, IEnumerable<int> selectCalCode, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode, IEnumerable<int> selectCalCode, DateTime startDate, DateTime endDate, int siteId, string DepositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, IEnumerable<int> payIds, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
             var SelectSite = JsonConvert.SerializeObject(selectSite);
             var DepositType = JsonConvert.SerializeObject(depositType);
@@ -49,6 +49,8 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelStatus);
+            var PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null;
+
             var depositId = 0;
             decimal tempAmount = 0;
             if (!string.IsNullOrWhiteSpace(amount))
@@ -61,7 +63,7 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(DepositId, @"\d+");
                 int.TryParse(m.Value, out depositId);
             }
-            
+
             var p = new DynamicParameters(new
             {
                 SelectSite,
@@ -78,12 +80,13 @@ namespace BackendSite.Service.DAL
                 Status,
                 VipStatus,
                 AmountType = amountType,
-                Amount = tempAmount
+                Amount = tempAmount,
+                PayIds = PayIds,
             });
 
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V4", p).ToList();
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V5", p).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.ForEach(x =>
@@ -101,7 +104,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V8", p);
+            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V9", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
@@ -322,7 +325,7 @@ namespace BackendSite.Service.DAL
             return conn.QueryFirstOrDefault<DepositReceipt>("DepositReceipt_Get", new { DepositId = depositId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode,string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount,string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -335,7 +338,7 @@ namespace BackendSite.Service.DAL
             {
                 tempAmount = Convert.ToDecimal(amount);
             }
-            
+
             var p = new DynamicParameters(new
             {
                 SelectSite = selectSite,
@@ -351,9 +354,10 @@ namespace BackendSite.Service.DAL
                 Status = status,
                 VipStatus = levelStatus,
                 AmountType = amountType,
-                Amount = tempAmount
+                Amount = tempAmount,
+                PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V9", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V10", p);
             return depositList;
         }
 
@@ -559,6 +563,12 @@ namespace BackendSite.Service.DAL
             props.Add("_Operator", input.Operator);
 
             return _mainDbClient.Execute("Admin_DepositRequestAmountV2_Set", props) > 0;
+        }
+
+        public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            return _mainDbClient.Query<PaymentGateWayOptions>("Admin_PaymentGateWayOptions_Get");
         }
     }
 }

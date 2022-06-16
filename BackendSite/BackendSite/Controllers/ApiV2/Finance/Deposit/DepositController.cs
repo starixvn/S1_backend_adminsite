@@ -73,6 +73,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> LevelStatuses { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
+
+            public IEnumerable<int> SelectPayId { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
         }
@@ -135,6 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.PageSize,
                 request.AmountType,
                 request.Amount,
+                request.SelectPayId,
                 ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
 
             foreach (var data in depositList)
@@ -172,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var exportDeposit = _depositBll.GetDepositExportList(
                 JsonConvert.SerializeObject(request.SiteIds),
                 JsonConvert.SerializeObject(request.SelectBankCode),
-                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null ,
+                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
                 JsonConvert.SerializeObject(request.DepositTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
@@ -182,7 +185,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 JsonConvert.SerializeObject(request.Statuses),
                 JsonConvert.SerializeObject(request.LevelStatuses),
                 request.AmountType,
-                request.Amount);
+                request.Amount,
+                request.SelectPayId.Any() ? JsonConvert.SerializeObject(request.SelectPayId) : null
+                );
 
             foreach (var data in exportDeposit)
             {
