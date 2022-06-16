@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model.Store.GiftManagement
 {
@@ -45,7 +46,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public GeneralStatusEnum ShowStock { get; set; }
         public int Stock { get; set; }
         public int Sort { get; set; }
-        public IEnumerable<LangInfoModel> Infos { get; set; }
+        public IEnumerable<CreateGiftInfo> Infos { get; set; }
     }
 
     public class UpdateGiftRequest
@@ -59,7 +60,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public GeneralStatusEnum ShowStock { get; set; }
         public int Stock { get; set; }
         public int Sort { get; set; }
-        public IEnumerable<LangInfoModel> Infos { get; set; }
+        public IEnumerable<CreateGiftInfo> Infos { get; set; }
     }
 
     public class CreateCategoryRequest
@@ -104,5 +105,10 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int SiteId { get; set; }
         public GeneralStatusEnum Status { get; set; }
         public int Limit { get; set; }
+    }
+    
+    public class UploadImageRequest
+    {
+        public IFormFile File { get; set; }
     }
 }

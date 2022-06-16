@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.GiftManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -118,6 +119,18 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
             var result = _giftManagementBll.SetRedemptionLimitAsync(request, user);
 
             return result;
+        }
+
+        [HttpPost]
+        public async Task<ApiResult> UploadAsync([FromForm] UploadImageRequest request)
+        {
+            var result = await _giftManagementBll.UploadPictureAsync(request.File);
+
+            return new ApiResult<UploadPictureResult>
+            {
+                Data = new UploadPictureResult(result),
+                ErrorCode = (int) (string.IsNullOrEmpty(result) ? ErrorCodeEnum.Fail : ErrorCodeEnum.Success)
+            };
         }
     }
 }

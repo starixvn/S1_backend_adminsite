@@ -1,9 +1,11 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
@@ -12,12 +14,18 @@ namespace BackendSite.Service.BLL
     {
         private readonly CourierAdapter _courierAdapter;
         private readonly string _storeSiteUrl;
+        private readonly AwsS3BLL _awsS3Bll;
+        private readonly string _bucketName;
+        private readonly string _folder;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
-            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             var configuration = provider.GetRequiredService<IConfiguration>();
             _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
+            _folder = configuration.GetValue<string>("AwsStoreFolder");
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _awsS3Bll = provider.GetRequiredService<AwsS3BLL>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -118,5 +126,24 @@ namespace BackendSite.Service.BLL
 
             return new ApiResult(result.ErrorCode, result.Message);
         }
+        
+        public async Task<string> UploadPictureAsync(IFormFile file)
+        {
+            if (!CheckIsImage(file))
+            {
+                return string.Empty;
+            }
+            
+            var ext = Path.GetExtension(file.FileName);
+            var path = $"/store/gift/{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
+            var key = _folder + path;
+            var success = await _awsS3Bll.UploadFileAsync(file, _bucketName, key);
+            var result = success ? path : string.Empty;
+            
+            return result;
+        }
+
+        private bool CheckIsImage(IFormFile file)
+            => file.ContentType.StartsWith("image/");
     }
 }
