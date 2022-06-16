@@ -615,11 +615,13 @@ import DateTimePicker from 'react-datetime';
             this.state = {
                 SiteList: [],
                 BankList: [],
+                PaymentGateWayList:[],
                 CalCodeList: [],
                 selectSite: [],
                 selectType: [],
                 selectCurrency: [],
                 selectBankCode: [],
+                selectPaymentGateWay:[],
                 selectCalCode:[],
                 selectStatus: [],
                 SelectUser: "",
@@ -662,6 +664,7 @@ import DateTimePicker from 'react-datetime';
                 SelectBankCode: this.searchFilter.selectBankCode,
                 SelectCalCode: this.searchFilter.selectCalCode,
                 AmountType: parseInt(this.searchFilter.amountType),
+                SelectPayId: this.searchFilter.selectPaymentGateWay,
                 Amount:this.searchFilter.amount,
                 PageSize:this.searchFilter.pageSize
             };
@@ -684,6 +687,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectCalCode.length != 0) {
                 data.SelectCalCode = this.searchFilter.selectCalCode;
+            }
+
+            if (this.searchFilter.selectPaymentGateWay.length != 0) {
+                data.SelectPayId = this.searchFilter.selectPaymentGateWay;
             }
 
             if (this.searchFilter.SelectUser != "") {
@@ -737,6 +744,7 @@ import DateTimePicker from 'react-datetime';
                 SelectSite: this.searchFilter.selectSite,
                 SelectBankCode: this.searchFilter.selectBankCode,
                 SelectCalCode: this.searchFilter.selectCalCode,
+                SelectPayId: this.searchFilter.selectPaymentGateWay,
                 AmountType: parseInt(this.searchFilter.amountType),
                 Amount:this.searchFilter.amount 
             };
@@ -758,6 +766,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectCalCode.length != 0) {
                 data.SelectCalCode = this.searchFilter.selectCalCode;
+            }
+
+            if (this.searchFilter.selectPaymentGateWay.length != 0) {
+                data.SelectPayId = this.searchFilter.selectPaymentGateWay;
             }
             
             if (this.searchFilter.SelectUser != "") {
@@ -930,7 +942,24 @@ import DateTimePicker from 'react-datetime';
                 alert(error);
             }.bind(this));
         }
-        
+
+        getPaymentGateWay() {
+            let state = this.state;
+            axios.post('/api/Deposit/GetPaymentGateWayOptions')
+                .then(function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        state.selectPaymentGateWay.length = 0;
+                        this.setState({ PaymentGateWayList: result.data });
+                        this.buildSelectPaymentGateWay();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));
+        }
+
         getCalCodeList() {
             let state = this.state;
             axios.post('/api/BankList/GetAllCalCodeList')
@@ -1185,6 +1214,37 @@ import DateTimePicker from 'react-datetime';
 
         }
 
+        buildSelectPaymentGateWay = () => {
+            let state = this.state, searchFilter = this.searchFilter;
+            $("#selectPaymentGateWay").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectPaymentGateWay.length = 0;
+                    state.PaymentGateWayList.forEach(function (obj) {
+                        state.selectPaymentGateWay.push(obj.payId);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectPaymentGateWay.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = $(option).val(), index = state.selectPaymentGateWay.indexOf(val);
+                    (checked) ? state.selectPaymentGateWay.push(val) : (index > -1) ? state.selectPaymentGateWay.splice(index, 1) : state.selectPaymentGateWay;
+                    state.selectPaymentGateWay.sort();
+                },
+                onInitialized: function () {
+                    state.selectPaymentGateWay.length = 0;
+                    if (searchFilter.selectPaymentGateWay)
+                        searchFilter.selectPaymentGateWay.forEach(function(obj) {
+                            state.selectPaymentGateWay.push(obj);
+                        });
+                }
+            });
+            $('#selectPaymentGateWay').multiselect('select', searchFilter.selectPaymentGateWay);
+            $('#selectPaymentGateWay').multiselect('updateButtonText');
+        }
+
         componentDidUpdate() {
             if (this.state.MutiSelRefresh) {
                 this.buildSelectSite();
@@ -1194,6 +1254,7 @@ import DateTimePicker from 'react-datetime';
                 this.buildCurrencySite();
                 this.buildStatusSite();
                 this.buildLevel();
+                this.buildSelectPaymentGateWay();
                 this.setState({ MutiSelRefresh: false });
             }
         }
@@ -1201,6 +1262,7 @@ import DateTimePicker from 'react-datetime';
         componentDidMount() {
             this.getSiteList();
             this.getBankInfoList();
+            this.getPaymentGateWay();
             this.getCalCodeList();
             this.buildTypeSite();
             this.buildCurrencySite();
@@ -1262,6 +1324,12 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{PageSize[obj]}</option>;
             }.bind(this));
             PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
+
+            let paymentGateWayList = this.state.PaymentGateWayList.map(function (item) {
+                return <option key={`payment-list-${item.payId}`} value={item.payId}>{item.payName}</option>;
+            }.bind(this));
+            paymentGateWayList = <select id="selectPaymentGateWay" name="selectPaymentGateWay[]" multiple="multiple">{paymentGateWayList}</select>;
+
 
 
             let searchData = this.state.searchData;
@@ -1326,6 +1394,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">VIP Level</span>
                                     <div className="field">
                                         {levelList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Payment GateWay</span>
+                                    <div className="field">
+                                        {paymentGateWayList}
                                     </div>
                                 </div>
                             </div>
