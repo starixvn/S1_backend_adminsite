@@ -50,7 +50,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
         {
             T result;
             var sw = Stopwatch.StartNew();
@@ -58,16 +58,16 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.QueryFirstOrDefault<T>(name, parameters,
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                _logger.LogError(e, $"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
                 throw;
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
             return result;
         }
 

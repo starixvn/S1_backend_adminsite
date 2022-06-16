@@ -4,6 +4,7 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers
 {
@@ -79,6 +80,8 @@ namespace BackendSite.Controllers
         public class DepositListReq
         {
             public string SelectSite { get; set; }
+            public string SelectBankCode { get; set; }
+            public string SelectCalCode { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
             public string DepositType { get; set; }
@@ -97,12 +100,29 @@ namespace BackendSite.Controllers
             var startTime = DateTimeExtensions.UnixToDateTime(depositListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             depositListReq.SelectSite = $"[{depositListReq.SelectSite}]";
+            var selectBankCode = depositListReq.SelectBankCode?.Split(',').ToList();
+            if (depositListReq.SelectCalCode != null)
+            {
+                depositListReq.SelectCalCode = $"[{depositListReq.SelectCalCode}]";
+            }
             depositListReq.DepositType = $"[{depositListReq.DepositType}]";
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
             depositListReq.Status = $"[{depositListReq.Status}]";
             depositListReq.LevelStatus = $"[{depositListReq.LevelStatus}]";
 
-            var exportDeposit = depositBLL.GetDepositExportList(depositListReq.SelectSite, depositListReq.DepositType, startTime, endTime, depositListReq.DepositId, depositListReq.UserName, depositListReq.CurrencyId, depositListReq.Status, depositListReq.LevelStatus, depositListReq.AmountType, depositListReq.Amount);
+            var exportDeposit = depositBLL.GetDepositExportList(
+                depositListReq.SelectSite,
+                selectBankCode != null && selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
+                depositListReq.SelectCalCode,
+                depositListReq.DepositType,
+                startTime, endTime, 
+                depositListReq.DepositId, 
+                depositListReq.UserName,
+                depositListReq.CurrencyId,
+                depositListReq.Status, 
+                depositListReq.LevelStatus,
+                depositListReq.AmountType, 
+                depositListReq.Amount);
 
             foreach (var data in exportDeposit)
             {
@@ -113,7 +133,7 @@ namespace BackendSite.Controllers
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = excelBLL.Export(exportDeposit);
+            var stream = excelBLL.ExportV2(exportDeposit);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportDeposit)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         public class WithdrawalListReq
@@ -159,7 +179,7 @@ namespace BackendSite.Controllers
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = excelBLL.Export(exportWithdrawal);
+            var stream = excelBLL.ExportV2(exportWithdrawal);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 

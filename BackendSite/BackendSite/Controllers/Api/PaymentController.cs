@@ -415,7 +415,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
             
-            var stream = _excelBLL.Export(exportData);
+            var stream = _excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -451,7 +451,7 @@ namespace BackendSite.Controllers.Api
             {
                 data.ClaimTime = new DateTimeOffset(data.ClaimTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = _excelBLL.Export(exportData);
+            var stream = _excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
