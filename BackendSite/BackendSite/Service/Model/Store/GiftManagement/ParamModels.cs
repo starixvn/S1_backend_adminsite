@@ -69,14 +69,12 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public SetRedemptionLimitParams(SetRedemptionLimitRequest req, string userName)
         {
             SiteId = req.SiteId;
-            CurrencyId = req.CurrencyId;
             Status = (int) req.Status;
             Limit = req.Limit;
             Operator = userName;
         }
 
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public int Status { get; set; }
         public int Limit { get; set; }
         public string Operator { get; set; }

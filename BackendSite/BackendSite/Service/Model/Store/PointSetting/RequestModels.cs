@@ -7,13 +7,11 @@ namespace BackendSite.Service.Model.Store.PointSetting
     public class GetInactivePointExpirySettingRequest
     {
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
     }
 
     public class SetInactivePointExpirySettingRequest
     {
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public int Days { get; set; }
         public GeneralStatusEnum Status { get; set; }
     }

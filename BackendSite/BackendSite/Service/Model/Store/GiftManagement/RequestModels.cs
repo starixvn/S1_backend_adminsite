@@ -27,6 +27,11 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int CurrencyId { get; set; }
         public IEnumerable<string> LangCodes { get; set; }
     }
+    
+    public class GetGiftRequest
+    {
+        public int GiftId { get; set; }
+    }
 
     public class CreateGiftRequest
     {
@@ -91,14 +96,12 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     public class GetRedemptionLimitRequest
     {
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
     }
 
 
     public class SetRedemptionLimitRequest
     {
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public GeneralStatusEnum Status { get; set; }
         public int Limit { get; set; }
     }

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
@@ -49,6 +48,14 @@ namespace BackendSite.Service.BLL
         {
             var url = _storeSiteUrl + "/api/GiftManagement/GetRedemptionLimit";
             var result = _courierAdapter.MyPostAsync<object, GetRedemptionLimitRequest>(url, req);
+
+            return result;
+        }
+        
+        public Task<ApiResult<object>> GetGiftAsync(GetGiftRequest req)
+        {
+            var url = _storeSiteUrl + "/api/GiftManagement/Get";
+            var result = _courierAdapter.MyPostAsync<object, GetGiftRequest>(url, req);
 
             return result;
         }

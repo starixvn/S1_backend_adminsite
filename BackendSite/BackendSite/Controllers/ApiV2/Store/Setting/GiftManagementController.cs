@@ -52,6 +52,14 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
 
             return result;
         }
+        
+        [HttpPost]
+        public Task<ApiResult<object>> GetAsync(GetGiftRequest req)
+        {
+            var result = _giftManagementBll.GetGiftAsync(req);
+
+            return result;
+        }
 
         [HttpPost]
         public Task<ApiResult> CreateAsync(CreateGiftRequest request)
