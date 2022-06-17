@@ -13,7 +13,6 @@ export class PaginationTotalAmount extends React.Component {
     render() {
 
         let data = this.props.Data;
-        console.log(data.pageNumber);
         let currencyAmountRows = [];
         currencyAmountRows = data.currencyAmount.map((currency)=>{
             return(<tr>{currency}</tr>)
