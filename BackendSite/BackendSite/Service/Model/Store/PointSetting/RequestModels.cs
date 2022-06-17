@@ -49,7 +49,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public decimal DepositAmount { get; set; }
-        public decimal PointRate { get; set; }
+        //public decimal PointRate { get; set; } 暫時不開放變更
         public GeneralStatusEnum PromotionStatus { get; set; }
         public decimal PromotionPointRate { get; set; }
 

@@ -13,6 +13,8 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public IEnumerable<int> CategoryIds { get; set; }
         public IEnumerable<int> Tags { get; set; }
         public string GiftName { get; set; }
+        public string OrderByField { get; set; } = "Sort";
+        public bool Desc { get; set; }
     }
 
     public class GetTagsRequest
