@@ -53,7 +53,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
             SiteId = req.SiteId;
             CurrencyId = req.CurrencyId;
             DepositAmount = req.DepositAmount;
-            PointRate = req.PointRate;
+            //PointRate = req.PointRate;
             PromotionStatus = (int) req.PromotionStatus;
             PromotionPointRate = req.PromotionPointRate;
             PromotionStartTime = req.PromotionStartTime.DateTime;
@@ -64,7 +64,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public decimal DepositAmount { get; set; }
-        public decimal PointRate { get; set; }
+        //public decimal PointRate { get; set; }
 
         /// <summary>
         /// 0: Enable, 1: Disabled
