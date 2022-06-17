@@ -110,20 +110,20 @@ namespace BackendSite.Controllers
             depositListReq.CurrencyId = $"[{depositListReq.CurrencyId}]";
             depositListReq.Status = $"[{depositListReq.Status}]";
             depositListReq.LevelStatus = $"[{depositListReq.LevelStatus}]";
-            depositListReq.SelectPayId = depositListReq.SelectPayId != "[]" ? $"[{depositListReq.SelectPayId}]" : null;
+            depositListReq.SelectPayId = depositListReq.SelectPayId != null ? $"[{depositListReq.SelectPayId}]" : null;
 
             var exportDeposit = depositBLL.GetDepositExportList(
                 depositListReq.SelectSite,
                 selectBankCode != null && selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
                 depositListReq.SelectCalCode,
                 depositListReq.DepositType,
-                startTime, endTime, 
-                depositListReq.DepositId, 
+                startTime, endTime,
+                depositListReq.DepositId,
                 depositListReq.UserName,
                 depositListReq.CurrencyId,
-                depositListReq.Status, 
+                depositListReq.Status,
                 depositListReq.LevelStatus,
-                depositListReq.AmountType, 
+                depositListReq.AmountType,
                 depositListReq.Amount,
                 depositListReq.SelectPayId);
 
