@@ -91,7 +91,19 @@ import DateTimePicker from 'react-datetime';
         25: 25,
         50: 50
     }
-
+    
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return;
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    }
     
     class DepositList extends React.Component {
         constructor(props) {
@@ -365,7 +377,6 @@ import DateTimePicker from 'react-datetime';
                         {
                             alert(result.message);
                             this.onBack();
-                            console.log(result);
                         } else {
                             alert(result.message);
                             this.onGetComment();
@@ -879,8 +890,7 @@ import DateTimePicker from 'react-datetime';
             //this._Search = true;
             let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).add(1, 'days').unix() - 1 };
             this.setState(data, function () {
-                console.log('aaa',this.state);
-                this.searchFilter = JSON.parse(JSON.stringify(this.state));
+                this.searchFilter = JSON.parse(JSON.stringify(this.state, getCircularReplacer())) ;
                 this.onSearch(1);
             }.bind(this));
         }
