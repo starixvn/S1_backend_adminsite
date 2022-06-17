@@ -1297,6 +1297,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`bank-list-${item.id}`} value={item.id}>{item.calCodeName}</option>;
             }.bind(this));
             calCodeList = <select id="selectCalCode" name="selectCalCode[]" multiple="multiple">{calCodeList}</select>
+
+            let paymentGateWayList = this.state.PaymentGateWayList.map(function (item) {
+                return <option key={`payment-list-${item.payId}`} value={item.payId}>{item.payName}</option>;
+            }.bind(this));
+            paymentGateWayList = <select id="selectPaymentGateWay" name="selectPaymentGateWay[]" multiple="multiple">{paymentGateWayList}</select>;
             
             let statusList = Object.keys(StatusSelectOp).map(function (obj) {
                 return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
@@ -1317,13 +1322,6 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{PageSize[obj]}</option>;
             }.bind(this));
             PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
-
-            let paymentGateWayList = this.state.PaymentGateWayList.map(function (item) {
-                return <option key={`payment-list-${item.payId}`} value={item.payId}>{item.payName}</option>;
-            }.bind(this));
-            paymentGateWayList = <select id="selectPaymentGateWay" name="selectPaymentGateWay[]" multiple="multiple">{paymentGateWayList}</select>;
-
-
 
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
@@ -1378,6 +1376,12 @@ import DateTimePicker from 'react-datetime';
                                     </div>
                                 </div>
                                 <div className="input-item">
+                                    <span className="label">Payment GateWay</span>
+                                    <div className="field">
+                                        {paymentGateWayList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
@@ -1387,12 +1391,6 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">VIP Level</span>
                                     <div className="field">
                                         {levelList}
-                                    </div>
-                                </div>
-                                <div className="input-item">
-                                    <span className="label">Payment GateWay</span>
-                                    <div className="field">
-                                        {paymentGateWayList}
                                     </div>
                                 </div>
                             </div>
