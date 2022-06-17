@@ -879,6 +879,27 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
+        public bool EditEWalletWithdrawalLimit(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0
+                || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.EditEWalletWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+        }
+
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            return _withdrawalLimitService.UpdateEWalletWithdrawalLimitInfoStatus(withdrawalLimitInfoManage, updater);
+        }
+
+        public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
+        {
+            return _withdrawalLimitService.GetEWalletWithdrawalLimitInfo(siteId);
+        }
+
         #endregion
 
         #region Private Methods
