@@ -32,12 +32,13 @@ namespace BackendSite.Service.BLL
         };
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
         
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo)
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo, ICacheHelper cacheHelper)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
             _siteConfig = siteConfig;
             _serverInfo = serverInfo;
+            _cacheHelper = cacheHelper;
         }
         
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId, bool refreshCache)
