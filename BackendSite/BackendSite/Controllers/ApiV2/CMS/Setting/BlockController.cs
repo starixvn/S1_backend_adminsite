@@ -86,8 +86,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         public class BlockAccountSetRequest : BlockBankAccRequest
         {
-            public int Status { get; set; }
+            public BlockAccountStatus Status { get; set; }
             public string Memo { get; set; }   
+        }
+
+        public class ReleaseAccountRequest : BlockBankAccRequest
+        {
+            public int CustId { get; set; }
+            public string IFSCCode { get; set; }
         }
         #endregion
 
@@ -228,7 +234,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var result = _blockBLL.BlockAccountSet(request.SysId, request.AccountNum, request.Status, User.Identity.Name, request.Memo);
             if (result > 0)
             {
-                _blockBLL.SetCustBankInfoLog(request.SysId, request.AccountNum, request.Status);
+                //_blockBLL.SetCustBankInfoLog(request.SysId, request.AccountNum, request.Status);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -263,6 +269,37 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+
+        /// <summary>
+        /// Block/ReleaseAccount 解除CustBankDetail跟user的連結
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult ReleaseAccount(ReleaseAccountRequest request)
+        {
+            var result = _blockBLL.ReleaseAccount(request.CustId, request.SysId, request.AccountNum, request.IFSCCode);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Release Success."
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Release Fail."
+                };
+            }
+        }
         #endregion
+
     }
 }

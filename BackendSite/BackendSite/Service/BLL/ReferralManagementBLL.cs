@@ -72,7 +72,6 @@ namespace BackendSite.Service.BLL
                     SiteName = x.SiteName,
                     ReferralUser = x.ReferralUser,
                     ReferredUser = x.ReferredUser,
-                    CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
                     RegTime = x.RegTime,
                     RewardTime = x.RewardTime,

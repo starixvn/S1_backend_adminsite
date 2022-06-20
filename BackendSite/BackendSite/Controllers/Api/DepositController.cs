@@ -59,6 +59,7 @@ namespace BackendSite.Controllers.Api
             public int AmountType { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
+            public IEnumerable<int> SelectPayId { get; set; }
             public string Amount { get; set; }
             public int PageSize { get; set; }
         }
@@ -88,8 +89,9 @@ namespace BackendSite.Controllers.Api
                 depositListReq.LevelStatus,
                 depositListReq.PageSize, 
                 depositListReq.AmountType, 
-                depositListReq.Amount, 
-                ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+                depositListReq.Amount,
+                depositListReq.SelectPayId,
+                pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
 
             foreach (var data in depositRequestList)
@@ -631,6 +633,41 @@ namespace BackendSite.Controllers.Api
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_editAmount" })]
+        [HttpPost]
+        public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response =  await depositBLL.DepositManual(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"ManualApproval Fail. {ex.Message}");
+            }
+        }
+
+        public ApiResult<IEnumerable<PaymentGateWayOptions>> GetPaymentGateWayOptions()
+        {
+            var apiResult = new ApiResult<IEnumerable<PaymentGateWayOptions>>();
+            try
+            {
+                apiResult.Data = depositBLL.GetPaymentGateWayOptions();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                 apiResult.ErrorCode = 999;
+                 apiResult.Message = "GetPayListOptions fail.";
+                 apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
         }
     }
 }

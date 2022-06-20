@@ -244,17 +244,10 @@ const EditPanel = (props) => {
             setSubmitStatus(false);
             if (isMountedRef.current) {
               if (response.data) {
-                let param = {
-                  Url: "Message/ExportSendMessageBatchResultReport",
-                  Data: {
-                    BatchId: response.data.data,
-                  },
-                };
+                
                 props.filterInfo.AccountStatus = 0;
                 props.filterInfo.Currency = 0;
                 
-                WebAPI.DownloadData(param);
-
                 updateData({
                   optSite: "",
                   file: "",

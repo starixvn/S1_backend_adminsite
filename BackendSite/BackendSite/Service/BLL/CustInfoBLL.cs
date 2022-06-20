@@ -924,7 +924,7 @@ namespace BackendSite.Service.BLL
                 var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custBankInfo.BankInfo).ToList();
                 bankInfoDetailList.ForEach(x =>
                 {
-                    var setResult = _blockService.BlockAccountSet(x.SysId, x.AccountNo, 2, Operator);
+                    var setResult = _blockService.BlockAccountSet(x.SysId, x.AccountNo, BlockAccountStatus.Lock, Operator);
                     if(setResult > 0)
                     {
                         SetCustBankInfoLog(custId, siteId, x.SysId, x.AccountNo, x.IFSCCode, custBankInfo.AccountName, 3);

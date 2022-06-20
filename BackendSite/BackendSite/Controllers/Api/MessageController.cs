@@ -10,10 +10,13 @@ using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Extensions;
+using BackendSite.Service.DAL;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.Api
@@ -27,6 +30,7 @@ namespace BackendSite.Controllers.Api
         #region Fields
 
         private readonly MessageBLL messageBLL;
+        private readonly ServerInfoService serverInfoService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly CustInfoBLL custInfoBLL;
@@ -39,6 +43,7 @@ namespace BackendSite.Controllers.Api
         #region Constructor
 
         public MessageController(MessageBLL messageBLL,
+            ServerInfoService serverInfoService,
             AuthorizeBLL authorizeBLL,
             ServerInfoBLL serverInfoBLL,
             CustInfoBLL custInfoBLL,
@@ -47,6 +52,7 @@ namespace BackendSite.Controllers.Api
             ExcelBLL excelBLL)
         {
             this.messageBLL = messageBLL;
+            this.serverInfoService = serverInfoService;
             this.authorizeBLL = authorizeBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.custInfoBLL = custInfoBLL;
@@ -534,6 +540,8 @@ namespace BackendSite.Controllers.Api
                         var custInfosDetail = await custInfoBLL.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
                         await messageBLL.PreSendBatchMessage(data, custInfosDetail, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
+                    
+                    messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
                 }
@@ -548,37 +556,42 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var langList = new List<string>
+                _ = Task.Run(() =>
                 {
-                    "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
-                };
-                
-                foreach (var lang in langList)
-                {
-                    var msg = JObject.Parse(req.personalMsg)[lang];
-                    if (msg != null)
+                    var userSiteList = serverInfoService.GetSiteList();
+                    var langList = new List<string>();
+                    foreach (var b in userSiteList.Select(x => x.LangList).ToList()
+                                 .Select(JsonConvert.DeserializeObject<IEnumerable<string>>))
                     {
-                        var popupMessage = msg.Value<string>("PopupMessage");
-                        var title = msg.Value<string>("Title");
-                        var content = msg.Value<string>("Content");
-                        var batchPersonalMsg = new BatchPersonalMsg()
-                        {
-                            BatchId = batchId,
-                            SiteId = req.optSite,
-                            LangId = lang,
-                            Operator = authData.UserName,
-                            CurrencyId = req.currency,
-                            AccountStatus = req.accountStatus,
-                            IsPopup = req.IsPopup,
-                            PopupMessage = popupMessage,
-                            Content = content,
-                            Title = title
-                        };
-                        custInfoBLL.SendMessageBatch(batchPersonalMsg);
+                        langList.AddRange(b.Except(langList));
                     }
-                }
-                _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
+                    
+                    foreach (var lang in langList)
+                    {
+                        var msg = JObject.Parse(req.personalMsg)[lang];
+                        if (msg != null)
+                        {
+                            var batchPersonalMsg = new BatchPersonalMsg()
+                            {
+                                BatchId = batchId,
+                                SiteId = req.optSite,
+                                LangId = lang,
+                                Operator = authData.UserName,
+                                CurrencyId = req.currency,
+                                AccountStatus = req.accountStatus,
+                                IsPopup = req.IsPopup
+                            };
+                            custInfoBLL.SendMessageBatch(batchPersonalMsg);
+                        }
+                    }
+
+                    messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
+                    
+                    _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
+                });
+                
             }
+            
 
             return new ApiResult<int>()
             {
@@ -677,9 +690,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult UpdateBatchMessage([FromForm] UpdateBatchMessageRequest req)
         {
             var result = new ApiResult();
+            var authData = authorizeBLL.GetAuthData();
+            
             try
             {
-                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg))
+                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg , authData.UserName))
                     result.ErrorCode = 0;
             }
             catch (Exception ex)
