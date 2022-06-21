@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int status,string accountNum,string userName)
+        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int status,string accountNum, IEnumerable<int> currencyId, string userName)
         {
             var jsonSelectStatus = string.Empty;
             if(status == 0)
@@ -114,7 +114,8 @@ namespace BackendSite.Service.DAL
                 AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null: accountNum,
                 UserName = string.IsNullOrWhiteSpace(userName) ? null : userName,
                 SelectStatus = jsonSelectStatus,
-            });
+                SelectCurrency = JsonConvert.SerializeObject(currencyId)
+        });
 
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
         }

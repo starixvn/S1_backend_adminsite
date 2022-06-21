@@ -78,6 +78,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                         _endDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
                 }
             }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
         public class BlockBankAccRequest
         {
@@ -193,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public ApiListResult<BlockBankAcc> GetBlockBankAcc(GetBlockBankAccRequest request)
         {
-            var blockBankAcc = _blockBLL.GetBlockBankAcc(request.StartDate.DateTime, request.EndDate.DateTime, request.Status,request.AccountNum,request.UserName);
+            var blockBankAcc = _blockBLL.GetBlockBankAcc(request.StartDate.DateTime, request.EndDate.DateTime, request.Status,request.AccountNum, request.CurrencyId, request.UserName);
             return new ApiListResult<BlockBankAcc>
             {
                 Data = blockBankAcc,
