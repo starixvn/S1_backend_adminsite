@@ -89,7 +89,7 @@ namespace BackendSite.Service.DAL
                     jsonSelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
-            if (selectTag != null && selectTag.Any() )
+            if (selectTag != null && selectTag.Any())
             {
                 jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
             }
@@ -98,7 +98,7 @@ namespace BackendSite.Service.DAL
                 jsonSelectTagList = null;
             }
             totalPages = 0;
-            
+
 
             var p = new DynamicParameters(new
             {
@@ -118,7 +118,7 @@ namespace BackendSite.Service.DAL
                 StartDate = startDate,
                 EndDate = endDate,
                 TagStartDate = tagStartDate,
-                TagEndDate = tagEndDate, 
+                TagEndDate = tagEndDate,
                 StatusStartDate = statusStartDate,
                 StatusEndDate = statusEndDate,
                 PageSize = pageSize,
@@ -193,7 +193,7 @@ namespace BackendSite.Service.DAL
                     SelectStatus = JsonConvert.SerializeObject(selectStatus);
                 }
             }
-            if (selectTag != null && selectTag.Any() )
+            if (selectTag != null && selectTag.Any())
             {
                 jsonSelectTagList = JsonConvert.SerializeObject(selectTag);
             }
@@ -201,32 +201,33 @@ namespace BackendSite.Service.DAL
             {
                 jsonSelectTagList = null;
             }
-            
-            var p = new DynamicParameters(new { 
+
+            var p = new DynamicParameters(new
+            {
                 SelectSite,
-                BirDate = birDate, 
+                BirDate = birDate,
                 BirMonth = birMonth,
-                BirYear = birYear, 
-                UserName = userName, 
+                BirYear = birYear,
+                UserName = userName,
                 AccountName = accountName,
-                LoginIp = loginIp, 
+                LoginIp = loginIp,
                 TpUserName = tpUserName,
                 WTransId = wTransId,
                 DTransId = dTransId,
                 TTransId = tTransId,
-                Email = email, 
-                PhoneNo = phoneNo, 
+                Email = email,
+                PhoneNo = phoneNo,
                 StartDate = startDate,
-                EndDate = endDate, 
+                EndDate = endDate,
                 TagStartDate = tagStartDate,
-                TagEndDate = tagEndDate, 
+                TagEndDate = tagEndDate,
                 StatusStartDate = statusStartDate,
                 StatusEndDate = statusEndDate,
-                SiteList = siteList, 
-                AffCode = affCode, 
+                SiteList = siteList,
+                AffCode = affCode,
                 BankAccountNumber = bankAccountNumber,
-                SelectCurrency = SelectCurrency, 
-                CurrncyList = currencyList, 
+                SelectCurrency = SelectCurrency,
+                CurrncyList = currencyList,
                 SelectStatus = SelectStatus,
                 SelectTagList = jsonSelectTagList
             });
@@ -244,7 +245,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V8", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V10", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -255,19 +256,20 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
-            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V2", 
-                new DynamicParameters(new { 
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V2",
+                new DynamicParameters(new
+                {
                     _BatchId = req.BatchId,
                     _SiteId = req.SiteId,
-                    _LangId = req.LangId,  
+                    _LangId = req.LangId,
                     _CurrencyId = req.CurrencyId,
                     _Status = req.AccountStatus,
                     _IsPopup = req.IsPopup,
                     _PopupMessage = req.PopupMessage,
-                    _Title = req.Title ,
-                    _Content =req.Content,
+                    _Title = req.Title,
+                    _Content = req.Content,
                     _Operator = req.Operator
-                }),120) > 0;
+                }), 120) > 0;
         }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
@@ -283,26 +285,26 @@ namespace BackendSite.Service.DAL
             var result = conn.Execute("Admin_CustStatusSwitch_Set", new { CustId = custId, Op }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        
-        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
+
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, Dictionary<string, string> address, string Operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustInfo_Set", new { CustId = custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator }, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_CustInfo_Set_V2", new { CustId = custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Address = JsonConvert.SerializeObject(address), Operator }, commandType: CommandType.StoredProcedure);
             return result;
         }
-        
+
         public CustPhotoId GetCustPhotoId(int CustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.QueryFirstOrDefault<CustPhotoId>("Admin_CustPhotoId_Get", new { CustId = CustId }, commandType: CommandType.StoredProcedure);
         }
-        
+
         public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustPhotoId_Ins", new { CustId = custId, SiteId = siteId, PicFileName = picFileName, PhotoIdPic = photoIdPic }, commandType: CommandType.StoredProcedure);
         }
-       
+
         public bool DelCustPhotoId(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -343,7 +345,7 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustNotes_Set_V2", new { NoteId = noteId, Note = note, Type = type, Operator = Operator }, commandType: CommandType.StoredProcedure) > 0;
         }
-        public IEnumerable<LoginLog> GetLoginLogByCust(int custId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize,int startIndex, out int totalPages, out int rowCount)
+        public IEnumerable<LoginLog> GetLoginLogByCust(int custId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int startIndex, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_CustId", custId, dbType: DbType.Int32);
@@ -367,7 +369,7 @@ namespace BackendSite.Service.DAL
         public bool ResetProfile(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_ResetProfile_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_ResetProfile_Set_V2", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
         }
         public bool ResetCustBankInfo(int custId)
         {
@@ -379,10 +381,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_ResetCustUSDTInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
         }
-        public bool SetCustStatus(int custId, int status , int taskId)
+        public bool SetCustStatus(int custId, int status, int taskId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status , TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
+            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status, TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
         }
         public decimal GetWithdrawalAvailableBalance(int custId)
         {
@@ -776,7 +778,7 @@ namespace BackendSite.Service.DAL
         public CustProfileReq GetCustProfile(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get_V2", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
@@ -787,7 +789,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             return await _mainDbClient.QueryFirstAsync<CustomerWhoWaitToSend>("Admin_Msg_CustInfoByCust_Get", p);
         }
-        
+
         public async Task<IEnumerable<CustomerWhoWaitToSend>> GetCustInfoBySite(int siteId, int currencyId, int status)
         {
             var p = new DynamicParameters();
@@ -805,7 +807,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("StartDate", DateTimeOffset.Parse(StartDate.ToString()).DateTime, DbType.DateTime);
             parameter.Add("EndDate", DateTimeOffset.Parse(EndDate.ToString()).DateTime, DbType.DateTime);
             parameter.Add("PageNumber", Math.Abs(PageNumber), dbType: DbType.Int32);
-            parameter.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),dbType: DbType.Int32);
+            parameter.Add("StartIndex", (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), dbType: DbType.Int32);
             parameter.Add("PageSize", Math.Abs(PageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
