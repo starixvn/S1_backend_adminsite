@@ -162,6 +162,12 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public int EnableRebatePayout { get; set; }
         public CustLineProfileModel CustLineProfile { get; set; }
+        public string AddressCountry { get; set; }
+        public string AddressState { get; set; }
+        public string AddressPostCode { get; set; }
+        public string AddressCity { get; set; }
+        public string AddressLineFirst { get; set; }
+        public string AddressLineSecond { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -565,6 +571,7 @@ namespace BackendSite.Service.Model
         public string Profile { get; set; }
         public string BankInfo { get; set; }
         public string USDTInfo { get; set; }
+        public string Address { get; set; }
     }
     public class BankInfoDetail
     {
@@ -651,4 +658,5 @@ namespace BackendSite.Service.Model
         }
 
     }
+
 }
