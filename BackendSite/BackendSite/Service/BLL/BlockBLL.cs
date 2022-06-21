@@ -49,9 +49,9 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.DeleteBlockIP(ip);
         }
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int status, string accountNum, string userName)
+        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int status, string accountNum, IEnumerable<int> currencyId, string userName)
         {
-            return _blockService.GetBlockBankAcc(startDate, endDate, status, accountNum, userName);
+            return _blockService.GetBlockBankAcc(startDate, endDate, status, accountNum, currencyId, userName);
         }
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
         {
