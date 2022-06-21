@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BaseDataController : ControllerBase
