@@ -24,7 +24,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
     {
         #region Fields
 
-        private readonly AuthorizeBLL _authorizeBll;
         private readonly Tools _tools;
         private readonly AdminBLL _adminBll;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
@@ -35,7 +34,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
 
         public HomeController(IServiceProvider provider)
         {
-            _authorizeBll = provider.GetService<AuthorizeBLL>();
             _tools = provider.GetService<Tools>();
             _adminBll = provider.GetService<AdminBLL>();
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
