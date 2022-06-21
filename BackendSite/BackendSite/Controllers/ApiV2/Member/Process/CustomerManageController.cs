@@ -420,6 +420,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// Email
             /// </summary>
             public string EMail { get; set; }
+            /// <summary>
+            /// Email
+            /// </summary>
+            public Dictionary<string,string> Address { get; set; }
         }
         public class VerificationRewardReq : CustIdRequest
         {
@@ -881,6 +885,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var apiResult = new ApiResult<bool>();
             var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            request.Address = request.Address.Count == 0 ? null : request.Address;
             var data = _custInfoBll.SetCustInfo(request.CustId,
                 request.Level,
                 request.FullName,
@@ -889,6 +894,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.Birthday_D,
                 request.Phone,
                 request.EMail,
+                request.Address,
                 User.Identity.Name) > 0;
 
             if (!data)
@@ -923,6 +929,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Info.Add("Action", $"Change EMail To {request.EMail}");
                 Info.Add("Before Change EMail", custProfile.Email);
+            }
+            else if (request.Address != null)
+            {
+                var beforeAddressDictionary = new Dictionary<string, string>();
+                if (custProfile.Address != null)
+                {
+                    var jsonObject = JObject.Parse(custProfile.Address);
+                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                    jTokens.ToList().ForEach(jToken =>
+                    {
+                        beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
+                    });
+                }
+                Info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(request.Address)}");
+                Info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
             }
 
             _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
@@ -1075,6 +1096,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if (!string.IsNullOrWhiteSpace(custProfile.Profile))
                 {
                     var jsonObject = JObject.Parse(custProfile.Profile);
+                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                    jTokens.ToList().ForEach(jToken =>
+                    {
+                        Info.Add(jToken.Path, jToken.ToString());
+                    });
+                }
+
+                if (!string.IsNullOrWhiteSpace(custProfile.Address))
+                {
+                    var jsonObject = JObject.Parse(custProfile.Address);
                     var jTokens = jsonObject.Descendants().Where(p => !p.Any());
                     jTokens.ToList().ForEach(jToken =>
                     {

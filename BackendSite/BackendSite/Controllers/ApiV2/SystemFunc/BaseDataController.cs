@@ -14,7 +14,7 @@ using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BaseDataController : ControllerBase
