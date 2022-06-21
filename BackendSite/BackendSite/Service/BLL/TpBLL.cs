@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using static BackendSite.Controllers.Api.TpController;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.BLL
 {
@@ -22,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly IMemoryCache _cache;
         private readonly int _balanceTimeoutSecond;
+        private CacheHelper _cacheHelper;
 
         public TpBLL(IServiceProvider provider)
         {
@@ -31,6 +33,7 @@ namespace BackendSite.Service.BLL
             _cache = provider.GetRequiredService<IMemoryCache>();
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            _cacheHelper = provider.GetRequiredService<CacheHelper>();
         }
 
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
@@ -153,6 +156,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
+        
         public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
@@ -195,107 +199,6 @@ namespace BackendSite.Service.BLL
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
         {
             _thirdPartyService.SetAdjustmentTpCustInfoLog(menu, actionType, detailInfo, @operator);
-        }
-
-        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, int minBet, int maxBet)
-        {
-            var sportType = new List<string>()
-            {
-                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
-            };
-            var betSetting = sportType.Select(type => new SabaBetSetting()
-            {
-                sport_type = type,
-                min_bet = minBet,
-                max_bet = maxBet,
-                max_bet_per_match = maxBet
-            }).ToList();
-            var myUrl = $"{_apiUrl}SetBetLimit";
-            var setBetLimit = new SetBetLimit()
-            {
-                TpId = tpId,
-                CustId = custId,
-                BetSetting = JsonConvert.SerializeObject(betSetting)
-            };
-
-            try
-            {
-                var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
-        }
-
-        public async Task<ApiResult> SetBetLimitAsync(int tpId, int custId, List<SabaBetSettingResponse> betSettings)
-        {
-            var sportType = new List<string>()
-            {
-                "1", "2", "3", "5", "8", "10", "11", "43", "99", "99MP", "1MP"
-            };
-
-            var tempSetting = betSettings
-                .Where(a => sportType.Contains(a.sport_type))
-                .Select(b => new SabaBetSetting()
-                {
-                    sport_type = b.sport_type,
-                    min_bet = decimal.ToInt32(b.min_bet),
-                    max_bet = decimal.ToInt32(b.max_bet),
-                    max_bet_per_match = decimal.ToInt32(b.max_bet_per_match)
-                });
-
-            var myUrl = $"{_apiUrl}SetBetLimit";
-            var setBetLimit = new SetBetLimit()
-            {
-                TpId = tpId,
-                CustId = custId,
-                BetSetting = JsonConvert.SerializeObject(tempSetting)
-            };
-
-            try
-            {
-                var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
-        }
-
-        public async Task<ApiResult<List<SabaBetSettingResponse>>> GetBetLimitAsync(int tpId, int custId)
-        {
-            var myUrl = $"{_apiUrl}GetBetLimit";
-            var setBetLimit = new GetBetLimitReq()
-            {
-                TpId = tpId,
-                CustId = custId
-            };
-
-            try
-            {
-                var apiResult =
-                    await _courierAdapter.MyPostAsync<List<SabaBetSettingResponse>, GetBetLimitReq>(myUrl, setBetLimit);
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                return new ApiResult<List<SabaBetSettingResponse>>()
-                {
-                    ErrorCode = 9000,
-                    Message = ex.Message
-                };
-            }
         }
 
         public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
@@ -349,6 +252,35 @@ namespace BackendSite.Service.BLL
                 }
             }
             return tpWalletList;
+        }
+        public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
+        {
+            var key = $"TpCategory_{siteId}";
+
+            return _cacheHelper.TryGetOrCreate(key,
+                new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)),
+                i => GetSiteTpCategoryListAsync(siteId));
+        }
+        private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
+        {
+            var tpList = await _thirdPartyService.GetSiteTpListAllAsync(siteId);
+            var tpGameTypeList = await _thirdPartyService.GetTpGameType();
+            var result = tpGameTypeList
+                .Where(x => tpList.Any(y => y.TpId == x.TpId))
+                .Select(x => new TpCategory
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                })
+                .Distinct(new TpCategoryComparer())
+                .OrderBy(x => x.CategoryId);
+
+            return result;
+        }
+        
+        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        {
+            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
         }
     }
 }

@@ -1,16 +1,15 @@
-﻿using Amazon;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalAccountingController : ControllerBase
@@ -36,33 +35,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly ExcelBLL _excelBll;
+        private readonly AWSS3Helper _s3Helper;
 
-        private readonly string _awsKey;
-        private readonly string _awsSecretKey;
         private readonly string _awsWithdrawalAccountingFolder;
         private readonly string _awsWithdrawalUrl;
         private readonly string _awsWithdrawalBucketName;
-        private readonly string _proxyHost;
-        private readonly int _proxyPort;
 
         #endregion
 
         #region Contructors
 
-        public WithdrawalAccountingController(IConfiguration configuration, IServiceProvider provider)
+        public WithdrawalAccountingController(IServiceProvider provider)
         {
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBankAccountingController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
 
-            _awsKey = configuration.GetValue<string>("AWSKey");
-            _awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
+            var configuration = provider.GetRequiredService<IConfiguration>();         
             _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
             _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
             _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
-            _proxyHost = configuration.GetValue<string>("ProxyHost");
-            _proxyPort = configuration.GetValue<int>("ProxyPort");
         }
 
         #endregion
@@ -125,11 +119,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         public class DeleteWithdrawalAccountingRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string TransId { get; set; }
             public int Id { get; set; }
         }
 
         public class UploadAccountingPictureRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public string Picture { get; set; }
             public int Id { get; set; }
             public string TransId { get; set; }
@@ -380,7 +379,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -421,7 +420,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -452,9 +451,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public ApiResult Delete(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
-                out var uploadPicTimes);
-
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, authData.UserName,
+                out var transId, out var seq,
+                out var uploadPicTimes, out var details);
+           
             if (!result)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "delete fail.");
@@ -485,7 +486,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
-            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id, out var newUploadPictureTimes);
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.UpdateWithdrawalAccountingForUploadPicture(request.Id, authData.UserName,
+                out var newUploadPictureTimes);
             if (result)
             {
                 var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
@@ -500,7 +503,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     };
                 }
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Fail,
@@ -552,7 +555,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     Message = "Delete Fail."
                 };
             }
-
+            
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -595,18 +598,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     return false;
                 }
 
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
-
-                if (!string.IsNullOrEmpty(_proxyHost))
-                {
-                    config.ProxyHost = _proxyHost;
-                    config.ProxyPort = _proxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
                 var putRequest = new PutObjectRequest
                 {
                     BucketName = _awsWithdrawalBucketName,
@@ -615,7 +606,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
 
-                var putResponse = await client.PutObjectAsync(putRequest);
+                var putResponse = await _s3Helper.PutObjectAsync(putRequest);
 
                 return putResponse.HttpStatusCode == HttpStatusCode.OK;
             }
@@ -636,25 +627,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 if (!await CheckAccountingPictureAsync(transId, seq, uploadPicTimes))
                     return false; //Picture not exist before delete.
 
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
-
-                if (!string.IsNullOrEmpty(_proxyHost))
-                {
-                    config.ProxyHost = _proxyHost;
-                    config.ProxyPort = _proxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
                 var deleteRequest = new DeleteObjectRequest
                 {
                     BucketName = _awsWithdrawalBucketName,
                     Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-
-                await client.DeleteObjectAsync(deleteRequest);
+              
+                await _s3Helper.DeleteObjectAsync(deleteRequest);
 
                 return !await CheckAccountingPictureAsync(transId, seq,
                     uploadPicTimes); //Picture not exist after delete.
@@ -673,24 +652,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             try
             {
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
-
-                if (!string.IsNullOrEmpty(_proxyHost))
-                {
-                    config.ProxyHost = _proxyHost;
-                    config.ProxyPort = _proxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(_awsKey, _awsSecretKey, config);
                 var request = new GetObjectRequest()
                 {
                     BucketName = _awsWithdrawalBucketName,
                     Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-                var response = await client.GetObjectAsync(request);
+                var response = await _s3Helper.GetObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }

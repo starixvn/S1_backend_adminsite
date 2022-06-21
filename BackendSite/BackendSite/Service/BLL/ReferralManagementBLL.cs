@@ -4,6 +4,8 @@ using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -19,14 +21,41 @@ namespace BackendSite.Service.BLL
         {
             return referralManagementService.GetReferralBySiteId(siteId);
         }
+
+        public async Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId)
+        {
+            var data = await referralManagementService.GetReferralDetail(siteId, currencyId);
+            var referralDetail = new ReferralDetail()
+            {
+                SiteId = data.SiteId,
+                CurrencyId = data.CurrencyId,
+                BonusAmount = data.BonusAmount,
+                InvitationLimit = data.InvitationLimit,
+                AgentValidBet = data.AgentValidBet,
+                AgentDeposit = data.AgentDeposit,
+                ReferralFreeCredit = data.ReferralFreeCredit,
+                ValidBet = data.ValidBet,
+                Deposit = data.Deposit,
+                PeriodDays = data.PeriodDays,
+                SpecificList = JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
+                Status = data.Status
+            };
+            return referralDetail;
+        }
+
         public void SetReferral(List<ReferralManagement> referralList)
         {
             referralManagementService.SetReferral(referralList);
+        }
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
+        {
+            return await referralManagementService.SetReferralAsync(setReferralRequest);
         }
         public void SetReferralStatus(int siteId, int currencyId,int status)
         {
             referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
+
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -43,7 +72,6 @@ namespace BackendSite.Service.BLL
                     SiteName = x.SiteName,
                     ReferralUser = x.ReferralUser,
                     ReferredUser = x.ReferredUser,
-                    CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
                     RegTime = x.RegTime,
                     RewardTime = x.RewardTime,

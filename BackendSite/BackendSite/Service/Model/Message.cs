@@ -1,4 +1,6 @@
 ﻿using System;
+using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
@@ -9,8 +11,11 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _endDate { get;set;}
         private DateTimeOffset _createTime { get;set;}
         private DateTimeOffset _lastUpdateTime { get;set;}
+        [LogIgnore]
         public int Id { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
+        [LogIgnore]
         public string SiteName { get; set; }
         public DateTimeOffset StartTime
         {
@@ -25,39 +30,55 @@ namespace BackendSite.Service.Model
         }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
+        [LogIgnore]
         public string Creator { get; set; }
+        [LogIgnore]
         public DateTimeOffset CreateTime { 
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        [LogIgnore]
         public DateTimeOffset LastUpdateTime
         {
             get => _lastUpdateTime;
             set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        [LogIgnore]
         public string LastUpdater { get; set; }
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     public class AddAnnouncementModel
     {
+        [LogIgnore]
         public int SiteId { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     
     public class UpdateAnnouncementModel
     {
+        [LogIgnore]
         public int Id { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
         public string Subject { get; set; }
         public string Content { get; set; }
-        public int Status { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
         public int IsTest { get; set; }
+        [LogIgnore]
         public int Seq { get; set; }
     }
     
@@ -104,10 +125,12 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int BatchId { get; set; }
         public string Author { get; set; }
+        public string LastUpdateUser { get; set; }
         public bool IsPopup { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string Message { get; set; }
+        public int Status { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public DateTimeOffset CreateTime { get; set; }
     }

@@ -87,7 +87,7 @@ const Panel = (props) => {
                 <button
                   className="btn btn-delete"
                   type="submit"
-                  onClick={props.DeleteButton.bind(this, data["id"])}
+                  onClick={props.DeleteButton.bind(this, data)}
                 >
                   <i className="icon-delete"></i>
                 </button>

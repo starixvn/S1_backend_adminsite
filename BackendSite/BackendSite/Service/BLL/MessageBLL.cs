@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -18,13 +19,15 @@ namespace BackendSite.Service.BLL
     {
         private readonly MessageService messageService;
         private readonly CustInfoBLL custInfoBLL;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<MessageBLL> _logger;
 
-        public MessageBLL(MessageService messageService, CustInfoBLL custInfoBLL, ILogger<MessageBLL> logger)
+        public MessageBLL(IServiceProvider provider)
         {
-            this.messageService = messageService;
-            this.custInfoBLL = custInfoBLL;
-            _logger = logger;
+            this.messageService = provider.GetRequiredService<MessageService>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _logger = provider.GetRequiredService<ILogger<MessageBLL>>();;
         }
 
         public int SendMessageToPlayer(string sender, string title, string content, int custId)
@@ -58,17 +61,79 @@ namespace BackendSite.Service.BLL
 
         public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
-            return messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
+            var result = messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
+            
+            if (result != null)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = creator,
+                    SiteId = data.SiteId,
+                    CurrencyId = 0, // 沒分
+                    AfterDetailInfo = data.ToLog(),
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
+                };
+                
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+
+            return result;
         }
 
         public Announcement UpdateAnnouncement(UpdateAnnouncementModel data, string lastUpdater, int lastUpdaterId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
+            var result = messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
+            var beforeData = GetAnnouncementById(data.Id);
+            
+            if (result != null)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = lastUpdater,
+                    SiteId = data.SiteId,
+                    CurrencyId = 0, // 沒分
+                    BeforeDetailInfo = beforeData.ToLog(),
+                    AfterDetailInfo = data.ToLog(),
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
+                };
+                
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            
             return messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
         }
 
-        public int DeleteAnnouncement(int id)
+        public int DeleteAnnouncement(int id, string @operator)
         {
-            return messageService.DeleteAnnouncement(id);
+            var result = messageService.DeleteAnnouncement(id);
+            var beforeData = GetAnnouncementById(id);
+            
+            if (result >= 1)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = beforeData.SiteId,
+                    CurrencyId = 0, // 沒分
+                    BeforeDetailInfo = beforeData.ToLog(),
+                    ActionType = ActionType.Delete,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
+                };
+                
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            return result;
         }
 
         public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int pageNumber, int pageSize, 
@@ -117,9 +182,13 @@ namespace BackendSite.Service.BLL
         {
             return messageService.DeleteBatchMessage(batchId);
         }
-        public bool UpdateBatchMessage(int batchId, bool isPopup, string message)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message ,string Operator)
         {
-            return messageService.UpdateBatchMessage(batchId, isPopup, message);
+            return messageService.UpdateBatchMessage(batchId, isPopup, message , Operator);
+        }
+        public bool UpdateBatchMessageStatus(int status,int batchId)
+        {
+            return messageService.UpdateBatchMessageStatus(status, batchId);
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

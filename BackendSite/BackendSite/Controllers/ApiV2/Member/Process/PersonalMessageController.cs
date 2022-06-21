@@ -11,7 +11,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,7 +20,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PersonalMessageController : ControllerBase
@@ -284,6 +283,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult UpdateBatchMessage(UpdateBatchMessageReq req)
         {
+            var authData = _authorizeBll.GetAuthData();
             var message = new Dictionary<string, MessageModel>();
 
             foreach (var item in req.LanguageDatas)
@@ -300,7 +300,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var messageString = JsonConvert.SerializeObject(message);
 
-            if (!_messageBll.UpdateBatchMessage(req.BatchId, req.IsPopup, messageString))
+            if (!_messageBll.UpdateBatchMessage(req.BatchId, req.IsPopup, messageString, authData.UserName))
             {
                 return new ApiResult
                 {

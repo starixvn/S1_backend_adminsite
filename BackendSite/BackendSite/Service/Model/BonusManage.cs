@@ -147,8 +147,11 @@ namespace BackendSite.Service.Model
 
     public class TpGameType
     {
+        public int TpId { get; set; }
         public int Type { get; set; }
         public string TypeName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
     }
 
     public class PromoCategory
