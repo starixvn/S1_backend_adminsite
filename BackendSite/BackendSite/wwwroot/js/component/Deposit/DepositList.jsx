@@ -34,34 +34,6 @@ import DateTimePicker from 'react-datetime';
         7: "BankAutoChannel"
     };
     
-    const BankCodeSelectInit = {
-            "AMB" :"AMB",
-            "CIMB":"CIMB",
-            "HLB":"HLB",
-            "MBB":"MBB",
-            "PBB":"PBB",
-            "RHB":"RHB",
-            "BBL" :"BBL",
-            "HSBC":"HSBC",
-            "KBANK":"KBANK",
-            "KTB":"KTB",
-            "SCB":"SCB",
-            "TBK":"TBK",
-            "BCA" :"BCA",
-            "BNI":"BNI",
-            "BRI":"BRI",
-            "CIMBN":"CIMBN",
-            "MDR":"MDR",
-            "UOB":"UOB",
-            "ACB" :"ACB",
-            "BIDV":"BIDV",
-            "DAB":"DAB",
-            "GAB":"GAB",
-            "TCB":"TCB",
-            "VCB":"UOB",
-            "VTB":"VTB"
-    };
-    
     const StatusSelectOp = {
         1: "Pending",
         7: "On Hold",
@@ -1110,19 +1082,14 @@ import DateTimePicker from 'react-datetime';
                 },
                 onInitialized: function () {
                     state.selectBankCode.length = 0;
-                    (searchFilter.selectBankCode) ?
+                    if (searchFilter.selectBankCode)
                         searchFilter.selectBankCode.forEach(function (obj) {
                             state.selectBankCode.push(obj);
-                        })
-                        :
-                        state.selectBankCode = [...Object.values(BankCodeSelectInit)];
+                        });
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectBankCode').multiselect('select', searchFilter.selectBankCode) 
-                : 
-                Object.keys(BankCodeSelectInit).forEach((key) => {
-                    $('#selectBankCode').multiselect('select', key);
-                    });
+            
+            $('#selectBankCode').multiselect('select', searchFilter.selectBankCode)
             $('#selectBankCode').multiselect('updateButtonText');
         }
 
