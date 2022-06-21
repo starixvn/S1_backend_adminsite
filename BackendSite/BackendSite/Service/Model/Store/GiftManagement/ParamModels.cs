@@ -15,7 +15,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
             PriceWorth = req.PriceWorth;
             ShowStock = (int) req.ShowStock;
             Stock = req.Stock;
-            Sort = req.Sort;
             Infos = req.Infos;
             Operator = userName;
         }
@@ -29,7 +28,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public decimal PriceWorth { get; set; }
         public int ShowStock { get; set; }
         public int Stock { get; set; }
-        public int Sort { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
     }
@@ -46,7 +44,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
             PriceWorth = req.PriceWorth;
             ShowStock = (int) req.ShowStock;
             Stock = req.Stock;
-            Sort = req.Sort;
             Infos = req.Infos;
             Operator = userName;
         }
@@ -59,7 +56,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public decimal PriceWorth { get; set; }
         public int ShowStock { get; set; }
         public int Stock { get; set; }
-        public int Sort { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
     }
@@ -85,5 +81,22 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public string Description { get; set; }
     
         public string PictureUrl { get; set; }
+    }
+    
+    public class SetSortParams
+    {
+        public SetSortParams(SetSortRequest req, string userName)
+        {
+            Infos = req.Infos;
+            Operator = userName;
+        }
+        public IEnumerable<SortItem> Infos { get; set; }
+        public string Operator { get; set; }
+    }
+    
+    public class SortItem
+    {
+        public int GiftId { get; set; }
+        public int Sort { get; set; }
     }
 }

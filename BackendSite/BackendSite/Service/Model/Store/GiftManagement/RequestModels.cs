@@ -47,7 +47,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public decimal PriceWorth { get; set; }
         public GeneralStatusEnum ShowStock { get; set; }
         public int Stock { get; set; }
-        public int Sort { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
     }
 
@@ -61,7 +60,6 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public decimal PriceWorth { get; set; }
         public GeneralStatusEnum ShowStock { get; set; }
         public int Stock { get; set; }
-        public int Sort { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
     }
 
@@ -112,5 +110,11 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     public class UploadImageRequest
     {
         public IFormFile File { get; set; }
+    }
+    
+    public class SetSortRequest
+    {
+        public IEnumerable<SortItem> Infos { get; set; }
+        public string Operator { get; set; }
     }
 }

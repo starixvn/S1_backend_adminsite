@@ -132,5 +132,14 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 ErrorCode = (int) (string.IsNullOrEmpty(result) ? ErrorCodeEnum.Fail : ErrorCodeEnum.Success)
             };
         }
+        
+        [HttpPost]
+        public async Task<ApiResult> SetSortAsync(SetSortRequest request)
+        {
+            var user = User.Identity.Name;
+            var result = await _giftManagementBll.SetGiftSortAsync(request, user);
+
+            return result;
+        }
     }
 }

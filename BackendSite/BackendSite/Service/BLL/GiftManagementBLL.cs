@@ -142,6 +142,15 @@ namespace BackendSite.Service.BLL
             
             return result;
         }
+    
+        public async Task<ApiResult> SetGiftSortAsync(SetSortRequest req, string userName)
+        {
+            var param = new SetSortParams(req, userName);
+            var url = _storeSiteUrl + "/api/GiftManagement/SetSort";
+            var result = await _courierAdapter.MyPostAsync<object, SetSortParams>(url, param);
+
+            return new ApiResult(result.ErrorCode, result.Message);
+        }
 
         private bool CheckIsImage(IFormFile file)
             => file.ContentType.StartsWith("image/");
