@@ -115,6 +115,5 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     public class SetSortRequest
     {
         public IEnumerable<SortItem> Infos { get; set; }
-        public string Operator { get; set; }
     }
 }
