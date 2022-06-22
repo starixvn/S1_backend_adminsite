@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
+using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model.Store.StorePoint
 {
@@ -34,7 +35,6 @@ namespace BackendSite.Service.Model.Store.StorePoint
     public class CreateManualRewardPointInfoBatchRequest
     {
         public int SiteId { get; set; }
-        public IEnumerable<ManualRewardPointInfo> Infos { get; set; }
-        public string Operator { get; set; }
+        public IFormFile File { get; set; }
     }
 }
