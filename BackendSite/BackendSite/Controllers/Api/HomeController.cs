@@ -58,7 +58,6 @@ namespace BackendSite.Controllers.Api
             _dashBoardBLL = dashBoardBLL;
             _menuBLL = menuBLL;
             _responseSettingBLL = responseSettingBLL;
-            _environment = environment;
         }
 
         #endregion
