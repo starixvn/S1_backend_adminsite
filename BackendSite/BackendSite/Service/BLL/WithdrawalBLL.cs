@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -22,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly WithdrawalLimitService _withdrawalLimitService;
         private readonly ReportService _reportService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<WithdrawalBLL> _logger;
 
         #endregion
@@ -36,6 +38,7 @@ namespace BackendSite.Service.BLL
             _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
             _reportService = provider.GetRequiredService<ReportService>();
             _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
         }
 
@@ -271,7 +274,8 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int>
             {
-                (int) WithdrawalStatusEnum.Pending
+                (int) WithdrawalStatusEnum.Pending,
+                (int) WithdrawalStatusEnum.OnHold
             };
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -281,7 +285,7 @@ namespace BackendSite.Service.BLL
             {
                 var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
                 throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending Can Set.");
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending And OnHold Can Set.");
             }
 
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
@@ -334,39 +338,40 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
 
-        public bool AddWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0
-                || withdrawalLimitInfoManage.WithdrawalMin < 0
-                || withdrawalLimitInfoManage.Times < 0)
+            if (input.After.WithdrawalMax < 0
+                || input.After.WithdrawalMin < 0
+                || input.After.Times < 0)
             {
                 return false;
             }
 
-            return _withdrawalLimitService.AddWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.AddWithdrawalLimitInfo(input);
         }
 
-        public bool EditWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool EditWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0
-                || withdrawalLimitInfoManage.WithdrawalMin < 0
-                || withdrawalLimitInfoManage.Times < 0)
+            if (input.After.WithdrawalMax < 0
+                || input.After.WithdrawalMin < 0
+                || input.After.Times < 0)
             {
                 return false;
             }
 
-            return _withdrawalLimitService.EditWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
 
-        public int DeleteWithdrawalLimit(WithdrawalLimitInfoManage withdrawalLimitInfoManage, string Operator)
+        public bool DeleteWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            var currentUpperPoint = _withdrawalLimitService.GetWithdrawalLimitInfo(withdrawalLimitInfoManage.SiteId,
-                withdrawalLimitInfoManage.CurrencyId, withdrawalLimitInfoManage.VipLevel + 1);
+            var currentUpperPoint = 
+                _withdrawalLimitService.GetWithdrawalLimitInfo(input.SiteId,
+                    input.CurrencyId, input.Before.VipLevel + 1);
 
             if (currentUpperPoint != null)
-                return 0;
+                return false;
 
-            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(withdrawalLimitInfoManage, Operator);
+            return _withdrawalLimitService.DeleteWithdrawalLimitInfo(input);
         }
 
         public IEnumerable<WithdrawalKYC> GetWithdrawalKYCList(int siteId)
@@ -374,9 +379,9 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalKYC(siteId);
         }
 
-        public bool EditWithdrawalKYCList(WithdrawalKYC withdrawalKYC)
+        public bool EditWithdrawalKYCList(ParamsWithLog<WithdrawalKYCAmount> input)
         {
-            return _withdrawalService.EditWithdrawalKYC(withdrawalKYC);
+            return _withdrawalService.EditWithdrawalKYC(input);
         }
 
         public List<WithdrawalData> GetWithdrawalLimitData(int siteId)
@@ -587,7 +592,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.EditUSDTWithdrawalLimitInfo(USDTwithdrawalLimitInfoManage, updater);
         }
 
-        public IEnumerable<CryptoWithdrawalLimitInfoManage> GetCryptoWithdrawalLimitInfos(IEnumerable<int> siteIds,
+        public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
             int cryptoCurrencyId,
             string network,
@@ -607,54 +612,46 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount).ToList();
 
-            result.ForEach(x =>
-            {
-                x.NetworkType = (int)(NetworkTypeEnum)Enum.Parse(typeof(NetworkTypeEnum), x.Network);
-            });
-
             return result;
         }
 
-        public bool AddCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool AddCryptoWithdrawalLimit(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
                 return false;
             }
-                
 
             return _withdrawalLimitService.AddCryptoWithdrawalLimitInfo(input);
         }
 
-        public bool DeleteCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool DeleteCryptoWithdrawalLimit(ParamsWithLog<DeleteCryptoWithdrawalLimitInfo> input)
         {
             var currentUpperPointInput = new CryptoWithdrawalLimitInfoManage
             {
-                SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
-                NetworkType = input.NetworkType,
-                CryptoCurrencyId = input.CryptoCurrencyId,
-                VipLevel = input.VipLevel + 1
+                NetworkType = input.Before.NetworkType,
+                CryptoCurrency = input.Before.CryptoCurrency,
+                VipLevel = input.Before.VipLevel + 1
             };
 
             var currentUpperPoint =
-                _withdrawalLimitService.GetCryptoWithdrawalLimitInfo(currentUpperPointInput);
+                _withdrawalLimitService.GetCryptoWithdrawalLimitInfo(currentUpperPointInput, input.SiteId, input.CurrencyId);
 
             if (currentUpperPoint != null)
             {
-                _logger.LogInformation($"Current upper point is not null. Current VIP level: { input.VipLevel}");
+                _logger.LogInformation($"Current upper point is not null. Current VIP level: { input.Before.VipLevel }");
                 return false;
             }
 
             return _withdrawalLimitService.DeleteCryptoWithdrawalLimitInfo(input);
         }
 
-        public bool EditCryptoWithdrawalLimit(CryptoWithdrawalLimitInfoManage input)
+        public bool EditCryptoWithdrawalLimit(ParamsWithLog<UpdateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.WithdrawalMax < 0 || input.WithdrawalMin < 0)
+            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.WithdrawalMin}, max: {input.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
                 return false;
             }
 
@@ -809,11 +806,35 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
-        public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
             {
-                return InsertWithdrawalBankAccounting(data);
+                var trans = GetWithdrawalRequest(data.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = data.ToLog()
+                };
+                
+                if (!InsertWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            
+                return true;
             }
             catch (Exception)
             {
@@ -821,11 +842,54 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool UpdateWithdrawalAccounting(WithdrawalBankAccountingModel data)
+        public bool UpdateWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
             {
-                return UpdateWithdrawalBankAccounting(data);
+                var item = GetAccountingById(data.Id);
+                var trans = GetWithdrawalRequest(data.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        item.Id,
+                        item.Seq,
+                        item.BankAccountNo,
+                        item.Amount,
+                        item.ChargeFee,
+                        item.UploadPicTimes,
+                        item.Memo
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        data.Id,
+                        data.Seq,
+                        data.BankAccountNo,
+                        data.Amount,
+                        data.ChargeFee,
+                        data.UploadPicTimes,
+                        data.Memo
+                    })
+                };
+                
+                if (!UpdateWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            
+                return true;
             }
             catch (Exception)
             {
@@ -833,15 +897,40 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool UpdateWithdrawalAccountingForUploadPicture(int id, out int newUploadPicTimes)
+        public bool UpdateWithdrawalAccountingForUploadPicture(int id, string @operator, out int newUploadPicTimes)
         {
             newUploadPicTimes = 0;
             try
             {
                 var data = GetAccountingById(id);
+                var trans = GetWithdrawalRequest(data.TransId);
+                
                 data.UploadPicTimes += 1;
                 newUploadPicTimes = data.UploadPicTimes;
-                return UpdateWithdrawalBankAccounting(data);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new {UploadPicTimes = data.UploadPicTimes - 1}),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new {data.UploadPicTimes})
+                };
+                
+                
+                if (!UpdateWithdrawalBankAccounting(data))
+                {
+                    return false;
+                }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+                return true;
             }
             catch (Exception)
             {
@@ -849,27 +938,47 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool DeleteWithdrawalAccounting(int id, out string transId, out int seq, out int uploadPicTimes)
+        public bool DeleteWithdrawalAccounting(int id, string @operator, out string transId, out int seq, out int uploadPicTimes, out string details)
         {
             transId = string.Empty;
             seq = 0;
             uploadPicTimes = 0;
+            details = string.Empty;
 
             try
             {
                 var item = GetAccountingById(id);
-
-                if (DeleteWithdrawalBankAccounting(item))
+                details = JsonConvert.SerializeObject(item);
+                var trans = GetWithdrawalRequest(item.TransId);
+                
+                var logParam = new CreateAdminAdjustmentInfoLogInput
                 {
-                    transId = item.TransId;
-                    seq = item.Seq;
-                    uploadPicTimes = item.UploadPicTimes;
-                    return true;
-                }
-                else
+                    Operator = @operator,
+                    SiteId = trans.SiteId,
+                    CurrencyId = trans.CurrencyId,
+                    RefTransId = trans.TransId,
+                    ActionType = ActionType.Delete,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalAccounting,
+                    BeforeDetailInfo = item.ToLog(),
+                    AfterDetailInfo = null
+                };
+                
+                
+                if (!DeleteWithdrawalBankAccounting(item))
                 {
                     return false;
                 }
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+
+                transId = item.TransId;
+                seq = item.Seq;
+                uploadPicTimes = item.UploadPicTimes;
+                
+                return true;
             }
             catch (Exception)
             {
@@ -878,6 +987,27 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        public bool EditEWalletWithdrawalLimit(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0
+                || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.EditEWalletWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+        }
+
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            return _withdrawalLimitService.UpdateEWalletWithdrawalLimitInfoStatus(withdrawalLimitInfoManage, updater);
+        }
+
+        public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
+        {
+            return _withdrawalLimitService.GetEWalletWithdrawalLimitInfo(siteId);
+        }
 
         #endregion
 

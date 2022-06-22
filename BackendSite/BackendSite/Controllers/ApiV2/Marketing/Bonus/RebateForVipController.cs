@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -10,13 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize]
+
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class RebateForVipController : ControllerBase
     {
         #region Fields
-        
+
         private readonly RebateManageBLL _rebateManageBll;
         private readonly AuthorizeBLL _authorizeBll;
 
@@ -33,7 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #endregion
 
         #region API Model
-        
+
         public class GetPeriodRequest
         {
             public int SiteId { get; set; }
@@ -46,20 +48,20 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int PeriodDay { get; set; }
             public int RedeemHours { get; set; }
         }
-        
+
         public class GetRebateInfoRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
-        
-        public class GetRebateInfoByGameTypeRequest
+
+        public class GetRebateGameTypeListRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public int GameType { get; set; }
+            public int RebateCategoryId { get; set; }
         }
-        
+
         public class SetCategoryRequest
         {
             public int SiteId { get; set; }
@@ -68,16 +70,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int Level { get; set; }
             public decimal Percentage { get; set; }
         }
-        
+
         public class SetGameTypeRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public int GameType { get; set; }
-            public int Level { get; set; }
-            public decimal Percentage { get; set; }
+            public IEnumerable<RebateGameTypeDetail> Detail { get; set; }
         }
-        
+
         public class SetPayoutLimitRequest
         {
             public int SiteId { get; set; }
@@ -98,49 +98,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebatePeriod> GetPeriod(GetPeriodRequest request)
         {
-            var apiResult = new ApiResult<RebatePeriod>
+            return new ApiResult<RebatePeriod>
             {
-                Data = new RebatePeriod()
+                Data = _rebateManageBll.GetRebatePeriod(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
-            
-            _rebateManageBll.GetRebatePeriod(request.SiteId, out var periodType, out var periodDay, out var redeemHours);
-            apiResult.Data.PeriodType = periodType;
-            apiResult.Data.PeriodDay = periodDay;
-            apiResult.Data.RedeemHours = redeemHours;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
-        }
-
-        /// <summary>
-        /// RebateForVip/SetPeriod 新增/更新指定品牌返水週期資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Period Type [Edit] > [Submit]
-        /// </remarks>
-        /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" , "f_vrm_edit" })]
-        [HttpPost]
-        public ApiResult SetPeriod(SetPeriodRequest request)
-        {
-            var apiResult = new ApiResult();
-            var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebatePeriod(request.SiteId, (int)request.PeriodType, request.PeriodDay, request.RedeemHours, userName);
-            
-            if (result)
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            }
-            else
-            {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
-            }
-            return apiResult;
         }
 
         /// <summary>
@@ -152,16 +118,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebateCurrencyData> GetRebateInfo(GetRebateInfoRequest request)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = _rebateManageBll.GeRebateInfo(request.SiteId, request.CurrencyId)
             };
-            
+
             return apiResult;
         }
 
@@ -174,16 +140,42 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(GetRebateInfoByGameTypeRequest request)
+        public async Task<ApiResult<IEnumerable<RebateGameTypeDetail>>> GetRebateGameTypeList(GetRebateGameTypeListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
+            return new ApiResult<IEnumerable<RebateGameTypeDetail>>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
-                Data = _rebateManageBll.GetRebateDataByGameType(request.SiteId, request.GameType, request.CurrencyId)
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId,request.RebateCategoryId)
             };
-            
+        }
+
+        /// <summary>
+        /// RebateForVip/SetPeriod 新增/更新指定品牌返水週期資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Period Type [Edit] > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [HttpPost]
+        public ApiResult SetPeriod(SetPeriodRequest request)
+        {
+            var apiResult = new ApiResult();
+            var userName = _authorizeBll.GetAuthData().UserName;
+            var result = _rebateManageBll.SetRebatePeriod(request.SiteId, (int)request.PeriodType, request.PeriodDay, request.RedeemHours, userName);
+
+            if (result)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+            }
             return apiResult;
         }
 
@@ -196,28 +188,28 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public ApiResult SetCategory(SetCategoryRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
             var result = _rebateManageBll.SetRebateCategory(request.SiteId, request.CurrencyId, request.CategoryId, request.Level, request.Percentage, userName);
-           
+
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
 
         /// <summary>
-        /// RebateForVip/SetGameType 新增/更新指定遊戲類型返水資訊
+        /// RebateForVip/BatchSetGameType 批次新增/更新指定遊戲類型返水資訊
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -225,22 +217,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
-        public ApiResult SetGameType(SetGameTypeRequest request)
+        public async Task<ApiResult> BatchSetGameTypeAsync(SetGameTypeRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebateGameType(request.SiteId, request.CurrencyId, request.GameType, request.Level, request.Percentage, userName);
+            var result = await _rebateManageBll.BatchSetRebateGameTypeAsync(request.SiteId, request.CurrencyId, request.Detail, userName);
             if (result)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
 
@@ -253,7 +245,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Payout Setting [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public ApiResult SetPayoutLimit(SetPayoutLimitRequest request)
         {
@@ -262,15 +254,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var result = _rebateManageBll.SetRebatePayoutLimit(request.SiteId, request.CurrencyId, request.CategoryId, request.MaxPayout, request.MinPayout, userName);
             if (result)
             {
-                apiResult.ErrorCode =(int) ErrorCodeEnum.Success;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
             }
-            
+
             return apiResult;
         }
-    
+
     }
 }

@@ -70,10 +70,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -157,10 +157,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    // "Marketing/VipRebateMangetment.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
-    // ],
+    "Marketing/VipRebateMangetment.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
+    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
@@ -275,9 +275,17 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
-    // "Marketing/HotEventManagement.min": [
-    //   "./src/pages/Marketing/HotEventManagement/index.js",
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
     // ],
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
+    "Marketing/HotEventManagement.min": [
+      "./src/pages/Marketing/HotEventManagement/index.js",
+    ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/DeepLinkManagement.min": [
     // 	 '@babel/polyfill',
