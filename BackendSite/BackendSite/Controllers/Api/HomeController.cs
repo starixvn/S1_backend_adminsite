@@ -152,35 +152,6 @@ namespace BackendSite.Controllers.Api
             if (string.IsNullOrWhiteSpace(loginModel.redirectUrl))
                 loginModel.redirectUrl = Url.Action("Index", "Home");
 
-            //For 前端查看swagger，只有在dev和local且帳號為admin
-            if ((adminUser.UserName == "admin" || adminUser.UserName == "Admin")
-                && (_environment.IsDevelopment() || _environment.IsEnvironment("Local")))
-            {
-                await HttpContext.SignOutAsync("backendV2");
-                await HttpContext.SignOutAsync("brand");
-
-                var claimsForSwagger = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name,"admin" ),
-                new Claim(ClaimTypes.NameIdentifier,"60".ToString())
-                //new Claim("LangId",? ),
-            };
-
-                var claimsV2 = new List<Claim>
-            {
-                new Claim(ClaimTypes.Thumbprint, "1"),
-                new Claim(ClaimTypes.NameIdentifier,"60".ToString())
-                //new Claim("LangId",? ),
-            };
-
-                var claimsIdentityForSwagger = new ClaimsIdentity(claimsForSwagger, "backendV2");
-                var claimsIdentityV2 = new ClaimsIdentity(claimsV2, "brand");
-                await HttpContext.SignInAsync("backendV2",
-                                     new ClaimsPrincipal(claimsIdentityForSwagger));
-                await HttpContext.SignInAsync("brand",
-                                     new ClaimsPrincipal(claimsIdentityV2));
-            }
-
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
