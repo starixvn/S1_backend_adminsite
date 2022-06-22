@@ -51,6 +51,7 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public int Status { get; set; }
         public int BlockStatus { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class BlockList 
     {
