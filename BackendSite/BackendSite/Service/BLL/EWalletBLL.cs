@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
         {
             return _eWalletService.GetBlockEWalletAcc(startDate, endDate, status, accountNum, currencyId, userName, eWalletId);
         }
-        public IEnumerable<EWalletList> GetBlockEWalletList(int sysId, string accountNum)
+        public IEnumerable<EWallet> GetBlockEWalletList(int sysId, string accountNum)
         {
             return _eWalletService.GetBlockEWalletList(sysId, accountNum);
         }
@@ -31,6 +31,11 @@ namespace BackendSite.Service.BLL
         public int ReleaseAccount(int custId, int sysId, string accountNum)
         {
             return _eWalletService.ReleaseAccount(custId, sysId, accountNum);
+        }
+
+        public IEnumerable<EWalletInfoSys> GetEWalletInfo()
+        {
+            return _eWalletService.GetEWalletInfo();
         }
     }
 }

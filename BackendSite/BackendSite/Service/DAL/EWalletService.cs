@@ -62,7 +62,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BlockEWalletAcc>("Admin_BlockEWalletAcc_Get", p);
         }
 
-        public IEnumerable<EWalletList> GetBlockEWalletList(int sysId, string accountNum)
+        public IEnumerable<EWallet> GetBlockEWalletList(int sysId, string accountNum)
         {
             var p = new DynamicParameters(new
             {
@@ -70,7 +70,7 @@ namespace BackendSite.Service.DAL
                 AccountNum = accountNum
             });
 
-            return _reportDbClient.Query<EWalletList>("Admin_BlockEWalletList_Get", p);
+            return _reportDbClient.Query<EWallet>("Admin_BlockEWalletList_Get", p);
         }
 
         public int BlockEWalletSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
@@ -82,11 +82,11 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                _SysId = sysId,
-                _AccountNum = accountNum,
-                _Status = (int)status,
-                _UpdateOperator = Operator,
-                _Memo = memo
+                SysId = sysId,
+                AccountNum = accountNum,
+                Status = (int)status,
+                UpdateOperator = Operator,
+                Memo = memo
             });
             result = _mainDbClient.Execute("Admin_BlockEWallet_Set", p, conn, trans);
 
@@ -189,9 +189,15 @@ namespace BackendSite.Service.DAL
             else
             {
                 trans.Rollback();
+                return result;
             }
             trans.Commit();
             return result;
+        }
+
+        public IEnumerable<EWalletInfoSys> GetEWalletInfo()
+        {
+            return _reportDbClient.Query<EWalletInfoSys>("Admin_EWalletInfoSys_Get");
         }
     }
 }

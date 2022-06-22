@@ -7,6 +7,10 @@ namespace BackendSite.Service.Model
 {
     public class EWallet
     {
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
+        public string AccountName { get; set; }
     }
     public class BlockEWalletAcc
     {
@@ -38,11 +42,10 @@ namespace BackendSite.Service.Model
         public int BlockStatus { get; set; }
         public int CurrencyId { get; set; }
     }
-    public class EWalletList
+    public class EWalletInfoSys
     {
-        public string UserName { get; set; }
-        public int CustId { get; set; }
-        public int SiteId { get; set; }
-        public string AccountName { get; set; }
+        public int SysId { get; set; }
+        public string EWalleName { get; set; }
+        public int CurrencyId { get; set; }
     }
 }

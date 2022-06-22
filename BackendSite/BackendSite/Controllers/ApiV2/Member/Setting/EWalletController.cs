@@ -102,10 +102,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<EWalletList> GetBlockEWalletList(BlockEWalletAccRequest request)
+        public ApiListResult<EWallet> GetBlockEWalletList(BlockEWalletAccRequest request)
         {
             var blockEWalletList = _eWalletBLL.GetBlockEWalletList(request.SysId, request.AccountNum);
-            return new ApiListResult<EWalletList>
+            return new ApiListResult<EWallet>
             {
                 Data = blockEWalletList,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -170,6 +170,25 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     Message = "Release Fail."
                 };
             }
+        }
+
+        /// <summary>
+        /// EWallet/GetEWalletInfo 取得EWalletInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<EWalletInfoSys> GetEWalletInfo()
+        {
+            var eWalletInfo = _eWalletBLL.GetEWalletInfo();
+            return new ApiListResult<EWalletInfoSys>
+            {
+                Data = eWalletInfo,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
         #endregion
     }
