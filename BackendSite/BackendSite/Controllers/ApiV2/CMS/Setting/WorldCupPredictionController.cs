@@ -4,14 +4,13 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
 
-    //[Authorize] // todo 掛 attribute
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WorldCupPredictionController : ControllerBase
@@ -23,8 +22,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _worldCupPredictionBll = provider.GetRequiredService<WorldCupPredictionBLL>();
         }
 
-
-        // todo 掛 attribute
         [HttpPost]
         public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
         {
