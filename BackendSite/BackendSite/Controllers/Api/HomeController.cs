@@ -34,7 +34,6 @@ namespace BackendSite.Controllers.Api
         private readonly DashBoardBLL _dashBoardBLL;
         private readonly MenuBLL _menuBLL;
         private readonly ResponseSettingBLL _responseSettingBLL;
-        private readonly IHostEnvironment _environment;
 
         #endregion
 
@@ -48,8 +47,7 @@ namespace BackendSite.Controllers.Api
                               HomeBLL homeBLL,
                               DashBoardBLL dashBoardBLL,
                               MenuBLL menuBLL,
-                              ResponseSettingBLL responseSettingBLL,
-                              IHostEnvironment environment)
+                              ResponseSettingBLL responseSettingBLL)
         {
             _selLangBLL = selLangBLL;
             _authorizeBLL = authorizeBLL;
