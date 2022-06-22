@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model.Store.GiftManagement
 {
-    public class GetListRequest : ApiRequestPageModel
+    public class GetListRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
