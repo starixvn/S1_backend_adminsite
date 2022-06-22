@@ -1001,4 +1001,11 @@ namespace BackendSite.Service.Model.enums
         Enabled = 1,
         Disabled = 0
     }
+    
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
 }

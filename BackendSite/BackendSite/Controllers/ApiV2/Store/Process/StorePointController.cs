@@ -15,10 +15,12 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
     public class StorePointController: ControllerBase
     {
         private readonly StorePointBLL _storePointBll;
+        private readonly ExcelBLL _excelBll;
 
         public StorePointController(IServiceProvider provider)
         {
             _storePointBll = provider.GetRequiredService<StorePointBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
         
         [HttpPost]
@@ -37,27 +39,32 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             return result;
         }
         
-        // [HttpPost]
-        // public async Task<ApiResult> ManualRewardPointAsync(CreateManualRewardPointInfoRequest request)
-        // {
-        //     var user = User.Identity.Name;
-        //     var result =
-        //         await _storePointBll.CreateManualRewardPointInfoAsync(new CreateManualRewardPointInfoParams(request, user));
-        //
-        //     return result;
-        // }
-        //
-        // [HttpPost]
-        // public async Task<ApiResult> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest request)
-        // {
-        //     var user = User.Identity.Name;
-        //     var result =
-        //         await _storePointBll.CreateManualRewardPointInfoBatchAsync(new CreateManualRewardPointInfoBatchParams(request, user));
-        //
-        //     return new ApiResult
-        //     {
-        //         ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Failed)
-        //     };
-        // }
+        [HttpPost]
+        public async Task<ApiResult> ManualRewardPointAsync(CreateManualRewardPointInfoRequest request)
+        {
+            var user = User.Identity.Name;
+            var result =
+                await _storePointBll.ManualRewardPointAsync(request, user);
+        
+            return result;
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest request)
+        {
+            var user = User.Identity.Name;
+            var result =
+                await _storePointBll.BatchManualRewardPointAsync(request, user);
+        
+            return result;
+        }
+        
+        [HttpPost]
+        public FileContentResult GetSampleExcelFileAsync()
+        {
+            var file = _storePointBll.GetSampleExcelFile();
+            
+            return _excelBll.ExcelFile(file, "BatchManualRewardPoint");
+        }
     }
 }
