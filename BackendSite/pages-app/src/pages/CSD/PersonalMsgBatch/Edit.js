@@ -143,6 +143,12 @@ const EditPanel = (props) => {
       
       let msg = "";
       let check = true;
+
+      if(props.IsAdding){
+        check = false;
+        msg = "Is still adding ,please add later.";
+      }
+      
       if (!stateData.optSite) {
         check = false;
         msg = "Please check Site.";
