@@ -188,7 +188,7 @@ namespace BackendSite.Service.DAL
                             SysId = sysId,
                             AccountNum = accountNum,
                             IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
-                            AccountName = accountNum,
+                            AccountName = x.AccountName,
                             Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
                         });
 
