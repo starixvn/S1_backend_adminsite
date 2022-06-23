@@ -50,7 +50,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
         
         [HttpPost]
-        public async Task<ApiResult> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest request)
+        public async Task<ApiResult> BatchManualRewardPointAsync([FromForm] CreateManualRewardPointInfoBatchRequest request)
         {
             var user = User.Identity.Name;
             var result =

@@ -42,7 +42,7 @@ namespace BackendSite.Service.BLL
         
         public Task<ApiResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
         {
-            var url = _storeSiteUrl + "/api/Member/GetMemberRewardPointLog";
+            var url = _storeSiteUrl + "/api/Member/GetRewardPointLog";
             var result = _courierAdapter.MyPostAsync<object, GetMemberRewardPointLogRequest>(url, req);
 
             return result;
@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        public async Task<ApiResult<object>> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest req, string @operator)
+        public async Task<ApiResult> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest req, string @operator)
         {
             // STEP 1: 讀取 Excel 內容
             var importResult = ImportExcel(req.File);
@@ -75,9 +75,14 @@ namespace BackendSite.Service.BLL
             var list = importResult.Datas.ToList();
             var userNames = list.Select(x => x.UserName);
             var custList = await _custInfoBll.GetCustInfosAsync(req.SiteId, userNames);
-            list.ForEach(x => x.CustId = custList
-                    .FirstOrDefault(y => y.UserName.Equals(x.UserName, StringComparison.OrdinalIgnoreCase))
-                    ?.CustId ?? 0);
+            list.ForEach(x =>
+            {
+                var cust = custList
+                    .FirstOrDefault(y => y.UserName.Equals(x.UserName, StringComparison.OrdinalIgnoreCase));
+
+                x.CustId = cust?.CustId ?? 0;
+                x.CurrencyId = cust?.CurrencyId ?? 0;
+            });
 
             if (list.Any(x => x.CustId == 0))
             {
@@ -97,7 +102,7 @@ namespace BackendSite.Service.BLL
             var url = _storeSiteUrl + "/api/Member/BatchManualRewardPoint";
             var result = await _courierAdapter.MyPostAsync<object, CreateManualRewardPointInfoBatchParams>(url, param);
 
-            return result;
+            return new ApiResult(result.ErrorCode, result.Message);;
         }
         
         public byte[] GetSampleExcelFile()
