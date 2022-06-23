@@ -870,5 +870,17 @@ namespace BackendSite.Service.BLL
             }
             return true;
         }
+        public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            return _custInfoService.GetCustEWalletLogList(custId,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount); ;
+        }
     }
 }

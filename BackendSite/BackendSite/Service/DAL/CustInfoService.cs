@@ -818,5 +818,27 @@ namespace BackendSite.Service.DAL
 
             return WithdrawalLimitLogData;
         }
+
+        public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_CustId", custId);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = conn.Query<CustEWalletLog>("Admin_EWalletLogList_Get", parameter, commandType: CommandType.StoredProcedure);
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
+        }
     }
 }

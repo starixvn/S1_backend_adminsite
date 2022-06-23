@@ -570,4 +570,12 @@ namespace BackendSite.Service.Model
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
+
+    public class CustEWalletLog
+    {
+        public string AccountNum { set; get; }
+        public string AccountName { set; get; }
+        public string EWalleName { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+    }
 }
