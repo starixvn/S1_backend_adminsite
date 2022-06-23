@@ -108,23 +108,22 @@ namespace BackendSite.Service.DAL
 
                     if (result > 0)
                     {
-                        //var prop = new DynamicParameters(new
-                        //{
-                        //    CustId = x.CustId,
-                        //    SiteId = x.SiteId,
-                        //    SysId = sysId,
-                        //    AccountNum = accountNum,
-                        //    IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
-                        //    AccountName = accountNum,
-                        //    Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
-                        //});
+                        var prop = new DynamicParameters(new
+                        {
+                            CustId = x.CustId,
+                            SiteId = x.SiteId,
+                            SysId = sysId,
+                            AccountNum = accountNum,
+                            AccountName = x.AccountName,
+                            Status = status == BlockAccountStatus.Lock ? 3 : 4
+                        });
 
-                        //result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
-                        //if (result == 0)
-                        //{
-                        //    trans.Rollback();
-                        //    return result;
-                        //}
+                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                        if (result == 0)
+                        {
+                            trans.Rollback();
+                            return result;
+                        }
                     }
                     else
                     {
