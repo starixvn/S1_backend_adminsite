@@ -759,13 +759,13 @@ const SubPanel = props => {
 								<div className="row-flex">
 									<InputBox
 										Type="Number"
-										Title="Usage"
+										Title="Daily Limit"
 										OnChange={props.EditMainValue}
 										dataColumn="usage"
 										value={props.state.specific[props.currencyId].usage}
 									/>
 									<InputBox
-										Title="Total Usage Limit"
+										Title="Total Limit"
 										OnChange={props.EditMainValue}
 										dataColumn="totalUsageLimit"
 										value={props.state.specific[props.currencyId].totalUsageLimit}
