@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public bool Flag { get; set; }
         public string ContentRemoveTag { get; set; }
-
+        public bool IsBatch { get; set; }
     }
     
     public class BatchPersonalMsg : PersonalMsgBase
