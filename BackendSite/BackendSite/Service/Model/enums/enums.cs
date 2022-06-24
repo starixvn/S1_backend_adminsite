@@ -356,9 +356,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
