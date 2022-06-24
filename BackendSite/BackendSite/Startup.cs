@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using StackExchange.Redis;
 using BackendSite.Service.Model;
 
 namespace BackendSite
@@ -33,7 +34,8 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
 
