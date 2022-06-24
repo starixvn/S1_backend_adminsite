@@ -994,5 +994,15 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+
+    public enum RedisDataBase
+    {
+        MebmerSite = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        AdminSite = 4
+    }
+
     #endregion
 }

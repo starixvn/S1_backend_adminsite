@@ -33,12 +33,5 @@ namespace BackendSite.Extensions
                     DataBase = DataBase.Log
                 });
         }
-
-        public static IServiceCollection AddRedisConnection(this IServiceCollection services, IConfiguration config)
-        {
-            var conn = config.GetValue<string>("RedisConnection");
-            services.AddSingleton(param => ConnectionMultiplexer.Connect(conn).GetDatabase());
-            return services;
-        }
     }
 }
