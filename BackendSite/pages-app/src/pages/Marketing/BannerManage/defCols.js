@@ -13,6 +13,7 @@ export const initCurrencyLangMap = {
 	"15":['id_en','id'],
 	"51":['vn','en'],
 	"61":['hi_en','hi'],
+	"74":['en','bd'],
 }
 
 export const initBannerType = [
