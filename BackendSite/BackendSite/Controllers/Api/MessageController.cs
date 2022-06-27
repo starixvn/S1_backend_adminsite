@@ -450,7 +450,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
             Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId,
+        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
             [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -459,7 +459,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id);
+                messageBLL.DeletePersonalMsg(Id,IsBatch);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 

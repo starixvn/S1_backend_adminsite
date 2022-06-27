@@ -395,9 +395,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
@@ -1062,6 +1066,15 @@ namespace BackendSite.Service.Model.enums
     {
         HTTP = 1,
         HTTPS = 2
+    }
+
+    public enum RedisDataBase
+    {
+        MebmerSite = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        AdminSite = 4
     }
 
     #endregion
