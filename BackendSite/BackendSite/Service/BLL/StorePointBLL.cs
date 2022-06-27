@@ -32,18 +32,18 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetRequiredService<ILogger<StorePointBLL>>();
         }
         
-        public Task<ApiResult<object>> GetMemberListAsync(GetMemberListRequest req)
+        public Task<ApiListResult<object>> GetMemberListAsync(GetMemberListRequest req)
         {
             var url = _storeSiteUrl + "/api/Member/GetList";
-            var result = _courierAdapter.MyPostAsync<object, GetMemberListRequest>(url, req);
+            var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberListRequest>(url, req);
 
             return result;
         }
         
-        public Task<ApiResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
+        public Task<ApiListResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
         {
             var url = _storeSiteUrl + "/api/Member/GetRewardPointLog";
-            var result = _courierAdapter.MyPostAsync<object, GetMemberRewardPointLogRequest>(url, req);
+            var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberRewardPointLogRequest>(url, req);
 
             return result;
         }
