@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
@@ -7,51 +8,58 @@ namespace BackendSite.Service.Library
 {
     public class RedisCacheHelper : ICacheHelper
     {
-        private readonly IDatabase _redis;
+        private readonly IConnectionMultiplexer _multiplexer;
         
         public RedisCacheHelper(IConnectionMultiplexer multiplexer)
         {
-            _redis =  multiplexer.GetDatabase();
+            _multiplexer = multiplexer;
         }
-        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<string, TItem> factory)
+
+        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<IDatabase, TItem> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
         {
-            if (!_redis.KeyExists(key))
+            key = $"{redisDataBase}:{key}";
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            if (!db.KeyExists(key))
             {
-                var result = factory("");
+                var result = factory(db);
 
                 if (result != null)
                 {
-                    _redis.StringSet(key, JsonConvert.SerializeObject(result), timeSpan);
+                    db.StringSet(key, JsonConvert.SerializeObject(result), timeSpan);
                 }
 
                 return result;
             }
 
-            var json = _redis.StringGet(key);
+            var json = db.StringGet(key);
             return JsonConvert.DeserializeObject<TItem>(json);
         }
         
-        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<string, Task<TItem>> factory)
+        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<IDatabase, Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
         {
-            if (!_redis.KeyExists(key))
+            key = $"{redisDataBase}:{key}";
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            if (!db.KeyExists(key))
             {
-                var result = await factory(key);
+                var result = await factory(db);
 
                 if (result != null)
                 {
-                    await _redis.StringSetAsync(key, JsonConvert.SerializeObject(result), timeSpan);
+                    await db.StringSetAsync(key, JsonConvert.SerializeObject(result), timeSpan);
                 }
 
                 return result;
             }
 
-            var json = _redis.StringGet(key);
+            var json = db.StringGet(key);
             return JsonConvert.DeserializeObject<TItem>(json);
         }
 
-        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null)
+        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
         {
-            return await _redis.StringSetAsync(key, value, timeSpan);
+            key = $"{redisDataBase}:{key}";
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            return await db.StringSetAsync(key, value, timeSpan);
         }
     }
 }
