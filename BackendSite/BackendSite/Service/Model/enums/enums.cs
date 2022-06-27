@@ -1068,6 +1068,15 @@ namespace BackendSite.Service.Model.enums
         HTTPS = 2
     }
 
+    public enum RedisDataBase
+    {
+        MebmerSite = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        AdminSite = 4
+    }
+
     #endregion
     
 	public enum LineChannelStatusEnum

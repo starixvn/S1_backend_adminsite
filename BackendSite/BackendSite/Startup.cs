@@ -46,8 +46,6 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
-            services.AddRedisConnection(Configuration);
-            services.AddSingleton<RedisHelper>();
             services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));          
             services.Configure<Dictionary<string, AWSKeyConfig>>(Configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
