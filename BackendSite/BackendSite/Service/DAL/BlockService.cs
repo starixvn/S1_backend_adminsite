@@ -88,15 +88,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int status,string accountNum, IEnumerable<int> currencyId, string userName)
+        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
             var jsonSelectStatus = string.Empty;
-            if(status == 0)
+            if(blockStatus == 0)
             {
                 var tempList = new List<int>() { 1, 2};
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
-            else if(status == 1)
+            else if(blockStatus == 1)
             {
                 var tempList = new List<int>() { 1};
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
