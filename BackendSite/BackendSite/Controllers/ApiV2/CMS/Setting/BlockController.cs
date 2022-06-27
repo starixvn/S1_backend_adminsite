@@ -59,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             private DateTimeOffset _endDate;
             public string AccountNum { get; set; }
             public string UserName { get; set; }
-            public int Status { get; set; }
+            public int BlockStatus { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -194,7 +194,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public ApiListResult<BlockBankAcc> GetBlockBankAcc(GetBlockBankAccRequest request)
         {
-            var blockBankAcc = _blockBLL.GetBlockBankAcc(request.StartDate.DateTime, request.EndDate.DateTime, request.Status,request.AccountNum, request.CurrencyId, request.UserName);
+            var blockBankAcc = _blockBLL.GetBlockBankAcc(request.StartDate.DateTime, request.EndDate.DateTime, request.BlockStatus, request.AccountNum, request.CurrencyId, request.UserName);
             return new ApiListResult<BlockBankAcc>
             {
                 Data = blockBankAcc,
