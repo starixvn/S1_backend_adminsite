@@ -24,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
         
         [HttpPost]
-        public Task<ApiResult<object>> GetMemberListAsync(GetMemberListRequest req)
+        public Task<ApiListResult<object>> GetMemberListAsync(GetMemberListRequest req)
         {
             var result = _storePointBll.GetMemberListAsync(req);
 
@@ -32,7 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
         
         [HttpPost]
-        public Task<ApiResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
+        public Task<ApiListResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
         {
             var result = _storePointBll.GetMemberRewardPointLogAsync(req);
 
