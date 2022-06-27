@@ -44,7 +44,7 @@ export default ({
 					/>
 					<div className="row-flex">
 						<label className="label">
-							Pay Time {" (" + moment().format('Z') + ") "}
+							Pay Time
 							<span className="bule-bold">{data.periodType === 2 ? weekOptions[data.periodWeek] : data.periodType === 3 ? `${data.periodMonth}th of every month` : ''}  {data.redeemHours === null || data.redeemHours === undefined || data.redeemHours === "" ? '' : `${data.redeemHours}:00`}</span>
 						</label>
 					</div>

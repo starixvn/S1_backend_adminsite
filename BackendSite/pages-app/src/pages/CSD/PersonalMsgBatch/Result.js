@@ -11,11 +11,24 @@ const dataColumnDefs = () => {
     { dataColumn: "siteName", columnTitle: "SiteName" },
     { dataColumn: "title", columnTitle: "Title" },
     { dataColumn: "content", columnTitle: "Content" },
-    { dataColumn: "author", columnTitle: "LastUpdateUser" },
+    { dataColumn: "author", columnTitle: "Author" },
+    {
+      dataColumn: "createTime",
+      columnTitle: "CreateTime (Adjusted to GMT+8)",
+      body: { format: dateFormat },
+    },
+    { dataColumn: "lastUpdateUser", columnTitle: "LastUpdateUser" },
     {
       dataColumn: "updateTime",
       columnTitle: "LastUpdateTime (Adjusted to GMT+8)",
       body: { format: dateFormat },
+    },
+    {
+      dataColumn: "status",
+      columnTitle: "Status",
+      body: {
+        format: boolFormat,
+      },
     },
     {
       dataColumn: "edit",
@@ -53,18 +66,22 @@ const Panel = (props) => {
     let row = columnDefs.map((element, idx) => {
       let body_content = null;
       if (element.body && element.body.SpecialItem === "actionBtn") {
-        body_content = (
-          <ActionButtons
-            clickEdit={props.ClickEdit.bind(null, data.batchId)}
-            clickDelete={props.ClickDelete.bind(null, data.batchId)}
-          />
-        );
+        if(data.status === 1){
+          body_content = (
+              <ActionButtons
+                  clickEdit={props.ClickEdit.bind(null, data.batchId)}
+                  clickDelete={props.ClickDelete.bind(null, data.batchId)}
+              />
+          )
+        };
       } else if (element.dataColumn === "result") {
-        body_content = (
-          <ExportButtons
-            downloadResult={props.DownloadResult.bind(null, data.batchId)}
-          />
-        );
+        if(data.status === 1){
+          body_content = (
+              <ExportButtons
+                  downloadResult={props.DownloadResult.bind(null, data.batchId)}
+              />
+          );
+        }
       } else {
         body_content =
           element.body && element.body.format
@@ -111,6 +128,10 @@ const Panel = (props) => {
 const dateFormat = (createTime) => {
   return moment(createTime).format("l LTS");
 };
+
+const boolFormat = (v)=>{
+  return v === 1 ? 'Finished' : 'Pending';
+}
 
 const numberFormat = (number) => {
   return number_format(number_toFixed(number, 2));

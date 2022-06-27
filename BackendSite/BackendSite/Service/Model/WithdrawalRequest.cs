@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -214,6 +215,17 @@ namespace BackendSite.Service.Model
 
         public int Times { get; set; }
     }
+    
+    public class SetWithdrawalLimitInfo
+    {
+        [LogIgnore]
+        public int VipLevel { get; set; }
+        public string VipLevelName { get; set; }
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+        [LogPropertyName("WithdrawalFrequency")]
+        public int Times { get; set; }
+    }
 
     public class WithdrawalKYC
     {
@@ -221,6 +233,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public double Amount { get; set; }
 
+    }
+    public class WithdrawalKYCAmount
+    {
+        public double Amount { get; set; }
     }
     public class WithdrawalData
     {
@@ -355,5 +371,27 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public string Network { get; set; }
         public int NetworkType { get; set; }
+    }
+
+    public class EWalletWithdrawalLimitInfoManage
+    {
+        private DateTimeOffset _updateTime { set; get; }
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public double WithdrawalMin { get; set; }
+
+        public double WithdrawalMax { get; set; }
+
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
+        public string UpdateOperator { get; set; }
+        public int Status { get; set; }
+        public string IsoCode { get; set; }
     }
 }

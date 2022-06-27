@@ -5,14 +5,16 @@ import SiteCheckList from "./Components/SiteCheckList"
 import DropDownBox from "./Components/DropDownBox"
 
 if (process.env.NODE_ENV !== "production") {
-    window.gCurrencyList = [2, 4, 13, 15, 51, 61];
+    window.gCurrencyList = [2, 3, 4, 13, 15, 51, 61, 74];
     window.i18n = {
         lbl_Currency2: "MYR",
+        lbl_Currency3: "USD",
         lbl_Currency4: "THB",
-        lbl_Currency13: "RMB",
+        lbl_Currency13: "CNY",
         lbl_Currency15: "IDR",
         lbl_Currency51: "VND",
         lbl_Currency61: "INR",
+        lbl_Currency74: "BDT",
     };
 }
 const defDateType = {

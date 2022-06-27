@@ -1,0 +1,62 @@
+﻿using System;
+using System.Threading.Tasks;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace BackendSite.Controllers.ApiV2.CMS.Setting
+{
+
+    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Route("apiV2/[controller]/[action]")]
+    [ApiController]
+    public class WorldCupPredictionController : ControllerBase
+    {
+        private readonly WorldCupPredictionBLL _worldCupPredictionBll;
+
+        public WorldCupPredictionController(IServiceProvider provider)
+        {
+            _worldCupPredictionBll = provider.GetRequiredService<WorldCupPredictionBLL>();
+        }
+
+        [HttpPost]
+        public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
+        {
+            var apiResult = new ApiResult<WorldCupPredictionSettingResponse>();
+            try
+            {
+                var responseData = _worldCupPredictionBll.GetCupPredictionSettingResponse("en"); //後台不用多語系，統一用英文，有需要可以更改
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<ApiResult> SetWorldCupPredictionSetting(SetWorldCupPredictionSettingRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                await _worldCupPredictionBll.SetWorldCupPredictionSetting(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+    }
+}

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,23 +31,20 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
+        
+        public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
+        {
+            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
+                new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
+        }
+        
         public void SetReferral(List<ReferralManagement> referralList)
         {
             var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
-                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
+                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.ValidBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
-                    //原本的寫法改用新的連線方式會有問題，先用迴圈Set
-                    //para.Add(new ReferralList
-                    //{
-                    //    SiteId = x.SiteId,
-                    //    CurrencyId = x.CurrencyId,
-                    //    PeriodDays = int.Parse(x.PeriodDays),
-                    //    BonusAmount = decimal.Parse(x.BonusAmount),
-                    //    VaildBet = decimal.Parse(x.VaildBet),
-                    //    Deposit = decimal.Parse(x.Deposit)
-                    //});
                     var param = new DynamicParameters(
                     new
                     {
@@ -54,17 +52,34 @@ namespace BackendSite.Service.DAL
                         CurrencyId = x.CurrencyId,
                         PeriodDays = int.Parse(x.PeriodDays),
                         BonusAmount = decimal.Parse(x.BonusAmount),
-                        VaildBet = decimal.Parse(x.VaildBet),
+                        ValidBet = decimal.Parse(x.ValidBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
                     _mainDbClient.Execute("Admin_Referral_Set", param);
                 }
-                //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
-        public void SetReferralStatus(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
         {
-            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+            var p = new DynamicParameters();
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_BonusAmount", setReferralRequest.BonusAmount);
+            p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("_AgentValidBet", setReferralRequest.AgentValidBet);
+            p.Add("_AgentDeposit", setReferralRequest.AgentDeposit);
+            p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
+            p.Add("_ValidBet", setReferralRequest.ValidBet);
+            p.Add("_Deposit", setReferralRequest.Deposit);
+            p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
+
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
+        }
+        
+        public int SetReferralStatus(int siteId, int currencyId, int status)
+        {
+            return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
