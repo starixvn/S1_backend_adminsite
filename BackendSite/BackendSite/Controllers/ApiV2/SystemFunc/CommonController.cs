@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backendV2,brand")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CommonController : ControllerBase
