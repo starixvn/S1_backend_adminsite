@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public bool Flag { get; set; }
         public string ContentRemoveTag { get; set; }
-
+        public bool IsBatch { get; set; }
     }
     
     public class BatchPersonalMsg : PersonalMsgBase
@@ -104,10 +104,12 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int BatchId { get; set; }
         public string Author { get; set; }
+        public string LastUpdateUser { get; set; }
         public bool IsPopup { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string Message { get; set; }
+        public int Status { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public DateTimeOffset CreateTime { get; set; }
     }

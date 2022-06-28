@@ -356,6 +356,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class DeleteMessageRequest
         {
             public int Id { get; set; }
+            public bool IsBatch { get; set; }
         }
 
         public class CustStatusSwitchRequest
@@ -2129,7 +2130,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                _messageBll.DeletePersonalMsg(request.Id);
+                _messageBll.DeletePersonalMsg(request.Id , request.IsBatch);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
