@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.StorePoint;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +69,20 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             var file = _storePointBll.GetSampleExcelFile();
             
             return _excelBll.ExcelFile(file, "BatchManualRewardPoint");
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<SelectListItem>> GetManualRewardPointCategoryType()
+        {
+            var type = typeof(ManualRewardPointCategoryEnum);
+            var data = Enum.GetValues(type)
+                .Cast<ManualRewardPointCategoryEnum>()
+                .Where(x => (int) x <= 4)
+                .Select(x => new SelectListItem((int) x, x.GetDescription()));
+            var apiResult = 
+                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
+            
+            return apiResult;
         }
     }
 }
