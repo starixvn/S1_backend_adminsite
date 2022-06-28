@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
-    [Authorize(AuthenticationSchemes = "backendV2,brand")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HomeController : ControllerBase
@@ -128,28 +128,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
 
             await HttpContext.SignOutAsync("backendV2");
-            await HttpContext.SignOutAsync("brand");
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,adminUser.UserName ),
-                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
-                //new Claim("LangId",? ),
-            };
-
-            var claimsV2 = new List<Claim>
-            {
-                new Claim(ClaimTypes.Thumbprint, siteList.FirstOrDefault().SiteId.ToString()),
-                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString()),
+                new Claim(ClaimTypes.Thumbprint, siteList.FirstOrDefault().SiteId.ToString())
                 //new Claim("LangId",? ),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "backendV2");
-            var claimsIdentityV2 = new ClaimsIdentity(claimsV2, "brand");
             await HttpContext.SignInAsync("backendV2",
                                  new ClaimsPrincipal(claimsIdentity));
-            await HttpContext.SignInAsync("brand",
-                                 new ClaimsPrincipal(claimsIdentityV2));
 
             return new ApiResult<string>
             {
@@ -198,7 +188,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         {
 
             await HttpContext.SignOutAsync("backendV2");
-            await HttpContext.SignOutAsync("brand");
 
             return new ApiResult
             {
@@ -284,17 +273,18 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public async Task<ApiResult<int>> ChangeBrand(ChangeBrandRequest request)
         {
             var authInfo = _newAuthorizeBLL.GetAuthData();
-            await HttpContext.SignOutAsync("brand");
+            await HttpContext.SignOutAsync("backendV2");
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Thumbprint, request.SiteId.ToString()),
-                new Claim(ClaimTypes.NameIdentifier,authInfo.UserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier,authInfo.UserId.ToString()),
+                new Claim(ClaimTypes.Name,authInfo.UserName)
             };
 
-            var claimsIdentityV2 = new ClaimsIdentity(claims, "brand");
+            var claimsIdentity = new ClaimsIdentity(claims, "backendV2");
 
-            await HttpContext.SignInAsync("brand",
-                                 new ClaimsPrincipal(claimsIdentityV2));
+            await HttpContext.SignInAsync("backendV2",
+                                 new ClaimsPrincipal(claimsIdentity));
 
             return new ApiResult<int>
             {
