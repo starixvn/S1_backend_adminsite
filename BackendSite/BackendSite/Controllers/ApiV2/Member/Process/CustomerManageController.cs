@@ -340,7 +340,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string Reason { get; set; }
         }
-        
+
         public class SetCustomerStatusRequest : CustIdWithReasonRequest
         {
 
@@ -387,12 +387,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int Status { get; set; }
         }
 
-        public class EditCustDetailRequest
+        public class EditCustDetailRequest : CustIdRequest
         {
-            /// <summary>
-            /// 客戶ID
-            /// </summary>
-            public int CustId { get; set; }
             /// <summary>
             /// 客戶等級
             /// </summary>
@@ -424,7 +420,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// <summary>
             /// Email
             /// </summary>
-            public Dictionary<string,string> Address { get; set; }
+            public Dictionary<string, string> Address { get; set; }
         }
         public class VerificationRewardReq : CustIdRequest
         {
@@ -884,7 +880,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult SetCustInfo(EditCustDetailRequest request)
         {
-            var apiResult = new ApiResult<bool>();
             var custProfile = _custInfoBll.GetCustProfile(request.CustId);
             request.Address = request.Address.Count == 0 ? null : request.Address;
             var data = _custInfoBll.SetCustInfo(request.CustId,
@@ -903,33 +898,100 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
 
-            var Menu = "CustManage/CustInfoList";
-            var Info = new Dictionary<string, dynamic>();
-            Info.Add("MenuName", "Customer Info");
             if (request.Level != null)
             {
-                Info.Add("Action", $"Change Level To {request.Level}");
-                Info.Add("Before Change Level", custProfile.UserLevel);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerLevel,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Level = custProfile.UserLevel
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Level = request.Level
+                    })
+                });
             }
             else if (request.FullName != null)
             {
-                Info.Add("Action", $"Change Full Name To {request.FullName}");
-                Info.Add("Before Change Full Name", custProfile.AccountName);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerFullName,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        FullName = custProfile.AccountName
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        FullName = request.FullName
+                    })
+                });
             }
             else if (request.Birthday_Y != null || request.Birthday_M != null || request.Birthday_D != null)
             {
-                Info.Add("Action", $"Change Birthday To {request.Birthday_Y}/{request.Birthday_M}/{request.Birthday_D}");
-                Info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerBirthday,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Birthday = $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}"
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Birthday = $"{ request.Birthday_Y }/{ request.Birthday_M }/{ request.Birthday_D }"
+                    })
+                });
             }
             else if (request.Phone != null)
             {
-                Info.Add("Action", $"Change Phone Number To {request.Phone}");
-                Info.Add("Before Change Phone Number", custProfile.PhoneNo);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerPhone,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Phone = custProfile.PhoneNo
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Phone = request.Phone
+                    })
+                });
             }
             else if (request.EMail != null)
             {
-                Info.Add("Action", $"Change EMail To {request.EMail}");
-                Info.Add("Before Change EMail", custProfile.Email);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerEMail,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Email = custProfile.Email
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Email = request.EMail
+                    })
+                });
             }
             else if (request.Address != null)
             {
@@ -943,11 +1005,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
                     });
                 }
-                Info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(request.Address)}");
-                Info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerAddress,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Address = JsonConvert.SerializeObject(beforeAddressDictionary)
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Address = JsonConvert.SerializeObject(request.Address)
+                    })
+                });
             }
-
-            _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
             return new ApiResult
             {
@@ -1151,7 +1225,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                
+
                 before = new
                 {
                     AccountName = custProfile.AccountName,
@@ -1159,7 +1233,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
                 }.ToLog();
             }
-            
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
@@ -1201,12 +1275,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                
+
                 var usdtDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
                 before = usdtDetailList.ToLog();
-                
+
             }
-            
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
@@ -1263,7 +1337,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -1313,7 +1387,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -1364,7 +1438,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -1412,7 +1486,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         Status = request.Status.ToString()
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -1453,7 +1527,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.KickOutCustomer
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -2312,7 +2386,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                _messageBll.DeletePersonalMsg(request.Id , request.IsBatch);
+                _messageBll.DeletePersonalMsg(request.Id, request.IsBatch);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
