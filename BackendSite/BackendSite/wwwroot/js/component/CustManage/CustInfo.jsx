@@ -2610,7 +2610,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         "Country":((this.state.newData.AddressCountry !== undefined && this.state.newData.AddressCountry != data.addressCountry) ? this.state.newData.AddressCountry : data.addressCountry),
                         "State": ((this.state.newData.AddressState !== undefined && this.state.newData.AddressState != data.addressState) ? this.state.newData.AddressState : data.addressState),
                         "PostCode": ((this.state.newData.AddressPostCode !== undefined && this.state.newData.AddressPostCode != data.addressPostCode) ? this.state.newData.AddressPostCode : data.addressPostCode),
-                        "City": ((this.state.newData.AddressCity !== undefined && this.state.newData.AddressCity != data.AddressCity) ? this.state.newData.AddressCity : data.addressCity),
+                        "City": ((this.state.newData.AddressCity !== undefined && this.state.newData.AddressCity != data.addressCity) ? this.state.newData.AddressCity : data.addressCity),
                         "LineFirst": ((this.state.newData.AddressLineFirst !== undefined && this.state.newData.AddressLineFirst != data.addressLineFirst) ? this.state.newData.AddressLineFirst : data.addressLineFirst),
                         "LineSecond": ((this.state.newData.AddressLineSecond !== undefined && this.state.newData.AddressLineSecond != data.addressLineSecond) ? this.state.newData.AddressLineSecond : data.addressLineSecond)
                     };
