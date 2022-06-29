@@ -70,6 +70,11 @@ namespace BackendSite.Controllers.Api
 
         #region API Model
 
+        public class GetRegLiveStatusNotesReq
+        {
+            public int CustId { get; set; }
+        }
+        
         public class CustInfoListReq
         {
             public IEnumerable<int> SelectSite { get; set; }
@@ -2137,11 +2142,11 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
         [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
+        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
-                Data = _custInfoBll.GetRegLiveStatusNotes(custId),
+                Data = _custInfoBll.GetRegLiveStatusNotes(req.CustId),
                 ErrorCode = 0
             };
 
