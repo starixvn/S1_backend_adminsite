@@ -2601,7 +2601,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     if((this.state.newData.AddressCountry != data.addressCountry) 
                     || (this.state.newData.AddressState != data.addressState)
                     || (this.state.newData.AddressPostCode != data.addressPostCode)
-                    || (this.state.newData.AddressCity != data.addressCountry)
+                    || (this.state.newData.AddressCity != data.addressCity)
                     || (this.state.newData.AddressLineFirst != data.addressLineFirst)
                     || (this.state.newData.AddressLineSecond != data.addressLineSecond))
                     {
