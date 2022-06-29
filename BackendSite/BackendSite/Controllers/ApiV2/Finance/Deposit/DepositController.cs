@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositController : ControllerBase
@@ -432,14 +432,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult SetAmountByTransId(SetAmountByTransIdRequest request)
+        public ApiResult SetAmountByTransId(ApiRequestWithLog<SetAmountRequest> request)
         {
             var depositRequest = _depositBll.GetDepositRequest(request.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (_depositBll.SetDepositRequestAmount(request.TransId, request.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (_depositBll.SetDepositRequestAmount(
+                    new ParamsWithLog<SetAmountRequest>(request, User.Identity.Name), depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {

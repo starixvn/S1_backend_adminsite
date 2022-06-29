@@ -21,7 +21,7 @@ using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -294,7 +294,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                messageBLL.DeleteAnnouncement(Id);
+                messageBLL.DeleteAnnouncement(Id, User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
