@@ -21,9 +21,9 @@ namespace BackendSite.Service.Library
 
         public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite) 
         {
+            key = $"{redisDataBase}:{key}";
             try
-            {        
-                key = $"{redisDataBase}:{key}";
+            {                      
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 
                 if (!db.KeyExists(key))
@@ -41,16 +41,16 @@ namespace BackendSite.Service.Library
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,ex.Message);
+                _logger.LogError(ex,$"{key} | {ex.Message}");
                 return factory();
             }
         }
         
         public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
         {
+            key = $"{redisDataBase}:{key}";
             try
-            {           
-                key = $"{redisDataBase}:{key}";
+            {                      
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 
                 if (!db.KeyExists(key))
@@ -68,22 +68,22 @@ namespace BackendSite.Service.Library
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, $"{key} | {ex.Message}");
                 return await factory();
             }
         }
 
         public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
         {
+            key = $"{redisDataBase}:{key}";
             try
-            {
-                key = $"{redisDataBase}:{key}";
+            {           
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 return await db.StringSetAsync(key, value, timeSpan);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, $"{key} | {ex.Message}");
                 return false;
             }
            
