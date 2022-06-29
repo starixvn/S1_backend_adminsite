@@ -5,6 +5,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -113,16 +114,19 @@ namespace BackendSite.Controllers.Api
         /// <param name="custBetLimit"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> PostUserBetLimit(CustBetLimit custBetLimit)
+        public async Task<ApiResult> PostUserBetLimit(ApiRequestWithLog<CustBetLimit> req)
         {
             var updateOperator = User.Identity.Name;
-            var customer = await _custInfoBll.GetCustId(custBetLimit.UserName, custBetLimit.SiteId);
+            var customer = await _custInfoBll.GetCustId(req.After.UserName, req.SiteId);
             if (customer == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
 
-            var result = await _userBetLimitBll.SetUserBetLimit(customer.CustId, customer.SiteId, custBetLimit.BetSetting, updateOperator);
+            req.After.CustId = customer.CustId;
+
+            var result = await _userBetLimitBll.SetUserBetLimit(
+                new ParamsWithLog<CustBetLimit>(req, updateOperator));
             return new ApiResult
             {
                 //result: 1 (新增成功),2 (修改成功)
@@ -167,9 +171,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="custId"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> Delete([FromForm] int custId)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteCustBetLimit> req)
         {
-            var result = await _userBetLimitBll.Delete(custId);
+            var result = await _userBetLimitBll.Delete(
+                new ParamsWithLog<DeleteCustBetLimit>(req, User.Identity.Name));
             return new ApiResult
             {
                 ErrorCode = result == 1 ? 0 : result,

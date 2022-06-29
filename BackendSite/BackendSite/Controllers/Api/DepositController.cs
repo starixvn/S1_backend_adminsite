@@ -394,9 +394,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult AddDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.AddDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -413,9 +414,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult EditDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.EditDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -432,11 +434,12 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult DeleteDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.DeleteDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
@@ -610,14 +613,15 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         [HttpPost]
-        public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
+        public ApiResult SetDepositRequestAmount(ApiRequestWithLog<SetAmountRequest> req)
         {
-            var depositRequest = depositBLL.GetDepositRequest(para.TransId);
+            var depositRequest = depositBLL.GetDepositRequest(req.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (depositBLL.SetDepositRequestAmount(para.TransId, para.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (depositBLL.SetDepositRequestAmount(
+                    new ParamsWithLog<SetAmountRequest>(req, User.Identity.Name), depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {

@@ -40,25 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
             public IEnumerable<int> CurrencyIds { get; set; }
         }
-
-
-        public class InsertOrUpdateRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-            public int WithdrawalMin { get; set; }
-            public int WithdrawalMax { get; set; }
-            public int Times { get; set; }
-        }
-
-        public class DeleteRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-        }
-
+        
         #endregion
 
         #region Action
@@ -106,20 +88,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(InsertOrUpdateRequest request)
+        public ApiResult Create(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-                Times = request.Times
-            };
-
-            var result = _withdrawalBll.AddWithdrawalLimit(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.AddWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -147,20 +119,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(InsertOrUpdateRequest request)
+        public ApiResult Update(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-                Times = request.Times
-            };
-
-            var result = _withdrawalBll.EditWithdrawalLimit(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.EditWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -188,19 +150,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(DeleteRequest request)
+        public ApiResult Delete(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel
-            };
-
-            var result = _withdrawalBll.DeleteWithdrawalLimit(data, User.Identity.Name);
+            var result = _withdrawalBll.DeleteWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
