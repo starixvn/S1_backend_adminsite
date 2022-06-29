@@ -192,14 +192,14 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
-                result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
             }
             catch (Exception e)
             {
