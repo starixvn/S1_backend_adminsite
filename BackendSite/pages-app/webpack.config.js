@@ -44,9 +44,9 @@ module.exports = {
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
-    // "CSD/PersonalMsgBatch.min": [
-    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
-    // ],
+    "CSD/PersonalMsgBatch.min": [
+    	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -267,17 +267,19 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
-    "Marketing/HotGames.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/HotGames/index.js",
-    ],
+    // "Marketing/HotGames.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/HotGames/index.js",
+    // ],
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/HotEventManagement.min": [
+    //   "./src/pages/Marketing/HotEventManagement/index.js",
     //     "./src/pages/Marketing/HotEventManagement/index.js",
     // ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/DeepLinkManagement.min": [
     // 	 '@babel/polyfill',
     // 	"./src/pages/Marketing/DeepLinkManagement/index.js"

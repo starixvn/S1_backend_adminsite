@@ -256,7 +256,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
-            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V2", 
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3", 
                 new DynamicParameters(new { 
                     _BatchId = req.BatchId,
                     _SiteId = req.SiteId,
@@ -264,11 +264,8 @@ namespace BackendSite.Service.DAL
                     _CurrencyId = req.CurrencyId,
                     _Status = req.AccountStatus,
                     _IsPopup = req.IsPopup,
-                    _PopupMessage = req.PopupMessage,
-                    _Title = req.Title ,
-                    _Content =req.Content,
                     _Operator = req.Operator
-                }),120) > 0;
+                }),600) > 0;
         }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
