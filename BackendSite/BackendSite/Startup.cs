@@ -108,13 +108,6 @@ namespace BackendSite
                 option.Cookie.Name = ".backendV2";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
-            })
-            .AddCookie("brand", "brand", option =>
-            {
-                option.LoginPath = "/Home/AuthorizedFailed";
-                option.Cookie.Name = ".brand";
-                option.ExpireTimeSpan = TimeSpan.FromDays(1);
-                option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();
             services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo("CookieKeys")).SetApplicationName("SharedCookieApp");
