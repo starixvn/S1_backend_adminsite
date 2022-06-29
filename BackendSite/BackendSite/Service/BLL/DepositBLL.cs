@@ -22,8 +22,8 @@ namespace BackendSite.Service.BLL
     {
         private readonly DepositService depositService;
         private readonly ServerInfoService serverInfoService;
-        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly DepositAccountingService _depositAccountingService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly CustInfoBLL custInfoBLL;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
@@ -44,9 +44,10 @@ namespace BackendSite.Service.BLL
             this.custInfoService = provider.GetRequiredService<CustInfoService>();
             this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            this._courierAdapter = provider.GetRequiredService<CourierAdapter>(); 
-            payApiUrl = configuration.GetValue<string>("PayService"); //DepositManual
+            this._configuration =  provider.GetRequiredService<IConfiguration>();
+            this._courierAdapter =  provider.GetRequiredService<CourierAdapter>();
+            payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
+            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
