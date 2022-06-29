@@ -64,7 +64,7 @@ namespace BackendSite.Service.Library
                 }
 
                 var json = db.StringGet(key);
-                return json.HasValue ? JsonConvert.DeserializeObject<TItem>(json) : await factory();
+                return JsonConvert.DeserializeObject<TItem>(json);
             }
             catch (Exception ex)
             {
