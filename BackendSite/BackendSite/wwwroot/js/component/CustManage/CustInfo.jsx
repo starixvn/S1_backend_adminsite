@@ -1128,7 +1128,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
+                console.log(data);
+                axios.post('/apiv2/CustomerManage/SetEnablePromotionStatus', { 
+                    CustId: data.custId ,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    status: e
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1147,7 +1153,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustBankInfo', { CustId: data.custId })
+                axios.post('/apiv2/CustomerManage/ResetCustBankInfo', { 
+                    
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1165,7 +1176,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustUSDTnfo() {
             if (confirm('Are you sure reset USDT Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustUSDTInfo', { CustId: data.custId })
+                axios.post('/apiv2/CustomerManage/ResetCustUSDTInfo', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1203,7 +1218,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetUnlock', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId,
+                    currentStatus: data.status,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1225,7 +1246,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetLock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetLock', { 
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1295,7 +1322,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
             if (confirm('Are you sure kick Out this Customer?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/KickOut', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/KickOut', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1315,7 +1347,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetClose', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/apiv2/CustomerManage/SetClose', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;

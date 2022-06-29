@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -296,7 +296,7 @@ namespace BackendSite.Controllers.Api
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -325,7 +325,7 @@ namespace BackendSite.Controllers.Api
                 ChargeFee = request.ChargeFee,
                 Memo = request.Memo,
                 Creator = request.Creator
-            });
+            }, User.Identity.Name);
 
             if (!result)
             {
@@ -344,8 +344,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult DeleteWithdrawalAccounting(DeleteWithdrawalAccountingRequest request)
         {
-            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, out var transId, out var seq,
-                out var uploadPicTimes);
+            var result = _withdrawalBLL.DeleteWithdrawalAccounting(request.Id, User.Identity.Name,
+                out var transId, out var seq,
+                out var uploadPicTimes, out var detailInfo);
 
             if (!result)
             {
@@ -367,7 +368,8 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> UploadAccountingPicture(UploadAccountingPictureRequest request)
         {
             var result =
-                _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, out var newUploadPictureTimes);
+                _withdrawalBLL.UpdateWithdrawalAccountingForUploadPicture(request.Id, User.Identity.Name,
+                    out var newUploadPictureTimes);
             if (result)
             {
                 var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");

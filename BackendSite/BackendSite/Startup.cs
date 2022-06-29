@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using StackExchange.Redis;
 using BackendSite.Service.Model;
 
 namespace BackendSite
@@ -33,7 +34,8 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
 
@@ -88,12 +90,23 @@ namespace BackendSite
             });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            services.AddAuthentication(option => 
+            {
+                option.DefaultScheme = "backend";
+            })
+            .AddCookie("backend", "backend", option =>
             {
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
+                option.Cookie.SameSite = SameSiteMode.Unspecified;
+            })
+            .AddCookie("backendV2", "backendV2", option =>
+            {
+                option.LoginPath = "/Home/AuthorizedFailed";
+                option.Cookie.Name = ".backendV2";
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();

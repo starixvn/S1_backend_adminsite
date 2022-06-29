@@ -9,10 +9,12 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpBetLimitController : ControllerBase
@@ -21,6 +23,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         private readonly UserBetLimitBLL _userBetLimitBll;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly ILogger<TpBetLimitController> _logger;
 
         #endregion
 
@@ -30,6 +34,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _logger = provider.GetRequiredService<ILogger<TpBetLimitController>>();
         }
 
         #endregion
@@ -123,21 +129,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public async Task<ApiResult> Set(CustBetLimit req)
+        public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimit> req)
         {
             var updateOperator = User.Identity.Name;
-            var customer = await _custInfoBll.GetCustId(req.UserName, req.SiteId);
+            var customer = await _custInfoBll.GetCustId(req.After.UserName, req.SiteId);
             if (customer == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
 
-            var result = await _userBetLimitBll.SetUserBetLimit(customer.CustId, customer.SiteId,
-                req.BetSetting, updateOperator);
+            req.After.CustId = customer.CustId;
+
+            var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(req, updateOperator));
+            //result: 1 (新增成功),2 (修改成功)
+            var success = result == 1 || result == 2;
+            
             return new ApiResult
             {
-                //result: 1 (新增成功),2 (修改成功)
-                ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
+                ErrorCode = success ? (int)ErrorCodeEnum.Success : result,
             };
         }
 
@@ -171,9 +180,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public async Task<ApiResult> Delete(CustBetLimitByCustIdReq req)
+        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteCustBetLimit> req)
         {
-            var result = await _userBetLimitBll.Delete(req.CustId);
+            var result = await _userBetLimitBll.Delete(
+                new ParamsWithLog<DeleteCustBetLimit>(req, User.Identity.Name));
             return new ApiResult
             {
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,

@@ -15,13 +15,13 @@ import DateTimePicker from 'react-datetime';
     };
 
     const DepositStatusOp = {
-        1: <span className="status status-pending">{i18n["lbl_DepositStatus1"]}</span>,
+        1: <span className="status status-deposit-pending">{i18n["lbl_DepositStatus1"]}</span>,
         2: <span className="status status-">Paid</span>,
-        3: <span className="status status-approved">{i18n["lbl_DepositStatus3"]}</span>,
-        4: <span className="status status-rejected">{i18n["lbl_DepositStatus4"]}</span>,
-        5: <span className="status status-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
+        3: <span className="status status-deposit-approved">{i18n["lbl_DepositStatus3"]}</span>,
+        4: <span className="status status-deposit-rejected">{i18n["lbl_DepositStatus4"]}</span>,
+        5: <span className="status status-deposit-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
         6: <span className="status status-">Expired</span>,
-        7: <span className="status status-hold">{i18n["lbl_DepositStatus7"]}</span>,
+        7: <span className="status status-deposit-hold">{i18n["lbl_DepositStatus7"]}</span>,
     }
 
     const TypeSelectOp = {
@@ -32,34 +32,6 @@ import DateTimePicker from 'react-datetime';
         5: "Load Card",
         6: "QRPay",
         7: "BankAutoChannel"
-    };
-    
-    const BankCodeSelectInit = {
-            "AMB" :"AMB",
-            "CIMB":"CIMB",
-            "HLB":"HLB",
-            "MBB":"MBB",
-            "PBB":"PBB",
-            "RHB":"RHB",
-            "BBL" :"BBL",
-            "HSBC":"HSBC",
-            "KBANK":"KBANK",
-            "KTB":"KTB",
-            "SCB":"SCB",
-            "TBK":"TBK",
-            "BCA" :"BCA",
-            "BNI":"BNI",
-            "BRI":"BRI",
-            "CIMBN":"CIMBN",
-            "MDR":"MDR",
-            "UOB":"UOB",
-            "ACB" :"ACB",
-            "BIDV":"BIDV",
-            "DAB":"DAB",
-            "GAB":"GAB",
-            "TCB":"TCB",
-            "VCB":"UOB",
-            "VTB":"VTB"
     };
     
     const StatusSelectOp = {
@@ -140,10 +112,13 @@ import DateTimePicker from 'react-datetime';
                             {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
                         {/* <td>{row.calCode}</td> */}
+                        <td>{row.operator}</td>
+                        <td>{DepositStatusOp[row.status]}</td>
                         <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td>{row.depositType === 4 ? row.channelName : ""}</td>
                         <td>{JSON.parse(row.depositInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
@@ -154,9 +129,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
-                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.depositCnt}</td>
-                        <td>{DepositStatusOp[row.status]}</td>
                     </tr>
                 )
             });
@@ -184,11 +157,14 @@ import DateTimePicker from 'react-datetime';
                             <tr>
                                 {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} /></th> : null}
                                 <th scope="col">Trxn.ID</th>
+                                <th scope="col">Operator</th>
+                                <th scope="col">{i18n.lbl_Status}</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_DepositType}</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col">NetWork</th>
                                 <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
@@ -199,9 +175,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Deposit Count</th>
-                                <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -401,22 +375,29 @@ import DateTimePicker from 'react-datetime';
                 NewAmount: e
             });
         }
-        AmountUpdate() {
-            let data = { TransId: this.props.transId, Amount: parseFloat(this.state.NewAmount) }
-            axios.post('/api/Deposit/SetDepositRequestAmount', data)
-                .then(function (response) {
-                    Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.onGetData();
-                    } else {
-                        alert(result.message);
-                        this.onGetComment();
-                    }
-                }.bind(this)).catch(function (error) {
-                    Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+        AmountUpdate(){
+            let detail = this.state.Data;
+            let data = {
+                siteId: detail.siteId,
+                currencyId: detail.currencyId,
+                transId: this.props.transId,
+                before: { amount: detail.amount },
+                after: { amount: this.state.NewAmount }
+            };
+            axios.post('/apiv2/Deposit/SetAmountByTransId', data)
+            .then(function (response) {
+                Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.onGetData();
+                } else {
+                    alert(result.message);
+                    this.onGetComment();
+                }
+            }.bind(this)).catch(function (error) {
+                Loading.UnLoading();
+                alert(error);
+            }.bind(this));
         }
         AmountCancel() {
             this.setState({
@@ -436,17 +417,17 @@ import DateTimePicker from 'react-datetime';
                 let payid = depositInfo.PayId;
                 let dS = DepositStatus;
                 if (data.status == dS.Pending || data.status == dS.OnHold)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                    btnGroup.push(<button key={0} type="button" className="btn btn-deposit-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if (data.status == dS.OnHold && data.depositType == 3)
-                    btnGroup.push(<button key={1} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                    btnGroup.push(<button key={1} type="button" className="btn btn-deposit-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
                 if (data.status == dS.Pending && data.depositType == 3)
-                    btnGroup.push(<button key={7} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
+                    btnGroup.push(<button key={7} type="button" className="btn btn-deposit-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
                 if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
-                    btnGroup.push(<button key={3} type="button" className="btn btn-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
+                    btnGroup.push(<button key={3} type="button" className="btn btn-deposit-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
                 if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕。 */
-                    btnGroup.push(<button type="button" className="btn btn-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
+                    btnGroup.push(<button type="button" className="btn btn-deposit-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
                 if (data.status == dS.Pending)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
+                    btnGroup.push(<button key={4} type="button" className="btn btn-deposit-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
 
                 let payK = 0;
                 PayFrom.push(<tr key={payK++}>
@@ -1103,19 +1084,14 @@ import DateTimePicker from 'react-datetime';
                 },
                 onInitialized: function () {
                     state.selectBankCode.length = 0;
-                    (searchFilter.selectBankCode) ?
+                    if (searchFilter.selectBankCode)
                         searchFilter.selectBankCode.forEach(function (obj) {
                             state.selectBankCode.push(obj);
-                        })
-                        :
-                        state.selectBankCode = [...Object.values(BankCodeSelectInit)];
+                        });
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectBankCode').multiselect('select', searchFilter.selectBankCode) 
-                : 
-                Object.keys(BankCodeSelectInit).forEach((key) => {
-                    $('#selectBankCode').multiselect('select', key);
-                    });
+            
+            $('#selectBankCode').multiselect('select', searchFilter.selectBankCode)
             $('#selectBankCode').multiselect('updateButtonText');
         }
 
