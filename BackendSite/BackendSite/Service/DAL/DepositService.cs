@@ -229,7 +229,7 @@ namespace BackendSite.Service.DAL
                 var p = new DynamicParameters(new { DepositId = depositId, SiteId = siteId, ActualDeposit = actualDeposit, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null, Operator = Operator });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = _mainDbClient.Execute("Admin_DepositInfo_Set", p, conn, trans);
+                result = _mainDbClient.Execute("Admin_DepositInfo_Set_V2", p, conn, trans);
 
                 if (result > 0)
                 {
