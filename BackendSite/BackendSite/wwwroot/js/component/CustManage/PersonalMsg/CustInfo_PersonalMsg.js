@@ -124,11 +124,11 @@ const PersonalMsg = (props) => {
             }.bind(this));
     }
 
-    const DeleteMsg = (Id) => {
+    const DeleteMsg = (Id , IsBatch) => {
         if (window.confirm('delete this message?')) {
             let CustId = getUrlParameter("custId");
             let iCustId = parseInt(CustId);
-            axios.post('/api/Message/DeletePersonalMsg', `CustId=${iCustId}&Id=${Id}&PageNumber=${stateDatas.PageInfo.pageNumber}`)
+            axios.post('/api/Message/DeletePersonalMsg', `CustId=${iCustId}&Id=${Id}&IsBatch=${IsBatch}&PageNumber=${stateDatas.PageInfo.pageNumber}`)
                 .then(function (response) {
                     let result = response.data;
                     if (result.errorCode == 0) {
@@ -177,7 +177,7 @@ const PersonalMsg = (props) => {
                     {row}
                     <td>
                         <button className="btn btn-add" onClick={handlePage.bind(null, page.detail, data)}>view</button>
-                        <button style={{ marginLeft: '.5rem' }} className="btn btn-delete" onClick={DeleteMsg.bind(null, data.id)}>delete</button>
+                        <button style={{ marginLeft: '.5rem' }} className="btn btn-delete" onClick={DeleteMsg.bind(null, data.id ,data.isBatch)}>delete</button>
                     </td>
                 </tr>
             )

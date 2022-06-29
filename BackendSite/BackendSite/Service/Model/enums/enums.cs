@@ -789,6 +789,12 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
+    
+    public enum SendBatchMessageStatus
+    {
+        Pending = 0,
+        Finished = 1
+    }
 
     public enum TpEnum
     {

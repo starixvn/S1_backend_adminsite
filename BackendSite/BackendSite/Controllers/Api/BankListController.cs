@@ -65,12 +65,45 @@ namespace BackendSite.Controllers.Api
             return apiListResult;
         }
 
-        [HttpGet]
+        [HttpPost]
         public ApiResult<IEnumerable<BankInfoOff>> GetAllBankInfoOffList()
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
             apiResult.Data = bankInfoOff;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
+            var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
+            var data = bankInfoOff
+                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
+        {
+            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
+            var bankInfoOff = bankDetailBLL.GetAllBankInfoOff();
+            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
+            var data = bankInfoOff
+                .Select(x => new CalCodeModel
+                {
+                    Id = x.Id,
+                    SysId = x.SysId,
+                    AccountName = x.AccountName,
+                    AccountNo = x.AccountNo,
+                    BankCode = x.BankCode , 
+                    SiteName = x.SiteName
+                });
+            apiResult.Data = data;
             apiResult.ErrorCode = 0;
             return apiResult;
         }

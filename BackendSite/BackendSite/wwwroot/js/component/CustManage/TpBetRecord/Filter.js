@@ -53,15 +53,28 @@ const Filter = (props) => {
           dataColumn="DateQuickPicker"
           onChange={(e) => props.EditDate(e, "DateQuickPicker")}
         />
-        <div className="button-group">
-          <button
-            className="btn btn-search"
-            type="button"
-            onClick={props.ClickSubmit}
-          >
-            Submit
-          </button>
-        </div>
+        {props.Isloading === true ? (
+          <div className="button-group">
+            <button
+              type="button"
+              className="btn btn-refresh"
+              disabled={true}
+              onClick={null}
+            >
+              Loading
+            </button>
+          </div>
+        ) : (
+          <div className="button-group">
+            <button
+              className="btn btn-search"
+              type="button"
+              onClick={props.ClickSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        )}
       </div>
     </form>
   );
