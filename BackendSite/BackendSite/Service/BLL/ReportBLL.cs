@@ -940,7 +940,7 @@ namespace BackendSite.Service.BLL
 
             var data = _cacheHelper.TryGetOrCreate($"BetList:{input.GetRedisKey()}",
                 TimeSpan.FromMinutes(15), 
-                redis =>
+                () =>
                 {
                     var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                     var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
