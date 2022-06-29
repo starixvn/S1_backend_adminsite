@@ -312,6 +312,15 @@ const App = () => {
       alert("Please choose a different team.");
       return false;
     }
+    
+    if (
+        bannerData.endTime === "" ||
+        bannerData.sportBattledate === "" )
+    {
+      alert(`Time does not allow null.`);
+      return false;
+    }
+    
     let _specific = {
       CurrencyId: 0,
       Details: null,

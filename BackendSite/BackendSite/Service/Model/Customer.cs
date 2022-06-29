@@ -160,6 +160,10 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
+
+        public string LineUserId { get; set; }
+
+        public CustLineProfileModel CustLineProfile { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -598,5 +602,17 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+
+    public class CustLineProfileModel
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public int CustId { get; set; }
+        public string userId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 }

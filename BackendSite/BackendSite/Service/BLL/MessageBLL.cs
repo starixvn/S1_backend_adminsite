@@ -157,9 +157,9 @@ namespace BackendSite.Service.BLL
             return messageService.GetCustLang(CustId);
         }
 
-        public void DeletePersonalMsg(int Id)
+        public void DeletePersonalMsg(int id , bool isBatch)
         {
-            messageService.DeletePersonalMsg(Id);
+            messageService.DeletePersonalMsg(id , isBatch);
         }
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
@@ -182,9 +182,13 @@ namespace BackendSite.Service.BLL
         {
             return messageService.DeleteBatchMessage(batchId);
         }
-        public bool UpdateBatchMessage(int batchId, bool isPopup, string message)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message ,string Operator)
         {
-            return messageService.UpdateBatchMessage(batchId, isPopup, message);
+            return messageService.UpdateBatchMessage(batchId, isPopup, message , Operator);
+        }
+        public bool UpdateBatchMessageStatus(int status,int batchId)
+        {
+            return messageService.UpdateBatchMessageStatus(status, batchId);
         }
         public BatchMsg GetBatchMessage(int batchId)
         {

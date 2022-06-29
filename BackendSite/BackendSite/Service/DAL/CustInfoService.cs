@@ -256,7 +256,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
-            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V2", 
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3", 
                 new DynamicParameters(new { 
                     _BatchId = req.BatchId,
                     _SiteId = req.SiteId,
@@ -264,11 +264,8 @@ namespace BackendSite.Service.DAL
                     _CurrencyId = req.CurrencyId,
                     _Status = req.AccountStatus,
                     _IsPopup = req.IsPopup,
-                    _PopupMessage = req.PopupMessage,
-                    _Title = req.Title ,
-                    _Content =req.Content,
                     _Operator = req.Operator
-                }),120) > 0;
+                }),600) > 0;
         }
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
@@ -578,6 +575,34 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_OnUser_Del";
             return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
         }
+
+        /// <summary>
+        /// 刪除使用者Line資料
+        /// </summary>
+        /// <param name="custId">客戶ID</param>
+        /// <returns></returns>
+        public int DeleteLineProfile(int custId)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _CustId = custId
+                });
+
+            var SpName = "Admin_CustLineProfile_Del";
+            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+        }
+
+        public CustLineProfileModel GetCustLineProfile(int custId, string lineUserId)
+        {
+            return _reportDbClient.QueryFirst<CustLineProfileModel>("Member_CustLineProfile_Get", new DynamicParameters(new
+            {
+                _CustId = custId,
+                _userId = lineUserId
+            }));
+        }
+
 
         #region Tag
         public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)

@@ -367,6 +367,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class DeleteMessageRequest
         {
             public int Id { get; set; }
+            public bool IsBatch { get; set; }
         }
 
         public class CustStatusSwitchRequest
@@ -613,7 +614,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
             var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
             var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
-            
+
             if (request.ExportTransferWallet)
             {
                 var exportCustInfo = GetCustInfoExportList<CustInfoDetailForExport>(request, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate);
@@ -691,6 +692,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                    custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
                 }
 
                 return new ApiResult<CustInfoDetail>
@@ -1431,6 +1433,37 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             else
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
+            }
+        }
+
+        /// <summary>
+        /// CustomerManage/KickOut 踢出/登出客戶
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Line Unbind]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_lineUnbind" })]
+        public ApiResult LineUnbind(CustIdRequest request)
+        {
+            if (_custInfoBll.LineUnbind("CustManage/CustInfoList",
+                                        request.CustId,
+                                        User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Line Unbind Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
 
@@ -2191,7 +2224,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                _messageBll.DeletePersonalMsg(request.Id);
+                _messageBll.DeletePersonalMsg(request.Id , request.IsBatch);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -2798,6 +2831,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// LineUserId遮罩
+        /// </summary>
+        /// <param name="data">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskLineId(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(data, pattern, m => new string('*', m.Length));
         }
 
         #endregion

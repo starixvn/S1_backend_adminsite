@@ -13,6 +13,7 @@ using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Service.BLL
 {
@@ -26,6 +27,9 @@ namespace BackendSite.Service.BLL
         private readonly Common common;
         private readonly CustInfoService custInfoService;
         private readonly ImageEditorBLL _imageEditorBll;
+        private readonly IConfiguration _configuration;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string payApiUrl;
 
         public DepositBLL(IServiceProvider provider)
         {
@@ -37,12 +41,27 @@ namespace BackendSite.Service.BLL
             this.common = provider.GetRequiredService<Common>();
             this.custInfoService = provider.GetRequiredService<CustInfoService>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            this._configuration =  provider.GetRequiredService<IConfiguration>();
+            this._courierAdapter =  provider.GetRequiredService<CourierAdapter>();
+            payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, DateTime startDate, DateTime endDate, string depositId, string userName, IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize, int amountType, string amount, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
+            IEnumerable<int> selectCalCode,
+            DateTime startDate, 
+            DateTime endDate,
+            string depositId,
+            string userName,
+            IEnumerable<int> currencyId, 
+            IEnumerable<int> status,
+            IEnumerable<int> levelStatus, 
+            int pageSize, 
+            int amountType, 
+            string amount,
+            IEnumerable<int> payIds,
+            int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
-            var serverInfo = serverInfoService.GetModel();/*Check SiteID By Permission*/
-            return depositService.GetDepositRequestList(selectSite, depositType, startDate, endDate, serverInfo.SiteId/*Not require*/, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, ref pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,
@@ -251,9 +270,9 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string depositType, DateTime startDate, DateTime endDate, string depositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount,string payIds)
         {
-            return depositService.GetDepositExportList(selectSite, depositType, startDate, endDate, depositId, userName, currencyId, status, levelStatus, amountType, amount);
+            return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userName, currencyId, status, levelStatus, amountType, amount, payIds);
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 
@@ -446,5 +465,22 @@ namespace BackendSite.Service.BLL
             scope.Complete();
             return result;
         }
+
+        public async Task<ApiResult<DepositManualResponse>> DepositManual(DepositManualRequest depositManualRequest)
+        {
+            var url = $"{payApiUrl}DepositManual";
+            var response = await _courierAdapter.MyPostAsync<DepositManualResponse, DepositManualRequest>(url, depositManualRequest);
+            return response;
+        }
+
+        /// <summary>
+        /// 取得 paymentGateWay
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
+        {
+            return depositService.GetPaymentGateWayOptions();
+        }
     }
+
 }

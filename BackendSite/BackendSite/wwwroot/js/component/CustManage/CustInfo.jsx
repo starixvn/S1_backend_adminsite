@@ -257,6 +257,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         render() {
             let rows = this.props.searchData.data.map(row =>
                 <tr key={row.id}>
+                    <td>{row.bonusId}</td>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                     <td>{row.typeName ? row.typeName : "N/A"}</td>
                     <td className="text-right">{Direction[row.direction] + number_format(row.changeBonus)}</td>
@@ -277,6 +278,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">BonusId</th>
                                 <th scope="col">Time (Adjusted to GMT+8)</th>
                                 <th scope="col">Type</th>
                                 <th scope="col" className="text-right">Change Bonus</th>
@@ -1194,6 +1196,24 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onUnbindLine() {
+            if (confirm('Are you sure to Unbind Line Profile ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/apiV2/CustomerManage/LineUnbind', { CustId: data.custId })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onUnlock() {
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
@@ -1433,11 +1453,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                             {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
                             {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
-                            {wallet.tpId == 1 && wallet.balance < 0 ?
+                            {/* {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
                                 </div>
-                                : null}
+                                : null} */}
                         </li>;
                     }.bind(this))}</ul>;
 
@@ -1468,7 +1488,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-
+            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -1661,6 +1681,14 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                                     {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
                                                 </td>
                                         }
+                                    </tr>
+                                    <tr>
+                                        {data.custLineProfile === null ? <th scope="row">Line UserId</th> : <th scope="row">Line UserId{subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-copy js-copy" onClick={this.onUnbindLine.bind(this)}>Unbind</button> : null}</th>}
+                                        {data.custLineProfile === null ? <td></td> : <td>{data.custLineProfile.userId}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.custLineProfile.userId}>Copy</button></td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Line Binding Time (Adjusted to GMT+8)</th>
+                                        {data.custLineProfile === null ? <td></td> : <td>{moment.utc(data.custLineProfile.createTime).add(8,'hour').format('l LTS')}</td>}
                                     </tr>
                                     <tr>
                                         <th scope="row">Act Status</th>
@@ -1901,7 +1929,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                         {data.hasPhotoId ?
                                             <tr>
                                                 <td>
-                                                    <div className="id-image">
+                                                    <div className="id-image" style={{margin:"0 auto"}}>
                                                         <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
                                                     </div>
                                                     <button onClick={this.rotate.bind(this)}>rotate</button>
