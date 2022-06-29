@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitController : ControllerBase

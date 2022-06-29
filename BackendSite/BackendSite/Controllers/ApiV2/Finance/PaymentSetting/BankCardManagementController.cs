@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankCardManagementController : ControllerBase

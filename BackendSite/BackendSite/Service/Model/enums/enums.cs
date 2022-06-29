@@ -506,7 +506,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-    
+
     #endregion
 
     #region Referral
@@ -518,7 +518,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -842,7 +842,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-    
+
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
@@ -1039,6 +1039,20 @@ namespace BackendSite.Service.Model.enums
     }
     
     public enum GeneralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    public enum PermissionTypeEnum
+    {
+        AddRole = 0,
+        UpdateRole = 1,
+        AddUser = 2,
+        UpdateUser = 3
+    }
+
+    public enum AdminBrandTypeEnum
     {
         Disable = 0,
         Enable = 1
