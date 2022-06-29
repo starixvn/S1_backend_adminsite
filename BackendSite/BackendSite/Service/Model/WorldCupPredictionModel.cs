@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -141,5 +143,35 @@ namespace BackendSite.Service.Model
         /// 排序
         /// </summary>
         public int Sort { get; set; }
+    }
+
+    public class GetWorldCupMemberReportRequest : ApiRequestPageModel
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int TicketType { get; set; }
+        public int TeamId { get; set; }
+        public int Selected { get; set; }
+        public string UserName { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
+
+    public class GetWorldCupMemberReportResponse
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
+    }
+    
+    public class WorldCupMemberReportData
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
     }
 }

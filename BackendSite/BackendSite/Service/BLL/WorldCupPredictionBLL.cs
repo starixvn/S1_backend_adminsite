@@ -139,5 +139,18 @@ namespace BackendSite.Service.BLL
 
             return updateData;
         }
+
+        public IEnumerable<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        {
+            var memberReport = _worldCupPredictionService.GetMemberReport(request, out totalPages, out rowCount);
+            return memberReport.Select(a => new GetWorldCupMemberReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TicketType = a.TicketType,
+                TeamName = a.TeamName,
+                SelectTime = a.SelectTime
+            });
+        }
     }
 }

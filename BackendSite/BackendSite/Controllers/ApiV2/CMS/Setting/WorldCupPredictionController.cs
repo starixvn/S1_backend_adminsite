@@ -61,5 +61,27 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
+
+        [HttpPost]
+        public ApiListResult<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request)
+        {
+            var apiResult = new ApiListResult<GetWorldCupMemberReportResponse>();
+            try
+            {
+                apiResult.Data = _worldCupPredictionBll.GetMemberReport(request,
+                    out var totalPages,
+                    out var rowCount);;
+                apiResult.TotalPages = totalPages;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.RowCount = rowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
     }
 }

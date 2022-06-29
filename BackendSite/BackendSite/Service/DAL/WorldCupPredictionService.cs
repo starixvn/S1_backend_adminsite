@@ -15,15 +15,15 @@ namespace BackendSite.Service.DAL
 {
     public class WorldCupPredictionService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
         private MySqlConnection _connection;
         private MySqlTransaction _transaction;
 
-        public WorldCupPredictionService(IServiceProvider provider)
+        public WorldCupPredictionService(IList<MySqlClient> sqlClients)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
-            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         public async Task BeginTransaction()
@@ -87,6 +87,27 @@ namespace BackendSite.Service.DAL
             parameters.Add("_LevelName", setData.LevelName, dbType: DbType.String);
             parameters.Add("_Sort", setData.Sort, dbType: DbType.Int64);
             return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Ins", parameters, _connection, _transaction);
+        }
+
+        public IEnumerable<WorldCupMemberReportData> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId);
+            p.Add("_CurrencyId", request.CurrencyId);
+            p.Add("_TicketType", request.TicketType);
+            p.Add("_TeamId", request.TeamId);
+            p.Add("_Selected", request.Selected);
+            p.Add("_UserName", request.UserName);
+            p.Add("_StartTime", request.StartTime);
+            p.Add("_EndTime", request.EndTime);
+            p.Add("_PageSize", Math.Abs(request.PageSize));
+            p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _reportDbClient.Query<WorldCupMemberReportData>("Admin_WorldCupMemberTicketInfo_Get", p);
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
+            return result;
         }
     }
 }
