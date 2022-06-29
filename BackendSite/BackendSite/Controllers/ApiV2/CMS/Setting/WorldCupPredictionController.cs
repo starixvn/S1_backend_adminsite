@@ -17,13 +17,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     public class WorldCupPredictionController : ControllerBase
     {
         private readonly WorldCupPredictionBLL _worldCupPredictionBll;
+        private readonly ExcelBLL _excelBll;
 
-        public WorldCupPredictionController(IServiceProvider provider)
+        public WorldCupPredictionController(WorldCupPredictionBLL worldCupPredictionBll, ExcelBLL excelBll)
         {
-            _worldCupPredictionBll = provider.GetRequiredService<WorldCupPredictionBLL>();
+            _excelBll = excelBll;
+            _worldCupPredictionBll = worldCupPredictionBll;
         }
-
-
+        
         // todo 掛 attribute
         [HttpPost]
         public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
@@ -82,6 +83,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 apiResult.Message = ex.Message;
             }
             return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
+        {
+            var exportData = await _worldCupPredictionBll.GetMemberReportdWithoutPage(request);
+            var stream = _excelBll.Export(exportData);
+            return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
         }
     }
 }

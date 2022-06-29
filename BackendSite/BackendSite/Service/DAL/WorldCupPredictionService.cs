@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         private MySqlConnection _connection;
         private MySqlTransaction _transaction;
 
-        public WorldCupPredictionService(IList<MySqlClient> sqlClients)
+        public WorldCupPredictionService(IEnumerable<MySqlClient> sqlClients)
         {
             _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
@@ -108,6 +108,20 @@ namespace BackendSite.Service.DAL
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
+        }
+        
+        public async Task<IEnumerable<WorldCupMemberReportData>> GetMemberReportWithoutPage(ExportWorldCupMemberReportRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId);
+            p.Add("_CurrencyId", request.CurrencyId);
+            p.Add("_TicketType", request.TicketType);
+            p.Add("_TeamId", request.TeamId);
+            p.Add("_Selected", request.Selected);
+            p.Add("_UserName", request.UserName);
+            p.Add("_StartTime", request.StartTime);
+            p.Add("_EndTime", request.EndTime);
+            return await _reportDbClient.QueryAsync<WorldCupMemberReportData>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
         }
     }
 }

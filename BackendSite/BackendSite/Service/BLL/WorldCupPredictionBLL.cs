@@ -152,5 +152,18 @@ namespace BackendSite.Service.BLL
                 SelectTime = a.SelectTime
             });
         }
+
+        public async Task<IEnumerable<ExportWorldCupMemberReportResponse>> GetMemberReportdWithoutPage(ExportWorldCupMemberReportRequest request)
+        {
+            var memberReport = await _worldCupPredictionService.GetMemberReportWithoutPage(request);
+            return memberReport.Select(a => new ExportWorldCupMemberReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TicketType = a.TicketType,
+                TeamName = a.TeamName,
+                SelectTime = a.SelectTime
+            });
+        }
     }
 }

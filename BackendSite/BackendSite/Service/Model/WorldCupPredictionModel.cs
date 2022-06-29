@@ -174,4 +174,25 @@ namespace BackendSite.Service.Model
         public string TeamName { get; set; }
         public DateTime? SelectTime { get; set; }
     }
+    
+    public class ExportWorldCupMemberReportRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int TicketType { get; set; }
+        public int TeamId { get; set; }
+        public int Selected { get; set; }
+        public string UserName { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
+    
+    public class ExportWorldCupMemberReportResponse
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
+    }
 }
