@@ -206,6 +206,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
+        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
@@ -505,7 +506,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-    
+
     #endregion
 
     #region Referral
@@ -517,7 +518,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -538,6 +539,35 @@ namespace BackendSite.Service.Model.enums
         Read = 2,
         Update = 3,
         Delete = 4
+    }
+    
+    public enum AdminAdjustmentLogMenuEnum
+    {
+        Undefined = 0,
+        BankCardManagement = 1,
+        SetDepositRequestAmount = 2,
+        WithdrawalAccounting = 3,
+        BalanceAdjustment = 4,
+        ThirdPartyAdjustment = 5,
+        IssueBonusManagement = 6,
+        PaymentGateway = 7,
+        DepositLimitation = 8,
+        WithdrawalLimitation = 9,
+        CryptoWithdrawalLimitation = 10,
+        AdjustmentLimitation = 11,
+        LineDepositChannel = 12,
+        DepositSubmission = 13,
+        ResetCustomerBankInfo = 14,
+        ResetCustomerUSDTInfo = 15,
+        SetCustomerStatus = 16,
+        KickOutCustomer = 17,
+        SetCustomerPromotionStatus = 18,
+        Announcement = 19,
+        WithdrawalKycControl = 20,
+        TagManagement = 21,
+        LiveRegistrationStatistics = 22,
+        GameExclusion = 23,
+        BetLimit = 24
     }
 
     #region BankFinancialTransferInfoLog
@@ -743,7 +773,7 @@ namespace BackendSite.Service.Model.enums
 
     #region Customer_RegLiveStatus
 
-    public enum Customer_RegLiveStatusStatusEnum
+    public enum CustomerRegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
@@ -789,6 +819,12 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
+    
+    public enum SendBatchMessageStatus
+    {
+        Pending = 0,
+        Finished = 1
+    }
 
     public enum TpEnum
     {
@@ -806,7 +842,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-    
+
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
@@ -997,7 +1033,32 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    public enum LineChannelStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+    
+    public enum GeneralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
 
+    public enum PermissionTypeEnum
+    {
+        AddRole = 0,
+        UpdateRole = 1,
+        AddUser = 2,
+        UpdateUser = 3
+    }
+
+    public enum AdminBrandTypeEnum
+    {
+        Disable = 0,
+        Enable = 1
+	}
+	
     public enum SiteEnum
     {
         [Description("Nova88")]

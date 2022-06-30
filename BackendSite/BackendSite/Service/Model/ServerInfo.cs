@@ -22,7 +22,9 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyList);
+                return string.IsNullOrWhiteSpace(CurrencyList) ? 
+                    null:
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyList);
             }
         }
         public IEnumerable<string> ILangList

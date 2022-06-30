@@ -23,6 +23,7 @@ const Result = (props) => {
                 EditfilterData={props.EditfilterData}
                 EditDate={props.EditDate}
                 ClickSubmit={props.ClickSubmit}
+                Isloading={props.Isloading}
             />
             <label>※Allow search data up to 12 months</label>
             <div className="table">
