@@ -1062,7 +1062,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetProfile(CustIdRequest request)
         {
@@ -1109,7 +1108,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustBankInfo(CustIdRequest request)
         {
@@ -1159,7 +1157,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustUSDTInfo(CustIdRequest request)
         {
@@ -1206,7 +1203,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
         public ApiResult SetUnlock(SetCustomerStatusRequest request)
         {
             if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
@@ -1256,7 +1252,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
         public ApiResult SetLock(SetCustomerStatusRequest request)
         {
             if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
@@ -1358,7 +1353,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
         [HttpPost]
         public ApiResult SetEnablePromotionStatus(SetEnableDisableBonusRequest request)
         {
@@ -1407,7 +1401,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
         public ApiResult KickOut(CustIdWithReasonRequest request)
         {
             if (_custInfoBll.DeleteOnUserData("CustManage/CustInfoList",
@@ -1448,7 +1441,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_lineUnbind" })]
         public ApiResult LineUnbind(CustIdRequest request)
         {
             if (_custInfoBll.LineUnbind("CustManage/CustInfoList",
