@@ -20,7 +20,7 @@ using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerManageController : ControllerBase
@@ -418,7 +418,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             /// </summary>
             public string EMail { get; set; }
             /// <summary>
-            /// Email
+            /// 地址
             /// </summary>
             public Dictionary<string, string> Address { get; set; }
         }
@@ -876,12 +876,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, new[] { 41, 42, 43, 44, 45, 46 } })]
         [HttpPost]
         public ApiResult SetCustInfo(EditCustDetailRequest request)
         {
             var custProfile = _custInfoBll.GetCustProfile(request.CustId);
-            request.Address = request.Address.Count == 0 ? null : request.Address;
+            request.Address = (request.Address == null || (request.Address != null && request.Address.Count == 0)) ? null : request.Address;
             var data = _custInfoBll.SetCustInfo(request.CustId,
                 request.Level,
                 request.FullName,
@@ -951,7 +951,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Birthday = $"{ request.Birthday_Y }/{ request.Birthday_M }/{ request.Birthday_D }"
+                        Birthday = $"{request.Birthday_Y}/{request.Birthday_M}/{request.Birthday_D}"
                     })
                 });
             }
