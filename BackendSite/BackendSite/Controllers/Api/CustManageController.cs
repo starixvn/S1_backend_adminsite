@@ -692,7 +692,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             var custProfile = _custInfoBll.GetCustProfile(custStatus.CustId);
 
-            //custStatus.Address = custStatus.Address.Count == 0 ? null : custStatus.Address;
+            custStatus.Address = (custStatus.Address == null || (custStatus.Address != null && custStatus.Address.Count == 0)) ? null : custStatus.Address;
             var data = _custInfoBll.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, custStatus.Address, User.Identity.Name) > 0;
 
             if (data)
