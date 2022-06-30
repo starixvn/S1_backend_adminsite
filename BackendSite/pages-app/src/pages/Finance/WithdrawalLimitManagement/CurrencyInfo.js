@@ -103,7 +103,7 @@ const Result = (props) => {
   const handleDelete = (idx) => {
     if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
       api
-        .post("/apiv2/WithdrawalLimit/Delete", {
+        .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
           before:{
@@ -163,7 +163,7 @@ const Result = (props) => {
           }
       };
       api
-        .post("/apiv2/WithdrawalLimit/Update", data)
+        .post("/api/Withdrawal/EditWithdrawalLimitInfo", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
             handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);
