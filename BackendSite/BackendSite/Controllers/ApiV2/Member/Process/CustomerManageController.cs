@@ -876,7 +876,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
 
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, new[] { 41, 42, 43, 44, 45, 46 } })]
         [HttpPost]
         public ApiResult SetCustInfo(EditCustDetailRequest request)
         {
