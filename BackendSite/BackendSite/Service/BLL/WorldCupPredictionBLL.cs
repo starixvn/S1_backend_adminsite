@@ -152,9 +152,9 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupMemberReportResponse>> GetMemberReportdWithoutPage(ExportWorldCupMemberReportRequest request)
+        public async Task<IEnumerable<ExportWorldCupMemberReportResponse>> GetMemberReport(ExportWorldCupMemberReportRequest request)
         {
-            var memberReport = await _worldCupPredictionService.GetMemberReportWithoutPage(request);
+            var memberReport = await _worldCupPredictionService.GetMemberReport(request);
             return memberReport.Select(a => new ExportWorldCupMemberReportResponse()
             {
                 Currency = a.Currency,

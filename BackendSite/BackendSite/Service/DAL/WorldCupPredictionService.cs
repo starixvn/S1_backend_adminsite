@@ -110,7 +110,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public async Task<IEnumerable<WorldCupMemberReportData>> GetMemberReportWithoutPage(ExportWorldCupMemberReportRequest request)
+        public async Task<IEnumerable<WorldCupMemberReportData>> GetMemberReport(ExportWorldCupMemberReportRequest request)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId);

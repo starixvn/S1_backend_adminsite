@@ -88,7 +88,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
         {
-            var exportData = await _worldCupPredictionBll.GetMemberReportdWithoutPage(request);
+            var exportData = await _worldCupPredictionBll.GetMemberReport(request);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
         }
