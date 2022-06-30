@@ -375,22 +375,29 @@ import DateTimePicker from 'react-datetime';
                 NewAmount: e
             });
         }
-        AmountUpdate() {
-            let data = { TransId: this.props.transId, Amount: parseFloat(this.state.NewAmount) }
-            axios.post('/api/Deposit/SetDepositRequestAmount', data)
-                .then(function (response) {
-                    Loading.UnLoading();
-                    let result = response.data;
-                    if (result.errorCode == 0) {
-                        this.onGetData();
-                    } else {
-                        alert(result.message);
-                        this.onGetComment();
-                    }
-                }.bind(this)).catch(function (error) {
-                    Loading.UnLoading();
-                    alert(error);
-                }.bind(this));
+        AmountUpdate(){
+            let detail = this.state.Data;
+            let data = {
+                siteId: detail.siteId,
+                currencyId: detail.currencyId,
+                transId: this.props.transId,
+                before: { amount: detail.amount },
+                after: { amount: this.state.NewAmount }
+            };
+            axios.post('/apiv2/Deposit/SetAmountByTransId', data)
+            .then(function (response) {
+                Loading.UnLoading();
+                let result = response.data;
+                if (result.errorCode == 0) {
+                    this.onGetData();
+                } else {
+                    alert(result.message);
+                    this.onGetComment();
+                }
+            }.bind(this)).catch(function (error) {
+                Loading.UnLoading();
+                alert(error);
+            }.bind(this));
         }
         AmountCancel() {
             this.setState({

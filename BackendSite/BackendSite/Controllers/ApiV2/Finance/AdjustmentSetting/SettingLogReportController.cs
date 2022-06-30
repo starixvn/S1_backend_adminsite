@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class SettingLogReportController : ControllerBase
@@ -36,27 +36,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// 
         /// Func Path：Finance > Adjustment Log Report > [Submit]
         /// </remarks>
-        /// <param name="para">參數</param>
+        /// <param name="request">參數</param>
         [HttpPost]
-        public ApiListResult<AdjustmentLogReport> GetList(GetAdjustmentInfoLogPara para)
+        public ApiListResult<AdminAdjustmentLogReport> GetList(GetAdminAdjustmentInfoLogInput request)
         {
-            var apiResult = new ApiListResult<AdjustmentLogReport>();
+            var apiResult = new ApiListResult<AdminAdjustmentLogReport>();
             try
             {
-                var searchResult = _adjustmentLogReportBll.GetAdjustmentInfoLog(para);
-                apiResult.Data = searchResult.AdjustmentLogReport;
-                apiResult.PageNumber = searchResult.PageNumber;
-                apiResult.TotalPages = searchResult.TotalPages;
-                apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var searchResult = _adjustmentLogReportBll.GetAdminAdjustmentInfoLog(request);
+
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    Data = searchResult.AdminAdjustmentLogReport,
+                    PageNumber = searchResult.PageNumber,
+                    TotalPages = searchResult.TotalPages,
+                    RowCount = searchResult.RowCount,
+                    ErrorCode = (int) ErrorCodeEnum.Success
+                };
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    ErrorCode = (int) ErrorCodeEnum.SystemException,
+                    Message = ex.Message
+                };
             }
-
-            return apiResult;
         }
     }
 }

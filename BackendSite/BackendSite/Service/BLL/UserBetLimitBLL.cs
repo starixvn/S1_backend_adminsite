@@ -27,9 +27,9 @@ namespace BackendSite.Service.BLL
                 .Select(category => new TpCategoryBetLimit() {CategoryId = category.CategoryId, CategoryName = category.CategoryName}).ToList();
         }
 
-        public async Task<int> SetUserBetLimit(int custId, int siteId, List<BetSetting> betSetting, string updateOperator)
+        public async Task<int> SetUserBetLimit(ParamsWithLog<CustBetLimit> input)
         {
-            return await _userBetLimitService.InsertOrUpdate(custId, siteId, betSetting, updateOperator);
+            return await _userBetLimitService.InsertOrUpdate(input);
         }
 
         public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
@@ -37,9 +37,9 @@ namespace BackendSite.Service.BLL
             return _userBetLimitService.GetUserBetLimit(siteIds,currencyIds,  userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
         }
 
-        public async Task<int> Delete(int custId)
+        public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
         {
-            return await _userBetLimitService.Delete(custId);
+            return await _userBetLimitService.Delete(input);
         }
 
         public async Task<int> UpdateStatus(int custId, int status, string updateOperator)

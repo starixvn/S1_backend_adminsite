@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -448,6 +450,7 @@ namespace BackendSite.Service.Model
         public string PhoneNo { get; set; }
         public int Status { get; set; }
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
         public string SiteName { get; set; }
         public string AffCode { get; set; }
         public string Agent { get; set; }
@@ -459,6 +462,45 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+    
+    public class SetRegLiveStatus
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        [LogIgnore]
+        public CustomerRegLiveStatusStatusEnum Status { get; set; }
+
+        public string StatusName => Status.ToString();
+    }
+    
+    public class AddRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
+    
+    public class EditRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        [LogIgnore]
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
+    
+    public class DeleteRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        [LogIgnore]
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
     }
 
     public class RegLiveStatusNotes
@@ -527,12 +569,15 @@ namespace BackendSite.Service.Model
     }
     public class BankInfoDetail
     {
+        [LogIgnore]
         public int SysId { set; get; }
         public string AccountNo { set; get; }
         public string IFSCCode { set; get; }
     }
     public class USDTDetail
     {
+        public string Network { set; get; }
+        public string CurrencyName { set; get; }
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }

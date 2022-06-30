@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AdjustmentReportController : ControllerBase
@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentBll;
         private readonly ExcelBLL _excelBll;
+        private readonly PermissionBLL _permissionBll;
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             _paymentAdjustmentBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         #endregion
@@ -76,6 +78,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
             public string TransId { get; set; }
+        }
+        
+        public class SetAdjustmentReq
+        {
+            public string TransId { get; set; }
+            public int BeforeCategory { get; set; }
+            public int AfterCategory { get; set; }
+            public string BeforeMemo { get; set; }
+            public string AfterMemo { get; set; }
         }
 
         #endregion
@@ -155,5 +166,49 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 
+        /// <summary>
+        /// AdjustmentReport/SetAdjustment 變更調帳（原因和備註）
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Adjustment Report > [Submit] > [V]
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult SetAdjustment(ApiRequestWithLog<SetAdjustment> request)
+        {
+            try
+            {
+                if (!_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_reason")
+                    && !_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_memo"))
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.PermissionDenied,
+                        Message = "Permission denied."
+                    };
+                }
+
+                var success =
+                    _paymentAdjustmentBll.SetAdjustment(new ParamsWithLog<SetAdjustment>(request, User.Identity.Name));
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)(success 
+                        ? ErrorCodeEnum.Success 
+                        : ErrorCodeEnum.SetAdjustmentError)
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult
+                {
+                    Message = "Something went wrong.",
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    RawMessage = ex.ToString()
+                };
+            }
+        }
     }
 }

@@ -250,9 +250,47 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new { SiteId = siteId }));
         }
 
-        public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
+        public bool EditWithdrawalKYC(ParamsWithLog<WithdrawalKYCAmount> input)
         {
-            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set", new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new
+            {
+                input.SiteId,
+                input.CurrencyId,
+                input.After.Amount
+            };
+
+            var success = conn
+                .Execute("Admin_WithdrawalKyc_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalKycControl);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
