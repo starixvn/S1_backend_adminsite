@@ -165,10 +165,19 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public IEnumerable<GetWorldCupEventReportResponse> GetEventReport()
+        public async Task<IEnumerable<GetWorldCupEventReportResponse>> GetEventReport(int siteId)
         {
-            throw new NotImplementedException();
+            var eventReport = await _worldCupPredictionService.GetEventReport(siteId);
+            return eventReport.Select(a => new GetWorldCupEventReportResponse()
+            {
+                TeamName = a.TeamName,
+                PredictUserCount = a.PredictUserCount,
+                IsPayoutDone = a.UpdateTime.HasValue,
+                Operator = a.Operator,
+                UpdateTime = a.UpdateTime
+            });
         }
+
         public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetEventReport(ExportWorldCupEventReportRequest request)
         {
             throw new NotImplementedException();

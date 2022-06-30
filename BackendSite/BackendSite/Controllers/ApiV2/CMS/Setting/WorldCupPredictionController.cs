@@ -95,12 +95,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        public ApiResult<IEnumerable<GetWorldCupEventReportResponse>> GetEventReport()
+        public async Task<ApiResult<IEnumerable<GetWorldCupEventReportResponse>>> GetEventReport(GetWorldCupEventReportRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
             try
             {
-                apiResult.Data = _worldCupPredictionBll.GetEventReport();;
+                apiResult.Data = await _worldCupPredictionBll.GetEventReport(request.SiteId);;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

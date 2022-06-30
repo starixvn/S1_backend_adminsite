@@ -109,7 +109,7 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
         }
-        
+
         public async Task<IEnumerable<WorldCupMemberReportDto>> GetMemberReport(ExportWorldCupMemberReportRequest request)
         {
             var p = new DynamicParameters();
@@ -122,6 +122,13 @@ namespace BackendSite.Service.DAL
             p.Add("_StartTime", request.StartTime);
             p.Add("_EndTime", request.EndTime);
             return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
+        }
+
+        public async Task<IEnumerable<WorldCupEventReportDto>> GetEventReport(int siteId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            return await _reportDbClient.QueryAsync<WorldCupEventReportDto>("Admin_WorldCupPredictiveStatistics_Get", p);
         }
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)

@@ -212,15 +212,26 @@ namespace BackendSite.Service.Model
         public DateTime? SelectTime { get; set; }
     }
     
+    public class WorldCupEventReportDto
+    {
+        public string TeamName { get; set; }
+        public int PredictUserCount { get; set; }
+        public string Operator { get; set; }
+        public DateTime? UpdateTime { get; set; }
+    }
+    public class GetWorldCupEventReportRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+    }
     public class GetWorldCupEventReportResponse
     {
         public string TeamName { get; set; }
         public int PredictUserCount { get; set; }
         public bool IsPayoutDone { get; set; }
         public string Operator { get; set; }
-        public DateTime UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
     }
-    
     public class ExportWorldCupEventReportRequest
     {
         [JsonProperty("siteId")]
@@ -228,16 +239,9 @@ namespace BackendSite.Service.Model
         [JsonProperty("teamId")]
         public int TeamId { get; set; }
     }
-    
     public class ExportWorldCupEventReportResponse
     {
-        public string TeamName { get; set; }
-        public int PredictUserCount { get; set; }
-        public bool IsPayoutDone { get; set; }
-        public string Operator { get; set; }
-        public DateTime UpdateTime { get; set; }
     }
-    
     public class SetPayoutDoneRequest
     {
         [JsonProperty("siteId")]
