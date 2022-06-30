@@ -7,6 +7,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -120,9 +121,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string Password { get; set; }
         }
 
-        public class SetAdminUserStatusReq : AdminUserReq
+        public class SetAdminUserStatusReq 
         {
-            public int Status { get; set; }
+            public int UserId { get; set; }
+            public int SiteId { get; set; }
+            public int Status { get; set; }       
         }
         public class GetAddAdminUserCurrencyReq
         {
@@ -1027,9 +1030,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
-        public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
+        public ApiResult SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> request)
         {
-            if (_permissionBll.SetAdminUserStatus(request.UserId, request.Status) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            var brand = _newAuthorizeBLL.CheckBrand();
+
+            if (_permissionBll.SetAdminUserStatus(request, brand, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {

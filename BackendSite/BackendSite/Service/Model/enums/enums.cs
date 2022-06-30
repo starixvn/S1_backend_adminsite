@@ -567,7 +567,9 @@ namespace BackendSite.Service.Model.enums
         TagManagement = 21,
         LiveRegistrationStatistics = 22,
         GameExclusion = 23,
-        BetLimit = 24
+        BetLimit = 24,
+        RoleManagement = 25,
+        SetAdminUserStatus = 26
     }
 
     #region BankFinancialTransferInfoLog

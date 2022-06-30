@@ -13,6 +13,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Data;
 using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.DAL
 {
@@ -226,11 +227,27 @@ namespace BackendSite.Service.DAL
             props.Add("Userpwd", tools.MD5Encrypt(password));
             return  _mainDbClient.Execute("Admin_UserPassword_Set", props);
         }
-        public int SetAdminUserStatus(int userId, int status)
+        public int SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
         {
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("Status", status);
+            var propsLog = new DynamicParameters();
+
+            #region
+            props.Add("UserId", input.After.UserId);
+            props.Add("Status", input.After.Status);
+            #endregion
+
+            #region propsLog
+            propsLog.Add("_SiteId", brand);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int)(isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog());
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
+            propsLog.Add("_Operator", Operator);
+            #endregion
+
             return _mainDbClient.Execute("Admin_UserStatus_Set", props);
         }
 
