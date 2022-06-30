@@ -227,7 +227,7 @@ import { number_format } from '../commJS/common';
                         BankAccountNo: detail.accountNo,
                     }
                 };
-                axios.post('/apiv2/BankCardManagement/Delete', data)
+                axios.post('/api/BankList/DelBankCard', data)
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -697,7 +697,7 @@ import { number_format } from '../commJS/common';
         }
 
         onSaveBankCard(data, finishFunc) {
-            axios.post('/apiv2/BankCardManagement/Set', data)
+            axios.post('/api/BankList/SetBankCardwithIFSC', data)
                 .then(function (response) {
                     let result = response.data;
                     if (result.errorCode == 0) {

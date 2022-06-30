@@ -104,7 +104,7 @@ const App = () => {
     };
     
     api
-      .post("/apiv2/TpDisable/Delete", p)
+      .post("/api/Risk/Delete", p)
       .then(function (res) {
         if (res.data.errorCode === 0) {
             alert("success.");
@@ -135,7 +135,7 @@ const App = () => {
     };
 
     api
-      .post("/apiv2/TpDisable/UpdateStatus", p)
+      .post("/api/Risk/UpdateStatus", p)
       .then(function (res) {
         if (res.data.errorCode === 0) {
             alert("success.");
