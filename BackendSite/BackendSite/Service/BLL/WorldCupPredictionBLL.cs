@@ -12,7 +12,6 @@ namespace BackendSite.Service.BLL
     {
         private readonly WorldCupPredictionService _worldCupPredictionService;
         private readonly ILogger<WorldCupPredictionBLL> _logger;
-
         public WorldCupPredictionBLL(WorldCupPredictionService worldCupPredictionService)
         {
             this._worldCupPredictionService = worldCupPredictionService;
@@ -160,7 +159,7 @@ namespace BackendSite.Service.BLL
             {
                 Currency = a.Currency,
                 UserName = a.UserName,
-                TicketType = a.TicketType,
+                TicketType = $"Ticket {a.TicketType}",
                 TeamName = a.TeamName,
                 SelectTime = a.SelectTime
             });
