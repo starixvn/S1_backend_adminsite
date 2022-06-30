@@ -540,7 +540,7 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
-    
+
     public enum AdminAdjustmentLogMenuEnum
     {
         Undefined = 0,
@@ -567,7 +567,11 @@ namespace BackendSite.Service.Model.enums
         TagManagement = 21,
         LiveRegistrationStatistics = 22,
         GameExclusion = 23,
-        BetLimit = 24
+        BetLimit = 24,
+        VipRebatePeriod = 25,
+        VipRebateCategory = 26,
+        VipRebateGameType = 27,
+        VipRebatePayoutLimit = 28
     }
 
     #region BankFinancialTransferInfoLog
@@ -819,7 +823,7 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
-    
+
     public enum SendBatchMessageStatus
     {
         Pending = 0,
@@ -1022,7 +1026,7 @@ namespace BackendSite.Service.Model.enums
     public enum DeepLinkTableTypeEnum
     {
         Android = 1,
-        IOS  = 2,
+        IOS = 2,
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
@@ -1037,7 +1041,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    
+
     public enum GeneralStatusEnum
     {
         Disable = 0,

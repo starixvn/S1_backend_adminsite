@@ -97,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebatePeriod> GetPeriod(GetPeriodRequest request)
         {
@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebateCurrencyData> GetRebateInfo(GetRebateInfoRequest request)
         {
@@ -139,7 +139,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<RebateGameTypeDetail>>> GetRebateGameTypeList(GetRebateGameTypeListRequest request)
         {
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Period Type [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public ApiResult SetPeriod(SetPeriodRequest request)
         {
@@ -187,7 +187,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public ApiResult SetCategory(SetCategoryRequest request)
         {
@@ -216,7 +216,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public async Task<ApiResult> BatchSetGameTypeAsync(SetGameTypeRequest request)
         {
@@ -244,7 +244,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Payout Setting [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public ApiResult SetPayoutLimit(SetPayoutLimitRequest request)
         {
