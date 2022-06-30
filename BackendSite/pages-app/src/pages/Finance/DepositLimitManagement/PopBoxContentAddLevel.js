@@ -33,7 +33,7 @@ export const PopBoxContentAddLevel = (props) => {
                 depositStatus: depositStatus
             }
         }
-        api.post('/apiv2/DepositLimit/Create', data)
+        api.post('/api/Deposit/AddDepositLimitInfo', data)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newLevelList);

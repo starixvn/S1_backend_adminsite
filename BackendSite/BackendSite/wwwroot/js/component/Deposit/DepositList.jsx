@@ -384,7 +384,7 @@ import DateTimePicker from 'react-datetime';
                 before: { amount: detail.amount },
                 after: { amount: this.state.NewAmount }
             };
-            axios.post('/apiv2/Deposit/SetAmountByTransId', data)
+            axios.post('/api/Deposit/SetDepositRequestAmount', data)
             .then(function (response) {
                 Loading.UnLoading();
                 let result = response.data;

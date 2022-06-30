@@ -77,7 +77,7 @@ const Result = (props) => {
             }
         };
 
-        api.post('/apiv2/DepositLimit/Update', data)
+        api.post('/api/Deposit/EditDepositLimitInfo', data)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     alert(response.data.message);
@@ -115,7 +115,7 @@ const Result = (props) => {
             }
         };
         if (window.confirm("您真的確定要刪除嗎？\n\n請確認！") === true) {
-            api.post('/apiv2/DepositLimit/Delete', data)
+            api.post('/api/Deposit/DeleteDepositLimitInfo', data)
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Delete");
@@ -152,7 +152,7 @@ const Result = (props) => {
                 }
             };
 
-            api.post('/apiv2/DepositLimit/Update', data)
+            api.post('/api/Deposit/EditDepositLimitInfo', data)
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         handleSetLevelList(idx, "Update", depositMin, depositMax);

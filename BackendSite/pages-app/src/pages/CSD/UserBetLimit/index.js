@@ -93,7 +93,7 @@ const App = () => {
     };
     
     api
-      .post("/apiv2/TpBetLimit/Set", param)
+      .post("/api/UserBetLimit/PostUserBetLimit", param)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           alert("success.");
@@ -135,7 +135,7 @@ const App = () => {
     };
 
     api
-      .post("/apiv2/TpBetLimit/Delete", param)
+      .post("/api/UserBetLimit/Delete", param)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           alert("success.");
