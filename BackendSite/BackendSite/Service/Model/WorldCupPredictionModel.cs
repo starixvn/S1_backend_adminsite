@@ -147,13 +147,21 @@ namespace BackendSite.Service.Model
 
     public class GetWorldCupMemberReportRequest : ApiRequestPageModel
     {
+        [JsonProperty("siteId")]
         public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
         public int CurrencyId { get; set; }
+        [JsonProperty("ticketType")]
         public int TicketType { get; set; }
+        [JsonProperty("teamId")]
         public int TeamId { get; set; }
+        [JsonProperty("selected")]
         public int Selected { get; set; }
+        [JsonProperty("userName")]
         public string UserName { get; set; }
+        [JsonProperty("startTime")]
         public DateTime StartTime { get; set; }
+        [JsonProperty("endTime")]
         public DateTime EndTime { get; set; }
     }
 
@@ -166,7 +174,7 @@ namespace BackendSite.Service.Model
         public DateTime? SelectTime { get; set; }
     }
     
-    public class WorldCupMemberReportData
+    public class WorldCupMemberReportDto
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
@@ -177,13 +185,21 @@ namespace BackendSite.Service.Model
     
     public class ExportWorldCupMemberReportRequest
     {
+        [JsonProperty("siteId")]
         public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
         public int CurrencyId { get; set; }
+        [JsonProperty("ticketType")]
         public int TicketType { get; set; }
+        [JsonProperty("teamId")]
         public int TeamId { get; set; }
+        [JsonProperty("selected")]
         public int Selected { get; set; }
+        [JsonProperty("userName")]
         public string UserName { get; set; }
+        [JsonProperty("startTime")]
         public DateTime StartTime { get; set; }
+        [JsonProperty("endTime")]
         public DateTime EndTime { get; set; }
     }
     

@@ -89,7 +89,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Ins", parameters, _connection, _transaction);
         }
 
-        public IEnumerable<WorldCupMemberReportData> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        public IEnumerable<WorldCupMemberReportDto> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId);
@@ -104,13 +104,13 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<WorldCupMemberReportData>("Admin_WorldCupMemberTicketInfo_Get", p);
+            var result = _reportDbClient.Query<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfo_Get", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
         }
         
-        public async Task<IEnumerable<WorldCupMemberReportData>> GetMemberReport(ExportWorldCupMemberReportRequest request)
+        public async Task<IEnumerable<WorldCupMemberReportDto>> GetMemberReport(ExportWorldCupMemberReportRequest request)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId);
@@ -121,7 +121,7 @@ namespace BackendSite.Service.DAL
             p.Add("_UserName", request.UserName);
             p.Add("_StartTime", request.StartTime);
             p.Add("_EndTime", request.EndTime);
-            return await _reportDbClient.QueryAsync<WorldCupMemberReportData>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
+            return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
         }
     }
 }
