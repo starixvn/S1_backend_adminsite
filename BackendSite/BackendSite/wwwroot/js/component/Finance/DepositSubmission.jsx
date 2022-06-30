@@ -206,7 +206,7 @@ import { Dropdown } from 'semantic-ui-react';
 
             axios({
                     method: "post",
-                    url: "/apiv2/DepositSubmission/Submit",
+                    url: "/api/Deposit/DepositSubmission",
                     data: bodyFormData,
                     headers: { 'Content-Type': "multipart/form-data" }
                 })
