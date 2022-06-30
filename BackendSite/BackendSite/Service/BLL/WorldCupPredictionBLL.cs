@@ -164,5 +164,19 @@ namespace BackendSite.Service.BLL
                 SelectTime = a.SelectTime
             });
         }
+
+        public IEnumerable<GetWorldCupEventReportResponse> GetEventReport()
+        {
+            throw new NotImplementedException();
+        }
+        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetEventReport(ExportWorldCupEventReportRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
+        {
+            return await _worldCupPredictionService.SetPayoutDone(siteId, teamId, updateOperator);
+        }
     }
 }

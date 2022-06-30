@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -91,6 +92,49 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var exportData = await _worldCupPredictionBll.GetMemberReport(request);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<GetWorldCupEventReportResponse>> GetEventReport()
+        {
+            var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
+            try
+            {
+                apiResult.Data = _worldCupPredictionBll.GetEventReport();;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
+        {
+            var exportData = await _worldCupPredictionBll.GetEventReport(request);
+            var stream = _excelBll.Export(exportData);
+            return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> SetPayoutDone(SetPayoutDoneRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var updateOperator = User.Identity.Name;
+                var result = await _worldCupPredictionBll.SetPayoutDone(request.SiteId, request.TeamId, updateOperator);
+                apiResult.ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.UpdateFailed;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
         }
     }
 }

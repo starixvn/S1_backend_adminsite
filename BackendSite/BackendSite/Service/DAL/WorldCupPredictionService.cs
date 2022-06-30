@@ -123,5 +123,14 @@ namespace BackendSite.Service.DAL
             p.Add("_EndTime", request.EndTime);
             return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
         }
+
+        public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_TeamId", teamId);
+            p.Add("UpdateOperator", updateOperator);
+            return await _mainDbClient.ExecuteAsync("Admin_WorldCupTeamSettleLog_Ins", p);
+        }
     }
 }

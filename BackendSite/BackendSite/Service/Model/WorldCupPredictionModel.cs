@@ -211,4 +211,38 @@ namespace BackendSite.Service.Model
         public string TeamName { get; set; }
         public DateTime? SelectTime { get; set; }
     }
+    
+    public class GetWorldCupEventReportResponse
+    {
+        public string TeamName { get; set; }
+        public int PredictUserCount { get; set; }
+        public bool IsPayoutDone { get; set; }
+        public string Operator { get; set; }
+        public DateTime UpdateTime { get; set; }
+    }
+    
+    public class ExportWorldCupEventReportRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
+    }
+    
+    public class ExportWorldCupEventReportResponse
+    {
+        public string TeamName { get; set; }
+        public int PredictUserCount { get; set; }
+        public bool IsPayoutDone { get; set; }
+        public string Operator { get; set; }
+        public DateTime UpdateTime { get; set; }
+    }
+    
+    public class SetPayoutDoneRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
+    }
 }
