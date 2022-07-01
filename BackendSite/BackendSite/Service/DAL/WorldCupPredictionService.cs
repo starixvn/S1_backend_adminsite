@@ -124,11 +124,19 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
         }
 
-        public async Task<IEnumerable<WorldCupEventReportDto>> GetEventReport(int siteId)
+        public async Task<IEnumerable<WorldCupPredictiveStatisticsDto>> GetPredictiveStatistics(int siteId)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
-            return await _reportDbClient.QueryAsync<WorldCupEventReportDto>("Admin_WorldCupPredictiveStatistics_Get", p);
+            return await _reportDbClient.QueryAsync<WorldCupPredictiveStatisticsDto>("Admin_WorldCupPredictiveStatistics_Get", p);
+        }
+        
+        public async Task<IEnumerable<WorldCupPredictDetailDto>> GetPredictDetail(int siteId, int teamId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_TeamId", teamId);
+            return await _reportDbClient.QueryAsync<WorldCupPredictDetailDto>("Admin_WorldCupPredictDetail_Get", p);
         }
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)

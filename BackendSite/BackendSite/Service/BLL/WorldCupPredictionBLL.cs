@@ -165,9 +165,9 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<GetWorldCupEventReportResponse>> GetEventReport(int siteId)
+        public async Task<IEnumerable<GetWorldCupEventReportResponse>> GetPredictiveStatistics(int siteId)
         {
-            var eventReport = await _worldCupPredictionService.GetEventReport(siteId);
+            var eventReport = await _worldCupPredictionService.GetPredictiveStatistics(siteId);
             return eventReport.Select(a => new GetWorldCupEventReportResponse()
             {
                 TeamName = a.TeamName,
@@ -178,9 +178,16 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetEventReport(ExportWorldCupEventReportRequest request)
+        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId)
         {
-            throw new NotImplementedException();
+            var predictDetail = await _worldCupPredictionService.GetPredictDetail(siteId, teamId);
+            return predictDetail.Select(a => new ExportWorldCupEventReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TicketType = $"Ticket {a.TicketType}",
+                SelectTime = a.SelectTime
+            });
         }
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)

@@ -100,7 +100,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
             try
             {
-                apiResult.Data = await _worldCupPredictionBll.GetEventReport(request.SiteId);;
+                apiResult.Data = await _worldCupPredictionBll.GetPredictiveStatistics(request.SiteId);;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -114,9 +114,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
         {
-            var exportData = await _worldCupPredictionBll.GetEventReport(request);
+            var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId);
             var stream = _excelBll.Export(exportData);
-            return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
+            return _excelBll.ExcelFile(stream, "WorldCupEventReport");
         }
         
         [HttpPost]
