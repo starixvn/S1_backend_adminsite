@@ -942,8 +942,8 @@ namespace BackendSite.Service.BLL
                 TimeSpan.FromMinutes(15), 
                 () =>
                 {
-                    var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                    var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    var StartDate = new DateTimeOffset(input.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    var EndDate = new DateTimeOffset(input.EndTime.ToUniversalTime().DateTime, TimeSpan.Zero);
                     var parameters = new DynamicParameters(input);
                     parameters.AddDynamicParams(new
                     {

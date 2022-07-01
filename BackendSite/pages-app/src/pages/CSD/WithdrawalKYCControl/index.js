@@ -59,7 +59,7 @@ const WithdrawalKYCInfo = () => {
     const handleUpdate = (idx) => {
         if (editValue !== null) {
             let amount = typeof editValue.amount === "undefined" ? kycList[idx].amount : editValue.amount;
-            api.post('/apiv2/WithdrawalKYC/Update', { 
+            api.post('/api/Withdrawal/EditWithdrawalKYCList', { 
                 siteId: kycList[idx].siteId,
                 currencyId: kycList[idx].currencyId,
                 before:{
