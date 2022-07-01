@@ -44,9 +44,6 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var data = _reportBll.GetBetListReport(request, out int totalPages, out int rowCount);
 
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
-
             return new ApiListResult<BetListReport>
             {
                 Data = data,
@@ -76,9 +73,6 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             request.PageNumber = -1; //export all
             var data = _reportBll.GetBetListReport(request, out var _, out var _);
-
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
         
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
