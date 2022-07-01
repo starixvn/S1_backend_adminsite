@@ -573,7 +573,8 @@ namespace BackendSite.Service.Model.enums
         SetCustomerBirthday = 27,
         SetCustomerPhone = 28,
         SetCustomerEMail = 29,
-        SetCustomerAddress = 30
+        SetCustomerAddress = 30,
+        ResetCustomerProfile = 31
     }
 
     #region BankFinancialTransferInfoLog

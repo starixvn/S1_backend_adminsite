@@ -733,9 +733,9 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
         {
-            return await _custInfoService.GetCustId(userName, siteId);
+            return await _custInfoService.GetCustId(custId,userName, siteId);
         }
 
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
