@@ -42,8 +42,8 @@ namespace BackendSite.Controllers.Api
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly BonusInfoService _bonusInfoService;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+
 
         #endregion
 
@@ -63,7 +63,6 @@ namespace BackendSite.Controllers.Api
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
@@ -75,7 +74,7 @@ namespace BackendSite.Controllers.Api
         {
             public int CustId { get; set; }
         }
-        
+
         public class CustInfoListReq
         {
             public IEnumerable<int> SelectSite { get; set; }
@@ -708,48 +707,125 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
         [HttpPost]
-        public ApiResult SetCustInfo(CustStatus custStatus)
+        public async Task<ApiResult> SetCustInfoAsync(CustStatus custStatus)
         {
-            var apiResult = new ApiResult<bool>();
             var custProfile = _custInfoBll.GetCustProfile(custStatus.CustId);
+            var custSimpleInfo = await _custInfoBll.GetCustId(custStatus.CustId, null, null);
 
-            custStatus.Address = (custStatus.Address == null || (custStatus.Address != null && custStatus.Address.Count == 0)) ? null : custStatus.Address;
+            custStatus.Address = (custStatus.Address == null || (custStatus.Address != null && custStatus.Address.Count == 0)) ? null : CheckAddress(custStatus.Address);
             var data = _custInfoBll.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, custStatus.Address, User.Identity.Name) > 0;
 
             if (data)
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
                 if (custStatus.Level != null)
                 {
-                    Info.Add("Action", $"Change Level To {custStatus.Level}");
-                    Info.Add("Before Change Level", custProfile.UserLevel);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerLevel,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Level = custProfile.UserLevel
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Level = custStatus.Level
+                        })
+                    });
                 }
                 else if (custStatus.FullName != null)
                 {
-                    Info.Add("Action", $"Change Full Name To {custStatus.FullName}");
-                    Info.Add("Before Change Full Name", custProfile.AccountName);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerFullName,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            FullName = custProfile.AccountName
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            FullName = custStatus.FullName
+                        })
+                    });
                 }
                 else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
                 {
-                    Info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
-                    Info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerBirthday,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Birthday = $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}"
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Birthday = $"{custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}"
+                        })
+                    });
                 }
                 else if (custStatus.PhoneNumber != null)
                 {
-                    Info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
-                    Info.Add("Before Change Phone Number", custProfile.PhoneNo);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerPhone,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Phone = custProfile.PhoneNo
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Phone = custStatus.PhoneNumber
+                        })
+                    });
                 }
                 else if (custStatus.EMail != null)
                 {
-                    Info.Add("Action", $"Change EMail To {custStatus.EMail}");
-                    Info.Add("Before Change EMail", custProfile.Email);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerEMail,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Email = custProfile.Email
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Email = custStatus.EMail
+                        })
+                    });
                 }
                 else if (custStatus.Address != null)
                 {
                     var beforeAddressDictionary = new Dictionary<string, string>();
-                    if(custProfile.Address != null)
+                    if (custProfile.Address != null)
                     {
                         var jsonObject = JObject.Parse(custProfile.Address);
                         var jTokens = jsonObject.Descendants().Where(p => !p.Any());
@@ -758,11 +834,25 @@ namespace BackendSite.Controllers.Api
                             beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
                         });
                     }
-                    Info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(custStatus.Address)}");
-                    Info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerAddress,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Address = JsonConvert.SerializeObject(beforeAddressDictionary)
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Address = JsonConvert.SerializeObject(custStatus.Address)
+                        })
+                    });
                 }
-
-                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -871,32 +961,64 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetProfile]
 
         [HttpPost]
-        public ApiResult ResetProfile(CustInfoReq custInfoReq)
+        public async Task<ApiResult> ResetProfileAsync(CustInfoReq custInfoReq)
         {
+            var custSimpleInfo = await _custInfoBll.GetCustId(custInfoReq.CustId, null, null);
             var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
             if (_custInfoBll.ResetProfile(custInfoReq.CustId))
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset Profile");
-
+                var beforeProfileDictionary = new Dictionary<string, string>();
+                var beforeAddressDictionary = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(custProfile.Profile))
                 {
-                    var jsonObject = JObject.Parse(custProfile.Profile);
-                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
-                    jTokens.ToList().ForEach(jToken =>
+                    if (custProfile.Profile != null)
                     {
-                        Info.Add(jToken.Path, jToken.ToString());
-                    });
+                        var jsonObject = JObject.Parse(custProfile.Profile);
+                        var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                        jTokens.ToList().ForEach(jToken =>
+                        {
+                            beforeProfileDictionary.Add(jToken.Path, jToken.ToString());
+                        });
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(custProfile.Address))
                 {
-                    Info.Add("Address", custProfile.Address);
+                    if (custProfile.Address != null)
+                    {
+                        var jsonObject = JObject.Parse(custProfile.Address);
+                        var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                        jTokens.ToList().ForEach(jToken =>
+                        {
+                            beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
+                        });
+                    }
                 }
 
-                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = custSimpleInfo.SiteId,
+                    CurrencyId = custSimpleInfo.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.ResetCustomerProfile,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        UserName = custSimpleInfo.UserName,
+                        Profile = JsonConvert.SerializeObject(beforeProfileDictionary),
+                        Phone = custProfile.PhoneNo,
+                        AreaCode = custProfile.AreaCode,
+                        Address = JsonConvert.SerializeObject(beforeAddressDictionary)
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        UserName = custSimpleInfo.UserName,
+                        Profile = (string)null,
+                        Phone = (string)null,
+                        AreaCode = (string)null,
+                        Address = (string)null
+                    })
+                });
 
                 return new ApiResult
                 {
@@ -2544,6 +2666,19 @@ namespace BackendSite.Controllers.Api
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(data, pattern, m => new string('*', m.Length));
+        }
+
+        private static Dictionary<string, string> CheckAddress(Dictionary<string, string> address)
+        {
+            var newAddress = new Dictionary<string, string>();
+            foreach (var data in address)
+            {
+                if (string.IsNullOrWhiteSpace(data.Value))
+                    newAddress.Add(data.Key, "");
+                else
+                    newAddress.Add(data.Key, data.Value);
+            }
+            return newAddress;
         }
 
         #endregion
