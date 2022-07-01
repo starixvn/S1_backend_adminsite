@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
 
-    //[Authorize] // todo 掛 attribute
+    [Authorize]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WorldCupPredictionController : ControllerBase
@@ -25,8 +25,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _excelBll = excelBll;
             _worldCupPredictionBll = worldCupPredictionBll;
         }
-        
-        // todo 掛 attribute
+
         [HttpPost]
         public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
         {
