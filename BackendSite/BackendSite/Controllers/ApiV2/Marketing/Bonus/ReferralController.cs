@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -70,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         }
         
         /// <summary>
-        /// ReferralManagement/GetList 取得推薦資料清單
+        /// ReferralManagement/Get 取得推薦資料內容
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -101,13 +97,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
-        public ApiResult UpdateStatus(SetStatusRequest request)
+        public async Task<ApiResult> UpdateStatus(SetStatusRequest request)
         {
             _managementDecorator.Operator = User.Identity.Name;
-            _managementDecorator.SetReferralStatus(request.SiteId, request.CurrencyId, (int)request.Status);
+            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, (int)request.Status);
             var apiResult = new ApiResult
             {
-                ErrorCode = (int)ErrorCodeEnum.Success
+                ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : result
             };
             return apiResult;
         }

@@ -28,6 +28,7 @@ namespace BackendSite.Service.BLL
         public async Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId)
         {
             var data = await referralManagementService.GetReferralDetail(siteId, currencyId);
+            if (data == null) return null;
             var referralDetail = new ReferralDetail()
             {
                 SiteId = data.SiteId,
@@ -57,6 +58,11 @@ namespace BackendSite.Service.BLL
         public int SetReferralStatus(int siteId, int currencyId,int status)
         {
             return referralManagementService.SetReferralStatus(siteId, currencyId, status);
+        }
+
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        {
+            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, status);
         }
 
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)

@@ -101,6 +101,39 @@ namespace BackendSite.Service.BLL
             
         }
 
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        {
+            var referral = await _referralManagementBll.GetReferralDetail(siteId, currencyId);
+            if (referral == null)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+            var result = await _referralManagementBll.SetReferralStatusAsync(siteId, currencyId, status);
+            
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = Operator,
+                SiteId = siteId,
+                CurrencyId = currencyId,
+                BeforeDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Status = _statusDescription[referral.Status]
+                }),
+                AfterDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Stauts = _statusDescription[status]
+                }),
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.Referral
+            };
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+            {
+                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+            }
+
+            return result;
+        }
+
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
