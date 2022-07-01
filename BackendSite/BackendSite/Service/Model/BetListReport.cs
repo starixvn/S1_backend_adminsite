@@ -89,7 +89,7 @@ namespace BackendSite.Service.Model
         {
             get 
             {
-                if (TagList.Length > 0 )
+                if (TagList?.Length > 0 )
                 {
                     return JsonConvert.DeserializeObject<IEnumerable<int>>(TagList);
                 }
