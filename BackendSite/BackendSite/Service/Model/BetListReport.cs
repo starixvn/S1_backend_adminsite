@@ -85,6 +85,17 @@ namespace BackendSite.Service.Model
         public string Live { get; set; }
         public string IP { get; set; }
         public string TagList { get; set; }
+        public IEnumerable<int> Tags 
+        {
+            get 
+            {
+                if (TagList.Length > 0 )
+                {
+                    return JsonConvert.DeserializeObject<IEnumerable<int>>(TagList);
+                }
+                return null;
+            }
+        }
         public int VipLevel { get; set; }
         public string LevelName { get; set; }      
     }
