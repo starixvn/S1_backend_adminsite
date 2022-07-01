@@ -40,6 +40,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
         public ApiListResult<BetListReport> GetBetList(GetBetListRequest request)
         {
+            DateCheck(request);
+
             var data = _reportBll.GetBetListReport(request, out int totalPages, out int rowCount);
 
             if (!data.Any())
@@ -70,6 +72,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
         public IActionResult Export(GetBetListRequest request)
         {
+            DateCheck(request);
+
             request.PageNumber = -1; //export all
             var data = _reportBll.GetBetListReport(request, out var _, out var _);
 
@@ -78,6 +82,20 @@ namespace BackendSite.Controllers.ApiV2.Report
         
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
+        }
+
+        private void DateCheck(GetBetListRequest request)
+        {
+            var startDate = new DateTimeOffset(request.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+            if (startDate.Date < DateTimeOffset.UtcNow.AddDays(-14).Date)
+            {
+                throw new AdminException(ErrorCodeEnum.DateOutOfRange);
+            }
+            var endDate = new DateTimeOffset(request.EndTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+            if (endDate.Date > DateTimeOffset.UtcNow.Date)
+            {
+                throw new AdminException(ErrorCodeEnum.DateOutOfRange);
+            }
         }
 
     }
