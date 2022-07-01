@@ -47,14 +47,14 @@ namespace BackendSite.Service.Model
         public string VerificationReward { get; set; }
         public string Iovation { get; set; }
         public int Status { get; set; }
-        private DateTimeOffset _lastLoginTime  { get; set; }
-        public DateTimeOffset LastLoginTime 
+        private DateTimeOffset _lastLoginTime { get; set; }
+        public DateTimeOffset LastLoginTime
         {
             get => _lastLoginTime;
             set => _lastLoginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        private DateTimeOffset _regTime  { get; set; }
-        public DateTimeOffset RegTime 
+        private DateTimeOffset _regTime { get; set; }
+        public DateTimeOffset RegTime
         {
             get => _regTime;
             set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -82,7 +82,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<Promotion> promotions { get; set; }
         public string AffiliateId { get; set; }
         private DateTimeOffset? _reloadTime { get; set; }
-        public DateTimeOffset? ReloadTime 
+        public DateTimeOffset? ReloadTime
         {
             get => _reloadTime;
             set
@@ -91,8 +91,8 @@ namespace BackendSite.Service.Model
                     _reloadTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
-        private DateTimeOffset? _lastTagUpdateTime  { get; set; }
-        public DateTimeOffset? LastTagUpdateTime 
+        private DateTimeOffset? _lastTagUpdateTime { get; set; }
+        public DateTimeOffset? LastTagUpdateTime
         {
             get => _lastTagUpdateTime;
             set
@@ -101,8 +101,8 @@ namespace BackendSite.Service.Model
                     _lastTagUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
-        private DateTimeOffset? _lastStatusUpdateTime  { get; set; }
-        public DateTimeOffset? LastStatusUpdateTime 
+        private DateTimeOffset? _lastStatusUpdateTime { get; set; }
+        public DateTimeOffset? LastStatusUpdateTime
         {
             get => _lastStatusUpdateTime;
             set
@@ -117,42 +117,42 @@ namespace BackendSite.Service.Model
         public decimal TotalAdjustment { get; set; }
         public decimal TotalBonusClaimed { get; set; }
         private DateTimeOffset? _lastWithdrawlTime;
-        public DateTimeOffset? LastWithdrawlTime 
+        public DateTimeOffset? LastWithdrawlTime
         {
             get => _lastWithdrawlTime;
             set
             {
-                if (value != null) 
+                if (value != null)
                     _lastWithdrawlTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
         private DateTimeOffset? _lastDepositTime;
-        public DateTimeOffset? LastDepositTime 
+        public DateTimeOffset? LastDepositTime
         {
             get => _lastDepositTime;
             set
             {
-                if (value != null) 
+                if (value != null)
                     _lastDepositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
         private DateTimeOffset? _lastBettingTime;
-        public DateTimeOffset? LastBettingTime 
+        public DateTimeOffset? LastBettingTime
         {
             get => _lastBettingTime;
             set
             {
-                if (value != null) 
+                if (value != null)
                     _lastBettingTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
         private DateTimeOffset? _firstDepositTime;
-        public DateTimeOffset? FirstDepositTime 
+        public DateTimeOffset? FirstDepositTime
         {
             get => _firstDepositTime;
             set
             {
-                if (value != null) 
+                if (value != null)
                     _firstDepositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
@@ -201,7 +201,7 @@ namespace BackendSite.Service.Model
         public string SignupUrl { get; set; }
         public string AffiliateId { get; set; }
         public string AffiliateCode { get; set; }
-        public string LastActivityIP { get; set; }      
+        public string LastActivityIP { get; set; }
     }
     public class CustInfoDetailForExportV2
     {
@@ -469,7 +469,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    
+
     public class SetRegLiveStatus
     {
         [LogIgnore]
@@ -480,7 +480,7 @@ namespace BackendSite.Service.Model
 
         public string StatusName => Status.ToString();
     }
-    
+
     public class AddRegLiveStatusNote
     {
         [LogIgnore]
@@ -488,7 +488,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string Note { get; set; }
     }
-    
+
     public class EditRegLiveStatusNote
     {
         [LogIgnore]
@@ -498,7 +498,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string Note { get; set; }
     }
-    
+
     public class DeleteRegLiveStatusNote
     {
         [LogIgnore]
@@ -532,7 +532,7 @@ namespace BackendSite.Service.Model
         public string AffCode { get; set; }
         public string Agent { get; set; }
     }
-    
+
     public class RegLiveStatusForMarketingExport
     {
         public string Site { get; set; }
@@ -551,6 +551,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string UserName { get; set; }
     }
     public class CustomerSwitchStatus
     {
