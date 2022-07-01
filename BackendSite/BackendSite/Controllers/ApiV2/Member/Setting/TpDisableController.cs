@@ -175,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var apiResult = new ApiResult();
 
             var updateOperator = User.Identity.Name;
-            var customer = await _custInfoBll.GetCustId(disableGames.UserName, disableGames.SiteId);
+            var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
             if (customer == null)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
