@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using BackendSite.Service.BLL;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
 
@@ -80,6 +81,8 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ReferralManagementDecorator>();
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class ReferralManagementBLL
+    public class ReferralManagementBLL : IReferralManagementBLL
     {
         private readonly ReferralManagementService referralManagementService;
      
@@ -17,6 +17,9 @@ namespace BackendSite.Service.BLL
         {
             this.referralManagementService = referralManagementService;
         }
+
+        public string Operator { get; set; }
+
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
             return referralManagementService.GetReferralBySiteId(siteId);
@@ -47,13 +50,13 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
-        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
         {
-            return await referralManagementService.SetReferralAsync(setReferralRequest);
+            return await referralManagementService.SetReferralAsync(setReferral);
         }
-        public void SetReferralStatus(int siteId, int currencyId,int status)
+        public int SetReferralStatus(int siteId, int currencyId,int status)
         {
-            referralManagementService.SetReferralStatus(siteId, currencyId, status);
+            return referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
 
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
