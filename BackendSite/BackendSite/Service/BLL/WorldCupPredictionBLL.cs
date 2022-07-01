@@ -12,7 +12,6 @@ namespace BackendSite.Service.BLL
     {
         private readonly WorldCupPredictionService _worldCupPredictionService;
         private readonly ILogger<WorldCupPredictionBLL> _logger;
-
         public WorldCupPredictionBLL(WorldCupPredictionService worldCupPredictionService)
         {
             this._worldCupPredictionService = worldCupPredictionService;
@@ -138,6 +137,63 @@ namespace BackendSite.Service.BLL
                 }).ToList());
 
             return updateData;
+        }
+
+        public IEnumerable<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        {
+            var memberReport = _worldCupPredictionService.GetMemberReport(request, out totalPages, out rowCount);
+            return memberReport.Select(a => new GetWorldCupMemberReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TicketType = a.TicketType,
+                TeamName = a.TeamName,
+                SelectTime = a.SelectTime
+            });
+        }
+
+        public async Task<IEnumerable<ExportWorldCupMemberReportResponse>> GetMemberReport(ExportWorldCupMemberReportRequest request)
+        {
+            var memberReport = await _worldCupPredictionService.GetMemberReport(request);
+            return memberReport.Select(a => new ExportWorldCupMemberReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TicketType = $"Ticket {a.TicketType}",
+                TeamName = a.TeamName,
+                SelectTime = a.SelectTime?.AddHours(request.Timezone)
+            });
+        }
+
+        public async Task<IEnumerable<GetWorldCupEventReportResponse>> GetPredictiveStatistics(int siteId)
+        {
+            var eventReport = await _worldCupPredictionService.GetPredictiveStatistics(siteId);
+            return eventReport.Select(a => new GetWorldCupEventReportResponse()
+            {
+                TeamName = a.TeamName,
+                PredictUserCount = a.PredictUserCount,
+                IsPayoutDone = a.UpdateTime.HasValue,
+                Operator = a.Operator,
+                UpdateTime = a.UpdateTime
+            });
+        }
+
+        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId, int timezone = 8)
+        {
+            var predictDetail = await _worldCupPredictionService.GetPredictDetail(siteId, teamId);
+            return predictDetail.Select(a => new ExportWorldCupEventReportResponse()
+            {
+                Currency = a.Currency,
+                UserName = a.UserName,
+                TeamName = a.TeamName,
+                TicketType = $"Ticket {a.TicketType}",
+                SelectTime = a.SelectTime.AddHours(timezone)
+            });
+        }
+
+        public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
+        {
+            return await _worldCupPredictionService.SetPayoutDone(siteId, teamId, updateOperator);
         }
     }
 }
