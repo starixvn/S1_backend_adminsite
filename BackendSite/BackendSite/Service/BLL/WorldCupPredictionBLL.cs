@@ -161,7 +161,7 @@ namespace BackendSite.Service.BLL
                 UserName = a.UserName,
                 TicketType = $"Ticket {a.TicketType}",
                 TeamName = a.TeamName,
-                SelectTime = a.SelectTime
+                SelectTime = a.SelectTime?.AddHours(request.Timezone)
             });
         }
 
@@ -178,7 +178,7 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId)
+        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId, int timezone = 8)
         {
             var predictDetail = await _worldCupPredictionService.GetPredictDetail(siteId, teamId);
             return predictDetail.Select(a => new ExportWorldCupEventReportResponse()
@@ -187,7 +187,7 @@ namespace BackendSite.Service.BLL
                 UserName = a.UserName,
                 TeamName = a.TeamName,
                 TicketType = $"Ticket {a.TicketType}",
-                SelectTime = a.SelectTime
+                SelectTime = a.SelectTime.AddHours(timezone)
             });
         }
 

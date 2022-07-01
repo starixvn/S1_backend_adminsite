@@ -199,8 +199,10 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         [JsonProperty("startTime")]
         public DateTime StartTime { get; set; }
-        [JsonProperty("endTime")]
+        [JsonProperty("endTime")] 
         public DateTime EndTime { get; set; }
+        [JsonProperty("timezone")] 
+        public int Timezone { get; set; } = 8;
     }
     
     public class ExportWorldCupMemberReportResponse
