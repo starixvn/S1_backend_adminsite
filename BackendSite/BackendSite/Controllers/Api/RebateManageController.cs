@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -84,12 +85,12 @@ namespace BackendSite.Controllers.Api
 
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
-        public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
+        public async Task<ApiResult> SetRebatePeriodAsync(SetRebatePeriodReq setRebatePeriodReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebatePeriod(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
+            var result = await rebateManageBLL.SetRebatePeriodAsync(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -183,7 +184,7 @@ namespace BackendSite.Controllers.Api
 
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
-        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        public async Task<ApiResult> SetRebateCategoryAsync(SetRebateCategoryReq setRebateCategoryReq)
         {
             var apiResult = new ApiResult
             {
@@ -191,7 +192,7 @@ namespace BackendSite.Controllers.Api
             };
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
+            var result = await rebateManageBLL.SetRebateCategoryAsync(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -270,12 +271,12 @@ namespace BackendSite.Controllers.Api
 
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
-        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
+        public async Task<ApiResult> SetRebateGameTypeAsync(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebateGameType(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
+            var result = await rebateManageBLL.SetRebateGameTypeAsync(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -349,12 +350,12 @@ namespace BackendSite.Controllers.Api
 
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
-        public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
+        public async Task<ApiResult> SetRebatePayoutLimitAsync(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
+            var result = await rebateManageBLL.SetRebatePayoutLimitAsync(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
