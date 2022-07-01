@@ -550,6 +550,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string UserName { get; set; }
     }
     
     public class CustomerInfo
