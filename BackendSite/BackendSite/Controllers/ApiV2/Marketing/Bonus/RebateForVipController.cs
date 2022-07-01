@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
@@ -98,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebatePeriod> GetPeriod(GetPeriodRequest request)
         {
@@ -118,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public ApiResult<RebateCurrencyData> GetRebateInfo(GetRebateInfoRequest request)
         {
@@ -140,14 +139,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<RebateGameTypeDetail>>> GetRebateGameTypeList(GetRebateGameTypeListRequest request)
         {
             return new ApiResult<IEnumerable<RebateGameTypeDetail>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId,request.RebateCategoryId)
+                Data = await _rebateManageBll.GetRebateGameTypeList(request.SiteId, request.CurrencyId, request.RebateCategoryId)
             };
         }
 
@@ -160,13 +159,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Period Type [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
-        public ApiResult SetPeriod(SetPeriodRequest request)
+        public async Task<ApiResult> SetPeriodAsync(SetPeriodRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebatePeriod(request.SiteId, (int)request.PeriodType, request.PeriodDay, request.RedeemHours, userName);
+            var result = await _rebateManageBll.SetRebatePeriodAsync(request.SiteId, (int)request.PeriodType, request.PeriodDay, request.RedeemHours, userName);
 
             if (result)
             {
@@ -188,13 +187,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
-        public ApiResult SetCategory(SetCategoryRequest request)
+        public async Task<ApiResult> SetCategoryAsync(SetCategoryRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebateCategory(request.SiteId, request.CurrencyId, request.CategoryId, request.Level, request.Percentage, userName);
+            var result = await _rebateManageBll.SetRebateCategoryAsync(request.SiteId, request.CurrencyId, request.CategoryId, request.Level, request.Percentage, userName);
 
             if (result)
             {
@@ -217,7 +216,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Select [Game Type] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
         public async Task<ApiResult> BatchSetGameTypeAsync(SetGameTypeRequest request)
         {
@@ -245,13 +244,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Vip Rebate Mangetment > Select [Available Sites] > Select [Currency] > Select [Category] > Payout Setting [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 3 })]
         [HttpPost]
-        public ApiResult SetPayoutLimit(SetPayoutLimitRequest request)
+        public async Task<ApiResult> SetPayoutLimitAsync(SetPayoutLimitRequest request)
         {
             var apiResult = new ApiResult();
             var userName = _authorizeBll.GetAuthData().UserName;
-            var result = _rebateManageBll.SetRebatePayoutLimit(request.SiteId, request.CurrencyId, request.CategoryId, request.MaxPayout, request.MinPayout, userName);
+            var result = await _rebateManageBll.SetRebatePayoutLimitAsync(request.SiteId, request.CurrencyId, request.CategoryId, request.MaxPayout, request.MinPayout, userName);
             if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

@@ -42,9 +42,9 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetRebatePayoutLimit(siteId, currencyId, categoryId);
         }
-        public bool SetRebatePayoutLimit(int siteId, int currencyId, int categoryId, decimal maxPayout, decimal minPayout, string lastUpdateUser)
+        public async Task<bool> SetRebatePayoutLimitAsync(int siteId, int currencyId, int categoryId, decimal maxPayout, decimal minPayout, string lastUpdateUser)
         {
-            return _rebateManageService.SetRebatePayoutLimit(siteId, currencyId, categoryId, maxPayout, minPayout, lastUpdateUser);
+            return await _rebateManageService.SetRebatePayoutLimitAsync(siteId, currencyId, categoryId, maxPayout, minPayout, lastUpdateUser);
         }
         public bool SetRebatePayoutLimitBatch(int siteId, int currencyId, string levelPayout, string lastUpdateUser)
         {
@@ -58,10 +58,10 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetRebatePeriod(siteId).FirstOrDefault();
         }
-        public bool SetRebatePeriod(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
+        public async Task<bool> SetRebatePeriodAsync(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
         {
             var siteData = _serverInfoBll.GetSiteList().Where(x => x.SiteId == siteId).FirstOrDefault();
-            return _rebateManageService.SetRebatePeriod(siteId, siteData.ICurrencyList, periodType, periodDay, redeemHours, lastUpdateUser);
+            return await _rebateManageService.SetRebatePeriodAsync(siteId, siteData.ICurrencyList, periodType, periodDay, redeemHours, lastUpdateUser);
         }
         public async Task<IEnumerable<RebateGameTypeDetail>> GetRebateGameTypeList(int siteId, int currencyId, int rebateCategoryId)
         {
@@ -119,7 +119,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var item in details)
             {
-                if (!_rebateManageService.SetRebateGameType(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser))
+                if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser, conn, trans))
                 {
                     _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
                     trans.Rollback();
@@ -168,9 +168,9 @@ namespace BackendSite.Service.BLL
             reault.GameTypeList = rList;
             return reault;
         }
-        public bool SetRebateCategory(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
+        public async Task<bool> SetRebateCategoryAsync(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
-            return _rebateManageService.SetRebateCategory(siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
+            return await _rebateManageService.SetRebateCategoryAsync(siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
         }
         public bool SetRebateCategoryBatch(int siteId, int currencyId, int categoryId, string levelPercentage, string lastUpdateUser)
         {
@@ -180,9 +180,19 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.DelRebateCategory(siteId, currencyId, categoryId, level, lastUpdateUser);
         }
-        public bool SetRebateGameType(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
+        public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
         {
-            return _rebateManageService.SetRebateGameType(siteId, currencyId, gameType, level, percentage, lastUpdateUser);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+            if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, gameType, level, percentage, lastUpdateUser, conn, trans))
+            {
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
         }
         public bool SetRebateGameTypeBatch(int siteId, int currencyId, int gameType, string levelPercentage, string lastUpdateUser)
         {
