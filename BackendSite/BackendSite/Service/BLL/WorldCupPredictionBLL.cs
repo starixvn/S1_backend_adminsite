@@ -185,6 +185,7 @@ namespace BackendSite.Service.BLL
             {
                 Currency = a.Currency,
                 UserName = a.UserName,
+                TeamName = a.TeamName,
                 TicketType = $"Ticket {a.TicketType}",
                 SelectTime = a.SelectTime
             });

@@ -236,6 +236,7 @@ namespace BackendSite.Service.Model
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
+        public string TeamName { get; set; }
         public int TicketType { get; set; }
         public DateTime SelectTime { get; set; }
     }
@@ -250,6 +251,7 @@ namespace BackendSite.Service.Model
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
+        public string TeamName { get; set; }
         public string TicketType { get; set; }
         public DateTime SelectTime { get; set; }
     }
