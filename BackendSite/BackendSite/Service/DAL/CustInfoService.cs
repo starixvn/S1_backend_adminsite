@@ -259,8 +259,9 @@ namespace BackendSite.Service.DAL
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
 
-            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3", 
-                new DynamicParameters(new { 
+            return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
+                new DynamicParameters(new
+                {
                     _BatchId = req.BatchId,
                     _SiteId = req.SiteId,
                     _LangId = req.LangId,
@@ -268,8 +269,9 @@ namespace BackendSite.Service.DAL
                     _Status = req.AccountStatus,
                     _IsPopup = req.IsPopup,
                     _Operator = req.Operator
-                }),600) > 0;
+                }), 600) > 0;
         }
+
 
         public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
         {
@@ -630,8 +632,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
-                logParam.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int)(isCreate ? ActionType.Create : ActionType.Update));
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog(), DbType.String);
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -691,8 +693,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.TagManagement);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.TagManagement);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -781,7 +783,7 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             var props = new DynamicParameters();
             props.Add("CustId", input.After.CustId);
             props.Add("Status", (int)input.After.Status);
@@ -796,8 +798,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -827,10 +829,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             var props = new DynamicParameters();
             props.Add("CustId", input.After.CustId);
-            props.Add("Note",  string.IsNullOrWhiteSpace(input.After.Note) ? "" : input.After.Note);
+            props.Add("Note", string.IsNullOrWhiteSpace(input.After.Note) ? "" : input.After.Note);
             props.Add("Operator", input.Operator);
 
             var success = conn
@@ -841,8 +843,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
-                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int)ActionType.Create);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", null, DbType.String);
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -867,10 +869,10 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             var props = new DynamicParameters();
             props.Add("CustId", input.Before.CustId);
-            props.Add("Id",  input.Before.Id);
+            props.Add("Id", input.Before.Id);
 
             var success = conn
                 .Execute("Admin_CustRegLiveStatusNotes_Del", props, commandType: CommandType.StoredProcedure) > 0;
@@ -880,8 +882,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
-                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int)ActionType.Delete);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", null, DbType.String);
@@ -906,11 +908,11 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             var props = new DynamicParameters();
             props.Add("CustId", input.After.CustId);
-            props.Add("Id",  input.After.Id);
-            props.Add("Note",  input.After.Note);
+            props.Add("Id", input.After.Id);
+            props.Add("Note", input.After.Note);
             props.Add("Operator", input.Operator);
 
             var success = conn
@@ -921,8 +923,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -963,10 +965,10 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
         {
             var props = new DynamicParameters();
-            props.Add("CustId", null);
+            props.Add("CustId", custId);
             props.Add("UserName", userName);
             props.Add("SiteId", siteId);
             return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get", props);
@@ -1023,15 +1025,24 @@ namespace BackendSite.Service.DAL
             return WithdrawalLimitLogData;
         }
 
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, string userNames)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_UserNames", userNames);
+
+            return _reportDbClient.QueryAsync<CustomerInfo>("Admin_CustInfo_GetList", props);
+        }
+
         public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
         }
 
-        public CustBankInfo GetCustBankInfo(int custId,int siteId)
+        public CustBankInfo GetCustBankInfo(int custId, int siteId)
         {
-            return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId , SiteId  = siteId }));
+            return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId, SiteId = siteId }));
         }
         public BankLockInfoDetail GetBlockAccount(int SysId, string accountNum)
         {
@@ -1039,11 +1050,13 @@ namespace BackendSite.Service.DAL
         }
         public int SetCustBankInfoLog(int custId, int siteId, int sysId, string accountNum, string iFSCCode, string accountName, int status)
         {
-            return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new { CustId = custId,
+            return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new
+            {
+                CustId = custId,
                 SiteId = siteId,
                 SysId = sysId,
                 AccountNum = accountNum,
-                IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "": iFSCCode,
+                IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "" : iFSCCode,
                 AccountName = accountName,
                 Status = status
             }));

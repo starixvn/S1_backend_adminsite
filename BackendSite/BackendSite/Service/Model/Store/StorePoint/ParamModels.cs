@@ -24,10 +24,10 @@ namespace BackendSite.Service.Model.Store.StorePoint
     
     public class CreateManualRewardPointInfoBatchParams
     {
-        public CreateManualRewardPointInfoBatchParams(CreateManualRewardPointInfoBatchRequest req, string @operator)
+        public CreateManualRewardPointInfoBatchParams(int siteId, IEnumerable<ManualRewardPointInfo> infos, string @operator)
         {
-            SiteId = req.SiteId;
-            Infos = req.Infos;
+            SiteId = siteId;
+            Infos = infos;
             Operator = @operator;
         }
     
@@ -39,8 +39,17 @@ namespace BackendSite.Service.Model.Store.StorePoint
     public class ManualRewardPointInfo
     {
         public int CustId { get; set; }
+        public string UserName { get; set; }
         public int CurrencyId { get; set; }
         public int CategoryId { get; set; }
+        public decimal Point { get; set; }
+        public string Memo { get; set; }
+    }
+    
+    public class ManualRewardPointItem
+    {
+        public string MemberId { get; set; }
+        public string Category { get; set; }
         public decimal Point { get; set; }
         public string Memo { get; set; }
     }

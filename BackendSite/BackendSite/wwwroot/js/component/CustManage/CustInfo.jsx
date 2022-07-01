@@ -1129,7 +1129,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
                 console.log(data);
-                axios.post('/apiv2/CustomerManage/SetEnablePromotionStatus', { 
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { 
                     CustId: data.custId ,
                     siteId: data.siteId,
                     currencyId: data.currencyId,
@@ -1153,7 +1153,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/ResetCustBankInfo', { 
+                axios.post('/api/CustManage/ResetCustBankInfo', { 
                     
                     siteId: data.siteId,
                     currencyId: data.currencyId,
@@ -1176,7 +1176,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustUSDTnfo() {
             if (confirm('Are you sure reset USDT Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/ResetCustUSDTInfo', { 
+                axios.post('/api/CustManage/ResetCustUSDTInfo', { 
                     siteId: data.siteId,
                     currencyId: data.currencyId,
                     CustId: data.custId 
@@ -1199,7 +1199,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onUnbindLine() {
             if (confirm('Are you sure to Unbind Line Profile ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiV2/CustomerManage/LineUnbind', { CustId: data.custId })
+                axios.post('/api/CustManage/LineUnbind', { CustId: data.custId })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1218,7 +1218,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/SetUnlock', { 
+                axios.post('/api/CustManage/SetUnlock', { 
                     siteId: data.siteId,
                     currencyId: data.currencyId,
                     CustId: data.custId,
@@ -1246,7 +1246,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/SetLock', { 
+                axios.post('/api/CustManage/SetLock', { 
                     CustId: data.custId,
                     siteId: data.siteId,
                     currentStatus: data.status,
@@ -1322,7 +1322,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
             if (confirm('Are you sure kick Out this Customer?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/KickOut', {
+                axios.post('/api/CustManage/KickOut', {
                     CustId: data.custId,
                     siteId: data.siteId,
                     currencyId: data.currencyId,
@@ -1347,7 +1347,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiv2/CustomerManage/SetClose', {
+                axios.post('/api/CustManage/SetClose', {
                     CustId: data.custId,
                     siteId: data.siteId,
                     currentStatus: data.status,
@@ -2596,28 +2596,25 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         _isEdit = Object.assign({}, this._isEdit),
                         _newData = Object.assign({}, this._newData);
 
-                        console.log("Address");
 
                     let Address=null;
-                    if((this.state.newData.AddressCountry) 
-                    || (this.state.newData.AddressState)
-                    || (this.state.newData.AddressPostCode)
-                    || (this.state.newData.AddressCity)
-                    || (this.state.newData.AddressLineFirst)
-                    || (this.state.newData.AddressLineSecond))
+                    if((this.state.newData.AddressCountry != data.addressCountry) 
+                    || (this.state.newData.AddressState != data.addressState)
+                    || (this.state.newData.AddressPostCode != data.addressPostCode)
+                    || (this.state.newData.AddressCity != data.addressCity)
+                    || (this.state.newData.AddressLineFirst != data.addressLineFirst)
+                    || (this.state.newData.AddressLineSecond != data.addressLineSecond))
                     {
                     Address= 
                     {
-                        "Country":((this.state.newData.AddressCountry) ? this.state.newData.AddressCountry : data.addressCountry),
-                        "State": ((this.state.newData.AddressState) ? this.state.newData.AddressState : data.addressState),
-                        "PostCode": ((this.state.newData.AddressPostCode) ? this.state.newData.AddressPostCode : data.addressPostCode),
-                        "City": ((this.state.newData.AddressCity) ? this.state.newData.AddressCity : data.addressCountry),
-                        "LineFirst": ((this.state.newData.AddressLineFirst) ? this.state.newData.AddressLineFirst : data.addressLineFirst),
-                        "LineSecond": ((this.state.newData.AddressLineSecond) ? this.state.newData.AddressLineSecond : data.addressLineSecond)
+                        "Country":((this.state.newData.AddressCountry !== undefined && this.state.newData.AddressCountry != data.addressCountry) ? this.state.newData.AddressCountry : data.addressCountry),
+                        "State": ((this.state.newData.AddressState !== undefined && this.state.newData.AddressState != data.addressState) ? this.state.newData.AddressState : data.addressState),
+                        "PostCode": ((this.state.newData.AddressPostCode !== undefined && this.state.newData.AddressPostCode != data.addressPostCode) ? this.state.newData.AddressPostCode : data.addressPostCode),
+                        "City": ((this.state.newData.AddressCity !== undefined && this.state.newData.AddressCity != data.addressCity) ? this.state.newData.AddressCity : data.addressCity),
+                        "LineFirst": ((this.state.newData.AddressLineFirst !== undefined && this.state.newData.AddressLineFirst != data.addressLineFirst) ? this.state.newData.AddressLineFirst : data.addressLineFirst),
+                        "LineSecond": ((this.state.newData.AddressLineSecond !== undefined && this.state.newData.AddressLineSecond != data.addressLineSecond) ? this.state.newData.AddressLineSecond : data.addressLineSecond)
                     };
                     }
-
-                    console.log("Address",Address);
                     
                     if (Level != data.userLevel 
                         || FullName != data.accountName 

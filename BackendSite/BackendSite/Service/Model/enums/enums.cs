@@ -395,9 +395,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
@@ -549,7 +553,7 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
-    
+
     public enum AdminAdjustmentLogMenuEnum
     {
         Undefined = 0,
@@ -576,7 +580,14 @@ namespace BackendSite.Service.Model.enums
         TagManagement = 21,
         LiveRegistrationStatistics = 22,
         GameExclusion = 23,
-        BetLimit = 24
+        BetLimit = 24,
+        SetCustomerLevel = 25,
+        SetCustomerFullName = 26,
+        SetCustomerBirthday = 27,
+        SetCustomerPhone = 28,
+        SetCustomerEMail = 29,
+        SetCustomerAddress = 30,
+        ResetCustomerProfile = 31
     }
 
     #region BankFinancialTransferInfoLog
@@ -820,7 +831,7 @@ namespace BackendSite.Service.Model.enums
         Success = 3,
         Failed = 4
     }
-    
+
     public enum SendBatchMessageStatus
     {
         Pending = 0,
@@ -1055,13 +1066,22 @@ namespace BackendSite.Service.Model.enums
     public enum DeepLinkTableTypeEnum
     {
         Android = 1,
-        IOS  = 2,
+        IOS = 2,
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
         HTTP = 1,
         HTTPS = 2
+    }
+
+    public enum RedisDataBase
+    {
+        MebmerSite = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        AdminSite = 4
     }
 
     #endregion
@@ -1071,12 +1091,13 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    
+
     public enum GeneralStatusEnum
     {
         Disable = 0,
         Enable = 1
     }
+
     public enum PermissionTypeEnum
     {
         AddRole = 0,
@@ -1119,5 +1140,12 @@ namespace BackendSite.Service.Model.enums
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
+    }
+    
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
     }
 }

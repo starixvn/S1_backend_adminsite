@@ -46,8 +46,6 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
-            services.AddRedisConnection(Configuration);
-            services.AddSingleton<RedisHelper>();
             services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));          
             services.Configure<Dictionary<string, AWSKeyConfig>>(Configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
@@ -111,13 +109,6 @@ namespace BackendSite
             {
                 option.LoginPath = "/Home/AuthorizedFailed";
                 option.Cookie.Name = ".backendV2";
-                option.ExpireTimeSpan = TimeSpan.FromDays(1);
-                option.Cookie.SameSite = SameSiteMode.Unspecified;
-            })
-            .AddCookie("brand", "brand", option =>
-            {
-                option.LoginPath = "/Home/AuthorizedFailed";
-                option.Cookie.Name = ".brand";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });

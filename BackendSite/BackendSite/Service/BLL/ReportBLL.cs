@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly SelLangBLL selLangBLL;
         private readonly Common _common;
         private readonly PartitionService _partitionService;
-        private readonly RedisHelper _redisHelper;
+        private readonly ICacheHelper _cacheHelper;
 
         #endregion
 
@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
             selLangBLL = provider.GetRequiredService<SelLangBLL>();
             _common = provider.GetRequiredService<Common>();
             _partitionService = provider.GetRequiredService<PartitionService>();
-            _redisHelper = provider.GetRequiredService<RedisHelper>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #endregion
@@ -938,22 +938,24 @@ namespace BackendSite.Service.BLL
             totalPages = 0;
             rowCount = 0;
 
-            var data = _redisHelper.TryGetOrCreate(input.GetRedisKey(), TimeSpan.FromMinutes(15), i =>
-            {
-                var StartDate = new DateTimeOffset(input.StartTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                var EndDate = new DateTimeOffset(input.EndTime.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                var parameters = new DynamicParameters(input);
-                parameters.AddDynamicParams(new
+            var data = _cacheHelper.TryGetOrCreate($"BetList:{input.GetRedisKey()}",
+                TimeSpan.FromMinutes(15), 
+                () =>
                 {
-                    SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                    CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                    TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                    StartDate = StartDate.DateTime,
-                    EndDate = EndDate.DateTime,
+                    var StartDate = new DateTimeOffset(input.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    var EndDate = new DateTimeOffset(input.EndTime.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    var parameters = new DynamicParameters(input);
+                    parameters.AddDynamicParams(new
+                    {
+                        SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                        CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                        TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                        StartDate = StartDate.DateTime,
+                        EndDate = EndDate.DateTime,
+                    });
+                    var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+                    return result.OrderByDescending(i => i.SettledTime).ToList();
                 });
-                var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
-                return result.OrderByDescending(i => i.SettledTime).ToList();
-            });
 
             //Export
             if (input.PageNumber == -1)

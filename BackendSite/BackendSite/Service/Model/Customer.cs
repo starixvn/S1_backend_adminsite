@@ -550,7 +550,18 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string UserName { get; set; }
     }
+    
+    public class CustomerInfo
+    {
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public int Status { get; set; }
+    }
+    
     public class CustomerSwitchStatus
     {
         public int IsKyc { get; set; }

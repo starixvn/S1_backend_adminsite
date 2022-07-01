@@ -66,6 +66,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? UpdateTime { set; get; }
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
+        public string Operator { set; get; }
     }
 
     public class DepositInfoForExport
@@ -118,7 +119,7 @@ namespace BackendSite.Service.Model
 
     public class DepositDetailSubmission
     {
-        public string DepositDetails { get; set; }
+        public DepositDetailInfo Detail { get; set; }
         public IFormFile Receipt { get; set; }
     }
 
