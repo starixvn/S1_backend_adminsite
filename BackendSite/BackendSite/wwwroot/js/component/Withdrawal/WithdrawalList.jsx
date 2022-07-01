@@ -31,6 +31,7 @@ import DateTimePicker from 'react-datetime';
         1: "Online Payment",
         2: "Local Bank",
         4: "Crypto Pay",
+        5: "E-Wallet"
     };
 
     const StatusSelectOp = {
