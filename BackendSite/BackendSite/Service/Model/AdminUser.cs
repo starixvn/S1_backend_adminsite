@@ -49,7 +49,43 @@ namespace BackendSite.Service.Model
         public int UserId { get; set; }
         public int GroupSEQ { get; set; }
     }
-    
+
+    public class AdminUserV2
+    {
+        public int UserId { set; get; }
+        public string UserName { set; get; }
+        public string Userpwd { set; get; }
+        public bool IsSuper { set; get; }
+        public int Status { set; get; }
+        public DateTime CreateTime { set; get; }
+        public string Role { get; set; }
+        public string CurrencyList { get; set; }
+        public int SiteId { get; set; }
+        public DateTime? LoginTime { set; get; }
+    }
+    public class UpdataAdminUserV2Role
+    {
+        public int UserId { set; get; }
+        public List<int> Role { get; set; }
+    }
+
+    public class AssignBrand
+    {
+        public int UserId { get; set; }
+        public int SiteId { set; get; }
+        public string CurrencyList { get; set; }
+    }
+
+    public class AdminUserData
+    {
+        public int UserId { set; get; }
+        public string UserName { set; get; }
+        public string Userpwd { set; get; }
+        public bool IsSuper { set; get; }
+        public DateTime? LoginTime { set; get; }
+        public int Status { set; get; }
+    }
+
     public class GetLanguageListRequest
     {
         public int SiteId { get; set; }

@@ -69,7 +69,7 @@ namespace BackendSite.Service.DAL
             props.Add("_SiteIds", siteId != 0 ? JsonConvert.SerializeObject(siteList) : JsonConvert.SerializeObject(canSearchSite));
             props.Add("_Type", tempTableType);
 
-            return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_TodayExtra_Get_V2", props);
+            return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_TodayExtra_Get_V2", props, 60);
         }
     }
 }
