@@ -19,17 +19,29 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<ReferralManagementDecorator> _logger;
 
+        private readonly Dictionary<int, string> _siteDescription = new Dictionary<int, string>()
+        {
+            { 1, "Nova88" },
+            { 2, "Goal123" },
+            { 3, "Bwing" },
+        };
         private readonly Dictionary<int, string> _statusDescription = new Dictionary<int, string>()
         {
             { 0, "Disable" },
             { 1, "Enable" }
         };
+
+        private readonly Dictionary<int, string> _currencyDescription;
         public string Operator { get; set; }
-        public ReferralManagementDecorator(IReferralManagementBLL referralManagementBll, AdjustmentLogReportService adjustmentLogReportService, ILogger<ReferralManagementDecorator> logger)
+        public ReferralManagementDecorator(IReferralManagementBLL referralManagementBll, AdjustmentLogReportService adjustmentLogReportService,
+            ReportService reportService, ILogger<ReferralManagementDecorator> logger)
         {
             _referralManagementBll = referralManagementBll;
             _adjustmentLogReportService = adjustmentLogReportService;
             _logger = logger;
+            _currencyDescription = reportService.GetCurrencyList()
+                .ToDictionary(c => c.CurrencyId, c => c.IsoCode);
+
         }
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
@@ -55,8 +67,8 @@ namespace BackendSite.Service.BLL
                 Operator = Operator,
                 SiteId = setReferral.SiteId,
                 CurrencyId = setReferral.CurrencyId,
-                BeforeDetailInfo = referral?.ToLog(),
-                AfterDetailInfo = setReferral.ToLog(),
+                BeforeDetailInfo = referral == null ? null : JsonConvert.SerializeObject(ToDictionary(referral)),
+                AfterDetailInfo = JsonConvert.SerializeObject(ToDictionary(setReferral)),
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.Referral
             };
@@ -68,38 +80,7 @@ namespace BackendSite.Service.BLL
         }
         public int SetReferralStatus(int siteId, int currencyId,int status)
         {
-            var referralList = _referralManagementBll.GetReferralBySiteId(siteId).ToList();
-            var referral = referralList.FirstOrDefault(x => x.CurrencyId == currencyId);
-
-            if (referral == null)
-            {
-                throw new AdminException(ErrorCodeEnum.Fail);
-            }
-            var result =_referralManagementBll.SetReferralStatus(siteId, currencyId, status);
-            
-            var logParam = new CreateAdminAdjustmentInfoLogInput
-            {
-                Operator = Operator,
-                SiteId = siteId,
-                CurrencyId = currencyId,
-                BeforeDetailInfo = JsonConvert.SerializeObject(new
-                {
-                    Status = referral.Status ? _statusDescription[1] : _statusDescription[0]
-                }),
-                AfterDetailInfo = JsonConvert.SerializeObject(new
-                {
-                    Stauts = _statusDescription[status]
-                }),
-                ActionType = ActionType.Update,
-                MenuEnum = AdminAdjustmentLogMenuEnum.Referral
-            };
-            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
-            {
-                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
-            }
-
-            return result;
-            
+            return _referralManagementBll.SetReferralStatus(siteId, currencyId, status);
         }
 
         public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
@@ -148,6 +129,34 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount, bool byRewardTime)
         {
             return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount, byRewardTime);
+        }
+
+        private Dictionary<string, object> ToDictionary(object source)
+        {
+            var type = source.GetType();
+            var properties = type.GetProperties();
+            var target = new Dictionary<string, object>();
+            foreach (var prop in properties)
+            {
+                if (prop.Name == "SiteId")
+                {
+                    target.Add(prop.Name, _siteDescription[(int)prop.GetValue(source)!]);
+                }
+                else if (prop.Name == "CurrencyId")
+                {
+                    target.Add(prop.Name, _currencyDescription[(int)prop.GetValue(source)!]);
+                }
+                else if (prop.Name == "Status")
+                {
+                    
+                }
+                else
+                {
+                    target.Add(prop.Name, prop.GetValue(source));
+                }
+            }
+
+            return target;
         }
     }
 }
