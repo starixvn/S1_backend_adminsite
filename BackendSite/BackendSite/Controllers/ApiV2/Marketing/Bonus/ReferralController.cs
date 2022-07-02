@@ -37,7 +37,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-
             public ReferralStatusEnum Status { get; set; }
         }
         #endregion

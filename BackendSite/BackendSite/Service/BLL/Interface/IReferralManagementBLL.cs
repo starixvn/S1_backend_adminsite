@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.Model;
 
-namespace BackendSite.Service.BLL
+namespace BackendSite.Service.BLL.Interface
 {
     public interface IReferralManagementBLL
     {
