@@ -89,7 +89,7 @@ namespace BackendSite.Service.DAL
             {
                 var asignBeforeData = beforeData.Where(x => x.CurrencyId == currencyId).FirstOrDefault() ?? null;
                 var afterData = new { SiteId = siteId, CurrencyId = currencyId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours };
-                if (beforeData.ToLog() == afterData.ToLog()) return true;
+                if ((asignBeforeData?.PeriodType == periodType) && (asignBeforeData?.PeriodDay == periodDay) && (asignBeforeData?.RedeemHours == redeemHours)) continue;
 
                 var parameters = new { SiteId = siteId, CurrencyId = currencyId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours, LastUpdateUser = lastUpdateUser };
 
@@ -157,7 +157,7 @@ namespace BackendSite.Service.DAL
 
             var beforeData = new { CategoryId = categoryId, CategoryName = categoryData?.CategoryName, MaxPayout = asignBeforeData?.MaxPayout, MinPayout = asignBeforeData?.MinPayout };
             var afterData = new { CategoryId = categoryId, CategoryName = categoryData?.CategoryName, MaxPayout = maxPayout, MinPayout = minPayout };
-            if (beforeData.ToLog() == afterData.ToLog()) return true;
+            if ((asignBeforeData?.MaxPayout == maxPayout) && (asignBeforeData?.MinPayout == minPayout)) return true;
 
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId, MaxPayout = maxPayout, MinPayout = minPayout, LastUpdateUser = lastUpdateUser };
             if (conn.Execute("Admin_RebatePayoutLimit_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
@@ -217,7 +217,7 @@ namespace BackendSite.Service.DAL
 
             var beforeData = new { CategoryId = categoryId, CategoryName = categoryData?.CategoryName, LevelName = vipLevelData?.LevelName, Percentage = asignBeforeData?.Percentage };
             var afterData = new { CategoryId = categoryId, CategoryName = categoryData?.CategoryName, LevelName = vipLevelData?.LevelName, Percentage = percentage };
-            if (beforeData.ToLog() == afterData.ToLog()) return true;
+            if (asignBeforeData?.Percentage == percentage) return true;
 
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
@@ -285,7 +285,7 @@ namespace BackendSite.Service.DAL
 
             var beforeData = new { GameType = gameType, GameTypeName = gameTypeData?.TypeName, LevelName = vipLevelData?.LevelName, Percentage = asignBeforeData?.Percentage };
             var afterData = new { GameType = gameType, GameTypeName = gameTypeData?.TypeName, LevelName = vipLevelData?.LevelName, Percentage = percentage };
-            if (beforeData.ToLog() == afterData.ToLog()) return true;
+            if (asignBeforeData?.Percentage == percentage) return true;
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, GameType = gameType, Level = level, Percentage = percentage, LastUpdateUser = lastUpdateUser };
             if (conn.Execute("Admin_RebateGameType_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
                 result = false;
