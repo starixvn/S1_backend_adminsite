@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AdjustmentLimitController : ControllerBase
@@ -95,13 +95,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public ApiResult Set(ApiRequestWithLog<AdjustmentLimit> request)
         {
-            var result =
-                _paymentBll.AddAdjustmentLimitInfo(request.SiteId, request.CurrencyId, request.AdjustmentMax,
-                    User.Identity.Name);
+            var result = _paymentBll.SetAdjustmentLimitInfo(
+                new ParamsWithLog<AdjustmentLimit>(request, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
