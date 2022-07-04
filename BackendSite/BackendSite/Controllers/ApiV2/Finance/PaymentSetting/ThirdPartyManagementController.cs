@@ -3,16 +3,16 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class ThirdPartyManagementController : ControllerBase
@@ -35,48 +35,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #endregion
 
         #region API Model
-
-        public class UpdatePayInfoRequest
-        {
-            public int PayId { get; set; }
-
-            /// <summary>
-            /// 狀態(1=Enable、2=Disable)
-            /// </summary>
-            public PayListStatusEnum Status { get; set; }
-        }
-
-        public class UpdatePayChannelRequest
-        {
-            public int ChannelId { get; set; }
-
-            public int Sort { get; set; }
-
-            /// <summary>
-            /// 狀態(1=Enable、2=Disable)
-            /// </summary>
-            public PayChannelStatusEnum Status { get; set; }
-
-            public int PointLevel { get; set; }
-        }
-
-        public class UpdatePayCurrencyRequest
-        {
-            public int ChannelId { get; set; }
-
-            public int CurrencyId { get; set; }
-
-            public decimal MinAmount { get; set; }
-
-            public decimal MaxAmount { get; set; }
-
-            /// <summary>
-            /// 數字規則(1=Integer、2=Decimal、3=Fixed)
-            /// </summary>
-            public AmountRuleEnum AmountRule { get; set; }
-
-            public IEnumerable<decimal> FixedAmountList { get; set; }
-        }
 
         public class GetBankListByPayIdRequest
         {
@@ -132,13 +90,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdatePayInfo(UpdatePayInfoRequest request)
+        public ApiResult UpdatePayInfo(ApiRequestWithLog<UpdatePayInfo> request)
         {
             var result = new ApiResult();
-
-            _paymentManageBll.UpdatePayList(request.PayId, (int)request.Status, User.Identity.Name);
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
+            var success = _paymentManageBll.UpdatePayList(new ParamsWithLog<UpdatePayInfo>(request, User.Identity.Name));
+            
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 
@@ -156,13 +121,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdatePayChannel(UpdatePayChannelRequest request)
+        public ApiResult UpdatePayChannel(ApiRequestWithLog<UpdatePayChannel> request)
         {
             var result = new ApiResult();
 
-            _paymentManageBll.UpdatePayChannel(request.ChannelId, request.Sort, (int)request.Status, request.PointLevel, User.Identity.Name);
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
+            var success = _paymentManageBll.UpdatePayChannel(new ParamsWithLog<UpdatePayChannel>(request, User.Identity.Name));
+            
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 
@@ -178,37 +151,29 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage", "f_pm_editAmountRule" })]
         [HttpPost]
-        public ApiResult UpdatePayCurrency(UpdatePayCurrencyRequest request)
+        public ApiResult UpdatePayCurrency(ApiRequestWithLog<UpdatePayCurrency> request)
         {
             var result = new ApiResult();
-            string amountShow = null;
-            if (request.AmountRule == AmountRuleEnum.Fixed)
-            {
-                amountShow = JsonConvert.SerializeObject(request.FixedAmountList);
-            }
-
+            var success = false;
             if (_permissionBll.CheckPermission("Finance/PaymentManage", "f_pm_editAmountRule"))
             {
                 //有權限，可以修改數字規則和固定數字清單
-                _paymentManageBll.UpdatePayCurrency(request.ChannelId,
-                request.CurrencyId,
-                request.MinAmount,
-                request.MaxAmount,
-                (int)request.AmountRule,
-                amountShow,
-                User.Identity.Name);
+                success = _paymentManageBll.UpdatePayCurrency(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
             }
             else
             {
                 //沒有權限
-                _paymentManageBll.UpdatePayCurrency(request.ChannelId,
-                    request.CurrencyId,
-                    request.MinAmount,
-                    request.MaxAmount,
-                    User.Identity.Name);
+                success = _paymentManageBll.UpdatePayCurrencyAmount(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
             }
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
+            if (success)
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                result.ErrorCode = (int)ErrorCodeEnum.Fail;
+                result.Message = "Update failed.";
+            }
             return result;
         }
 

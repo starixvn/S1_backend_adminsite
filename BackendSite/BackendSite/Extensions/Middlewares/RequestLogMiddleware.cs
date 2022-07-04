@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
-using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Context;
@@ -25,15 +20,6 @@ namespace BackendSite.Extensions.Middlewares
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
         private readonly AuthorizeBLL _authorizeBLL;
-        private readonly ServerInfoBLL _serverInfoBLL;
-        private readonly Tools _tools;
-        private readonly List<string> _accessController = new List<string>
-        {
-            "TpFailRecordReport",
-            "WithdrawalLimitCrypto",
-            "GetAllData",
-            "BaseData"
-        };
 
         #endregion
 
@@ -48,8 +34,6 @@ namespace BackendSite.Extensions.Middlewares
             _next = next;
             _logger = factory.CreateLogger("RequestLog");
             _authorizeBLL = authorizeBLL;
-            _serverInfoBLL = serverInfoBLL;
-            _tools = tools;
         }
 
         #endregion
@@ -60,16 +44,6 @@ namespace BackendSite.Extensions.Middlewares
         {
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
-            
-            if (env.IsProduction())
-            {
-                if (path.IndexOf("apiV2", StringComparison.OrdinalIgnoreCase) >= 0
-                    && !_accessController.Any(x => path.Contains(x)))
-                {
-                    //_logger.LogInformation("Cannot access apiV2: " + path);
-                    //throw new AdminException(ErrorCodeEnum.Fail);
-                }
-            }
             
             var requestBodyStream = new MemoryStream();
             var originalRequestBody = context.Request.Body;
@@ -106,7 +80,6 @@ namespace BackendSite.Extensions.Middlewares
 
             await _next(context);
             context.Request.Body = originalRequestBody;
-            //}
         }
 
         #endregion

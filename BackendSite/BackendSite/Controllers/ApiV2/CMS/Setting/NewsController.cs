@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -15,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class NewsController : ControllerBase

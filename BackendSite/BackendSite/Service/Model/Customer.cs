@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -158,6 +160,10 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
+
+        public string LineUserId { get; set; }
+
+        public CustLineProfileModel CustLineProfile { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -181,7 +187,6 @@ namespace BackendSite.Service.Model
         public string AreaCode { get; set; }
         public string PhoneNo { get; set; }
         public int CurrencyId { get; set; }
-        //public int VipLevel { get; set; }
         public string LevelName { get; set; }
         public string Agent { get; set; }
         public DateTimeOffset RegTime { get; set; }
@@ -191,6 +196,35 @@ namespace BackendSite.Service.Model
         public string AffiliateId { get; set; }
         public string AffiliateCode { get; set; }
         public string LastActivityIP { get; set; }      
+    }
+    public class CustInfoDetailForExportV2
+    {
+        public string SiteName { get; set; }
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public int Birth_d { get; set; }
+        public int Birth_m { get; set; }
+        public int Birth_y { get; set; }
+        public int IsTest { get; set; }
+        public int IsKyc { get; set; }
+        public int IsRisk { get; set; }
+        public decimal SeamlessWallet { get; set; }
+        public decimal BonusWallet { get; set; }
+        public string Email { get; set; }
+        public string RealName { get; set; }
+        public string CountryCode { get; set; }
+        public string AreaCode { get; set; }
+        public string PhoneNo { get; set; }
+        public int CurrencyId { get; set; }
+        public string LevelName { get; set; }
+        public string Agent { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public int Status { get; set; }
+        public string SabaID { get; set; }
+        public string SignupUrl { get; set; }
+        public string AffiliateId { get; set; }
+        public string AffiliateCode { get; set; }
+        public string LastActivityIP { get; set; }
     }
 
     public class CustPhotoId
@@ -417,6 +451,7 @@ namespace BackendSite.Service.Model
         public string PhoneNo { get; set; }
         public int Status { get; set; }
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
         public string SiteName { get; set; }
         public string AffCode { get; set; }
         public string Agent { get; set; }
@@ -428,6 +463,45 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+    
+    public class SetRegLiveStatus
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        [LogIgnore]
+        public CustomerRegLiveStatusStatusEnum Status { get; set; }
+
+        public string StatusName => Status.ToString();
+    }
+    
+    public class AddRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
+    
+    public class EditRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        [LogIgnore]
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
+    
+    public class DeleteRegLiveStatusNote
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        [LogIgnore]
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
     }
 
     public class RegLiveStatusNotes
@@ -496,12 +570,15 @@ namespace BackendSite.Service.Model
     }
     public class BankInfoDetail
     {
+        [LogIgnore]
         public int SysId { set; get; }
         public string AccountNo { set; get; }
         public string IFSCCode { set; get; }
     }
     public class USDTDetail
     {
+        public string Network { set; get; }
+        public string CurrencyName { set; get; }
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }
@@ -526,5 +603,17 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+
+    public class CustLineProfileModel
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public int CustId { get; set; }
+        public string userId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 }

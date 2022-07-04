@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.ExceptionHandling;
@@ -17,7 +16,7 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]

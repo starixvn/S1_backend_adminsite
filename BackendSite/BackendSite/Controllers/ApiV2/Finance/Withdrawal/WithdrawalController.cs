@@ -8,7 +8,6 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -22,7 +21,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalController : ControllerBase
@@ -224,7 +223,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             //        item.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
             //}
 
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "WithdrawalRequestList");
         }
 
