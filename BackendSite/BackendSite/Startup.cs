@@ -16,8 +16,8 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
-using StackExchange.Redis;
 using BackendSite.Service.Model;
+using StackExchange.Redis;
 
 namespace BackendSite
 {
@@ -46,7 +46,10 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(Configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
+            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));          
+            services.Configure<Dictionary<string, AWSKeyConfig>>(Configuration.GetSection("AwsKeyConfig"));
+            services.AddSingleton<AWSS3Helper>();
+            services.AddSingleton<AWSCloudFrontHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();

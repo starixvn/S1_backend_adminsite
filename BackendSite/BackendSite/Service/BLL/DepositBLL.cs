@@ -15,6 +15,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
+
 namespace BackendSite.Service.BLL
 {
     public class DepositBLL
@@ -41,6 +42,7 @@ namespace BackendSite.Service.BLL
             this.authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             this.common = provider.GetRequiredService<Common>();
             this.custInfoService = provider.GetRequiredService<CustInfoService>();
+            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             this._configuration =  provider.GetRequiredService<IConfiguration>();
             this._courierAdapter =  provider.GetRequiredService<CourierAdapter>();

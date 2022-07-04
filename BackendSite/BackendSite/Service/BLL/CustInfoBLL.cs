@@ -31,6 +31,7 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly BlockService _blockService;
 
         public CustInfoBLL(IServiceProvider provider)
         {
@@ -49,6 +50,7 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _blockService = provider.GetRequiredService<BlockService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -229,9 +231,9 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail,Dictionary<string,string> address, string Operator)
         {
-            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
+            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, address, Operator);
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
@@ -733,11 +735,18 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
         {
-            return await _custInfoService.GetCustId(userName, siteId);
+            return await _custInfoService.GetCustId(custId,userName, siteId);
         }
-
+        
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
+        {
+            var strUserNames = JsonConvert.SerializeObject(userNames);
+            
+            return _custInfoService.GetCustInfosAsync(siteId, strUserNames);
+        }
+        
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
             return _custInfoService.GetCustSwitchStatus(custId);
@@ -869,6 +878,75 @@ namespace BackendSite.Service.BLL
                 return false;
             }
             return true;
+        }
+
+        public int SetEnableRebatePayout(int custId, int enableRebatePayout, string reason, string Operator)
+        {
+            var result = 1;
+
+            using var scope = new TransactionScope();
+            if (!_custInfoService.SetEnableRebatePayout(custId, enableRebatePayout))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+            string DisableOrEnable = enableRebatePayout == 0 ? "Disable Rebate Payout" : "Enable Rebate Payout";
+            if (!_custInfoService.AddCustNote(custId, $"{DisableOrEnable} Reason : {reason}", Operator))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
+            return result;
+        }
+        public IEnumerable<BankLockInfoDetail> GetBankLockInfoDetail(int custId, int siteId)
+        {
+            var custBankInfo = _custInfoService.GetCustBankInfo(custId, siteId);
+            List<BankLockInfoDetail> result = new List<BankLockInfoDetail>();
+            if (!string.IsNullOrWhiteSpace(custBankInfo.BankInfo))
+            {
+                var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custBankInfo.BankInfo).ToList();
+                bankInfoDetailList.ForEach(x =>
+                {
+                    var blockAccount = _custInfoService.GetBlockAccount(x.SysId, x.AccountNo);
+                    blockAccount.SysId = x.SysId;
+                    blockAccount.AccountNo = x.AccountNo;
+                    blockAccount.IFSCCode = x.IFSCCode;
+                    blockAccount.CreateTime = custBankInfo.CreateTime;
+                    blockAccount.AccountName = custBankInfo.AccountName;
+                    result.Add(blockAccount);
+                });
+            }
+            return result;
+        }
+        public int LockAllBankAccount(int custId, int siteId, string Operator)
+        {
+            var result = 1;
+            var custBankInfo = _custInfoService.GetCustBankInfo(custId, siteId);
+            if (!string.IsNullOrWhiteSpace(custBankInfo.BankInfo))
+            {
+                var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custBankInfo.BankInfo).ToList();
+                bankInfoDetailList.ForEach(x =>
+                {
+                    var setResult = _blockService.BlockAccountSet(x.SysId, x.AccountNo, BlockAccountStatus.Lock, Operator);
+                    if(setResult > 0)
+                    {
+                        SetCustBankInfoLog(custId, siteId, x.SysId, x.AccountNo, x.IFSCCode, custBankInfo.AccountName, 3);
+                    }
+                });
+            }
+            else
+            {
+                result = 0;
+            }
+            return result;
+        }
+        public int SetCustBankInfoLog(int custId, int siteId,int SysId,string accountNum,string iFSCCode,string accountName,int status)
+        {
+            return _custInfoService.SetCustBankInfoLog(custId, siteId, SysId, accountNum, iFSCCode, accountName, status);
         }
     }
 }
