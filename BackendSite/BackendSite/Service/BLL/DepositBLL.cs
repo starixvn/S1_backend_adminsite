@@ -12,8 +12,10 @@ using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using BackendSite.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 
 namespace BackendSite.Service.BLL
@@ -32,22 +34,23 @@ namespace BackendSite.Service.BLL
         private readonly IConfiguration _configuration;
         private readonly CourierAdapter _courierAdapter;
         private readonly string payApiUrl;
+        private readonly ILogger<DepositBLL> _logger;
+
 
         public DepositBLL(IServiceProvider provider)
         {
-            this.depositService = provider.GetRequiredService<DepositService>();
-            this.serverInfoService = provider.GetRequiredService<ServerInfoService>();
-            this._adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
-            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
-            this.authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
-            this.common = provider.GetRequiredService<Common>();
-            this.custInfoService = provider.GetRequiredService<CustInfoService>();
-            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
-            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
-            this._configuration =  provider.GetRequiredService<IConfiguration>();
-            this._courierAdapter =  provider.GetRequiredService<CourierAdapter>();
+            depositService = provider.GetRequiredService<DepositService>();
+            serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            common = provider.GetRequiredService<Common>();
+            custInfoService = provider.GetRequiredService<CustInfoService>();
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
-            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
+            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
@@ -288,8 +291,11 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
+            var result = depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest);
 
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest);
+            InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
+            
+            return result;
         }
 
         public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
@@ -544,6 +550,18 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
         {
             return depositService.GetPaymentGateWayOptions();
+        }
+
+        private void InsertDepositRewardPointQueue(string transId, int siteId, int currencyId)
+        {
+            if (CommonExtension.CanRewardPoint(siteId, currencyId))
+            {
+                var resultCode = depositService.InsertDepositRewardPointQueue(transId);
+                if (resultCode != (int) ErrorCodeEnum.Success)
+                {
+                    _logger.LogError($"{transId} InsertDepositRewardPointQueue failed, resultCode: {resultCode}");
+                }
+            }
         }
     }
 
