@@ -290,7 +290,7 @@ namespace BackendSite.Service.DAL
             if (conn.Execute("Admin_RebateGameType_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
                 result = false;
 
-            if (!await AddNewOprateLog(siteId, currencyId, beforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebateCategory,
+            if (!await AddNewOprateLog(siteId, currencyId, beforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebateGameType,
                 (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
                 result = false;
 
