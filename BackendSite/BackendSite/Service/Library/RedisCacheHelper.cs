@@ -19,7 +19,7 @@ namespace BackendSite.Service.Library
             _multiplexer = provider.GetRequiredService<IConnectionMultiplexer>();
         }
 
-        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite) 
+        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin) 
         {
             key = $"{redisDataBase}:{key}";
             try
@@ -46,7 +46,7 @@ namespace BackendSite.Service.Library
             }
         }
         
-        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
+        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{key}";
             try
@@ -73,7 +73,7 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
+        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{key}";
             try
