@@ -1336,65 +1336,65 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
-        /// <summary>
-        /// CustomerManage/SetDisableRebatePayout 不讓用戶領取Rebate
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
-        public ApiResult SetDisableRebatePayout(CustIdWithReasonRequest request)
-        {
-            if (_custInfoBll.SetEnableRebatePayout(request.CustId,
-                                          0,
-                                          request.Reason,
-                                          User.Identity.Name) > 0)
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Set Disable Rebate Payout Success."
-                };
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Disable Rebate Payout Fail.Please Contact admin.");
-            }
-        }
+        ///// <summary>
+        ///// CustomerManage/SetDisableRebatePayout 不讓用戶領取Rebate
+        ///// </summary>
+        ///// <remarks>
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
+        ///// </remarks>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
+        //public ApiResult SetDisableRebatePayout(CustIdWithReasonRequest request)
+        //{
+        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
+        //                                  0,
+        //                                  request.Reason,
+        //                                  User.Identity.Name) > 0)
+        //    {
+        //        return new ApiResult
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.Success,
+        //            Message = "Set Disable Rebate Payout Success."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Disable Rebate Payout Fail.Please Contact admin.");
+        //    }
+        //}
 
-        /// <summary>
-        /// CustomerManage/SetEnableRebatePayout 解除不讓用戶領取Rebate設定
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
-        public ApiResult SetEnableRebatePayout(CustIdWithReasonRequest request)
-        {
-            if (_custInfoBll.SetEnableRebatePayout(request.CustId,
-                                          1,
-                                          request.Reason,
-                                          User.Identity.Name) > 0)
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Set Enable Rebate Payout Success."
-                };
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Enable Rebate Payout Fail.Please Contact admin.");
-            }
-        }
+        ///// <summary>
+        ///// CustomerManage/SetEnableRebatePayout 解除不讓用戶領取Rebate設定
+        ///// </summary>
+        ///// <remarks>
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
+        ///// </remarks>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
+        //public ApiResult SetEnableRebatePayout(CustIdWithReasonRequest request)
+        //{
+        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
+        //                                  1,
+        //                                  request.Reason,
+        //                                  User.Identity.Name) > 0)
+        //    {
+        //        return new ApiResult
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.Success,
+        //            Message = "Set Enable Rebate Payout Success."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Enable Rebate Payout Fail.Please Contact admin.");
+        //    }
+        //}
 
         #endregion
 
