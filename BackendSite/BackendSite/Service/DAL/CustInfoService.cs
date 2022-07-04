@@ -791,31 +791,5 @@ namespace BackendSite.Service.DAL
 
             return WithdrawalLimitLogData;
         }
-
-        //public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
-        //{
-        //    using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-        //    return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
-        //}
-
-        //public CustBankInfo GetCustBankInfo(int custId,int siteId)
-        //{
-        //    return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId , SiteId  = siteId }));
-        //}
-        //public BankLockInfoDetail GetBlockAccount(int SysId, string accountNum)
-        //{
-        //    return _reportDbClient.QueryFirst<BankLockInfoDetail>("Admin_BlockAccount_Get", new DynamicParameters(new { SysId = SysId, AccountNum = accountNum }));
-        //}
-        //public int SetCustBankInfoLog(int custId, int siteId, int sysId, string accountNum, string iFSCCode, string accountName, int status)
-        //{
-        //    return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new { CustId = custId,
-        //        SiteId = siteId,
-        //        SysId = sysId,
-        //        AccountNum = accountNum,
-        //        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "": iFSCCode,
-        //        AccountName = accountName,
-        //        Status = status
-        //    }));
-        //}
     }
 }

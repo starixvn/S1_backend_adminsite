@@ -1336,66 +1336,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
-        ///// <summary>
-        ///// CustomerManage/SetDisableRebatePayout 不讓用戶領取Rebate
-        ///// </summary>
-        ///// <remarks>
-        ///// Http Method：POST
-        ///// 
-        ///// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
-        ///// </remarks>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
-        //public ApiResult SetDisableRebatePayout(CustIdWithReasonRequest request)
-        //{
-        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
-        //                                  0,
-        //                                  request.Reason,
-        //                                  User.Identity.Name) > 0)
-        //    {
-        //        return new ApiResult
-        //        {
-        //            ErrorCode = (int)ErrorCodeEnum.Success,
-        //            Message = "Set Disable Rebate Payout Success."
-        //        };
-        //    }
-        //    else
-        //    {
-        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Disable Rebate Payout Fail.Please Contact admin.");
-        //    }
-        //}
-
-        ///// <summary>
-        ///// CustomerManage/SetEnableRebatePayout 解除不讓用戶領取Rebate設定
-        ///// </summary>
-        ///// <remarks>
-        ///// Http Method：POST
-        ///// 
-        ///// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
-        ///// </remarks>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
-        //public ApiResult SetEnableRebatePayout(CustIdWithReasonRequest request)
-        //{
-        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
-        //                                  1,
-        //                                  request.Reason,
-        //                                  User.Identity.Name) > 0)
-        //    {
-        //        return new ApiResult
-        //        {
-        //            ErrorCode = (int)ErrorCodeEnum.Success,
-        //            Message = "Set Enable Rebate Payout Success."
-        //        };
-        //    }
-        //    else
-        //    {
-        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Enable Rebate Payout Fail.Please Contact admin.");
-        //    }
-        //}
-
         #endregion
 
         #region CSD > Customer Administration > Bonus Log
@@ -2730,60 +2670,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        #endregion
-
-        #region CSD > Customer Administration > Block Bank
-        /// <summary>
-        /// CustomerManage/GetBankLockInfoDetail 取得客戶現在的BankLockInfo
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        //[HttpPost]
-        //public ApiResult<IEnumerable<BankLockInfoDetail>> GetBankLockInfoDetail(CustIdRequest request)
-        //{
-        //    var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-        //    var bankLockInfoDetail = _custInfoBll.GetBankLockInfoDetail(custInfo.CustId, custInfo.SiteId);
-        //    return new ApiResult<IEnumerable<BankLockInfoDetail>>
-        //    {
-        //        Data = bankLockInfoDetail,
-        //        ErrorCode = (int)ErrorCodeEnum.Success
-        //    };
-        //}
-
-        /// <summary>
-        /// CustomerManage/LockAllBankAccount 針對客戶Lock他現在所使用的所有BankAccount
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        //[HttpPost]
-        //public ApiResult LockAllBankAccount(CustIdRequest request)
-        //{
-        //    var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-        //    if (_custInfoBll.LockAllBankAccount(custInfo.CustId,
-        //                                  custInfo.SiteId,
-        //                                  User.Identity.Name) > 0)
-        //    {
-        //        return new ApiResult
-        //        {
-        //            ErrorCode = (int)ErrorCodeEnum.Success,
-        //            Message = "Lock All Bank Account Success."
-        //        };
-        //    }
-        //    else
-        //    {
-        //        throw new AdminException(ErrorCodeEnum.Fail, "Lock All Bank Account Fail.Please Contact admin.");
-        //    }
-        //}
         #endregion
 
         #region Private Methods
