@@ -60,7 +60,7 @@ namespace BackendSite.Service.BLL
                     TpName = a.TpName,
                     TpLogo = a.TpLogo
                 });
-                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames), null, RedisDataBase.MemberSite);
+                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames), null, RedisDataBase.Member);
             }
             
             return listHotGames.Select(a=> new GetHotGameListResponse()
