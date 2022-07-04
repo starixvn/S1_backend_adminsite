@@ -62,15 +62,15 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
         }
-        public void SetCustBankInfoLog(int sysId, string accountNum,int status)
-        {
-            var blockBankAccBlockList  = _blockService.GetBlockBankAccList(sysId, accountNum).ToList();
+        //public void SetCustBankInfoLog(int sysId, string accountNum,int status)
+        //{
+        //    var blockBankAccBlockList  = _blockService.GetBlockBankAccList(sysId, accountNum).ToList();
 
-            blockBankAccBlockList.ForEach(x =>
-            {
-                _custInfoService.SetCustBankInfoLog(x.CustId, x.SiteId, sysId, accountNum, x.IFSCCode, x.AccountName, status == 2 ? 3 : 4);
-            });
-        }
+        //    blockBankAccBlockList.ForEach(x =>
+        //    {
+        //        _custInfoService.SetCustBankInfoLog(x.CustId, x.SiteId, sysId, accountNum, x.IFSCCode, x.AccountName, status == 2 ? 3 : 4);
+        //    });
+        //}
         private IEnumerable<IPCountry> GetIPCountryList()
         {
             return _blockService.GetIPCountryList();
