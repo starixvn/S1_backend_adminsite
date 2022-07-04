@@ -74,7 +74,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
         public ApiResult<IEnumerable<ReferralList>> GetList(GetListRequest request)
         {
@@ -105,7 +104,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search] > [Status]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
         public ApiResult UpdateStatus(SetStatusRequest request)
         {
@@ -135,7 +133,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search] > [Edit] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
         public ApiResult Set(SetRequest request)
         {
