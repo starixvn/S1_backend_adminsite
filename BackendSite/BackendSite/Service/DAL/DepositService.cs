@@ -503,5 +503,33 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_DepositRequestAmountV2_Set", props) > 0;
         }
+        
+        public int InsertDepositRewardPointQueue(string transId)
+        {
+            var para = new DynamicParameters();
+            para.Add("_TransId", transId);
+            para.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var trans = conn.BeginTransaction();
+            _ = conn.Execute("Service_DepositRewardPointQueue_Ins", para, transaction: trans,
+                commandType: CommandType.StoredProcedure);
+            var resultCode = para.Get<int?>("_Result") ?? -9;
+                
+            if (resultCode == 0)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            conn.CloseAsync();
+            
+            return resultCode;
+        }
     }
 }
