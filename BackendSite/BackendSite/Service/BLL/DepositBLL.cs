@@ -543,15 +543,6 @@ namespace BackendSite.Service.BLL
             return response;
         }
 
-        /// <summary>
-        /// 取得 paymentGateWay
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
-        {
-            return depositService.GetPaymentGateWayOptions();
-        }
-
         private void InsertDepositRewardPointQueue(string transId, int siteId, int currencyId)
         {
             if (CommonExtension.CanRewardPoint(siteId, currencyId))
@@ -563,6 +554,14 @@ namespace BackendSite.Service.BLL
                 }
             }
         }
-    }
 
+        /// <summary>
+        /// 取得 paymentGateWay
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
+        {
+            return depositService.GetPaymentGateWayOptions();
+        }
+    }
 }

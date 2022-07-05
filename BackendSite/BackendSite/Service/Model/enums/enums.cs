@@ -1078,6 +1078,7 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+    #endregion
 
     public enum RedisDataBase
     {
@@ -1088,8 +1089,6 @@ namespace BackendSite.Service.Model.enums
         AdminSite = 4
     }
 
-    #endregion
-    
 	public enum LineChannelStatusEnum
     {
         Disable = 0,
@@ -1145,7 +1144,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum ManualRewardPointCategoryEnum
     {
         Default = 0,
