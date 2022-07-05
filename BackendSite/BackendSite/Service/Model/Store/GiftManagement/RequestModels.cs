@@ -112,6 +112,11 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public IFormFile File { get; set; }
     }
     
+    public class UploadMultiImagesRequest
+    {
+        public IEnumerable<IFormFile> File { get; set; }
+    }
+    
     public class SetSortRequest
     {
         public IEnumerable<SortItem> Infos { get; set; }

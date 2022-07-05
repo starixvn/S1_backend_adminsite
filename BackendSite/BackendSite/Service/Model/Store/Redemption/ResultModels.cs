@@ -19,5 +19,14 @@ namespace BackendSite.Service.Model.Store.Redemption
         public decimal ActualCost { get; set; }
         public string Operator { get; set; }
     }
+    
+    public class UploadReceiptResult
+    {
+        public UploadReceiptResult(string url)
+        {
+            ReceiptUrls = url;
+        }
+        public string ReceiptUrls { get; set; }
+    }
 
 }
