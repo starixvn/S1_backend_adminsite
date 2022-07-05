@@ -18,13 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly IReferralManagementBLL _referralManagementBll;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<ReferralManagementDecorator> _logger;
-
-        private readonly Dictionary<int, string> _siteDescription = new Dictionary<int, string>()
-        {
-            { 1, "Nova88" },
-            { 2, "Goal123" },
-            { 3, "Bwing" },
-        };
+        
         private readonly Dictionary<int, string> _statusDescription = new Dictionary<int, string>()
         {
             { 0, "Disable" },
@@ -138,22 +132,13 @@ namespace BackendSite.Service.BLL
             var target = new Dictionary<string, object>();
             foreach (var prop in properties)
             {
-                if (prop.Name == "SiteId")
-                {
-                    target.Add(prop.Name, _siteDescription[(int)prop.GetValue(source)!]);
-                }
-                else if (prop.Name == "CurrencyId")
+                if (prop.Name == "CurrencyId")
                 {
                     target.Add(prop.Name, _currencyDescription[(int)prop.GetValue(source)!]);
                 }
-                else if (prop.Name == "Status")
-                {
-                    
-                }
-                else if(prop.Name == "SpecificList")
-                {
-                    
-                }
+                else if (string.Equals(prop.Name, "SiteId")) { }
+                else if (string.Equals(prop.Name, "Status")) { }
+                else if(string.Equals(prop.Name, "SpecificList")) { }
                 else
                 {
                     target.Add(prop.Name, prop.GetValue(source));
