@@ -170,6 +170,7 @@ namespace BackendSite.Service.BLL
             var eventReport = await _worldCupPredictionService.GetPredictiveStatistics(siteId);
             return eventReport.Select(a => new GetWorldCupEventReportResponse()
             {
+                TeamId = a.TeamId,
                 TeamName = a.TeamName,
                 PredictUserCount = a.PredictUserCount,
                 IsPayoutDone = a.UpdateTime.HasValue,
