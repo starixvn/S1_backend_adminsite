@@ -591,7 +591,8 @@ namespace BackendSite.Service.Model.enums
         VipRebatePeriod = 32,
         VipRebateCategory = 33,
         VipRebateGameType = 34,
-        VipRebatePayoutLimit = 35
+        VipRebatePayoutLimit = 35,
+        Referral = 36
     }
 
     #region BankFinancialTransferInfoLog
@@ -1082,11 +1083,12 @@ namespace BackendSite.Service.Model.enums
 
     public enum RedisDataBase
     {
-        MebmerSite = 0,
+        Member = 0,
         Shared = 1,
         Tp = 2,
         Bonus = 3,
-        AdminSite = 4
+        Admin = 4,
+        Payment = 5
     }
 
 	public enum LineChannelStatusEnum
