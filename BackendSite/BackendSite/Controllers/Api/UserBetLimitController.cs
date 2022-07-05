@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> PostUserBetLimit(ApiRequestWithLog<CustBetLimit> req)
         {
             var updateOperator = User.Identity.Name;
-            var customer = await _custInfoBll.GetCustId(req.After.UserName, req.SiteId);
+            var customer = await _custInfoBll.GetCustId(null,req.After.UserName, req.SiteId);
             if (customer == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
