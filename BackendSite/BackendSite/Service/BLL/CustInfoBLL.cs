@@ -229,9 +229,9 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail,Dictionary<string,string> address, string Operator)
         {
-            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
+            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, address, Operator);
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
@@ -733,9 +733,9 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
         {
-            return await _custInfoService.GetCustId(userName, siteId);
+            return await _custInfoService.GetCustId(custId,userName, siteId);
         }
 
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
