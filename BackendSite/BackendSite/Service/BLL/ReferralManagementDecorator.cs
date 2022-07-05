@@ -150,6 +150,10 @@ namespace BackendSite.Service.BLL
                 {
                     
                 }
+                else if(prop.Name == "SpecificList")
+                {
+                    
+                }
                 else
                 {
                     target.Add(prop.Name, prop.GetValue(source));
