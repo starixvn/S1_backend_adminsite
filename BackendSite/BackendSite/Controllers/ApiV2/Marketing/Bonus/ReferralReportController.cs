@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -19,19 +20,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     {
         #region Fields
 
-        private readonly ReferralManagementBLL _referralManagementBll;
+        private readonly IReferralManagementBLL _referralManagementBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
 
         #region Constructors
-
-        public ReferralReportController(IServiceProvider provider)
+        public ReferralReportController(IReferralManagementBLL referralManagementBll, ExcelBLL excelBll)
         {
-            _referralManagementBll = provider.GetRequiredService<ReferralManagementBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _referralManagementBll = referralManagementBll;
+            _excelBll = excelBll;
         }
-
         #endregion
 
         #region API Model
@@ -181,7 +180,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.PageSize,
                     request.PageNumber,
                     out var totalPages,
-                    out var rowCount, true);
+                    out var rowCount, 
+                    true);
 
                 foreach (var x in data)
                 {
