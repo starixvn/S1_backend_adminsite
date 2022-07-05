@@ -216,6 +216,7 @@ namespace BackendSite.Service.Model
     
     public class WorldCupPredictiveStatisticsDto
     {
+        public int TeamId { get; set; }
         public string TeamName { get; set; }
         public int PredictUserCount { get; set; }
         public string Operator { get; set; }
@@ -228,6 +229,7 @@ namespace BackendSite.Service.Model
     }
     public class GetWorldCupEventReportResponse
     {
+        public int TeamId { get; set; }
         public string TeamName { get; set; }
         public int PredictUserCount { get; set; }
         public bool IsPayoutDone { get; set; }
