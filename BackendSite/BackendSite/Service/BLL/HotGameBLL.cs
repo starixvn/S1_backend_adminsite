@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -30,16 +31,15 @@ namespace BackendSite.Service.BLL
             { 61, "hi" },
             { 74, "bn" },
         };
-
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
         
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo)
+        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo, ICacheHelper cacheHelper)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
-            _cacheHelper = cacheHelper;
             _siteConfig = siteConfig;
             _serverInfo = serverInfo;
+            _cacheHelper = cacheHelper;
         }
         
         public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId, bool refreshCache)
@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
             var listHotGames = hotGames.ToList();
             if (refreshCache)
             {
-                var key = $"GetHotGames_{siteId}_{currencyId}";
+                var key = $"GetHotGames:{siteId}:{currencyId}";
                 var cacheHotGames = listHotGames.Select(a => new HotGameData()
                 {
                     TpId = a.TpId,
@@ -60,7 +60,7 @@ namespace BackendSite.Service.BLL
                     TpName = a.TpName,
                     TpLogo = a.TpLogo
                 });
-                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames));
+                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames), null, RedisDataBase.Member);
             }
             
             return listHotGames.Select(a=> new GetHotGameListResponse()

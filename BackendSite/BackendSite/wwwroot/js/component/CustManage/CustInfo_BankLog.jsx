@@ -10,10 +10,11 @@ export class BankLog extends React.Component {
         const actionTypeStatus = {
             1: "Create",
             2: "Delete",
-            3: "Lock",
+            3: "Block",
             4: "Unlock",
+            5: "Bo-Delete"
         }
-        console.log(this.props);
+        
         let rows = this.props.searchData.length != 0 ? this.props.searchData.map((row, idx) => {
             return (
                 <tr key={"data-" + idx}>

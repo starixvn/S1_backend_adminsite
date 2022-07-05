@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -48,28 +49,28 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.DeleteBlockIP(ip);
         }
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int status, string accountNum, string userName)
+        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
-            return _blockService.GetBlockBankAcc(startDate, endDate, status, accountNum, userName);
+            return _blockService.GetBlockBankAcc(startDate, endDate, blockStatus, accountNum, currencyId, userName);
         }
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
         {
             return _blockService.GetBlockBankAccList(sysId, accountNum);
         }
 
-        public int BlockAccountSet(int sysId, string accountNum, int status, string Operator, string memo)
+        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo)
         {
             return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
         }
-        public void SetCustBankInfoLog(int sysId, string accountNum,int status)
-        {
-            var blockBankAccBlockList  = _blockService.GetBlockBankAccList(sysId, accountNum).ToList();
+        //public void SetCustBankInfoLog(int sysId, string accountNum,int status)
+        //{
+        //    var blockBankAccBlockList  = _blockService.GetBlockBankAccList(sysId, accountNum).ToList();
 
-            blockBankAccBlockList.ForEach(x =>
-            {
-                _custInfoService.SetCustBankInfoLog(x.CustId, x.SiteId, sysId, accountNum, x.IFSCCode, x.AccountName, status == 2 ? 3 : 4);
-            });
-        }
+        //    blockBankAccBlockList.ForEach(x =>
+        //    {
+        //        _custInfoService.SetCustBankInfoLog(x.CustId, x.SiteId, sysId, accountNum, x.IFSCCode, x.AccountName, status == 2 ? 3 : 4);
+        //    });
+        //}
         private IEnumerable<IPCountry> GetIPCountryList()
         {
             return _blockService.GetIPCountryList();
@@ -77,6 +78,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {
             return _blockService.GetIPUserList(ip);
+        }
+
+        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
+        {
+            return _blockService.ReleaseAccount(custId, sysId, accountNum, iFSCCode);
         }
     }
 }

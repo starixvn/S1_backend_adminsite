@@ -395,9 +395,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
@@ -549,7 +553,7 @@ namespace BackendSite.Service.Model.enums
         Update = 3,
         Delete = 4
     }
-    
+
     public enum AdminAdjustmentLogMenuEnum
     {
         Undefined = 0,
@@ -576,7 +580,18 @@ namespace BackendSite.Service.Model.enums
         TagManagement = 21,
         LiveRegistrationStatistics = 22,
         GameExclusion = 23,
-        BetLimit = 24
+        BetLimit = 24,
+        SetCustomerLevel = 25,
+        SetCustomerFullName = 26,
+        SetCustomerBirthday = 27,
+        SetCustomerPhone = 28,
+        SetCustomerEMail = 29,
+        SetCustomerAddress = 30,
+        ResetCustomerProfile = 31,
+        VipRebatePeriod = 32,
+        VipRebateCategory = 33,
+        VipRebateGameType = 34,
+        VipRebatePayoutLimit = 35
     }
 
     #region BankFinancialTransferInfoLog
@@ -821,6 +836,12 @@ namespace BackendSite.Service.Model.enums
         Failed = 4
     }
 
+    public enum SendBatchMessageStatus
+    {
+        Pending = 0,
+        Finished = 1
+    }
+
     public enum TpEnum
     {
         Saba = 1,
@@ -1049,7 +1070,7 @@ namespace BackendSite.Service.Model.enums
     public enum DeepLinkTableTypeEnum
     {
         Android = 1,
-        IOS  = 2,
+        IOS = 2,
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
@@ -1057,6 +1078,17 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+
+    public enum RedisDataBase
+    {
+        Member = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        Admin = 4,
+        Payment = 5
+    }
+
     #endregion
     
 	public enum LineChannelStatusEnum
@@ -1064,12 +1096,13 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    
+
     public enum GeneralStatusEnum
     {
         Disable = 0,
         Enable = 1
     }
+
     public enum PermissionTypeEnum
     {
         AddRole = 0,
@@ -1082,5 +1115,54 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
+    }
+
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+        BODelete = 2
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+    public enum CustBankInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+	}
+
+    public enum SiteEnum
+    {
+        [Description("Nova88")]
+        NOVA88 = 1,
+        [Description("Goal123")]     
+        GOAL123 = 2,
+        [Description("Bwing")]
+        BWING = 3
+    }
+    
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
+
+    public enum CurrencyEnum
+    {
+        MYR = 2,
+        USD = 3,
+        THB = 4,
+        CNY = 13,
+        IDR = 15,
+        VND = 51,
+        INR = 61,
+        BDT = 74
     }
 }

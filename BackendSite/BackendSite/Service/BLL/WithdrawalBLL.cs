@@ -274,7 +274,8 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int>
             {
-                (int) WithdrawalStatusEnum.Pending
+                (int) WithdrawalStatusEnum.Pending,
+                (int) WithdrawalStatusEnum.OnHold
             };
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -284,7 +285,7 @@ namespace BackendSite.Service.BLL
             {
                 var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
                 throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending Can Set.");
+                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending And OnHold Can Set.");
             }
 
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
@@ -986,6 +987,27 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        public bool EditEWalletWithdrawalLimit(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            if (withdrawalLimitInfoManage.WithdrawalMax < 0
+                || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            {
+                return false;
+            }
+
+            return _withdrawalLimitService.EditEWalletWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+        }
+
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        {
+            return _withdrawalLimitService.UpdateEWalletWithdrawalLimitInfoStatus(withdrawalLimitInfoManage, updater);
+        }
+
+        public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
+        {
+            return _withdrawalLimitService.GetEWalletWithdrawalLimitInfo(siteId);
+        }
 
         #endregion
 

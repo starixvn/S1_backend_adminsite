@@ -151,7 +151,7 @@ const Result = (props) => {
   const EditSubmit = () => {
     if (editValue !== null) {
       api
-        .post("/apiV2/AdjustmentLimit/Set", {
+        .post("/api/Payment/AddAdjustmentLimitInfo", {
           siteId: props.siteId,
           currencyId: props.currId,
           before:{

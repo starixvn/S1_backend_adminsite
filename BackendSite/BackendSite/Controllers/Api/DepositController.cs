@@ -11,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
@@ -30,19 +31,22 @@ namespace BackendSite.Controllers.Api
         private readonly ExcelBLL excelBLL;
         private readonly int mainWalletType;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
 
-        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL, ServerInfoBLL serverInfoBLL)
+        public DepositController(IServiceProvider provider)
         {
-            this.depositBLL = depositBLL;
-            this.selLangBLL = selLangBLL;
-            this.messageBLL = messageBLL;
-            this.pendingFundBLL = pendingFundBLL;
-            this.custInfoBLL = custInfoBLL;
-            this.bankDetailBLL = bankDetailBLL;
-            this.excelBLL = excelBLL;
-            this.serverInfoBLL = serverInfoBLL;
+            this.depositBLL = provider.GetRequiredService<DepositBLL>();
+            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            this.messageBLL = provider.GetRequiredService<MessageBLL>();
+            this.pendingFundBLL = provider.GetRequiredService<PendingFundBLL>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this.bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
+            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
             mainWalletType = configuration.GetValue<int>("MainWalletType");
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
         public class DepositListReq
         {
@@ -59,6 +63,7 @@ namespace BackendSite.Controllers.Api
             public int AmountType { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
+            public IEnumerable<int> SelectPayId { get; set; }
             public string Amount { get; set; }
             public int PageSize { get; set; }
         }
@@ -88,8 +93,9 @@ namespace BackendSite.Controllers.Api
                 depositListReq.LevelStatus,
                 depositListReq.PageSize, 
                 depositListReq.AmountType, 
-                depositListReq.Amount, 
-                ref pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+                depositListReq.Amount,
+                depositListReq.SelectPayId,
+                pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
 
 
             foreach (var data in depositRequestList)
@@ -366,25 +372,35 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
-        public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission deposit)
+        public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission request)
         {
-            var depositDetails = JsonConvert.DeserializeObject<DepositDetailInfo>(deposit.DepositDetails);
-
-            var result = await depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
+            var result = await depositBLL.CreateDeposit(request.Detail, request.Receipt);
+            
             var apiResult = new ApiResult();
             if (result == 1)
             {
-                apiResult.ErrorCode = 1;
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.Detail.SiteId,
+                    CurrencyId = request.Detail.CurrencyId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.DepositSubmission,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = request.Detail.ToLog()
+                });
+                
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
             }
             else if (result == -1)
             {
-                apiResult.ErrorCode = -1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = selLangBLL.GetMsg("msg_UserNotFound");
             }
             else
             {
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
             }
             return apiResult;
@@ -631,6 +647,41 @@ namespace BackendSite.Controllers.Api
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList", "f_dp_editAmount" })]
+        [HttpPost]
+        public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response =  await depositBLL.DepositManual(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"ManualApproval Fail. {ex.Message}");
+            }
+        }
+
+        public ApiResult<IEnumerable<PaymentGateWayOptions>> GetPaymentGateWayOptions()
+        {
+            var apiResult = new ApiResult<IEnumerable<PaymentGateWayOptions>>();
+            try
+            {
+                apiResult.Data = depositBLL.GetPaymentGateWayOptions();
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                 apiResult.ErrorCode = 999;
+                 apiResult.Message = "GetPayListOptions fail.";
+                 apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
         }
     }
 }

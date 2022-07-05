@@ -275,7 +275,7 @@ const App = () => {
     };
     //console.log(p);
     api
-      .post("/apiv2/RegistrationManagement/SetRegLiveStatus", p)
+      .post("/api/CustManage/SetRegLiveStatus", p)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           UpdateReset();
@@ -336,7 +336,7 @@ const App = () => {
     let custId = data.custId;
     console.log(custId);
     api
-      .post("/apiv2/RegistrationManagement/GetRegLiveStatusNotes", {
+      .post("/api/CustManage/GetRegLiveStatusNotes", {
         custId: custId,
       })
       .then(function (res) {
@@ -402,11 +402,11 @@ const App = () => {
     };
     
     api
-      .post("/apiv2/RegistrationManagement/AddRegLiveStatusNote", Data)
+      .post("/api/CustManage/AddRegLiveStatusNote", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           api
-            .post("/apiv2/RegistrationManagement/GetRegLiveStatusNotes", {
+            .post("/api/CustManage/GetRegLiveStatusNotes", {
               custId: noteFilter.CustId,
             })
             .then(function (res) {
@@ -448,12 +448,12 @@ const App = () => {
       };
       
       api
-        .post("/apiv2/RegistrationManagement/DeleteRegLiveStatusNote", p)
+        .post("/api/CustManage/DeleteRegLiveStatusNote", p)
         .then(function (res) {
           if (res.data.errorCode === 0) {
             
             api
-              .post("/apiv2/RegistrationManagement/GetRegLiveStatusNotes", {
+              .post("/api/CustManage/GetRegLiveStatusNotes", {
                 custId: noteFilter.CustId,
               })
               .then(function (res) {
@@ -481,18 +481,29 @@ const App = () => {
       NewNote: props,
     });
   };
-  const SaveButton = () => {
-    let Data = {
-      CustId: Number(noteFilter.CustId),
-      Id: editNoteData.Id,
-      Note: editNoteData.NewNote,
+  const SaveButton = (data) => {
+    let d = {
+      currencyId: noteFilter.currencyId,
+        siteId: noteFilter.siteId,
+        before: {
+          userName: noteFilter.userName,
+          CustId: Number(noteFilter.CustId),
+          Note: data.note,
+          Id: data.id,
+        },
+        after: {
+          userName: noteFilter.userName,
+          CustId: Number(noteFilter.CustId),
+          Note: editNoteData.NewNote,
+          Id: editNoteData.Id,
+        }
     };
     api
-      .post("/api/CustManage/EditRegLiveStatusNote", Data)
+      .post("/api/CustManage/EditRegLiveStatusNote", d)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           api
-            .post("/apiv2/RegistrationManagement/GetRegLiveStatusNotes", {
+            .post("/api/CustManage/GetRegLiveStatusNotes", {
               custId: noteFilter.CustId,
             })
             .then(function (res) {

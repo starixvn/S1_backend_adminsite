@@ -482,5 +482,59 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CryptoInfo> GetCryptoInfoList()
             => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
+
+        public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
+        }
+
+        public bool EditEWalletWithdrawalLimitInfo(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                _SiteId = withdrawalLimitInfoManage.SiteId,
+                _CurrencyId = withdrawalLimitInfoManage.CurrencyId,
+                _WithdrawalMin = withdrawalLimitInfoManage.WithdrawalMin,
+                _WithdrawalMax = withdrawalLimitInfoManage.WithdrawalMax,
+                _UpdateOperator = string.IsNullOrWhiteSpace(UpdateOperator) ? "": UpdateOperator,
+            };
+
+            //conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "WithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);
+
+            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
+
+
+            tran.Commit();
+
+            return result;
+        }
+
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string UpdateOperator)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                _SiteId = withdrawalLimitInfoManage.SiteId,
+                _CurrencyId = withdrawalLimitInfoManage.CurrencyId,
+                _Status = withdrawalLimitInfoManage.Status,
+                _UpdateOperator = string.IsNullOrWhiteSpace(UpdateOperator) ? "" : UpdateOperator,
+            };
+
+            //conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "WithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);
+
+            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfoStatus_Set", param, commandType: CommandType.StoredProcedure) > 0;
+
+
+            tran.Commit();
+
+            return result;
+        }
+
     }
 }

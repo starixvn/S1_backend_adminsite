@@ -15,7 +15,6 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.IO;
 using System.Net;
-using Amazon;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,39 +37,34 @@ namespace BackendSite.Controllers.Api
         private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly string payApiUrl;
         private readonly CourierAdapter courierAdapter;
-        private readonly string awsKey;
-        private readonly string awsSecretKey;
         private readonly string awsWithdrawalFolder;
         private readonly string awsWithdrawalAccountingFolder;
         private readonly string awsWithdrawalUrl;
         private readonly string awsWithdrawalBucketName;
-        private readonly string ProxyHost;
-        private readonly int ProxyPort;
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ILogger<WithdrawalController> _logger;
+        private readonly AWSS3Helper _s3Helper;
 
         public WithdrawalController(IServiceProvider provider)
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
-            this.withdrawalBLL = provider.GetRequiredService<WithdrawalBLL>();
-            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
-            this.messageBLL = provider.GetRequiredService<MessageBLL>();
-            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
-            this.bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
-            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
-            this.courierAdapter = provider.GetRequiredService<CourierAdapter>(); ;
+            withdrawalBLL = provider.GetRequiredService<WithdrawalBLL>();
+            selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            messageBLL = provider.GetRequiredService<MessageBLL>();
+            custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
+            excelBLL = provider.GetRequiredService<ExcelBLL>();
+            courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalController>>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
 
             payApiUrl = configuration.GetValue<string>("PayService");
-            awsKey = configuration.GetValue<string>("AWSKey");
-            awsSecretKey = configuration.GetValue<string>("AwsSecretKey");
+
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
             awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
             awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
             awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
-            ProxyHost = configuration.GetValue<string>("ProxyHost");
-            ProxyPort = configuration.GetValue<int>("ProxyPort");
         }
 
         public class WithdrawalListReq
@@ -138,25 +132,12 @@ namespace BackendSite.Controllers.Api
             {
                 if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
                 {
-                    var config = new AmazonS3Config
-                    {
-                        RegionEndpoint = RegionEndpoint.APSoutheast1
-                    };
-
-                    if (!string.IsNullOrEmpty(ProxyHost))
-                    {
-                        config.ProxyHost = ProxyHost;
-                        config.ProxyPort = ProxyPort;
-                    }
-
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
-
                     var getRequest = new GetObjectRequest();
                     var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId,
                         withdrawalRequest.BankSlipPicCount);
                     getRequest.BucketName = awsWithdrawalBucketName;
                     getRequest.Key = key;
-                    var getResponse = await client.GetObjectAsync(getRequest);
+                    var getResponse = await _s3Helper.GetObjectAsync(getRequest);
                     withdrawalRequest.HasPic = true;
                 }
                 else
@@ -803,18 +784,7 @@ namespace BackendSite.Controllers.Api
                     var x = para.Pic.Replace("data:image/png;base64,", "");
                     var bytes = Convert.FromBase64String(x);
                     var stream = new MemoryStream(bytes);
-                    var config = new AmazonS3Config
-                    {
-                        RegionEndpoint = RegionEndpoint.APSoutheast1
-                    };
 
-                    if (!string.IsNullOrEmpty(ProxyHost))
-                    {
-                        config.ProxyHost = ProxyHost;
-                        config.ProxyPort = ProxyPort;
-                    }
-
-                    IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                     var putRequest = new PutObjectRequest();
                     var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
                         WithdrawalPic.BankSlipPicCount);
@@ -823,8 +793,7 @@ namespace BackendSite.Controllers.Api
                     putRequest.InputStream = stream;
                     putRequest.Key = key;
 
-
-                    var putResponse = await client.PutObjectAsync(putRequest);
+                    var putResponse = await _s3Helper.PutObjectAsync(putRequest);
                     apiResult.ErrorCode = 0;
                 }
                 else
@@ -866,24 +835,12 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
-
-                if (!string.IsNullOrEmpty(ProxyHost))
-                {
-                    config.ProxyHost = ProxyHost;
-                    config.ProxyPort = ProxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new DeleteObjectRequest();
                 var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, para.TransId,
                     WithdrawalPic.BankSlipPicCount);
                 request.BucketName = awsWithdrawalBucketName;
                 request.Key = key;
-                var Response = await client.DeleteObjectAsync(request);
+                var Response = await _s3Helper.DeleteObjectAsync(request);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -1056,24 +1013,12 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var withdrawalPicCount = withdrawalBLL.GetWithdrawalPicCount(transId);
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
-
-                if (!string.IsNullOrEmpty(ProxyHost))
-                {
-                    config.ProxyHost = ProxyHost;
-                    config.ProxyPort = ProxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new GetObjectRequest()
                 {
                     BucketName = awsWithdrawalBucketName,
                     Key = $"{awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png"
                 };
-                var response = await client.GetObjectAsync(request);
+                var response = await _s3Helper.GetObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }
@@ -1094,18 +1039,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var withdrawalPicCount = withdrawalBLL.GetWithdrawalPicCount(transId);
-                var config = new AmazonS3Config
-                {
-                    RegionEndpoint = RegionEndpoint.APSoutheast1
-                };
 
-                if (!string.IsNullOrEmpty(ProxyHost))
-                {
-                    config.ProxyHost = ProxyHost;
-                    config.ProxyPort = ProxyPort;
-                }
-
-                IAmazonS3 client = new AmazonS3Client(awsKey, awsSecretKey, config);
                 var request = new CopyObjectRequest();
                 var withdrawalKey = $"{awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png";
                 //NameingRule:{TransId}_{Seq}_{UploadTimes}
@@ -1114,7 +1048,7 @@ namespace BackendSite.Controllers.Api
                 request.SourceKey = withdrawalKey;
                 request.DestinationBucket = awsWithdrawalBucketName;
                 request.DestinationKey = accountingKey;
-                var response = await client.CopyObjectAsync(request);
+                var response = await _s3Helper.CopyObjectAsync(request);
 
                 return response.HttpStatusCode == HttpStatusCode.OK;
             }

@@ -140,7 +140,6 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string ReferralUser { get; set; }
         public string ReferredUser { get; set; }
-        public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public DateTimeOffset RegTime { get; set; }
         public decimal ReferralAmount { get; set; }

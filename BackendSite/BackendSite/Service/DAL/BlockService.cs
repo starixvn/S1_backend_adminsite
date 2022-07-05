@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,14 @@ namespace BackendSite.Service.DAL
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly MySqlClient _ipTableClient;
+        private readonly CustInfoService _custInfoService;
         public BlockService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
         public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
             DateTime endDate, int startIndex,
@@ -85,15 +88,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int status,string accountNum,string userName)
+        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
             var jsonSelectStatus = string.Empty;
-            if(status == 0)
+            if(blockStatus == 0)
             {
                 var tempList = new List<int>() { 1, 2};
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
-            else if(status == 1)
+            else if(blockStatus == 1)
             {
                 var tempList = new List<int>() { 1};
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
@@ -111,7 +114,8 @@ namespace BackendSite.Service.DAL
                 AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null: accountNum,
                 UserName = string.IsNullOrWhiteSpace(userName) ? null : userName,
                 SelectStatus = jsonSelectStatus,
-            });
+                SelectCurrency = JsonConvert.SerializeObject(currencyId)
+        });
 
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
         }
@@ -126,20 +130,6 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
         }
-
-        public int BlockAccountSet(int sysId, string accountNum,int status,string Operator, string memo = "")
-        {
-            var p = new DynamicParameters(new
-            {
-                _SysId = sysId,
-                _AccountNum = accountNum,
-                _Status = status,
-                _UpdateOperator = Operator,
-                _Memo = memo
-            });
-            var result = _mainDbClient.Execute("Admin_BlockAccount_Set", p);
-            return result;
-        }
         public IEnumerable<IPCountry> GetIPCountryList()
         {
             return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
@@ -153,6 +143,129 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
+        }
+
+        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                _SysId = sysId,
+                _AccountNum = accountNum,
+                _Status = (int)status,
+                _UpdateOperator = Operator,
+                _Memo = memo
+            });
+            result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
+
+            if(result > 0)
+            {
+                var blockBankAccBlockList = GetBlockBankAccList(sysId, accountNum).ToList();
+
+                foreach(var x in blockBankAccBlockList)
+                {
+                    var parameter = new DynamicParameters(new
+                    {
+                        CustId = x.CustId,
+                        SysId = sysId,
+                        AccountNo = accountNum,
+                        IFSCCode = x.IFSCCode,
+                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
+                    });
+
+                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
+
+                    if (result > 0)
+                    {
+                        var prop = new DynamicParameters(new
+                        {
+                            CustId = x.CustId,
+                            SiteId = x.SiteId,
+                            SysId = sysId,
+                            AccountNum = accountNum,
+                            IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
+                            AccountName = x.AccountName,
+                            Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                        });
+
+                        result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+                        if(result == 0)
+                        {
+                            trans.Rollback();
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                        return result;
+                    }
+                }
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            return result;
+        }
+
+        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                CustId = custId,
+                SysId = sysId,
+                AccountNo = accountNum
+            });
+            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
+            
+            if(result > 0)
+            {
+                var custInfo = _custInfoService.GetCustInfo(custId);
+
+                if(custInfo != null)
+                {
+                    var prop = new DynamicParameters(new
+                    {
+                        CustId = custId,
+                        SiteId = custInfo.SiteId,
+                        SysId = sysId,
+                        AccountNum = accountNum,
+                        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "" : iFSCCode,
+                        AccountName = accountNum,
+                        Status = CustBankInfoLogStatus.Release
+                    });
+
+                    result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+
+                    if(result <= 0)
+                    {
+                        trans.Rollback();
+                    }
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+                
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            trans.Commit();
+            return result;
         }
     }
 }

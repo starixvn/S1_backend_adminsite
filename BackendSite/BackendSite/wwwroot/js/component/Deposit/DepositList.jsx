@@ -15,13 +15,13 @@ import DateTimePicker from 'react-datetime';
     };
 
     const DepositStatusOp = {
-        1: <span className="status status-pending">{i18n["lbl_DepositStatus1"]}</span>,
+        1: <span className="status status-deposit-pending">{i18n["lbl_DepositStatus1"]}</span>,
         2: <span className="status status-">Paid</span>,
-        3: <span className="status status-approved">{i18n["lbl_DepositStatus3"]}</span>,
-        4: <span className="status status-rejected">{i18n["lbl_DepositStatus4"]}</span>,
-        5: <span className="status status-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
+        3: <span className="status status-deposit-approved">{i18n["lbl_DepositStatus3"]}</span>,
+        4: <span className="status status-deposit-rejected">{i18n["lbl_DepositStatus4"]}</span>,
+        5: <span className="status status-deposit-cancelled">{i18n["lbl_DepositStatus5"]}</span>,
         6: <span className="status status-">Expired</span>,
-        7: <span className="status status-hold">{i18n["lbl_DepositStatus7"]}</span>,
+        7: <span className="status status-deposit-hold">{i18n["lbl_DepositStatus7"]}</span>,
     }
 
     const TypeSelectOp = {
@@ -32,34 +32,6 @@ import DateTimePicker from 'react-datetime';
         5: "Load Card",
         6: "QRPay",
         7: "BankAutoChannel"
-    };
-    
-    const BankCodeSelectInit = {
-            "AMB" :"AMB",
-            "CIMB":"CIMB",
-            "HLB":"HLB",
-            "MBB":"MBB",
-            "PBB":"PBB",
-            "RHB":"RHB",
-            "BBL" :"BBL",
-            "HSBC":"HSBC",
-            "KBANK":"KBANK",
-            "KTB":"KTB",
-            "SCB":"SCB",
-            "TBK":"TBK",
-            "BCA" :"BCA",
-            "BNI":"BNI",
-            "BRI":"BRI",
-            "CIMBN":"CIMBN",
-            "MDR":"MDR",
-            "UOB":"UOB",
-            "ACB" :"ACB",
-            "BIDV":"BIDV",
-            "DAB":"DAB",
-            "GAB":"GAB",
-            "TCB":"TCB",
-            "VCB":"UOB",
-            "VTB":"VTB"
     };
     
     const StatusSelectOp = {
@@ -91,7 +63,19 @@ import DateTimePicker from 'react-datetime';
         25: 25,
         50: 50
     }
-
+    
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return;
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    }
     
     class DepositList extends React.Component {
         constructor(props) {
@@ -120,7 +104,7 @@ import DateTimePicker from 'react-datetime';
                 let styleblod = (row.flag === 0) ? { fontWeight: 'bold' } : {};
                 let showbankname = (row.depositType === 1 || row.depositType === 7) ? row.bankName + " ( " + row.payName + " ) " : (row.depositType === 2 || row.depositType === 6) ? row.channelName + " ( " + row.payName + " ) " : (row.depositType === 3) ? row.bankName : null;
                 //銅=>銀=>金=>白金=>水鑽藍=>紅寶石
-                let vipbg = (row.vipLevel === 1 ) ? "c6842c": (row.vipLevel === 2 ) ? "c0c0c0" : (row.vipLevel === 3 ) ? "ffd700" : (row.vipLevel === 4 ) ? "66CDAA" :　(row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
+                let vipbg = (row.vipLevel === 1) ? "c6842c" : (row.vipLevel === 2) ? "c0c0c0" : (row.vipLevel === 3) ? "ffd700" : (row.vipLevel === 4) ? "66CDAA" : (row.vipLevel === 5) ? "4169E1" : (row.vipLevel === 6) ? "B22222" : null;
                 return (
                     <tr key={row.transId} style={styleblod}>
                         {(subFuncKeys.indexOf("f_dp_execute") > -1) ? (row.status === 1) ? <td><input type="checkbox" value={row.transId} checked={this.props.rejectChecks.list[idx].isChecked} onChange={this.props.handleChange.bind(this, row.transId)} /></td> : <td></td> : null}
@@ -128,11 +112,14 @@ import DateTimePicker from 'react-datetime';
                             {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
                         {/* <td>{row.calCode}</td> */}
+                        <td>{row.operator}</td>
+                        <td>{DepositStatusOp[row.status]}</td>
                         <td>{i18n["lbl_DepositType" + row.depositType]}</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
-                        <td>{row.depositType === 4 ? row.channelName : "" }</td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
+                        <td>{row.depositType === 4 ? row.channelName : ""}</td>
                         <td>{JSON.parse(row.depositInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
@@ -142,9 +129,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.accountName}</td>
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
-                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.depositCnt}</td>
-                        <td>{DepositStatusOp[row.status]}</td>
                     </tr>
                 )
             });
@@ -153,7 +138,7 @@ import DateTimePicker from 'react-datetime';
             if (this.props.onRefresh == null) {
                 RefreshBtn = <button type="button" className="btn btn-refresh" disabled={true} onClick={null}>
                     Loading
-                        </button>;
+                </button>;
             } else {
                 RefreshBtn = <button type="button" className="btn btn-refresh" onClick={this.onRefresh.bind(this)}>
                     Refresh <span>({this.props.timeInterval})</span>
@@ -172,11 +157,14 @@ import DateTimePicker from 'react-datetime';
                             <tr>
                                 {(subFuncKeys.indexOf("f_dp_execute") > -1) ? <th scope="col"><input type="checkbox" checked={this.props.rejectChecks.allChecked} onChange={this.props.handleChange.bind(this, "checkAll")} /></th> : null}
                                 <th scope="col">Trxn.ID</th>
+                                <th scope="col">Operator</th>
+                                <th scope="col">{i18n.lbl_Status}</th>
                                 {/* <th scope="col">Calvin Code</th> */}
                                 <th scope="col">{i18n.lbl_DepositType}</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col">NetWork</th>
                                 <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
@@ -187,9 +175,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">To Acc. Name</th>
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Deposit Count</th>
-                                <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -266,8 +252,9 @@ import DateTimePicker from 'react-datetime';
                 .then(async function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
+
                     if (result.errorCode == 0) {
-                        this.setState({ Data: result.data, selectType: result.data.DepositType, GetData: true, Comment: result.data.comment ,EditAmount:false,NewAmount:0});
+                        this.setState({ Data: result.data, selectType: result.data.DepositType, GetData: true, Comment: result.data.comment, EditAmount: false, NewAmount: 0 });
                     } else {
                         alert(result.message);
                     }
@@ -350,17 +337,42 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
-        editOnChange(e){
+        /* Fatty pay 手動 Approval  */
+        depositManualApproval() {
+            let confirmString = "Are you sure deposit Manual Approval ?";
+            if (confirm(confirmString)) {
+                Loading.OnLoading();
+                let data = { TransId: this.props.transId, Amount: this.state.Data.amount };
+                axios.post('/api/Deposit/DepositManualApproval', data)
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0)
+                        {
+                            alert(result.message);
+                            this.onBack();
+                        } else {
+                            alert(result.message);
+                            this.onGetComment();
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        editOnChange(e) {
             this.setState({
                 ...this.state,
-                NewAmount:e
+                NewAmount: e
             });
         }
-        onClickEdit(e){
+        onClickEdit(e) {
             this.setState({
                 ...this.state,
                 EditAmount: true,
-                NewAmount:e
+                NewAmount: e
             });
         }
         AmountUpdate(){
@@ -372,7 +384,7 @@ import DateTimePicker from 'react-datetime';
                 before: { amount: detail.amount },
                 after: { amount: this.state.NewAmount }
             };
-            axios.post('/apiv2/Deposit/SetAmountByTransId', data)
+            axios.post('/api/Deposit/SetDepositRequestAmount', data)
             .then(function (response) {
                 Loading.UnLoading();
                 let result = response.data;
@@ -387,7 +399,7 @@ import DateTimePicker from 'react-datetime';
                 alert(error);
             }.bind(this));
         }
-        AmountCancel(){
+        AmountCancel() {
             this.setState({
                 ...this.state,
                 EditAmount: false
@@ -399,18 +411,24 @@ import DateTimePicker from 'react-datetime';
             let isedit = this.state.EditAmount;
             let btnGroup = [];
             let PayFrom = [];
+
             if (data != null) {
+                let depositInfo = JSON.parse(data.depositInfo);
+                let payid = depositInfo.PayId;
                 let dS = DepositStatus;
                 if (data.status == dS.Pending || data.status == dS.OnHold)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                    btnGroup.push(<button key={0} type="button" className="btn btn-deposit-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if (data.status == dS.OnHold && data.depositType == 3)
-                    btnGroup.push(<button key={1} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                    btnGroup.push(<button key={1} type="button" className="btn btn-deposit-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
                 if (data.status == dS.Pending && data.depositType == 3)
-                    btnGroup.push(<button key={7} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
+                    btnGroup.push(<button key={7} type="button" className="btn btn-deposit-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
                 if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
-                    btnGroup.push(<button key={3} type="button" className="btn btn-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
+                    btnGroup.push(<button key={3} type="button" className="btn btn-deposit-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
+                if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕。 */
+                    btnGroup.push(<button type="button" className="btn btn-deposit-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
                 if (data.status == dS.Pending)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
+                    btnGroup.push(<button key={4} type="button" className="btn btn-deposit-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
+
                 let payK = 0;
                 PayFrom.push(<tr key={payK++}>
                     <th scope="row">To Bank Code</th>
@@ -507,7 +525,7 @@ import DateTimePicker from 'react-datetime';
                             <tr>
                                 <th scope="row">Request Amount</th>
                                 {
-                                    isedit?(<td>
+                                    isedit ? (<td>
                                         <input type="text" defaultValue={data.amount} onChange={(e) => this.editOnChange(e.target.value)} />
                                         <div className="button-action float-right">
                                             <button className="btn btn-save" onClick={this.AmountUpdate.bind(this)}>
@@ -517,20 +535,20 @@ import DateTimePicker from 'react-datetime';
                                                 <i className="icon-cancel"></i>
                                             </button>
                                         </div>
-                                    </td>):
-                                    (<td>
-                                        <div>
-                                            {number_format(data.amount)}
-                                            <div className="button-action float-right">
-                                                {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && (data.status == 1 || data.status == 4))?
-                                                (<button type="button" className="btn btn-edit" onClick={this.onClickEdit.bind(this,data.amount)}>
-                                                    <i className="icon-edit"></i>
-                                                </button>):null}
+                                    </td>) :
+                                        (<td>
+                                            <div>
+                                                {number_format(data.amount)}
+                                                <div className="button-action float-right">
+                                                    {(subFuncKeys.indexOf("f_dp_editAmount") > -1 && (data.status == 1 || data.status == 4)) ?
+                                                        (<button type="button" className="btn btn-edit" onClick={this.onClickEdit.bind(this, data.amount)}>
+                                                            <i className="icon-edit"></i>
+                                                        </button>) : null}
+                                                </div>
+                                                <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
+                                                </button>
                                             </div>
-                                            <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.amount}>Copy
-                                            </button>
-                                        </div>
-                                    </td>)
+                                        </td>)
                                 }
                             </tr>
                             <tr>
@@ -540,7 +558,7 @@ import DateTimePicker from 'react-datetime';
                             {PayFrom}
                             <tr>
                                 <th scope="row">{"Deposit Time" + " (" + moment().format('Z') + ")"}</th>
-                                <td>{data.depositTime ? moment(data.depositTime).format('l LTS') : "N/A" }</td>
+                                <td>{data.depositTime ? moment(data.depositTime).format('l LTS') : "N/A"}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Ref ID</th>
@@ -582,11 +600,13 @@ import DateTimePicker from 'react-datetime';
             this.state = {
                 SiteList: [],
                 BankList: [],
+                PaymentGateWayList:[],
                 CalCodeList: [],
                 selectSite: [],
                 selectType: [],
                 selectCurrency: [],
                 selectBankCode: [],
+                selectPaymentGateWay:[],
                 selectCalCode:[],
                 selectStatus: [],
                 SelectUser: "",
@@ -597,9 +617,9 @@ import DateTimePicker from 'react-datetime';
                 MutiSelRefresh: false,
                 rejectChecks: {},
                 levelStatus: [],
-                amountType:0,
+                amountType: 0,
                 amount: "",
-                pageSize:25
+                pageSize: 25
             };
             this.searchFilter = {};
         }
@@ -629,6 +649,7 @@ import DateTimePicker from 'react-datetime';
                 SelectBankCode: this.searchFilter.selectBankCode,
                 SelectCalCode: this.searchFilter.selectCalCode,
                 AmountType: parseInt(this.searchFilter.amountType),
+                SelectPayId: this.searchFilter.selectPaymentGateWay,
                 Amount:this.searchFilter.amount,
                 PageSize:this.searchFilter.pageSize
             };
@@ -651,6 +672,10 @@ import DateTimePicker from 'react-datetime';
 
             if (this.searchFilter.selectCalCode.length != 0) {
                 data.SelectCalCode = this.searchFilter.selectCalCode;
+            }
+
+            if (this.searchFilter.selectPaymentGateWay.length != 0) {
+                data.SelectPayId = this.searchFilter.selectPaymentGateWay;
             }
 
             if (this.searchFilter.SelectUser != "") {
@@ -704,6 +729,7 @@ import DateTimePicker from 'react-datetime';
                 SelectSite: this.searchFilter.selectSite,
                 SelectBankCode: this.searchFilter.selectBankCode,
                 SelectCalCode: this.searchFilter.selectCalCode,
+                SelectPayId: this.searchFilter.selectPaymentGateWay,
                 AmountType: parseInt(this.searchFilter.amountType),
                 Amount:this.searchFilter.amount 
             };
@@ -726,6 +752,10 @@ import DateTimePicker from 'react-datetime';
             if (this.searchFilter.selectCalCode.length != 0) {
                 data.SelectCalCode = this.searchFilter.selectCalCode;
             }
+
+            if (this.searchFilter.selectPaymentGateWay.length != 0) {
+                data.SelectPayId = this.searchFilter.selectPaymentGateWay;
+            }
             
             if (this.searchFilter.SelectUser != "") {
                 data.UserName = this.searchFilter.SelectUser;
@@ -738,7 +768,7 @@ import DateTimePicker from 'react-datetime';
             if (this.searchFilter.levelStatus.length != 0) {
                 data.LevelStatus = this.searchFilter.levelStatus;
             }
-        
+
             let ExportParam = [];
             for (var prop in data) {
                 ExportParam.push(<input key={prop} type="hidden" name={prop} value={data[prop]} />);
@@ -834,15 +864,14 @@ import DateTimePicker from 'react-datetime';
                 return;
             }
 
-            if(parseInt(this.state.amountType) != 0 && this.state.amount == ""){
+            if (parseInt(this.state.amountType) != 0 && this.state.amount == "") {
                 alert("Please Set Amount")
                 return;
             }
             //this._Search = true;
             let data = { StartDate: moment(this.selectdate_start.current.state.inputValue).unix(), EndDate: moment(this.selectdate_end.current.state.inputValue).add(1, 'days').unix() - 1 };
             this.setState(data, function () {
-                console.log('aaa',this.state);
-                this.searchFilter = JSON.parse(JSON.stringify(this.state));
+                this.searchFilter = JSON.parse(JSON.stringify(this.state, getCircularReplacer())) ;
                 this.onSearch(1);
             }.bind(this));
         }
@@ -897,7 +926,24 @@ import DateTimePicker from 'react-datetime';
                 alert(error);
             }.bind(this));
         }
-        
+
+        getPaymentGateWay() {
+            let state = this.state;
+            axios.post('/api/Deposit/GetPaymentGateWayOptions')
+                .then(function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        state.selectPaymentGateWay.length = 0;
+                        this.setState({ PaymentGateWayList: result.data });
+                        this.buildSelectPaymentGateWay();
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));
+        }
+
         getCalCodeList() {
             let state = this.state;
             axios.post('/api/BankList/GetAllCalCodeList')
@@ -1038,19 +1084,14 @@ import DateTimePicker from 'react-datetime';
                 },
                 onInitialized: function () {
                     state.selectBankCode.length = 0;
-                    (searchFilter.selectBankCode) ?
+                    if (searchFilter.selectBankCode)
                         searchFilter.selectBankCode.forEach(function (obj) {
                             state.selectBankCode.push(obj);
-                        })
-                        :
-                        state.selectBankCode = [...Object.values(BankCodeSelectInit)];
+                        });
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectBankCode').multiselect('select', searchFilter.selectBankCode) 
-                : 
-                Object.keys(BankCodeSelectInit).forEach((key) => {
-                    $('#selectBankCode').multiselect('select', key);
-                    });
+            
+            $('#selectBankCode').multiselect('select', searchFilter.selectBankCode)
             $('#selectBankCode').multiselect('updateButtonText');
         }
 
@@ -1152,6 +1193,37 @@ import DateTimePicker from 'react-datetime';
 
         }
 
+        buildSelectPaymentGateWay = () => {
+            let state = this.state, searchFilter = this.searchFilter;
+            $("#selectPaymentGateWay").multiselect({
+                includeSelectAllOption: true,
+                selectAllText: 'Check all!',
+                onSelectAll: function () {
+                    state.selectPaymentGateWay.length = 0;
+                    state.PaymentGateWayList.forEach(function (obj) {
+                        state.selectPaymentGateWay.push(obj.payId);
+                    });
+                },
+                onDeselectAll: function () {
+                    state.selectPaymentGateWay.length = 0;
+                },
+                onChange: function (option, checked, select) {
+                    let val = $(option).val(), index = state.selectPaymentGateWay.indexOf(val);
+                    (checked) ? state.selectPaymentGateWay.push(val) : (index > -1) ? state.selectPaymentGateWay.splice(index, 1) : state.selectPaymentGateWay;
+                    state.selectPaymentGateWay.sort();
+                },
+                onInitialized: function () {
+                    state.selectPaymentGateWay.length = 0;
+                    if (searchFilter.selectPaymentGateWay)
+                        searchFilter.selectPaymentGateWay.forEach(function(obj) {
+                            state.selectPaymentGateWay.push(obj);
+                        });
+                }
+            });
+            $('#selectPaymentGateWay').multiselect('select', searchFilter.selectPaymentGateWay);
+            $('#selectPaymentGateWay').multiselect('updateButtonText');
+        }
+
         componentDidUpdate() {
             if (this.state.MutiSelRefresh) {
                 this.buildSelectSite();
@@ -1161,6 +1233,7 @@ import DateTimePicker from 'react-datetime';
                 this.buildCurrencySite();
                 this.buildStatusSite();
                 this.buildLevel();
+                this.buildSelectPaymentGateWay();
                 this.setState({ MutiSelRefresh: false });
             }
         }
@@ -1168,6 +1241,7 @@ import DateTimePicker from 'react-datetime';
         componentDidMount() {
             this.getSiteList();
             this.getBankInfoList();
+            this.getPaymentGateWay();
             this.getCalCodeList();
             this.buildTypeSite();
             this.buildCurrencySite();
@@ -1209,6 +1283,11 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`bank-list-${item.id}`} value={item.id}>{item.calCodeName}</option>;
             }.bind(this));
             calCodeList = <select id="selectCalCode" name="selectCalCode[]" multiple="multiple">{calCodeList}</select>
+
+            let paymentGateWayList = this.state.PaymentGateWayList.map(function (item) {
+                return <option key={`payment-list-${item.payId}`} value={item.payId}>{item.payName}</option>;
+            }.bind(this));
+            paymentGateWayList = <select id="selectPaymentGateWay" name="selectPaymentGateWay[]" multiple="multiple">{paymentGateWayList}</select>;
             
             let statusList = Object.keys(StatusSelectOp).map(function (obj) {
                 return <option key={`status-list-${obj}`} value={obj}>{StatusSelectOp[obj]}</option>;
@@ -1229,7 +1308,6 @@ import DateTimePicker from 'react-datetime';
                 return <option key={`status-list-${obj}`} value={obj}>{PageSize[obj]}</option>;
             }.bind(this));
             PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
-            
 
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
@@ -1284,6 +1362,12 @@ import DateTimePicker from 'react-datetime';
                                     </div>
                                 </div>
                                 <div className="input-item">
+                                    <span className="label">Payment GateWay</span>
+                                    <div className="field">
+                                        {paymentGateWayList}
+                                    </div>
+                                </div>
+                                <div className="input-item">
                                     <span className="label">Status</span>
                                     <div className="field">
                                         {statusList}
@@ -1328,13 +1412,13 @@ import DateTimePicker from 'react-datetime';
                                         {PageSizeList}
                                     </div>
                                 </div>
-                                {IsRefresh ? 
-                                <div className="button-group">
-                                    <button className="btn btn-search" type="submit" disabled={true}><span>Loading</span></button>
-                                </div>:
-                                <div className="button-group">
-                                    <button className="btn btn-search" type="submit"><span>Search</span></button>
-                                </div>}
+                                {IsRefresh ?
+                                    <div className="button-group">
+                                        <button className="btn btn-search" type="submit" disabled={true}><span>Loading</span></button>
+                                    </div> :
+                                    <div className="button-group">
+                                        <button className="btn btn-search" type="submit"><span>Search</span></button>
+                                    </div>}
                             </div>
                         </div>
                     </form> : null}

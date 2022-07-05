@@ -96,6 +96,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{row.operator}</td>
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                         <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
+                        <td>{row.calCode}</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
@@ -141,6 +142,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">Operator</th>
                                 <th scope="col">{i18n.lbl_Status}</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
+                                <th scope="col">CalCode</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
@@ -507,7 +509,7 @@ import DateTimePicker from 'react-datetime';
                 if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
                     btnGroup.push(<button key={1} type="button" className="btn btn-withdrawal-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
-                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
+                if (((data.status == 1 || data.status == 2) && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={8} type="button" className="btn btn-withdrawal-kyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
 
                 selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
