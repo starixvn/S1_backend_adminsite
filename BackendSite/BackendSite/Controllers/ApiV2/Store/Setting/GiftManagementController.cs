@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Store.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [ApiController]
     [Route("apiV2/[controller]/[action]")]
     public class GiftManagementController : ControllerBase

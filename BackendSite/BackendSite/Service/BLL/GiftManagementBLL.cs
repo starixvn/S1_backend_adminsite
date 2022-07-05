@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using Microsoft.Extensions.Configuration;
@@ -145,7 +146,14 @@ namespace BackendSite.Service.BLL
     
         public async Task<ApiResult> SetGiftSortAsync(SetSortRequest req, string userName)
         {
-            var param = new SetSortParams(req, userName);
+            var index = 1;
+            var sortInfos = req.SortedIdList.Select(x => new SortItem
+            {
+                Sort = index++,
+                GiftId = x
+            });
+            
+            var param = new SetSortParams(sortInfos, userName);
             var url = _storeSiteUrl + "/api/GiftManagement/SetSort";
             var result = await _courierAdapter.MyPostAsync<object, SetSortParams>(url, param);
 

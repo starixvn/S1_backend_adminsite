@@ -14,7 +14,7 @@ using SelectListItem = BackendSite.Service.Model.Store.StorePoint.SelectListItem
 
 namespace BackendSite.Controllers.ApiV2.Store.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [ApiController]
     [Route("apiV2/[controller]/[action]")]
     public class StorePointController: ControllerBase
