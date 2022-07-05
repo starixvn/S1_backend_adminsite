@@ -30,5 +30,13 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
+        
+        [HttpPost]
+        public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
+        {
+            var result = _redemptionBll.GetRedemptionDetailAsync(req);
+
+            return result;
+        }
     }
 }

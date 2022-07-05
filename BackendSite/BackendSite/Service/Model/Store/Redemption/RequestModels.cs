@@ -44,4 +44,8 @@ namespace BackendSite.Service.Model.Store.Redemption
         public string SabaId { get; set; }
     }
 
+    public class GetRedemptionDetailRequest 
+    {
+        public int RedemptionId { get; set; }
+    }
 }

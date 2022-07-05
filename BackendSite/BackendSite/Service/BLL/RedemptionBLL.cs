@@ -31,5 +31,13 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Redemption/GetRedemptionDetail";
+            var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionDetailRequest>(url, req);
+
+            return result;
+        }
     }
 }
