@@ -1,0 +1,162 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
+namespace BackendSite.Service.BLL
+{
+    public class ReferralManagementDecorator : IReferralManagementBLL
+    {
+        private readonly IReferralManagementBLL _referralManagementBll;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly ILogger<ReferralManagementDecorator> _logger;
+
+        private readonly Dictionary<int, string> _siteDescription = new Dictionary<int, string>()
+        {
+            { 1, "Nova88" },
+            { 2, "Goal123" },
+            { 3, "Bwing" },
+        };
+        private readonly Dictionary<int, string> _statusDescription = new Dictionary<int, string>()
+        {
+            { 0, "Disable" },
+            { 1, "Enable" }
+        };
+
+        private readonly Dictionary<int, string> _currencyDescription;
+        public string Operator { get; set; }
+        public ReferralManagementDecorator(IReferralManagementBLL referralManagementBll, AdjustmentLogReportService adjustmentLogReportService,
+            ReportService reportService, ILogger<ReferralManagementDecorator> logger)
+        {
+            _referralManagementBll = referralManagementBll;
+            _adjustmentLogReportService = adjustmentLogReportService;
+            _logger = logger;
+            _currencyDescription = reportService.GetCurrencyList()
+                .ToDictionary(c => c.CurrencyId, c => c.IsoCode);
+
+        }
+        public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
+        {
+            return _referralManagementBll.GetReferralBySiteId(siteId);
+        }
+
+        public async Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId)
+        {
+            return await _referralManagementBll.GetReferralDetail(siteId, currencyId);
+        }
+
+        public void SetReferral(List<ReferralManagement> referralList)
+        {
+            _referralManagementBll.SetReferral(referralList);
+        }
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
+        {
+            var referral = await _referralManagementBll.GetReferralDetail(setReferral.SiteId, setReferral.CurrencyId);
+            
+            var result = await _referralManagementBll.SetReferralAsync(setReferral);
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = Operator,
+                SiteId = setReferral.SiteId,
+                CurrencyId = setReferral.CurrencyId,
+                BeforeDetailInfo = referral == null ? null : JsonConvert.SerializeObject(ToDictionary(referral)),
+                AfterDetailInfo = JsonConvert.SerializeObject(ToDictionary(setReferral)),
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.Referral
+            };
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+            {
+                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+            }
+            return result;
+        }
+        public int SetReferralStatus(int siteId, int currencyId,int status)
+        {
+            return _referralManagementBll.SetReferralStatus(siteId, currencyId, status);
+        }
+
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        {
+            var referral = await _referralManagementBll.GetReferralDetail(siteId, currencyId);
+            if (referral == null)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+            var result = await _referralManagementBll.SetReferralStatusAsync(siteId, currencyId, status);
+            
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = Operator,
+                SiteId = siteId,
+                CurrencyId = currencyId,
+                BeforeDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Status = _statusDescription[referral.Status]
+                }),
+                AfterDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Stauts = _statusDescription[status]
+                }),
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.Referral
+            };
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+            {
+                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+            }
+
+            return result;
+        }
+
+        public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        {
+            return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        {
+            return _referralManagementBll.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
+        }
+
+        public IEnumerable<ReferralFriend> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount, bool byRewardTime)
+        {
+            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount, byRewardTime);
+        }
+
+        private Dictionary<string, object> ToDictionary(object source)
+        {
+            var type = source.GetType();
+            var properties = type.GetProperties();
+            var target = new Dictionary<string, object>();
+            foreach (var prop in properties)
+            {
+                if (prop.Name == "SiteId")
+                {
+                    target.Add(prop.Name, _siteDescription[(int)prop.GetValue(source)!]);
+                }
+                else if (prop.Name == "CurrencyId")
+                {
+                    target.Add(prop.Name, _currencyDescription[(int)prop.GetValue(source)!]);
+                }
+                else if (prop.Name == "Status")
+                {
+                    
+                }
+                else
+                {
+                    target.Add(prop.Name, prop.GetValue(source));
+                }
+            }
+
+            return target;
+        }
+    }
+}

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -18,25 +14,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [ApiController]
     public class ReferralController : ControllerBase
     {
-        #region Fields
-
-        private readonly ServerInfoBLL _serverInfoBll;
-        private readonly ReferralManagementBLL _referralManagementBll;
-        private readonly ReportBLL _reportBll;
-
-        #endregion
-
-        #region Constructors
-
-        public ReferralController(IServiceProvider provider)
+        private readonly ReferralManagementDecorator _managementDecorator;
+        public ReferralController(ReferralManagementDecorator managementDecorator)
         {
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _referralManagementBll = provider.GetRequiredService<ReferralManagementBLL>();
-            _reportBll = provider.GetRequiredService<ReportBLL>();
+            _managementDecorator = managementDecorator;
         }
-
-        #endregion
-
+        
         #region API Model
 
         public class GetListRequest
@@ -54,7 +37,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-
             public ReferralStatusEnum Status { get; set; }
         }
         #endregion
@@ -76,13 +58,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var apiResult = new ApiResult<IEnumerable<ReferralList>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = _referralManagementBll.GetReferralBySiteId(request.SiteId)
+                Data = _managementDecorator.GetReferralBySiteId(request.SiteId)
             };
             return apiResult;
         }
         
         /// <summary>
-        /// ReferralManagement/GetList 取得推薦資料清單
+        /// ReferralManagement/Get 取得推薦資料內容
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -97,7 +79,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var apiResult = new ApiResult<ReferralDetail>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _referralManagementBll.GetReferralDetail(request.SiteId, request.CurrencyId)
+                Data = await _managementDecorator.GetReferralDetail(request.SiteId, request.CurrencyId)
             };
             return apiResult;
         }
@@ -112,22 +94,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult UpdateStatus(SetStatusRequest request)
+        public async Task<ApiResult> UpdateStatus(SetStatusRequest request)
         {
-            var apiResult = new ApiResult();
-
-            var referralList = _referralManagementBll.GetReferralBySiteId(request.SiteId).ToList();
-            var referral = referralList.FirstOrDefault(x => x.CurrencyId == request.CurrencyId);
-
-            if (referral == null)
+            _managementDecorator.Operator = User.Identity.Name;
+            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, (int)request.Status);
+            var apiResult = new ApiResult
             {
-                throw new AdminException(ErrorCodeEnum.Fail);
-            }
-
-            _referralManagementBll.SetReferralStatus(request.SiteId, request.CurrencyId, (int)request.Status);
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
+                ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : result
+            };
             return apiResult;
         }
 
@@ -143,9 +117,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
-            var apiResult = new ApiResult();
-            var result = await _referralManagementBll.SetReferralAsync(setReferral);
-            apiResult.ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result;
+            _managementDecorator.Operator = User.Identity.Name;
+            var result = await _managementDecorator.SetReferralAsync(setReferral);
+            var apiResult = new ApiResult
+            {
+                ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result
+            };
             return apiResult;
         }
 
