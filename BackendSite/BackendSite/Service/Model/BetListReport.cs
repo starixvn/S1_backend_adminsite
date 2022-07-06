@@ -57,13 +57,7 @@ namespace BackendSite.Service.Model
             {
                 key.Append($"{item.Name}:{item.Value}:");
             }
-            var result = key.ToString();
-            var  charsToRemove = new string[] { "[", "]", "/"," ",","};
-            foreach (var c in charsToRemove)
-            {
-                result = result.Replace(c, string.Empty);
-            }
-            return result; 
+            return key.ToString();
         }
     }
 
