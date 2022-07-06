@@ -1091,7 +1091,7 @@ namespace BackendSite.Service.Model.enums
         Payment = 5
     }
 
-	public enum LineChannelStatusEnum
+    public enum LineChannelStatusEnum
     {
         Disable = 0,
         Enable = 1
