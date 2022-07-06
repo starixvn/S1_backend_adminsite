@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace BackendSite.Service.Model
 {
@@ -44,11 +45,19 @@ namespace BackendSite.Service.Model
         public decimal WinlostAmount { get; set; } = 0;
 
         public string GetRedisKey()
-        {
+        {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
-            jObject.Remove("PageNumber");
+            jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
+            jObject["EndTime"] = EndTime.ToString("yyyyMMddHHmmssfff");
             jObject.Remove("PageSize");
-            return jObject.ToString().ToLower(); 
+            jObject.Remove("PageNumber");
+            
+            var key = new StringBuilder();          
+            foreach (var item in jObject.Properties())
+            {
+                key.Append($"{item.Name}:{item.Value}:");
+            }
+            return key.ToString();
         }
     }
 
