@@ -6,6 +6,8 @@
 @inject ServerInfoBLL serverInfoBLL
 @inject AuthorizeBLL authorizeBLL
 @inject PermissionBLL permissionBLL
+@inject ReportBLL _reportBll
+
 @section Style {
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/css/main.css" rel="stylesheet" asp-append-version="true" />
@@ -25,11 +27,18 @@
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 
-    var currencyList = serverInfoBLL.GetCurrencyList();
-    foreach (var currency in currencyList)
+    //var currencyList = serverInfoBLL.GetCurrencyList();
+    //foreach (var currency in currencyList)
+    //{
+    //    if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
+    //        i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+    //}
+
+    var list = _reportBll.GetCurrency();
+    foreach (var data in list)
     {
-        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
-            i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
+        if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"CurrencyWithdrawal_{data.CurrencyId}")))
+            i18n.Add($"lbl_Currency{data.CurrencyId}", string.Format(selLangBLL.GetResourceValue($"CurrencyWithdrawal_{data.CurrencyId}"), data.TimeZone) );
     }
 
     var subFuncKeys = permissionBLL.GetSubFunckeys("Marketing/VipRebateMangetment");

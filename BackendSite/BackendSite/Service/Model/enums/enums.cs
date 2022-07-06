@@ -574,7 +574,11 @@ namespace BackendSite.Service.Model.enums
         SetCustomerPhone = 28,
         SetCustomerEMail = 29,
         SetCustomerAddress = 30,
-        ResetCustomerProfile = 31
+        ResetCustomerProfile = 31,
+        VipRebatePeriod = 32,
+        VipRebateCategory = 33,
+        VipRebateGameType = 34,
+        VipRebatePayoutLimit = 35
     }
 
     #region BankFinancialTransferInfoLog

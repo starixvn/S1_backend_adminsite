@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -63,21 +65,14 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebatePeriod> GetRebatePeriod(RebatePeriodReq rebatePeriodReq)
         {
-            var apiResult = new ApiResult<RebatePeriod>
+            return new ApiResult<RebatePeriod>
             {
-                Data = new RebatePeriod()
+                Data = rebateManageBLL.GetRebatePeriod(rebatePeriodReq.SiteId),
+                ErrorCode = 0
             };
-            var periodType = 0;
-            var periodDay = 0;
-            var redeemHours = 0;
-            apiResult.ErrorCode = 0;
-            rebateManageBLL.GetRebatePeriod(rebatePeriodReq.SiteId, out periodType, out periodDay, out redeemHours);
-            apiResult.Data.PeriodType = periodType;
-            apiResult.Data.PeriodDay = periodDay;
-            apiResult.Data.RedeemHours = redeemHours;
-            return apiResult;
         }
 
         public class SetRebatePeriodReq
@@ -89,12 +84,13 @@ namespace BackendSite.Controllers.Api
 
 
         }
-        public ApiResult SetRebatePeriod(SetRebatePeriodReq setRebatePeriodReq)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        public async Task<ApiResult> SetRebatePeriodAsync(SetRebatePeriodReq setRebatePeriodReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebatePeriod(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
+            var result = await rebateManageBLL.SetRebatePeriodAsync(setRebatePeriodReq.SiteId, setRebatePeriodReq.PeriodType, setRebatePeriodReq.PeriodDay, setRebatePeriodReq.RedeemHours, UserName); ;
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -110,6 +106,7 @@ namespace BackendSite.Controllers.Api
         {
             public int SiteId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebatePeriod(DelRebatePeriodReq delRebatePeriodReq)
         {
             var apiResult = new ApiResult
@@ -134,6 +131,7 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
@@ -149,6 +147,7 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public int GameType { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<IEnumerable<RebateLevelData>> GetRebateInfoByGameType(RebateInfoByGameTypeReq rebateInfoByGameTypeReq)
         {
             var apiResult = new ApiResult<IEnumerable<RebateLevelData>>
@@ -164,6 +163,7 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
             public int CategoryId { get; set; }
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
         public ApiResult<RebateCategoryDetail> GeRebateCategoryDetail(RebateCategoryDetailReq rebateCategoryDetailReq)
         {
             var apiResult = new ApiResult<RebateCategoryDetail>
@@ -183,7 +183,8 @@ namespace BackendSite.Controllers.Api
             public decimal percentage { get; set; }
 
         }
-        public ApiResult SetRebateCategory(SetRebateCategoryReq setRebateCategoryReq)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        public async Task<ApiResult> SetRebateCategoryAsync(SetRebateCategoryReq setRebateCategoryReq)
         {
             var apiResult = new ApiResult
             {
@@ -191,7 +192,7 @@ namespace BackendSite.Controllers.Api
             };
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebateCategory(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
+            var result = await rebateManageBLL.SetRebateCategoryAsync(setRebateCategoryReq.SiteId, setRebateCategoryReq.CurrencyId, setRebateCategoryReq.CategoryId, setRebateCategoryReq.level, setRebateCategoryReq.percentage, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -211,6 +212,7 @@ namespace BackendSite.Controllers.Api
             public string levelPercentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateCategoryBatch(SetRebateCategoryBatchReq setRebateCategoryBatchReq)
         {
             var apiResult = new ApiResult
@@ -240,6 +242,7 @@ namespace BackendSite.Controllers.Api
             public int level { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebateCategory(DelRebateCategoryReq delRebateCategoryReq)
         {
             var apiResult = new ApiResult
@@ -267,12 +270,13 @@ namespace BackendSite.Controllers.Api
             public decimal percentage { get; set; }
 
         }
-        public ApiResult SetRebateGameType(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        public async Task<ApiResult> SetRebateGameTypeAsync(SetRebateGameTypeReq setRebateCategoryGameTypeReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebateGameType(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
+            var result = await rebateManageBLL.SetRebateGameTypeAsync(setRebateCategoryGameTypeReq.SiteId, setRebateCategoryGameTypeReq.CurrencyId, setRebateCategoryGameTypeReq.GameType, setRebateCategoryGameTypeReq.level, setRebateCategoryGameTypeReq.percentage, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -292,6 +296,7 @@ namespace BackendSite.Controllers.Api
             public string levelPercentage { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebateGameTypeBatch(SetRebateGameTypeBatchReq setRebateGameTypeBatchReq)
         {
             var apiResult = new ApiResult();
@@ -316,6 +321,7 @@ namespace BackendSite.Controllers.Api
             public int level { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebateGameType(DelRebateGameTypeReq delRebateGameTypeReq)
         {
             var apiResult = new ApiResult
@@ -343,12 +349,13 @@ namespace BackendSite.Controllers.Api
             public decimal MinPayout { get; set; }
 
         }
-        public ApiResult SetRebatePayoutLimit(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
+        public async Task<ApiResult> SetRebatePayoutLimitAsync(SetRebatePayoutLimitReq setRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult();
             var UserName = authorizeBLL.GetAuthData().UserName;
             apiResult.ErrorCode = 99;
-            var result = rebateManageBLL.SetRebatePayoutLimit(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
+            var result = await rebateManageBLL.SetRebatePayoutLimitAsync(setRebatePayoutLimitReq.SiteId, setRebatePayoutLimitReq.CurrencyId, setRebatePayoutLimitReq.CategoryId, setRebatePayoutLimitReq.MaxPayout, setRebatePayoutLimitReq.MinPayout, UserName);
             if (result)
             {
                 apiResult.ErrorCode = 0;
@@ -366,6 +373,7 @@ namespace BackendSite.Controllers.Api
             public string LevelPayout { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult SetRebatePayoutLimitBatch(SetRebatePayoutLimitBatchReq setRebatePayoutLimitBatchReq)
         {
             var apiResult = new ApiResult();
@@ -389,6 +397,7 @@ namespace BackendSite.Controllers.Api
             public int CategoryId { get; set; }
 
         }
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment", "f_vrm_edit" })]
         public ApiResult DelRebatePayoutLimit(DelRebatePayoutLimitReq delRebatePayoutLimitReq)
         {
             var apiResult = new ApiResult
