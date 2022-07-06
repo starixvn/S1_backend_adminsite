@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace BackendSite.Service.Model
 {
@@ -48,7 +49,13 @@ namespace BackendSite.Service.Model
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
             jObject.Remove("PageNumber");
             jObject.Remove("PageSize");
-            return jObject.ToString().ToLower(); 
+            
+            var key = new StringBuilder();          
+            foreach (var item in jObject.Properties())
+            {
+                key.Append($"{item.Name}:{item.Value}:");
+            }
+            return key.ToString(); 
         }
     }
 
