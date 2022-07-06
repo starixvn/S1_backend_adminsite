@@ -42,8 +42,8 @@ namespace BackendSite.Controllers.Api
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly BonusInfoService _bonusInfoService;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-
 
         #endregion
 
@@ -63,6 +63,7 @@ namespace BackendSite.Controllers.Api
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 

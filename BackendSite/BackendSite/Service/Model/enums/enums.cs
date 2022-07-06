@@ -16,8 +16,9 @@ namespace BackendSite.Service.Model.enums
     {
         Main, //ConnectionString
         Report, //ConnectionStringReport
-        Wager, //ConnectionStringWager
-        Log, //ConnectionStringLog
+        Wager,  //ConnectionStringWager
+        Log,    //ConnectionStringLog
+        IP      //ConnectionStringIPTable
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -1041,6 +1042,17 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+
+    public enum RedisDataBase
+    {
+        Member = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        Admin = 4,
+        Payment = 5
+    }
+
     #endregion
 
     public enum LineChannelStatusEnum
@@ -1067,5 +1079,35 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
+	}
+	
+    public enum SiteEnum
+    {
+        [Description("Nova88")]
+        NOVA88 = 1,
+        [Description("Goal123")]     
+        GOAL123 = 2,
+        [Description("Bwing")]
+        BWING = 3
+    }
+
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+        BODelete = 2
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+    public enum CustBankInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 }

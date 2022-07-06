@@ -31,6 +31,7 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly BlockService _blockService;
 
         public CustInfoBLL(IServiceProvider provider)
         {
@@ -49,6 +50,7 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _blockService = provider.GetRequiredService<BlockService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
