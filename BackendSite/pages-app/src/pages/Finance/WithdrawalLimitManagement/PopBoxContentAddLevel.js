@@ -39,7 +39,7 @@ export const PopBoxContentAddLevel = (props) => {
                 times: Times
             }
         };
-        api.post('/apiv2/WithdrawalLimit/Create', data)
+        api.post('/api/Withdrawal/AddWithdrawalLimitInfo', data)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newLevelList);

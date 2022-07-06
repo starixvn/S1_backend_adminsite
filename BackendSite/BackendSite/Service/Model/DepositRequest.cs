@@ -119,7 +119,7 @@ namespace BackendSite.Service.Model
 
     public class DepositDetailSubmission
     {
-        public string DepositDetails { get; set; }
+        public DepositDetailInfo Detail { get; set; }
         public IFormFile Receipt { get; set; }
     }
 

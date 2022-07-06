@@ -69,7 +69,7 @@ const App = () => {
       }
     };
     api
-      .post("/apiv2/TagManagement/EditTagManagement", Data)
+      .post("/api/CustManage/EditTagManagement", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           //EditBack();
@@ -236,7 +236,7 @@ const App = () => {
         }
       };
       api
-        .post("/apiv2/TagManagement/SetTagStatus", Data)
+        .post("/api/CustManage/SetTagStatus", Data)
         .then(function (res) {
           if (res.data.errorCode === 0) {
             Resubmit();
