@@ -45,17 +45,25 @@ namespace BackendSite.Service.Model
         public decimal WinlostAmount { get; set; } = 0;
 
         public string GetRedisKey()
-        {
+        {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
-            jObject.Remove("PageNumber");
+            jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
+            jObject["EndTime"] = EndTime.ToString("yyyyMMddHHmmssfff");
             jObject.Remove("PageSize");
+            jObject.Remove("PageNumber");
             
             var key = new StringBuilder();          
             foreach (var item in jObject.Properties())
             {
                 key.Append($"{item.Name}:{item.Value}:");
             }
-            return key.ToString(); 
+            var result = key.ToString();
+            var  charsToRemove = new string[] { "[", "]", "/"," ",","};
+            foreach (var c in charsToRemove)
+            {
+                result = result.Replace(c, string.Empty);
+            }
+            return result; 
         }
     }
 
