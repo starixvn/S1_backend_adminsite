@@ -70,10 +70,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -173,7 +173,6 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-
     // "Marketing/DomainManage.min": [
     // 	"./src/pages/Marketing/DomainManage/index.js"
     // ],
@@ -257,9 +256,9 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
-    // "Finance/CryptoWithdrawalLimitManagement.min": [
-    //   "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
-    // ],
+    "Finance/CryptoWithdrawalLimitManagement.min": [
+      "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
+    ],
     // "Marketing/VerificationReward.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationReward/index.js",
@@ -275,8 +274,10 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/HotEventManagement.min": [
     //   "./src/pages/Marketing/HotEventManagement/index.js",
+    //     "./src/pages/Marketing/HotEventManagement/index.js",
     // ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/DeepLinkManagement.min": [
