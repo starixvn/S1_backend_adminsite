@@ -37,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 1 })]
         public ApiListResult<BetListReport> GetBetList(GetBetListRequest request)
         {
             DateCheck(request);
@@ -66,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </param>
         /// <returns>檔案</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 2 })]
         public IActionResult Export(GetBetListRequest request)
         {
             DateCheck(request);
