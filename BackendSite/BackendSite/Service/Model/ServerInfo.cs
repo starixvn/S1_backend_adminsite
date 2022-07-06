@@ -67,5 +67,6 @@ namespace BackendSite.Service.Model
     public class SiteConfig
     {
         public string BannerURL { get; set; }
+        public string AwsCloudFrontErrorDomainID { get; set; }     
     }
 }

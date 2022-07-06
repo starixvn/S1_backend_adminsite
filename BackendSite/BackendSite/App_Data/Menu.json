@@ -820,6 +820,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "SiteMaintenance",
+        "Title": "Site Maintenance",
+        "FuncKey": "CMS/SiteMaintain",
+        "Controller": "Marketing",
+        "Action": "SiteMaintain",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   }

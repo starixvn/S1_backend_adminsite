@@ -621,6 +621,11 @@
       "DisplayKey": "Deep Link Management",
       "FuncKey": "CMS/DeepLinkManagement",
       "Enable": false
+    },
+    {
+      "DisplayKey": "Site Maintenance",
+      "FuncKey": "CMS/SiteMaintain",
+      "Enable": false
     }
   ]
 },
