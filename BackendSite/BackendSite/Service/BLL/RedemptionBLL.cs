@@ -49,6 +49,14 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Redemption/SetRedemptionInfo";
+            var result = _courierAdapter.PostAsync<ApiResult<object>, SetRedemptionInfoRequest>(url, req);
+
+            return result;
+        }
+        
         public async Task<string> UploadReceiptAsync(IFormFile file)
         {
             if (!CheckIsImage(file))

@@ -48,4 +48,15 @@ namespace BackendSite.Service.Model.Store.Redemption
     {
         public int RedemptionId { get; set; }
     }
+    
+    public class SetRedemptionInfoRequest 
+    {
+        public int SiteId { get; set; }
+        public string TransId { get; set; }
+        public int Action { get; set; }
+        public string Comment { get; set; }
+        public decimal? ActualCost { get; set; }
+        public string ReceiptUrls { get; set; } = "";
+        public string Operator { get; set; }
+    }
 }
