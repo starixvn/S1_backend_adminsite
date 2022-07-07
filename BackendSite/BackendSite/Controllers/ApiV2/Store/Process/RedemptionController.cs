@@ -14,17 +14,19 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Store.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [ApiController]
     [Route("apiV2/[controller]/[action]")]
     public class RedemptionController : ControllerBase
     {
         private readonly RedemptionBLL _redemptionBll;
+        private readonly AuthorizeBLL _authorizeBll;
         private readonly ExcelBLL _excelBll;
 
         public RedemptionController(IServiceProvider provider)
         {
             _redemptionBll = provider.GetRequiredService<RedemptionBLL>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
         
@@ -40,6 +42,17 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var result = _redemptionBll.GetRedemptionDetailAsync(req);
+
+            return result;
+        }
+        
+        [HttpPost]
+        public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            req.Operator = authData.UserName;
+            
+            var result = _redemptionBll.SetRedemptionInfoAsync(req);
 
             return result;
         }
