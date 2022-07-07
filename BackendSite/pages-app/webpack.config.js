@@ -44,9 +44,9 @@ module.exports = {
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
-    // "CSD/PersonalMsgBatch.min": [
-    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
-    // ],
+    "CSD/PersonalMsgBatch.min": [
+    	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -157,10 +157,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    // "Marketing/VipRebateMangetment.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
-    // ],
+    "Marketing/VipRebateMangetment.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
+    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",

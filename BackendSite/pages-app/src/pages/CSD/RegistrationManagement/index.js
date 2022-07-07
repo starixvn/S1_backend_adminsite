@@ -66,7 +66,7 @@ const App = () => {
   }, []);
 
   const Filter_OnChange = (v, dataColumn) => {
-    console.log(v, dataColumn);
+    //console.log(v, dataColumn);
     setFilter({
       ...stateFilter,
       [dataColumn]: v,
@@ -258,14 +258,24 @@ const App = () => {
       });
   };
 
-  const UpdateStatus = (status, custid, siteid) => {
-    let Data = {
-      CustId: Number(custid),
-      SiteId: Number(siteid),
-      Status: Number(status),
+  const UpdateStatus = (status, data) => {
+    let p = {
+      currencyId: data.currencyId,
+      siteId: data.siteId,
+      before: {
+        custId: data.custId,
+        userName: data.userName,
+        status: data.status
+      },
+      after: {
+        custId: data.custId,
+        userName: data.userName,
+        status: Number(status),
+      }
     };
+    //console.log(p);
     api
-      .post("/api/CustManage/SetRegLiveStatus", Data)
+      .post("/api/CustManage/SetRegLiveStatus", p)
       .then(function (res) {
         if (res.data.errorCode === 0) {
           UpdateReset();
@@ -322,28 +332,31 @@ const App = () => {
       });
   };
 
-  const EditNote = (custid) => {
-    let param = {
-      Url: "CustManage/GetRegLiveStatusNotes",
-      Data: {
-        CustId: Number(custid),
-      },
-    };
-    WebAPI.PostData(param)
-      .then((res) => {
+  const EditNote = (data) => {
+    let custId = data.custId;
+    console.log(custId);
+    api
+      .post("/api/CustManage/GetRegLiveStatusNotes", {
+        custId: custId,
+      })
+      .then(function (res) {
         if (res.data.errorCode === 0) {
-          setnoteDatas(res.data.data);
-        } else {
-          alert(res.data.message ?? "failed to get data.");
-        }
+            setnoteDatas(res.data.data);
+          } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
       })
       .catch(function (error) {
         alert(error);
       });
+    
     setstatus(1);
     setNoteFilter({
       ...noteFilter,
-      CustId: custid,
+      CustId: custId,
+      currencyId: data.currencyId,
+      siteId: data.siteId,
+      userName: data.userName
     });
   };
 
@@ -371,6 +384,7 @@ const App = () => {
   };
 
   const AddNote = (props) => {
+    
     setNoteFilter({
       ...noteFilter,
       Note: props,
@@ -378,26 +392,29 @@ const App = () => {
   };
   const SubmitAddNote = () => {
     let Data = {
-      CustId: Number(noteFilter.CustId),
-      Note: noteFilter.Note,
+      currencyId: noteFilter.currencyId,
+      siteId: noteFilter.siteId,
+      after: {
+        userName: noteFilter.userName,
+        CustId: Number(noteFilter.CustId),
+        Note: noteFilter.Note,
+      }
     };
+    
     api
       .post("/api/CustManage/AddRegLiveStatusNote", Data)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          let param = {
-            Url: "CustManage/GetRegLiveStatusNotes",
-            Data: {
-              CustId: Number(noteFilter.CustId),
-            },
-          };
-          WebAPI.PostData(param)
-            .then((res) => {
+          api
+            .post("/api/CustManage/GetRegLiveStatusNotes", {
+              custId: noteFilter.CustId,
+            })
+            .then(function (res) {
               if (res.data.errorCode === 0) {
-                setnoteDatas(res.data.data);
-              } else {
-                alert(res.data.message ?? "failed to get data.");
-              }
+                  setnoteDatas(res.data.data);
+                } else {
+                  alert(res.data.message ?? "failed to get data.");
+                }
             })
             .catch(function (error) {
               alert(error);
@@ -416,33 +433,39 @@ const App = () => {
       NewNote: "",
     });
   };
-  const DeleteButton = (id) => {
+  const DeleteButton = (data) => {
+    
     if (confirm("Are you sure Delete ?")) {
-      let Data = {
-        CustId: Number(noteFilter.CustId),
-        Id: id,
+      let p = {
+        currencyId: noteFilter.currencyId,
+        siteId: noteFilter.siteId,
+        before: {
+          userName: noteFilter.userName,
+          CustId: Number(noteFilter.CustId),
+          Note: data.note,
+          Id: data.id,
+        }
       };
+      
       api
-        .post("/api/CustManage/DeleteRegLiveStatusNote", Data)
+        .post("/api/CustManage/DeleteRegLiveStatusNote", p)
         .then(function (res) {
           if (res.data.errorCode === 0) {
-            let param = {
-              Url: "CustManage/GetRegLiveStatusNotes",
-              Data: {
-                CustId: Number(noteFilter.CustId),
-              },
-            };
-            WebAPI.PostData(param)
-              .then((res) => {
-                if (res.data.errorCode === 0) {
-                  setnoteDatas(res.data.data);
-                } else {
-                  alert(res.data.message ?? "failed to get data.");
-                }
+            
+            api
+              .post("/api/CustManage/GetRegLiveStatusNotes", {
+                custId: noteFilter.CustId,
               })
-              .catch(function (error) {
-                alert(error);
-              });
+              .then(function (res) {
+                if (res.data.errorCode === 0) {
+                    setnoteDatas(res.data.data);
+                  } else {
+                    alert(res.data.message ?? "failed to get data.");
+                  }
+              })
+            .catch(function (error) {
+              alert(error);
+            });
           } else {
             alert(res.data.message);
           }
@@ -458,33 +481,41 @@ const App = () => {
       NewNote: props,
     });
   };
-  const SaveButton = () => {
-    let Data = {
-      CustId: Number(noteFilter.CustId),
-      Id: editNoteData.Id,
-      Note: editNoteData.NewNote,
+  const SaveButton = (data) => {
+    let d = {
+      currencyId: noteFilter.currencyId,
+        siteId: noteFilter.siteId,
+        before: {
+          userName: noteFilter.userName,
+          CustId: Number(noteFilter.CustId),
+          Note: data.note,
+          Id: data.id,
+        },
+        after: {
+          userName: noteFilter.userName,
+          CustId: Number(noteFilter.CustId),
+          Note: editNoteData.NewNote,
+          Id: editNoteData.Id,
+        }
     };
     api
-      .post("/api/CustManage/EditRegLiveStatusNote", Data)
+      .post("/api/CustManage/EditRegLiveStatusNote", d)
       .then(function (res) {
         if (res.data.errorCode === 0) {
-          let param = {
-            Url: "CustManage/GetRegLiveStatusNotes",
-            Data: {
-              CustId: Number(noteFilter.CustId),
-            },
-          };
-          WebAPI.PostData(param)
-            .then((res) => {
+          api
+            .post("/api/CustManage/GetRegLiveStatusNotes", {
+              custId: noteFilter.CustId,
+            })
+            .then(function (res) {
               if (res.data.errorCode === 0) {
                 setnoteDatas(res.data.data);
                 seteditNoteData({
                   Id: 0,
                   NewNote: "",
                 });
-              } else {
-                alert(res.data.message ?? "failed to get data.");
-              }
+                } else {
+                  alert(res.data.message ?? "failed to get data.");
+                }
             })
             .catch(function (error) {
               alert(error);

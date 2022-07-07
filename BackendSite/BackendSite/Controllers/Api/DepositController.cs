@@ -11,11 +11,12 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -30,19 +31,22 @@ namespace BackendSite.Controllers.Api
         private readonly ExcelBLL excelBLL;
         private readonly int mainWalletType;
         private readonly ServerInfoBLL serverInfoBLL;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
 
-        public DepositController(IConfiguration configuration, DepositBLL depositBLL, SelLangBLL selLangBLL, MessageBLL messageBLL, PendingFundBLL pendingFundBLL, CustInfoBLL custInfoBLL, BankDetailBLL bankDetailBLL, ExcelBLL excelBLL, ServerInfoBLL serverInfoBLL)
+        public DepositController(IServiceProvider provider)
         {
-            this.depositBLL = depositBLL;
-            this.selLangBLL = selLangBLL;
-            this.messageBLL = messageBLL;
-            this.pendingFundBLL = pendingFundBLL;
-            this.custInfoBLL = custInfoBLL;
-            this.bankDetailBLL = bankDetailBLL;
-            this.excelBLL = excelBLL;
-            this.serverInfoBLL = serverInfoBLL;
+            this.depositBLL = provider.GetRequiredService<DepositBLL>();
+            this.selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            this.messageBLL = provider.GetRequiredService<MessageBLL>();
+            this.pendingFundBLL = provider.GetRequiredService<PendingFundBLL>();
+            this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            this.bankDetailBLL = provider.GetRequiredService<BankDetailBLL>();
+            this.excelBLL = provider.GetRequiredService<ExcelBLL>();
+            this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
             mainWalletType = configuration.GetValue<int>("MainWalletType");
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
         public class DepositListReq
         {
@@ -368,25 +372,35 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
-        public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission deposit)
+        public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission request)
         {
-            var depositDetails = JsonConvert.DeserializeObject<DepositDetailInfo>(deposit.DepositDetails);
-
-            var result = await depositBLL.CreateDeposit(depositDetails, deposit.Receipt);
+            var result = await depositBLL.CreateDeposit(request.Detail, request.Receipt);
+            
             var apiResult = new ApiResult();
             if (result == 1)
             {
-                apiResult.ErrorCode = 1;
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.Detail.SiteId,
+                    CurrencyId = request.Detail.CurrencyId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.DepositSubmission,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = request.Detail.ToLog()
+                });
+                
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertSuccessful");
             }
             else if (result == -1)
             {
-                apiResult.ErrorCode = -1;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = selLangBLL.GetMsg("msg_UserNotFound");
             }
             else
             {
-                apiResult.ErrorCode = 0;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = selLangBLL.GetMsg("msg_InsertFailed");
             }
             return apiResult;
@@ -394,9 +408,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult AddDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult AddDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.AddDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -413,9 +428,10 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
-        public ApiResult EditDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult EditDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.EditDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -432,11 +448,12 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult DeleteDepositLimitInfo(DepositLimitInfo depositLimitInfo)
+        public ApiResult DeleteDepositLimitInfo(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = depositBLL.DeleteDepositLimit(depositLimitInfo, User.Identity.Name);
+            var result =
+                depositBLL.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = 0;
                 apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
@@ -610,14 +627,15 @@ namespace BackendSite.Controllers.Api
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         [HttpPost]
-        public ApiResult SetDepositRequestAmount(DepositRequestAmountPara para)
+        public ApiResult SetDepositRequestAmount(ApiRequestWithLog<SetAmountRequest> req)
         {
-            var depositRequest = depositBLL.GetDepositRequest(para.TransId);
+            var depositRequest = depositBLL.GetDepositRequest(req.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (depositBLL.SetDepositRequestAmount(para.TransId, para.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (depositBLL.SetDepositRequestAmount(
+                    new ParamsWithLog<SetAmountRequest>(req, User.Identity.Name), depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {

@@ -1128,7 +1128,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
+                console.log(data);
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { 
+                    CustId: data.custId ,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    status: e
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1147,7 +1153,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustBankInfo', { CustId: data.custId })
+                axios.post('/api/CustManage/ResetCustBankInfo', { 
+                    
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1165,7 +1176,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustUSDTnfo() {
             if (confirm('Are you sure reset USDT Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustUSDTInfo', { CustId: data.custId })
+                axios.post('/api/CustManage/ResetCustUSDTInfo', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1184,7 +1199,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onUnbindLine() {
             if (confirm('Are you sure to Unbind Line Profile ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/apiV2/CustomerManage/LineUnbind', { CustId: data.custId })
+                axios.post('/api/CustManage/LineUnbind', { CustId: data.custId })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1203,7 +1218,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetUnlock', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId,
+                    currentStatus: data.status,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1225,7 +1246,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetLock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetLock', { 
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1295,7 +1322,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
             if (confirm('Are you sure kick Out this Customer?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/KickOut', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/KickOut', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1315,7 +1347,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetClose', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetClose', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1651,6 +1689,119 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     <tr>
                                         <th scope="row">Line Binding Time (Adjusted to GMT+8)</th>
                                         {data.custLineProfile === null ? <td></td> : <td>{moment.utc(data.custLineProfile.createTime).add(8,'hour').format('l LTS')}</td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row"style={{ borderBottom:"none"}}>Shipping Address</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderBottom:"none"}}>
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Address, "Address")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderBottom:"none"}}>
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Address, "Address")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Line 1</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressLineFirst} onChange={(e) => this.props.editOnChange(e.target.value, "AddressLineFirst")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressLineFirst=="" || data.addressLineFirst==null) ? "N/A" : data.addressLineFirst}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Line 2</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressLineSecond} onChange={(e) => this.props.editOnChange(e.target.value, "AddressLineSecond")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressLineSecond=="" || data.addressLineSecond==null) ? "N/A" : data.addressLineSecond}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>City</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressCity} onChange={(e) => this.props.editOnChange(e.target.value, "AddressCity")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressCity=="" || data.addressCity==null) ? "N/A" : data.addressCity}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Post Code</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressPostCode} onChange={(e) => this.props.editOnChange(e.target.value, "AddressPostCode")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressPostCode=="" || data.addressPostCode==null) ? "N/A" : data.addressPostCode}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>State</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressState} onChange={(e) => this.props.editOnChange(e.target.value, "AddressState")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressState=="" || data.addressState==null) ? "N/A" : data.addressState}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none"}}>Country</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none"}}>
+                                                    <input type="text" defaultValue={data.addressCountry} onChange={(e) => this.props.editOnChange(e.target.value, "AddressCountry")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none"}}>
+                                                        {(data.addressCountry=="" || data.addressCountry==null) ? "N/A" : data.addressCountry}
+                                                    </td>
+                                                )
+                                        }
                                     </tr>
                                     <tr>
                                         <th scope="row">Act Status</th>
@@ -2445,10 +2596,50 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         _isEdit = Object.assign({}, this._isEdit),
                         _newData = Object.assign({}, this._newData);
 
-                    if (Level != data.userLevel || FullName != data.accountName || Birthday_D != data.birth_d || Birthday_M != data.birth_m || Birthday_Y != data.birth_y || PhoneNumber != data.phoneNo || EMail != data.email) {
-                        axios.post('/api/CustManage/SetCustInfo', { CustId: iCustId, Level: Level, FullName: FullName, Birthday_Y: Birthday_Y, Birthday_M: Birthday_M, Birthday_D: Birthday_D, PhoneNumber: PhoneNumber, EMail: EMail })
+
+                    let Address=null;
+                    if((this.state.newData.AddressCountry != data.addressCountry) 
+                    || (this.state.newData.AddressState != data.addressState)
+                    || (this.state.newData.AddressPostCode != data.addressPostCode)
+                    || (this.state.newData.AddressCity != data.addressCity)
+                    || (this.state.newData.AddressLineFirst != data.addressLineFirst)
+                    || (this.state.newData.AddressLineSecond != data.addressLineSecond))
+                    {
+                    Address= 
+                    {
+                        "Country":((this.state.newData.AddressCountry !== undefined && this.state.newData.AddressCountry != data.addressCountry) ? this.state.newData.AddressCountry : data.addressCountry),
+                        "State": ((this.state.newData.AddressState !== undefined && this.state.newData.AddressState != data.addressState) ? this.state.newData.AddressState : data.addressState),
+                        "PostCode": ((this.state.newData.AddressPostCode !== undefined && this.state.newData.AddressPostCode != data.addressPostCode) ? this.state.newData.AddressPostCode : data.addressPostCode),
+                        "City": ((this.state.newData.AddressCity !== undefined && this.state.newData.AddressCity != data.addressCity) ? this.state.newData.AddressCity : data.addressCity),
+                        "LineFirst": ((this.state.newData.AddressLineFirst !== undefined && this.state.newData.AddressLineFirst != data.addressLineFirst) ? this.state.newData.AddressLineFirst : data.addressLineFirst),
+                        "LineSecond": ((this.state.newData.AddressLineSecond !== undefined && this.state.newData.AddressLineSecond != data.addressLineSecond) ? this.state.newData.AddressLineSecond : data.addressLineSecond)
+                    };
+                    }
+                    
+                    if (Level != data.userLevel 
+                        || FullName != data.accountName 
+                        || Birthday_D != data.birth_d 
+                        || Birthday_M != data.birth_m 
+                        || Birthday_Y != data.birth_y 
+                        || PhoneNumber != data.phoneNo
+                        || EMail != data.email
+                        || AddressCountry != data.addressCountry 
+                        || AddressState != data.addressState 
+                        || AddressPostCode != data.addressPostCode 
+                        || AddressCity != data.addressCity 
+                        || AddressLineFirst != data.addressLineFirst 
+                        || AddressLineSecond != data.addressLineSecond) {
+                        axios.post('/api/CustManage/SetCustInfo', 
+                                   { CustId: iCustId,
+                                     Level: Level,
+                                     FullName: FullName,
+                                     Birthday_Y: Birthday_Y,
+                                     Birthday_M: Birthday_M,
+                                     Birthday_D: Birthday_D,
+                                     PhoneNumber: PhoneNumber,
+                                     EMail: EMail,
+                                     Address: Address })
                             .then(function (response) {
-                                //Loading.UnLoading();
                                 let result = response.data;
                                 if (result.errorCode == 0) {
                                     let newCustInfo = { ...this.state.CustInfoData };
@@ -2459,6 +2650,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     newCustInfo['birth_y'] = (Birthday_Y) ? Birthday_Y : data.birth_y;
                                     newCustInfo['phoneNo'] = (PhoneNumber) ? PhoneNumber : data.phoneNo;
                                     newCustInfo['email'] = (EMail) ? EMail : data.email;
+                                    newCustInfo['addressCountry'] = (Address) ? Address["Country"] : data.addressCountry;
+                                    newCustInfo['addressState'] = (Address) ? Address["State"] : data.addressState;
+                                    newCustInfo['addressPostCode'] = (Address) ? Address["PostCode"] : data.addressPostCode;
+                                    newCustInfo['addressCity'] = (Address) ? Address["City"] : data.addressCity;
+                                    newCustInfo['addressLineFirst'] = (Address) ? Address["LineFirst"] : data.addressLineFirst;
+                                    newCustInfo['addressLineSecond'] = (Address) ? Address["LineSecond"] : data.addressLineSecond;
                                     this.setState({
                                         isEdit: _isEdit,
                                         CustInfoData: newCustInfo,

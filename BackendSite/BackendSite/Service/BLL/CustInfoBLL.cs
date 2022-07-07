@@ -31,6 +31,7 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly BlockService _blockService;
 
         public CustInfoBLL(IServiceProvider provider)
         {
@@ -49,6 +50,7 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _blockService = provider.GetRequiredService<BlockService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -229,9 +231,9 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail,Dictionary<string,string> address, string Operator)
         {
-            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Operator);
+            return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, address, Operator);
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int CustId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
         {
@@ -593,9 +595,9 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region TagMamagement
-        public int EditTagManagement(int id, string tagName, string tagColour, string description, string @operator)
+        public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
         {
-            return _custInfoService.EditTagManagement(id, tagName, tagColour, description, @operator);
+            return _custInfoService.EditTagManagement(input);
         }
 
         public GetTagDataResult GetTagData(int status, int pageNumber, int pageSize)
@@ -603,9 +605,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetTagData(status, pageNumber, pageSize);
         }
 
-        public int SetTagStatus(int id, string @operator)
+        public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            return _custInfoService.SetTagStatus(id, @operator);
+            return _custInfoService.SetTagStatus(input);
         }
 
         public IEnumerable<TagData> GetAllTag()
@@ -662,9 +664,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
 
-        public int SetRegLiveStatus(int custId, int status, int siteId, string @operator)
+        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
         {
-            return _custInfoService.SetRegLiveStatus(custId, status, siteId, @operator);
+            return _custInfoService.SetRegLiveStatus(input);
         }
 
         public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
@@ -672,19 +674,19 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetRegLiveStatusNotes(custId);
         }
 
-        public int AddRegLiveStatusNote(int custId, string note, string @operator)
+        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
         {
-            return _custInfoService.AddRegLiveStatusNote(custId, note, @operator);
+            return _custInfoService.AddRegLiveStatusNote(input);
         }
 
-        public int DeleteRegLiveStatusNote(int custId, int id)
+        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
         {
-            return _custInfoService.DeleteRegLiveStatusNote(custId, id);
+            return _custInfoService.DeleteRegLiveStatusNote(input);
         }
 
-        public int EditRegLiveStatusNote(int custId, int id, string note, string @operator)
+        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
         {
-            return _custInfoService.EditRegLiveStatusNote(custId, id, note, @operator);
+            return _custInfoService.EditRegLiveStatusNote(input);
         }
 
         public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
@@ -703,7 +705,7 @@ namespace BackendSite.Service.BLL
                     Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
                     RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(Customer_RegLiveStatusStatusEnum), x.Status),
+                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
                     AffCode = x.AffCode,
                     Agent = x.Agent
                 });
@@ -733,9 +735,9 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        public async Task<CustomerForRisk> GetCustId(string userName, int siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
         {
-            return await _custInfoService.GetCustId(userName, siteId);
+            return await _custInfoService.GetCustId(custId,userName, siteId);
         }
 
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
