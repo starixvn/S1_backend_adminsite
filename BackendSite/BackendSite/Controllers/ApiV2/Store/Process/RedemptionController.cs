@@ -39,9 +39,27 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
         
         [HttpPost]
+        public async Task<IActionResult> ExportRedemptionListAsync(ExportRedemptionListRequest req)
+        {
+            var result = _redemptionBll.ExportRedemptionListAsync(req).Result.Data;
+
+            var stream = _excelBll.Export(result);
+            return _excelBll.ExcelFile(stream, "CustInfoList");
+            
+        }
+        
+        [HttpPost]
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var result = _redemptionBll.GetRedemptionDetailAsync(req);
+
+            return result;
+        }
+        
+        [HttpPost]
+        public Task<ApiResult<object>> GetRedemptionLogAsync(GetRedemptionLogRequest req)
+        {
+            var result = _redemptionBll.GetRedemptionLogAsync(req);
 
             return result;
         }

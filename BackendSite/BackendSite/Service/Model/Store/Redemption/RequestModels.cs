@@ -44,6 +44,38 @@ namespace BackendSite.Service.Model.Store.Redemption
         public string SabaId { get; set; }
     }
 
+    
+    public class ExportRedemptionListRequest 
+    {
+        private DateTimeOffset? _startTime;
+        private DateTimeOffset? _endTime;
+        public DateTimeOffset? StartTime 
+        {
+            get => _startTime;
+            set
+            {
+                if (value != null) 
+                    _startTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? EndTime 
+        {
+            get => _endTime;
+            set
+            {
+                if (value != null) 
+                    _endTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<int> VipLevels { get; set; }
+        public IEnumerable<int> Statuses { get; set; }
+        public string TransId { get; set; }
+        public string UserName { get; set; }
+        public string SabaId { get; set; }
+    }
+    
     public class GetRedemptionDetailRequest 
     {
         public int RedemptionId { get; set; }
@@ -58,5 +90,10 @@ namespace BackendSite.Service.Model.Store.Redemption
         public decimal? ActualCost { get; set; }
         public string ReceiptUrls { get; set; } = "";
         public string Operator { get; set; }
+    }
+    
+    public class GetRedemptionLogRequest 
+    {
+        public string TransId { get; set; }
     }
 }

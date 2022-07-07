@@ -5,7 +5,7 @@ namespace BackendSite.Service.Model.Store.Redemption
     public class GetRedemptionListResult
     {
         public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public string TransId { get; set; }
         public int Status { get; set; }
         public DateTime CreateTime { get; set; }
