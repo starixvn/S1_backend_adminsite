@@ -31,6 +31,9 @@ namespace BackendSite.Extensions
                 .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_LogDB"), logger)
                 {
                     DataBase = DataBase.Log
+                }).AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_IPTable"), logger)
+                {
+                    DataBase = DataBase.IP
                 });
         }
     }

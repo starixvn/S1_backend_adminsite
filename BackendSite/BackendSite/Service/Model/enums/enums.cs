@@ -16,8 +16,9 @@ namespace BackendSite.Service.Model.enums
     {
         Main, //ConnectionString
         Report, //ConnectionStringReport
-        Wager, //ConnectionStringWager
-        Log, //ConnectionStringLog
+        Wager,  //ConnectionStringWager
+        Log,    //ConnectionStringLog
+        IP      //ConnectionStringIPTable
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -1088,5 +1089,25 @@ namespace BackendSite.Service.Model.enums
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
+    }
+
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+        BODelete = 2
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+    public enum CustBankInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 }
