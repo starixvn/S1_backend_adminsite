@@ -41,10 +41,26 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public Task<ApiListResult<GetRedemptionListResult>> ExportRedemptionListAsync(ExportRedemptionListRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Redemption/ExportRedemptionList";
+            var result = _courierAdapter.PostAsync<ApiListResult<GetRedemptionListResult>, ExportRedemptionListRequest>(url, req);
+
+            return result;
+        }
+        
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/GetRedemptionDetail";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionDetailRequest>(url, req);
+
+            return result;
+        }
+        
+        public Task<ApiResult<object>> GetRedemptionLogAsync(GetRedemptionLogRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Redemption/GetRedemptionLog";
+            var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionLogRequest>(url, req);
 
             return result;
         }
