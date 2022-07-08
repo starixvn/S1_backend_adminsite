@@ -1110,4 +1110,16 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+    
+    public enum CurrencyEnum
+    {
+        MYR = 2,
+        USD = 3,
+        THB = 4,
+        CNY = 13,
+        IDR = 15,
+        VND = 51,
+        INR = 61,
+        BDT = 74
+    }
 }
