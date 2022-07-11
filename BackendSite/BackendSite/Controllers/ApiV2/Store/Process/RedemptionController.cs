@@ -78,7 +78,10 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         [HttpPost]
         public async Task<ApiResult> UploadReceiptAsync([FromForm] UploadMultiImagesRequest request)
         {
-            var receiptList = new List<string>();
+            var receiptList = new UploadReceiptResult
+            {
+                ReceiptUrls = new List<string>()
+            };
             var result = new ApiResult<UploadReceiptResult>();
             
             foreach (var receipt in request.File)
@@ -87,14 +90,13 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
                 if (!string.IsNullOrEmpty(uploadResult))
                 {
-                    receiptList.Add(uploadResult);
+                    receiptList.ReceiptUrls.Add(uploadResult);
                 }
             }
 
-            if (receiptList.Any())
+            if (receiptList.ReceiptUrls.Any())
             {
-                var receiptUrls = JsonConvert.SerializeObject(receiptList);
-                result.Data = new UploadReceiptResult(receiptUrls);
+                result.Data = receiptList;
                 result.ErrorCode = (int) ErrorCodeEnum.Success;
                 return result;
             }

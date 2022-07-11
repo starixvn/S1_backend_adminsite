@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.Model.Store.Redemption
 {
@@ -22,11 +23,8 @@ namespace BackendSite.Service.Model.Store.Redemption
     
     public class UploadReceiptResult
     {
-        public UploadReceiptResult(string url)
-        {
-            ReceiptUrls = url;
-        }
-        public string ReceiptUrls { get; set; }
+        public List<string> ReceiptUrls { get; set; }
+       
     }
 
 }
