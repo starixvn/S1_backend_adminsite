@@ -34,7 +34,7 @@ const Panel = () => {
   const [stateDatas, setDatas] = React.useState({
     FilterInfo: null,
   });
-
+  const [isloading,setisloading] = React.useState(true);
   const EditfilterData = (v, col) => {
     setfilterData({
       ...filterData,
@@ -96,6 +96,7 @@ const Panel = () => {
   };
 
   const ClickSubmit = () => {
+    setisloading(true);
     axios
       .post("/api/Payment/GetCustTpBetRecordList", {
         CustId: CustId,
@@ -110,12 +111,15 @@ const Panel = () => {
           setDatas({
             FilterInfo: filterData,
           });
+          setisloading(false);
         } else {
           alert(result.message);
+          setisloading(false);
         }
       })
       .catch((error) => {
         alert(error);
+        setisloading(false);
       });
   };
 
@@ -135,14 +139,17 @@ const Panel = () => {
             setDatas({
               FilterInfo: filterData,
             });
+            setisloading(false);
           } else {
             alert(result.message);
+            setisloading(false);
           }
         }.bind(this)
       )
       .catch(
         function (error) {
           alert(error);
+          setisloading(false);
         }.bind(this)
       );
   }, []);
@@ -290,6 +297,7 @@ const Panel = () => {
       EditfilterData={EditfilterData}
       EditDate={EditDate}
       ClickSubmit={ClickSubmit}
+      Isloading={isloading}
     />
   ) : stateInfoType === "day" ? (
     <DayResult
