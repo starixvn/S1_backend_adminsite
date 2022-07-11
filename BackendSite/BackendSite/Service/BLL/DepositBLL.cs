@@ -12,8 +12,10 @@ using BackendSite.Service.Library;
 using System.Transactions;
 using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using BackendSite.Controllers.ApiV2.Finance.Deposit;
+using BackendSite.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -250,9 +252,9 @@ namespace BackendSite.Service.BLL
             return _depositAccountingService.GetDepositAccountingByTransId(transId);
         }
         
-        public int EditDepositAccounting(string transId, string accountNo ,string memo ,string Operator)
+        public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
-            return _depositAccountingService.EditDepositAccounting(transId,accountNo,memo,Operator);
+            return _depositAccountingService.EditDepositAccounting(input);
         }
         
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(
