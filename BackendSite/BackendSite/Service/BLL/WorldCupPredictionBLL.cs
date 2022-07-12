@@ -150,7 +150,7 @@ namespace BackendSite.Service.BLL
                 UserName = a.UserName,
                 TicketType = a.TicketType,
                 TeamName = a.TeamName,
-                SelectTime = a.SelectTime
+                SelectTime = DatetimeFormat(a.SelectTime)
             });
         }
 
@@ -177,7 +177,7 @@ namespace BackendSite.Service.BLL
                 PredictUserCount = a.PredictUserCount,
                 IsPayoutDone = a.UpdateTime.HasValue,
                 Operator = a.Operator,
-                UpdateTime = a.UpdateTime
+                UpdateTime = DatetimeFormat(a.UpdateTime)
             });
         }
 
@@ -197,6 +197,11 @@ namespace BackendSite.Service.BLL
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
         {
             return await _worldCupPredictionService.SetPayoutDone(siteId, teamId, updateOperator);
+        }
+
+        private string DatetimeFormat(DateTime? dateTime)
+        {
+            return dateTime.HasValue ? $"{dateTime.Value:yyyy-MM-ddT:hh:mm:ss}+00:00" : null;
         }
     }
 }

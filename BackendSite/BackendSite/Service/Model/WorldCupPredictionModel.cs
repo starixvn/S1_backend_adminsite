@@ -171,7 +171,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int TicketType { get; set; }
         public string TeamName { get; set; }
-        public DateTime? SelectTime { get; set; }
+        public string SelectTime { get; set; }
     }
     
     public class WorldCupMemberReportDto
@@ -234,7 +234,7 @@ namespace BackendSite.Service.Model
         public int PredictUserCount { get; set; }
         public bool IsPayoutDone { get; set; }
         public string Operator { get; set; }
-        public DateTime? UpdateTime { get; set; }
+        public string UpdateTime { get; set; }
     }
     public class WorldCupPredictDetailDto
     {
