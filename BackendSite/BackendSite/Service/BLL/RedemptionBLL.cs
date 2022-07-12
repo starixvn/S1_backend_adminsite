@@ -33,18 +33,18 @@ namespace BackendSite.Service.BLL
            
         }
 
-        public Task<ApiListResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
+        public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/GetRedemptionList";
-            var result = _courierAdapter.PostAsync<ApiListResult<object>, GetRedemptionListRequest>(url, req);
+            var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionListRequest>(url, req);
 
             return result;
         }
         
-        public Task<ApiListResult<GetRedemptionListResult>> ExportRedemptionListAsync(ExportRedemptionListRequest req)
+        public Task<ApiResult<ExportRedemptionListResult>> ExportRedemptionListAsync(ExportRedemptionListRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/ExportRedemptionList";
-            var result = _courierAdapter.PostAsync<ApiListResult<GetRedemptionListResult>, ExportRedemptionListRequest>(url, req);
+            var result = _courierAdapter.PostAsync<ApiResult<ExportRedemptionListResult>, ExportRedemptionListRequest>(url, req);
 
             return result;
         }
