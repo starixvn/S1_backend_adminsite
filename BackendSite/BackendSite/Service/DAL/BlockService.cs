@@ -192,7 +192,7 @@ namespace BackendSite.Service.DAL
                             Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
                         });
 
-                        result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
                         if(result == 0)
                         {
                             trans.Rollback();
@@ -247,7 +247,7 @@ namespace BackendSite.Service.DAL
                         Status = CustBankInfoLogStatus.Release
                     });
 
-                    result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
 
                     if(result <= 0)
                     {

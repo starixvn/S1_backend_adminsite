@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -47,7 +48,7 @@ namespace BackendSite.Service.BLL
             var listHotGames = hotGames.ToList();
             if (refreshCache)
             {
-                var key = $"GetHotGames_{siteId}_{currencyId}";
+                var key = $"GetHotGames:{siteId}:{currencyId}";
                 var cacheHotGames = listHotGames.Select(a => new HotGameData()
                 {
                     TpId = a.TpId,
@@ -59,7 +60,7 @@ namespace BackendSite.Service.BLL
                     TpName = a.TpName,
                     TpLogo = a.TpLogo
                 });
-                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames));
+                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames), null, RedisDataBase.Member);
             }
             
             return listHotGames.Select(a=> new GetHotGameListResponse()

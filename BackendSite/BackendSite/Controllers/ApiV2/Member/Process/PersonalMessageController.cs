@@ -131,11 +131,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var authData = _authorizeBll.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
             {
+                _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
                 if (_excelBll.IsValidFile(req.excelUpload.ContentType))
                 {
                     var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
@@ -186,6 +186,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             else
             {
+                #region checkMsg
+
+                var (result , errorMsg) = _messageBll.CheckBatchMessage(req.currency, req.personalMsg);
+                if (!result)
+                {
+                    return new ApiResult<int>()
+                    {
+                        ErrorCode = (int) ErrorCodeEnum.Fail,
+                        Message = errorMsg
+                    };
+                }
+
+                #endregion
+                
+                _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
+                
                 _ = Task.Run(() =>
                 {
                     var userSiteList = _serverInfoService.GetSiteList();

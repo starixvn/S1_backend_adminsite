@@ -85,9 +85,9 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     
     public class SetSortParams
     {
-        public SetSortParams(SetSortRequest req, string userName)
+        public SetSortParams(IEnumerable<SortItem> infos, string userName)
         {
-            Infos = req.Infos;
+            Infos = infos;
             Operator = userName;
         }
         public IEnumerable<SortItem> Infos { get; set; }

@@ -587,7 +587,12 @@ namespace BackendSite.Service.Model.enums
         SetCustomerPhone = 28,
         SetCustomerEMail = 29,
         SetCustomerAddress = 30,
-        ResetCustomerProfile = 31
+        ResetCustomerProfile = 31,
+        VipRebatePeriod = 32,
+        VipRebateCategory = 33,
+        VipRebateGameType = 34,
+        VipRebatePayoutLimit = 35,
+        Referral = 36
     }
 
     #region BankFinancialTransferInfoLog
@@ -1074,19 +1079,19 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+    #endregion
 
     public enum RedisDataBase
     {
-        MebmerSite = 0,
+        Member = 0,
         Shared = 1,
         Tp = 2,
         Bonus = 3,
-        AdminSite = 4
+        Admin = 4,
+        Payment = 5
     }
 
-    #endregion
-    
-	public enum LineChannelStatusEnum
+    public enum LineChannelStatusEnum
     {
         Disable = 0,
         Enable = 1
@@ -1141,11 +1146,23 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum ManualRewardPointCategoryEnum
     {
         Default = 0,
         BirthdayRewardPoint = 1,
         SpecialRewardPoint = 2
+    }
+
+    public enum CurrencyEnum
+    {
+        MYR = 2,
+        USD = 3,
+        THB = 4,
+        CNY = 13,
+        IDR = 15,
+        VND = 51,
+        INR = 61,
+        BDT = 74
     }
 }

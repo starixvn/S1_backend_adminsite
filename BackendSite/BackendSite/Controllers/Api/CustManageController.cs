@@ -44,7 +44,6 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL _authorizeBll;
         private readonly BonusInfoService _bonusInfoService;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        
 
         #endregion
 

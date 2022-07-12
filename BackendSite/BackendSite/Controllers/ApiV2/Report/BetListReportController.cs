@@ -37,15 +37,12 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 1 })]
         public ApiListResult<BetListReport> GetBetList(GetBetListRequest request)
         {
             DateCheck(request);
 
             var data = _reportBll.GetBetListReport(request, out int totalPages, out int rowCount);
-
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
 
             return new ApiListResult<BetListReport>
             {
@@ -69,16 +66,13 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </param>
         /// <returns>檔案</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/BetListReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 2 })]
         public IActionResult Export(GetBetListRequest request)
         {
             DateCheck(request);
 
             request.PageNumber = -1; //export all
             var data = _reportBll.GetBetListReport(request, out var _, out var _);
-
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
         
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "BetListReport");

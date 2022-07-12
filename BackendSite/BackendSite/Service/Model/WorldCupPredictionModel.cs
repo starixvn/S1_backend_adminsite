@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -141,5 +143,127 @@ namespace BackendSite.Service.Model
         /// 排序
         /// </summary>
         public int Sort { get; set; }
+    }
+
+    public class GetWorldCupMemberReportRequest : ApiRequestPageModel
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
+        public int CurrencyId { get; set; }
+        [JsonProperty("ticketType")]
+        public int TicketType { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
+        [JsonProperty("selected")]
+        public int Selected { get; set; }
+        [JsonProperty("userName")]
+        public string UserName { get; set; }
+        [JsonProperty("startTime")]
+        public DateTime StartTime { get; set; }
+        [JsonProperty("endTime")]
+        public DateTime EndTime { get; set; }
+    }
+
+    public class GetWorldCupMemberReportResponse
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
+    }
+    
+    public class WorldCupMemberReportDto
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
+    }
+    
+    public class ExportWorldCupMemberReportRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
+        public int CurrencyId { get; set; }
+        [JsonProperty("ticketType")]
+        public int TicketType { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
+        [JsonProperty("selected")]
+        public int Selected { get; set; }
+        [JsonProperty("userName")]
+        public string UserName { get; set; }
+        [JsonProperty("startTime")]
+        public DateTime StartTime { get; set; }
+        [JsonProperty("endTime")] 
+        public DateTime EndTime { get; set; }
+        [JsonProperty("timezone")] 
+        public int Timezone { get; set; } = 8;
+    }
+    
+    public class ExportWorldCupMemberReportResponse
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public string TicketType { get; set; }
+        public string TeamName { get; set; }
+        public DateTime? SelectTime { get; set; }
+    }
+    
+    public class WorldCupPredictiveStatisticsDto
+    {
+        public int TeamId { get; set; }
+        public string TeamName { get; set; }
+        public int PredictUserCount { get; set; }
+        public string Operator { get; set; }
+        public DateTime? UpdateTime { get; set; }
+    }
+    public class GetWorldCupEventReportRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+    }
+    public class GetWorldCupEventReportResponse
+    {
+        public int TeamId { get; set; }
+        public string TeamName { get; set; }
+        public int PredictUserCount { get; set; }
+        public bool IsPayoutDone { get; set; }
+        public string Operator { get; set; }
+        public DateTime? UpdateTime { get; set; }
+    }
+    public class WorldCupPredictDetailDto
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public string TeamName { get; set; }
+        public int TicketType { get; set; }
+        public DateTime SelectTime { get; set; }
+    }
+    public class ExportWorldCupEventReportRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
+    }
+    public class ExportWorldCupEventReportResponse
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public string TeamName { get; set; }
+        public string TicketType { get; set; }
+        public DateTime SelectTime { get; set; }
+    }
+    public class SetPayoutDoneRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("teamId")]
+        public int TeamId { get; set; }
     }
 }

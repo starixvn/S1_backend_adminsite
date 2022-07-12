@@ -12,6 +12,7 @@ namespace BackendSite.Service.Library
     {
         private readonly ILogger<ICacheHelper> _logger;
         private readonly IConnectionMultiplexer _multiplexer;
+        private readonly string[] _charsToRemove = { "[", "]", "/", " ", "," };
         
         public RedisCacheHelper(IServiceProvider provider)
         {
@@ -19,9 +20,9 @@ namespace BackendSite.Service.Library
             _multiplexer = provider.GetRequiredService<IConnectionMultiplexer>();
         }
 
-        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite) 
+        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin) 
         {
-            key = $"{redisDataBase}:{key}";
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
             {                      
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -46,9 +47,9 @@ namespace BackendSite.Service.Library
             }
         }
         
-        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
+        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            key = $"{redisDataBase}:{key}";
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
             {                      
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -73,9 +74,9 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.AdminSite)
+        public async Task<bool> StringSetAsync(string key, string value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            key = $"{redisDataBase}:{key}";
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
             {           
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -87,6 +88,16 @@ namespace BackendSite.Service.Library
                 return false;
             }
            
+        }
+        
+        private string RemoveSpecialChars(string key)
+        {
+            foreach (var c in _charsToRemove)
+            {
+                key = key.Replace(c, string.Empty);
+            }
+
+            return key;
         }
     }
 }
