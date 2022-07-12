@@ -59,6 +59,7 @@ namespace BackendSite.Service.BLL
             int amounttype,
             string amount,
             int pageNumber,
+            WithdrawalMethodEnum withdrawalMethod,
             out int totalPages,
             out int rowCount,
             ref List<string> currencyAmount)
@@ -76,6 +77,7 @@ namespace BackendSite.Service.BLL
                 pageSize,
                 amounttype,
                 amount,
+                withdrawalMethod,
                 out totalPages,
                 out rowCount,
                 ref currencyAmount);
@@ -319,10 +321,11 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
             DateTime startDate, DateTime endDate, string withdrawalId, string userName, string currencyId, string status,
-            string levelStatus, int AmountType, string Amount)
+            string levelStatus, int AmountType, string Amount,
+            WithdrawalMethodEnum withdrawalMethod)
         {
             return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,
-                withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount);
+                withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount, withdrawalMethod);
         }
 
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(IEnumerable<int> siteId,
