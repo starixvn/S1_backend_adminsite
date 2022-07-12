@@ -995,5 +995,63 @@ namespace BackendSite.Service.BLL
             var count = index + input.PageSize <= data.Count ? input.PageSize : data.Count - index;
             return data.GetRange(index, count);
         }
+
+        public List<BetListReport> GetBetListReportByRedisList(GetBetListRequest input, out int totalPages, out int rowCount)
+        {          
+            totalPages = 0;
+            rowCount = 0;
+            var key = $"BetList:V2:{input.GetRedisMasterKey()}";
+
+            if (_cacheHelper.KeyExists(key))
+            {
+                //Export
+                if (input.PageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<BetListReport>(key, 0, input.PageNumber);
+                }
+
+                //Pagination
+                var total = (int)_cacheHelper.GetListLength(key);
+                totalPages = (int)Math.Ceiling(total / (float)input.PageSize);
+                rowCount = total;
+                var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+                var endIndex = startIndex + input.PageSize <= total ? startIndex + input.PageSize : total;
+                return _cacheHelper.GetListByRange<BetListReport>(key, startIndex, endIndex - 1);
+            }
+
+            //Search range table
+            var StartDate = input.StartTime.ToUniversalTime().DateTime;
+            var EndDate = input.EndTime.ToUniversalTime().DateTime;
+            var parameters = new DynamicParameters(input);
+            parameters.AddDynamicParams(new
+            {
+                SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                StartDate,
+                EndDate,
+            });
+
+            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(key, TimeSpan.FromMinutes(15), data.OrderByDescending(i => i.SettledTime));
+            });
+
+            //Export
+            if (input.PageNumber == -1 || data.Count == 0)
+            {
+                return data;
+            }
+
+            //Pagination
+            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
+            rowCount = data.Count;
+            var index = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+            var count = index + input.PageSize <= data.Count ? input.PageSize : data.Count - index;
+            return data.GetRange(index, count);
+        }
     }
 }
