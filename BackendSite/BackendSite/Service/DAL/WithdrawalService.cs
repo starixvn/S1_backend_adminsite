@@ -129,7 +129,7 @@ namespace BackendSite.Service.DAL
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V4",
+            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V5",
                 new { WithdrawalId = withdrawalId }, commandType: CommandType.StoredProcedure);
         }
 

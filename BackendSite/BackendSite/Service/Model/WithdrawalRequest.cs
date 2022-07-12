@@ -85,6 +85,8 @@ namespace BackendSite.Service.Model
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string ChannelName { set; get; }
+        public string EWalleName { get; set; }
+        public int EWalletSysId { get; set; }
     }
     public class WithdrawalInfo
     {
