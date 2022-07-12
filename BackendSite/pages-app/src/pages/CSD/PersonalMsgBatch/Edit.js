@@ -249,11 +249,9 @@ const EditPanel = (props) => {
           .then(function (response) {
             setSubmitStatus(false);
             if (isMountedRef.current) {
-              if (response.data) {
-                
+              if (response.data.errorCode == 0) {
                 props.filterInfo.AccountStatus = 0;
                 props.filterInfo.Currency = 0;
-                
                 updateData({
                   optSite: "",
                   file: "",
@@ -267,7 +265,7 @@ const EditPanel = (props) => {
                 if (props.FilterInfo) props.FilterSubmit();
                 alert("sent successfully");
               } else {
-                alert("sent error");
+                alert(response.data.message);
               }
               updateSend(false);
             }
