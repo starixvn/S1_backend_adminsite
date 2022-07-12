@@ -14,7 +14,7 @@ using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BaseDataController : ControllerBase
@@ -65,6 +65,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 幣別
             /// </summary>
             public int CurrencyId { get; set; }
+            /// <summary>
+            /// 1. Deposit, 2. Withdrawal
+            /// </summary>
+            public int Purpose { get; set; }
         }
 
         public class GetPayListRequest
@@ -209,7 +213,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & 2) > 0)
+            // request.Purpose = 1 => x.purpose = 1,3
+            // request.Purpose = 2 => x.purpose = 2,3
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & request.Purpose) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

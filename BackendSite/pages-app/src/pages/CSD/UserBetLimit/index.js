@@ -4,7 +4,7 @@ import Edit from "./Edit"
 import Result from "./Result";
 import Filter from "./Filter";
 import qs from "qs";
-import WebAPI from "../../../module//WebAPI";
+import WebAPI, { api } from "../../../module//WebAPI";
 import moment from "moment";
 
 const App = () => {
@@ -81,29 +81,34 @@ const App = () => {
     });
   }
 
-  const InsertOrUpdate = (userName, siteId, betSetting) => {
+  const InsertOrUpdate = (customer, betSetting) => {
+
     let param = {
-      Url: "UserBetLimit/PostUserBetLimit",
-      Data: {
-        UserName: userName,
-        SiteId: siteId,
-        BetSetting: betSetting
+      siteId: customer.siteId,
+      currencyId: customer.currencyId,
+      after: {
+        userName: customer.userName,
+        betSetting: betSetting
       }
     };
-
-    WebAPI.PostData(param).then((res) => {
-
-      if (res.data.errorCode === 0) {
-        alert("success.");
-        updateEvent({
-          ...eventState,
-          ShowSettingPanel: false,
-        });
-        GetUserBetLimitData(stateFilter);
-      } else {
-        alert(res.data.message);
-      }
-    });
+    
+    api
+      .post("/api/UserBetLimit/PostUserBetLimit", param)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          alert("success.");
+          updateEvent({
+            ...eventState,
+            ShowSettingPanel: false,
+          });
+          GetUserBetLimitData(stateFilter);
+        } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   };
 
   const Result_ChangePage = (PageNumber) => {
@@ -119,20 +124,29 @@ const App = () => {
     });
   }
 
-  const DeleteUser = (custId) => {
+  const DeleteUser = (data) => {
     let param = {
-      Url: "UserBetLimit/Delete",
-      Data: `custId=${custId}`,
+      siteId: data.siteId,
+      currencyId: data.currencyId,
+      before: {
+        custId: data.custId,
+        userName: data. userName
+      }
     };
 
-    WebAPI.PostData(param).then((res) => {
-      if (res.data.errorCode === 0) {
-        alert("success.");
-        GetUserBetLimitData(stateFilter);
-      } else {
-        alert(res.data.message);
-      }
-    });
+    api
+      .post("/api/UserBetLimit/Delete", param)
+      .then(function (res) {
+        if (res.data.errorCode === 0) {
+          alert("success.");
+          GetUserBetLimitData(stateFilter);
+        } else {
+            alert(res.data.message ?? "failed to get data.");
+          }
+      })
+      .catch(function (error) {
+        alert(error);
+      });
   }
 
   const SwitchStatus = (custId, status) => {

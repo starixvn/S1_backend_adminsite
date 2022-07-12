@@ -10,10 +10,11 @@ using BackendSite.Service.Model.Store.StorePoint;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using SelectListItem = BackendSite.Service.Model.Store.StorePoint.SelectListItem;
 
 namespace BackendSite.Controllers.ApiV2.Store.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [ApiController]
     [Route("apiV2/[controller]/[action]")]
     public class StorePointController: ControllerBase

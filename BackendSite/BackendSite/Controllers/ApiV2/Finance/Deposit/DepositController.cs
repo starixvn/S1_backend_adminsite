@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositController : ControllerBase
@@ -73,6 +73,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> LevelStatuses { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
+
+            public IEnumerable<int> SelectPayId { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
         }
@@ -135,7 +137,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.PageSize,
                 request.AmountType,
                 request.Amount,
-                ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
+                request.SelectPayId,
+                pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
 
             foreach (var data in depositList)
             {
@@ -172,7 +175,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var exportDeposit = _depositBll.GetDepositExportList(
                 JsonConvert.SerializeObject(request.SiteIds),
                 JsonConvert.SerializeObject(request.SelectBankCode),
-                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null ,
+                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
                 JsonConvert.SerializeObject(request.DepositTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
@@ -182,7 +185,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 JsonConvert.SerializeObject(request.Statuses),
                 JsonConvert.SerializeObject(request.LevelStatuses),
                 request.AmountType,
-                request.Amount);
+                request.Amount,
+                request.SelectPayId.Any() ? JsonConvert.SerializeObject(request.SelectPayId) : null
+                );
 
             foreach (var data in exportDeposit)
             {
@@ -427,14 +432,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult SetAmountByTransId(SetAmountByTransIdRequest request)
+        public ApiResult SetAmountByTransId(ApiRequestWithLog<SetAmountRequest> request)
         {
             var depositRequest = _depositBll.GetDepositRequest(request.TransId);
             if (depositRequest == null)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
             }
-            if (_depositBll.SetDepositRequestAmount(request.TransId, request.Amount, User.Identity.Name, depositRequest.CustId) > 0)
+            if (_depositBll.SetDepositRequestAmount(
+                    new ParamsWithLog<SetAmountRequest>(request, User.Identity.Name), depositRequest.CustId) > 0)
             {
                 return new ApiResult
                 {
