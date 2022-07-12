@@ -201,7 +201,7 @@ namespace BackendSite.Service.BLL
 
         private string DatetimeFormat(DateTime? dateTime)
         {
-            return dateTime.HasValue ? $"{dateTime.Value:yyyy-MM-ddT:hh:mm:ss}+00:00" : null;
+            return dateTime.HasValue ? $"{dateTime.Value:yyyy-MM-ddTHH:mm:ss}+00:00" : null;
         }
     }
 }
