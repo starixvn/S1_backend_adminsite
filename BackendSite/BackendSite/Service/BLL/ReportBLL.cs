@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -937,28 +938,52 @@ namespace BackendSite.Service.BLL
         {
             totalPages = 0;
             rowCount = 0;
-
-            var data = _cacheHelper.TryGetOrCreate($"BetList:{input.GetRedisKey()}",
-                TimeSpan.FromMinutes(15), 
-                () =>
+            var data = new List<BetListReport>();
+            var masterKey = $"BetList:{input.GetRedisMasterKey()}";
+            if (_cacheHelper.KeyExists(masterKey))
+            {
+                //Get cahce by hours key  
+                var keyList = input.GetHoursRange().Select(yyyyMMddHH => $"{masterKey}:{yyyyMMddHH}");
+                var cacheList = _cacheHelper.GetCacheList<List<BetListReport>>(keyList, RedisDataBase.Admin);
+                foreach (var cache in cacheList)
                 {
-                    var StartDate = new DateTimeOffset(input.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
-                    var EndDate = new DateTimeOffset(input.EndTime.ToUniversalTime().DateTime, TimeSpan.Zero);
-                    var parameters = new DynamicParameters(input);
-                    parameters.AddDynamicParams(new
-                    {
-                        SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                        CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                        TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                        StartDate = StartDate.DateTime,
-                        EndDate = EndDate.DateTime,
-                    });
-                    var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
-                    return result.OrderByDescending(i => i.SettledTime).ToList();
+                    data.AddRange(cache);
+                }
+            }
+            else
+            {
+                //Search range table
+                var StartDate = input.StartTime.ToUniversalTime().DateTime;
+                var EndDate = input.EndTime.ToUniversalTime().DateTime;
+                var parameters = new DynamicParameters(input);
+                parameters.AddDynamicParams(new
+                {
+                    SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                    CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                    TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                    StartDate,
+                    EndDate,
                 });
 
+                data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+
+                // Add Cache by hours key           
+                _ = Task.Run(() =>
+                {
+                    var expireTime = TimeSpan.FromMinutes(15);
+                    _cacheHelper.StringSetAsync(masterKey, masterKey, expireTime, RedisDataBase.Admin);
+                    var cacheList = data.GroupBy(i => i.SettledTime.DateTime.GetHoursRedisKey())
+                    .ToDictionary(i => $"{masterKey}:{i.Key}", i => i.ToList());
+                    _cacheHelper.SetCacheList(cacheList, expireTime, RedisDataBase.Admin);
+
+                });
+            }
+
+            //Sort
+            data = data.OrderByDescending(i => i.SettledTime).ToList();
+
             //Export
-            if (input.PageNumber == -1)
+            if (input.PageNumber == -1 || data.Count == 0)
             {
                 return data;
             }
