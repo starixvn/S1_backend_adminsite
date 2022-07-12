@@ -1109,4 +1109,11 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+
+    public enum WithdrawalMethodEnum
+    {
+        All = 0,
+        EWallet = 1,
+        BankCard = 2
+    }
 }
