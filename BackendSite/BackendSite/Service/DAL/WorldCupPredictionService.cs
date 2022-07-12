@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -13,7 +14,7 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
-    public class WorldCupPredictionService
+    public class WorldCupPredictionService : IWorldCupPredictionService
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
