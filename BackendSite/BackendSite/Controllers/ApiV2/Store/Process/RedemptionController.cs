@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
         
         [HttpPost]
-        public Task<ApiListResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
+        public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
         {
             var result = _redemptionBll.GetRedemptionListAsync(req);
 
@@ -43,7 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         {
             var result = _redemptionBll.ExportRedemptionListAsync(req).Result.Data;
 
-            var stream = _excelBll.Export(result);
+            var stream = _excelBll.Export(result.List);
             return _excelBll.ExcelFile(stream, "CustInfoList");
             
         }
