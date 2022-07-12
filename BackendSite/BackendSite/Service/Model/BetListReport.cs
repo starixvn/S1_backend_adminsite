@@ -45,7 +45,7 @@ namespace BackendSite.Service.Model
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
 
-        public string GetRedisMasterKey()
+        public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
             jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
@@ -59,10 +59,6 @@ namespace BackendSite.Service.Model
                 key.Append($"{item.Name}:{item.Value}:");
             }
             return key.ToString();
-        }
-        public IEnumerable<string> GetHoursRange()
-        {
-            return StartTime.ToUniversalTime().DateTime.GetHoursRange(EndTime.ToUniversalTime().DateTime);
         }
     }
 

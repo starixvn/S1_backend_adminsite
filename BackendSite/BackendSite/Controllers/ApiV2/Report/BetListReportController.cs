@@ -78,37 +78,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 1 })]
-        public ApiListResult<BetListReport> GetBetListReportByRedisList(GetBetListRequest request)
-        {
-            DateCheck(request);
-
-            var data = _reportBll.GetBetListReportByRedisList(request, out int totalPages, out int rowCount);
-
-            return new ApiListResult<BetListReport>
-            {
-                Data = data,
-                PageNumber = request.PageNumber,
-                RowCount = rowCount,
-                TotalPages = totalPages,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 2 })]
-        public IActionResult ExportByRedisList(GetBetListRequest request)
-        {
-            DateCheck(request);
-
-            request.PageNumber = -1; //export all
-            var data = _reportBll.GetBetListReportByRedisList(request, out var _, out var _);
-
-            var stream = _excelBll.Export(data);
-            return _excelBll.ExcelFile(stream, "BetListReport");
-        }
-
         private void DateCheck(GetBetListRequest request)
         {
             var startDate = new DateTimeOffset(request.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);

@@ -934,73 +934,12 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
 
+        
         public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
-        {
-            totalPages = 0;
-            rowCount = 0;
-            var data = new List<BetListReport>();
-            var masterKey = $"BetList:{input.GetRedisMasterKey()}";
-            if (_cacheHelper.KeyExists(masterKey))
-            {
-                //Get cahce by hours key  
-                var keyList = input.GetHoursRange().Select(yyyyMMddHH => $"{masterKey}:{yyyyMMddHH}");
-                var cacheList = _cacheHelper.GetCacheList<List<BetListReport>>(keyList, RedisDataBase.Admin);
-                foreach (var cache in cacheList)
-                {
-                    data.AddRange(cache);
-                }
-            }
-            else
-            {
-                //Search range table
-                var StartDate = input.StartTime.ToUniversalTime().DateTime;
-                var EndDate = input.EndTime.ToUniversalTime().DateTime;
-                var parameters = new DynamicParameters(input);
-                parameters.AddDynamicParams(new
-                {
-                    SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                    CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                    TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                    StartDate,
-                    EndDate,
-                });
-
-                data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
-
-                // Add Cache by hours key           
-                _ = Task.Run(() =>
-                {
-                    var expireTime = TimeSpan.FromMinutes(15);
-                    _cacheHelper.StringSetAsync(masterKey, masterKey, expireTime, RedisDataBase.Admin);
-                    var cacheList = data.GroupBy(i => i.SettledTime.DateTime.GetHoursRedisKey())
-                    .ToDictionary(i => $"{masterKey}:{i.Key}", i => i.ToList());
-                    _cacheHelper.SetCacheList(cacheList, expireTime, RedisDataBase.Admin);
-
-                });
-            }
-
-            //Sort
-            data = data.OrderByDescending(i => i.SettledTime).ToList();
-
-            //Export
-            if (input.PageNumber == -1 || data.Count == 0)
-            {
-                return data;
-            }
-
-            //Pagination
-            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
-            rowCount = data.Count;
-            var index = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
-            var count = index + input.PageSize <= data.Count ? input.PageSize : data.Count - index;
-            return data.GetRange(index, count);
-        }
-
-        public List<BetListReport> GetBetListReportByRedisList(GetBetListRequest input, out int totalPages, out int rowCount)
         {          
             totalPages = 0;
             rowCount = 0;
-            var key = $"BetList:V2:{input.GetRedisMasterKey()}";
+            var key = $"BetList:{input.GetRedisKey()}";
 
             if (_cacheHelper.KeyExists(key))
             {
