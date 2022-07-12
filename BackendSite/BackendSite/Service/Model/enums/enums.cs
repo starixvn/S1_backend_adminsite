@@ -1066,7 +1066,17 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
-
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+        BODelete = 2
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1117,17 +1127,6 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum CustBankDetailStatus
-    {
-        Disable = 0,
-        Able = 1,
-        BODelete = 2
-    }
-    public enum BlockAccountStatus
-    {
-        Lock = 1,
-        UnLock = 2,
-    }
     public enum CustBankInfoLogStatus
     {
         Create = 1,
