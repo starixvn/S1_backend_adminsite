@@ -670,4 +670,11 @@ namespace BackendSite.Service.Model
 
     }
 
+    public class CustEWalletLog
+    {
+        public string AccountNum { set; get; }
+        public string AccountName { set; get; }
+        public string EWalleName { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+    }
 }

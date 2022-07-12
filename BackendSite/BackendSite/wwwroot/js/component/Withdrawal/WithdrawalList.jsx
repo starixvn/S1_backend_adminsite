@@ -31,6 +31,7 @@ import DateTimePicker from 'react-datetime';
         1: "Online Payment",
         2: "Local Bank",
         4: "Crypto Pay",
+        5: "E-Wallet"
     };
 
     const StatusSelectOp = {
@@ -373,7 +374,7 @@ import DateTimePicker from 'react-datetime';
             //   console.log(this.state.CryptoPayList);
                 SelId = this.state.CryptoPayList[0].payId;
                 ChannelId = this.state.CryptoPayList[0].channelId;
-            }
+            } 
             this.setState({ selectType: parseInt(event.target.value), SelId: SelId, ChannelId: ChannelId });
         }
 
@@ -521,7 +522,13 @@ import DateTimePicker from 'react-datetime';
                     {
                         if (this.state.CryptoPayList.length > 0)
                             selectOp.push(<option key={4} value="4">Crypto Pay</option>);
-                    }else
+                    }
+                    else if(this.state.Data.accountType === 'ewallet')
+                    {
+                        if (this.state.BankInfoOffList.length > 0)
+                            selectOp.push(<option key={2} value="2">Local Bank</option>);
+                    }
+                    else
                     {
                         if (this.state.PayList.length > 0)
                             selectOp.push(<option key={1} value="1">Online Payment</option>);
@@ -549,7 +556,6 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
                     }
-
                     if (selectPay != null) {
                         selectPay = <tr>
                             <th scope="row">select Pay</th>
@@ -656,13 +662,19 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.bankName}</td>
                             </tr>
                             : null}
+                            {data.eWalleName != null ?
+                            <tr>
+                                <th scope="row">Name of E-Wallet</th>
+                                <td>{data.eWalleName}</td>
+                            </tr>
+                            : null}
                             {data.accountType != null ?
                             <tr>
                                 <th scope="row">Account Type</th>
                                 <td>{data.cryptoCurrency || data.accountType}</td>
                             </tr>
                             : null}
-                            {data.accountType != null ?
+                            {data.accountType != null && data.accountType == "crypto"?
                             <tr>
                                 <th scope="row">Network</th>
                                 <td>{data.network}</td>
