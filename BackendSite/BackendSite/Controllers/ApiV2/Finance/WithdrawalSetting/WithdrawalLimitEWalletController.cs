@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitEWalletController : ControllerBase
