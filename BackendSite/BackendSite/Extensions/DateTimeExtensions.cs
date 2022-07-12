@@ -22,7 +22,7 @@ namespace BackendSite.Extensions
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
 
-        public static IEnumerable<string> GetPartitionRange(this DateTimeOffset startDate, DateTimeOffset endDate)
+        public static IEnumerable<string> GetPartitionRange(this DateTime startDate, DateTime endDate)
         {
             var result = new List<string>();
             while (startDate <= endDate)
@@ -33,9 +33,27 @@ namespace BackendSite.Extensions
             return result;
         }
 
-        public static string GetDailyPartitionKey(this DateTimeOffset partitionTime)
+        public static string GetDailyPartitionKey(this DateTime partitionTime)
         {
             return partitionTime.ToString("yyyyMMdd");
         }
+       
+        public static IEnumerable<string> GetHoursRange(this DateTime startDate, DateTime endDate)
+        {
+            var result = new List<string>();
+            while (startDate <= endDate)
+            {
+                result.Add(startDate.GetHoursRedisKey());
+                startDate = startDate.AddHours(1);
+            } 
+            return result;
+        }
+
+        public static string GetHoursRedisKey(this DateTime partitionTime)
+        {
+            return partitionTime.ToString("yyyyMMddHH");
+        }
+
+
     }
 }
