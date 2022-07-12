@@ -16,8 +16,9 @@ namespace BackendSite.Service.Model.enums
     {
         Main, //ConnectionString
         Report, //ConnectionStringReport
-        Wager, //ConnectionStringWager
-        Log, //ConnectionStringLog
+        Wager,  //ConnectionStringWager
+        Log,    //ConnectionStringLog
+        IP      //ConnectionStringIPTable
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -206,6 +207,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
+        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
@@ -505,7 +507,7 @@ namespace BackendSite.Service.Model.enums
         Percentage = 1,
         Amount = 2
     }
-    
+
     #endregion
 
     #region Referral
@@ -517,7 +519,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -538,6 +540,46 @@ namespace BackendSite.Service.Model.enums
         Read = 2,
         Update = 3,
         Delete = 4
+    }
+
+    public enum AdminAdjustmentLogMenuEnum
+    {
+        Undefined = 0,
+        BankCardManagement = 1,
+        SetDepositRequestAmount = 2,
+        WithdrawalAccounting = 3,
+        BalanceAdjustment = 4,
+        ThirdPartyAdjustment = 5,
+        IssueBonusManagement = 6,
+        PaymentGateway = 7,
+        DepositLimitation = 8,
+        WithdrawalLimitation = 9,
+        CryptoWithdrawalLimitation = 10,
+        AdjustmentLimitation = 11,
+        LineDepositChannel = 12,
+        DepositSubmission = 13,
+        ResetCustomerBankInfo = 14,
+        ResetCustomerUSDTInfo = 15,
+        SetCustomerStatus = 16,
+        KickOutCustomer = 17,
+        SetCustomerPromotionStatus = 18,
+        Announcement = 19,
+        WithdrawalKycControl = 20,
+        TagManagement = 21,
+        LiveRegistrationStatistics = 22,
+        GameExclusion = 23,
+        BetLimit = 24,
+        SetCustomerLevel = 25,
+        SetCustomerFullName = 26,
+        SetCustomerBirthday = 27,
+        SetCustomerPhone = 28,
+        SetCustomerEMail = 29,
+        SetCustomerAddress = 30,
+        ResetCustomerProfile = 31,
+        VipRebatePeriod = 32,
+        VipRebateCategory = 33,
+        VipRebateGameType = 34,
+        VipRebatePayoutLimit = 35
     }
 
     #region BankFinancialTransferInfoLog
@@ -743,7 +785,7 @@ namespace BackendSite.Service.Model.enums
 
     #region Customer_RegLiveStatus
 
-    public enum Customer_RegLiveStatusStatusEnum
+    public enum CustomerRegLiveStatusStatusEnum
     {
         Pending = 1,
         Done = 2,
@@ -790,6 +832,12 @@ namespace BackendSite.Service.Model.enums
         Failed = 4
     }
 
+    public enum SendBatchMessageStatus
+    {
+        Pending = 0,
+        Finished = 1
+    }
+
     public enum TpEnum
     {
         Saba = 1,
@@ -806,7 +854,7 @@ namespace BackendSite.Service.Model.enums
         RetentionBouns = 5,
         ManualBonus = 6
     }
-    
+
     public enum TpGameTypeEnum
     {
         DG_LiveCasino = 10
@@ -996,7 +1044,7 @@ namespace BackendSite.Service.Model.enums
     public enum DeepLinkTableTypeEnum
     {
         Android = 1,
-        IOS  = 2,
+        IOS = 2,
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
@@ -1004,5 +1052,61 @@ namespace BackendSite.Service.Model.enums
         HTTP = 1,
         HTTPS = 2
     }
+
+    public enum RedisDataBase
+    {
+        Member = 0,
+        Shared = 1,
+        Tp = 2,
+        Bonus = 3,
+        Admin = 4,
+        Payment = 5
+    }
+
     #endregion
+
+    public enum LineChannelStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    public enum GeneralStatusEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    public enum PermissionTypeEnum
+    {
+        AddRole = 0,
+        UpdateRole = 1,
+        AddUser = 2,
+        UpdateUser = 3
+    }
+
+    public enum AdminBrandTypeEnum
+    {
+        Disable = 0,
+        Enable = 1
+	}
+	
+    public enum SiteEnum
+    {
+        [Description("Nova88")]
+        NOVA88 = 1,
+        [Description("Goal123")]     
+        GOAL123 = 2,
+        [Description("Bwing")]
+        BWING = 3
+    }
+
+    public enum CustBankInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+    }
 }

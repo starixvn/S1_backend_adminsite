@@ -2,6 +2,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
 
@@ -65,6 +66,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? UpdateTime { set; get; }
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
+        public string Operator { set; get; }
     }
 
     public class DepositInfoForExport
@@ -117,22 +119,33 @@ namespace BackendSite.Service.Model
 
     public class DepositDetailSubmission
     {
-        public string DepositDetails { get; set; }
+        public DepositDetailInfo Detail { get; set; }
         public IFormFile Receipt { get; set; }
     }
 
     public class DepositDetailInfo
     {
+        private DateTimeOffset _depositTime { get; set; }
+        [LogIgnore]
         public int CustId { get; set; }
         public string UserName { get; set; }
+        [LogIgnore]
         public int CurrencyId { get; set; }
+        [LogIgnore]
         public int SiteId { get; set; }
+        [LogIgnore]
         public int SysId { get; set; }
+        [LogIgnore]
         public string DepositInfo { get; set; }
         public decimal Amount { get; set; }
         public string Comment { get; set; }
+        [LogPropertyName("ReferenceNo")]
         public string RefId { get; set; }
-        public long DepositTime { get; set; }
+        public DateTimeOffset DepositTime
+        {
+            get => _depositTime;
+            set => _depositTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string Operator { get; set; }
         public string BankName { get; set; }
         public string AccountHolderName { get; set; }
@@ -226,6 +239,19 @@ namespace BackendSite.Service.Model
 
         public int DepositStatus { get; set; }
     }
+    
+    public class DepositLimitModel
+    {
+        public int VipLevel { get; set; }
+
+        public double DepositMin { get; set; }
+
+        public double DepositMax { get; set; }
+        public DepositTypeEnum DepositType { get; set; }
+        public DepositStatusEnum DepositStatus { get; set; }
+        public string DepositTypeName => DepositType.ToString();
+        public string DepositStatusName => DepositStatus.ToString();
+    }
 
     public class DepositLimitCurrencyInfo
     {
@@ -307,9 +333,8 @@ namespace BackendSite.Service.Model
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
     }
-    public class DepositRequestAmountPara
+    public class SetAmountRequest
     {
-        public string TransId { get; set; }
         public decimal Amount { get; set; }
     }
 

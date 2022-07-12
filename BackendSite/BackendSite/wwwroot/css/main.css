@@ -354,19 +354,19 @@
     border-color: #D70404;
 }
 
-.btn-withdrawal-rejected {
+.btn-withdrawal-rejected , .btn-deposit-rejected {
     background-color: #C70707;
     color: #fff;
 }
-    .btn-withdrawal-rejected:hover {
+    .btn-withdrawal-rejected:hover , .btn-deposit-rejected:hover {
         background-color: #be0303;
     }
     
-.btn-withdrawal-cancelled {
+.btn-withdrawal-cancelled , .btn-deposit-cancelled {
     background-color: #F97C08;
     color: #fff;
 }
-    .btn-withdrawal-cancelled:hover {
+    .btn-withdrawal-cancelled:hover , .btn-deposit-cancelled:hover {
         background-color: #ef7402;
     }
 
@@ -386,11 +386,11 @@
         background-color: #269fe3;
     }
 
-.btn-withdrawal-pending {
+.btn-withdrawal-pending , .btn-deposit-pending{
     background-color: #38425B;
     color: #fff;
 }
-    .btn-withdrawal-pending:hover {
+    .btn-withdrawal-pending:hover , .btn-deposit-pending:hover {
         background-color: #323c54;
     }
 
@@ -402,27 +402,27 @@
         background-color: #0eafa5;
     }
 
-.btn-withdrawal-hold {
+.btn-withdrawal-hold , .btn-deposit-hold{
     background-color: #F4B30B;
     color: #fff;
 }
-    .btn-withdrawal-hold:hover {
+    .btn-withdrawal-hold:hover , .btn-deposit-hold:hover {
         background-color: #e8a905;
     }
 
-.btn-withdrawal-approved {
+.btn-withdrawal-approved , .btn-deposit-approved{
     background-color: #3EA62E;
     color: #fff;
 }
-    .btn-withdrawal-approved:hover {
+    .btn-withdrawal-approved:hover  , .btn-deposit-approved:hover{
         background-color: #369b27;
     }
 
-.btn-withdrawal-draft {
+.btn-withdrawal-draft , .btn-deposit-draft{
     background-color: #8B8B8B;
     color: #fff;
 }
-    .btn-withdrawal-draft:hover {
+    .btn-withdrawal-draft:hover , .btn-deposit-draft:hover {
         background-color: #808080;
     }
 
@@ -986,11 +986,11 @@ body {
         background-color: #616161;
     }
     
-    .status.status-withdrawal-rejected {
+    .status.status-withdrawal-rejected , .status.status-deposit-rejected {
         background-color: #C70707;
     }
     
-    .status.status-withdrawal-cancelled {
+    .status.status-withdrawal-cancelled , .status.status-deposit-pending{
         background-color: #F97C08;
     }
     
@@ -998,11 +998,11 @@ body {
         background-color: #9957EC;
     }
     
-    .status.status-withdrawal-verified {
+    .status.status-withdrawal-verified  {
         background-color: #2DA7EC;
     }
 
-    .status.status-withdrawal-pending {
+    .status.status-withdrawal-pending ,.status.status-deposit-cancelled {
         background-color: #38425B;
     }
     
@@ -1010,11 +1010,11 @@ body {
         background-color: #13BBB1;
     }
     
-    .status.status-withdrawal-hold {
+    .status.status-withdrawal-hold , .status.status-deposit-hold{
         background-color: #F4B30B;
     }
 
-    .status.status-withdrawal-approved {
+    .status.status-withdrawal-approved , .status.status-deposit-approved {
         background-color: #3EA62E;
     }
 
