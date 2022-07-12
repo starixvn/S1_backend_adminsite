@@ -113,7 +113,7 @@ namespace BackendSite.Extensions
                         var val = item.GetType().GetProperty(prop.Name)?.GetValue(item);
                         if (val is DateTimeOffset offset && offset.Year > 1)
                         {
-                            offset = new DateTimeOffset(offset.DateTime, TimeSpan.FromHours(8));
+                            offset = offset.ToOffset(TimeSpan.FromHours(8));
                             row.CreateCell(i).SetCellValue($"{offset:MM/dd/yyyy h:mm:ss tt}");
                         }
                         else
