@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -12,13 +11,11 @@ namespace BackendSite.Service.BLL
     public class DashBoardBLL
     {
         private readonly DashBoardService dashBoardService;
-        private readonly CacheHelper _cacheHelper;
-        private readonly IMemoryCache cache;
+        private readonly ICacheHelper _redisHelper;
         public DashBoardBLL(IServiceProvider provider)
         {
             dashBoardService = provider.GetRequiredService<DashBoardService>();
-            cache = provider.GetRequiredService<IMemoryCache>();
-            _cacheHelper = provider.GetRequiredService<CacheHelper>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public DashBoardData GetDashBoardData(int siteId, int currencyId, int baseCurrencyId, List<int> canSearchSite, int timeZone)
@@ -30,10 +27,9 @@ namespace BackendSite.Service.BLL
             var endTime = new DateTimeOffset(localDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddHours(24).AddMilliseconds(-1);
             var siteList = siteId == 0 ? JsonConvert.SerializeObject(canSearchSite) : JsonConvert.SerializeObject(new List<int> { siteId });
 
-            var key = $"DashBoard_{siteList}_{currencyId}_{baseCurrencyId}";
-            return _cacheHelper.TryGetOrCreate(key,
-                new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(10)),
-                i => GetDashBoardData(siteId, currencyId, baseCurrencyId, canSearchSite, startTime, endTime, type));
+            var key = $"DashBoard:{siteList}:{currencyId}:{baseCurrencyId}";
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+                () => GetDashBoardData(siteId, currencyId, baseCurrencyId, canSearchSite, startTime, endTime, type));
         }
 
         private DashBoardData GetDashBoardData(int siteId, int currencyId, int baseCurrencyId, List<int> canSearchSite,
