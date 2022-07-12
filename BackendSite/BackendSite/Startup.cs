@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
 
@@ -83,6 +85,8 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
