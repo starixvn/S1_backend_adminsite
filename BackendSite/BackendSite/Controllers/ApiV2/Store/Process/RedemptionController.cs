@@ -41,10 +41,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         [HttpPost]
         public async Task<IActionResult> ExportRedemptionListAsync(ExportRedemptionListRequest req)
         {
-            var result = _redemptionBll.ExportRedemptionListAsync(req).Result.Data;
+            var result = await _redemptionBll.ExportRedemptionListAsync(req);
 
-            var stream = _excelBll.Export(result.List);
-            return _excelBll.ExcelFile(stream, "CustInfoList");
+            return _excelBll.ExcelFile(result, "RedemptionList");
             
         }
         

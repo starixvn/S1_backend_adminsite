@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using BackendSite.Attributes;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -21,16 +25,16 @@ namespace BackendSite.Extensions
             var headerRow = sheet.CreateRow(0);
             var props = typeof(T).GetProperties();
 
-            int index = 0;
+            var index = 0;
             foreach (var prop in props)
             {
-                // if (!prop.ExcelIgnore())
-                // {
-                //     index++;
-                //     continue;
-                // }
+                if (prop.ExcelIgnore())
+                {
+                    continue;
+                }
 
-                headerRow.CreateCell(index).SetCellValue(prop.Name);
+                var name = prop.GetDisplayName();
+                headerRow.CreateCell(index).SetCellValue(name);
                 index++;
             }
 
@@ -74,14 +78,12 @@ namespace BackendSite.Extensions
 
             WriteToSheet(sheet1, list, freeze);
 
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                workbook.Write(memoryStream);
-                return memoryStream.GetBuffer();
-            }
+            using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            return memoryStream.GetBuffer();
         }
 
-        public static void WriteToSheet<T>(ISheet sheet, IEnumerable<T> list, bool freeze = false)
+        public static void WriteToSheet<T>(this ISheet sheet, IEnumerable<T> list, bool freeze = false)
             where T : class
         {
             sheet.CreateHeaders<T>(freeze);
@@ -95,30 +97,36 @@ namespace BackendSite.Extensions
             {
                 var props = list.First().GetType().GetProperties();
 
-                int index = 1;
+                var index = 1;
                 foreach (var item in list)
                 {
                     var row = sheet.CreateRow(index);
 
-                    int i = 0;
+                    var i = 0;
                     foreach (var prop in props)
                     {
+                        if (prop.ExcelIgnore())
+                        {
+                            continue;
+                        }
+                        
                         var val = item.GetType().GetProperty(prop.Name)?.GetValue(item);
-                        row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
+                        if (val is DateTimeOffset offset && offset.Year > 1)
+                        {
+                            offset = new DateTimeOffset(offset.DateTime, TimeSpan.FromHours(8));
+                            row.CreateCell(i).SetCellValue($"{offset:MM/dd/yyyy h:mm:ss tt}");
+                        }
+                        else
+                        {
+                            row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
+                        }
+                        
                         i++;
                     }
                     index++;
                 }
             }
         }
-        
-        // private static bool ExcelIgnore(this PropertyInfo propertyInfo)
-        // {
-        //     var attributes = (ExcelIgnoreAttribute[])propertyInfo
-        //         .GetCustomAttributes(typeof(ExcelIgnoreAttribute), false);
-        //
-        //     return attributes.Length > 0;
-        // }
         
         private static decimal ToDecimal(this object value)
         {
@@ -140,6 +148,24 @@ namespace BackendSite.Extensions
                 .Replace(",", string.Empty), out int result);
             
             return result;
+        }
+    
+        private static bool ExcelIgnore(this ICustomAttributeProvider propertyInfo)
+        {
+            var attributes = (ExportIgnoreAttribute[])propertyInfo
+                .GetCustomAttributes(typeof(ExportIgnoreAttribute), false);
+     
+            return attributes.Length > 0;
+        }
+        
+        private static string GetDisplayName(this PropertyInfo propertyInfo)
+        {
+            var attributes = (DisplayNameAttribute[])propertyInfo
+                .GetCustomAttributes(typeof(DisplayNameAttribute), false);
+            
+            return attributes.Length > 0 
+                ? attributes.First().DisplayName
+                : propertyInfo.Name;
         }
     }
 }
