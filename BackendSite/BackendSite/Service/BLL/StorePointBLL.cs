@@ -114,7 +114,7 @@ namespace BackendSite.Service.BLL
             sheet.CreateHeaders<ManualRewardPointItem>(freeze: true);
             sheet.SetDropDownList(categoryList, 1, 10, 1, 1);
 
-            using MemoryStream memoryStream = new MemoryStream();
+            using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
             

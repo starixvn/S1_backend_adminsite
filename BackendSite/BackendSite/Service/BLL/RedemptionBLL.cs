@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.Redemption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
 {
@@ -19,7 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly AwsS3BLL _awsS3Bll;
         private readonly string _bucketName;
         private readonly string _folder;
-        
+
 
         public RedemptionBLL(IServiceProvider provider)
         {
@@ -30,7 +34,6 @@ namespace BackendSite.Service.BLL
             _awsS3Bll = provider.GetRequiredService<AwsS3BLL>();
             _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
             _folder = configuration.GetValue<string>("AwsStoreFolder");
-           
         }
 
         public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
@@ -40,15 +43,33 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
-        public Task<ApiResult<ExportRedemptionListResult>> ExportRedemptionListAsync(ExportRedemptionListRequest req)
+
+        public async Task<byte[]> ExportRedemptionListAsync(ExportRedemptionListRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/ExportRedemptionList";
-            var result = _courierAdapter.PostAsync<ApiResult<ExportRedemptionListResult>, ExportRedemptionListRequest>(url, req);
+            var exportResult =
+                await _courierAdapter.PostAsync<ApiResult<ExportRedemptionListResult>, ExportRedemptionListRequest>(url, req);
+
+            if (exportResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            {
+                _logger.LogError($"StoreService ExportRedemptionList Failed. ErrorCode: {exportResult.ErrorCode}");
+                throw new AdminException("ExportRedemptionList Failed.");
+            }
+
+            var workbook = new XSSFWorkbook();
+            var sheet1 = workbook.CreateSheet("RedemptionList");
+            var sheet2 = workbook.CreateSheet("Overview");
+
+            sheet1.WriteToSheet(exportResult.Data.List, true);
+            sheet2.WriteToSheet(exportResult.Data.Overview, true);
+            
+            await using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
 
             return result;
         }
-        
+
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/GetRedemptionDetail";
@@ -56,7 +77,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public Task<ApiResult<object>> GetRedemptionLogAsync(GetRedemptionLogRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/GetRedemptionLog";
@@ -64,7 +85,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
         {
             var url = _storeSiteUrl + "/api/Redemption/SetRedemptionInfo";
@@ -72,20 +93,20 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public async Task<string> UploadReceiptAsync(IFormFile file)
         {
             if (!CheckIsImage(file))
             {
                 return string.Empty;
             }
-            
+
             var ext = Path.GetExtension(file.FileName);
             var path = $"/store/receipt/{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
             var key = _folder + path;
             var success = await _awsS3Bll.UploadFileAsync(file, _bucketName, key);
             var result = success ? path : string.Empty;
-            
+
             return result;
         }
 
@@ -95,6 +116,5 @@ namespace BackendSite.Service.BLL
             => file.ContentType.StartsWith("image/");
 
         #endregion
-        
     }
 }
