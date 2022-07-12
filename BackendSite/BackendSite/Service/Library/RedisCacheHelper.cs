@@ -177,6 +177,56 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public bool InsertList<TItem>(string key, TimeSpan timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            if (list == null)
+            {
+                return false;
+            }
+
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";          
+            var taskList = new List<Task<long>>();
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var trans = db.CreateTransaction();
+            
+            foreach (var item in list)
+            {
+                var task = db.ListRightPushAsync(key, JsonConvert.SerializeObject(item));
+                taskList.Add(task);
+            }
+            db.KeyExpire(key, timeSpan);
+            return trans.Execute();
+        }
+
+        public List<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            var result = new List<TItem>();
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            var db = _multiplexer.GetDatabase((int)redisDataBase);           
+            if (!db.KeyExists(key))
+            {
+                return result;
+            }
+
+            var list = db.ListRange(key, startIndex, endIndex);        
+            foreach (var item in list)
+            {
+                if (item.HasValue)
+                {
+                    var data = JsonConvert.DeserializeObject<TItem>(item);
+                    result.Add(data);
+                }
+            }
+            return result;
+        }
+
+        public long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            return db.ListLength(key);
+        }
+
         private string RemoveSpecialChars(string key)
         {
             foreach (var c in _charsToRemove)

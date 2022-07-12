@@ -30,8 +30,7 @@ import DateTimePicker from 'react-datetime';
         0: "Undefine",
         1: "Online Payment",
         2: "Local Bank",
-        4: "Crypto Pay",
-        5: "E-Wallet"
+        4: "Crypto Pay"
     };
 
     const StatusSelectOp = {
@@ -63,6 +62,11 @@ import DateTimePicker from 'react-datetime';
         10: 10,
         25: 25,
         50: 50
+    }
+    const WithdrawalMethod = {
+        0:"All",
+        1:"E-Wallet",
+        2:"Bank Card"
     }
 
     class WithdrawalList extends React.Component {
@@ -760,7 +764,7 @@ import DateTimePicker from 'react-datetime';
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
             this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: [],amountType:0,
-            amount: "",pageSize:25};
+            amount: "",pageSize:25, withdrawalMethod:0};
             this.searchFilter = {};
         }
 
@@ -782,7 +786,8 @@ import DateTimePicker from 'react-datetime';
             }
             //Loading.OnLoading();
             let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite, 
-                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize};
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize, 
+                        WithdrawalMethod: parseInt(this.searchFilter.withdrawalMethod)};
 
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
@@ -829,7 +834,8 @@ import DateTimePicker from 'react-datetime';
         }
 
         onExport() {
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType)
+                , Amount:this.searchFilter.amount, WithdrawalMethod: this.searchFilter.withdrawalMethod };
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
             }
@@ -1180,6 +1186,11 @@ import DateTimePicker from 'react-datetime';
             }.bind(this));
             PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
 
+            let WithdrawalMethodList = Object.keys(WithdrawalMethod).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{WithdrawalMethod[obj]}</option>;
+            }.bind(this));
+            WithdrawalMethodList = <select onChange={this.onChange.bind(this)} name="withdrawalMethod" value={this.state.withdrawalMethod}>{WithdrawalMethodList}</select>
+
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
@@ -1244,6 +1255,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Withdrawal ID</span>
                                     <div className="field">
                                         <input type="text" name="SelectWithdrawalID" value={this.state.SelectWithdrawalID} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Withdrawal Method</span>
+                                    <div className="field">
+                                        {WithdrawalMethodList}
                                     </div>
                                 </div>
                                 <div className="input-item">

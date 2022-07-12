@@ -94,6 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public IEnumerable<int> LevelStatuses { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+            public WithdrawalMethodEnum WithdrawalMethod { get; set; }
         }
 
         public class GetByTransIdRequest
@@ -164,7 +165,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
                 request.WithdrawalId, request.UserName, request.CurrencyIds,
-                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber, out totalPages,
+                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber,request.WithdrawalMethod
+                , out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -201,7 +203,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 JsonConvert.SerializeObject(request.Statuses),
                 JsonConvert.SerializeObject(request.LevelStatuses),
                 request.AmountType,
-                request.Amount);
+                request.Amount,
+                request.WithdrawalMethod);
 
             //foreach (var item in data)
             //{

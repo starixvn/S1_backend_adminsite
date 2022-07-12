@@ -1164,4 +1164,11 @@ namespace BackendSite.Service.Model.enums
         INR = 61,
         BDT = 74
     }
+
+    public enum WithdrawalMethodEnum
+    {
+        All = 0,
+        EWallet = 1,
+        BankCard = 2
+    }
 }

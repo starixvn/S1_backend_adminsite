@@ -38,22 +38,5 @@ namespace BackendSite.Extensions
             return partitionTime.ToString("yyyyMMdd");
         }
        
-        public static IEnumerable<string> GetHoursRange(this DateTime startDate, DateTime endDate)
-        {
-            var result = new List<string>();
-            while (startDate <= endDate)
-            {
-                result.Add(startDate.GetHoursRedisKey());
-                startDate = startDate.AddHours(1);
-            } 
-            return result;
-        }
-
-        public static string GetHoursRedisKey(this DateTime partitionTime)
-        {
-            return partitionTime.ToString("yyyyMMddHH");
-        }
-
-
     }
 }
