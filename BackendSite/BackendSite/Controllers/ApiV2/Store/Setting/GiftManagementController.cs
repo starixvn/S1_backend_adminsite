@@ -7,6 +7,7 @@ using BackendSite.Service.Model.Store.GiftManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
 namespace BackendSite.Controllers.ApiV2.Store.Setting
 {
