@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Data;
 using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL
 {
@@ -227,8 +228,11 @@ namespace BackendSite.Service.DAL
             props.Add("Userpwd", tools.MD5Encrypt(password));
             return  _mainDbClient.Execute("Admin_UserPassword_Set", props);
         }
-        public int SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
             var propsLog = new DynamicParameters();
 
@@ -240,15 +244,26 @@ namespace BackendSite.Service.DAL
             #region propsLog
             propsLog.Add("_SiteId", brand);
             propsLog.Add("_CurrencyId", input.CurrencyId);
-            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BankCardManagement);
-            propsLog.Add("_ActionType", (int)(isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserStatus);
+            propsLog.Add("_ActionType", (int)ActionType.Update);
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog());
+            propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
             propsLog.Add("_AfterDetailInfo", input.After.ToLog());
             propsLog.Add("_Operator", Operator);
             #endregion
 
-            return _mainDbClient.Execute("Admin_UserStatus_Set", props);
+            //return _mainDbClient.Execute("Admin_UserStatus_Set", props);
+            var r = _mainDbClient.Execute("Admin_UserStatus_Set", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            if (r & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return r & result;
         }
 
         public IEnumerable<AdminBrandRole> GetAdminBrandRole(int role)

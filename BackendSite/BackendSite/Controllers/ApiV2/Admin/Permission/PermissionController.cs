@@ -121,12 +121,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string Password { get; set; }
         }
 
-        public class SetAdminUserStatusReq 
-        {
-            public int UserId { get; set; }
-            public int SiteId { get; set; }
-            public int Status { get; set; }       
-        }
         public class GetAddAdminUserCurrencyReq
         {
             public int SiteId { get; set; }
@@ -1035,7 +1029,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             var authInfo = _newAuthorizeBLL.GetAuthData();
             var brand = _newAuthorizeBLL.CheckBrand();
 
-            if (_permissionBll.SetAdminUserStatus(request, brand, authInfo.UserName) > 0)
+            if (_permissionBll.SetAdminUserStatus(new ParamsWithLog<SetAdminUserStatusReq>(request, authInfo.UserName), brand, authInfo.UserName))
             {
                 return new ApiResult
                 {

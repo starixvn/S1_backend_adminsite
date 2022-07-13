@@ -926,7 +926,7 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.SetAdminUserPassword(userId, password);
         }
-        public int SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
         {
             return permissionService.SetAdminUserStatus(input, brand, Operator);
         }

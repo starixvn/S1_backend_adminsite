@@ -223,4 +223,10 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public string SiteName { get; set; }
     }
+    public class SetAdminUserStatusReq
+    {
+        public int UserId { get; set; }
+        public int SiteId { get; set; }
+        public int Status { get; set; }
+    }
 }
