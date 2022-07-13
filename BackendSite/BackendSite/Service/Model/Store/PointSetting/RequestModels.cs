@@ -77,6 +77,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public int TpCategoryId { get; set; }
         public IEnumerable<TurnoverPointStatusParams> Infos { get; set; }
     }
 }

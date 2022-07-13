@@ -62,5 +62,38 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public Task<ApiResult<object>> GetAdjustmentPointReportAsync(GetAdjustmentPointReportRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Report/GetAdjustmentPointReport";
+            var result = _courierAdapter.PostAsync<ApiResult<object>, GetAdjustmentPointReportRequest>(url, req);
+
+            return result;
+        }
+        
+        public async Task<byte[]> ExportAdjustmentPointReportAsync(ExportAdjustmentPointReportRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Report/ExportAdjustmentPointReport";
+            var exportResult =
+                await _courierAdapter.PostAsync<ApiResult<ExportAdjustmentPointReportResult>, ExportAdjustmentPointReportRequest>(url, req);
+
+            if (exportResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            {
+                _logger.LogError($"StoreService ExportAdjustmentPointReport Failed. ErrorCode: {exportResult.ErrorCode}");
+                throw new AdminException("ExportAdjustmentPointReport Failed.");
+            }
+
+            var workbook = new XSSFWorkbook();
+            var sheet1 = workbook.CreateSheet("AdjustmentPointReport");
+            var sheet2 = workbook.CreateSheet("Overview");
+
+            sheet1.WriteToSheet(exportResult.Data.List, true);
+            sheet2.WriteToSheet(exportResult.Data.Overview, true);
+            
+            await using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+
+            return result;
+        }
     }
 }

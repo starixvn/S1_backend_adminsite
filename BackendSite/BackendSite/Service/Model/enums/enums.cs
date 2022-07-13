@@ -601,6 +601,12 @@ namespace BackendSite.Service.Model.enums
         Referral = 36,
         EditEWalletWithdrawalLimitInfo = 37,
         SetEWalletWithdrawalLimitInfoStatus = 38,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 41,
+        InactivePointExpirySetting = 42,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
         SetCustInfoEnableRebate = 45
     }
 
@@ -873,7 +879,7 @@ namespace BackendSite.Service.Model.enums
     {
         DG_LiveCasino = 10
     }
-    
+
     public enum TpCategoryEnum
     {
         Sports = 1,
