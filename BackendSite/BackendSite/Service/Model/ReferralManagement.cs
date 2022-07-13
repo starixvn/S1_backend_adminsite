@@ -16,19 +16,19 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public bool Status { get; set; }
     }
-    public class GetListRequest
+    public class GetReferralListRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
     }
-    public class GetRequest
+    public class GetReferralRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
         [JsonProperty("currencyId")]
         public int CurrencyId { get; set; }
     }
-    public class SetStatusRequest
+    public class SetReferralStatusRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
