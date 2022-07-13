@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,14 +37,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         {
             public int SiteId { get; set; }
         }
-        public class UpdateRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int WithdrawalMin { get; set; }
-            public int WithdrawalMax { get; set; }
-            public int Status { get; set; }
-        }
         #endregion
 
         #region Action
@@ -78,18 +71,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult Update(UpdateRequest request)
+        public ApiResult Update(ApiRequestWithLog<EWalletUpdateRequest> request)
         {
-            var data = new EWalletWithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-            };
-
-            var result = _withdrawalBll.EditEWalletWithdrawalLimit(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.EditEWalletWithdrawalLimit(new ParamsWithLog<EWalletUpdateRequest>(request,
+                User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -115,17 +100,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SwitchStatus(UpdateRequest request)
+        public ApiResult SwitchStatus(ApiRequestWithLog<EWalletSwitchStatusRequest> request)
         {
-            var data = new EWalletWithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                Status = request.Status
-            };
-
-            var result = _withdrawalBll.UpdateEWalletWithdrawalLimitInfoStatus(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.UpdateEWalletWithdrawalLimitInfoStatus
+                (new ParamsWithLog<EWalletSwitchStatusRequest>(request,User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

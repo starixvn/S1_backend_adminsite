@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,5 +49,16 @@ namespace BackendSite.Service.Model
         public int SysId { get; set; }
         public string EWalleName { get; set; }
         public int CurrencyId { get; set; }
+    }
+    public class EWalletUpdateRequest
+    {
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+    }
+    public class EWalletSwitchStatusRequest
+    {
+        [LogIgnore]
+        public EWalletStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
     }
 }

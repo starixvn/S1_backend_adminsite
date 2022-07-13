@@ -991,20 +991,20 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        public bool EditEWalletWithdrawalLimit(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool EditEWalletWithdrawalLimit(ParamsWithLog<EWalletUpdateRequest> input)
         {
-            if (withdrawalLimitInfoManage.WithdrawalMax < 0
-                || withdrawalLimitInfoManage.WithdrawalMin < 0)
+            if (input.After.WithdrawalMax < 0
+                || input.After.WithdrawalMin < 0)
             {
                 return false;
             }
 
-            return _withdrawalLimitService.EditEWalletWithdrawalLimitInfo(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.EditEWalletWithdrawalLimitInfo(input);
         }
 
-        public bool UpdateEWalletWithdrawalLimitInfoStatus(EWalletWithdrawalLimitInfoManage withdrawalLimitInfoManage, string updater)
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(ParamsWithLog<EWalletSwitchStatusRequest> input)
         {
-            return _withdrawalLimitService.UpdateEWalletWithdrawalLimitInfoStatus(withdrawalLimitInfoManage, updater);
+            return _withdrawalLimitService.UpdateEWalletWithdrawalLimitInfoStatus(input);
         }
 
         public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)

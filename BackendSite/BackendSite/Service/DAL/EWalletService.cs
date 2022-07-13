@@ -115,7 +115,7 @@ namespace BackendSite.Service.DAL
                             SysId = sysId,
                             AccountNum = accountNum,
                             AccountName = x.AccountName,
-                            Status = status == BlockAccountStatus.Lock ? 3 : 4
+                            Status = status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock
                         });
 
                         result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
@@ -154,36 +154,29 @@ namespace BackendSite.Service.DAL
                 SysId = sysId,
                 AccountNo = accountNum
             });
+            var releaseEWalletList = GetBlockEWalletList(sysId, accountNum).ToList();
             result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", p, conn, trans);
 
             if (result > 0)
             {
-                var custInfo = _custInfoService.GetCustInfo(custId);
-
-                //if (custInfo != null)
-                //{
-                //    var prop = new DynamicParameters(new
-                //    {
-                //        CustId = custId,
-                //        SiteId = custInfo.SiteId,
-                //        SysId = sysId,
-                //        AccountNum = accountNum,
-                //        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "" : iFSCCode,
-                //        AccountName = accountNum,
-                //        Status = CustBankInfoLogStatus.Release
-                //    });
-
-                //    result = _mainDbClient.Execute("Admin_CustBankInfoLog_Set", prop, conn, trans);
-
-                //    if (result <= 0)
-                //    {
-                //        trans.Rollback();
-                //    }
-                //}
-                //else
-                //{
-                //    trans.Rollback();
-                //}
+                foreach (var x in releaseEWalletList)
+                {
+                    var prop = new DynamicParameters(new
+                    {
+                        CustId = x.CustId,
+                        SiteId = x.SiteId,
+                        SysId = sysId,
+                        AccountNum = accountNum,
+                        AccountName = x.AccountName,
+                        Status = (int)EWalletinfoLogStatusEnum.Release
+                    });
+                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                    if (result == 0)
+                    {
+                        trans.Rollback();
+                        return result;
+                    }
+                }
             }
             else
             {
