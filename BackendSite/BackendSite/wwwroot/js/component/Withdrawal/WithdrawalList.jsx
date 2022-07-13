@@ -666,10 +666,10 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.bankName}</td>
                             </tr>
                             : null}
-                            {data.eWalleName != null ?
+                            {data.eWalletName != null ?
                             <tr>
                                 <th scope="row">Name of E-Wallet</th>
-                                <td>{data.eWalleName}</td>
+                                <td>{data.eWalletName}</td>
                             </tr>
                             : null}
                             {data.accountType != null ?

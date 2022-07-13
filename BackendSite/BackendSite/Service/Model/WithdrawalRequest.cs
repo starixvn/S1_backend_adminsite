@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string ChannelName { set; get; }
-        public string EWalleName { get; set; }
+        public string EWalletName { get; set; }
         public int EWalletSysId { get; set; }
     }
     public class WithdrawalInfo
@@ -117,6 +117,8 @@ namespace BackendSite.Service.Model
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string NickName { get; set; }
         public string Network { set; get; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? EWalletSysId { get; set; }
     }
     public class WithdrawalInfoForExport
     {
