@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
@@ -32,7 +33,8 @@ namespace BackendSite.Service.BLL
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly BlockService _blockService;
-
+        private readonly ILogger<CustInfoBLL> _logger;
+        private readonly MySqlClient _mainDbClient;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -51,6 +53,8 @@ namespace BackendSite.Service.BLL
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _blockService = provider.GetRequiredService<BlockService>();
+            _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -231,7 +235,7 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);
         }
-        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail,Dictionary<string,string> address, string Operator)
+        public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, Dictionary<string, string> address, string Operator)
         {
             return _custInfoService.SetCustInfo(custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, address, Operator);
         }
@@ -654,6 +658,40 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public async Task<bool> SetEnableRebateAsync(int custId, EnableRebateEnum status, string Operator)
+        {
+            var custSimpleInfo = await GetCustId(custId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, conn, trans))
+            {
+                _logger.LogError($"SetEnableRebate: Update EnableRebate Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
+                trans.Rollback();
+                return false;
+            }
+            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, conn, trans))
+            {
+                _logger.LogError($"SetEnableRebate: Insert CustNote Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
+                trans.Rollback();
+                return false;
+            }
+            var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
+            var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
+
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CurrencyId, beforeData.ToString(), afterData.ToString(),
+                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
+            {
+                _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
+        }
+
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
         {
             return _custInfoService.GetAllSiteVipLevelList();
@@ -735,9 +773,9 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        public async Task<CustomerForRisk> GetCustId(int? custId,string userName, int? siteId)
+        public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
         {
-            return await _custInfoService.GetCustId(custId,userName, siteId);
+            return await _custInfoService.GetCustId(custId, userName, siteId);
         }
         
         public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
