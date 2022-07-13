@@ -102,8 +102,8 @@ namespace BackendSite.Service.Model.Store.PointSetting
 
     public class TurnoverPointSettingParams
     {
-        private DateTimeOffset _startTime { get; set; }
-        private DateTimeOffset _endTime { get; set; }
+        private DateTimeOffset? _startTime { get; set; }
+        private DateTimeOffset? _endTime { get; set; }
 
         public int TpCategoryId { get; set; }
         public int VipLevel { get; set; }
@@ -112,16 +112,23 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public int PromotionStatus { get; set; }
         public decimal PromotionPointRate { get; set; }
 
-        public DateTimeOffset PromotionStartTime
+        public DateTimeOffset? PromotionStartTime
         {
             get => _startTime;
-            set => _startTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+            set
+            {
+                if (value != null)
+                    _startTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
         }
-
-        public DateTimeOffset PromotionEndTime
+        public DateTimeOffset? PromotionEndTime
         {
             get => _endTime;
-            set => _endTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+            set
+            {
+                if (value != null)
+                    _endTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
         }
     }
 }
