@@ -30,7 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<ReferralList>> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<ReferralList>> GetList(GetReferralListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<ReferralList>>
             {
@@ -51,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         [HttpPost]
-        public async Task<ApiResult<ReferralDetail>> Get(GetRequest request)
+        public async Task<ApiResult<ReferralDetail>> Get(GetReferralRequest request)
         {
             var apiResult = new ApiResult<ReferralDetail>
             {
@@ -71,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult> UpdateStatus(SetStatusRequest request)
+        public async Task<ApiResult> UpdateStatus(SetReferralStatusRequest request)
         {
             _managementDecorator.Operator = User.Identity.Name;
             var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, (int)request.Status);
