@@ -594,7 +594,13 @@ namespace BackendSite.Service.Model.enums
         VipRebatePayoutLimit = 35,
         Referral = 36,
         EditEWalletWithdrawalLimitInfo = 37,
-        SetEWalletWithdrawalLimitInfoStatus = 38
+        SetEWalletWithdrawalLimitInfoStatus = 38,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 41,
+        InactivePointExpirySetting = 42,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
     }
 
     #region BankFinancialTransferInfoLog

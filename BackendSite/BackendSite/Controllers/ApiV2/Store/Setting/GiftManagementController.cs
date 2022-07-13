@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -7,6 +9,7 @@ using BackendSite.Service.Model.Store.GiftManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
 namespace BackendSite.Controllers.ApiV2.Store.Setting
@@ -17,10 +20,12 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
     public class GiftManagementController : ControllerBase
     {
         private readonly GiftManagementBLL _giftManagementBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         public GiftManagementController(IServiceProvider provider)
         {
             _giftManagementBll = provider.GetRequiredService<GiftManagementBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         [HttpPost]
@@ -48,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
 
         [HttpPost]
-        public Task<ApiResult<object>> GetRedemptionLimitAsync(GetRedemptionLimitRequest request)
+        public Task<ApiResult<RedemptionLimit>> GetRedemptionLimitAsync(GetRedemptionLimitRequest request)
         {
             var result = _giftManagementBll.GetRedemptionLimitAsync(request);
 
@@ -56,7 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
         
         [HttpPost]
-        public Task<ApiResult<object>> GetAsync(GetGiftRequest req)
+        public Task<ApiResult<IEnumerable<GiftInfo>>> GetAsync(GetGiftRequest req)
         {
             var result = _giftManagementBll.GetGiftAsync(req);
 
@@ -73,11 +78,39 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
 
         [HttpPost]
-        public Task<ApiResult> UpdateAsync(UpdateGiftRequest request)
+        public async Task<ApiResult> UpdateAsync(UpdateGiftRequest request)
         {
             var user = User.Identity.Name;
-            var result = _giftManagementBll.UpdateGiftAsync(request, user);
-
+            var before = await _giftManagementBll.GetGiftAsync(new GetGiftRequest
+            {
+                GiftId = request.GiftId
+            });
+            var result = await _giftManagementBll.UpdateGiftAsync(request, user);
+            
+            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            {
+                var b = before.Data.First(x => x.Lang == "en");
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = user,
+                    SiteId = b.SiteId,
+                    CurrencyId = b.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.GiftManagement,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Name = b.GiftName,
+                        Point = b.Point,
+                        Status = b.Status.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Point = request.Point,
+                        Status = request.Status.ToString()
+                    })
+                });
+            }
+            
             return result;
         }
 
@@ -114,10 +147,37 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
 
         [HttpPost]
-        public Task<ApiResult> SetRedemptionLimitAsync(SetRedemptionLimitRequest request)
+        public async Task<ApiResult> SetRedemptionLimitAsync(SetRedemptionLimitRequest request)
         {
             var user = User.Identity.Name;
-            var result = _giftManagementBll.SetRedemptionLimitAsync(request, user);
+            var before = await _giftManagementBll.GetRedemptionLimitAsync(
+                new GetRedemptionLimitRequest
+                {
+                    SiteId = request.SiteId
+                });
+            
+            var result = await _giftManagementBll.SetRedemptionLimitAsync(request, user);
+            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = user,
+                    SiteId = request.SiteId,
+                    CurrencyId = 0,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.RedemptionLimitSetting,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Limit = before.Data.Limit,
+                        Status = before.Data.Status.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        Limit = request.Limit,
+                        Status = request.Status.ToString()
+                    })
+                });
+            }
 
             return result;
         }
