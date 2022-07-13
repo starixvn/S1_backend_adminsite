@@ -48,16 +48,12 @@ namespace BackendSite.Service.Model.Store.PointSetting
             Turnover = setting.Turnover;
             PromotionStatus = setting.PromotionStatus.ToString();
             PromotionPointRate = setting.PromotionPointRate;
-            PromotionStartTime = setting.PromotionStartTime;
-            PromotionEndTime = setting.PromotionEndTime;
         }
         
         public string TpCategory { get; set; }
         public decimal Turnover { get; set; }
         public string PromotionStatus { get; set; }
         public decimal PromotionPointRate { get; set; }
-        public DateTimeOffset PromotionStartTime { get; set; }
-        public DateTimeOffset PromotionEndTime { get; set; }
     }
     
     public class TurnoverPointStatusSetting : LastUpdateModel

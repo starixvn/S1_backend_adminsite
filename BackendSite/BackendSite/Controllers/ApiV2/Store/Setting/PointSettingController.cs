@@ -116,9 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                         TpCategory = before.Data.First(y => y.TpCategoryId == x.TpCategoryId).TpCategoryName,
                         Turnover = x.Turnover,
                         PromotionStatus = x.PromotionStatus.ToString(),
-                        PromotionPointRate = x.PromotionPointRate,
-                        PromotionStartTime = x.PromotionStartTime,
-                        PromotionEndTime = x.PromotionEndTime
+                        PromotionPointRate = x.PromotionPointRate
                     });
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
