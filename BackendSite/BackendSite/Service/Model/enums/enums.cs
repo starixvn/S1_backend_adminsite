@@ -579,7 +579,9 @@ namespace BackendSite.Service.Model.enums
         VipRebatePeriod = 32,
         VipRebateCategory = 33,
         VipRebateGameType = 34,
-        VipRebatePayoutLimit = 35
+        VipRebatePayoutLimit = 35,
+        EditEWalletWithdrawalLimitInfo = 37,
+        SetEWalletWithdrawalLimitInfoStatus = 38
     }
 
     #region BankFinancialTransferInfoLog
@@ -1115,5 +1117,18 @@ namespace BackendSite.Service.Model.enums
         All = 0,
         EWallet = 1,
         BankCard = 2
+    }
+    public enum EWalletStatusEnum
+    {
+        Disable = 0,
+        Able = 1
+    }
+    public enum EWalletinfoLogStatusEnum
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 }
