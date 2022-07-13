@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using BackendSite.Service.Library;
 using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
+using BackendSite.Service.Model.Store.PointSetting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -53,18 +55,18 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<ApiResult<object>> GetRedemptionLimitAsync(GetRedemptionLimitRequest req)
+        public Task<ApiResult<RedemptionLimit>> GetRedemptionLimitAsync(GetRedemptionLimitRequest req)
         {
             var url = _storeSiteUrl + "/api/GiftManagement/GetRedemptionLimit";
-            var result = _courierAdapter.MyPostAsync<object, GetRedemptionLimitRequest>(url, req);
+            var result = _courierAdapter.MyPostAsync<RedemptionLimit, GetRedemptionLimitRequest>(url, req);
 
             return result;
         }
         
-        public Task<ApiResult<object>> GetGiftAsync(GetGiftRequest req)
+        public Task<ApiResult<IEnumerable<GiftInfo>>> GetGiftAsync(GetGiftRequest req)
         {
             var url = _storeSiteUrl + "/api/GiftManagement/Get";
-            var result = _courierAdapter.MyPostAsync<object, GetGiftRequest>(url, req);
+            var result = _courierAdapter.MyPostAsync<IEnumerable<GiftInfo>, GetGiftRequest>(url, req);
 
             return result;
         }
