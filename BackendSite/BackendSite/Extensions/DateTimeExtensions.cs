@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BackendSite.Extensions
 {
@@ -20,5 +21,22 @@ namespace BackendSite.Extensions
         {
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
+
+        public static IEnumerable<string> GetPartitionRange(this DateTime startDate, DateTime endDate)
+        {
+            var result = new List<string>();
+            while (startDate <= endDate)
+            {
+                result.Add(startDate.GetDailyPartitionKey());
+                startDate = startDate.AddDays(1);
+            }
+            return result;
+        }
+
+        public static string GetDailyPartitionKey(this DateTime partitionTime)
+        {
+            return partitionTime.ToString("yyyyMMdd");
+        }
+       
     }
 }

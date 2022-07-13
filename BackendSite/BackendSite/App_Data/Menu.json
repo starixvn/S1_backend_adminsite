@@ -92,6 +92,16 @@
         "Icon": "",
         "Roles": null,
         "Childs": null
+      },
+      {
+        "Key": "",
+        "Title": "Bet List Report",
+        "FuncKey": "Report/BetListReport",
+        "Controller": "Report",
+        "Action": "BetListReport",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
       }
     ]
   },
@@ -807,6 +817,16 @@
         "FuncKey": "CMS/DeepLinkManagement",
         "Controller": "Marketing",
         "Action": "DeepLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SiteMaintenance",
+        "Title": "Site Maintenance",
+        "FuncKey": "CMS/SiteMaintain",
+        "Controller": "Marketing",
+        "Action": "SiteMaintain",
         "Icon": "",
         "Roles": null,
         "Childs": null

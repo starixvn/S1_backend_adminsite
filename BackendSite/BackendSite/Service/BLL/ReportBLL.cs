@@ -1,12 +1,16 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace BackendSite.Service.BLL
 {
@@ -17,18 +21,20 @@ namespace BackendSite.Service.BLL
         private readonly ReportService reportService;
         private readonly SelLangBLL selLangBLL;
         private readonly Common _common;
+        private readonly PartitionService _partitionService;
+        private readonly ICacheHelper _cacheHelper;
 
         #endregion
 
         #region Constructors
 
-        public ReportBLL(ReportService reportService,
-                         SelLangBLL selLangBLL,
-                         Common common)
+        public ReportBLL(IServiceProvider provider)
         {
-            this.reportService = reportService;
-            this.selLangBLL = selLangBLL;
-            _common = common;
+            reportService = provider.GetRequiredService<ReportService>();
+            selLangBLL = provider.GetRequiredService<SelLangBLL>();
+            _common = provider.GetRequiredService<Common>();
+            _partitionService = provider.GetRequiredService<PartitionService>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #endregion
@@ -80,13 +86,13 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
-        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
+        public IEnumerable<MainFinancialModel> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var keyValuePairs = new Dictionary<string, MainFinancialModel>();
             string dateFormat;
             var currencyIdList = JsonConvert.DeserializeObject<List<int>>(currencyIds);
-            var reportList = reportService.GetMainFinancialReport(siteIds, currencyIds, startDate, endDate ,timeZone);
-            var turnoverAndWinLossList = reportService.GetTurnoverAndWinLossSummary(siteIds, currencyIds, startDate, endDate,timeZone);
+            var reportList = reportService.GetMainFinancialReport(siteIds, currencyIds, startDate, endDate, timeZone);
+            var turnoverAndWinLossList = reportService.GetTurnoverAndWinLossSummary(siteIds, currencyIds, startDate, endDate, timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Combine
@@ -270,7 +276,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<StatisticalReportModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
             var keyValuePairs = new Dictionary<string, StatisticalReportModel>();
-            var statisticalList = reportService.GetStatisticalReport(siteIds,timeZone, startDate, endDate);
+            var statisticalList = reportService.GetStatisticalReport(siteIds, timeZone, startDate, endDate);
             var currencyList = reportService.GetCurrencyList();
 
             #region Data Statistical
@@ -278,7 +284,7 @@ namespace BackendSite.Service.BLL
             foreach (var data in statisticalList)
             {
                 StatisticalReportModel statisticalReportModel;
-                
+
                 if (!keyValuePairs.ContainsKey($"{data.CategoryId}-{data.GameId}-{data.CurrencyId}"))
                 {
                     statisticalReportModel = new StatisticalReportModel();
@@ -444,7 +450,7 @@ namespace BackendSite.Service.BLL
                             userOnlineReportModel.LocalTime = $"{dateTimeFormat}~{Convert.ToDateTime(selectDate).AddHours(i + 1).ToString("HH:00")}";
                             userOnlineReportModel.SiteName = serverInfoList.Where(y => y.SiteId == site).Select(x => x.SiteName).FirstOrDefault();
                             userOnlineReportModel.SiteId = site;
-                            userOnlineReportModel.DeviceType = (short) id;
+                            userOnlineReportModel.DeviceType = (short)id;
                             userOnlineReportModel.DeviceName = Enum.GetName(typeof(DeviceId), id);
                         }
                     }
@@ -454,11 +460,11 @@ namespace BackendSite.Service.BLL
             #endregion
 
             // 不顯示Old登入次數
-            var oldList = keyValuePairs.Where(x => x.Value.DeviceType == (short) DeviceId.Old);
+            var oldList = keyValuePairs.Where(x => x.Value.DeviceType == (short)DeviceId.Old);
             var isRemoveOld = oldList.All(x => x.Value.MaxCount == 0);
             if (isRemoveOld)
             {
-                foreach(var item in oldList)
+                foreach (var item in oldList)
                 {
                     keyValuePairs.Remove(item.Key);
                 }
@@ -470,7 +476,7 @@ namespace BackendSite.Service.BLL
                 .ThenBy(value => value.SiteId);
         }
 
-        public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds, string siteIds, string currencyIds, string startDate, string endDate , string timeZone)
+        public IEnumerable<DepositReportModel> GetDepositReport(IEnumerable<int> CurrencyIds, string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var accountKeyValuePairs = new Dictionary<string, DepositAccountModel>();
             var accountDateKeyValuePairs = new Dictionary<string, DepositByDateReportModel>();
@@ -481,7 +487,7 @@ namespace BackendSite.Service.BLL
 
             #region Get Data
 
-            var depositDetailList = reportService.GetDepositReport(siteIds, currencyIds, startDate, endDate ,timeZone);
+            var depositDetailList = reportService.GetDepositReport(siteIds, currencyIds, startDate, endDate, timeZone);
             var currencyList = reportService.GetCurrencyList();
 
             #endregion
@@ -904,7 +910,7 @@ namespace BackendSite.Service.BLL
             }
 
             #endregion
-            
+
             var Data = keyValuePairs.Select(s => s.Value).OrderBy(value => value.CustId)
                                                          .ThenBy(value => value.Date)
                                                          .ThenBy(value => value.CategoryId)
@@ -914,7 +920,7 @@ namespace BackendSite.Service.BLL
             return Data;
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date,string timeZone)
+        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
         {
             var detailList = reportService.GetCustomerDetail(custId, gameId, date, timeZone);
             return detailList;
@@ -922,10 +928,69 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
             out int totalPages,
-            out int rowCount) 
+            out int rowCount)
             => reportService.GetTpFailRecordReport(input, out totalPages, out rowCount);
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
+
+        
+        public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
+        {          
+            totalPages = 0;
+            rowCount = 0;
+            var key = $"BetList:{input.GetRedisKey()}";
+
+            if (_cacheHelper.KeyExists(key))
+            {
+                //Export
+                if (input.PageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<BetListReport>(key, 0, input.PageNumber);
+                }
+
+                //Pagination
+                var total = (int)_cacheHelper.GetListLength(key);
+                totalPages = (int)Math.Ceiling(total / (float)input.PageSize);
+                rowCount = total;
+                var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+                var endIndex = startIndex + input.PageSize <= total ? startIndex + input.PageSize : total;
+                return _cacheHelper.GetListByRange<BetListReport>(key, startIndex, endIndex - 1);
+            }
+
+            //Search range table
+            var StartDate = input.StartTime.ToUniversalTime().DateTime;
+            var EndDate = input.EndTime.ToUniversalTime().DateTime;
+            var parameters = new DynamicParameters(input);
+            parameters.AddDynamicParams(new
+            {
+                SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                StartDate,
+                EndDate,
+            });
+
+            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(key, TimeSpan.FromMinutes(15), data.OrderByDescending(i => i.SettledTime));
+            });
+
+            //Export
+            if (input.PageNumber == -1 || data.Count == 0)
+            {
+                return data;
+            }
+
+            //Pagination
+            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
+            rowCount = data.Count;
+            var index = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+            var count = index + input.PageSize <= data.Count ? input.PageSize : data.Count - index;
+            return data.GetRange(index, count);
+        }
     }
 }
