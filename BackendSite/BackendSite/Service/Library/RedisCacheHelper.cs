@@ -21,7 +21,7 @@ namespace BackendSite.Service.Library
             _multiplexer = provider.GetRequiredService<IConnectionMultiplexer>();
         }
 
-        public TItem TryGetOrCreate<TItem>(string key, TimeSpan timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin) 
+        public TItem TryGetOrCreate<TItem>(string key, TimeSpan? timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin) 
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
@@ -48,7 +48,7 @@ namespace BackendSite.Service.Library
             }
         }
         
-        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan? timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
@@ -155,7 +155,7 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public bool SetCacheList<TItem>(Dictionary<string, TItem> dataList, TimeSpan timeSpan, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public bool SetCacheList<TItem>(Dictionary<string, TItem> dataList, TimeSpan? timeSpan, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             try
             {
@@ -177,54 +177,78 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public bool InsertList<TItem>(string key, TimeSpan timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public bool InsertList<TItem>(string key, TimeSpan? timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            if (list == null)
+            try
+            {        
+                if (list == null)
+                {
+                    return false;
+                }
+
+                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";          
+                var taskList = new List<Task<long>>();
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var trans = db.CreateTransaction();
+            
+                foreach (var item in list)
+                {
+                    var task = db.ListRightPushAsync(key, JsonConvert.SerializeObject(item));
+                    taskList.Add(task);
+                }
+                db.KeyExpire(key, timeSpan);
+                return trans.Execute();
+            }
+            catch (Exception ex)
             {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
                 return false;
             }
-
-            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";          
-            var taskList = new List<Task<long>>();
-            var db = _multiplexer.GetDatabase((int)redisDataBase);
-            var trans = db.CreateTransaction();
-            
-            foreach (var item in list)
-            {
-                var task = db.ListRightPushAsync(key, JsonConvert.SerializeObject(item));
-                taskList.Add(task);
-            }
-            db.KeyExpire(key, timeSpan);
-            return trans.Execute();
         }
 
         public List<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            var result = new List<TItem>();
-            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-            var db = _multiplexer.GetDatabase((int)redisDataBase);           
-            if (!db.KeyExists(key))
-            {
+            try
+            {      
+                var result = new List<TItem>();
+                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+                var db = _multiplexer.GetDatabase((int)redisDataBase);           
+                if (!db.KeyExists(key))
+                {
+                    return result;
+                }
+
+                var list = db.ListRange(key, startIndex, endIndex);        
+                foreach (var item in list)
+                {
+                    if (item.HasValue)
+                    {
+                        var data = JsonConvert.DeserializeObject<TItem>(item);
+                        result.Add(data);
+                    }
+                }
                 return result;
             }
-
-            var list = db.ListRange(key, startIndex, endIndex);        
-            foreach (var item in list)
+            catch (Exception ex)
             {
-                if (item.HasValue)
-                {
-                    var data = JsonConvert.DeserializeObject<TItem>(item);
-                    result.Add(data);
-                }
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
             }
-            return result;
         }
 
         public long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-            var db = _multiplexer.GetDatabase((int)redisDataBase);
-            return db.ListLength(key);
+            try
+            {           
+                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return db.ListLength(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
         }
 
         private string RemoveSpecialChars(string key)
