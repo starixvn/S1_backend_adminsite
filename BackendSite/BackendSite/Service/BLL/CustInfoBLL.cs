@@ -739,7 +739,14 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustId(custId,userName, siteId);
         }
-
+        
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
+        {
+            var strUserNames = JsonConvert.SerializeObject(userNames);
+            
+            return _custInfoService.GetCustInfosAsync(siteId, strUserNames);
+        }
+        
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
             return _custInfoService.GetCustSwitchStatus(custId);
