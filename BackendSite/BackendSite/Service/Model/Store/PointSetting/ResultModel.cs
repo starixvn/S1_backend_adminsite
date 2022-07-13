@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
@@ -25,7 +26,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public string TpCategoryName { get; set; }
         public decimal Turnover { get; set; }
         public decimal PointRate { get; set; }
-        public int PromotionStatus { get; set; }
+        public GeneralStatusEnum PromotionStatus { get; set; }
         public decimal PromotionPointRate { get; set; }
         public DateTimeOffset PromotionStartTime { get; set; }
         public DateTimeOffset PromotionEndTime { get; set; }
@@ -33,6 +34,30 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public string LastUpdater { get; set; }
         [LogIgnore]
         public DateTimeOffset LastUpdateTime { get; set; }
+    }
+    
+    public class TurnoverPointSettingForLog
+    {
+        public TurnoverPointSettingForLog()
+        {
+        }
+        
+        public TurnoverPointSettingForLog(TurnoverPointSetting setting, string vipLevel)
+        {
+            TpCategory = setting.TpCategoryName;
+            Turnover = setting.Turnover;
+            PromotionStatus = setting.PromotionStatus.ToString();
+            PromotionPointRate = setting.PromotionPointRate;
+            PromotionStartTime = setting.PromotionStartTime;
+            PromotionEndTime = setting.PromotionEndTime;
+        }
+        
+        public string TpCategory { get; set; }
+        public decimal Turnover { get; set; }
+        public string PromotionStatus { get; set; }
+        public decimal PromotionPointRate { get; set; }
+        public DateTimeOffset PromotionStartTime { get; set; }
+        public DateTimeOffset PromotionEndTime { get; set; }
     }
     
     public class TurnoverPointStatusSetting : LastUpdateModel

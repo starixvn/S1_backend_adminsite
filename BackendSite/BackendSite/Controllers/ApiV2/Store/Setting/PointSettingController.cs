@@ -108,6 +108,18 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
             if (result.ErrorCode == (int) ErrorCodeEnum.Success)
             {
                 var vip = _vipLevelBll.GetVipLevelSetting(request.SiteId);
+                var vipLevel = vip.First(x => x.Level == request.Infos.First().VipLevel).LevelName;
+                var beforeData = before.Data.Select(x => new TurnoverPointSettingForLog(x, vipLevel));
+                var afterData = request.Infos
+                    .Select(x => new TurnoverPointSettingForLog
+                    {
+                        TpCategory = before.Data.First(y => y.TpCategoryId == x.TpCategoryId).TpCategoryName,
+                        Turnover = x.Turnover,
+                        PromotionStatus = x.PromotionStatus.ToString(),
+                        PromotionPointRate = x.PromotionPointRate,
+                        PromotionStartTime = x.PromotionStartTime,
+                        PromotionEndTime = x.PromotionEndTime
+                    });
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
                     Operator = user,
@@ -115,20 +127,11 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     CurrencyId = request.CurrencyId,
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.TurnoverRewardPointSetting,
-                    BeforeDetailInfo = before.Data.ToLog(),
+                    BeforeDetailInfo = JsonConvert.SerializeObject(beforeData),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
                         VipLevel = vip.First(x => x.Level == request.Infos.First().VipLevel).LevelName,
-                        Infos = request.Infos
-                            .Select(x => new
-                            {
-                                TpCategory = before.Data.First(y => y.TpCategoryId == x.TpCategoryId).TpCategoryName,
-                                x.Turnover,
-                                PromotionStatus = x.PromotionStatus.ToString(),
-                                x.PromotionPointRate,
-                                x.PromotionStartTime,
-                                x.PromotionEndTime
-                            })
+                        Infos = afterData
                     })
                 });
             }
@@ -214,9 +217,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 var beforeData = before.Data.Any() 
                     ? JsonConvert.SerializeObject(new
                     {
-                        Enabled = before.Data
+                        Enabled = string.Join(", ", before.Data
                             .Where(x => x.Status == GeneralStatusEnum.Enable)
-                            .Select(x => x.TpGameTypeName)
+                            .Select(x => x.TpGameTypeName))
                     })
                     : null;
                 
@@ -230,9 +233,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     BeforeDetailInfo = beforeData,
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Enabled = request.Infos
+                        Enabled = string.Join(", ", request.Infos
                             .Where(x => x.Status == GeneralStatusEnum.Enable) 
-                            .Select(x => typeList.FirstOrDefault(y => y.TypeId == x.TpGameTypeId)?.TypeName)
+                            .Select(x => typeList.FirstOrDefault(y => y.TypeId == x.TpGameTypeId)?.TypeName))
                     })
                 });
             }
