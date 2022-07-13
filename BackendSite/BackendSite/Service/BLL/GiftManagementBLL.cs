@@ -8,6 +8,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
 namespace BackendSite.Service.BLL
 {

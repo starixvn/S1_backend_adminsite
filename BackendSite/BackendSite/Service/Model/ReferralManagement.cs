@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -14,19 +16,51 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public bool Status { get; set; }
     }
-    
+    public class GetReferralListRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+    }
+    public class GetReferralRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
+        public int CurrencyId { get; set; }
+    }
+    public class SetReferralStatusRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
+        public int CurrencyId { get; set; }
+        [JsonProperty("status")]
+        public ReferralStatusEnum Status { get; set; }
+    }
+
     public class SetReferralRequest
     {
+        [JsonProperty("siteId")]
         public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
         public int CurrencyId { get; set; }
+        [JsonProperty("bonusAmount")]
         public decimal BonusAmount { get; set; }
+        [JsonProperty("invitationLimit")]
         public int InvitationLimit { get; set; }
+        [JsonProperty("agentValidBet")]
         public decimal AgentValidBet { get; set; }
+        [JsonProperty("agentDeposit")]
         public decimal AgentDeposit { get; set; }
+        [JsonProperty("referralFreeCredit")]
         public decimal ReferralFreeCredit { get; set; }
+        [JsonProperty("validBet")]
         public decimal ValidBet { get; set; }
+        [JsonProperty("deposit")]
         public decimal Deposit { get; set; }
+        [JsonProperty("periodDays")]
         public string PeriodDays { get; set; }
+        [JsonProperty("specificList")]
         public IEnumerable<ReferralContent> SpecificList { get; set; }
     }
 
