@@ -19,29 +19,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             _managementDecorator = managementDecorator;
         }
-        
-        #region API Model
-
-        public class GetListRequest
-        {
-            public int SiteId { get; set; }
-        }
-        
-        public class GetRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-        }
-
-        public class SetStatusRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public ReferralStatusEnum Status { get; set; }
-        }
-        #endregion
-
-        #region Action
 
         /// <summary>
         /// ReferralManagement/GetList 取得推薦資料清單
@@ -128,7 +105,5 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             };
             return apiResult;
         }
-
-        #endregion
     }
 }
