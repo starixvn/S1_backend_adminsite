@@ -42,7 +42,7 @@ namespace BackendSite.Service.BLL
                 ValidBet = data.ValidBet,
                 Deposit = data.Deposit,
                 PeriodDays = data.PeriodDays,
-                SpecificList = JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
+                SpecificList = data.Details == null ? null : JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
                 Status = data.Status
             };
             return referralDetail;
