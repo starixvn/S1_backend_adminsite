@@ -22,7 +22,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             _storeReportBLL = provider.GetRequiredService<StoreReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
-        
+
+        #region DepositPoint
+
         [HttpPost]
         public Task<ApiResult<object>> GetDepositPointReportAsync(GetDepositPointReportRequest req)
         {
@@ -37,7 +39,28 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             var result = await _storeReportBLL.ExportDepositPointReportAsync(req);
             
             return _excelBll.ExcelFile(result, "DepositPointReport");
-            
         }
+
+        #endregion
+        
+        #region AdjustmentPoint
+
+        [HttpPost]
+        public Task<ApiResult<object>> GetAdjustmentPointReportAsync(GetAdjustmentPointReportRequest req)
+        {
+            var result = _storeReportBLL.GetAdjustmentPointReportAsync(req);
+
+            return result;
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ExportAdjustmentPointReportAsync(ExportAdjustmentPointReportRequest req)
+        {
+            var result = await _storeReportBLL.ExportAdjustmentPointReportAsync(req);
+            
+            return _excelBll.ExcelFile(result, "AdjustmentPointReport");
+        }
+
+        #endregion
     }
 }
