@@ -18,7 +18,7 @@ namespace BackendSite.Service.Model
     {
         public int CustId { get; set; }
         public string UserName { get; set; }
-        public string EWalleName { get; set; }
+        public string EWalletName { get; set; }
         public string AccountNum { get; set; }
         public int SysId { get; set; }
         private DateTimeOffset _createTime { get; set; }
