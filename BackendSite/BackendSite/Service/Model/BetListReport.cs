@@ -29,11 +29,11 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> Tags { get; set; } = new List<int>();
         public int VIPlevel { get; set; } = 0;
         public int TpId { get; set; } = 0;
+        public int GameType { get; set; } = 0;
+        public string TransId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string TpUserName { get; set; } = string.Empty;
         public string RefNo { get; set; } = string.Empty;
-        public string Provider { get; set; } = string.Empty;
-        public string Product { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public string Game { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
