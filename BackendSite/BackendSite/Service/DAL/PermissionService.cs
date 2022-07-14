@@ -221,14 +221,41 @@ namespace BackendSite.Service.DAL
             trans.Commit();
             return result;
         }
-        public int SetAdminUserPassword(int userId, string password)
+        public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq> input)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("Userpwd", tools.MD5Encrypt(password));
-            return  _mainDbClient.Execute("Admin_UserPassword_Set", props);
+            var propsLog = new DynamicParameters();
+
+            props.Add("UserId", input.After.UserId);
+            props.Add("Userpwd", tools.MD5Encrypt(input.After.Password));
+
+            #region propsLog
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserPassword);
+            propsLog.Add("_ActionType", (int)ActionType.Update);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", null);
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
+            propsLog.Add("_Operator", input.Operator);
+            #endregion
+
+            var result = _mainDbClient.Execute("Admin_UserPassword_Set", props, conn, trans) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            if (logResult & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return logResult & result;
         }
-        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
@@ -238,18 +265,18 @@ namespace BackendSite.Service.DAL
 
             #region
             props.Add("UserId", input.After.UserId);
-            props.Add("Status", input.After.Status);
+            props.Add("Status", (int)input.After.Status);
             #endregion
 
             #region propsLog
-            propsLog.Add("_SiteId", brand);
+            propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
             propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserStatus);
             propsLog.Add("_ActionType", (int)ActionType.Update);
             propsLog.Add("_RefTransId", string.Empty);
             propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
             propsLog.Add("_AfterDetailInfo", input.After.ToLog());
-            propsLog.Add("_Operator", Operator);
+            propsLog.Add("_Operator", input.Operator);
             #endregion
 
             //return _mainDbClient.Execute("Admin_UserStatus_Set", props);
@@ -286,13 +313,40 @@ namespace BackendSite.Service.DAL
                     new { UserId = userId }));
         }
 
-        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("SiteId", siteId);
-            props.Add("Status", status);
-            return _mainDbClient.Execute("Admin_AdminBrand_Set", props);
+            var propsLog = new DynamicParameters();
+
+            props.Add("UserId", input.UserId);
+            props.Add("SiteId", input.SiteId);
+            props.Add("Status", (int)input.Status);
+
+            #region propsLog
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", 0);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserStatus);
+            propsLog.Add("_ActionType", (int)ActionType.Update);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(beforeUserBrands));
+            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(afterUserBrands));
+            propsLog.Add("_Operator", userName);
+            #endregion
+
+            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", props, conn, trans) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            if (logResult & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return logResult & result;
         }
     }
 }

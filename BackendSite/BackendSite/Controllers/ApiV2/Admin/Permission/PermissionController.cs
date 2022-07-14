@@ -116,10 +116,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<SetPermission> Permission { get; set; }
         }
 
-        public class SetAdminUserPasswordReq : AdminUserReq
-        {
-            public string Password { get; set; }
-        }
+        //public class SetAdminUserPasswordReq : AdminUserReq
+        //{
+        //    public string Password { get; set; }
+        //}
 
         public class GetAddAdminUserCurrencyReq
         {
@@ -130,12 +130,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string UserName { get; set; }
             public IEnumerable<int> SelectSite { get; set; }
         }
-        public class SetAdminBrandReq
-        {
-            public int SiteId { get; set; }
-            public AdminBrandTypeEnum Status { get; set; }
-            public int UserId { get; set; }
-        }
+        //public class SetAdminBrandReq
+        //{
+        //    public int SiteId { get; set; }
+        //    public AdminBrandTypeEnum Status { get; set; }
+        //    public int UserId { get; set; }
+        //}
         #endregion
 
         /// <summary>
@@ -997,9 +997,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
-        public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
+        public ApiResult SetAdminUserPassword(ApiRequestWithLog<SetAdminUserPasswordReq> request)
         {
-            if (_permissionBll.SetAdminUserPassword(request.UserId, request.Password) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_permissionBll.SetAdminUserPassword(new ParamsWithLog<SetAdminUserPasswordReq>(request, authInfo.UserName)))
             {
                 return new ApiResult
                 {
@@ -1027,9 +1028,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public ApiResult SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> request)
         {
             var authInfo = _newAuthorizeBLL.GetAuthData();
-            var brand = _newAuthorizeBLL.CheckBrand();
 
-            if (_permissionBll.SetAdminUserStatus(new ParamsWithLog<SetAdminUserStatusReq>(request, authInfo.UserName), brand, authInfo.UserName))
+            if (_permissionBll.SetAdminUserStatus(new ParamsWithLog<SetAdminUserStatusReq>(request, authInfo.UserName)))
             {
                 return new ApiResult
                 {
@@ -1102,10 +1102,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult SetAdminBrand(SetAdminBrandReq request)
         {
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            var beforeUserBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
+            var afterUserBrands = new List<UserBrand>();
             if (AdminBrandTypeEnum.Disable == request.Status)
             {
-                var userBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
-                if (userBrands.Count <= 1)
+                if (beforeUserBrands.Count <= 1)
                 {
                     return new ApiResult
                     {
@@ -1113,8 +1115,20 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                         Message = "Set user brand fail"
                     };
                 }
+                afterUserBrands = beforeUserBrands.FindAll(x => x.SiteId != request.SiteId);
             }
-            if (_permissionBll.SetAdminBrand(request.UserId, request.SiteId, request.Status) > 0)
+            else if(AdminBrandTypeEnum.Enable == request.Status)
+            {
+                var data = _serverInfoBll.GetSiteList().ToList();
+                afterUserBrands.AddRange(beforeUserBrands);
+                afterUserBrands.Add(new UserBrand() 
+                { 
+                    SiteId = request.SiteId,
+                    SiteName = data.Find(x=> x.SiteId == request.SiteId)?.SiteName 
+                });
+            }
+
+            if (_permissionBll.SetAdminBrand(request, authInfo.UserName, beforeUserBrands, afterUserBrands))
             {
                 return new ApiResult
                 {

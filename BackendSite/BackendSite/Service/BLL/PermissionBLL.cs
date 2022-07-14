@@ -922,13 +922,13 @@ namespace BackendSite.Service.BLL
             var userPermission = GetUserPermission(role, permission);
             return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission);
         }
-        public int SetAdminUserPassword(int userId, string password)
+        public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq>input)
         {
-            return permissionService.SetAdminUserPassword(userId, password);
+            return permissionService.SetAdminUserPassword(input);
         }
-        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input, int brand, string Operator)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
-            return permissionService.SetAdminUserStatus(input, brand, Operator);
+            return permissionService.SetAdminUserStatus(input);
         }
         #endregion
 
@@ -955,9 +955,9 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetUserBrand(userId);
         }
-        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
-            return permissionService.SetAdminBrand(userId, siteId, status);
+            return permissionService.SetAdminBrand(input, userName, beforeUserBrands, afterUserBrands);
         }
         #endregion
 
