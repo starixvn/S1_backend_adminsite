@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -933,32 +934,53 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
 
+        
         public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
-        {
+        {          
             totalPages = 0;
             rowCount = 0;
+            var key = $"BetList:{input.GetRedisKey()}";
 
-            var data = _cacheHelper.TryGetOrCreate($"BetList:{input.GetRedisKey()}",
-                TimeSpan.FromMinutes(15), 
-                () =>
+            if (_cacheHelper.KeyExists(key))
+            {
+                //Export
+                if (input.PageNumber == -1)
                 {
-                    var StartDate = new DateTimeOffset(input.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
-                    var EndDate = new DateTimeOffset(input.EndTime.ToUniversalTime().DateTime, TimeSpan.Zero);
-                    var parameters = new DynamicParameters(input);
-                    parameters.AddDynamicParams(new
-                    {
-                        SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                        CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                        TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                        StartDate = StartDate.DateTime,
-                        EndDate = EndDate.DateTime,
-                    });
-                    var result = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
-                    return result.OrderByDescending(i => i.SettledTime).ToList();
-                });
+                    return _cacheHelper.GetListByRange<BetListReport>(key, 0, input.PageNumber);
+                }
+
+                //Pagination
+                var total = (int)_cacheHelper.GetListLength(key);
+                totalPages = (int)Math.Ceiling(total / (float)input.PageSize);
+                rowCount = total;
+                var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
+                var endIndex = startIndex + input.PageSize <= total ? startIndex + input.PageSize : total;
+                return _cacheHelper.GetListByRange<BetListReport>(key, startIndex, endIndex - 1);
+            }
+
+            //Search range table
+            var StartDate = input.StartTime.ToUniversalTime().DateTime;
+            var EndDate = input.EndTime.ToUniversalTime().DateTime;
+            var parameters = new DynamicParameters(input);
+            parameters.AddDynamicParams(new
+            {
+                SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
+                CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
+                TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
+                StartDate,
+                EndDate,
+            });
+
+            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(key, TimeSpan.FromMinutes(15), data.OrderByDescending(i => i.SettledTime));
+            });
 
             //Export
-            if (input.PageNumber == -1)
+            if (input.PageNumber == -1 || data.Count == 0)
             {
                 return data;
             }

@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -70,8 +71,31 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public string TransId { get; set; }
         public int GameType { get; set; }
-        public DateTimeOffset TransTime { get; set; }
-        public DateTimeOffset SettledTime { get; set; }
+        public DateTimeOffset TransTime 
+        {
+            get
+            {
+                return new DateTimeOffset(_transTime,TimeSpan.Zero);
+            }
+            set
+            {
+                _transTime = value.DateTime;
+            }
+        }
+        private DateTime _transTime { get; set; }
+        public DateTimeOffset SettledTime 
+        {
+            get
+            {
+                return new DateTimeOffset(_settledTime, TimeSpan.Zero);
+            }
+            set
+            {
+                _settledTime = value.DateTime;
+            }
+
+        }
+        private DateTime _settledTime { get; set; }
         public decimal Stake { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
