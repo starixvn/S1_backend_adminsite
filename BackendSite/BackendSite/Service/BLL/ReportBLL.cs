@@ -971,7 +971,7 @@ namespace BackendSite.Service.BLL
                 EndDate,
             });
 
-            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get", parameters);
+            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
 
             // Add Cache by List      
             _ = Task.Run(() =>
