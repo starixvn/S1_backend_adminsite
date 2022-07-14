@@ -1151,6 +1151,28 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
             }
         }
 
+        onSetEnableRebate(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Rebate Payout ?')) {
+                axios.post('/api/CustManage/SetEnableRebate', { 
+                    CustId: this.props.CustInfoData.custId,
+                    status: e
+                })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert("Update Success!");
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
@@ -1507,6 +1529,8 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                             {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
                             {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
                             {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
+                            {(data.enableRebate == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,1)}>Enable Rebate Payout</button> : null}
+                            {(data.enableRebate == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,0)}>Disable Rebate Payout</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">

@@ -154,6 +154,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum EnableRebateEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
     #endregion
 
     #region CustProfile
@@ -594,7 +600,14 @@ namespace BackendSite.Service.Model.enums
         VipRebatePayoutLimit = 35,
         Referral = 36,
         EditEWalletWithdrawalLimitInfo = 37,
-        SetEWalletWithdrawalLimitInfoStatus = 38
+        SetEWalletWithdrawalLimitInfoStatus = 38,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 41,
+        InactivePointExpirySetting = 42,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
+        SetCustInfoEnableRebate = 45
     }
 
     #region BankFinancialTransferInfoLog
@@ -866,7 +879,7 @@ namespace BackendSite.Service.Model.enums
     {
         DG_LiveCasino = 10
     }
-    
+
     public enum TpCategoryEnum
     {
         Sports = 1,
@@ -1128,21 +1141,11 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
-    public enum CustBankInfoLogStatus
-    {
-        Create = 1,
-        Delete = 2,
-        Lock = 3,
-        Unlock = 4,
-        Release = 5
-	}
-
     public enum SiteEnum
     {
         [Description("Nova88")]
         NOVA88 = 1,
-        [Description("Goal123")]     
+        [Description("Goal123")]
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
@@ -1153,6 +1156,14 @@ namespace BackendSite.Service.Model.enums
         Default = 0,
         BirthdayRewardPoint = 1,
         SpecialRewardPoint = 2
+    }
+    public enum CustBankInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 
     public enum CurrencyEnum

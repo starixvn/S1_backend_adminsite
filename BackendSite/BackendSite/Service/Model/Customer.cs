@@ -168,6 +168,7 @@ namespace BackendSite.Service.Model
         public string AddressCity { get; set; }
         public string AddressLineFirst { get; set; }
         public string AddressLineSecond { get; set; }
+        public int EnableRebate { get; set; }
     }
 
     public class CustInfoDetailForExport
