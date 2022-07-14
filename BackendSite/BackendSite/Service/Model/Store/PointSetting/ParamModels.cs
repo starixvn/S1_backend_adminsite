@@ -109,7 +109,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public int VipLevel { get; set; }
         public decimal Turnover { get; set; }
         public decimal PointRate { get; set; }
-        public int PromotionStatus { get; set; }
+        public GeneralStatusEnum PromotionStatus { get; set; }
         public decimal PromotionPointRate { get; set; }
 
         public DateTimeOffset? PromotionStartTime
@@ -121,6 +121,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
                     _startTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
+
         public DateTimeOffset? PromotionEndTime
         {
             get => _endTime;
