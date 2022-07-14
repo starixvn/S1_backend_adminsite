@@ -71,7 +71,7 @@ namespace BackendSite.Service.Model.Store.Report
         public int SiteId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> VipLevels { get; set; }
-        public IEnumerable<int> CategoryIds { get; set; }
+        public IEnumerable<int> AdjustTypes { get; set; }
         public string TransId { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }
@@ -94,7 +94,7 @@ namespace BackendSite.Service.Model.Store.Report
         public int SiteId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> VipLevels { get; set; }
-        public IEnumerable<int> CategoryIds { get; set; }
+        public IEnumerable<int> AdjustTypes { get; set; }
         public string TransId { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }

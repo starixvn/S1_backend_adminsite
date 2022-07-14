@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.Store.Report
 {
@@ -72,6 +73,9 @@ namespace BackendSite.Service.Model.Store.Report
         public int VipLevel { get; set; }
         public string VipLevelName { get; set; }
         public string TransId { get; set; }
+        [ExportIgnore]
+        public int AdjustType { get; set; }
+        public string AdjustTypeName => Enum.GetName(typeof(ManualRewardPointCategoryEnum), AdjustType);
         public decimal PointEarned { get; set; }
         public string Memo { get; set; }
         public string Operator { get; set; }
