@@ -181,7 +181,7 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId, int timezone = 8)
+        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId, int timezone)
         {
             var predictDetail = await _worldCupPredictionService.GetPredictDetail(siteId, teamId);
             return predictDetail.Select(a => new ExportWorldCupEventReportResponse()

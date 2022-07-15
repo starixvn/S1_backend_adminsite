@@ -202,7 +202,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("endTime")] 
         public DateTime EndTime { get; set; }
         [JsonProperty("timezone")] 
-        public int Timezone { get; set; } = 8;
+        public int Timezone { get; set; }
     }
     
     public class ExportWorldCupMemberReportResponse
@@ -250,6 +250,8 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         [JsonProperty("teamId")]
         public int TeamId { get; set; }
+        [JsonProperty("timezone")]
+        public int Timezone { get; set; }
     }
     public class ExportWorldCupEventReportResponse
     {
