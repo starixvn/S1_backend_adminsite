@@ -371,7 +371,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [RequestSizeLimit(40000000)]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositSubmission" })]
         public async Task<ApiResult> DepositSubmissionAsync([FromForm] DepositDetailSubmission request)
         {
