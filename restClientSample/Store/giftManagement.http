@@ -1,0 +1,317 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得兌換商品列表
+POST {{url}}/apiV2/GiftManagement/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "status": [1, 0],
+    "categoryIds": [1],
+    "tags": [1],
+    "giftName": "",
+    //"orderByField": "Sort",
+    "desc": false
+}
+
+###
+# 取得兌換商品內容
+POST {{url}}/apiV2/GiftManagement/Get HTTP/1.1
+Content-Type: application/json
+
+{
+    "giftId": 6
+}
+
+###
+# 新增兌換商品
+POST {{url}}/apiV2/GiftManagement/Create HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "status": 1,
+    "categoryId": 1,
+    "tags": [1],
+    "point": 130,
+    "priceWorth": 1990,
+    "showStock": 1,
+    "stock": 5,
+    "infos": [
+        {
+            "lang": "en",
+            "name": "test_en345",
+            "description": "test test test",
+            "pictureUrl": "/store/gift/20220616190232279.jpg"
+        },
+        {
+            "lang": "my",
+            "name": "test_my345",
+            "description": "test test test my",
+            "pictureUrl": "/store/gift/20220616191743566.jpg"
+        }
+    ]
+}
+
+###
+# 上傳商品圖片 => 這請用Postman打
+POST {{url}}/apiV2/GiftManagement/Upload HTTP/1.1
+Content-Type: multipart/form-data;
+
+File:
+
+###
+# 修改兌換商品
+POST {{url}}/apiV2/GiftManagement/Update HTTP/1.1
+Content-Type: application/json
+
+{
+    "giftId": 7,
+    "status": 0,
+    "categoryId": 1,
+    "tags": [1],
+    "point": 130,
+    "priceWorth": 1990,
+    "showStock": 0,
+    "stock": 5,
+    "infos": [
+        {
+            "lang": "en",
+            "name": "test_en7",
+            "description": "test test test en",
+            "pictureUrl": "/store/gift/20220616190232279.jpg"
+        },
+        {
+            "lang": "my",
+            "name": "test_my7",
+            "description": "test test test my",
+            "pictureUrl": "/store/gift/20220616191743566.jpg"
+        }
+    ]
+}
+
+###
+# 取得商品類別
+POST {{url}}/apiV2/GiftManagement/GetCategories HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "langCodes": ["en", "my"]
+}
+
+###
+# 新增商品類別
+POST {{url}}/apiV2/GiftManagement/CreateCategory HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 4,
+    "infos": [
+        {
+            "lang": "th",
+            "name": "เครื่องใช้ในบ้าน"
+        },
+        {
+            "lang": "en",
+            "name": "HOME APPLIANCES"
+        },
+        {
+            "lang": "th",
+            "name": "สุขภาพและการดูแลส่วนบุคคล"
+        },
+        {
+            "lang": "en",
+            "name": "HEALTH & PERSONAL CARE"
+        },
+        {
+            "lang": "th",
+            "name": "ระบบเครื่องเสียงและลำโพง"
+        },
+        {
+            "lang": "en",
+            "name": "HOME THEATRE SYSTEM & SPEAKERS"
+        },
+        {
+            "lang": "th",
+            "name": "คอมพิวเตอร์และโทรศัพท์มือถือ"
+        },
+        {
+            "lang": "en",
+            "name": "COPUTING & PHONE"
+        },
+        {
+            "lang": "th",
+            "name": "เสื้อผ้าและอุปกรณ์กีฬา"
+        },
+        {
+            "lang": "en",
+            "name": "SPORTS APPAREL & ACCERSORIES"
+        },
+        {
+            "lang": "th",
+            "name": "ไลฟ์สไตล์และการเดินทาง"
+        },
+        {
+            "lang": "en",
+            "name": "LIFESTYLE & TRAVEL"
+        }
+    ]
+}
+
+###
+# 修改商品類別
+POST {{url}}/apiV2/GiftManagement/UpdateCategory HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "categoryId": 6,
+    "infos": [
+        {
+            "lang": "en",
+            "name": "test6_c_en"
+        },
+        {
+            "lang": "my",
+            "name": "test6_c_my"
+        }
+    ]
+}
+
+###
+# 取得商品標籤
+POST {{url}}/apiV2/GiftManagement/GetTags HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "langCodes": ["en", "my"]
+}
+
+###
+# 新增商品標籤
+POST {{url}}/apiV2/GiftManagement/CreateTag HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "infos": [
+        {
+            "lang": "en",
+            "name": "test_ttt_en"
+        },
+        {
+            "lang": "my",
+            "name": "test_ttt_my"
+        }
+    ]
+}
+
+###
+# 修改商品標籤
+POST {{url}}/apiV2/GiftManagement/UpdateTag HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "tagId": 5,
+    "infos": [
+        {
+            "lang": "en",
+            "name": "test_t5_en"
+        },
+        {
+            "lang": "my",
+            "name": "test_t5_my"
+        }
+    ]
+}
+
+###
+# 取得兌換限制
+POST {{url}}/apiV2/GiftManagement/GetRedemptionLimit HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 設定兌換限制
+POST {{url}}/apiV2/GiftManagement/SetRedemptionLimit HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "status": 1,
+    "limit": 13
+}
+
+###
+# 設定商品排序
+POST {{url}}/apiV2/GiftManagement/SetSort HTTP/1.1
+Content-Type: application/json
+
+{
+    "sortedIdList": [1,5,4,6,7]
+}
+
+###
+# Redemption Report
+POST {{url}}/apiV2/Redemption/GetRedemptionList HTTP/1.1
+Content-Type: application/json
+
+{
+    "StartTime": "2022-05-31T16:00:00+00:00",
+    "EndTime": "2022-07-30T15:59:59+00:00",
+    "SiteId": 1,
+    "CurrencyIds": [2,4,15],
+    "VipLevels": [1,2,3,4,5,6],
+    "Statuses": [1,2,3,4],
+    "TransId": "",
+    "UserName": "",
+    "SabaId": "",
+    "PageNumber": 1,
+    "PageSize": 25
+}
+
+###
+# Export Redemption Report
+POST {{url}}/apiV2/Redemption/ExportRedemptionList HTTP/1.1
+Content-Type: application/json
+
+{
+    "StartTime": "2022-05-31T16:00:00+00:00",
+    "EndTime": "2022-07-30T15:59:59+00:00",
+    "SiteId": 1,
+    "CurrencyIds": [2,4,15],
+    "VipLevels": [1,2,3,4,5,6],
+    "Statuses": [1,2,3,4],
+    "TransId": "",
+    "UserName": "",
+    "SabaId": ""
+}
