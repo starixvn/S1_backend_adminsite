@@ -608,6 +608,8 @@ namespace BackendSite.Service.Model.enums
         RedemptionLimitSetting = 43,
         GiftManagement = 44,
         SetCustInfoEnableRebate = 45,
+        SetAdminUserStatus = 46,
+        SetAdminUserPassword = 47,
         SetFinanceAccount = 50
     }
 
@@ -1204,5 +1206,10 @@ namespace BackendSite.Service.Model.enums
         Lock = 3,
         Unlock = 4,
         Release = 5
+    }
+    public enum AdminUserV2StatusEnum
+    {
+        Disable = 0,
+        Able = 1,
     }
 }

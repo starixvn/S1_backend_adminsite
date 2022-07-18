@@ -1,10 +1,12 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
 
 namespace BackendSite.Service.BLL
 {
@@ -584,13 +586,13 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetAdminRole();
         }
-        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId, string Operator)
         {
-            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId);
+            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId, Operator);
         }
-        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
-            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission);
+            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission, Operator);
         }
         public void DeleteAdminRole(int role)
         {
@@ -763,10 +765,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission);
+            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission, Operator);
         }
 
         public UpdateUserPermission GetUpdateAdminUser(int role, int userId,int siteId, AdminUserV2 loginUser)
@@ -915,18 +917,18 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission);
+            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission, Operator);
         }
-        public int SetAdminUserPassword(int userId, string password)
+        public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq>input)
         {
-            return permissionService.SetAdminUserPassword(userId, password);
+            return permissionService.SetAdminUserPassword(input);
         }
-        public int SetAdminUserStatus(int userId, int status)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
-            return permissionService.SetAdminUserStatus(userId, status);
+            return permissionService.SetAdminUserStatus(input);
         }
         #endregion
 
@@ -953,9 +955,9 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetUserBrand(userId);
         }
-        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
-            return permissionService.SetAdminBrand(userId, siteId, status);
+            return permissionService.SetAdminBrand(input, userName, beforeUserBrands, afterUserBrands);
         }
         #endregion
 

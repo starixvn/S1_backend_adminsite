@@ -155,7 +155,23 @@ namespace BackendSite.Service.Model
         public DateTime? RewardTime { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
-
+    }
+    public class ReferralFriendRresponse
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public string RegisterDate { get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal DepositC { get; set; }
+        public decimal TotalBet { get; set; }
+        public decimal ValidBetC { get; set; }
+        public decimal BonusAmount { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public string RewardTime { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
     }
     public class ReferralExcel
     {
