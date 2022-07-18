@@ -63,26 +63,28 @@ Content-Type: application/json
 
 ###
 # 新增(Id=0)/更新轉帳帳戶資訊
+# accountCode 現在只 for INR IFSC.使用
 POST {{url}}/apiV2/BankTransferAccount/Set HTTP/1.1
 Content-Type: application/json
 
 {
-    "Id": 366,
+    "id": 366,
     "siteId": 1,
     "currencyId": 2,
     "sysId": 31,
-    "Purposes": [1,2,3],
-    "Channel": 1,
+    "purposes": [1,2,3],
+    "channel": 1,
     "Agent": "Billy",
-    "PayId": 0,
-    "AccountNo": "0691790327",
-    "AccountName": "Autchara Phetkhaw",
-    "DisplayName": "Nova88-MBB-Autchara-0327",
-    "InitialAmount": 0,
-    "MaxBalanceAlertAmount": 0,
-    "Reason": 16,
-    "Remark": null,
-    "Status": 1
+    "payId": 0,
+    "accountNo": "0691790327",
+    "accountName": "Autchara Phetkhaw",
+    "accountCode": "",
+    "displayName": "Nova88-MBB-Autchara-0327",
+    "initialAmount": 0,
+    "maxBalanceAlertAmount": 0,
+    "reason": 16,
+    "remark": null,
+    "status": 1
 }
 
 ###

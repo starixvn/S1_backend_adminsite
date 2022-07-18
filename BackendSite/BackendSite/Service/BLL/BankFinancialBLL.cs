@@ -112,6 +112,7 @@ namespace BackendSite.Service.BLL
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
+                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? null : input.AccountCode,
                 AccountNo = input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
