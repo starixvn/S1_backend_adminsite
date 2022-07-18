@@ -160,38 +160,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         [HttpPost]
-        public ApiListResult<ReferralFriend> GetByCustId(GetByCustIdRequest request)
+        public ApiListResult<ReferralFriendRresponse> GetByCustId(GetByCustIdRequest request)
         {
-            var apiResult = new ApiListResult<ReferralFriend>();
-            var referralStatus = new Dictionary<int, string>()
-            {
-                {0,"Approved" },
-                {1,"Running" },
-                {2,"Expired" }
-            };
-            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
-            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var apiResult = new ApiListResult<ReferralFriendRresponse>();
+            var startDate = request.StartDate?.DateTime;
+            var endDate = request.EndDate?.DateTime;
 
             try
             {
-                var pageNumber = request.PageNumber;
-
-                var data = _referralManagementBll.GetRefFriendList(request.CustId,
-                    startDate,
-                    endDate,
-                    request.PageSize,
-                    request.PageNumber,
-                    out var totalPages,
-                    out var rowCount, 
-                    true);
-
-                foreach (var x in data)
-                {
-                    referralStatus.TryGetValue(x.Status, out var name);
-                    x.StatusName = name;
-                }
+                var data = _referralManagementBll.GetRefFriendList(
+                    request.CustId, startDate, endDate, request.PageSize, request.PageNumber, 
+                    out var totalPages, out var rowCount);
                 apiResult.Data = data;
-                apiResult.PageNumber = pageNumber;
+                apiResult.PageNumber = request.PageNumber;
                 apiResult.TotalPages = totalPages;
                 apiResult.RowCount = rowCount;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
