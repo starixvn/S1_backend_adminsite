@@ -112,8 +112,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public DateTimeOffset UpdateTime 
         {
-            get => _createTime;
-            set => _createTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
 
         /// <summary>

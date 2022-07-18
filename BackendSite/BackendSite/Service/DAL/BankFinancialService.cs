@@ -89,6 +89,27 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferAccount_Get";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
         }
+        
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _IsSetting = input.IsSetting,
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.StrCurrencyIds,
+                    _Channels = input.StrChannels,
+                    _Agent = input.Agent,
+                    _Status = input.StrStatus,
+                    _Purposes = input.StrPurposes,
+                    _SysIds = input.StrSysIds,
+                    _AccountNo = input.AccountNo,
+                    _Id = input.Id
+                });
+
+            var spName = "Admin_BankFinancialTransferAccount_Get_V2";
+            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
+        }
 
         public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {

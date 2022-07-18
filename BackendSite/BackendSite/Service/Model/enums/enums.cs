@@ -607,7 +607,8 @@ namespace BackendSite.Service.Model.enums
         InactivePointExpirySetting = 42,
         RedemptionLimitSetting = 43,
         GiftManagement = 44,
-        SetCustInfoEnableRebate = 45
+        SetCustInfoEnableRebate = 45,
+        SetFinanceAccount = 50
     }
 
     #region BankFinancialTransferInfoLog
@@ -918,6 +919,13 @@ namespace BackendSite.Service.Model.enums
     public enum CustTaskType
     {
         LastStatusUpdateTime = 2,
+    }
+    
+    public enum TransferAccountPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        Transfer = 3
     }
 
     #region BankDetailOff
