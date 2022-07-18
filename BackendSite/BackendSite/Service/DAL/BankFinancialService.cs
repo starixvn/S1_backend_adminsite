@@ -126,19 +126,18 @@ namespace BackendSite.Service.DAL
                     _PayId = bankFinancialTransferAccount.PayId,
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
+                    _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_CreateTime = bankFinancialTransferAccount.CreateTime.DateTime,
                     _Creator = bankFinancialTransferAccount.Creator,
-                    //_UpdateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Ins_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_Ins_V3";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -159,17 +158,17 @@ namespace BackendSite.Service.DAL
                     _PayId = bankFinancialTransferAccount.PayId,
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
+                    _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_UpdateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V3";
 
             return _mainDbClient.Execute(SpName, parameters);
         }

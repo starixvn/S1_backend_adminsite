@@ -78,6 +78,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
+        
+        /// <summary>
+        /// 目前只 for INR IFSC. 使用
+        /// </summary>
+        public string AccountCode { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
