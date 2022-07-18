@@ -13,7 +13,13 @@ namespace BackendSite.Service.BLL
     public class ReferralManagementBLL : IReferralManagementBLL
     {
         private readonly ReferralManagementService referralManagementService;
-     
+
+        private readonly Dictionary<int, string> referralStatus = new Dictionary<int, string>()
+        {
+            { 0, "Approved" },
+            { 1, "Running" },
+            { 2, "Expired" }
+        };
         public ReferralManagementBLL(ReferralManagementService referralManagementService)
         {
             this.referralManagementService = referralManagementService;
@@ -109,6 +115,31 @@ namespace BackendSite.Service.BLL
                 out TotalPages,
                 out RowCount,
                 byRewardTime);
+        }
+
+        public IEnumerable<ReferralFriendRresponse> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount)
+        {
+            var data = referralManagementService.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize),
+                (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount, true);
+
+            var referralFriends = data.Select(a => new ReferralFriendRresponse()
+            {
+                CustId = a.CustId,
+                UserName = a.UserName,
+                CurrencyId = a.CurrencyId,
+                Currency = a.Currency,
+                RegisterDate = a.RegisterDate.ToString("yyyy-MM-ddTHH:mm:ss") + "+00:00",
+                TotalDeposit = a.TotalDeposit,
+                DepositC = a.DepositC,
+                TotalBet = a.TotalBet,
+                ValidBetC = a.ValidBetC,
+                BonusAmount = a.BonusAmount,
+                ReferralFreeCredit = a.ReferralFreeCredit,
+                RewardTime = a.RewardTime.HasValue ? a.RewardTime.Value.ToString("yyyy-MM-ddTHH:mm:ss") + "+00:00" : null,
+                Status = a.Status,
+                StatusName = referralStatus[a.Status]
+            }).ToList();
+            return referralFriends;
         }
     }
 }

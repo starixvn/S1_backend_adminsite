@@ -125,6 +125,11 @@ namespace BackendSite.Service.BLL
             return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount, byRewardTime);
         }
 
+        public IEnumerable<ReferralFriendRresponse> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount)
+        {
+            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount);
+        }
+
         private Dictionary<string, object> ToDictionary(object source)
         {
             var type = source.GetType();
