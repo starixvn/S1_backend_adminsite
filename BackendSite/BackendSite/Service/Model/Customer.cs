@@ -160,9 +160,7 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
-
-        public string LineUserId { get; set; }
-
+        public int EnableRebatePayout { get; set; }
         public CustLineProfileModel CustLineProfile { get; set; }
         public string AddressCountry { get; set; }
         public string AddressState { get; set; }
@@ -170,6 +168,7 @@ namespace BackendSite.Service.Model
         public string AddressCity { get; set; }
         public string AddressLineFirst { get; set; }
         public string AddressLineSecond { get; set; }
+        public int EnableRebate { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -554,6 +553,16 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
     }
+    
+    public class CustomerInfo
+    {
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public int Status { get; set; }
+    }
+    
     public class CustomerSwitchStatus
     {
         public int IsKyc { get; set; }
@@ -612,17 +621,61 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class CustBankInfo
+    {
+        public string AccountName { set; get; }
+        public string BankInfo { set; get; }
+        public string USDTInfo { set; get; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<BankInfoDetail> bankInfoDetail { set; get; }
+        public IEnumerable<USDTDetail> usdtDetail { set; get; }
+    }
+
+    public class BankLockInfoDetail : BankInfoDetail
+    {
+        public int Status { get; set; }
+        public string UpdateOperator { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string AccountName { get; set; }
+        public string BankName { get; set; }
+    }
+
 
     public class CustLineProfileModel
     {
         private DateTimeOffset _createTime { get; set; }
         public int CustId { get; set; }
         public string userId { get; set; }
+
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+
     }
 
+    public class CustEWalletLog
+    {
+        public string AccountNum { set; get; }
+        public string AccountName { set; get; }
+        public string EWalleName { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+    }
 }

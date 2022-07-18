@@ -1147,5 +1147,36 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
         #endregion
+
+        /// <summary>
+        /// Permission/GetLanguageList 取得指定站台幣別對應語系列表
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 取得指定站台幣別對應語系列表。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<string>>> GetLanguageList(GetLanguageListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<string>>();
+            try
+            {
+                apiResult.Data = await _serverInfoBll.GetLanguageList(request.SiteId, request.CurrencyId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
     }
 }

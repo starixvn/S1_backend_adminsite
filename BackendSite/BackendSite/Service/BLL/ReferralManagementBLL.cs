@@ -4,10 +4,13 @@ using BackendSite.Service.Model.enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Service.BLL.Interface;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class ReferralManagementBLL
+    public class ReferralManagementBLL : IReferralManagementBLL
     {
         private readonly ReferralManagementService referralManagementService;
      
@@ -15,18 +18,54 @@ namespace BackendSite.Service.BLL
         {
             this.referralManagementService = referralManagementService;
         }
+
+        public string Operator { get; set; }
+
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
             return referralManagementService.GetReferralBySiteId(siteId);
         }
+
+        public async Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId)
+        {
+            var data = await referralManagementService.GetReferralDetail(siteId, currencyId);
+            if (data == null) return null;
+            var referralDetail = new ReferralDetail()
+            {
+                SiteId = data.SiteId,
+                CurrencyId = data.CurrencyId,
+                BonusAmount = data.BonusAmount,
+                InvitationLimit = data.InvitationLimit,
+                AgentValidBet = data.AgentValidBet,
+                AgentDeposit = data.AgentDeposit,
+                ReferralFreeCredit = data.ReferralFreeCredit,
+                ValidBet = data.ValidBet,
+                Deposit = data.Deposit,
+                PeriodDays = data.PeriodDays,
+                SpecificList = data.Details == null ? null : JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
+                Status = data.Status
+            };
+            return referralDetail;
+        }
+
         public void SetReferral(List<ReferralManagement> referralList)
         {
             referralManagementService.SetReferral(referralList);
         }
-        public void SetReferralStatus(int siteId, int currencyId,int status)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
         {
-            referralManagementService.SetReferralStatus(siteId, currencyId, status);
+            return await referralManagementService.SetReferralAsync(setReferral);
         }
+        public int SetReferralStatus(int siteId, int currencyId,int status)
+        {
+            return referralManagementService.SetReferralStatus(siteId, currencyId, status);
+        }
+
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        {
+            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, status);
+        }
+
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
@@ -43,7 +82,6 @@ namespace BackendSite.Service.BLL
                     SiteName = x.SiteName,
                     ReferralUser = x.ReferralUser,
                     ReferredUser = x.ReferredUser,
-                    CurrencyId = x.CurrencyId,
                     Currency = x.Currency,
                     RegTime = x.RegTime,
                     RewardTime = x.RewardTime,
