@@ -87,7 +87,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > 3RD Funds Adjustment > Third Party Name
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         [HttpPost]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpBySiteId(GetTpBySiteIdRequest request)
         {
@@ -108,7 +107,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > 3RD Funds Adjustment > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         [HttpPost]
         public async Task<ApiResult<dynamic>> GetTpCustInfo(GetTpCustInfoRequest request)
         {
@@ -175,7 +173,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > 3RD Funds Adjustment > [Submit] > add/minus
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         [HttpPost]
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
@@ -222,7 +219,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// Func Path：Finance > 3RD Funds Adjustment > [Submit] > Show Log
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         [HttpPost]
         public ApiListResult<AdminTpTransferInfo> GetLog(GetLogRequest request)
         {
