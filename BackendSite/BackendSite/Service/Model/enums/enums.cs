@@ -581,8 +581,7 @@ namespace BackendSite.Service.Model.enums
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
         SetAdminUserStatus = 41,
-        SetAdminUserPassword = 42,
-        SetAdminBrand = 43
+        SetAdminUserPassword = 42
     }
 
     #region BankFinancialTransferInfoLog

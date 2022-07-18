@@ -238,7 +238,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserPassword);
             propsLog.Add("_ActionType", (int)ActionType.Update);
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", null);
+            propsLog.Add("_BeforeDetailInfo", input.After.ToLog());
             propsLog.Add("_AfterDetailInfo", input.After.ToLog());
             propsLog.Add("_Operator", input.Operator);
             #endregion
@@ -326,18 +326,14 @@ namespace BackendSite.Service.DAL
             props.Add("Status", (int)input.Status);
 
             #region propsLog
-            propsLog.Add("_SiteId", input.SiteId);
-            propsLog.Add("_CurrencyId", 0);
-            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserStatus);
-            propsLog.Add("_ActionType", (int)ActionType.Update);
-            propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(beforeUserBrands));
-            propsLog.Add("_AfterDetailInfo", JsonConvert.SerializeObject(afterUserBrands));
-            propsLog.Add("_Operator", userName);
+            propsLog.Add("UserId", input.UserId);
+            propsLog.Add("BeforeDetailInfo", JsonConvert.SerializeObject(beforeUserBrands));
+            propsLog.Add("AfterDetailInfo", JsonConvert.SerializeObject(afterUserBrands));
+            propsLog.Add("Operator", userName);
             #endregion
 
             var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", props, conn, trans) > 0;
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", propsLog, conn, trans) > 0;
             if (logResult & result)
             {
                 trans.Commit();

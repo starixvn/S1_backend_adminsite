@@ -234,6 +234,7 @@ namespace BackendSite.Service.Model
     public class SetAdminUserPasswordReq
     {
         public int UserId { get; set; }
+        [LogIgnore]
         public string Password { get; set; }
     }
     public class SetAdminBrandReq
