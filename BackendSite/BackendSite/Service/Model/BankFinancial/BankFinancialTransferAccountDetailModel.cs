@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.BankFinancial
@@ -45,6 +46,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 1=Deposit,2=Withdrawal,3=Transfer
         /// </summary>
         public string Purpose { get; set; }
+        
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
 
         /// <summary>
         /// 讀寫 付款方式

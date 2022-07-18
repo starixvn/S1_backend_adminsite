@@ -579,7 +579,8 @@ namespace BackendSite.Service.Model.enums
         VipRebatePeriod = 32,
         VipRebateCategory = 33,
         VipRebateGameType = 34,
-        VipRebatePayoutLimit = 35
+        VipRebatePayoutLimit = 35,
+        SetFinanceAccount = 50
     }
 
     #region BankFinancialTransferInfoLog
@@ -898,6 +899,13 @@ namespace BackendSite.Service.Model.enums
     public enum CustTaskType
     {
         LastStatusUpdateTime = 2,
+    }
+    
+    public enum TransferAccountPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        Transfer = 3
     }
 
     #region BankDetailOff

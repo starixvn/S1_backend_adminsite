@@ -1,0 +1,118 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得轉帳帳戶列表
+POST {{url}}/apiV2/BankTransferAccount/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyIds": [2, 4, 15, 51],
+    "channels": [1, 2, 3],
+    "agent": "",
+    "status": [0, 1, 2, 3],
+    "purposes": [1, 2, 3],
+    "sysIds": [9,10,11,33,32,31],
+    "accountNo": ""
+}
+
+###
+# 匯出轉帳帳戶列表
+POST {{url}}/apiV2/BankTransferAccount/Export HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyIds": [2, 4, 15, 51],
+    "channels": [1, 2, 3],
+    "agent": "",
+    "status": [0, 1, 2, 3],
+    "purposes": [1, 2, 3],
+    "sysIds": [9,10,11,33,32,31],
+    "accountNo": ""
+}
+
+###
+# 取得轉帳帳戶資訊
+POST {{url}}/apiV2/BankTransferAccount/GetById HTTP/1.1
+Content-Type: application/json
+
+{
+    "id": 23
+}
+
+###
+# 取得轉帳帳戶原因(?)
+POST {{url}}/apiV2/BankTransferAccount/GetTransferAccountReason HTTP/1.1
+Content-Type: application/json
+
+
+###
+# 新增(Id=0)/更新轉帳帳戶資訊
+POST {{url}}/apiV2/BankTransferAccount/Set HTTP/1.1
+Content-Type: application/json
+
+{
+    "Id": 366,
+    "siteId": 1,
+    "currencyId": 2,
+    "sysId": 31,
+    "Purposes": [1,2,3],
+    "Channel": 1,
+    "Agent": "Billy",
+    "PayId": 0,
+    "AccountNo": "0691790327",
+    "AccountName": "Autchara Phetkhaw",
+    "DisplayName": "Nova88-MBB-Autchara-0327",
+    "InitialAmount": 0,
+    "MaxBalanceAlertAmount": 0,
+    "Reason": 16,
+    "Remark": null,
+    "Status": 1
+}
+
+###
+# 取得所有銀行
+POST {{url}}/apiV2/GetAllData/GetBankInfoSys HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferChannelEnum"
+}
+
+###
+# 取得狀態列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferAccountStatusEnum"
+}
+
+###
+# 取得目的列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferAccountPurposeEnum"
+}
