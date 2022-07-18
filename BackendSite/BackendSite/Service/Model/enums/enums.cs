@@ -609,7 +609,8 @@ namespace BackendSite.Service.Model.enums
         GiftManagement = 44,
         SetCustInfoEnableRebate = 45,
         SetAdminUserStatus = 46,
-        SetAdminUserPassword = 47
+        SetAdminUserPassword = 47,
+        SetFinanceAccount = 50
     }
 
     #region BankFinancialTransferInfoLog
@@ -920,6 +921,13 @@ namespace BackendSite.Service.Model.enums
     public enum CustTaskType
     {
         LastStatusUpdateTime = 2,
+    }
+    
+    public enum TransferAccountPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        Transfer = 3
     }
 
     #region BankDetailOff
