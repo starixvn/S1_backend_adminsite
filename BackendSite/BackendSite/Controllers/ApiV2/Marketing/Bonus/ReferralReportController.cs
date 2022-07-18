@@ -113,6 +113,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
                 }
             }
+
+            public int Timezone { get; set; }
         }
 
         #endregion

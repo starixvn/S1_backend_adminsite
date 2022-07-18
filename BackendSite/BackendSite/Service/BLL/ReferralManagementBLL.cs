@@ -77,7 +77,7 @@ namespace BackendSite.Service.BLL
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
         }
         
-        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate, int timezone)
         {
             List<ReferralExcelData> result = new List<ReferralExcelData>();
             var referralCustList =  referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate).ToList();
@@ -89,8 +89,8 @@ namespace BackendSite.Service.BLL
                     ReferralUser = x.ReferralUser,
                     ReferredUser = x.ReferredUser,
                     Currency = x.Currency,
-                    RegTime = x.RegTime,
-                    RewardTime = x.RewardTime,
+                    RegTime = x.RegTime.AddHours(timezone),
+                    RewardTime = x.RewardTime?.AddHours(timezone),
                     ReferralAmount = x.ReferralAmount,
                     Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
                 });
