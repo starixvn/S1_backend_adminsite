@@ -58,7 +58,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminRole>("Admin_AdminRole_Get");
         }
-        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId,string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -71,9 +71,10 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
             props.Add("UserId", userId);
             props.Add("SiteId", siteId);
+            props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Ins", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", props, conn, trans);
 
             if(result <= 0)
             {
@@ -96,7 +97,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -107,8 +108,9 @@ namespace BackendSite.Service.DAL
             props.Add("RoleName", roleName);
             props.Add("Remark", remark);
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+            props.Add("Operator", Operator);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Set", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", props, conn, trans);
 
             if (result <= 0)
             {
@@ -148,7 +150,7 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
         }
 
-        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -159,9 +161,10 @@ namespace BackendSite.Service.DAL
             roleList.Add(role);
             props.Add("UserName", userName);
             props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Ins", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", props, conn, trans);
 
             if (result <= 0)
             {
@@ -194,7 +197,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -205,6 +208,14 @@ namespace BackendSite.Service.DAL
 
             result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", new DynamicParameters
                 (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
+
+            if (result <= 0)
+            {
+                trans.Rollback();
+                return result;
+            }
+
+            result = _mainDbClient.Execute("Admin_AdminUser_Set", new DynamicParameters(new { UserId = userId, Operator = Operator }), conn, trans);
 
             if (result <= 0)
             {
@@ -231,6 +242,7 @@ namespace BackendSite.Service.DAL
 
             props.Add("UserId", input.After.UserId);
             props.Add("Userpwd", tools.MD5Encrypt(input.After.Password));
+            props.Add("Operator", input.Operator);
 
             #region propsLog
             propsLog.Add("_SiteId", input.SiteId);
@@ -243,7 +255,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_UserPassword_Set", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", props, conn, trans) > 0;
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
             if (logResult & result)
             {
@@ -266,6 +278,7 @@ namespace BackendSite.Service.DAL
             #region
             props.Add("UserId", input.After.UserId);
             props.Add("Status", (int)input.After.Status);
+            props.Add("Operator", input.Operator);
             #endregion
 
             #region propsLog
@@ -279,8 +292,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            //return _mainDbClient.Execute("Admin_UserStatus_Set", props);
-            var r = _mainDbClient.Execute("Admin_UserStatus_Set", props, conn, trans) > 0;
+            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", props, conn, trans) > 0;
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
             if (r & result)
             {

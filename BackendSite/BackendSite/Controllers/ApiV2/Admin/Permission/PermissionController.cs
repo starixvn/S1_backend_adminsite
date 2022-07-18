@@ -646,7 +646,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role name is exists"
                 };
             }
-            if (_permissionBll.AddAdminRole(request.SiteId, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId) > 0)
+            if (_permissionBll.AddAdminRole(request.SiteId, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -711,7 +711,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public ApiResult UpdateRolePermission(SetRolePermissionReq request)
         {
             var result = _permissionBll.GetAdminRole().ToList();
-
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role) )
             {
                 return new ApiResult
@@ -728,7 +728,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -936,7 +936,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            if(_adminBll.CheckAdminUserDuplicate(request.UserName))
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_adminBll.CheckAdminUserDuplicate(request.UserName))
             {
                 return new ApiResult
                 {
@@ -945,7 +946,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -972,7 +973,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
-            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {

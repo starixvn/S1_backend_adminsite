@@ -586,13 +586,13 @@ namespace BackendSite.Service.BLL
         {
             return permissionService.GetAdminRole();
         }
-        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId, string Operator)
         {
-            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId);
+            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId, Operator);
         }
-        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
-            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission);
+            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission, Operator);
         }
         public void DeleteAdminRole(int role)
         {
@@ -765,10 +765,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission);
+            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission, Operator);
         }
 
         public UpdateUserPermission GetUpdateAdminUser(int role, int userId,int siteId, AdminUserV2 loginUser)
@@ -917,10 +917,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission);
+            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission, Operator);
         }
         public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq>input)
         {
