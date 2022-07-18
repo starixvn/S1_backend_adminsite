@@ -207,7 +207,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 request.UserName,
                 request.CurrencyId,
                 request.StartDate?.ToUniversalTime().DateTime,
-                request.EndDate?.ToUniversalTime().DateTime);
+                request.EndDate?.ToUniversalTime().DateTime,
+                request.Timezone);
 
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "ReferralReport");

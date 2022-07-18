@@ -170,7 +170,8 @@ namespace BackendSite.Controllers.Api
                 userName,
                 currencyId,
                 startDate?.DateTime.AddHours(-8),
-                endDate?.DateTime.AddHours(-8)).ToList();
+                endDate?.DateTime.AddHours(-8),
+                8).ToList();
 
             exportData.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             exportData.ForEach(s => s.RewardTime = s.RewardTime == null? s.RewardTime: new DateTimeOffset(s.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)));
