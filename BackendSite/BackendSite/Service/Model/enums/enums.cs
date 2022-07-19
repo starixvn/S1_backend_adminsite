@@ -610,6 +610,7 @@ namespace BackendSite.Service.Model.enums
         SetCustInfoEnableRebate = 45,
         SetAdminUserStatus = 46,
         SetAdminUserPassword = 47,
+        VerificationRewardSetting = 49,
         SetFinanceAccount = 50
     }
 

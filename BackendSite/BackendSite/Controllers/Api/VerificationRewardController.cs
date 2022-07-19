@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -33,7 +33,6 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult<VerificationRewardModel>> Get(GetVerificationRewardRequest request)
         {
             var apiResult = new ApiResult<VerificationRewardModel>
@@ -45,7 +44,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult> Set(SetVerificationRewardRequest request)
         {
             var updateOperator = User.Identity.Name;
@@ -61,7 +59,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult> UpdateStatus(UpdateVerificationRewardStatusReq request)
         {
             var updateOperator = User.Identity.Name;
