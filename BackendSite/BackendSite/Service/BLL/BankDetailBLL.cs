@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.BankCardManagement;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace BackendSite.Service.BLL
 {
@@ -14,14 +15,16 @@ namespace BackendSite.Service.BLL
         private readonly BankDetailService bankDetailService;
         private readonly ServerInfoService serverInfoService;
         private readonly LocalBankService localBankService;
+        private readonly VipLevelService _vipLevelService;
         private readonly IMemoryCache cache;
 
-        public BankDetailBLL(IMemoryCache cache, BankDetailService bankDetailService, ServerInfoService serverInfoService, LocalBankService localBankService)
+        public BankDetailBLL(IServiceProvider provider)
         {
-            this.bankDetailService = bankDetailService;
-            this.serverInfoService = serverInfoService;
-            this.localBankService = localBankService;
-            this.cache = cache;
+            bankDetailService = provider.GetRequiredService<BankDetailService>();
+            serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            localBankService = provider.GetRequiredService<LocalBankService>();
+            _vipLevelService = provider.GetRequiredService<VipLevelService>();
+            cache = provider.GetRequiredService<IMemoryCache>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -35,6 +38,21 @@ namespace BackendSite.Service.BLL
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
                 out totalPages, out rowCount);
+        }
+        
+        public IEnumerable<OfflineBankingSetting> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input, out int totalPages, out int rowCount)
+        {
+            var result = bankDetailService.GetOfflineBankingSettingList(input, out totalPages, out rowCount);
+            var vip = _vipLevelService.GetVipLevelSetting(input.SiteId);
+            
+            foreach (var item in result)
+            {
+                item.VipLevelNames = vip
+                    .Where(x => item.VipLevels.Contains(x.Level))
+                    .Select(x => x.LevelName);
+            }
+
+            return result;
         }
 
         public int SetBankCard(ParamsWithLog<SetBankCard> input)

@@ -910,10 +910,11 @@ namespace BackendSite.Service.Model.enums
 
     #region BankDetailOff
 
-    public enum PurposeEnum
+    public enum BankDetailOffPurposeEnum
     {
         Deposit = 1,
         Withdrawal = 2,
+        [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
 
