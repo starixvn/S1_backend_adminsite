@@ -579,7 +579,8 @@ namespace BackendSite.Service.Model.enums
         VipRebatePeriod = 32,
         VipRebateCategory = 33,
         VipRebateGameType = 34,
-        VipRebatePayoutLimit = 35
+        VipRebatePayoutLimit = 35,
+        VerificationRewardSetting = 49,
     }
 
     #region BankFinancialTransferInfoLog
