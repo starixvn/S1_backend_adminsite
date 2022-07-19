@@ -2580,14 +2580,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustDetail(GetCustDetailRequest request)
         {
             var apiResult = new ApiResult<CustInfoDetail>();
 
             var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-
+            
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
@@ -2597,6 +2596,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 if (custInfo.Status == (int)CustomerStatusEnum.Running)
                 {
+                    var balance = _custInfoBll.GetBalance(custInfo.CustId);
+                    custInfo.Balance = balance;
                     apiResult.Data = custInfo;
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
@@ -2608,10 +2609,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     throw new AdminException(ErrorCodeEnum.CustStatusIsClosed);
                 }
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
             }
 
             return apiResult;
