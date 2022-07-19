@@ -328,10 +328,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string TpUserName { get; set; }
             public string Email { get; set; }
             public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
+            public string AffCode { get; set; }
             public string BankAccountNumber { get; set; }
             public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
         }
 
         public class CustIdWithReasonRequest : CustIdRequest
@@ -486,6 +485,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnablePromotionEnum Status { get; set; }
         }
 
+        public class SetEnableRebateRequest : CustIdRequest
+        {
+            public EnableRebateEnum Status { get; set; }
+        }
+
         public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public string RefTransId { get; set; }
@@ -538,7 +542,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
+        public ApiResult GetCustInfoList(CustInfoListRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -669,6 +673,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region CSD > Customer Administration > CustInfo
 
+        /// <summary>
         /// <summary>
         /// CustomerManage/GetCustInfoDetail 取得客戶資料明細
         /// </summary>
@@ -1092,7 +1097,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 throw new AdminException(ErrorCodeEnum.FileTypeNotMatch);
             }
-
 
             await using var fileStream = file.OpenReadStream();
             using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
@@ -1541,6 +1545,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// CustomerManage/SetEnableRebate 客戶是否可以領取Rebate Payout
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Enable Rebate Payout] / [Disable Rebate Payout]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
+        public async Task<ApiResult> SetEnableRebateAsync(SetEnableRebateRequest request)
+        {
+            if (!await _custInfoBll.SetEnableRebateAsync(request.CustId, request.Status, User.Identity.Name))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+
+        /// <summary>
         /// CustomerManage/KickOut 踢出/登出客戶
         /// </summary>
         /// <remarks>
@@ -1581,17 +1612,45 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
+        ///// <summary>
+        ///// CustomerManage/SetDisableRebatePayout 不讓用戶領取Rebate
+        ///// </summary>
+        ///// <remarks>
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
+        ///// </remarks>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
+        //public ApiResult SetDisableRebatePayout(CustIdWithReasonRequest request)
+        //{
+        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
+        //                                  0,
+        //                                  request.Reason,
+        //                                  User.Identity.Name) > 0)
+        //    {
+        //        return new ApiResult
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.Success,
+        //            Message = "Set Disable Rebate Payout Success."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Disable Rebate Payout Fail.Please Contact admin.");
+        //    }
+        //}
+
         /// <summary>
-        /// CustomerManage/KickOut 踢出/登出客戶
+        /// CustomerManage/LineUnbind 解除Line綁定資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Line Unbind]
         /// </remarks>
-        /// <param name="request"></param>
         /// <returns></returns>
-        /// <exception cref="AdminException"></exception>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_lineUnbind" })]
         public ApiResult LineUnbind(CustIdRequest request)
@@ -1611,6 +1670,36 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
+
+        /// <summary>
+        /// CustomerManage/SetEnableRebatePayout 解除不讓用戶領取Rebate設定
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Disable Rebate Payout]
+        /// </remarks>
+        /// <returns></returns>
+        //[HttpPost]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_rebatePayout" })]
+        //public ApiResult SetEnableRebatePayout(CustIdWithReasonRequest request)
+        //{
+        //    if (_custInfoBll.SetEnableRebatePayout(request.CustId,
+        //                                  1,
+        //                                  request.Reason,
+        //                                  User.Identity.Name) > 0)
+        //    {
+        //        return new ApiResult
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.Success,
+        //            Message = "Set Enable Rebate Payout Success."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.Fail, "Set Enable Rebate Payout Fail.Please Contact admin.");
+        //    }
+        //}
 
         #endregion
 
@@ -2901,6 +2990,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// CustomerManage/GetWithdrawalLimitLog 取得提款額度限額的log
         /// </summary>
         /// <remarks>
+        /// Http Method：POST
+        /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > WithdrawalLimitLog
         /// </remarks>
         /// <param name="request"></param>
@@ -2946,6 +3037,60 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+        #endregion
+
+        #region CSD > Customer Administration > Block Bank
+        /// <summary>
+        /// CustomerManage/GetBankLockInfoDetail 取得客戶現在的BankLockInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //[HttpPost]
+        //public ApiResult<IEnumerable<BankLockInfoDetail>> GetBankLockInfoDetail(CustIdRequest request)
+        //{
+        //    var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+        //    var bankLockInfoDetail = _custInfoBll.GetBankLockInfoDetail(custInfo.CustId, custInfo.SiteId);
+        //    return new ApiResult<IEnumerable<BankLockInfoDetail>>
+        //    {
+        //        Data = bankLockInfoDetail,
+        //        ErrorCode = (int)ErrorCodeEnum.Success
+        //    };
+        //}
+
+        /// <summary>
+        /// CustomerManage/LockAllBankAccount 針對客戶Lock他現在所使用的所有BankAccount
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //[HttpPost]
+        //public ApiResult LockAllBankAccount(CustIdRequest request)
+        //{
+        //    var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+        //    if (_custInfoBll.LockAllBankAccount(custInfo.CustId,
+        //                                  custInfo.SiteId,
+        //                                  User.Identity.Name) > 0)
+        //    {
+        //        return new ApiResult
+        //        {
+        //            ErrorCode = (int)ErrorCodeEnum.Success,
+        //            Message = "Lock All Bank Account Success."
+        //        };
+        //    }
+        //    else
+        //    {
+        //        throw new AdminException(ErrorCodeEnum.Fail, "Lock All Bank Account Fail.Please Contact admin.");
+        //    }
+        //}
         #endregion
 
         #region Private Methods

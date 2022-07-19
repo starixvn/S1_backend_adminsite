@@ -7,6 +7,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -115,15 +116,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public List<SetPermission> Permission { get; set; }
         }
 
-        public class SetAdminUserPasswordReq : AdminUserReq
-        {
-            public string Password { get; set; }
-        }
+        //public class SetAdminUserPasswordReq : AdminUserReq
+        //{
+        //    public string Password { get; set; }
+        //}
 
-        public class SetAdminUserStatusReq : AdminUserReq
-        {
-            public int Status { get; set; }
-        }
         public class GetAddAdminUserCurrencyReq
         {
             public int SiteId { get; set; }
@@ -133,12 +130,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             public string UserName { get; set; }
             public IEnumerable<int> SelectSite { get; set; }
         }
-        public class SetAdminBrandReq
-        {
-            public int SiteId { get; set; }
-            public AdminBrandTypeEnum Status { get; set; }
-            public int UserId { get; set; }
-        }
+        //public class SetAdminBrandReq
+        //{
+        //    public int SiteId { get; set; }
+        //    public AdminBrandTypeEnum Status { get; set; }
+        //    public int UserId { get; set; }
+        //}
         #endregion
 
         /// <summary>
@@ -649,7 +646,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role name is exists"
                 };
             }
-            if (_permissionBll.AddAdminRole(request.SiteId, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId) > 0)
+            if (_permissionBll.AddAdminRole(request.SiteId, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserId, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -714,7 +711,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         public ApiResult UpdateRolePermission(SetRolePermissionReq request)
         {
             var result = _permissionBll.GetAdminRole().ToList();
-
+            var authInfo = _newAuthorizeBLL.GetAuthData();
             if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role) )
             {
                 return new ApiResult
@@ -731,7 +728,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -939,7 +936,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult AddAdminUser(SetAdminUserReq request)
         {
-            if(_adminBll.CheckAdminUserDuplicate(request.UserName))
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_adminBll.CheckAdminUserDuplicate(request.UserName))
             {
                 return new ApiResult
                 {
@@ -948,7 +946,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission) > 0)
+            if (_permissionBll.AddAdminUser(request.SiteId, request.Role, request.UserName, request.Password, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -975,7 +973,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult UpdateAdminUser(SetAdminUserReq request)
         {
-            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_permissionBll.UpdateAdminUser(request.SiteId, request.UserId, request.Role, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -1000,9 +999,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
-        public ApiResult SetAdminUserPassword(SetAdminUserPasswordReq request)
+        public ApiResult SetAdminUserPassword(ApiRequestWithLog<SetAdminUserPasswordReq> request)
         {
-            if (_permissionBll.SetAdminUserPassword(request.UserId, request.Password) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            if (_permissionBll.SetAdminUserPassword(new ParamsWithLog<SetAdminUserPasswordReq>(request, authInfo.UserName)))
             {
                 return new ApiResult
                 {
@@ -1027,9 +1027,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// </remarks>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
         [HttpPost]
-        public ApiResult SetAdminUserStatus(SetAdminUserStatusReq request)
+        public ApiResult SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> request)
         {
-            if (_permissionBll.SetAdminUserStatus(request.UserId, request.Status) > 0)
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+
+            if (_permissionBll.SetAdminUserStatus(new ParamsWithLog<SetAdminUserStatusReq>(request, authInfo.UserName)))
             {
                 return new ApiResult
                 {
@@ -1102,10 +1104,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         [HttpPost]
         public ApiResult SetAdminBrand(SetAdminBrandReq request)
         {
+            var authInfo = _newAuthorizeBLL.GetAuthData();
+            var beforeUserBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
+            var afterUserBrands = new List<UserBrand>();
             if (AdminBrandTypeEnum.Disable == request.Status)
             {
-                var userBrands = _permissionBll.GetUserBrand(request.UserId).ToList();
-                if (userBrands.Count <= 1)
+                if (beforeUserBrands.Count <= 1)
                 {
                     return new ApiResult
                     {
@@ -1113,8 +1117,20 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                         Message = "Set user brand fail"
                     };
                 }
+                afterUserBrands = beforeUserBrands.FindAll(x => x.SiteId != request.SiteId);
             }
-            if (_permissionBll.SetAdminBrand(request.UserId, request.SiteId, request.Status) > 0)
+            else if(AdminBrandTypeEnum.Enable == request.Status)
+            {
+                var data = _serverInfoBll.GetSiteList().ToList();
+                afterUserBrands.AddRange(beforeUserBrands);
+                afterUserBrands.Add(new UserBrand() 
+                { 
+                    SiteId = request.SiteId,
+                    SiteName = data.Find(x=> x.SiteId == request.SiteId)?.SiteName 
+                });
+            }
+
+            if (_permissionBll.SetAdminBrand(request, authInfo.UserName, beforeUserBrands, afterUserBrands))
             {
                 return new ApiResult
                 {
@@ -1131,5 +1147,36 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
         #endregion
+
+        /// <summary>
+        /// Permission/GetLanguageList 取得指定站台幣別對應語系列表
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 取得指定站台幣別對應語系列表。
+        /// 
+        /// </remarks>
+        /// <returns>結果</returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<string>>> GetLanguageList(GetLanguageListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<string>>();
+            try
+            {
+                apiResult.Data = await _serverInfoBll.GetLanguageList(request.SiteId, request.CurrencyId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
     }
 }

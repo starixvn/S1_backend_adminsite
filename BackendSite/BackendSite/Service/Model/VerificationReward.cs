@@ -78,28 +78,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-    
-    public class ExportVerificationRewardReport
-    {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
-        public string SiteIds { get; set; }
-        public string UserName { get; set; }
-        public int CurrencyId { get; set; }
 
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-    }
-    
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -134,7 +113,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;
