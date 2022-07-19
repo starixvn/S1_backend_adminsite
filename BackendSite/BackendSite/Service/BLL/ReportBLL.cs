@@ -959,6 +959,7 @@ namespace BackendSite.Service.BLL
             }
 
             //Search range table
+            input.VIPlevel = input.VIPlevel == 1 ? null : input.VIPlevel;
             var StartDate = input.StartTime.ToUniversalTime().DateTime;
             var EndDate = input.EndTime.ToUniversalTime().DateTime;
             var parameters = new DynamicParameters(input);

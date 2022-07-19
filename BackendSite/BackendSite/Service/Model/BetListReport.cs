@@ -27,7 +27,7 @@ namespace BackendSite.Service.Model
         [Required]
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> Tags { get; set; } = new List<int>();
-        public int VIPlevel { get; set; } = 0;
+        public int? VIPlevel { get; set; } = 0;
         public int TpId { get; set; } = 0;
         public int GameType { get; set; } = 0;
         public string TransId { get; set; } = string.Empty;
