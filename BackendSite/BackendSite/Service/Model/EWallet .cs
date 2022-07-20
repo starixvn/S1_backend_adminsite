@@ -61,4 +61,22 @@ namespace BackendSite.Service.Model
         public EWalletStatusEnum Status { get; set; }
         public string StatusName => Status.ToString();
     }
+    public class BlockEWalletAccRequest
+    {
+        public int SysId { get; set; }
+        public string AccountNum { get; set; }
+    }
+    public class BlockEWalletSetRequest : BlockEWalletAccRequest
+    {
+        [LogIgnore]
+        public BlockAccountStatus Status { get; set; }
+        public string StatusName => Status.ToString();
+        [LogIgnore]
+        public string Memo { get; set; }
+    }
+
+    public class ReleaseEWalletAccountRequest : BlockEWalletAccRequest
+    {
+        public int CustId { get; set; }
+    }
 }

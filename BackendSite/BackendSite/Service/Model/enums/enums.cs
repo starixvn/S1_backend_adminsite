@@ -615,7 +615,9 @@ namespace BackendSite.Service.Model.enums
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
-        SetBlockIP = 54
+        SetBlockIP = 54,
+        SetBlockEWallet = 55,
+        ReleaseEWalletAccount = 56
     }
 
     #region BankFinancialTransferInfoLog
