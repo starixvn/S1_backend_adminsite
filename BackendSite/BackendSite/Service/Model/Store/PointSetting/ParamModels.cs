@@ -56,8 +56,8 @@ namespace BackendSite.Service.Model.Store.PointSetting
             //PointRate = req.PointRate;
             PromotionStatus = (int) req.PromotionStatus;
             PromotionPointRate = req.PromotionPointRate;
-            PromotionStartTime = req.PromotionStartTime.DateTime;
-            PromotionEndTime = req.PromotionEndTime.DateTime;
+            PromotionStartTime = req.PromotionStartTime;
+            PromotionEndTime = req.PromotionEndTime;
             Operator = userName;
         }
 
@@ -72,8 +72,8 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public int PromotionStatus { get; set; }
 
         public decimal PromotionPointRate { get; set; }
-        public DateTime PromotionStartTime { get; set; }
-        public DateTime PromotionEndTime { get; set; }
+        public DateTimeOffset PromotionStartTime { get; set; }
+        public DateTimeOffset PromotionEndTime { get; set; }
         public string Operator { get; set; }
     }
 
