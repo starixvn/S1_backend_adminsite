@@ -72,7 +72,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
             logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBlockIP);
-            logParam.Add("_ActionType", (int)ActionType.Delete);
+            logParam.Add("_ActionType", (int)ActionType.Create);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", null, DbType.String);
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
