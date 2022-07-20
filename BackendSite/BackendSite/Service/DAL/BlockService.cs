@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Library;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
@@ -53,38 +54,109 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetBlockIP(string ip,string memo,string Operator)
+        public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
         {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
             var para = new DynamicParameters(new
             {
-                IP = ip
+                IP = input.After.IP
             });
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBlockIP);
+            logParam.Add("_ActionType", (int)ActionType.Create);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", null, DbType.String);
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
             var data =  _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", para).ToList();
 
             if(data.Count == 0)
             {
                 var p = new DynamicParameters(new
                 {
-                    IP = ip,
-                    Memo = memo,
-                    Operator = Operator
+                    IP = input.After.IP,
+                    Memo = input.After.Memo,
+                    Operator = input.Operator
                 });
-                var result = _mainDbClient.Execute("Admin_BlockIP_Set", p);
-                return result;
+                result = _mainDbClient.Execute("Admin_BlockIP_Set", p, conn, trans);
+                if(result > 0)
+                {
+                    var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                    if (!logResult)
+                    {
+                        trans.Rollback();
+                        return 0;
+                    }
+                }
+                else
+                {
+                    trans.Rollback();
+                    return result;
+                }
             }
             else
             {
-                return 0;
+                return result;
             }
+            trans.Commit();
+            return result;
         }
 
-        public int DeleteBlockIP(string ip)
+        public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
             var p = new DynamicParameters(new
             {
-                IP = ip
+                IP = input.Before.IP
             });
-            var result = _mainDbClient.Execute("Admin_BlockIP_Del", p);
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DeleteBlockIP);
+            logParam.Add("_ActionType", (int)ActionType.Delete);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
+            result = _mainDbClient.Execute("Admin_BlockIP_Del", p, conn, trans);
+
+            if (result > 0)
+            {
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+            }
+            else
+            {
+                trans.Rollback();
+                return result;
+            }
+            trans.Commit();
             return result;
         }
 
@@ -145,7 +217,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
         }
 
-        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
+        public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -154,27 +226,49 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                _SysId = sysId,
-                _AccountNum = accountNum,
-                _Status = (int)status,
-                _UpdateOperator = Operator,
-                _Memo = memo
+                _SysId = input.After.SysId,
+                _AccountNum = input.After.AccountNum,
+                _Status = (int)input.After.Status,
+                _UpdateOperator = input.Operator,
+                _Memo = input.After.Memo
             });
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBlockAccount);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
             result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
 
             if(result > 0)
             {
-                var blockBankAccBlockList = GetBlockBankAccList(sysId, accountNum).ToList();
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
+                var blockBankAccBlockList = GetBlockBankAccList(input.After.SysId, input.After.AccountNum).ToList();
 
                 foreach(var x in blockBankAccBlockList)
                 {
                     var parameter = new DynamicParameters(new
                     {
                         CustId = x.CustId,
-                        SysId = sysId,
-                        AccountNo = accountNum,
+                        SysId = input.After.SysId,
+                        AccountNo = input.After.AccountNum,
                         IFSCCode = x.IFSCCode,
-                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
+                        Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
                     result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
@@ -185,11 +279,11 @@ namespace BackendSite.Service.DAL
                         {
                             CustId = x.CustId,
                             SiteId = x.SiteId,
-                            SysId = sysId,
-                            AccountNum = accountNum,
+                            SysId = input.After.SysId,
+                            AccountNum = input.After.AccountNum,
                             IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
                             AccountName = x.AccountName,
-                            Status = status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
                         });
 
                         result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
@@ -215,7 +309,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
+        public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -224,26 +318,48 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                CustId = custId,
-                SysId = sysId,
-                AccountNo = accountNum
+                CustId = input.Before.CustId,
+                SysId = input.Before.SysId,
+                AccountNo = input.Before.AccountNum
             });
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.ReleaseAccount);
+            logParam.Add("_ActionType", (int)ActionType.Delete);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
             result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
             
             if(result > 0)
             {
-                var custInfo = _custInfoService.GetCustInfo(custId);
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
+                var custInfo = _custInfoService.GetCustInfo(input.Before.CustId);
 
                 if(custInfo != null)
                 {
                     var prop = new DynamicParameters(new
                     {
-                        CustId = custId,
+                        CustId = input.Before.CustId,
                         SiteId = custInfo.SiteId,
-                        SysId = sysId,
-                        AccountNum = accountNum,
-                        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "" : iFSCCode,
-                        AccountName = accountNum,
+                        SysId = input.Before.SysId,
+                        AccountNum = input.Before.AccountNum,
+                        IFSCCode = string.IsNullOrWhiteSpace(input.Before.IFSCCode) ? "" : input.Before.IFSCCode,
+                        AccountName = input.Before.CustId,
                         Status = CustBankInfoLogStatus.Release
                     });
 

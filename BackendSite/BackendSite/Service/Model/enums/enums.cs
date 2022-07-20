@@ -611,7 +611,11 @@ namespace BackendSite.Service.Model.enums
         SetAdminUserStatus = 46,
         SetAdminUserPassword = 47,
         VerificationRewardSetting = 49,
-        SetFinanceAccount = 50
+        SetFinanceAccount = 50,
+        SetBlockAccount = 51,
+        ReleaseAccount = 52,
+        DeleteBlockIP = 53,
+        SetBlockIP = 54
     }
 
     #region BankFinancialTransferInfoLog
