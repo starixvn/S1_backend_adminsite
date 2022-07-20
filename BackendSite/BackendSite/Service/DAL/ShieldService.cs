@@ -69,6 +69,36 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public IEnumerable<ShieldTaggingReportExport> GetExport(
+            ShieldTaggingReportController.GetExportReq request)
+        {
+            var tagList = Enum.GetNames(typeof(ShieldRiskTagged)).ToList();
+            var props = new DynamicParameters();
+            foreach (var shield in tagList)
+            {
+                if (request.Tags.Exists(x => x == (int) Enum.Parse(typeof(ShieldRiskTagged), shield)))
+                {
+                    props.Add($"_{shield}", 1 );
+                }
+                else
+                {
+                    props.Add($"_{shield}" );
+                }
+            }
+            
+            props.Add("_SiteId", request.SiteId);
+            props.Add("_ShieldId", string.IsNullOrWhiteSpace(request.ShieldId) ? "" : request.ShieldId);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(request.UserName) ? "" : request.UserName);
+            props.Add("_StartDate", request.StartDate.DateTime);
+            props.Add("_EndDate", request.EndDate.DateTime);
+            props.Add("_TriggeredPoint", JsonConvert.SerializeObject(request.TriggeredPoints));
+            props.Add("_Platform", JsonConvert.SerializeObject(request.Platform));
+            var result = _reportDbClient.Query<ShieldTaggingReportExport>("Admin_ShieldTaggingReportExport_Get", props).ToList();
+          
+            
+            return result;
+        }
+        
         public IEnumerable<ShieldAssociateAccountResult> GetAssociateAccount(
             ShieldTaggingReportController.GetAssociateAccountReq request)
         {
