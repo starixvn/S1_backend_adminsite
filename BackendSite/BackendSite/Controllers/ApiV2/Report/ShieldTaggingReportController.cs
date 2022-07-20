@@ -11,15 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    //[Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class ShieldTaggingReportController : Controller
+    public class ShieldTaggingReportController : ControllerBase
     {
         #region Fields
 
         private readonly ShieldBLL _shieldBll;
-        private readonly ReportExcelBLL _reportExcelBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
@@ -29,7 +28,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         public ShieldTaggingReportController(IServiceProvider provider)
         {
             _shieldBll = provider.GetRequiredService<ShieldBLL>();
-            _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -59,6 +57,28 @@ namespace BackendSite.Controllers.ApiV2.Report
             public List<int> Tags { get; set; }
         }
 
+        public class GetExportReq
+        {
+            private DateTimeOffset _startDate { get; set; }
+            private DateTimeOffset _endDate { get; set; }
+            public int SiteId { get; set; }
+            public string ShieldId { get; set; }
+            public string UserName { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public IEnumerable<int> TriggeredPoints { get; set; }
+            public IEnumerable<string> Platform { get; set; }
+            public List<int> Tags { get; set; }
+        }
+        
         public class GetAssociateAccountReq
         {
             public string ShieldId { get; set; }
@@ -101,6 +121,22 @@ namespace BackendSite.Controllers.ApiV2.Report
                 TotalPages = totalPages,
                 RowCount = rowCount
             };
+        }
+        
+        [HttpPost]
+        public IActionResult GetExport(GetExportReq request)
+        {
+            var datas = _shieldBll.GetExport(request);
+            
+            foreach (var data in datas)
+            {
+                data.TriggeredPointName = Enum.GetName(typeof(TriggeredPoints), data.TriggeredPoint);
+                data.TaggedIssueName = Enum.GetName(typeof(TaggedIssue), data.TaggedIssue);
+            }
+            
+            var stream = _excelBll.Export(datas);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ShieldTaggingReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         
         [HttpPost]

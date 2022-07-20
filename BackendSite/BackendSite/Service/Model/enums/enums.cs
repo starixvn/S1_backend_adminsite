@@ -1142,4 +1142,18 @@ namespace BackendSite.Service.Model.enums
         VirtualOs = 15,
         Hooking = 16
     }
+    
+    public enum TriggeredPoints
+    {
+        Registration = 1, 
+        Login = 2,
+        Deposit = 3,
+        Withdrawal = 4,
+        ClaimBonus = 5,
+    }
+    
+    public enum TaggedIssue
+    {
+        HighRisk = 1
+    }
 }
