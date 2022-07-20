@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             request.PageNumber = -1; //export all
             var data = _reportBll.GetBetListReport(request, out var _, out var _);
         
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 
