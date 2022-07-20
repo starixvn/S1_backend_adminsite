@@ -99,8 +99,8 @@ namespace BackendSite.Service.DAL
             p.Add("_TeamId", request.TeamId);
             p.Add("_Selected", request.Selected);
             p.Add("_UserName", request.UserName);
-            p.Add("_StartTime", request.StartTime);
-            p.Add("_EndTime", request.EndTime);
+            p.Add("_StartTime", request.StartTime.ToUniversalTime().DateTime);
+            p.Add("_EndTime", request.EndTime.ToUniversalTime().DateTime);
             p.Add("_PageSize", Math.Abs(request.PageSize));
             p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -120,8 +120,8 @@ namespace BackendSite.Service.DAL
             p.Add("_TeamId", request.TeamId);
             p.Add("_Selected", request.Selected);
             p.Add("_UserName", request.UserName);
-            p.Add("_StartTime", request.StartTime);
-            p.Add("_EndTime", request.EndTime);
+            p.Add("_StartTime", request.StartTime.ToUniversalTime().DateTime);
+            p.Add("_EndTime", request.EndTime.ToUniversalTime().DateTime);
             return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
         }
 
