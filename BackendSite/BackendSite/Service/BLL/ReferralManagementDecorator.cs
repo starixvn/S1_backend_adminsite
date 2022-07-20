@@ -115,9 +115,9 @@ namespace BackendSite.Service.BLL
             return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate, int timezone)
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
-            return _referralManagementBll.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate, timezone);
+            return _referralManagementBll.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
         }
 
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount, bool byRewardTime)
