@@ -190,7 +190,7 @@ namespace BackendSite.Service.BLL
                 UserName = a.UserName,
                 TeamName = a.TeamName,
                 TicketType = $"Ticket {a.TicketType}",
-                SelectTime = a.SelectTime
+                SelectTime = new DateTimeOffset(a.SelectTime, TimeSpan.Zero)
             });
         }
 
