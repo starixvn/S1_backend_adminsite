@@ -25,7 +25,7 @@ namespace BackendSite.Extensions
         public static IEnumerable<string> GetPartitionRange(this DateTime startDate, DateTime endDate)
         {
             var result = new List<string>();
-            while (startDate <= endDate)
+            while (startDate.Date <= endDate.Date)
             {
                 result.Add(startDate.GetDailyPartitionKey());
                 startDate = startDate.AddDays(1);
