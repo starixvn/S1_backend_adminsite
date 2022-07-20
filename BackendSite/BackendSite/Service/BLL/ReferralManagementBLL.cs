@@ -18,7 +18,8 @@ namespace BackendSite.Service.BLL
         {
             { 0, "Approved" },
             { 1, "Running" },
-            { 2, "Expired" }
+            { 2, "Expired" },
+            { 3, "Exceed" },
         };
         public ReferralManagementBLL(ReferralManagementService referralManagementService)
         {
@@ -79,23 +80,19 @@ namespace BackendSite.Service.BLL
         
         public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate, int timezone)
         {
-            List<ReferralExcelData> result = new List<ReferralExcelData>();
             var referralCustList =  referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate).ToList();
-            referralCustList.ForEach(x =>
+            
+            var result = referralCustList.Select(x => new ReferralExcelData()
             {
-                result.Add(new ReferralExcelData()
-                {
-                    SiteName = x.SiteName,
-                    ReferralUser = x.ReferralUser,
-                    ReferredUser = x.ReferredUser,
-                    Currency = x.Currency,
-                    RegTime = x.RegTime.AddHours(timezone),
-                    RewardTime = x.RewardTime?.AddHours(timezone),
-                    ReferralAmount = x.ReferralAmount,
-                    Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
-                });
-            });
-           
+                SiteName = x.SiteName,
+                ReferralUser = x.ReferralUser,
+                ReferredUser = x.ReferredUser,
+                Currency = x.Currency,
+                RegTime = x.RegTime.AddHours(timezone),
+                RewardTime = x.RewardTime?.AddHours(timezone),
+                ReferralAmount = x.ReferralAmount,
+                Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
+            }).ToList();
             return result;
         }
         public IEnumerable<ReferralFriend> GetRefFriendList(int custId,
