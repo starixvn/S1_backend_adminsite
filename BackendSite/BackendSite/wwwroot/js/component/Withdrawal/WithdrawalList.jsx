@@ -97,11 +97,11 @@ import DateTimePicker from 'react-datetime';
                         <th scope="row">
                             {(subFuncKeys.indexOf("f_wd_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
-                        {/* <td>{row.calCode}</td> */}
                         <td>{row.operator}</td>
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                         <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                         <td>{row.calCode}</td>
+                        <td>{row.deviceScore != null ? (row.deviceScore > 74 ? "Low Risk(" + row.deviceScore + ")"  : "High Risk(" + row.deviceScore + ")")  : "" }</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
@@ -148,6 +148,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_Status}</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
                                 <th scope="col">CalCode</th>
+                                <th scope="col">Device Score</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
