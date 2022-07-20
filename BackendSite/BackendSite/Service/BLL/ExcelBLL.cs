@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null) where T : notnull, new()
+        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -120,7 +120,7 @@ namespace BackendSite.Service.BLL
                 
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 
-                ExportBody(ws, t, propertyInfo);
+                ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }
             p.Save();
@@ -163,7 +163,8 @@ namespace BackendSite.Service.BLL
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,
-            IEnumerable<PropertyInfo> propertyInfo)
+            IEnumerable<PropertyInfo> propertyInfo,
+            TimeSpan? offset = null)
         {
             var currentRow = 2;
             for (var i = 0; i < data.Count(); i++)
@@ -184,7 +185,8 @@ namespace BackendSite.Service.BLL
                     else if (propValue != null && propValue.GetType().Name == "DateTimeOffset" && ((DateTimeOffset)propValue).Year > 1)
                     {
                         var time = (DateTimeOffset)propValue;
-                        ws.Cells[currentRow, j + 1].Value = time.DateTime;
+                        var value = offset != null ? time.ToOffset(offset.Value).DateTime : time.DateTime;
+                        ws.Cells[currentRow, j + 1].Value = value;
                         ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
                     }
                     else
