@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Library;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
@@ -73,7 +74,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<EWallet>("Admin_BlockEWalletList_Get", p);
         }
 
-        public int BlockEWalletSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo = "")
+        public int BlockEWalletSet(ParamsWithLog<BlockEWalletSetRequest> input)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -82,26 +83,47 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                SysId = sysId,
-                AccountNum = accountNum,
-                Status = (int)status,
-                UpdateOperator = Operator,
-                Memo = memo
+                SysId = input.After.SysId,
+                AccountNum = input.After.AccountNum,
+                Status = (int)input.After.Status,
+                UpdateOperator = input.Operator,
+                Memo = input.After.Memo
             });
+
+            var logParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Menu = (int)AdminAdjustmentLogMenuEnum.SetBlockEWallet,
+                _ActionType = (int)ActionType.Update,
+                _RefTransId = string.Empty,
+                _BeforeDetailInfo = input.Before.ToLog(),
+                _AfterDetailInfo = input.After.ToLog(),
+                _Operator = input.Operator
+            };
+
             result = _mainDbClient.Execute("Admin_BlockEWallet_Set", p, conn, trans);
 
             if (result > 0)
             {
-                var blockEWalletList = GetBlockEWalletList(sysId, accountNum).ToList();
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if(!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
+                var blockEWalletList = GetBlockEWalletList(input.After.SysId, input.After.AccountNum).ToList();
 
                 foreach (var x in blockEWalletList)
                 {
                     var parameter = new DynamicParameters(new
                     {
                         CustId = x.CustId,
-                        SysId = sysId,
-                        AccountNo = accountNum,
-                        Status = status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
+                        SysId = input.After.SysId,
+                        AccountNo = input.After.AccountNum,
+                        Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
                     result = _mainDbClient.Execute("Member_CustEWalletDetail_Set", parameter, conn, trans);
@@ -112,10 +134,10 @@ namespace BackendSite.Service.DAL
                         {
                             CustId = x.CustId,
                             SiteId = x.SiteId,
-                            SysId = sysId,
-                            AccountNum = accountNum,
+                            SysId = input.After.SysId,
+                            AccountNum = input.After.AccountNum,
                             AccountName = x.AccountName,
-                            Status = status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock
                         });
 
                         result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
@@ -141,7 +163,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int ReleaseAccount(int custId, int sysId, string accountNum)
+        public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -150,23 +172,44 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                CustId = custId,
-                SysId = sysId,
-                AccountNo = accountNum
+                CustId = input.Before.CustId,
+                SysId = input.Before.SysId,
+                AccountNo = input.Before.AccountNum
             });
-            var releaseEWalletList = GetBlockEWalletList(sysId, accountNum).ToList();
+
+            #region propsLog
+            var propsLog = new DynamicParameters();
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.ReleaseEWalletAccount);
+            propsLog.Add("_ActionType", ActionType.Create);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
+            propsLog.Add("_AfterDetailInfo", null, DbType.String);
+            propsLog.Add("_Operator", input.Operator);
+            #endregion
+
+            var releaseEWalletList = GetBlockEWalletList(input.Before.SysId, input.Before.AccountNum).ToList();
             result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", p, conn, trans);
 
             if (result > 0)
             {
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
                 foreach (var x in releaseEWalletList)
                 {
                     var prop = new DynamicParameters(new
                     {
                         CustId = x.CustId,
                         SiteId = x.SiteId,
-                        SysId = sysId,
-                        AccountNum = accountNum,
+                        SysId = input.Before.SysId,
+                        AccountNum = input.Before.AccountNum,
                         AccountName = x.AccountName,
                         Status = (int)EWalletinfoLogStatusEnum.Release
                     });
