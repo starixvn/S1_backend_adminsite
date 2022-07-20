@@ -48,11 +48,12 @@ namespace BackendSite.Service.BLL
                 throw new AdminException("ExportDepositPointReport Failed.");
             }
 
+            var offset = req.StartTime.Offset;
             var workbook = new XSSFWorkbook();
             var sheet1 = workbook.CreateSheet("DepositPointReport");
             var sheet2 = workbook.CreateSheet("Overview");
 
-            sheet1.WriteToSheet(exportResult.Data.List, true);
+            sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
             
             await using var memoryStream = new MemoryStream();
@@ -82,11 +83,12 @@ namespace BackendSite.Service.BLL
                 throw new AdminException("ExportAdjustmentPointReport Failed.");
             }
 
+            var offset = req.StartTime.Offset;
             var workbook = new XSSFWorkbook();
             var sheet1 = workbook.CreateSheet("AdjustmentPointReport");
             var sheet2 = workbook.CreateSheet("Overview");
 
-            sheet1.WriteToSheet(exportResult.Data.List, true);
+            sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
             
             await using var memoryStream = new MemoryStream();
