@@ -89,7 +89,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
         {
             var exportData = await _worldCupPredictionBll.GetMemberReport(request);
-            var stream = _excelBll.Export(exportData);
+            var ts = request.StartTime.Offset;
+            var stream = _excelBll.Export(exportData, offset: ts);
             return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
         }
         
@@ -113,8 +114,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
         {
-            var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId, request.Timezone);
-            var stream = _excelBll.Export(exportData);
+            var ts = TimeSpan.Parse(request.Timezone.TrimStart('+'));
+            var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId);
+            var stream = _excelBll.Export(exportData, offset: ts);
             return _excelBll.ExcelFile(stream, "WorldCupEventReport");
         }
         

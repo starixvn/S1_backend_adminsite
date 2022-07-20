@@ -160,9 +160,9 @@ namespace BackendSite.Service.Model
         [JsonProperty("userName")]
         public string UserName { get; set; }
         [JsonProperty("startTime")]
-        public DateTime StartTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
         [JsonProperty("endTime")]
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
     }
 
     public class GetWorldCupMemberReportResponse
@@ -198,9 +198,9 @@ namespace BackendSite.Service.Model
         [JsonProperty("userName")]
         public string UserName { get; set; }
         [JsonProperty("startTime")]
-        public DateTime StartTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
         [JsonProperty("endTime")] 
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
         [JsonProperty("timezone")] 
         public int Timezone { get; set; }
     }
@@ -251,7 +251,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("teamId")]
         public int TeamId { get; set; }
         [JsonProperty("timezone")]
-        public int Timezone { get; set; }
+        public string Timezone { get; set; }
     }
     public class ExportWorldCupEventReportResponse
     {
