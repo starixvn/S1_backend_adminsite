@@ -48,7 +48,7 @@ namespace BackendSite.Controllers.Api
                     CurrencyId = currencyId,
                     PeriodDays = referral == null ? string.Empty : referral.PeriodDays.ToString(),
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
-                    VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
+                    ValidBet = referral == null ? string.Empty : referral.ValidBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
                     Status = referral?.Status ?? false
@@ -170,7 +170,8 @@ namespace BackendSite.Controllers.Api
                 userName,
                 currencyId,
                 startDate?.DateTime.AddHours(-8),
-                endDate?.DateTime.AddHours(-8)).ToList();
+                endDate?.DateTime.AddHours(-8),
+                8).ToList();
 
             exportData.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             exportData.ForEach(s => s.RewardTime = s.RewardTime == null? s.RewardTime: new DateTimeOffset(s.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)));

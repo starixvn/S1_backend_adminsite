@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VerificationRewardReportController : Controller
@@ -61,7 +61,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
         public ApiListResult<CustVerificationRewardModel> Get(QueryVerificationRewardReport request)
         {
             var apiResult = new ApiListResult<CustVerificationRewardModel>();
@@ -94,7 +93,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
         public async Task<IActionResult> Export(ExportRequest request)
         {
             var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(JsonConvert.SerializeObject(request.SiteIds),

@@ -115,11 +115,9 @@ namespace BackendSite.Service.BLL
             {
                 if (propertyInfo == null)
                 {
-                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
-                
-                propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
-                
                 ExportBody(ws, t, propertyInfo);
                 ExportHeader(ws, propertyInfo);
             }

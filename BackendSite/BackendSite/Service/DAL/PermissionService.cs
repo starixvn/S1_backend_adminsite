@@ -13,6 +13,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Data;
 using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL
 {
@@ -56,7 +58,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminRole>("Admin_AdminRole_Get");
         }
-        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId,string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -69,9 +71,10 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
             props.Add("UserId", userId);
             props.Add("SiteId", siteId);
+            props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Ins", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", props, conn, trans);
 
             if(result <= 0)
             {
@@ -94,7 +97,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -105,8 +108,9 @@ namespace BackendSite.Service.DAL
             props.Add("RoleName", roleName);
             props.Add("Remark", remark);
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
+            props.Add("Operator", Operator);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Set", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", props, conn, trans);
 
             if (result <= 0)
             {
@@ -146,7 +150,7 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
         }
 
-        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -157,9 +161,10 @@ namespace BackendSite.Service.DAL
             roleList.Add(role);
             props.Add("UserName", userName);
             props.Add("Userpwd", tools.MD5Encrypt(password));
+            props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Ins", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", props, conn, trans);
 
             if (result <= 0)
             {
@@ -192,7 +197,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission)
+        public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = new MySqlConnection(_connectionString);
@@ -210,6 +215,14 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
+            result = _mainDbClient.Execute("Admin_AdminUser_Set", new DynamicParameters(new { UserId = userId, Operator = Operator }), conn, trans);
+
+            if (result <= 0)
+            {
+                trans.Rollback();
+                return result;
+            }
+
             _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId, SiteId = siteId}), conn, trans);
 
             foreach (var data in permission)
@@ -219,19 +232,77 @@ namespace BackendSite.Service.DAL
             trans.Commit();
             return result;
         }
-        public int SetAdminUserPassword(int userId, string password)
+        public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq> input)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("Userpwd", tools.MD5Encrypt(password));
-            return  _mainDbClient.Execute("Admin_UserPassword_Set", props);
+            var propsLog = new DynamicParameters();
+
+            props.Add("UserId", input.After.UserId);
+            props.Add("Userpwd", tools.MD5Encrypt(input.After.Password));
+            props.Add("Operator", input.Operator);
+
+            #region propsLog
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserPassword);
+            propsLog.Add("_ActionType", (int)ActionType.Update);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", input.After.ToLog());
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
+            propsLog.Add("_Operator", input.Operator);
+            #endregion
+
+            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", props, conn, trans) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            if (logResult & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return logResult & result;
         }
-        public int SetAdminUserStatus(int userId, int status)
+        public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("Status", status);
-            return _mainDbClient.Execute("Admin_UserStatus_Set", props);
+            var propsLog = new DynamicParameters();
+
+            #region
+            props.Add("UserId", input.After.UserId);
+            props.Add("Status", (int)input.After.Status);
+            props.Add("Operator", input.Operator);
+            #endregion
+
+            #region propsLog
+            propsLog.Add("_SiteId", input.SiteId);
+            propsLog.Add("_CurrencyId", input.CurrencyId);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetAdminUserStatus);
+            propsLog.Add("_ActionType", (int)ActionType.Update);
+            propsLog.Add("_RefTransId", string.Empty);
+            propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
+            propsLog.Add("_AfterDetailInfo", input.After.ToLog());
+            propsLog.Add("_Operator", input.Operator);
+            #endregion
+
+            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            if (r & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return r & result;
         }
 
         public IEnumerable<AdminBrandRole> GetAdminBrandRole(int role)
@@ -254,13 +325,36 @@ namespace BackendSite.Service.DAL
                     new { UserId = userId }));
         }
 
-        public int SetAdminBrand(int userId, int siteId, AdminBrandTypeEnum status)
+        public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
-            props.Add("UserId", userId);
-            props.Add("SiteId", siteId);
-            props.Add("Status", status);
-            return _mainDbClient.Execute("Admin_AdminBrand_Set", props);
+            var propsLog = new DynamicParameters();
+
+            props.Add("UserId", input.UserId);
+            props.Add("SiteId", input.SiteId);
+            props.Add("Status", (int)input.Status);
+
+            #region propsLog
+            propsLog.Add("UserId", input.UserId);
+            propsLog.Add("BeforeDetailInfo", JsonConvert.SerializeObject(beforeUserBrands));
+            propsLog.Add("AfterDetailInfo", JsonConvert.SerializeObject(afterUserBrands));
+            propsLog.Add("Operator", userName);
+            #endregion
+
+            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", props, conn, trans) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", propsLog, conn, trans) > 0;
+            if (logResult & result)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            return logResult & result;
         }
     }
 }

@@ -86,6 +86,8 @@ namespace BackendSite.Service.Model
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string ChannelName { set; get; }
+        public string EWalletName { get; set; }
+        public int EWalletSysId { get; set; }
     }
     public class WithdrawalInfo
     {
@@ -115,6 +117,8 @@ namespace BackendSite.Service.Model
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string NickName { get; set; }
         public string Network { set; get; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public int? EWalletSysId { get; set; }
     }
     public class WithdrawalInfoForExport
     {
@@ -371,5 +375,27 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public string Network { get; set; }
         public int NetworkType { get; set; }
+    }
+
+    public class EWalletWithdrawalLimitInfoManage
+    {
+        private DateTimeOffset _updateTime { set; get; }
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public double WithdrawalMin { get; set; }
+
+        public double WithdrawalMax { get; set; }
+
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+
+        public string UpdateOperator { get; set; }
+        public int Status { get; set; }
+        public string IsoCode { get; set; }
     }
 }

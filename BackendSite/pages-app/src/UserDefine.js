@@ -156,7 +156,7 @@ const HotGames = lazy(() =>
   import("./pages/Marketing/HotGames/index")
 );
 
-export const defaultPage = "PersonalMsgBatch";
+export const defaultPage = "LineChannelManagement";
 
 export const layoutType = {
   N88: "N88",
@@ -823,19 +823,6 @@ export const pages = {
   TpFailRecordReport: {
     comp: (
       <Suspense fallback="loading...">
-        <TpFailRecordReport />
-      </Suspense>
-    ),
-    css: [
-      "./lib/bootstrap/dist/css/bootstrap.min.css",
-      "./css/css/main.css",
-      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
-    ],
-    layout: layoutType.N88,
-  },
-  VerificationReward: {
-    comp: (
-      <Suspense fallback="loading...">
         <VerificationReward />
       </Suspense>
     ),
@@ -846,13 +833,32 @@ export const pages = {
     ],
     layout: layoutType.N88,
   },
-  CryptoWithdrawalLimitManagement: {
+  VerificationRewardReport: {
     comp: (
       <Suspense fallback="loading...">
-        <CryptoWithdrawalLimitManagement />
+        <VerificationRewardReport />
       </Suspense>
     ),
-    css: ["./lib/bootstrap/dist/css/bootstrap.min.css", "./css/css/main.css"],
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/pages/Marketing.css",
+      "./css/common/fonts/main-font/style.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
+    layout: layoutType.N88,
+  },
+  TpFailRecordReport: {
+    comp: (
+      <Suspense fallback="loading...">
+        <TpFailRecordReport />
+      </Suspense>
+    ),
+    css: [
+      "./lib/bootstrap/dist/css/bootstrap.min.css",
+      "./css/css/main.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
+    ],
     layout: layoutType.N88,
   },
   LineChannelManagement: {
@@ -864,8 +870,17 @@ export const pages = {
     css: [
       "./lib/bootstrap/dist/css/bootstrap.min.css",
       "./css/css/main.css",
-      "./css/css/pages/Marketing.css",
+      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
     ],
+    layout: layoutType.N88,
+  },
+  CryptoWithdrawalLimitManagement: {
+    comp: (
+      <Suspense fallback="loading...">
+        <CryptoWithdrawalLimitManagement />
+      </Suspense>
+    ),
+    css: ["./lib/bootstrap/dist/css/bootstrap.min.css", "./css/css/main.css"],
     layout: layoutType.N88,
   },
   HotGames: {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -55,7 +54,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         
         public class EditRequest 
         {
-            public string TransId{ get; set; }
             public string AccountNo{ get; set; }
             public string Memo{ get; set; }
         }
@@ -93,7 +91,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositAccountingList" })]
         public ApiResult GetList(GetListRequest request)
         {
             var endDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
@@ -140,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
         
         /// <summary>
-        /// DepositAccounting/GetByTransId 取得帳務
+        /// DepositAccounting/Edit 編輯帳務
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -150,11 +147,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult Edit(EditRequest request)
+        public ApiResult Edit(ApiRequestWithLog<EditRequest> request)
         {
-            var result = _depositBll.EditDepositAccounting(request.TransId, request.AccountNo, request.Memo, User.Identity.Name);
-
             var apiResult = new ApiResult();
+            
+            var beforeData = _depositBll.GetDepositAccountingByTransId(request.TransId);
+            if (beforeData == null)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "TransId not found";
+                return apiResult;
+            }
+            request.Before = new EditRequest()
+            {
+                AccountNo = beforeData.AccountNo,
+                Memo = beforeData.Memo
+            };
+            
+            var result = _depositBll.EditDepositAccounting(
+                new ParamsWithLog<EditRequest>(request, User.Identity.Name));
+            
             if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
