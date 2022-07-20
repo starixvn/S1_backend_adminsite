@@ -580,10 +580,10 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
-        SetBlockAccount = 42,
-        ReleaseAccount = 43,
-        DeleteBlockIP = 44,
-        SetBlockIP = 45
+        SetBlockAccount = 51,
+        ReleaseAccount = 52,
+        DeleteBlockIP = 53,
+        SetBlockIP = 54
     }
 
     #region BankFinancialTransferInfoLog
