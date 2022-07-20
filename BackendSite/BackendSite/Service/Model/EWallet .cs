@@ -75,7 +75,7 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
     }
 
-    public class ReleaseAccountRequest : BlockEWalletAccRequest
+    public class ReleaseEWalletAccountRequest : BlockEWalletAccRequest
     {
         public int CustId { get; set; }
     }

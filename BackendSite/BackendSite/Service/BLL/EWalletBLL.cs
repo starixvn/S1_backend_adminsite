@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
         {
             return _eWalletService.BlockEWalletSet(input);
         }
-        public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
+        public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
             return _eWalletService.ReleaseAccount(input);
         }

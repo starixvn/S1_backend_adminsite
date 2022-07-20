@@ -163,7 +163,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
+        public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
             var result = 0;
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

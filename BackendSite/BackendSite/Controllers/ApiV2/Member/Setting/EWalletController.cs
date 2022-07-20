@@ -153,9 +153,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult ReleaseAccount(ApiRequestWithLog<ReleaseAccountRequest> request)
+        public ApiResult ReleaseAccount(ApiRequestWithLog<ReleaseEWalletAccountRequest> request)
         {
-            var result = _eWalletBLL.ReleaseAccount(new ParamsWithLog<ReleaseAccountRequest>(request,
+            var result = _eWalletBLL.ReleaseAccount(new ParamsWithLog<ReleaseEWalletAccountRequest>(request,
                 User.Identity.Name));
             if (result > 0)
             {
