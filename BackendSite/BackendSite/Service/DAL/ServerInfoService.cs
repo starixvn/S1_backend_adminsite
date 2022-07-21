@@ -6,6 +6,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -72,6 +73,14 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
             return adminOperateLogList;
+        }
+        
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            return await _reportDbClient.QueryAsync<string>("Admin_CurrencyListBySiteAndCurrency_Get", p);
         }
     }
 }
