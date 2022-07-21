@@ -37,6 +37,7 @@ namespace BackendSite.Service.BLL
             this.depositService = provider.GetRequiredService<DepositService>();
             this.serverInfoService = provider.GetRequiredService<ServerInfoService>();
             this._adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            this._depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             this.authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             this.common = provider.GetRequiredService<Common>();
