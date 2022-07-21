@@ -28,10 +28,10 @@ module.exports = {
     //   // '@babel/polyfill',
     //   "./src/pages/Report/LicenseeWinLost/index.js",
     // ],
-    // "Finance/PaymentAdjustmentReport.min": [
-    // 	// '@babel/polyfill',
-    // 	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
-    // ],
+    "Finance/PaymentAdjustmentReport.min": [
+    	// '@babel/polyfill',
+    	"./src/pages/Finance/PaymentAdjustmentReport/index.js"
+    ],
     // "Marketing/BonusInfoReport.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Marketing/BonusInfoReport/index.js",
@@ -44,9 +44,9 @@ module.exports = {
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
-    "CSD/PersonalMsgBatch.min": [
-    	"./src/pages/CSD/PersonalMsgBatch/index.js"
-    ],
+    // "CSD/PersonalMsgBatch.min": [
+    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    // ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -64,22 +64,22 @@ module.exports = {
     // 	"./src/pages/CSD/WithdrawalKYCControl/index.js"
     // ],
     // "Home/DashBoard.min": ["./src/pages/Home/DashBoard/index.js"],
-    // "Finance/BalanceAdjustmentBatch.min": [
-    // 	"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
-    // ],
+    "Finance/BalanceAdjustmentBatch.min": [
+    	"./src/pages/Finance/BalanceAdjustmentBatch/index.js"
+    ],
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
-    // "Finance/ThirdPartyAdjustment.min": [
-    // 	"./src/pages/Finance/ThirdPartyAdjustment/index.js"
-    // ],
+    "Finance/ThirdPartyAdjustment.min": [
+    	"./src/pages/Finance/ThirdPartyAdjustment/index.js"
+    ],
     // "Marketing/NewsManage.min": [
     // 	"./src/pages/Marketing/NewsManage/index.js"
     // ],

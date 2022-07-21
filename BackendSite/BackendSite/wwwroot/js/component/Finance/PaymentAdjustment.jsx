@@ -55,7 +55,7 @@ import qs from 'qs';
         }
 
         getAdjustCategoryList(){
-            axios.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+            axios.post('/api/PaymentAdjustmentInfo/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
                 .then(function (response) {
                     if (response.data.errorCode === 0) {
                         this.setState({AdjustCategoryList: response.data.data === null ? [] : response.data.data});
