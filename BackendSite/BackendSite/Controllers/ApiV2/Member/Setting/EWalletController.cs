@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -57,21 +58,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public IEnumerable<int> CurrencyId { get; set; }
             public IEnumerable<int> EWalletId { get; set; }
         }
-        //public class BlockEWalletAccRequest
-        //{
-        //    public int SysId { get; set; }
-        //    public string AccountNum { get; set; }
-        //}
-        //public class BlockEWalletSetRequest : BlockEWalletAccRequest
-        //{
-        //    public BlockAccountStatus Status { get; set; }
-        //    public string Memo { get; set; }
-        //}
-
-        //public class ReleaseAccountRequest : BlockEWalletAccRequest
-        //{
-        //    public int CustId { get; set; }
-        //}
         #endregion
 
         #region Action
@@ -83,6 +69,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 118, 1 })]
         [HttpPost]
         public ApiListResult<BlockEWalletAcc> GetBlockEWalletAcc(GetBlockEWalletAccRequest request)
         {
@@ -102,6 +89,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 118, 1 })]
         [HttpPost]
         public ApiListResult<EWallet> GetBlockEWalletList(BlockEWalletAccRequest request)
         {
@@ -121,6 +109,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 118, 3 })]
         [HttpPost]
         public ApiResult BlockEWalletSet(ApiRequestWithLog<BlockEWalletSetRequest> request)
         {
@@ -152,6 +141,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 118, 4 })]
         [HttpPost]
         public ApiResult ReleaseAccount(ApiRequestWithLog<ReleaseEWalletAccountRequest> request)
         {
@@ -183,6 +173,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 118, 1 })]
         [HttpPost]
         public ApiListResult<EWalletInfoSys> GetEWalletInfo()
         {
