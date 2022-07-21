@@ -718,8 +718,15 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
+                // 補回 LogAdminOperateInfo
+                var menu = "CustManage/CustInfoList";
+                var info = new Dictionary<string, dynamic>();
+                info.Add("MenuName", "Customer Info");
+                
                 if (custStatus.Level != null)
                 {
+                    info.Add("Action", $"Change Level To {custStatus.Level}");
+                    info.Add("Before Change Level", custProfile.UserLevel);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -741,6 +748,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.FullName != null)
                 {
+                    info.Add("Action", $"Change Full Name To {custStatus.FullName}");
+                    info.Add("Before Change Full Name", custProfile.AccountName);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -762,6 +771,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
                 {
+                    info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
+                    info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -783,6 +794,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.PhoneNumber != null)
                 {
+                    info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
+                    info.Add("Before Change Phone Number", custProfile.PhoneNo);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -804,6 +817,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.EMail != null)
                 {
+                    info.Add("Action", $"Change EMail To {custStatus.EMail}");
+                    info.Add("Before Change EMail", custProfile.Email);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -835,6 +850,8 @@ namespace BackendSite.Controllers.Api
                             beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
                         });
                     }
+                    info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(custStatus.Address)}");
+                    info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -854,6 +871,8 @@ namespace BackendSite.Controllers.Api
                         })
                     });
                 }
+
+                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, menu, ActionType.Update, info, User.Identity.Name);
 
                 return new ApiResult
                 {

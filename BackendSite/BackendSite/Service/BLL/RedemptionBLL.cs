@@ -56,11 +56,12 @@ namespace BackendSite.Service.BLL
                 throw new AdminException("ExportRedemptionList Failed.");
             }
 
+            var offset = req.StartTime.Offset;
             var workbook = new XSSFWorkbook();
             var sheet1 = workbook.CreateSheet("RedemptionList");
             var sheet2 = workbook.CreateSheet("Overview");
 
-            sheet1.WriteToSheet(exportResult.Data.List, true);
+            sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
             
             await using var memoryStream = new MemoryStream();

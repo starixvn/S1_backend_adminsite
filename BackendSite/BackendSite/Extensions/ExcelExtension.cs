@@ -70,20 +70,20 @@ namespace BackendSite.Extensions
             return cell?.NumericCellValue.ToInt() ?? 0;
         }
 
-        public static byte[] ToExcelFile<T>(this IEnumerable<T> list, string sheetName, bool freeze = false)
+        public static byte[] ToExcelFile<T>(this IEnumerable<T> list, string sheetName, bool freeze = false, TimeSpan? offset = null)
             where T : class
         {
             var workbook = new XSSFWorkbook();
             var sheet1 = workbook.CreateSheet(sheetName);
 
-            WriteToSheet(sheet1, list, freeze);
+            WriteToSheet(sheet1, list, freeze, offset);
 
             using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             return memoryStream.GetBuffer();
         }
 
-        public static void WriteToSheet<T>(this ISheet sheet, IEnumerable<T> list, bool freeze = false)
+        public static void WriteToSheet<T>(this ISheet sheet, IEnumerable<T> list, bool freeze = false, TimeSpan? offset = null)
             where T : class
         {
             sheet.CreateHeaders<T>(freeze);
@@ -111,10 +111,10 @@ namespace BackendSite.Extensions
                         }
                         
                         var val = item.GetType().GetProperty(prop.Name)?.GetValue(item);
-                        if (val is DateTimeOffset offset && offset.Year > 1)
+                        if (val is DateTimeOffset dto && dto.Year > 1)
                         {
-                            offset = offset.ToOffset(TimeSpan.FromHours(8));
-                            row.CreateCell(i).SetCellValue($"{offset:MM/dd/yyyy h:mm:ss tt}");
+                            dto = offset != null ? dto.ToOffset(offset.Value).DateTime : dto.DateTime;
+                            row.CreateCell(i).SetCellValue($"{dto:MM/dd/yyyy h:mm:ss tt}");
                         }
                         else
                         {
