@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
@@ -192,6 +193,11 @@ namespace BackendSite.Service.BLL
                     permissionLoop(s.FuncKeys, ref dictKeys);
                 }
             }
+        }
+
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
 
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -19,101 +20,44 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     {
         #region Fields
 
-        private readonly ReferralManagementBLL _referralManagementBll;
+        private readonly IReferralManagementBLL _referralManagementBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
 
         #region Constructors
-
-        public ReferralReportController(IServiceProvider provider)
+        public ReferralReportController(IReferralManagementBLL referralManagementBll, ExcelBLL excelBll)
         {
-            _referralManagementBll = provider.GetRequiredService<ReferralManagementBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _referralManagementBll = referralManagementBll;
+            _excelBll = excelBll;
         }
-
         #endregion
 
         #region API Model
 
         public class GetListRequest : ApiRequestPageModel
         {
-            private DateTimeOffset? _startDate;
-            private DateTimeOffset? _endDate;
             public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         public class GetByCustIdRequest : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
             public int CustId { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         public class ExportRequest
         {
-            private DateTimeOffset? _startDate;
-            private DateTimeOffset? _endDate;
             public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         #endregion
@@ -127,19 +71,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Report > [Submit] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         [HttpPost]
         public ApiListResult<ReferralCustList> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<ReferralCustList>();
 
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
             var pageNumber = request.PageNumber;
             apiResult.Data = _referralManagementBll.GetReferralCustList(request.SiteIds,
-                request.UserName,
-                request.CurrencyId,
-                request.StartDate?.DateTime,
-                request.EndDate?.DateTime,
-                request.PageSize,
+                request.UserName, request.CurrencyId, startTime, endTime, request.PageSize,
                 ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
@@ -161,37 +103,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
         [HttpPost]
-        public ApiListResult<ReferralFriend> GetByCustId(GetByCustIdRequest request)
+        public ApiListResult<ReferralFriendRresponse> GetByCustId(GetByCustIdRequest request)
         {
-            var apiResult = new ApiListResult<ReferralFriend>();
-            var referralStatus = new Dictionary<int, string>()
-            {
-                {0,"Approved" },
-                {1,"Running" },
-                {2,"Expired" }
-            };
-            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
-            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var apiResult = new ApiListResult<ReferralFriendRresponse>();
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
 
             try
             {
-                var pageNumber = request.PageNumber;
-
-                var data = _referralManagementBll.GetRefFriendList(request.CustId,
-                    startDate,
-                    endDate,
-                    request.PageSize,
-                    request.PageNumber,
-                    out var totalPages,
-                    out var rowCount, true);
-
-                foreach (var x in data)
-                {
-                    referralStatus.TryGetValue(x.Status, out var name);
-                    x.StatusName = name;
-                }
+                var data = _referralManagementBll.GetRefFriendList(
+                    request.CustId, startTime, endTime, request.PageSize, request.PageNumber, 
+                    out var totalPages, out var rowCount);
                 apiResult.Data = data;
-                apiResult.PageNumber = pageNumber;
+                apiResult.PageNumber = request.PageNumber;
                 apiResult.TotalPages = totalPages;
                 apiResult.RowCount = rowCount;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -219,14 +143,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
             var exportData = _referralManagementBll.GetReferralCustListExport(
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.UserName,
                 request.CurrencyId,
-                request.StartDate?.ToUniversalTime().DateTime,
-                request.EndDate?.ToUniversalTime().DateTime);
+                startTime,
+                endTime);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "ReferralReport");
         }
     }
