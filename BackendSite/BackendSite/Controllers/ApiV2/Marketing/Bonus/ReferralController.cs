@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 48, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<ReferralList>> GetList(GetReferralListRequest request)
         {
@@ -40,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// ReferralManagement/Get 取得推薦資料內容
         /// </summary>
@@ -50,7 +50,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 48, 1 })]
         [HttpPost]
         public async Task<ApiResult<ReferralDetail>> Get(GetReferralRequest request)
         {
@@ -71,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search] > [Status]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 48, 12 })]
         [HttpPost]
         public async Task<ApiResult> UpdateStatus(SetReferralStatusRequest request)
         {
@@ -93,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing > Referral Management > [Search] > [Edit] > [Save]
         /// </remarks>
         /// <param name="setReferral"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 48, 3 })]
         [HttpPost]
         public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
