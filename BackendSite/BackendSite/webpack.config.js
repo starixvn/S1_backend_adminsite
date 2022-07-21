@@ -4,9 +4,9 @@ var webpack = require("webpack");
 
 module.exports = {
   entry: {
-    "js/component/Withdrawal/WithdrawalList.min": [
-        '../BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
-    ],
+    // "js/component/Withdrawal/WithdrawalList.min": [
+    //     '../BackendSite/wwwroot/js/component/Withdrawal/WithdrawalList.jsx'
+    // ],
     //  "js/component/Deposit/DepositList.min": [
     //     '../BackendSite/wwwroot/js/component/Deposit/DepositList.jsx'
     //  ],
@@ -16,15 +16,15 @@ module.exports = {
     // "js/component/Payment/BankInfoList.min": [
     //     '../BackendSite/wwwroot/js/component/Payment/BankInfoList.jsx'
     // ],
-    // "js/component/Finance/PaymentAdjustment.min": [
-    //     '../BackendSite/wwwroot/js/component/Finance/PaymentAdjustment.jsx'
-    // ],
+    "js/component/Finance/PaymentAdjustment.min": [
+        '../BackendSite/wwwroot/js/component/Finance/PaymentAdjustment.jsx'
+    ],
     // "js/component/CustManage/CustInfo.min": [
     //   "../BackendSite/wwwroot/js/component/CustManage/CustInfo.jsx",
     // ],
-    "js/component/CustManage/CustInfoList.min": [
-        '../BackendSite/wwwroot/js/component/CustManage/CustInfoList.jsx'
-    ],
+    // "js/component/CustManage/CustInfoList.min": [
+    //     '../BackendSite/wwwroot/js/component/CustManage/CustInfoList.jsx'
+    // ],
     // "js/component/Marketing/PointLevelList.min": [
     //     '../BackendSite/wwwroot/js/component/Marketing/PointLevelList.jsx'
     // ],
