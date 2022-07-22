@@ -62,5 +62,25 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
 
         #endregion
+
+        #region TurnoverPoint
+
+        [HttpPost]
+        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        {
+            var result = _storeReportBLL.GetTurnoverPointReportRequest(req);
+
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExportTurnoverPointReportAsync(ExportTurnoverPointReportRequest req)
+        {
+            var result = await _storeReportBLL.ExportTurnoverPointReportAsync(req);
+
+            return _excelBll.ExcelFile(result, "DepositPointReport");
+        }
+
+        #endregion
     }
 }
