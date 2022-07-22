@@ -53,7 +53,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{data.sabaID}</td> 
                     <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
-                    <td>{data.deviceScore != null ? (data.deviceScore > 74 ? "Low Risk(" + data.deviceScore + ")"  : "High Risk(" + data.deviceScore + ")")  : "" }</td>
+                    <td className={data.deviceScore > 74 ? "low-risk" : "high-risk"}>{data.deviceScore != null ? (data.deviceScore > 74 ? "Low Risk(" + data.deviceScore + ")"  : "High Risk(" + data.deviceScore + ")")  : "" }</td>
                     <td>{data.levelName}</td>
                     <td>{data.userLevel}</td>
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
