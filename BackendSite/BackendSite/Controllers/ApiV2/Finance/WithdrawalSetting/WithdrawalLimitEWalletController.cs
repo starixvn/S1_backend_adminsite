@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -49,6 +50,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 122, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<EWalletWithdrawalLimitInfoManage>> GetList(GetListRequest request)
         {
@@ -70,6 +72,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 122, 3 })]
         [HttpPost]
         public ApiResult Update(ApiRequestWithLog<EWalletUpdateRequest> request)
         {
@@ -99,6 +102,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 122, 3 })]
         [HttpPost]
         public ApiResult SwitchStatus(ApiRequestWithLog<EWalletSwitchStatusRequest> request)
         {

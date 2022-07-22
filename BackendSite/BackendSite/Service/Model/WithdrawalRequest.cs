@@ -88,6 +88,7 @@ namespace BackendSite.Service.Model
         public string ChannelName { set; get; }
         public string EWalletName { get; set; }
         public int EWalletSysId { get; set; }
+        public int? DeviceScore { set; get; }
     }
     public class WithdrawalInfo
     {

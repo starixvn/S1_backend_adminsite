@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL.Interface;
 using Newtonsoft.Json;
+using Org.BouncyCastle.X509;
 
 namespace BackendSite.Service.BLL
 {
@@ -78,7 +79,7 @@ namespace BackendSite.Service.BLL
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
         }
         
-        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate, int timezone)
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
             var referralCustList =  referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate).ToList();
             
@@ -88,8 +89,8 @@ namespace BackendSite.Service.BLL
                 ReferralUser = x.ReferralUser,
                 ReferredUser = x.ReferredUser,
                 Currency = x.Currency,
-                RegTime = x.RegTime.AddHours(timezone),
-                RewardTime = x.RewardTime?.AddHours(timezone),
+                RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
+                RewardTime = Convert(x.RewardTime, TimeSpan.Zero),
                 ReferralAmount = x.ReferralAmount,
                 Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
             }).ToList();
@@ -137,6 +138,13 @@ namespace BackendSite.Service.BLL
                 StatusName = referralStatus[a.Status]
             }).ToList();
             return referralFriends;
+        }
+
+        private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
+        {
+            if (dateTime.HasValue)
+                return new DateTimeOffset(dateTime.Value, ts);
+            return null;
         }
     }
 }

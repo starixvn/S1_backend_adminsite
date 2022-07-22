@@ -24,13 +24,13 @@ namespace BackendSite.Service.BLL
         {
             return _eWalletService.GetBlockEWalletList(sysId, accountNum);
         }
-        public int BlockEWalletSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo)
+        public int BlockEWalletSet(ParamsWithLog<BlockEWalletSetRequest> input)
         {
-            return _eWalletService.BlockEWalletSet(sysId, accountNum, status, Operator, memo);
+            return _eWalletService.BlockEWalletSet(input);
         }
-        public int ReleaseAccount(int custId, int sysId, string accountNum)
+        public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
-            return _eWalletService.ReleaseAccount(custId, sysId, accountNum);
+            return _eWalletService.ReleaseAccount(input);
         }
 
         public IEnumerable<EWalletInfoSys> GetEWalletInfo()
