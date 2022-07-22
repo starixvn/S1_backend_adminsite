@@ -96,7 +96,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                         <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
                         <td>{row.calCode}</td>
-                        <td>{row.deviceScore != null ? (row.deviceScore > 74 ? "Low Risk(" + row.deviceScore + ")"  : "High Risk(" + row.deviceScore + ")")  : "" }</td>
+                        <td className={row.deviceScore > 74 ? "low-risk" : "high-risk"}>{row.deviceScore != null ? (row.deviceScore > 74 ? "Low Risk(" + row.deviceScore + ")"  : "High Risk(" + row.deviceScore + ")")  : "" }</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
