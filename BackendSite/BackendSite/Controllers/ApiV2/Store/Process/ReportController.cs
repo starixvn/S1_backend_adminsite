@@ -78,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         {
             var result = await _storeReportBLL.ExportTurnoverPointReportAsync(req);
 
-            return _excelBll.ExcelFile(result, "DepositPointReport");
+            return _excelBll.ExcelFile(result, "TurnoverPointReport");
         }
 
         #endregion
