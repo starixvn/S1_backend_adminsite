@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,13 +64,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult> Set(SetVerificationRewardRequest request)
+        public async Task<ApiResult> Set(ApiRequestWithLog<SetVerificationRewardParams> request)
         {
             
             var updateOperator = User.Identity.Name;
-            var oldData = await _verificationRewardBll.GetVerificationReward(request.SiteId, request.CurrencyId);
             var result = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
-                (int)request.VerificationType, request.PhoneReward, request.EmailReward, updateOperator);
+                (int)request.After.VerificationType, request.After.PhoneReward, request.After.EmailReward, updateOperator);
 
             var success = result == 1 || result == 2;
             if (success)
@@ -81,17 +81,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     CurrencyId = request.CurrencyId,
                     SiteId = request.SiteId,
                     MenuEnum = AdminAdjustmentLogMenuEnum.VerificationRewardSetting,
-                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    BeforeDetailInfo = request.Before != null ? JsonConvert.SerializeObject(new
                     {
-                        VerificationType = ((VerificationTypeEnum) oldData.VerificationType).ToString(),
-                        oldData.EmailReward,
-                        oldData.PhoneReward
-                    }),
+                        VerificationType = request.Before.VerificationType.ToString(),
+                        request.Before.EmailReward,
+                        request.Before.PhoneReward
+                    }) : null,
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        VerificationType = request.VerificationType.ToString(),
-                        request.EmailReward,
-                        request.PhoneReward
+                        VerificationType = request.After.VerificationType.ToString(),
+                        request.After.EmailReward,
+                        request.After.PhoneReward
                     })
                 });
             }
@@ -111,10 +111,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult> UpdateStatus(UpdateVerificationRewardStatusReq request)
+        public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<UpdateVerificationRewardStatusParams> request)
         {
             var updateOperator = User.Identity.Name;
-            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId,(int)request.Status, updateOperator);
+            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId,(int)request.After.Status, updateOperator);
             var success = result == 1 || result == 2;
             if (success)
             {
@@ -127,13 +127,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     MenuEnum = AdminAdjustmentLogMenuEnum.VerificationRewardSetting,
                     BeforeDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Status = (request.Status == VerificationRewardStatusEnum.Enable
-                            ? VerificationRewardStatusEnum.Disable
-                            : VerificationRewardStatusEnum.Enable).ToString()
+                        Status = request.Before.Status.ToString()
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
-                        Status = request.Status.ToString()
+                        Status = request.After.Status.ToString()
                     })
                 });
             }
