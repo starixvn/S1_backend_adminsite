@@ -165,6 +165,26 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+        
+        public ApiResult GetPayList()
+        {
+            var apiResult = new ApiResult<IEnumerable<PayList>>();
+
+            try
+            {
+                apiResult.Data = _bankFinancialBll.GetPayList()
+                    .Where(x=> x.Status == (int)GeneralStatusEnum.Enable);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.RawMessage = ex.Message;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "something went wrong.";
+            }
+
+            return apiResult;
+        }
 
         #endregion
     }
