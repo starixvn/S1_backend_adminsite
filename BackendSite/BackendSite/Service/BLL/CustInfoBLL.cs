@@ -225,6 +225,11 @@ namespace BackendSite.Service.BLL
         {
             return _walletService.GetBalance(custId);
         }
+        
+        public Task<decimal> GetBalanceAsync(int custId)
+        {
+            return _walletService.GetBalanceAsync(custId);
+        }
         public int SetCustStatusSwitch(int custId, int Op)
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);

@@ -521,6 +521,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public CustomerStatusEnum Status { get; set; }
             public decimal Balance { get; set; }
         }
+        
+        public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
+        {
+            public IEnumerable<TpWallet> TpWalletList { get; set; }
+        }
 
         #endregion
 
@@ -2618,6 +2623,56 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             UserName = custInfo.UserName,
                             Status = status,
                             Balance = balance
+                        },
+                        ErrorCode = (int) ErrorCodeEnum.Success
+                    },
+                    
+                CustomerStatusEnum.Suspend
+                    => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
+                    
+                _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
+            };
+        }
+        
+        /// <summary>
+        /// CustomerManage/GetCustInfoWithTpBalance 取得客戶資料、主錢包餘額及三方錢包餘額
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<GetCustInfoWithTpBalanceResult>> GetCustInfoWithTpBalanceAsync(GetCustInfoWithBalanceRequest request)
+        {
+            var result =
+                _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+            
+            if (result != ErrorCodeEnum.Success)
+            {
+                throw new AdminException(result);
+            }
+
+            var balance = await _custInfoBll.GetBalanceAsync(custInfo.CustId);
+            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(custInfo.CustId);
+            var status = (CustomerStatusEnum) custInfo.Status;
+            return status switch
+            {
+                CustomerStatusEnum.Running
+                    => new ApiResult<GetCustInfoWithTpBalanceResult>
+                    {
+                        Data = new GetCustInfoWithTpBalanceResult
+                        {
+                            SiteId = custInfo.SiteId,
+                            SiteName = custInfo.SiteName,
+                            CustId = custInfo.CustId,
+                            CurrencyId = custInfo.CurrencyId,
+                            UserName = custInfo.UserName,
+                            Status = status,
+                            Balance = balance,
+                            TpWalletList = custTPWallet
                         },
                         ErrorCode = (int) ErrorCodeEnum.Success
                     },
