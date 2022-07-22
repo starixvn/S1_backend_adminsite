@@ -7,7 +7,6 @@ using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BackendSite.Controllers
 {

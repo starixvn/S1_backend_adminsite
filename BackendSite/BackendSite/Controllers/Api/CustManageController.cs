@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -12,19 +11,18 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using LazZiya.ImageResize;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -45,7 +43,7 @@ namespace BackendSite.Controllers.Api
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly BonusInfoService _bonusInfoService;
-        
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         #endregion
 
@@ -66,11 +64,17 @@ namespace BackendSite.Controllers.Api
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         #endregion
 
         #region API Model
+
+        public class GetRegLiveStatusNotesReq
+        {
+            public int CustId { get; set; }
+        }
 
         public class CustInfoListReq
         {
@@ -99,6 +103,20 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectStatus { get; set; }
             public IEnumerable<int> SelectTag { get; set; }
             public bool ExportTransferWallet { get; set; } = false;
+        }
+        
+        public class CustIdWithReasonRequest : CustIdRequest
+        {
+            /// <summary>
+            /// 異動原因
+            /// </summary>
+            public string Reason { get; set; }
+        }
+        
+        public class SetCustomerStatusRequest : CustIdWithReasonRequest
+        {
+
+            public CustomerStatusEnum CurrentStatus { get; set; }
         }
 
         public class CustStatusSwitch
@@ -129,6 +147,7 @@ namespace BackendSite.Controllers.Api
             public int? Birthday_D { get; set; }
             public string PhoneNumber { get; set; }
             public string EMail { get; set; }
+            public Dictionary<string, string> Address { get; set; }
         }
 
         public class AddCustNoteReq
@@ -262,13 +281,19 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
-
-        public class SetEnableDisableBonusPara
+        
+        public class CustIdRequest
         {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public int CustId { get; set; }
-            public int EnablePromotion { get; set; }
         }
 
+        public class SetEnableDisableBonusRequest : CustIdRequest
+        {
+            public EnablePromotionEnum Status { get; set; }
+        }
+        
         public class VerificationRewardReq
         {
             /// <summary>
@@ -280,7 +305,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             public int OTPType { get; set; }
         }
-        
+
         #region RegLiveStatus
         public class RegLiveStatusPara
         {
@@ -305,16 +330,6 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
         }
 
-        public class AddRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public string Note { get; set; }
-        }
-        public class DeleteRegLiveStatusNotes
-        {
-            public int CustId { get; set; }
-            public int Id { get; set; }
-        }
         public class EditRegLiveStatusNotes
         {
             public int CustId { get; set; }
@@ -347,14 +362,14 @@ namespace BackendSite.Controllers.Api
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListReq req)
         {
             var pageNumber = req.PageNumber;
-            
-            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
-            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
-            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
-            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
-            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
-            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
-            
+
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StartDate) : (DateTime?)null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.EndDate) : (DateTime?)null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.TagStartDate) : (DateTime?)null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.TagEndDate) : (DateTime?)null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StatusStartDate) : (DateTime?)null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StatusEndDate) : (DateTime?)null;
+
             var data = _custInfoBll.GetCustInfoList(req.SelectSite,
                                                    req.BirDate,
                                                    req.BirMonth,
@@ -416,12 +431,12 @@ namespace BackendSite.Controllers.Api
         [RequestSizeLimit(40000000)]
         public async Task<IActionResult> ExportCustInfoListAsync(CustInfoListReq req)
         {
-            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StartDate) : (DateTime?) null;
-            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.EndDate) : (DateTime?) null;
-            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagStartDate) : (DateTime?) null;
-            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.TagEndDate) : (DateTime?) null;
-            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusStartDate) : (DateTime?) null;
-            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long) req.StatusEndDate) : (DateTime?) null;
+            var startDate = req.StartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StartDate) : (DateTime?)null;
+            var endDate = req.EndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.EndDate) : (DateTime?)null;
+            var tagStartDate = req.TagStartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.TagStartDate) : (DateTime?)null;
+            var tagEndDate = req.TagEndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.TagEndDate) : (DateTime?)null;
+            var statusStartDate = req.StatusStartDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StatusStartDate) : (DateTime?)null;
+            var statusEndDate = req.StatusEndDate != null ? DateTimeExtensions.UnixToDateTime((long)req.StatusEndDate) : (DateTime?)null;
 
             if (req.ExportTransferWallet)
             {
@@ -502,6 +517,10 @@ namespace BackendSite.Controllers.Api
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                    if (custInfoDetail.CustLineProfile != null)
+                    {
+                        custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                    }
                 }
 
                 return new ApiResult<CustInfoDetail>
@@ -578,7 +597,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<bool>();
             int OldStatus = 0;
             int NewStatus = 0;
-            
+
             var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(custStatusSwitch.CustId);
 
             switch (custStatusSwitch.Op)
@@ -601,7 +620,7 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
-                
+
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
                 Info.Add("MenuName", "Customer Info");
@@ -634,7 +653,7 @@ namespace BackendSite.Controllers.Api
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success." 
+                    Message = "Update Success."
                 };
             }
             else
@@ -661,14 +680,14 @@ namespace BackendSite.Controllers.Api
                 if (verificationRewardReq.OTPType == 0)
                 {
                     Info.Add("Action", "Payout Verification Reward");
-                    Info.Add("OTPType","SMS");
+                    Info.Add("OTPType", "SMS");
                 }
                 else if (verificationRewardReq.OTPType == 1)
                 {
                     Info.Add("Action", "Payout Verification Reward");
                     Info.Add("OTPType", "EMAIL");
                 }
-                
+
                 _serverInfoBll.AdminOperateLog(null, verificationRewardReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
             }
             return apiResult;
@@ -689,44 +708,171 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_userEdit" })]
         [HttpPost]
-        public ApiResult SetCustInfo(CustStatus custStatus)
+        public async Task<ApiResult> SetCustInfoAsync(CustStatus custStatus)
         {
-            var apiResult = new ApiResult<bool>();
             var custProfile = _custInfoBll.GetCustProfile(custStatus.CustId);
-            var data = _custInfoBll.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, User.Identity.Name) > 0;
+            var custSimpleInfo = await _custInfoBll.GetCustId(custStatus.CustId, null, null);
+
+            custStatus.Address = (custStatus.Address == null || (custStatus.Address != null && custStatus.Address.Count == 0)) ? null : CheckAddress(custStatus.Address);
+            var data = _custInfoBll.SetCustInfo(custStatus.CustId, custStatus.Level, custStatus.FullName, custStatus.Birthday_Y, custStatus.Birthday_M, custStatus.Birthday_D, custStatus.PhoneNumber, custStatus.EMail, custStatus.Address, User.Identity.Name) > 0;
 
             if (data)
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
+                // 補回 LogAdminOperateInfo
+                var menu = "CustManage/CustInfoList";
+                var info = new Dictionary<string, dynamic>();
+                info.Add("MenuName", "Customer Info");
+                
                 if (custStatus.Level != null)
                 {
-                    Info.Add("Action", $"Change Level To {custStatus.Level}");
-                    Info.Add("Before Change Level", custProfile.UserLevel);
+                    info.Add("Action", $"Change Level To {custStatus.Level}");
+                    info.Add("Before Change Level", custProfile.UserLevel);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerLevel,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Level = custProfile.UserLevel
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Level = custStatus.Level
+                        })
+                    });
                 }
                 else if (custStatus.FullName != null)
                 {
-                    Info.Add("Action", $"Change Full Name To {custStatus.FullName}");
-                    Info.Add("Before Change Full Name", custProfile.AccountName);
+                    info.Add("Action", $"Change Full Name To {custStatus.FullName}");
+                    info.Add("Before Change Full Name", custProfile.AccountName);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerFullName,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            FullName = custProfile.AccountName
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            FullName = custStatus.FullName
+                        })
+                    });
                 }
                 else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
                 {
-                    Info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
-                    Info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
+                    info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
+                    info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerBirthday,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Birthday = $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}"
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Birthday = $"{custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}"
+                        })
+                    });
                 }
                 else if (custStatus.PhoneNumber != null)
                 {
-                    Info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
-                    Info.Add("Before Change Phone Number", custProfile.PhoneNo);
+                    info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
+                    info.Add("Before Change Phone Number", custProfile.PhoneNo);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerPhone,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Phone = custProfile.PhoneNo
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Phone = custStatus.PhoneNumber
+                        })
+                    });
                 }
                 else if (custStatus.EMail != null)
                 {
-                    Info.Add("Action", $"Change EMail To {custStatus.EMail}");
-                    Info.Add("Before Change EMail", custProfile.Email);
+                    info.Add("Action", $"Change EMail To {custStatus.EMail}");
+                    info.Add("Before Change EMail", custProfile.Email);
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerEMail,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Email = custProfile.Email
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Email = custStatus.EMail
+                        })
+                    });
+                }
+                else if (custStatus.Address != null)
+                {
+                    var beforeAddressDictionary = new Dictionary<string, string>();
+                    if (custProfile.Address != null)
+                    {
+                        var jsonObject = JObject.Parse(custProfile.Address);
+                        var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                        jTokens.ToList().ForEach(jToken =>
+                        {
+                            beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
+                        });
+                    }
+                    info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(custStatus.Address)}");
+                    info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
+                    _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    {
+                        Operator = User.Identity.Name,
+                        SiteId = custSimpleInfo.SiteId,
+                        CurrencyId = custSimpleInfo.CurrencyId,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerAddress,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Address = JsonConvert.SerializeObject(beforeAddressDictionary)
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            UserName = custSimpleInfo.UserName,
+                            Address = JsonConvert.SerializeObject(custStatus.Address)
+                        })
+                    });
                 }
 
-                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, menu, ActionType.Update, info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -787,7 +933,7 @@ namespace BackendSite.Controllers.Api
             fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
             var result = _custInfoBll.SetCustPhotoId(custInfo.CustId, custInfo.SiteId, fileName, fileBytes);
-                
+
             if (result > 0)
             {
                 return new ApiResult
@@ -835,27 +981,64 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetProfile]
 
         [HttpPost]
-        public ApiResult ResetProfile(CustInfoReq custInfoReq)
+        public async Task<ApiResult> ResetProfileAsync(CustInfoReq custInfoReq)
         {
+            var custSimpleInfo = await _custInfoBll.GetCustId(custInfoReq.CustId, null, null);
             var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
             if (_custInfoBll.ResetProfile(custInfoReq.CustId))
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset Profile");
-
+                var beforeProfileDictionary = new Dictionary<string, string>();
+                var beforeAddressDictionary = new Dictionary<string, string>();
                 if (!string.IsNullOrWhiteSpace(custProfile.Profile))
                 {
-                    var jsonObject = JObject.Parse(custProfile.Profile);
-                    var jTokens = jsonObject.Descendants().Where(p => !p.Any());
-                    jTokens.ToList().ForEach(jToken =>
+                    if (custProfile.Profile != null)
                     {
-                        Info.Add(jToken.Path, jToken.ToString());
-                    });
+                        var jsonObject = JObject.Parse(custProfile.Profile);
+                        var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                        jTokens.ToList().ForEach(jToken =>
+                        {
+                            beforeProfileDictionary.Add(jToken.Path, jToken.ToString());
+                        });
+                    }
                 }
 
-                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+                if (!string.IsNullOrWhiteSpace(custProfile.Address))
+                {
+                    if (custProfile.Address != null)
+                    {
+                        var jsonObject = JObject.Parse(custProfile.Address);
+                        var jTokens = jsonObject.Descendants().Where(p => !p.Any());
+                        jTokens.ToList().ForEach(jToken =>
+                        {
+                            beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
+                        });
+                    }
+                }
+
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = custSimpleInfo.SiteId,
+                    CurrencyId = custSimpleInfo.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.ResetCustomerProfile,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        UserName = custSimpleInfo.UserName,
+                        Profile = JsonConvert.SerializeObject(beforeProfileDictionary),
+                        Phone = custProfile.PhoneNo,
+                        AreaCode = custProfile.AreaCode,
+                        Address = JsonConvert.SerializeObject(beforeAddressDictionary)
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        UserName = custSimpleInfo.UserName,
+                        Profile = (string)null,
+                        Phone = (string)null,
+                        AreaCode = (string)null,
+                        Address = (string)null
+                    })
+                });
 
                 return new ApiResult
                 {
@@ -874,39 +1057,41 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetCustBankInfo]
 
         [HttpPost]
-        public ApiResult ResetCustBankInfo(CustInfoReq custInfoReq)
+        public ApiResult ResetCustBankInfo(CustIdRequest request)
         {
-            var apiResult = new ApiResult();
-            var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
-            if (_custInfoBll.ResetCustBankInfo(custInfoReq.CustId))
+            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            string before = null;
+            if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset Bank Info");
-                if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
+                if (!_custInfoBll.ResetCustBankInfo(request.CustId))
                 {
-                    var bankInfoDetailList = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo);
-
-                    bankInfoDetailList.ToList().ForEach(x =>
-                    {
-                        Info.Add("SysId", x.SysId);
-                        Info.Add("AccountNo", x.AccountNo);
-                        Info.Add("IFSCCode", x.IFSCCode);
-                    });
+                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-                return new ApiResult
+                
+                before = new
                 {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Reset Success."
-                };
+                    AccountName = custProfile.AccountName,
+                    BankInfo = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo),
+                    USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
+                }.ToLog();
             }
-            else
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
-                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-            }
+                Operator = User.Identity.Name,
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetCustomerBankInfo,
+                BeforeDetailInfo = before,
+                AfterDetailInfo = null
+            });
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = "Reset Success."
+            };
         }
 
         #endregion
@@ -914,39 +1099,38 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetCustUSDTInfo]
 
         [HttpPost]
-        public ApiResult ResetCustUSDTInfo(CustInfoReq custInfoReq)
+        public ApiResult ResetCustUSDTInfo(CustIdRequest request)
         {
-            var apiResult = new ApiResult();
-            var custProfile = _custInfoBll.GetCustProfile(custInfoReq.CustId);
-            if (_custInfoBll.ResetCustUSDTInfo(custInfoReq.CustId))
+            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            string before = null;
+            if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
             {
-                var Menu = "CustManage/CustInfoList";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Reset USDT Info");
-                if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                if (!_custInfoBll.ResetCustUSDTInfo(request.CustId))
                 {
-                    var USDTDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
-
-                    USDTDetailList.ToList().ForEach(x =>
-                    {
-                        Info.Add("NickName", x.NickName);
-                        Info.Add("USDTAddress", x.USDTAddress);
-                    });
-
+                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                _serverInfoBll.AdminOperateLog(null, custInfoReq.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Reset Success."
-                };
+                
+                var usdtDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
+                before = usdtDetailList.ToLog();
+                
             }
-            else
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
-                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-            }
+                Operator = User.Identity.Name,
+                SiteId = request.SiteId,
+                CurrencyId = request.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetCustomerUSDTInfo,
+                BeforeDetailInfo = before,
+                AfterDetailInfo = null
+            });
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Message = "Reset Success."
+            };
         }
 
         #endregion
@@ -979,25 +1163,43 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_unlock" })]
-        public ApiResult SetUnlock(CustInfoReq setCustStatusReq)
+        public ApiResult SetUnlock(SetCustomerStatusRequest request)
         {
             if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          1,
-                                          setCustStatusReq.Reason,
-                                          "Set Unlock",
-                                          User.Identity.Name))
+                    request.CustId,
+                    1,
+                    request.Reason,
+                    "Set Unlock",
+                    User.Identity.Name))
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = request.CurrentStatus.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = CustomerStatusEnum.Running.ToString(),
+                        request.Reason
+                    })
+                });
+                
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Unlock Success."
                 };
             }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Unlock Fail.Please Contact admin.");
-            }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Set Unlock Fail.Please Contact admin.");
         }
 
         #endregion
@@ -1011,25 +1213,43 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_lock" })]
-        public ApiResult SetLock(CustInfoReq setCustStatusReq)
+        public ApiResult SetLock(SetCustomerStatusRequest request)
         {
             if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          2,
-                                          setCustStatusReq.Reason,
-                                          "Set Lock",
-                                          User.Identity.Name))
+                    request.CustId,
+                    2,
+                    request.Reason,
+                    "Set Lock",
+                    User.Identity.Name))
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = request.CurrentStatus.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = CustomerStatusEnum.Suspend.ToString(),
+                        request.Reason
+                    })
+                });
+                
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Lock Success."
                 };
             }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Lock Fail.Please Contact admin.");
-            }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Set Lock Fail.Please Contact admin.");
         }
 
         #endregion
@@ -1043,25 +1263,43 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_acc_close" })]
         [HttpPost]
-        public ApiResult SetClose(CustInfoReq setCustStatusReq)
+        public ApiResult SetClose(SetCustomerStatusRequest request)
         {
             if (_custInfoBll.SetCustStatus("CustManage/CustInfoList",
-                                          setCustStatusReq.CustId,
-                                          3,
-                                          setCustStatusReq.Reason,
-                                          "Set Close",
-                                          User.Identity.Name))
+                    request.CustId,
+                    3,
+                    request.Reason,
+                    "Set Close",
+                    User.Identity.Name))
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerStatus,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = request.CurrentStatus.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = CustomerStatusEnum.Closed.ToString(),
+                        request.Reason
+                    })
+                });
+                
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Close Success."
                 };
             }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Close Fail.Please Contact admin.");
-            }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Set Close Fail.Please Contact admin.");
         }
 
         #endregion
@@ -1072,20 +1310,39 @@ namespace BackendSite.Controllers.Api
 
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
         [HttpPost]
-        public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusPara para)
+        public ApiResult SetEnableDisablePromotion(SetEnableDisableBonusRequest request)
         {
-            if (_custInfoBll.SetEnableDisablePromotion(para.CustId, para.EnablePromotion, User.Identity.Name) > 0)
+            if (_custInfoBll.SetEnableDisablePromotion(request.CustId, (int)request.Status, User.Identity.Name) > 0)
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerPromotionStatus,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = (request.Status == EnablePromotionEnum.Enable
+                            ? EnablePromotionEnum.Disable
+                            : EnablePromotionEnum.Enable).ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.CustId,
+                        Status = request.Status.ToString()
+                    })
+                });
+                
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Success."
                 };
             }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
-            }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
         }
         #endregion
 
@@ -1100,23 +1357,30 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_kickout" })]
-        public ApiResult KickOut(CustInfoReq setCustStatusReq)
+        public ApiResult KickOut(CustIdWithReasonRequest request)
         {
             if (_custInfoBll.DeleteOnUserData("CustManage/CustInfoList",
-                                                    setCustStatusReq.CustId,
-                                                    setCustStatusReq.Reason,
-                                                    User.Identity.Name) > 0)
+                    request.CustId,
+                    request.Reason,
+                    User.Identity.Name) > 0)
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.KickOutCustomer
+                });
+                
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Kick Out Success."
                 };
             }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
-            }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
         }
 
         #endregion
@@ -1540,9 +1804,9 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult();
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
-            
+
             //轉帳制
-            if (data != null && data.WalletType == (int) TpListWalletTypeEnum.FundTransfer)
+            if (data != null && data.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
             {
                 if (data.Status == (int)BonusStatus.Running)
                 {
@@ -1550,10 +1814,10 @@ namespace BackendSite.Controllers.Api
                     return apiResult;
                 }
 
-                var winLossAmount = _bonusInfoBll.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m; 
-                var transferBonusAmount = data.BonusAmount + data.LockedAmount; 
+                var winLossAmount = _bonusInfoBll.GetBonusWinLoss(bonusReq.BonusId)?.FirstOrDefault() ?? 0m;
+                var transferBonusAmount = data.BonusAmount + data.LockedAmount;
                 var remainingBonus = transferBonusAmount + winLossAmount;
-            
+
                 switch (data.PromotionType)
                 {
                     case PromotionTypeEnum.FstDeposit:
@@ -1577,7 +1841,7 @@ namespace BackendSite.Controllers.Api
                         }
 
                         // var bonus = remainingBonus - refundAmount;
-                        
+
                         //呼叫轉帳 API 扣款
                         if (remainingBonus > 0)
                         {
@@ -1601,16 +1865,16 @@ namespace BackendSite.Controllers.Api
                         {
                             CancelBonus(bonusReq, data, apiResult);
                             return apiResult;
-                        } 
-                        break; 
+                        }
+                        break;
                 }
                 return apiResult;
             }
-            
+
             //單一錢包
             if (data != null)
             {
-                var result = _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId,out _);
+                var result = _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId, out _);
                 if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -1623,7 +1887,7 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = "Can't find available bonus";
                 return apiResult;
             }
@@ -1871,9 +2135,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult EditTagManagement(EditTagManagementpara para)
+        public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
-            if (_custInfoBll.EditTagManagement(para.Id, para.TagName, para.TagColour, para.Description, User.Identity.Name) > 0)
+            if (_custInfoBll.EditTagManagement(new ParamsWithLog<EditTagManagement>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -1940,9 +2204,9 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         [HttpPost]
-        public ApiResult SetTagStatus(SetTagStatuspara para)
+        public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
-            if (_custInfoBll.SetTagStatus(para.Id, User.Identity.Name) > 0)
+            if (_custInfoBll.SetTagStatus(new ParamsWithLog<SetTagStatus>(req, User.Identity.Name)))
             {
                 return new ApiResult
                 {
@@ -2075,7 +2339,7 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="custInfoReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}})]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" } })]
         [HttpPost]
         public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusPara custInfoReq)
         {
@@ -2086,7 +2350,7 @@ namespace BackendSite.Controllers.Api
                 var endTime = DateTimeExtensions.UnixToDateTime(custInfoReq.EndDate);
                 var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.Currency, custInfoReq.DepositStatus, custInfoReq.Status,
                     custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, startTime, endTime, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-                
+
                 apiResult.Data = searchResult.RegLiveStatusDatas;
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;
@@ -2114,12 +2378,12 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="para"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" } })]
         [HttpPost]
-        public ApiResult SetRegLiveStatus(SetRegLiveStatusPara para)
+        public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.SetRegLiveStatus(para.CustId, para.Status, para.SiteId, User.Identity.Name) > 0)
+            if (_custInfoBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2143,13 +2407,13 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" } })]
         [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(AddRegLiveStatusNotes addCustNoteReq)
+        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
         {
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
-                Data = _custInfoBll.GetRegLiveStatusNotes(addCustNoteReq.CustId),
+                Data = _custInfoBll.GetRegLiveStatusNotes(req.CustId),
                 ErrorCode = 0
             };
 
@@ -2174,12 +2438,12 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" }, "rm_add_note" })]
         [HttpPost]
-        public ApiResult AddRegLiveStatusNote(AddRegLiveStatusNotes addCustNoteReq)
+        public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.AddRegLiveStatusNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.AddRegLiveStatusNote(new ParamsWithLog<AddRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2203,12 +2467,13 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="deleteCustNoteReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" }, "rm_delete_note" })]
         [HttpPost]
-        public ApiResult DeleteRegLiveStatusNote(DeleteRegLiveStatusNotes deleteCustNoteReq)
+        public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.DeleteRegLiveStatusNote(deleteCustNoteReq.CustId, deleteCustNoteReq.Id) > 0)
+            if (_custInfoBll.DeleteRegLiveStatusNote(
+                    new ParamsWithLog<DeleteRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2232,12 +2497,12 @@ namespace BackendSite.Controllers.Api
         /// </remarks>
         /// <param name="EditRegLiveStatusNote"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" }, "rm_edit_note" })]
         [HttpPost]
-        public ApiResult EditRegLiveStatusNote(EditRegLiveStatusNotes EditRegLiveStatusNote)
+        public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
         {
             var apiResult = new ApiResult();
-            if (_custInfoBll.EditRegLiveStatusNote(EditRegLiveStatusNote.CustId, EditRegLiveStatusNote.Id, EditRegLiveStatusNote.Note, User.Identity.Name) > 0)
+            if (_custInfoBll.EditRegLiveStatusNote(new ParamsWithLog<EditRegLiveStatusNote>(req, User.Identity.Name)))
             {
                 apiResult.ErrorCode = 0;
             }
@@ -2270,7 +2535,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="AffiliatesCode"></param>
         /// <param name="AgentCodeType"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[] { "CustManage/RegistrationManagement", "Marketing/RegistrationForMarketing" } })]
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(string SelectSite,
             int Currency,
@@ -2305,7 +2570,7 @@ namespace BackendSite.Controllers.Api
                 }
                 stream = _excelBll.Export(exportData);
             }
-            
+
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -2357,6 +2622,26 @@ namespace BackendSite.Controllers.Api
         }
         #endregion
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_lineUnbind" })]
+        public ApiResult LineUnbind(CustIdRequest request)
+        {
+            if (_custInfoBll.LineUnbind("CustManage/CustInfoList",
+                    request.CustId,
+                    User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Line Unbind Success."
+                };
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
+            }
+        }
+        
         #endregion
 
         #region Private Methods
@@ -2387,6 +2672,33 @@ namespace BackendSite.Controllers.Api
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
             return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// LineUserId遮罩
+        /// </summary>
+        /// <param name="data">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskLineId(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(data, pattern, m => new string('*', m.Length));
+        }
+
+        private static Dictionary<string, string> CheckAddress(Dictionary<string, string> address)
+        {
+            var newAddress = new Dictionary<string, string>();
+            foreach (var data in address)
+            {
+                if (string.IsNullOrWhiteSpace(data.Value))
+                    newAddress.Add(data.Key, "");
+                else
+                    newAddress.Add(data.Key, data.Value);
+            }
+            return newAddress;
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -42,20 +43,34 @@ namespace BackendSite.Service.Model
     public class CustBetLimit
     {
         public string UserName { get; set; }
-        public int SiteId { get; set; }
+        [LogIgnore]
+        public int CustId { get; set; }
         public List<BetSetting> BetSetting { get; set; }
+    }
+    
+    public class DeleteCustBetLimit
+    {
+        public string UserName { get; set; }
+        [LogIgnore]
+        public int CustId { get; set; }
     }
 
     public class BetSetting
     {
+        [LogIgnore]
         public int TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
         public List<TpBetSetting> TpBetSetting { get; set; }
     }
     
     public class TpBetSetting
     {
+        [LogIgnore]
         public int GameTypeId { get; set; }
+        public string GameTypeName { get; set; }
+        [LogIgnore]
         public string LimitGroup { get; set; }
+        public string LimitRange { get; set; }
     }
 
     public class TpBetLimitData
@@ -77,6 +92,7 @@ namespace BackendSite.Service.Model
     public class UserBetLimit
     {
         public string SiteName { get; set; }
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }

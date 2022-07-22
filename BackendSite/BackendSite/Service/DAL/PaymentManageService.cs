@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
+using Org.BouncyCastle.Utilities.Zlib;
 
 namespace BackendSite.Service.DAL
 {
@@ -43,152 +46,176 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<PayCurrency>(SpName, new DynamicParameters(new { ChannelId = 0 }));
         }
 
-        public void UpdatePayList(int payId, int status,string @operator)
+        public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var props = new DynamicParameters();
-            var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("PayId", payId);
-            props.Add("Status", status);
+            var props = new DynamicParameters();
+            props.Add("PayId", input.After.PayId);
+            props.Add("Status", (int)input.After.Status);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "PaymentManagement");
-            propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", @operator);
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
             #endregion
 
-            _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
-            if (result > 0)
+            var result = _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans) > 0;
+            if (result)
             {
-                trans.Commit();
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    trans.Commit();
+                    return true;
+                }
             }
-            else
-            {
-                trans.Rollback();
-            }
+            
+            trans.Rollback();
+            return false; 
         }
 
-        public void UpdatePayChannel(int channelId, int sort, int status, int pointLevel, string @operator)
+        public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var props = new DynamicParameters();
-            var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("ChannelId", channelId);
-            props.Add("Sort", sort);
-            props.Add("Status", status);
-            props.Add("PointLevel", pointLevel);
+            var props = new DynamicParameters();
+            props.Add("ChannelId", input.After.ChannelId);
+            props.Add("Sort", input.After.Sort);
+            props.Add("Status", (int)input.After.Status);
+            props.Add("PointLevel", input.After.PointLevel);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "PaymentManagement");
-            propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", @operator);
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
             #endregion
 
-            _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
-            if (result > 0)
+            var result = _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans) > 0;
+            if (result)
             {
-                trans.Commit();
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    trans.Commit();
+                    return true;
+                }
             }
-            else
-            {
-                trans.Rollback();
-            }
+            
+            trans.Rollback();
+            return false;
         }
 
-        public void UpdatePayCurrency(int channelId, int currencyId, decimal minAmount, decimal maxAmount, int amountRule, string amountShow, string @operator)
+        public bool UpdatePayCurrency(ParamsWithLog<UpdatePayCurrency> input, string amountShow)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
-            using var tran = conn.BeginTransaction();
-            var SpName = "Admin_PayCurrency_Set";
-            conn.Execute(SpName, new {ChannelId = channelId, CurrencyId = currencyId, MinAmount = minAmount, MaxAmount = maxAmount,
-                AmountRule = amountRule,
-                AmountShow = amountShow }, tran, commandType: CommandType.StoredProcedure);
-
-            var list = new Dictionary<string, string>();
-
+            using var trans = conn.BeginTransaction();
+            
+            #region props
             var props = new DynamicParameters();
-            props.Add("ChannelId", channelId);
-            props.Add("CurrencyId", currencyId);
-            props.Add("MinAmount", minAmount);
-            props.Add("MaxAmount", maxAmount);
-            props.Add("AmountRule", amountRule);
-            props.Add("AmountShow", amountShow);
-            foreach (var paraName in props.ParameterNames)
+            props.Add("ChannelId", input.After.ChannelId);
+            props.Add("CurrencyId", input.CurrencyId);
+            props.Add("MinAmount", input.After.MinAmount);
+            props.Add("MaxAmount", input.After.MaxAmount);
+            props.Add("AmountRule", (int)input.After.AmountRule);
+            props.Add("AmountShow", amountShow, DbType.String);
+            #endregion
+
+            #region propsLog
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
+            var result = _mainDbClient.Execute("Admin_PayCurrency_Set", props, conn, trans) > 0;
+            if (result)
             {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    trans.Commit();
+                    return true;
+                }
             }
-
-            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu= "PaymentManagement", ActionType = 1, DetailInfo= JsonConvert.SerializeObject(list), Operator = @operator }, tran, commandType: CommandType.StoredProcedure);
-
-            tran.Commit();
+            
+            trans.Rollback();
+            return false;
         }
 
-        public void UpdatePayCurrencyAmount(int channelId, int currencyId, decimal minAmount, decimal maxAmount, string @operator)
+        public bool UpdatePayCurrencyAmount(ParamsWithLog<UpdatePayCurrency> input)
         {
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var props = new DynamicParameters();
-            var propsLog = new DynamicParameters();
 
             #region props
-            props.Add("ChannelId", channelId);
-            props.Add("CurrencyId", currencyId);
-            props.Add("MinAmount", minAmount);
-            props.Add("MaxAmount", maxAmount);
+            var props = new DynamicParameters();
+            props.Add("ChannelId", input.After.ChannelId);
+            props.Add("CurrencyId", input.CurrencyId);
+            props.Add("MinAmount", input.After.MinAmount);
+            props.Add("MaxAmount", input.After.MaxAmount);
             #endregion
 
             #region propsLog
-            var list = new Dictionary<string, string>();
-            foreach (var paraName in props.ParameterNames)
-            {
-                var value = Convert.ToString(props.Get<dynamic>(paraName));
-                list.Add(paraName, value);
-            }
-            propsLog.Add("Menu", "PaymentManagement");
-            propsLog.Add("ActionType", 1);
-            propsLog.Add("DetailInfo", JsonConvert.SerializeObject(list));
-            propsLog.Add("Operator", @operator);
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
             #endregion
 
-            _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
-            if (result > 0)
+            var result = _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans) > 0;
+            if (result)
             {
-                trans.Commit();
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    trans.Commit();
+                    return true;
+                }
             }
-            else
-            {
-                trans.Rollback();
-            }
+            
+            trans.Rollback();
+            return false;
         }
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int payId)

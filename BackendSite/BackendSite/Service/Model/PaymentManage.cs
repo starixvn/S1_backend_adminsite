@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -53,5 +55,60 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
 
         public int CurrencyId { get; set; }
+    }
+    
+    public class UpdatePayInfo
+    {
+        [LogIgnore]
+        public int PayId { get; set; }
+        // log用
+        public string PayName { get; set; }
+
+        /// <summary>
+        /// 狀態(1=Enable、2=Disable)
+        /// </summary>
+        [LogIgnore]
+        public PayListStatusEnum Status { get; set; }
+
+        public string StatusName => Status.ToString();
+    }
+    
+    public class UpdatePayChannel
+    {
+        [LogIgnore]
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
+
+        public int Sort { get; set; }
+
+        /// <summary>
+        /// 狀態(1=Enable、2=Disable)
+        /// </summary>
+        [LogIgnore]
+        public PayChannelStatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
+
+        [LogPropertyName("VipLevel")]
+        public int PointLevel { get; set; }
+    }
+
+    public class UpdatePayCurrency
+    {
+        [LogIgnore]
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
+
+        public decimal MinAmount { get; set; }
+
+        public decimal MaxAmount { get; set; }
+
+        /// <summary>
+        /// 數字規則(1=Integer、2=Decimal、3=Fixed)
+        /// </summary>
+        [LogIgnore]
+        public AmountRuleEnum AmountRule { get; set; }
+        public string AmountRuleName => AmountRule.ToString();
+
+        public IEnumerable<decimal> FixedAmountList { get; set; }
     }
 }

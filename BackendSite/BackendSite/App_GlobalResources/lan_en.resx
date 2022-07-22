@@ -502,7 +502,7 @@
     <value>OnHold</value>
   </data>
   <data name="lbl_WithdrawalStatus3" xml:space="preserve">
-    <value>Verify</value>
+    <value>Verified</value>
   </data>
   <data name="lbl_WithdrawalStatus4" xml:space="preserve">
     <value>Process</value>
@@ -698,5 +698,11 @@
   </data>
   <data name="lbl_CancelBonusTitle" xml:space="preserve">
     <value>Promotion expiration notice.</value>
+  </data>
+  <data name="CurrencyWithdrawal_3" xml:space="preserve">
+    <value>USD GMT({0})</value>
+  </data>
+  <data name="CurrencyWithdrawal_74" xml:space="preserve">
+    <value>BDT GMT({0})</value>
   </data>
 </root>

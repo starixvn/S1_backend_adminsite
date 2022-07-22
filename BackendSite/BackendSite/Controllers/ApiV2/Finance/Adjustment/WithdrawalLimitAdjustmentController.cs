@@ -1,19 +1,14 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
@@ -22,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
     //目的：該程式主要目的是限制Member的可提款限額，實際上異動的是RollOver數字。
     //公式：Balance-(Withdrawal Limit - RollOver)=可提款金額。
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitAdjustmentController : ControllerBase

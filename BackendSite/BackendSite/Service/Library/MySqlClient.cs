@@ -18,11 +18,15 @@ namespace BackendSite.Service.Library
         private readonly string _connectionString;
 
         private readonly ILogger<MySqlClient> _logger;
-
         public MySqlClient(string connectionString, ILogger<MySqlClient> logger)
         {
             _connectionString = connectionString;
             _logger = logger;
+        }
+
+        public MySqlConnection GetMySqlConnection()
+        {
+            return new MySqlConnection(_connectionString);
         }
 
         public async Task<T> QueryFirstAsync<T>(string name, DynamicParameters parameters)
@@ -46,7 +50,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
         {
             T result;
             var sw = Stopwatch.StartNew();
@@ -54,16 +58,16 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.QueryFirstOrDefault<T>(name, parameters,
-                    commandType: CommandType.StoredProcedure);
+                    commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                _logger.LogError(e, $"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
                 throw;
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c} {DateTime.UtcNow.AddHours(8)}");
             return result;
         }
 
@@ -147,6 +151,26 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
+        
+        public async Task <int> ExecuteAsync(string name, DynamicParameters parameters, MySqlConnection connection, MySqlTransaction trans)
+        {
+            var result = 0;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                result = await connection.ExecuteAsync(name, parameters, commandType: CommandType.StoredProcedure,
+                    transaction: trans);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
 
         public IEnumerable<T> Query<T>(string name)
         {
@@ -168,14 +192,14 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
-                result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
             }
             catch (Exception e)
             {

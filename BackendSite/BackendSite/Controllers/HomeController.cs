@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -38,6 +40,17 @@ namespace BackendSite.Controllers
         public IActionResult DashboardNew()
         {
             return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public ApiResult AuthorizedFailed()
+        {
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Fail,
+                Message = "Unauthorized."
+            };
         }
     }
 }

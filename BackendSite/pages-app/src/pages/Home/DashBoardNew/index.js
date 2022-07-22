@@ -105,7 +105,10 @@ const App = () => {
         alert(res.data.message ?? "failed to get data.");
         setisloading(false);
       }
-    });
+    }).catch(function (error) {
+      alert(error);
+      setisloading(false);
+    });;
   }
 
   return (
