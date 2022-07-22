@@ -9,10 +9,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BackendSite.Service.Model.BankCardManagement;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankCardManagementController : ControllerBase
@@ -51,46 +52,45 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Actions
 
         /// <summary>
-        /// BankCardManagement/GetList 取得指定品牌銀行卡清單
+        /// BankCardManagement/GetList 取得Offline銀行卡設定清單
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiListResult<BankDetail> GetListBySiteId(GetListRequest request)
+        public ApiListResult<OfflineBankingSetting> GetList(GetOfflineBankingSettingRequest request)
         {
-            var apiListResult = new ApiListResult<BankDetail>();
-            var statusList = request.Statuses.Select(x => (int)x).ToList();
-            var datas = _bankDetailBll.GetLoaclBankList(request.SiteIds, request.CurrencyIds, statusList,
-                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
-            apiListResult.Data = datas;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.PageNumber = request.PageNumber;
-            apiListResult.RowCount = rowCount;
-            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiListResult;
+            var result = _bankDetailBll.GetOfflineBankingSettingList(
+                new GetOfflineBankingSettingParams(request), out var totalPages, out var rowCount);
+            
+            return new ApiListResult<OfflineBankingSetting>
+            {
+                Data = result,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
-        /// BankCardManagement/Set 設定銀行卡(新增/更新)
+        /// BankCardManagement/Set Offline銀行卡設定
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Add Bank Card] / [Edit]
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List > [Edit]
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
         public ApiResult Set(ApiRequestWithLog<SetBankCard> request)
         {
@@ -115,39 +115,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             }
             return apiResult;
         }
-
-        /// <summary>
-        /// BankCardManagement/Delete 刪除銀行卡
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Delete]
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
-        [HttpPost]
-        public ApiResult Delete(ApiRequestWithLog<DeleteBankCard> request)
-        {
-            var result = _bankDetailBll.DelBankCard(
-                new ParamsWithLog<DeleteBankCard>(request, User.Identity.Name));
-            var apiResult = new ApiResult();
-            if (result > 0)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-
         #endregion
 
     }

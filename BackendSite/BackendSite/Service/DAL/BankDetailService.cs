@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
@@ -30,6 +31,30 @@ namespace BackendSite.Service.DAL
             _connectionString = configuration.GetConnectionString("ConnectionString");
         }
 
+        public IEnumerable<OfflineBankingSetting> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input, out int totalPages, out int rowCount)
+        {
+            var para = new DynamicParameters();
+            para.Add("_SiteId", input.SiteId);
+            para.Add("_CurrencyId", input.CurrencyId);
+            para.Add("_Purposes", JsonConvert.SerializeObject(input.Purposes));
+            para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
+            para.Add("_SysIds", JsonConvert.SerializeObject(input.SysIds));
+            para.Add("_VipLevels", JsonConvert.SerializeObject(input.VipLevels));
+            para.Add("_PointLevels", JsonConvert.SerializeObject(input.PointLevels));
+            para.Add("_AccountNo", input.AccountNo ?? string.Empty);
+            para.Add("_StartIndex", input.StartIndex);
+            para.Add("_PageSize", input.PageSize);
+            para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient.Query<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get", para);
+
+            totalPages = para.Get<int?>("_TotalPages") ?? 0;
+            rowCount = para.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+        
         public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
             string currencyIdList,
             string statusList, 
