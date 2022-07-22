@@ -71,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Referral Report > [Submit] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 77, 1 })]
         [HttpPost]
         public ApiListResult<ReferralCustList> GetList(GetListRequest request)
         {
@@ -101,18 +101,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 77, 1 })]
         [HttpPost]
         public ApiListResult<ReferralFriendRresponse> GetByCustId(GetByCustIdRequest request)
         {
             var apiResult = new ApiListResult<ReferralFriendRresponse>();
-            var startTime = request.StartDate.ToUniversalTime().DateTime;
-            var endTime = request.EndDate.ToUniversalTime().DateTime;
-
             try
             {
                 var data = _referralManagementBll.GetRefFriendList(
-                    request.CustId, startTime, endTime, request.PageSize, request.PageNumber, 
+                    request.CustId, null, null, request.PageSize, request.PageNumber, 
                     out var totalPages, out var rowCount);
                 apiResult.Data = data;
                 apiResult.PageNumber = request.PageNumber;
@@ -139,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1 ,2 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 77, 2 })]
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
