@@ -25,18 +25,21 @@ namespace BackendSite
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        private readonly IConfiguration configuration;
+        private readonly IHostEnvironment environment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
+        {
+            this.configuration = configuration;
+            this.environment = environment;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetValue<string>("RedisConnection")));
             services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
@@ -47,9 +50,9 @@ namespace BackendSite
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
-            services.AddDatabaseConnection(Configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));          
-            services.Configure<Dictionary<string, AWSKeyConfig>>(Configuration.GetSection("AwsKeyConfig"));
+            services.AddDatabaseConnection(configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(configuration.GetSection("SiteConfig"));          
+            services.Configure<Dictionary<string, AWSKeyConfig>>(configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
 
