@@ -97,5 +97,41 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Report/GetTurnoverPointReport";
+            var result = _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
+
+            return result;
+        }
+
+        public async Task<byte[]> ExportTurnoverPointReportAsync(ExportTurnoverPointReportRequest req)
+        {
+            var url = _storeSiteUrl + "/api/Report/ExportTurnoverPointReport";
+            var exportResult =
+                await _courierAdapter.PostAsync<ApiResult<ExportDepositPointReportResult>, ExportTurnoverPointReportRequest>(url, req);
+
+            if (exportResult.ErrorCode != (int)ErrorCodeEnum.Success)
+            {
+                _logger.LogError($"StoreService ExportTurnoverPointReport Failed. ErrorCode: {exportResult.ErrorCode}");
+                throw new AdminException("ExportTurnoverPointReport Failed.");
+            }
+
+            var offset = req.StartTime.Offset;
+            var workbook = new XSSFWorkbook();
+            var sheet1 = workbook.CreateSheet("TurnoverPointReport");
+            var sheet2 = workbook.CreateSheet("Overview");
+
+            sheet1.WriteToSheet(exportResult.Data.List, true, offset);
+            sheet2.WriteToSheet(exportResult.Data.Overview, true);
+
+            await using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+
+            return result;
+        }
+
     }
 }

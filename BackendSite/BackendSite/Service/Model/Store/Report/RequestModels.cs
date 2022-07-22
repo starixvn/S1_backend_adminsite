@@ -61,4 +61,32 @@ namespace BackendSite.Service.Model.Store.Report
     }
 
     #endregion
+
+    #region TurnoverPoint
+
+    public class GetTurnoverPointReportRequest : ApiRequestPageModel
+    {
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<int> VipLevels { get; set; }
+        public IEnumerable<int> Categories { get; set; }
+        public string UserName { get; set; }
+        public string SabaId { get; set; }
+    }
+
+    public class ExportTurnoverPointReportRequest
+    {
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<int> VipLevels { get; set; }
+        public IEnumerable<int> Categories { get; set; }
+        public string UserName { get; set; }
+        public string SabaId { get; set; }
+    }
+
+    #endregion
 }
