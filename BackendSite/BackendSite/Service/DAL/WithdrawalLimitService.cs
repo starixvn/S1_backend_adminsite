@@ -482,5 +482,92 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CryptoInfo> GetCryptoInfoList()
             => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
+
+        public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
+        }
+
+        public bool EditEWalletWithdrawalLimitInfo(ParamsWithLog<EWalletUpdateRequest> input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _WithdrawalMin = input.After.WithdrawalMin,
+                _WithdrawalMax = input.After.WithdrawalMax,
+                _UpdateOperator = string.IsNullOrWhiteSpace(input.Operator) ? "": input.Operator,
+            };
+
+            var logParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Menu = (int)AdminAdjustmentLogMenuEnum.EditEWalletWithdrawalLimitInfo,
+                _ActionType = (int)ActionType.Update,
+                _RefTransId = string.Empty,
+                _BeforeDetailInfo = input.Before.ToLog(),
+                _AfterDetailInfo = input.After.ToLog(),
+                _Operator = input.Operator
+            };
+
+            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfo_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if(result & logResult)
+            {
+                tran.Commit();
+            }
+            else
+            {
+                tran.Rollback();
+            }
+
+            return result & logResult;
+        }
+
+        public bool UpdateEWalletWithdrawalLimitInfoStatus(ParamsWithLog<EWalletSwitchStatusRequest> input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Status = (int)input.After.Status,
+                _UpdateOperator = string.IsNullOrWhiteSpace(input.Operator) ? "" : input.Operator,
+            };
+            var logParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Menu = (int)AdminAdjustmentLogMenuEnum.SetEWalletWithdrawalLimitInfoStatus,
+                _ActionType = (int)ActionType.Update,
+                _RefTransId = string.Empty,
+                _BeforeDetailInfo = input.Before.ToLog(),
+                _AfterDetailInfo = input.After.ToLog(),
+                _Operator = input.Operator
+            };
+
+            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfoStatus_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (result & logResult)
+            {
+                tran.Commit();
+            }
+            else
+            {
+                tran.Rollback();
+            }
+
+            return result & logResult;
+        }
+
     }
 }

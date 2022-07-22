@@ -60,6 +60,23 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<SiteTpListIfo>("Admin_SiteTpList_Get", new DynamicParameters(new { SiteId = siteId }));
         }
+        
+        public Task<IEnumerable<SiteTpListIfo>> GetSiteTpListAllAsync(int siteId)
+        {
+            var para = new DynamicParameters();
+            para.Add("_SiteId", siteId);
+        
+            return _reportDbClient.QueryAsync<SiteTpListIfo>("Admin_SiteTpList_GetAll", para);
+        }
+        
+        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategory(int categoryId)
+        {
+            var para = new DynamicParameters();
+            para.Add("CategoryId", categoryId);
+            
+            return _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", para);
+        }
+        
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int siteId, int tpId, int custId, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
             var props = new DynamicParameters();

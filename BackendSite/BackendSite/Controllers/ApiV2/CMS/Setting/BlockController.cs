@@ -29,14 +29,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #endregion
 
         #region API Model
-        public class BlockIPRequest
-        {
-            public String IP { get; set; }
-        }
-        public class SetBlockIPRequest: BlockIPRequest
-        {
-            public string Memo { get; set; }
-        }
+        
         public class GetBlockIPListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate;
@@ -85,17 +78,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int SysId { get; set; }
             public string AccountNum { get; set; }
         }
-        public class BlockAccountSetRequest : BlockBankAccRequest
-        {
-            public BlockAccountStatus Status { get; set; }
-            public string Memo { get; set; }   
-        }
+        //public class BlockAccountSetRequest : BlockBankAccRequest
+        //{
+        //    public BlockAccountStatus Status { get; set; }
+        //    public string Memo { get; set; }   
+        //}
 
-        public class ReleaseAccountRequest : BlockBankAccRequest
-        {
-            public int CustId { get; set; }
-            public string IFSCCode { get; set; }
-        }
+        //public class ReleaseAccountRequest : BlockBankAccRequest
+        //{
+        //    public int CustId { get; set; }
+        //    public string IFSCCode { get; set; }
+        //}
         #endregion
 
         #region Action
@@ -131,9 +124,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult SetBlockIP(SetBlockIPRequest request)
+        public ApiResult SetBlockIP(ApiRequestWithLog<SetBlockIPRequest> request)
         {
-            var result = _blockBLL.SetBlockIP(request.IP, request.Memo, User.Identity.Name);
+            var result = _blockBLL.SetBlockIP(new ParamsWithLog<SetBlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult
@@ -162,9 +155,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult DeleteBlockIP(BlockIPRequest request)
+        public ApiResult DeleteBlockIP(ApiRequestWithLog<BlockIPRequest> request)
         {
-            var result = _blockBLL.DeleteBlockIP(request.IP);
+            var result = _blockBLL.DeleteBlockIP(new ParamsWithLog<BlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult
@@ -230,12 +223,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult BlockAccountSet(BlockAccountSetRequest request)
+        public ApiResult BlockAccountSet(ApiRequestWithLog<BlockAccountSetRequest> request)
         {
-            var result = _blockBLL.BlockAccountSet(request.SysId, request.AccountNum, request.Status, User.Identity.Name, request.Memo);
+            var result = _blockBLL.BlockAccountSet(new ParamsWithLog<BlockAccountSetRequest>(request, User.Identity.Name));
             if (result > 0)
             {
-                //_blockBLL.SetCustBankInfoLog(request.SysId, request.AccountNum, request.Status);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -280,9 +272,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult ReleaseAccount(ReleaseAccountRequest request)
+        public ApiResult ReleaseAccount(ApiRequestWithLog<ReleaseAccountRequest> request)
         {
-            var result = _blockBLL.ReleaseAccount(request.CustId, request.SysId, request.AccountNum, request.IFSCCode);
+            var result = _blockBLL.ReleaseAccount(new ParamsWithLog<ReleaseAccountRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult

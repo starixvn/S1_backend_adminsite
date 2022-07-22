@@ -3,6 +3,7 @@ using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -152,6 +153,7 @@ namespace BackendSite.Controllers
             public string LevelStatus { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+            public WithdrawalMethodEnum WithdrawalMethod { get; set; }
         }
 
         [HttpPost]
@@ -171,7 +173,8 @@ namespace BackendSite.Controllers
                 startTime, endTime, withdrawalListReq.WithdrawalId,
                 withdrawalListReq.UserName, CurrencyId,
                 Status, VipStatus,
-                withdrawalListReq.AmountType, withdrawalListReq.Amount);
+                withdrawalListReq.AmountType, withdrawalListReq.Amount,
+                withdrawalListReq.WithdrawalMethod);
 
             foreach (var data in exportWithdrawal)
             {
@@ -247,13 +250,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }

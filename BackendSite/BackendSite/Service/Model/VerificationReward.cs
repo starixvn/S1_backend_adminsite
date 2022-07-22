@@ -48,11 +48,23 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public VerificationRewardStatusEnum Status { get; set; }
     }
+    
+    public class UpdateVerificationRewardStatusParams
+    {
+        public VerificationRewardStatusEnum Status { get; set; }
+    }
 
     public class SetVerificationRewardRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public VerificationTypeEnum VerificationType { get; set; }
+        public decimal PhoneReward { get; set; }
+        public decimal EmailReward { get; set; }
+    }
+    
+    public class SetVerificationRewardParams
+    {
         public VerificationTypeEnum VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
@@ -78,28 +90,7 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
     }
-    
-    public class ExportVerificationRewardReport
-    {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
-        public string SiteIds { get; set; }
-        public string UserName { get; set; }
-        public int CurrencyId { get; set; }
 
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-    }
-    
     public class CustVerificationReward
     {
         private DateTimeOffset? _phoneRewardTime;
@@ -134,7 +125,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;

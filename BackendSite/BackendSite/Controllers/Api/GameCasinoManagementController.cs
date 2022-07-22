@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/GameCasinoManagement" })]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
         {
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>

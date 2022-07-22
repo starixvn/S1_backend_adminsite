@@ -1018,6 +1018,14 @@ body {
         background-color: #3EA62E;
     }
 
+.high-risk {
+    color: #D70404;
+}
+
+.low-risk {
+    color: #3EA62E;
+}
+
 .action-draft {
     color: #005EA2;
     font-weight: bold;

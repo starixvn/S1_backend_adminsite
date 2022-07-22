@@ -1,0 +1,48 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得驗證獎勵設定
+POST {{url}}/apiV2/VerificationReward/Get HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 設定驗證獎勵
+POST {{url}}/apiV2/VerificationReward/Set HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "verificationType": 0,
+    "phoneReward": 30,
+    "emailReward": 40
+}
+
+###
+# 設定驗證獎勵狀態
+POST {{url}}/apiV2/VerificationReward/UpdateStatus HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "status": 1
+}

@@ -22,6 +22,11 @@ namespace BackendSite.Service.BLL
             return await _verificationRewardService.GetVerificationReward(siteId, currencyId);
         }
         
+        public async Task<IEnumerable<VerificationRewardModel>> GetVerificationRewardBySiteId(int siteId)
+        {
+            return await _verificationRewardService.GetVerificationRewardBySiteId(siteId);
+        }
+        
         public async Task<int> SetVerificationReward(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
         {
             var result = await _verificationRewardService.InsertOrUpdate(siteId, currencyId, verificationType, phoneReward, emailReward, updateOperator);

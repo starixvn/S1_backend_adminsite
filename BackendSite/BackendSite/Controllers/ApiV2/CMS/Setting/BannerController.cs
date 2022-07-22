@@ -216,7 +216,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management  > [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult SetBanner(SetRequest request)
         {
@@ -287,7 +286,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Status] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult UpdateStatus(UpdateStatusRequest request)
         {
@@ -316,6 +314,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Hot Event Management
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
         [HttpPost]
         public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
         {
@@ -351,6 +350,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Hot Event Management > [Edit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
         [HttpPost]
         public ApiResult<BannerInfo> GetHotEvent(GetHotEventreq req)
         {

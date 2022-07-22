@@ -68,8 +68,8 @@ namespace BackendSite.Controllers.Api
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
             _rebateManageBLL = rebateManageBLL;
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             this.courierAdapter = courierAdapter;
+            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 

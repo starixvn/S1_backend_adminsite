@@ -179,7 +179,8 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var (status, count, message) = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount);
+                var (status, count, message) = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount,
+                    _authorizeBLL.GetAuthData().UserName);
 
                 if (status)
                 {
