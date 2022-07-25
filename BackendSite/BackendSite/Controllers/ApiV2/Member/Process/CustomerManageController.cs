@@ -486,6 +486,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnablePromotionEnum Status { get; set; }
         }
 
+        public class SetEnableRebateRequest : CustIdRequest
+        {
+            public EnableRebateEnum Status { get; set; }
+        }
+
         public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public string RefTransId { get; set; }
@@ -1539,6 +1544,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
             }
         }
+
+        /// <summary>
+        /// CustomerManage/SetEnableRebate 客戶是否可以領取Rebate Payout
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Enable Rebate Payout] / [Disable Rebate Payout]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
+        public async Task<ApiResult> SetEnableRebateAsync(SetEnableRebateRequest request)
+        {
+            if (!await _custInfoBll.SetEnableRebateAsync(request.CustId, request.Status, User.Identity.Name))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
 
         /// <summary>
         /// CustomerManage/KickOut 踢出/登出客戶

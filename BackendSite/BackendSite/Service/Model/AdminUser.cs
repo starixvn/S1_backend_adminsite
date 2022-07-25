@@ -85,4 +85,10 @@ namespace BackendSite.Service.Model
         public DateTime? LoginTime { set; get; }
         public int Status { set; get; }
     }
+
+    public class GetLanguageListRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+    }
 }
