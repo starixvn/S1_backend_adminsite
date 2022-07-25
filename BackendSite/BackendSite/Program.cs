@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Exceptions;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using BackendSite.Extensions;
 using BackendSite;
 
@@ -29,7 +20,7 @@ builder.Host.UseSerilog((context, Configuration) =>
         .Enrich.WithExceptionDetails();
 });
 
-var startup = new Startup(builder.Configuration, builder.Environment);
+var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
