@@ -8,29 +8,10 @@ namespace BackendSite.Service.Model
     [Table("Currency")]
     public class CurrencyModel
     {
-        public int CurrencyId
-        {
-            get;
-            set;
-        }
-
-        public string IsoCode
-        {
-            get;
-            set;
-        }
-
-        public string Note
-        {
-            get;
-            set;
-        }
-
-        public decimal ActualRate
-        {
-            get;
-            set;
-        }
-
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public string Note { get; set; }
+        public decimal ActualRate { get; set; }
+        public string TimeZone { get; set; }
     }
 }

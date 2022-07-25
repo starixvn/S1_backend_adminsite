@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TeleCSDController : ControllerBase

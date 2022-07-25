@@ -7,19 +7,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Extensions;
+using BackendSite.Service.DAL;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -28,6 +30,7 @@ namespace BackendSite.Controllers.Api
         #region Fields
 
         private readonly MessageBLL messageBLL;
+        private readonly ServerInfoService serverInfoService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly CustInfoBLL custInfoBLL;
@@ -40,6 +43,7 @@ namespace BackendSite.Controllers.Api
         #region Constructor
 
         public MessageController(MessageBLL messageBLL,
+            ServerInfoService serverInfoService,
             AuthorizeBLL authorizeBLL,
             ServerInfoBLL serverInfoBLL,
             CustInfoBLL custInfoBLL,
@@ -48,6 +52,7 @@ namespace BackendSite.Controllers.Api
             ExcelBLL excelBLL)
         {
             this.messageBLL = messageBLL;
+            this.serverInfoService = serverInfoService;
             this.authorizeBLL = authorizeBLL;
             this.serverInfoBLL = serverInfoBLL;
             this.custInfoBLL = custInfoBLL;
@@ -289,7 +294,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                messageBLL.DeleteAnnouncement(Id);
+                messageBLL.DeleteAnnouncement(Id, User.Identity.Name);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -445,7 +450,7 @@ namespace BackendSite.Controllers.Api
         [TypeFilter(typeof(AuthorizeByFuncAttribute),
             Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] int CustId,
+        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
             [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -454,7 +459,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id);
+                messageBLL.DeletePersonalMsg(Id,IsBatch);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
@@ -495,11 +500,11 @@ namespace BackendSite.Controllers.Api
             var authData = authorizeBLL.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
-            messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
             {
+                messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
                 if (_excelBLL.IsValidFile(req.excelUpload.ContentType))
                 {
                     var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
@@ -535,6 +540,8 @@ namespace BackendSite.Controllers.Api
                         var custInfosDetail = await custInfoBLL.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
                         await messageBLL.PreSendBatchMessage(data, custInfosDetail, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
+                    
+                    messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
                 }
@@ -549,37 +556,59 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var langList = new List<string>
-                {
-                    "en","th","cs","id","vn","hi","hi_en","id_en","th_en"
-                };
                 
-                foreach (var lang in langList)
+                #region checkMsg
+
+                var (result , errorMsg) = messageBLL.CheckBatchMessage(req.currency, req.personalMsg);
+                if (!result)
                 {
-                    var msg = JObject.Parse(req.personalMsg)[lang];
-                    if (msg != null)
+                    return new ApiResult<int>()
                     {
-                        var popupMessage = msg.Value<string>("PopupMessage");
-                        var title = msg.Value<string>("Title");
-                        var content = msg.Value<string>("Content");
-                        var batchPersonalMsg = new BatchPersonalMsg()
-                        {
-                            BatchId = batchId,
-                            SiteId = req.optSite,
-                            LangId = lang,
-                            Operator = authData.UserName,
-                            CurrencyId = req.currency,
-                            AccountStatus = req.accountStatus,
-                            IsPopup = req.IsPopup,
-                            PopupMessage = popupMessage,
-                            Content = content,
-                            Title = title
-                        };
-                        custInfoBLL.SendMessageBatch(batchPersonalMsg);
-                    }
+                        ErrorCode = (int) ErrorCodeEnum.Fail,
+                        Message = errorMsg
+                    };
                 }
-                _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
+
+                #endregion
+
+                messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
+              
+                _ = Task.Run(() =>
+                {
+                    var userSiteList = serverInfoService.GetSiteList();
+                    var langList = new List<string>();
+                    foreach (var b in userSiteList.Select(x => x.LangList).ToList()
+                                 .Select(JsonConvert.DeserializeObject<IEnumerable<string>>))
+                    {
+                        langList.AddRange(b.Except(langList));
+                    }
+                    
+                    foreach (var lang in langList)
+                    {
+                        var msg = JObject.Parse(req.personalMsg)[lang];
+                        if (msg != null)
+                        {
+                            var batchPersonalMsg = new BatchPersonalMsg()
+                            {
+                                BatchId = batchId,
+                                SiteId = req.optSite,
+                                LangId = lang,
+                                Operator = authData.UserName,
+                                CurrencyId = req.currency,
+                                AccountStatus = req.accountStatus,
+                                IsPopup = req.IsPopup
+                            };
+                            custInfoBLL.SendMessageBatch(batchPersonalMsg);
+                        }
+                    }
+
+                    messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
+                    
+                    _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
+                });
+                
             }
+            
 
             return new ApiResult<int>()
             {
@@ -678,9 +707,11 @@ namespace BackendSite.Controllers.Api
         public ApiResult UpdateBatchMessage([FromForm] UpdateBatchMessageRequest req)
         {
             var result = new ApiResult();
+            var authData = authorizeBLL.GetAuthData();
+            
             try
             {
-                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg))
+                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg , authData.UserName))
                     result.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -918,125 +949,5 @@ namespace BackendSite.Controllers.Api
         #endregion
 
         #endregion
-
-        #region Private Methods
-
-        private async Task PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
-        {
-            string resultMessage;
-            var errorCode = 0;
-            var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
-            
-            if (data.CustInfoDetail == null)
-            {
-                resultMessage = $"Not found. {dataMessage}";
-            }
-            else
-            {
-                var customerStatus = (CustomerStatusEnum)data.CustInfoDetail.Status;
-                switch (customerStatus)
-                {
-                    case CustomerStatusEnum.Suspend:
-                    case CustomerStatusEnum.Closed:
-                        resultMessage = $"Fail. {dataMessage} Status={customerStatus.GetDescription()}";
-                        break;
-                    case CustomerStatusEnum.Running:
-                    case CustomerStatusEnum.Lock:
-                        try
-                        {
-                            errorCode = await messageBLL.SendMessageBatch(personalMsg, data.CustInfoDetail.CustId, optSite, authData.UserName, batchId, isPopup);
-                            resultMessage = errorCode == 1
-                                ? $"Success. {dataMessage} Status: {customerStatus.GetDescription()}."
-                                : $"Fail. {dataMessage} Status: {customerStatus.GetDescription()}. Insert done but affect count != 1 ";
-                        }
-                        catch (Exception ex)
-                        {
-                            resultMessage = ex.ToString();
-                            errorCode = -1;
-                        }
-                        break;
-                    default:
-                        resultMessage =
-                            $"Fail. {dataMessage} Status=non status";
-                        break;
-                }
-            }
-
-            var status= (errorCode == 1) ? 3 : 4;
-            var custId = data.CustInfoDetail?.CustId ?? 0;
-            if (!messageBLL.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
-            {
-                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
-                                 $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
-                                 $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
-            }
-        }
-
-        private void SendBatchMessage(string personalMsg,
-            int custId,
-            int siteId,
-            string updator,
-            int batchMessageId,
-            string userName,
-            string sabaId,
-            CustomerStatusEnum custStatus,
-            out int errorCode,
-            out string resultMessage)
-        {
-
-            try
-            {
-                if (messageBLL.SendMessageBatch(personalMsg, custId, siteId, updator, batchMessageId))
-                {
-                    resultMessage = $"Success. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. ";
-
-                    errorCode = 1;
-                }
-                else
-                {
-                    resultMessage = $"Fail. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. Insert done but affect count != 1 ";
-
-                    errorCode = 999;
-                }
-            }
-            catch (Exception ex)
-            {
-                resultMessage = ex.ToString();
-                errorCode = -1;
-            }
-        }
-
-        private void InsertBatchMessageSendLog(int batchMessageId,
-            int rowId,
-            int custId,
-            string userName,
-            string sabaId,
-            string resultMessage,
-            string updator,
-            int status)
-        {
-
-            if (!messageBLL.InsertBatchMessageSendLog(batchMessageId,
-                rowId,
-                custId,
-                userName,
-                sabaId,
-                resultMessage,
-                updator,
-                status))
-            {
-                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
-                    $@"BatchId: {batchMessageId}. CustId: {custId}. Username: {userName}." +
-                    $@" SabaId: {sabaId}. Result: {resultMessage}. Status:{status}");
-            }
-        }
-
-        #endregion
-        
-        public class MsgContent
-        {
-            public string Title { get; set; }  
-            public string Content { get; set; }
-        }
     }
 }

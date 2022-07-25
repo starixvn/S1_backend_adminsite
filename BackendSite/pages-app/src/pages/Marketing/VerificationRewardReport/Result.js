@@ -12,6 +12,8 @@ const dataColumnDefs = () => {
         subData: ["custId"],
       },
     },
+    { dataColumn: "sabaId", columnTitle: "Saba ID" },
+    { dataColumn: "agent", columnTitle: "Agent" },
     { dataColumn: "currency", columnTitle: "Currency" },
     { dataColumn: "phoneVerified", columnTitle: "Phone Number Verify",
       body: {

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -18,6 +19,7 @@ namespace BackendSite.Service.DAL
     {
         #region Fields
 
+        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
@@ -27,6 +29,7 @@ namespace BackendSite.Service.DAL
 
         public RiskService(IServiceProvider provider)
         {
+            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -47,13 +50,45 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_TpDisableUser_Set", p);
         }
 
-        public async Task<int> UpdateStatus(int custId, int status, string Operator)
+        public async Task<bool> UpdateStatus(ParamsWithLog<DisableDisableUser> input)
         {
+            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+            
             var p = new DynamicParameters();
-            p.Add("_CustId", custId);
-            p.Add("_Status", status);
-            p.Add("_Operator", Operator);
-            return await _mainDbClient.ExecuteAsync("Admin_TpDisableUserStatus_Set", p);
+            p.Add("_CustId", input.After.CustId);
+            p.Add("_Status", (int) input.After.Status);
+            p.Add("_Operator", input.Operator);
+
+            var success = await conn
+                .ExecuteAsync("Admin_TpDisableUserStatus_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.GameExclusion);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = await conn
+                    .ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<TpDisableUser> TpDisableUserGet(IEnumerable<int> siteIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
@@ -82,11 +117,43 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryFirstAsync<TpDisableUserDetail>("Admin_TpDisableUserByCustId_Get", p);
         }
 
-        public async Task<int> DeleteTpDisableUser(int custId)
+        public async Task<bool> DeleteTpDisableUser(ParamsWithLog<DeleteDisableUser> input)
         {
+            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+            
             var p = new DynamicParameters();
-            p.Add("_CustId", custId);
-            return await _mainDbClient.ExecuteAsync("Admin_TpDisableUser_Del", p);
+            p.Add("_CustId", input.Before.CustId);
+
+            var success = await conn
+                .ExecuteAsync("Admin_TpDisableUser_Del", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.GameExclusion);
+                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", null, DbType.String);
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = await conn
+                    .ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+
+            return false;
         }
         #endregion
 

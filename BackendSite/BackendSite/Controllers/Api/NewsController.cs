@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
     [Route("api/[controller]/[action]")]
     [ApiController]

@@ -7,11 +7,10 @@ using System;
 using System.Collections.Generic;
 using BackendSite.Extensions;
 using System.Linq;
-using System.Collections;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]

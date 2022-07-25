@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null) where T : notnull, new()
+        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -120,8 +120,41 @@ namespace BackendSite.Service.BLL
                 
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 
-                ExportBody(ws, t, propertyInfo);
+                ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+        public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add(nameof(t));
+
+            if (t.Any())
+            {
+                if (properties == null)
+                {
+                    properties = t.FirstOrDefault().GetType().GetProperties();
+                }
+
+                var rows = t.Count() + 1;
+                var cols = properties.Count();
+                if (rows > 0 && cols > 0)
+                {
+                    ws.Cells[1, 1].LoadFromCollection(t, true);
+
+                    using (var range = ws.Cells[1, 1, rows, cols])
+                    {
+                        // 標題列
+                        var title = ws.Cells[1, 1, 1, cols];
+                        title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                    }
+                }
             }
             p.Save();
             return ms.ToArray();
@@ -130,7 +163,8 @@ namespace BackendSite.Service.BLL
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,
-            IEnumerable<PropertyInfo> propertyInfo)
+            IEnumerable<PropertyInfo> propertyInfo,
+            TimeSpan? offset = null)
         {
             var currentRow = 2;
             for (var i = 0; i < data.Count(); i++)
@@ -151,7 +185,8 @@ namespace BackendSite.Service.BLL
                     else if (propValue != null && propValue.GetType().Name == "DateTimeOffset" && ((DateTimeOffset)propValue).Year > 1)
                     {
                         var time = (DateTimeOffset)propValue;
-                        ws.Cells[currentRow, j + 1].Value = time.DateTime;
+                        var value = offset != null ? time.ToOffset(offset.Value).DateTime : time.DateTime;
+                        ws.Cells[currentRow, j + 1].Value = value;
                         ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
                     }
                     else

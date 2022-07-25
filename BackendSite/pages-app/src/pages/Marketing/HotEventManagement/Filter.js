@@ -31,46 +31,11 @@ const Panel = (props) => {
       </div>
     );
   });
-  // let currencyRows =
-  //   props.Site.length === 0 || props.Filter.SiteId === 0
-  //     ? null
-  //     : props.Site.find(
-  //         (x) => x.siteId === props.Filter.SiteId
-  //       ).iCurrencyList.map((currency) => {
-  //         return (
-  //           <div
-  //             key={`CurrencyOpt-${currency}`}
-  //             className="custom-control custom-radio custom-control-inline"
-  //           >
-  //             <input
-  //               type="radio"
-  //               id={`Currency_${currency}`}
-  //               name="CurrencyList"
-  //               onChange={props.ChangeFilter.bind(null, currency, "CurrencyId")}
-  //               className="custom-control-input"
-  //               value={currency}
-  //               checked={currency === props.Filter.CurrencyId}
-  //             />
-  //             <label
-  //               className="custom-control-label"
-  //               htmlFor={`Currency_${currency}`}
-  //             >
-  //               {i18n[`lbl_Currency${currency}`]}
-  //             </label>
-  //           </div>
-  //         );
-  //       });
   return (
     <>
       <div className="filter">
         <label className="col-form-label d-block">Available Sites</label>
         {siteRows}
-        {/* {props.Site.length === 0 || props.Filter.SiteId === 0 ? null : (
-          <div className="table">
-            <label className="col-form-label d-block">Available Currency</label>
-            <div className="row-flex">{currencyRows}</div>
-          </div>
-        )} */}
         <div className="row-flex">
           <DropDownBox
             columnTitle="Status"

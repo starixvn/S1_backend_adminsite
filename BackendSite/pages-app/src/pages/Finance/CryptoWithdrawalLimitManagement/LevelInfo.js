@@ -13,14 +13,20 @@ export const LevelInfo = (props) => {
         let isDelete = lastIndex === idx;
         let _editValue = editValue[idx] && editValue !== null && idx === editValue.idx ? {
             withdrawalMin: editValue.withdrawalMin,
-            withdrawalMax: editValue.withdrawalMax
+            withdrawalMin: editValue.withdrawalMin,
+            times: editValue.times
         } : {
                 withdrawalMin: value.withdrawalMin,
-                withdrawalMax: value.withdrawalMax
+                withdrawalMax: value.withdrawalMax,
+                times: value.times
             };
         return (
             <tr key={`levellist-${value.currencyId}-${idx}`}>
                 <td>{value.vipLevel}</td>
+                <td>{value.levelName}</td>
+                <td><InputBox isEdit={isEdit}
+                    defaultValue={_editValue.times}
+                    onChange={props.changeData.bind(null, idx, "times")} /></td>
                 <td><InputBox isEdit={isEdit}
                     defaultValue={_editValue.withdrawalMin}
                     onChange={props.changeData.bind(null, idx, "withdrawalMin")} /></td>
@@ -44,6 +50,8 @@ export const LevelInfo = (props) => {
             <thead>
                 <tr>
                     <th scope="col">Vip Level</th>
+                    <th scope="col">Vip Level Name</th>
+                    <th scope="col">Withdrawal Frequency (0 = Unlimited)</th>
                     <th scope="col">Withdrawal Min</th>
                     <th scope="col">Withdrawal Max (0 = Unlimited)</th>
                     <th scope="col">Action</th>

@@ -7,7 +7,14 @@ export class BankLog extends React.Component {
     }
     render() {
         
-        console.log(this.props);
+        const actionTypeStatus = {
+            1: "Create",
+            2: "Delete",
+            3: "Block",
+            4: "Unlock",
+            5: "Bo-Delete"
+        }
+        
         let rows = this.props.searchData.length != 0 ? this.props.searchData.map((row, idx) => {
             return (
                 <tr key={"data-" + idx}>
@@ -16,7 +23,8 @@ export class BankLog extends React.Component {
                     <th>{row.accountNum}</th>
                     { this.props.CurrencyId == 61 ?
                         <th>{row.ifscCode}</th>
-                    :null}          
+                    :null}
+                    <th>{actionTypeStatus[row.status]}</th>
                     <td>{moment.utc(row.createTime).add(8,'hour').format('l LTS')}</td>
                 </tr>
             );
@@ -33,6 +41,7 @@ export class BankLog extends React.Component {
                             { this.props.CurrencyId == 61 ?
                                 <th scope="col">IFSC Code</th>
                             :null}
+                            <th scope="col">Status</th>
                             <th scope="col">Create Time (Adjusted to GMT+8)</th>
                         </tr>
                     </thead>

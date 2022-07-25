@@ -22,7 +22,18 @@ export const PopBoxContentAddLevel = (props) => {
         if (lastList.vipLevel >= Level) { return (alert("err1")) };
         // if (lastList.depositMin >= DepositMin) { return (alert("Deposit Min too small")) };
         // if (lastList.depositMax >= DepositMax) { return (alert("Deposit Max too small")) };
-        api.post('/api/Deposit/AddDepositLimitInfo', { siteId: siteId, depositType: depositType, currencyId: currencyId, vipLevel: Level, depositMin: DepositMin, depositMax: DepositMax, depositStatus: depositStatus })
+        var data = {
+            siteId: siteId,
+            currencyId: currencyId,
+            after:{
+                depositType: depositType,
+                vipLevel: Level,
+                depositMin: DepositMin,
+                depositMax: DepositMax,
+                depositStatus: depositStatus
+            }
+        }
+        api.post('/api/Deposit/AddDepositLimitInfo', data)
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     props.ClickSave(newLevelList);

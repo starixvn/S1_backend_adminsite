@@ -188,21 +188,25 @@ const App = () => {
         setDisabled(true);
         let data = stateDatas.Datas[editValue.idx];
         let transId = data.transId;
-        let beforeCategory = data.adjustCategory;
-        let beforeMemo = data.memo;
         let afterCategory = editValue.type === 'reason' ? editValue.value : data.adjustCategory;
         let afterMemo = editValue.type === 'memo' ? editValue.value : data.memo;
 
-        //console.log(transId, category, memo);
+        //console.log(data);
         let param = {
             Url: 'PaymentAdjustmentReport/SetAdjustment',
-            Data: qs.stringify({
+            Data: {
+                CurrencyId: data.currencyId,
+                SiteId: data.siteId,
                 TransId: transId,
-                BeforeCategory: beforeCategory,
-                AfterCategory: afterCategory,
-                BeforeMemo: beforeMemo,
-                AfterMemo: afterMemo
-            })
+                Before:{
+                    Category: data.adjustCategory,
+                    Memo: data.memo
+                },
+                After:{
+                    Category: afterCategory,
+                    Memo: afterMemo
+                }
+            }
         };
         
         WebAPI.PostData(param).then((res) => {

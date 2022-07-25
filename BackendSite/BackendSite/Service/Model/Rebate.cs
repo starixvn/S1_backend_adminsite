@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -29,9 +28,10 @@ namespace BackendSite.Service.Model
         public string TypeName { get; set; }
         public IEnumerable<RebateLevelData> GameTypeLevelList { get; set; }
     }
-   
+
     public class RebatePeriod
     {
+        public int CurrencyId { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
         public int? RedeemHours { get; set; }
@@ -50,16 +50,25 @@ namespace BackendSite.Service.Model
 
     public class RebateCurrencyData
     {
-        public int CurrencyId { get; set;}
+        public int CurrencyId { get; set; }
         public IEnumerable<RebatePayoutLimitData> PayoutLimitList { get; set; }
         public IEnumerable<RebateCategoryList> CategoryDataList { get; set; }
-       
+
     }
+
     public class RebateCategoryDetail
     {
         public int CategoryId { get; set; }
         public IEnumerable<RebateGameTypeList> GameTypeList { get; set; }
 
+    }
+
+    public class RebateGameTypeDetail
+    {
+        public int GameType { get; set; }
+        public string GameTypeName { get; set; }
+        public int Level { get; set; }
+        public decimal? Percentage { get; set; }
     }
 
     public class AdjustmentInfoLogParam

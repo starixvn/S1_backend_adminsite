@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -128,6 +129,8 @@ namespace BackendSite.Service.Model
         public int WithdrawalType { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
+        public string NetWork { set; get; }
+        public decimal CryptoAmount { set; get; }
         public int CurrencyId { set; get; }
         public bool IsTest { set; get; }
         public decimal Amount { set; get; }
@@ -207,6 +210,21 @@ namespace BackendSite.Service.Model
         }
 
         public string UpdateOperator { get; set; }
+        
+        public string LevelName { get; set; }
+
+        public int Times { get; set; }
+    }
+    
+    public class SetWithdrawalLimitInfo
+    {
+        [LogIgnore]
+        public int VipLevel { get; set; }
+        public string VipLevelName { get; set; }
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+        [LogPropertyName("WithdrawalFrequency")]
+        public int Times { get; set; }
     }
 
     public class WithdrawalKYC
@@ -215,6 +233,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public double Amount { get; set; }
 
+    }
+    public class WithdrawalKYCAmount
+    {
+        public double Amount { get; set; }
     }
     public class WithdrawalData
     {

@@ -2,7 +2,6 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using System.Collections.Generic;
-using BackendSite.Controllers.ApiV2.CMS.Setting;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

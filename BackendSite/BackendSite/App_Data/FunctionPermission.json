@@ -31,6 +31,11 @@
         "DisplayKey": "User Online Report",
         "FuncKey": "Report/UserOnlineReport",
         "Enable": false
+      },
+      {
+        "DisplayKey": "Bet List Report",
+        "FuncKey": "Report/BetListReport",
+        "Enable": false
       }
     ]
   },
@@ -118,6 +123,10 @@
           {
             "DisplayKey": "Set Add/Remove CustTag",
             "FuncKey": "ca_setCustTag"
+          },
+          {
+            "DisplayKey": "Line Unbind",
+            "FuncKey": "ca_lineUnbind"
           }
         ]
       },
@@ -252,6 +261,11 @@
         "Enable": false
       },
       {
+        "DisplayKey": "Deposit Accounting",
+        "FuncKey": "Finance/DepositAccountingList",
+        "Enable": false
+      },
+      {
         "DisplayKey": "Balance Adjustment",
         "FuncKey": "Finance/PaymentAdjustment",
         "Enable": false
@@ -346,6 +360,11 @@
       {
         "DisplayKey": "USDT WithdrawalLimit Management",
         "FuncKey": "Finance/USDTWithdrawalLimitManagement",
+        "Enable": false
+      },
+      {
+        "DisplayKey": "Deposit Line Management",
+        "FuncKey": "Finance/LineChannel",
         "Enable": false
       }
     ]
@@ -553,6 +572,11 @@
       "Enable": false
     },
     {
+      "DisplayKey": "Hot Games Management",
+      "FuncKey": "CMS/HotGamesManagement",
+      "Enable": false
+    },
+    {
       "DisplayKey": "Game Casino Management",
       "FuncKey": "CMS/GameCasinoManagement",
       "Enable": false,
@@ -591,6 +615,16 @@
     {
       "DisplayKey": "App Link Management",
       "FuncKey": "CMS/AppLinkManagement",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Deep Link Management",
+      "FuncKey": "CMS/DeepLinkManagement",
+      "Enable": false
+    },
+    {
+      "DisplayKey": "Site Maintenance",
+      "FuncKey": "CMS/SiteMaintain",
       "Enable": false
     }
   ]

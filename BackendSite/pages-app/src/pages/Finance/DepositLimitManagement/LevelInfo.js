@@ -37,7 +37,7 @@ export const LevelInfo = (props) => {
         <table className="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Vip Level</th>
+                    <th scope="col">Point Level</th>
                     <th scope="col">Deposit Min</th>
                     <th scope="col">Deposit Max</th>
                     <th scope="col">Deposit Status</th>

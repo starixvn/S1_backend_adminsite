@@ -1,11 +1,9 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,7 +11,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitController : ControllerBase
@@ -42,24 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
             public IEnumerable<int> CurrencyIds { get; set; }
         }
-
-
-        public class InsertOrUpdateRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-            public int WithdrawalMin { get; set; }
-            public int WithdrawalMax { get; set; }
-        }
-
-        public class DeleteRequest
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int VipLevel { get; set; }
-        }
-
+        
         #endregion
 
         #region Action
@@ -107,19 +88,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Create(InsertOrUpdateRequest request)
+        public ApiResult Create(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-            };
-
-            var result = _withdrawalBll.AddWithdrawalLimit(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.AddWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -147,19 +119,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(InsertOrUpdateRequest request)
+        public ApiResult Update(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel,
-                WithdrawalMax = request.WithdrawalMax,
-                WithdrawalMin = request.WithdrawalMin,
-            };
-
-            var result = _withdrawalBll.EditWithdrawalLimit(data,
-                User.Identity.Name);
+            var result = _withdrawalBll.EditWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -187,19 +150,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Delete(DeleteRequest request)
+        public ApiResult Delete(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
         {
-
-            var data = new WithdrawalLimitInfoManage()
-            {
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                VipLevel = request.VipLevel
-            };
-
-            var result = _withdrawalBll.DeleteWithdrawalLimit(data, User.Identity.Name);
+            var result = _withdrawalBll.DeleteWithdrawalLimit(
+                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");

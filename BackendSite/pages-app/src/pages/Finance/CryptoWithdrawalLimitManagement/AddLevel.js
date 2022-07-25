@@ -9,6 +9,7 @@ export const AddLevel = (props) => {
   let currentVipLevel = 1;
   let currentWithdrawalMin = 1;
   let currentWithdrawalMax = 1;
+  let currentTimes = 0;
 
   if (lastList.length !== 0) {
     currentVipLevel = parseInt(lastList.vipLevel) + 1;
@@ -19,6 +20,7 @@ export const AddLevel = (props) => {
   const [level, setLevel] = useState(currentVipLevel);
   const [withdrawalMin, setWithdrawalMin] = useState(currentWithdrawalMin);
   const [withdrawalMax, setWithdrawalMax] = useState(currentWithdrawalMax);
+  const [times, setTimes] = useState(currentTimes);
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -26,17 +28,20 @@ export const AddLevel = (props) => {
       return alert("VIP level error!");
     }
     let newLevelList = {
-      siteId: props.siteId,
-      currencyId: props.currencyId,
-      //vipLevel: level,
+      vipLevel: level,
       withdrawalMin: withdrawalMin,
       withdrawalMax: withdrawalMax,
+      times: times,
       networkType: props.networkType,
       cryptoCurrency: props.cryptoCurrencyId,
     };
     let param = {
       Url: "apiV2/WithdrawalLimitCrypto/Create",
-      Data: newLevelList,
+      Data: {
+        siteId: props.siteId,
+        currencyId: props.currencyId,
+        after: newLevelList
+      },
     };
     WebAPI.PostData(param)
       .then(function (response) {
@@ -95,6 +100,19 @@ export const AddLevel = (props) => {
             defaultValue={currentWithdrawalMax}
             onChange={(e) => {
               setWithdrawalMax(parseInt(e.target.value));
+            }}
+          />
+        </div>
+        <div className="form-group row">
+          <label className="col-sm-2 col-form-label">
+            Withdrawal Frequency (0 = Unlimited)
+          </label>
+          <input
+            className="col-sm-2 form-control"
+            type="number"
+            defaultValue={currentTimes}
+            onChange={(e) => {
+              setTimes(parseInt(e.target.value));
             }}
           />
         </div>

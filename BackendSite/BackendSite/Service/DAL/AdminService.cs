@@ -7,6 +7,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -92,6 +93,16 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", Operator);
 
             return _mainDbClient.Execute("Admin_SpecialPassword_Set", props);
+        }
+
+        public IEnumerable<AdminMenuDto> GetAllAdminMenu()
+        {
+            return  _reportDbClient.Query<AdminMenuDto>("Admin_AdminMenu_GetAll");
+        }
+
+        public IEnumerable<AdminPermissionDto> GetAllAdminPermission()
+        {
+            return  _reportDbClient.Query<AdminPermissionDto>("Admin_AdminPermission_GetAll");
         }
     }
 }

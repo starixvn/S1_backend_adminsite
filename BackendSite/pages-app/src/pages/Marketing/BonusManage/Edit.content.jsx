@@ -650,7 +650,15 @@ const SubPanel = props => {
 									dataColumn="rollOver"
 									value={props.state.specific[props.currencyId].rollOver}
 								/>
-								{props.state.promotionType == 7 ? <InputBox
+								{props.state.promotionType == 7 ?
+									<InputBox
+										Title="Winover"
+										OnChange={props.EditMainValue}
+										dataColumn="winOver"
+										value={props.state.specific[props.currencyId].winOver}
+									/> : null}
+								{props.state.promotionType == 7 ? 
+									<InputBox
 										Type="Number"
 										Title="Bonus"
 										OnChange={props.EditMainValue}
@@ -751,10 +759,16 @@ const SubPanel = props => {
 								<div className="row-flex">
 									<InputBox
 										Type="Number"
-										Title="Usage"
+										Title="Daily Limit"
 										OnChange={props.EditMainValue}
 										dataColumn="usage"
 										value={props.state.specific[props.currencyId].usage}
+									/>
+									<InputBox
+										Title="Total Limit"
+										OnChange={props.EditMainValue}
+										dataColumn="totalUsageLimit"
+										value={props.state.specific[props.currencyId].totalUsageLimit}
 									/>
 									<InputBox
 										Title="Rollover"
@@ -763,10 +777,10 @@ const SubPanel = props => {
 										value={props.state.specific[props.currencyId].rollOver}
 									/>
 									<InputBox
-										Title="Total Usage Limit"
+										Title="Winover"
 										OnChange={props.EditMainValue}
-										dataColumn="totalUsageLimit"
-										value={props.state.specific[props.currencyId].totalUsageLimit}
+										dataColumn="winOver"
+										value={props.state.specific[props.currencyId].winOver}
 									/>
 									<div>(0 = Unlimited)</div>
 								</div>
