@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -13,52 +14,39 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
-        #region Fields
-
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
+        private readonly LiveRegistrationBLL _registrationBll;
 
-        #endregion
-
-        #region Constructor
-
-        public RegistrationManagementController(IServiceProvider provider)
+        public RegistrationManagementController(CustInfoBLL custInfoBll, ExcelBLL excelBll, LiveRegistrationBLL registrationBll)
         {
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _custInfoBll = custInfoBll;
+            _excelBll = excelBll;
+            _registrationBll = registrationBll;
         }
-
-        #endregion
 
         #region Model
 
         public class RegLiveStatusReq : ApiRequestPageModel
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-            public int DepositStatus { get; set; }
             public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
+            public int DepositStatus { get; set; }
             public string AffiliatesCode { get; set; }
             public int AgentCodeType { get; set; }
+            public string UserName { get; set; }
+            public int CallOutStatus { get; set; }
+            public int DormantUser { get; set; }
+            public int DateType { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public int Sort { get; set; }
         }
         public class GetRegLiveStatusNotesReq
         {
@@ -91,20 +79,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query)
         /// </remarks>
         /// <param name="custInfoReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
         [HttpPost]
-        public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
+        public async Task<ApiListResult<LiveRegistration>> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
         {
-            var apiResult = new ApiListResult<RegLiveStatus>();
+            var apiResult = new ApiListResult<LiveRegistration>();
             try
             {
-                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.CurrencyId, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-                foreach (var data in searchResult.RegLiveStatusDatas)
-                {
-                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, TimeSpan.Zero);
-                }
-                apiResult.Data = searchResult.RegLiveStatusDatas;
+                var searchResult = await _registrationBll.GetRegLiveStatusData(custInfoReq.SiteId,
+                    custInfoReq.CurrencyId, custInfoReq.DepositStatus, custInfoReq.Status
+                    , custInfoReq.UserName, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,
+                    custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
+                
+                apiResult.Data = searchResult.LiveRegistration;
                 apiResult.PageNumber = searchResult.PageNumber;
                 apiResult.TotalPages = searchResult.TotalPages;
                 apiResult.RowCount = searchResult.RowCount;
@@ -128,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
         [HttpPost]
         public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
@@ -154,7 +141,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
         {
@@ -183,7 +170,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
         /// </remarks>
         /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 5 })]
         [HttpPost]
         public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
         {
@@ -209,7 +196,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
         /// </remarks>
         /// <param name="deleteCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 4 })]
         [HttpPost]
         public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
         {
@@ -236,7 +223,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Edit] > [Submit]
         /// </remarks>
         /// <param name="editRegLiveStatusNote"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost]
         public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
         {
@@ -262,7 +249,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
         {

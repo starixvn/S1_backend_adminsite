@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Dapper;
+using Newtonsoft.Json;
+
+namespace BackendSite.Service.DAL
+{
+    public class LiveRegistrationService
+    {
+        private readonly MySqlClient _reportDbClient;
+        private readonly List<string> _creditSite = new List<string> { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" }; 
+        public LiveRegistrationService(IEnumerable<MySqlClient> mySqlClients)
+        {
+            _reportDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Report);
+        }
+
+        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var searchData = new RegLiveStatusPageResult();
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_Currency", currency);
+            props.Add("_UserName", username);
+            props.Add("_DepositStatus", depositStatus);
+            props.Add("_Status", status);
+            props.Add("_Sort", sort);
+            props.Add("_StartDate", startDate.DateTime);
+            props.Add("_EndDate", endDate.DateTime);
+            props.Add("_AffCode", affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(_creditSite));
+            props.Add("_AgentCodeType", agentCodeType);
+            props.Add("_PageSize", Math.Abs(pageSize));
+            props.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            props.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V6", props);
+            searchData.RegLiveStatusData = result.ToList();
+            searchData.PageNumber = props.Get<int?>("_PageNumber") ?? 0;
+            searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
+
+            return searchData;
+        }
+    }
+}
