@@ -1,21 +1,10 @@
-using System;
-using System.IO;
-using System.Linq;
 using BackendSite.Service.Library;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
-using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
-using System.Collections.Generic;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -27,18 +16,17 @@ namespace BackendSite
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection")));
             services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
@@ -49,9 +37,9 @@ namespace BackendSite
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
-            services.AddDatabaseConnection(Configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));          
-            services.Configure<Dictionary<string, AWSKeyConfig>>(Configuration.GetSection("AwsKeyConfig"));
+            services.AddDatabaseConnection(_configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(_configuration.GetSection("SiteConfig"));          
+            services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
 
