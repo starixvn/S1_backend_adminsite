@@ -72,15 +72,32 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         [HttpPost]
         public IActionResult Export(GetTransferAccountInfoListRequest request)
         {
-            var result =
+            var datas =
                 _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(request));
 
-            foreach (var data in result)
-            {
-                data.Purpose = string.Join(", ", data.Purposes.Select(x => x.ToString()));
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
+            var result = datas.Select(x =>
+                new BankFinancialTransferAccountExportModel
+                {
+                    Id = x.Id,
+                    SiteName = x.SiteName,
+                    Currency = x.IsoCode,
+                    Channel = x.Channel.ToString(),
+                    Agent = x.Agent,
+                    PayName = x.PayName,
+                    Purpose = string.Join(", ", x.Purposes.Select(x => x.ToString())),
+                    BankCode = x.BankCode,
+                    AccountNo = x.AccountNo,
+                    AccountName = x.AccountName,
+                    DisplayName = x.DisplayName,
+                    Status = x.Status.ToString(),
+                    InitialAmount = x.InitialAmount,
+                    MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
+                    Remark = x.Remark,
+                    CreateTime = new DateTimeOffset(x.CreateTime.DateTime, TimeSpan.Zero),
+                    Creator = x.CreatorName,
+                    UpdateTime = new DateTimeOffset(x.UpdateTime.DateTime, TimeSpan.Zero),
+                    Updator = x.UpdatorName
+                });
             
             var stream = _excelBll.Export(result);
             return _excelBll.ExcelFile(stream, "TransferAccountInfoList");

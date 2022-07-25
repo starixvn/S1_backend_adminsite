@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+# @url=http://localhost:9158
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+@url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -118,3 +118,8 @@ Content-Type: application/json
 {
     "enumName": "TransferAccountPurposeEnum"
 }
+
+###
+# 取得金流商列表
+POST {{url}}/apiV2/BankTransferAccount/GetPayList HTTP/1.1
+Content-Type: application/json
