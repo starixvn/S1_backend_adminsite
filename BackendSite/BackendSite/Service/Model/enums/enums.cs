@@ -587,6 +587,8 @@ namespace BackendSite.Service.Model.enums
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
         Referral = 36,
+        SetAdminUserStatus = 41,
+        SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
@@ -1133,5 +1135,10 @@ namespace BackendSite.Service.Model.enums
         VND = 51,
         INR = 61,
         BDT = 74
+    }
+    public enum AdminUserV2StatusEnum
+    {
+        Disable = 0,
+        Able = 1,
     }
 }
