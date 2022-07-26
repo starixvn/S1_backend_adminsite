@@ -497,13 +497,13 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
+        public int UpdateCustomerTele(int siteId, int custId, string @operator)
         {
             var props = new DynamicParameters();
             props.Add("SiteId", siteId);
             props.Add("CustId", custId);
             props.Add("Operator", @operator);
-            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins", props);
+            return _mainDbClient.Execute("Admin_CustTele_Ins", props);
         }
 
         public List<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)

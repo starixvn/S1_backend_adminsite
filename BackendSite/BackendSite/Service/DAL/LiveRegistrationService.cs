@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -14,10 +15,12 @@ namespace BackendSite.Service.DAL
     public class LiveRegistrationService
     {
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _mainDbClient;
         private readonly List<string> _creditSite = new List<string> { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" }; 
         public LiveRegistrationService(IEnumerable<MySqlClient> mySqlClients)
         {
             _reportDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Report);
+            _mainDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Main);
         }
 
         public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
@@ -48,6 +51,32 @@ namespace BackendSite.Service.DAL
             searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return searchData;
+        }
+
+        public async Task<CustRegLiveStatus> GetRegLiveStatusByCustId(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _reportDbClient.QueryFirstAsync<CustRegLiveStatus>("Admin_RegLiveStatus_Get", p);
+        }
+
+        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("SiteId", siteId);
+            props.Add("CustId", custId);
+            props.Add("Operator", @operator);
+            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins", props);
+        }
+
+        public async Task<int> SetRegLiveStatus(int custId, int siteId, int status, string @operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("SiteId", siteId);
+            props.Add("Status", status);
+            props.Add("Operator", @operator);
+            return await _mainDbClient.ExecuteAsync("Admin_RegLiveStatus_Set", props);
         }
     }
 }

@@ -3,16 +3,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class LiveRegistrationBLL
     {
         private readonly LiveRegistrationService _registrationService;
-
-        public LiveRegistrationBLL(LiveRegistrationService registrationService)
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly ILogger<LiveRegistrationBLL> _logger;
+        
+        public LiveRegistrationBLL(LiveRegistrationService registrationService, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationBLL> logger)
         {
             _registrationService = registrationService;
+            _adjustmentLogReportService = adjustmentLogReportService;
+            _logger = logger;
         }
 
         public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
@@ -40,6 +47,46 @@ namespace BackendSite.Service.BLL
                 TotalPages = searchResult.TotalPages,
                 RowCount = searchResult.RowCount
             };
+        }
+
+        public async Task<CustRegLiveStatus> GetRegLiveStatusByCustId(int custId)
+        {
+            return await _registrationService.GetRegLiveStatusByCustId(custId);
+        }
+        
+        public async Task<int> SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
+        {
+            var result= await _registrationService.SetRegLiveStatus(input.After.CustId, input.SiteId, (int)input.After.Status, input.Operator);
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                BeforeDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    UserName = input.Before.UserName,
+                    Status = input.Before.StatusName
+                }),
+                AfterDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    UserName = input.After.UserName,
+                    Status = input.After.StatusName
+                }),
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics
+            };
+            if (result <= 0) return result;
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+            {
+                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+            }
+
+            return result;
+        }
+
+        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
+        {
+            return await _registrationService.UpdateCustomerTele(siteId, custId, @operator);
         }
     }
 }

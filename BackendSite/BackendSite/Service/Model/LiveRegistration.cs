@@ -50,4 +50,10 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
     }
+
+    public class CustRegLiveStatus
+    {
+        public string UserName { get; set; }
+        public int Status { get; set; }
+    }
 }

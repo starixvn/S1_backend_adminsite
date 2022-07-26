@@ -123,19 +123,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
         [HttpPost]
-        public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
+        public async Task<ApiResult> SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
-            var apiResult = new ApiResult();
-            if (_custInfoBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name)))
+            try
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var result = await _registrationBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name));
+                var apiResult = new ApiResult
+                {
+                    ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail
+                };
+                return apiResult;
             }
-            else
+            catch (Exception e)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                apiResult.Message = "update fail";
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
-            return apiResult;
         }
         
         /// <summary>
@@ -154,7 +156,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             try
             {
-                if (await _custInfoBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
+                if (await _registrationBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
                 {
                     return new ApiResult
                     {

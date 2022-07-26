@@ -2011,7 +2011,7 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
         {
-            if (_custInfoBll.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name).Result > 0)
+            if (_custInfoBll.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
