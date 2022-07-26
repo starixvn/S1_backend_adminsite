@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
@@ -25,6 +26,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly TpBLL _tpBll;
         private readonly Common _common;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly PaymentBLL _paymentBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         #endregion
 
@@ -35,6 +38,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _tpBll = provider.GetRequiredService<TpBLL>();
             _common = provider.GetRequiredService<Common>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _paymentBll = provider.GetRequiredService<PaymentBLL>();
         }
 
         #endregion
@@ -57,13 +62,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public class SubmitRequest
         {
             public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public int TpId { get; set; }
+            public string TpName { get; set; }
+            public int CustId { get; set; }
             public string UserName { get; set; }
-            public string UserTpId { get; set; }
-            public int Opt { get; set; }
+            public TpAdjustmentOptionEnum Option { get; set; }
             public decimal Amount { get; set; }
             public string Memo { get; set; }
-            public int Category { get; set; }
+            public AdjustmentCategoryEnum ReasonId { get; set; }
+            public string TransId { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -108,9 +116,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult<dynamic>> GetTpCustInfo(GetTpCustInfoRequest request)
+        public async Task<ApiResult<object>> GetTpCustInfoAsync(GetTpCustInfoRequest request)
         {
-            var apiResult = new ApiResult<dynamic>();
+            var apiResult = new ApiResult<object>();
 
             if (string.IsNullOrWhiteSpace(request.UserTpId))
                 request.UserTpId = null;
@@ -176,38 +184,77 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
-            var apiResult = new ApiResult();
-            var custId = (string.IsNullOrEmpty(request.UserTpId)) ? null : _common.TpIdToCustId(request.UserTpId);
-            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, request.UserName, request.SiteId);
-
+            var user = User.Identity.Name;
+            var isDeposit = request.ReasonId == AdjustmentCategoryEnum.Deposit;
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
-                CustId = custInfosDetail.CustId,
+                CustId = request.CustId,
                 Amount = request.Amount,
-                direction = (TpDirection)request.Opt,
-                Operator = User.Identity.Name,
+                direction = (TpDirection)(int)request.Option,
+                Operator = user,
                 Remarks = request.Memo,
-                Category = request.Category
+                Category = (int)request.ReasonId
             };
+            
+            if (isDeposit && !string.IsNullOrWhiteSpace(request.TransId))
+            {
+                var m = Regex.Match(request.TransId, @"\d+");
+                int.TryParse(m.Value, out var depositId);
+                inTpTransfer.DepositId = depositId;
+            }
+            
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
-                var param = new
+                var strDetail = string.Empty;
+                if (isDeposit)
                 {
-                    request.TpId,
-                    custInfosDetail.CustId,
-                    request.Amount,
-                    request.Opt,
-                    Memo = request.Memo,
-                    Category = request.Category
-                };
-                _tpBll.SetAdjustmentTpCustInfoLog("3RDFundsAdjustment", 1, JsonConvert.SerializeObject(param), User.Identity.Name);
-            }
-            apiResult.ErrorCode = result.ErrorCode;
-            apiResult.Message = string.IsNullOrWhiteSpace(result.Message) ? result.RawMessage : result.Message;
+                    var log = _paymentBll.GetAdjustmentDepositLogByTransId(result.Data.TransId);
+                    JsonConvert.SerializeObject(new
+                    {
+                        request.TpName,
+                        request.UserName,
+                        Option = request.Option.ToString(),
+                        request.Amount,
+                        request.Memo,
+                        Reason = request.ReasonId.ToString(),
+                        DepositTransId = request.TransId,
+                        BeforeActualDeposit = log?.BeforeAmount,
+                        AfterActualDeposit = log?.AfterAmount
+                    });
+                }
+                else
+                {
+                    strDetail = JsonConvert.SerializeObject(new
+                    {
+                        request.TpName,
+                        request.UserName,
+                        Option = request.Option.ToString(),
+                        request.Amount,
+                        request.Memo,
+                        Reason = request.ReasonId.ToString()
+                    });
+                }
 
-            return apiResult;
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    Operator = user,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment,
+                    AfterDetailInfo = strDetail,
+                    RefTransId = result.Data.TransId
+                });
+            }
+            
+            return new ApiResult
+            {
+                ErrorCode = result.ErrorCode,
+                Message = string.IsNullOrWhiteSpace(result.Message)
+                    ? result.RawMessage : result.Message
+            };
         }
 
         /// <summary>

@@ -300,5 +300,10 @@ namespace BackendSite.Service.BLL
         {
             return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
+        
+        public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
+        {
+            return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+        }
     }
 }

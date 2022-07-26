@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -32,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
         private readonly ILogger<BalanceAdjustmentController> _logger;
-        private readonly BankFinancialBLL _bankFinancialBll;
 
         private readonly int _mainWalletType;
         private readonly string _bonusApiUrl;
@@ -50,7 +50,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<BalanceAdjustmentController>>();
-            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
 
             _mainWalletType =
                 provider.GetRequiredService<IConfiguration>().GetValue<int>("MainWalletType"); //1=主錢包,2=體育錢包
@@ -69,7 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public decimal WithdrawalLimitAmount { get; set; }
             public int WithdrawalLimitOption { get; set; }
             public string Memo { set; get; }
-            public string BonusCode { get; set; }
+            public string TransId { get; set; }
             public int ReasonId { get; set; }
         }
 
@@ -112,9 +111,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int SiteId { get; set; }
             public int WithdrawalLimitOption { get; set; }
             public IFormFile ExcelUpload { get; set; }
-            public decimal Withdrawal { get; set; }
+            public decimal WithdrawalLimitAmount { get; set; }
             public string BonusCode { get; set; }
-            public int Category { get; set; }
+            public int ReasonId { get; set; }
         }
         
         public class SelectListItem
@@ -312,8 +311,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     WithdrawalLimitAmount = request.WithdrawalLimitAmount,
                     WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                     Memo = request.Memo,
-                    Category = request.ReasonId
+                    Category = request.ReasonId,
                 };
+
+                if (!string.IsNullOrWhiteSpace(request.TransId))
+                {
+                    var m = Regex.Match(request.TransId, @"\d+");
+                    int.TryParse(m.Value, out var depositId);
+                    adjustmentAndWithdrawalLimit.DepositId = depositId;
+                    adjustmentAndWithdrawalLimit.TransId = request.TransId;
+                }
 
                 if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
                         out var transId) > 0)
@@ -431,7 +438,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                         && request.Option != AdjustmentInfoAdjustTypeEnum.ManualBonus)
                                     {
                                         var withdrawalLimitAmount = (request.WithdrawalLimitOption == 1)
-                                            ? amount * request.Withdrawal
+                                            ? amount * request.WithdrawalLimitAmount
                                             : 0;
                                         var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit
                                         {
@@ -446,7 +453,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             WithdrawalLimitAmount = withdrawalLimitAmount,
                                             WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                                             Memo = memo,
-                                            Category = request.Category
+                                            Category = request.ReasonId
                                         };
 
                                         if (adjustmentAndWithdrawalLimit.AdjustType ==
@@ -705,7 +712,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 .Where(x => (int) x <= 4)
                 .Select(x => new SelectListItem((int) x, x.GetDescription()));
             var apiResult = 
-                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
+                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             
             return apiResult;
         }
@@ -713,14 +720,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
         {
-            var result =
-                _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
-            var data =
-                result.Select(x => new SelectListItem(x.ReasonId, x.Description));
+            var type = typeof(AdjustmentCategoryEnum);
+            var data = Enum.GetValues(type)
+                .Cast<AdjustmentCategoryEnum>()
+                .Select(x => new SelectListItem((int) x, x.GetDescription()));
             var apiResult = 
-                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
+                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             
             return apiResult;
+            
+            // Select from DB
+            // var result =
+            //     _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+            // var data =
+            //     result.Select(x => new SelectListItem(x.ReasonId, x.Description));
+            // var apiResult = 
+            //     new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
+            //
+            // return apiResult;
         }
 
         #endregion

@@ -27,6 +27,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public decimal WithdrawalLimitAmount { set; get; }
         public int WithdrawalLimitAmountAdjustType { set; get; }
+        public int DepositId { get; set; }
     }
     public class SetAdjustBonusReq
     { 
@@ -55,6 +56,15 @@ namespace BackendSite.Service.Model
         [LogPropertyName("AdjustReason")]
         public string CategoryName { get; set; }
         public string Memo { get; set; }
+    }
+    
+    public class AdjustmentDepositLog
+    {
+        public string TransId { get; set; }
+        public int AdjustType { get; set; }
+        public int  DepositId { get; set; }
+        public decimal BeforeAmount { get; set; }
+        public decimal AfterAmount { get; set; }
     }
 }
 

@@ -156,8 +156,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
-        
-        public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
+        public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
@@ -174,10 +173,11 @@ namespace BackendSite.Service.BLL
                 inputs = null,
                 Operator = inAdminTpTransfer.Operator,
                 Remarks = inAdminTpTransfer.Remarks,
-                Category = inAdminTpTransfer.Category
+                Category = inAdminTpTransfer.Category,
+                DepositId = inAdminTpTransfer.DepositId
             };
             var myUrl = $"{_apiUrl}AdjustWallet";
-            var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, adminTpTransfer);
+            var data = await _courierAdapter.MyPostAsync<AdjustWalletResult, TpTransfer>(myUrl, adminTpTransfer);
 
             return data;
         }
