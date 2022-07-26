@@ -54,8 +54,8 @@ namespace BackendSite.Service.DAL
             props.Add("_ActionTypes", JsonConvert.SerializeObject(input.ActionTypes));
             props.Add("_StartDate", input.StartDate.DateTime);
             props.Add("_EndDate", input.EndDate.DateTime);
-            props.Add("_RefTransId", input.TransId);
-            props.Add("_Operator", input.UserName);
+            props.Add("_RefTransId", string.IsNullOrEmpty(input.TransId) ? null : input.TransId, DbType.String);
+            props.Add("_Operator", string.IsNullOrEmpty(input.UserName) ? null : input.UserName, DbType.String);
             props.Add("_PageSize", Math.Abs(input.PageSize));
             props.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
