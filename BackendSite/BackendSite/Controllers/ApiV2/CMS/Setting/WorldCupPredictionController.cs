@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -27,6 +28,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
         public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
         {
             var apiResult = new ApiResult<WorldCupPredictionSettingResponse>();
@@ -46,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
         public async Task<ApiResult> SetWorldCupPredictionSetting(SetWorldCupPredictionSettingRequest request)
         {
             var apiResult = new ApiResult();
@@ -64,6 +67,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 1 })]
         public ApiListResult<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request)
         {
             var apiResult = new ApiListResult<GetWorldCupMemberReportResponse>();
@@ -86,6 +90,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 2 })]
         public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
         {
             var exportData = await _worldCupPredictionBll.GetMemberReport(request);
@@ -95,6 +100,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 1 })]
         public async Task<ApiResult<IEnumerable<GetWorldCupEventReportResponse>>> GetEventReport(GetWorldCupEventReportRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
@@ -112,6 +118,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
         public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
         {
             var ts = TimeSpan.Parse(request.Timezone.TrimStart('+'));
@@ -121,6 +128,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 3 })]
         public async Task<ApiResult> SetPayoutDone(SetPayoutDoneRequest request)
         {
             var apiResult = new ApiResult();
