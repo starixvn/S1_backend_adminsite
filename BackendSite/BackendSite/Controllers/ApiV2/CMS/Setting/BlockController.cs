@@ -78,17 +78,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int SysId { get; set; }
             public string AccountNum { get; set; }
         }
-        //public class BlockAccountSetRequest : BlockBankAccRequest
-        //{
-        //    public BlockAccountStatus Status { get; set; }
-        //    public string Memo { get; set; }   
-        //}
-
-        //public class ReleaseAccountRequest : BlockBankAccRequest
-        //{
-        //    public int CustId { get; set; }
-        //    public string IFSCCode { get; set; }
-        //}
         #endregion
 
         #region Action
