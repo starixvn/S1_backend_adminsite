@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
 using System.Collections.Generic;
+using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
@@ -84,9 +86,10 @@ namespace BackendSite
                 });
 
             }
-
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ReferralManagementDecorator>();
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
