@@ -345,9 +345,9 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
         }
 
-        public int UpdateCustomerTele(int siteId, int custId, string @operator)
+        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
         {
-            return _custInfoService.UpdateCustomerTele(siteId, custId, @operator);
+            return await _custInfoService.UpdateCustomerTele(siteId, custId, @operator);
         }
 
         public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)

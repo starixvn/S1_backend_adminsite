@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -65,7 +66,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string AffiliatesCode { get; set; }
             public int AgentCodeType { get; set; }
         }
-
+        
+        public class TeleCsdUpdateReq
+        {
+            public int CustId { get; set; }
+            public int SiteId { get; set; }
+        }
         #endregion
 
         #region Action
@@ -130,6 +136,39 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = "update fail";
             }
             return apiResult;
+        }
+        
+        /// <summary>
+        /// RegistrationManagement/CallMark 寫入客服致電紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > Submit(Query) > [Complete once]
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
+        [HttpPost]
+        public async Task<ApiResult> CallRecord(TeleCsdUpdateReq req)
+        {
+            try
+            {
+                if (await _custInfoBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Message = "Update Success."
+                    };
+                }
+
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
         }
 
         /// <summary>
