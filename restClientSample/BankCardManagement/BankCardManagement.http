@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+# @url=http://localhost:9158
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+@url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -38,16 +38,16 @@ POST {{url}}/apiV2/BankCardManagement/Set HTTP/1.1
 Content-Type: application/json
 
 {
-    "financialAccountId": 16,
+    "financialAccountId": 361,
     "siteId": 1,
     "currencyId": 2,
-    "minAmount": 50,
+    "minAmount": 100,
     "maxAmount": 10000,
     "dailyLimitAmount": 50000,
-    "pointLevels": [0, 1, 2, 3, 4, 5, 9],
-    "vipLevels": [1, 2, 3, 4, 5, 6],
+    "vipLevels": [1, 2, 3, 4, 5],
+    "pointLevels": [2, 3, 4, 5],
     "memo": "test",
-    "sort": 1,
+    "sort": 0,
     "status": 1
 }
 
@@ -80,10 +80,19 @@ Content-Type: application/json
 }
 
 ###
-# 取得目的列表
+# 取得目的列表(這看前端要打API還是直接寫死都可以)
 POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
 Content-Type: application/json
 
 {
     "enumName": "BankCardManagementPurposeEnum"
+}
+
+###
+# 取得VIP列表
+POST {{url}}/apiV2/BaseData/GetVipLevelSettingBySiteId HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
 }
