@@ -52,6 +52,7 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
                     <td className={data.deviceScore > 74 ? "low-risk" : "high-risk"}>{data.deviceScore != null ? (data.deviceScore > 74 ? "Low Risk(" + data.deviceScore + ")"  : "High Risk(" + data.deviceScore + ")")  : "" }</td>
+                    <td>{data.shieldId}</td>
                     <td>{data.levelName}</td>
                     <td>{data.userLevel}</td>
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
@@ -120,6 +121,7 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
                                     <th scope="col">Device Score</th>
+                                    <th scope="col">Shiled ID</th>
                                     <th scope="col">Vip Level</th>
                                     <th scope="col">Point Level</th>
                                     <th scope="col">Currency</th>
