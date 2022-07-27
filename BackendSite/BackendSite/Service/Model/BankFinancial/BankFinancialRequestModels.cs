@@ -69,6 +69,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
+        public string AccountCode { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
