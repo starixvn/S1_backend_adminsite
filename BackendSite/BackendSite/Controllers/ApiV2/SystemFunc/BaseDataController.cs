@@ -31,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly MarketingBLL _marketingBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
@@ -48,6 +49,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
+            _marketingBll = provider.GetRequiredService<MarketingBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
@@ -189,7 +191,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public string FuncKey { get; set; }
         }
-
+        
+        public class GetPointLevelListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+        
+        public class GetBankInfoSysRequest
+        {
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
 
         #endregion
 
@@ -572,6 +593,47 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
+        }
+        
+        
+        /// <summary>
+        /// BaseData/GetPointLevelList 取得績分等級資訊清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<PointLevelInfo>> GetPointLevelList(GetPointLevelListRequest request)
+        {
+            var pointLevelInfos = _marketingBll.GetPointLevelInfos(request.SiteId, request.CurrencyId);
+            
+            return new ApiResult<IEnumerable<PointLevelInfo>>
+            {
+                Data = pointLevelInfos,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// BaseData/BankInfoSys 取得銀行系統資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management.
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys(GetBankInfoSysRequest request)
+        {
+            var sysBankList = _bankDetailBll.GetSysBankList(request.CurrencyId);
+            
+            return new ApiResult<IEnumerable<BankInfoSys>>
+            {
+                Data = sysBankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
         
         /// <summary>

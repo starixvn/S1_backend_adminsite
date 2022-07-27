@@ -23,7 +23,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
         private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{FinancialAccountPurposes}]");
 
         public IEnumerable<string> Purposes
             => AccountPurposes
@@ -34,9 +34,15 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int SysId { set; get; }
         public string BankCode { set; get; }
         public string BankName { set; get; }
-        public BankDetailOffStatusEnum Status { set; get; }
-        public IEnumerable<int> PointLevels { set; get; }
-        public IEnumerable<int> VipLevels { set; get; }
+        public BankCardManagementStatusEnum Status { set; get; }
+        [JsonIgnore]
+        public string JsonPointLevels { set; get; }
+        public IEnumerable<int> PointLevels =>
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels);
+        [JsonIgnore]
+        public string JsonVipLevels { set; get; }
+        public IEnumerable<int> VipLevels =>
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels);
         public IEnumerable<string> VipLevelNames { set; get; }
         public decimal Dummy { set; get; }
         public string Memo { set; get; }

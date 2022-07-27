@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Model.BankCardManagement;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
@@ -23,6 +24,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         private readonly SelLangBLL _selLangBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly VipLevelBLL _vipLevelBll;
 
         #endregion
 
@@ -32,6 +35,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
         }
 
         #endregion
@@ -44,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             public IEnumerable<int> CurrencyIds { get; set; }
 
-            public List<BankDetailOffStatusEnum> Statuses { get; set; }
+            public List<BankCardManagementStatusEnum> Statuses { get; set; }
         }
 
         #endregion
@@ -64,14 +69,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<OfflineBankingSetting> GetList(GetOfflineBankingSettingRequest request)
+        public async Task<ApiListResult<OfflineBankingSetting>> GetList(GetOfflineBankingSettingRequest request)
         {
-            var result = _bankDetailBll.GetOfflineBankingSettingList(
-                new GetOfflineBankingSettingParams(request), out var totalPages, out var rowCount);
-            
+            var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
+                new GetOfflineBankingSettingParams(request));
+
             return new ApiListResult<OfflineBankingSetting>
             {
-                Data = result,
+                Data = datas,
                 PageNumber = request.PageNumber,
                 TotalPages = totalPages,
                 RowCount = rowCount,
@@ -92,28 +97,58 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult Set(ApiRequestWithLog<SetBankCard> request)
+        public async Task<ApiResult> SetAsync(SetOfflineBankingSettingRequest request)
         {
-            // if (request.CurrencyId != 61)
-            // {
-            //     request.Before.IFSCCode = "";
-            //     request.After.IFSCCode = "";
-            // }
-            var result = _bankDetailBll.SetBankCardwithIFSC(
-                new ParamsWithLog<SetBankCard>(request, User.Identity.Name));
+            var updater = User.Identity.Name;
+            var oldData = await _bankDetailBll.GetOfflineBankingSettingByIdAsync(request.FinancialAccountId);
+            var success = await _bankDetailBll.SetOfflineBankingSettingAsync(
+                new SetOfflineBankingSettingParams(request, updater));
 
-            var apiResult = new ApiResult();
-            if (result > 0)
+            if (success)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+                var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BankCardManagement,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        oldData.FinancialAccountId,
+                        oldData.BankName,
+                        oldData.AccountNo,
+                        oldData.AccountName,
+                        oldData.MinAmount,
+                        oldData.MaxAmount,
+                        oldData.DailyLimitAmount,
+                        PointLevels = string.Join(", ", oldData.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => oldData.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        oldData.Sort,
+                        Status = oldData.Status.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.MinAmount,
+                        request.MaxAmount,
+                        request.DailyLimitAmount,
+                        PointLevels = string.Join(", ", request.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => request.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        request.Sort,
+                        Status = request.Status.ToString(),
+                        request.Memo
+                    }),
+                    Operator = updater
+                });
             }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
+            
+            return success
+                ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
+                : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
         #endregion
 

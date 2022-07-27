@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
@@ -31,7 +33,8 @@ namespace BackendSite.Service.DAL
             _connectionString = configuration.GetConnectionString("ConnectionString");
         }
 
-        public IEnumerable<OfflineBankingSetting> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input, out int totalPages, out int rowCount)
+        public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingListAsync
+            (GetOfflineBankingSettingParams input)
         {
             var para = new DynamicParameters();
             para.Add("_SiteId", input.SiteId);
@@ -47,12 +50,41 @@ namespace BackendSite.Service.DAL
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get", para);
+            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get", para);
 
-            totalPages = para.Get<int?>("_TotalPages") ?? 0;
-            rowCount = para.Get<int?>("_RowCount") ?? 0;
+            var totalPages = para.Get<int?>("_TotalPages") ?? 0;
+            var rowCount = para.Get<int?>("_RowCount") ?? 0;
 
-            return result;
+            return (result, totalPages, rowCount);
+        }
+        
+        public async Task<OfflineBankingSetting> GetOfflineBankingSettingByIdAsync(int id)
+        {
+            var para = new DynamicParameters();
+            para.Add("_FinancialAccountId", id);
+
+            var result = await _reportDbClient
+                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById", para);
+
+            return result.FirstOrDefault();
+        }
+        
+        public Task<int> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
+        {
+            var para = new DynamicParameters();
+            para.Add("_FinancialAccountId", input.FinancialAccountId);
+            para.Add("_MinAmount", input.MinAmount);
+            para.Add("_MaxAmount", input.MaxAmount);
+            para.Add("_DailyLimitAmount", input.DailyLimitAmount);
+            para.Add("_VipLevels", JsonConvert.SerializeObject(input.VipLevels));
+            para.Add("_PointLevels", JsonConvert.SerializeObject(input.PointLevels));
+            para.Add("_Memo", input.Memo);
+            para.Add("_Status", (int)input.Status);
+            para.Add("_Sort", input.Sort);
+            para.Add("_Operator", input.Operator);
+
+            
+            return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set", para);
         }
         
         public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
