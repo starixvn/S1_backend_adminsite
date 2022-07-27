@@ -917,8 +917,14 @@ namespace BackendSite.Service.Model.enums
         [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
+    
+    public enum BankCardManagementPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
 
-    public enum BankDetailOffStatusEnum
+    public enum BankCardManagementStatusEnum
     {
         Initial = 0,     //Front-End Hidden
         Open = 1,        //Front-End green

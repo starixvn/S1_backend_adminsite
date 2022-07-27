@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
@@ -40,12 +41,13 @@ namespace BackendSite.Service.BLL
                 out totalPages, out rowCount);
         }
         
-        public IEnumerable<OfflineBankingSetting> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input, out int totalPages, out int rowCount)
+        public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingList
+            (GetOfflineBankingSettingParams input)
         {
-            var result = bankDetailService.GetOfflineBankingSettingList(input, out totalPages, out rowCount);
-            var vip = _vipLevelService.GetVipLevelSetting(input.SiteId);
+            var result = await bankDetailService.GetOfflineBankingSettingListAsync(input);
+            var vip = await _vipLevelService.GetVipLevelSettingAsync(input.SiteId);
             
-            foreach (var item in result)
+            foreach (var item in result.Datas)
             {
                 item.VipLevelNames = vip
                     .Where(x => item.VipLevels.Contains(x.Level))
@@ -53,6 +55,20 @@ namespace BackendSite.Service.BLL
             }
 
             return result;
+        }
+        
+        public async Task<OfflineBankingSetting> GetOfflineBankingSettingByIdAsync(int id)
+        {
+            var result = await bankDetailService.GetOfflineBankingSettingByIdAsync(id);
+            
+            return result;
+        }
+        
+        public async Task<bool> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
+        {
+            var result = await bankDetailService.SetOfflineBankingSettingAsync(input);
+            
+            return result > 0;
         }
 
         public int SetBankCard(ParamsWithLog<SetBankCard> input)
@@ -95,6 +111,13 @@ namespace BackendSite.Service.BLL
                     cache.Set(sBankInfoSysListKey, sysBankList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(10)));
                 }
             }
+
+            return sysBankList;
+        }
+        
+        public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
+        {
+            var sysBankList = GetSysBankList().Where(x => x.CurrencyId == currencyId);
 
             return sysBankList;
         }

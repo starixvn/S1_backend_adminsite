@@ -6,6 +6,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
@@ -30,6 +31,12 @@ namespace BackendSite.Service.DAL
         {
             var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
             return vipLevelSetting;
+        }
+        
+        public Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
+        {
+            return _mainDbClient
+                .QueryAsync<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
         }
 
         public VipLevelInfo GetVipLevelInfo(int CustId)
