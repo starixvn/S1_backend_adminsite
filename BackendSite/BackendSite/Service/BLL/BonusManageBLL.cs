@@ -253,5 +253,11 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
         }
+
+        public IEnumerable<PromotionType> GetPromotionType()
+        {
+            return _bonusManageService.GetPromotionType();
+        }
     }
+
 }
