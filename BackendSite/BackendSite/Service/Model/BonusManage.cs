@@ -143,6 +143,8 @@ namespace BackendSite.Service.Model
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
         public IEnumerable<PromotionCashBack> CashBackList { get; set; }
+        public string TierAmount { get; set; } = string.Empty;
+        public IEnumerable<TierAmount> TierAmountList { get; set; }
     }
 
     public class TpGameType
@@ -159,6 +161,12 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public string Name { get; set; }
         public int TpId { get; set; }
+    }
+
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
     }
 
     public class PromotionRebate
@@ -310,5 +318,12 @@ namespace BackendSite.Service.Model
     {
         public string BonusCode { get; set; }
         public int SiteId { get; set; }
+    }
+
+    public class TierAmount
+    {
+        public decimal Bonus { get; set; }
+        public decimal MaxBonus { get; set; }
+        public decimal RequiredAmount { get; set; }
     }
 }

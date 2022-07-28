@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly AdminBLL _adminBll;
+        private readonly BonusManageBLL _bonusManageBll;
 
         #endregion
 
@@ -559,6 +560,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return new ApiResult<IEnumerable<VipLevelModel>>
             {
                 Data = _custInfoBll.GetAllSiteVipLevelList(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// GetAllData/GetPromotionType  取得PromotionType List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType()
+        {
+            return new ApiResult<IEnumerable<PromotionType>>
+            {
+                Data = _bonusManageBll.GetPromotionType(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
