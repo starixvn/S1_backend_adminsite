@@ -254,6 +254,7 @@ namespace BackendSite.Service.BLL
                 result.CategoryId = balanceAdjustBonusCodeData.CategoryId;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
                 result.WalletType = balanceAdjustBonusCodeData.WalletType;
+                result.TierAmountList = balanceAdjustBonusCodeData.TierAmountList;
             }
             else
             {

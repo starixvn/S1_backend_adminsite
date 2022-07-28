@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -207,6 +208,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int CategoryId { get; set; }
         public string Name { get; set; }
+        public IEnumerable<TierAmount> TierAmountList
     }
     public class CheckBalanceAdjustData
     {
@@ -218,6 +220,20 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
+        public string TierAmount { get; set; }
+
+        public IEnumerable<TierAmount> TierAmountList
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(TierAmount))
+                {
+                    return default;
+                }
+
+                return JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(TierAmount);
+            }
+        }
     }
     public class BalanceAdjustBonusCodeBatchRep
     {
