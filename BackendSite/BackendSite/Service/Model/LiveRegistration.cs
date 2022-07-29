@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -50,7 +51,11 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
     }
-    
+    public class SetRegLiveStatusRequest
+    {
+        public int CustId { get; set; }
+        public CustomerRegLiveStatusStatusEnum Status { get; set; }
+    }
     public class CustRegLiveStatus
     {
         public string UserName { get; set; }

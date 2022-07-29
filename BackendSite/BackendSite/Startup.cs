@@ -86,6 +86,8 @@ namespace BackendSite
             }
 
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
+
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddControllersWithViews().AddJsonOptions(options =>

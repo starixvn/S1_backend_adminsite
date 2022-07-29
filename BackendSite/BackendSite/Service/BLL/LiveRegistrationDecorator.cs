@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -9,14 +10,14 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class LiveRegistrationDecorator
+    public class LiveRegistrationDecorator : ILiveRegistrationBLL
     {
         private readonly CustInfoBLL _custInfoBll;
-        private readonly LiveRegistrationBLL _liveRegistration;
+        private readonly ILiveRegistrationBLL _liveRegistration;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<LiveRegistrationDecorator> _logger;
 
-        public LiveRegistrationDecorator( CustInfoBLL custInfoBll, LiveRegistrationBLL liveRegistration, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationDecorator> logger)
+        public LiveRegistrationDecorator( CustInfoBLL custInfoBll, ILiveRegistrationBLL liveRegistration, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationDecorator> logger)
         {
             _custInfoBll = custInfoBll;
             _liveRegistration = liveRegistration;
@@ -65,6 +66,11 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<CustRegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
         {
             return await _liveRegistration.GetRegLiveStatusNotes(custId);
+        }
+
+        public Task<CustRegLiveStatusNotesData> GetRegLiveStatusNotesById(int id)
+        {
+            return _liveRegistration.GetRegLiveStatusNotesById(id);
         }
 
         public async Task<int> AddRegLiveStatusNote(int custId, string note, string @operator)

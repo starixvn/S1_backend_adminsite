@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -10,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class LiveRegistrationBLL
+    public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
         private readonly LiveRegistrationService _registrationService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
@@ -48,11 +49,6 @@ namespace BackendSite.Service.BLL
                 TotalPages = searchResult.TotalPages,
                 RowCount = searchResult.RowCount
             };
-        }
-
-        public async Task<CustRegLiveStatus> GetRegLiveStatusByCustId(int custId)
-        {
-            return await _registrationService.GetRegLiveStatusByCustId(custId);
         }
         
         public async Task<int> SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
@@ -101,11 +97,6 @@ namespace BackendSite.Service.BLL
                 Operator = a.Operator,
                 UpdateTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero)
             });
-        }
-
-        public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
-        {
-            return await _registrationService.GetRegLiveStatusNotesByCustId(custId);
         }
         public async Task<CustRegLiveStatusNotesData> GetRegLiveStatusNotesById(int id)
         {
