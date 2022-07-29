@@ -53,7 +53,7 @@ namespace BackendSite.Service.DAL
             return searchData;
         }
 
-        public async Task<CustRegLiveStatus> GetRegLiveStatusByCustId(int custId)
+        public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
             var p = new DynamicParameters();
             p.Add("_CustId", custId);

@@ -53,13 +53,13 @@ namespace BackendSite.Service.Model
     }
     public class SetRegLiveStatusRequest
     {
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public CustomerRegLiveStatusStatusEnum Status { get; set; }
     }
     public class CustRegLiveStatus
     {
-        public string UserName { get; set; }
-        public int Status { get; set; }
+        public CustomerRegLiveStatusStatusEnum Status { get; set; }
     }
     
     public class CustRegLiveStatusNotesData

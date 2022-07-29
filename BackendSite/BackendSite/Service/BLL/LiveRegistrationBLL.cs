@@ -50,35 +50,14 @@ namespace BackendSite.Service.BLL
                 RowCount = searchResult.RowCount
             };
         }
-        
-        public async Task<int> SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
+        public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
-            var result= await _registrationService.SetRegLiveStatus(input.After.CustId, input.SiteId, (int)input.After.Status, input.Operator);
-            var logParam = new CreateAdminAdjustmentInfoLogInput
-            {
-                Operator = input.Operator,
-                SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
-                BeforeDetailInfo = JsonConvert.SerializeObject(new
-                {
-                    UserName = input.Before.UserName,
-                    Status = input.Before.StatusName
-                }),
-                AfterDetailInfo = JsonConvert.SerializeObject(new
-                {
-                    UserName = input.After.UserName,
-                    Status = input.After.StatusName
-                }),
-                ActionType = ActionType.Update,
-                MenuEnum = AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics
-            };
-            if (result <= 0) return result;
-            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
-            {
-                _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
-            }
-
-            return result;
+            return await _registrationService.GetRegLiveStatus(custId);
+        }
+        
+        public async Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator)
+        {
+            return await _registrationService.SetRegLiveStatus(input.CustId, input.SiteId, (int)input.Status, @operator);
         }
 
         public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)

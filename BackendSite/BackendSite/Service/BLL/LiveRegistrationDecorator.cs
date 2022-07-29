@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
@@ -28,28 +29,40 @@ namespace BackendSite.Service.BLL
         {
             return await _liveRegistration.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
         }
-        public async Task<int> SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
+
+        public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
-            var result= await _liveRegistration.SetRegLiveStatus(input);
+            return await _liveRegistration.GetRegLiveStatus(custId);
+        }
+
+        public async Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator)
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(input.CustId);
+            if (customer == null) return 0;
+
+            var regLiveStatus = await _liveRegistration.GetRegLiveStatus(input.CustId);
+            
+            var result= await _liveRegistration.SetRegLiveStatus(input, @operator);
+            if (result <= 0) return result;
+            
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
-                Operator = input.Operator,
+                Operator = @operator,
                 SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
+                CurrencyId = customer.CurrencyId,
                 BeforeDetailInfo = JsonConvert.SerializeObject(new
                 {
-                    UserName = input.Before.UserName,
-                    Status = input.Before.StatusName
+                    UserName = customer.UserName,
+                    Status = regLiveStatus == null ? "Pending" : regLiveStatus.Status.ToString()
                 }),
                 AfterDetailInfo = JsonConvert.SerializeObject(new
                 {
-                    UserName = input.After.UserName,
-                    Status = input.After.StatusName
+                    UserName = customer.UserName,
+                    Status = input.Status.ToString()
                 }),
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.LiveRegistrationStatistics
             };
-            if (result <= 0) return result;
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));

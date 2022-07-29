@@ -111,11 +111,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
         [HttpPost("SetRegLiveStatus")]
-        public async Task<ApiResult> SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
+        public async Task<ApiResult> SetRegLiveStatus(SetRegLiveStatusRequest req)
         {
             try
             {
-                var result = await _registrationBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name));
+                var result = await _registrationBll.SetRegLiveStatus(req, User.Identity.Name);
                 var apiResult = new ApiResult
                 {
                     ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail
