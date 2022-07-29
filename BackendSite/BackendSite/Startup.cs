@@ -87,6 +87,7 @@ namespace BackendSite
 
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

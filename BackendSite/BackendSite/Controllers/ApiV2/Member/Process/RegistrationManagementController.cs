@@ -20,18 +20,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
-        private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
-        private readonly LiveRegistrationBLL _registrationBll;
+        private readonly LiveRegistrationDecorator _registrationBll;
 
-        public RegistrationManagementController(CustInfoBLL custInfoBll, ExcelBLL excelBll, LiveRegistrationBLL registrationBll)
+        public RegistrationManagementController(ExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
         {
-            _custInfoBll = custInfoBll;
             _excelBll = excelBll;
             _registrationBll = registrationBll;
         }
-
-        #region Model
 
         public class RegLiveStatusReq : ApiRequestPageModel
         {
@@ -49,10 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public int Sort { get; set; }
         }
-        public class GetRegLiveStatusNotesReq
-        {
-            public int CustId { get; set; }
-        }
+
         public class ExportRegLiveStatusListReq
         {
             public IEnumerable<int> SiteIds { get; set; }
@@ -72,9 +65,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CustId { get; set; }
             public int SiteId { get; set; }
         }
-        #endregion
-
-        #region Action
 
         /// <summary>
         /// RegistrationManagement/GetRegLiveStatusList 取得會員註冊資料
@@ -184,17 +174,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
         [HttpPost("Note/Get")]
-        public async Task<ApiResult<IEnumerable<RegLiveStatusNotes>>> GetNote(GetRegLiveStatusNotesReq req)
+        public async Task<ApiResult<IEnumerable<CustRegLiveStatusNotes>>> GetNote(GetRegLiveStatusNoteRequest req)
         {
-            var result = await _registrationBll.GetRegLiveStatusNotes(req.CustId);
-            var notes = result.ToList();
-            foreach (var data in notes)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
+            var notes = await _registrationBll.GetRegLiveStatusNotes(req.CustId);
+            var apiResult = new ApiResult<IEnumerable<CustRegLiveStatusNotes>>
             {
                 Data = notes,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -300,11 +283,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
         {
-            var exportData = _custInfoBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
+            var exportData = _registrationBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "Registration");
         }
-
-        #endregion
     }
 }

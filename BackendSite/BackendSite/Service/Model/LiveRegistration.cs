@@ -50,13 +50,34 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
     }
-
+    
     public class CustRegLiveStatus
     {
         public string UserName { get; set; }
         public int Status { get; set; }
     }
     
+    public class CustRegLiveStatusNotesData
+    {
+        public int Id { get; set; }
+        public int CustId { get; set; }
+        public string Note { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string Operator { get; set; }
+    }
+    
+    public class CustRegLiveStatusNotes
+    {
+        public int Id { get; set; }
+        public int CustId { get; set; }
+        public string Note { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public string Operator { get; set; }
+    }
+    public class GetRegLiveStatusNoteRequest
+    {
+        public int CustId { get; set; }
+    }
     public class AddRegLiveStatusNoteRequest
     {
         public int CustId { get; set; }

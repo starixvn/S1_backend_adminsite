@@ -78,12 +78,17 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_RegLiveStatus_Set", props);
         }
-        
-        public async Task<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
+        public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
         {
             var props = new DynamicParameters();
-            props.Add("CustId", custId);
-            return await _reportDbClient.QueryAsync<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get_V2", props);
+            props.Add("_CustId", custId);
+            return await _reportDbClient.QueryAsync<CustRegLiveStatusNotesData>("Admin_CustRegLiveStatusNotesByCustId_Get", props);
+        }
+        public async Task<CustRegLiveStatusNotesData> GetRegLiveStatusNotesById(int id)
+        {
+            var props = new DynamicParameters();
+            props.Add("_Id", id);
+            return await _reportDbClient.QueryFirstAsync<CustRegLiveStatusNotesData>("Admin_CustRegLiveStatusNotesById_Get", props);
         }
         public async Task<int> AddRegLiveStatusNote(int custId, string note, string @operator)
         {
@@ -108,6 +113,27 @@ namespace BackendSite.Service.DAL
             props.Add("Note",  note);
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Set", props);
+        }
+        
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var creditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
+            var props = new DynamicParameters();
+            props.Add("SelectSite", siteIds);
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
+            props.Add("DepositStatus", depositStatus);
+            props.Add("Status", status);
+            props.Add("Sort", sort);
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
+            props.Add("AgentCodeType", agentCodeType);
+
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V4", props);
+
+            return result;
         }
     }
 }

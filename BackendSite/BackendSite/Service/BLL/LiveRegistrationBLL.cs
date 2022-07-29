@@ -90,11 +90,27 @@ namespace BackendSite.Service.BLL
             return await _registrationService.UpdateCustomerTele(siteId, custId, @operator);
         }
 
-        public async Task<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
+        public async Task<IEnumerable<CustRegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
         {
-            return await _registrationService.GetRegLiveStatusNotes(custId);
+            var data = await _registrationService.GetRegLiveStatusNotesByCustId(custId);
+            return data.Select(a => new CustRegLiveStatusNotes()
+            {
+                Id = a.Id,
+                CustId = a.CustId,
+                Note = a.Note,
+                Operator = a.Operator,
+                UpdateTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero)
+            });
         }
 
+        public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
+        {
+            return await _registrationService.GetRegLiveStatusNotesByCustId(custId);
+        }
+        public async Task<CustRegLiveStatusNotesData> GetRegLiveStatusNotesById(int id)
+        {
+            return await _registrationService.GetRegLiveStatusNotesById(id);
+        }
         public async Task<int> AddRegLiveStatusNote(int custId, string note, string @operator)
         {
             return await _registrationService.AddRegLiveStatusNote(custId, note, @operator);
@@ -108,6 +124,29 @@ namespace BackendSite.Service.BLL
         public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
         {
             return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
+        }
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var list = new List<RegLiveStatusExport>();
+            var result = _registrationService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            result.ToList().ForEach(x =>
+            {
+                list.Add(new RegLiveStatusExport()
+                {
+                    Site = x.SiteName,
+                    Currency = x.Currency,
+                    UserName = x.UserName,
+                    FullName = x.AccountName,
+                    PhoneNo = x.PhoneNo,
+                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
+                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
+                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
+                    AffCode = x.AffCode,
+                    Agent = x.Agent
+                });
+            });
+            return list;
         }
     }
 }
