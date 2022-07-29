@@ -10,7 +10,7 @@ namespace BackendSite.Service.BLL.Interface
         Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType);
         Task<CustRegLiveStatus> GetRegLiveStatus(int custId);
         Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator);
-        Task<int> UpdateCustomerTele(int siteId, int custId, string @operator);
+        Task<int> AddCallingRecord(int siteId, int custId, string @operator);
         Task<IEnumerable<CustRegLiveStatusNotes>> GetRegLiveStatusNotes(int custId);
         Task<CustRegLiveStatusNotesData> GetRegLiveStatusNotesById(int id);
         Task<int> AddRegLiveStatusNote(int custId, string note, string @operator);

@@ -52,23 +52,32 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        {
+            var creditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
+            var props = new DynamicParameters();
+            props.Add("SelectSite", siteIds);
+            props.Add("Currency", currency);
+            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
+            props.Add("DepositStatus", depositStatus);
+            props.Add("Status", status);
+            props.Add("Sort", sort);
+            props.Add("StartDate", startDate.DateTime);
+            props.Add("EndDate", endDate.DateTime);
+            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
+            props.Add("AgentCodeType", agentCodeType);
 
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V4", props);
+
+            return result;
+        }
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
             return await _reportDbClient.QueryFirstAsync<CustRegLiveStatus>("Admin_RegLiveStatus_Get", p);
         }
-
-        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
-        {
-            var props = new DynamicParameters();
-            props.Add("SiteId", siteId);
-            props.Add("CustId", custId);
-            props.Add("Operator", @operator);
-            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins", props);
-        }
-
         public async Task<int> SetRegLiveStatus(int custId, int siteId, int status, string @operator)
         {
             var props = new DynamicParameters();
@@ -77,6 +86,14 @@ namespace BackendSite.Service.DAL
             props.Add("Status", status);
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_RegLiveStatus_Set", props);
+        }
+        public async Task<int> AddCallingRecord(int siteId, int custId, string @operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("SiteId", siteId);
+            props.Add("CustId", custId);
+            props.Add("Operator", @operator);
+            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins", props);
         }
         public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
         {
@@ -113,27 +130,6 @@ namespace BackendSite.Service.DAL
             props.Add("Note",  note);
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Set", props);
-        }
-        
-        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            var creditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
-            var props = new DynamicParameters();
-            props.Add("SelectSite", siteIds);
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("DepositStatus", depositStatus);
-            props.Add("Status", status);
-            props.Add("Sort", sort);
-            props.Add("StartDate", startDate.DateTime);
-            props.Add("EndDate", endDate.DateTime);
-            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
-            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
-            props.Add("AgentCodeType", agentCodeType);
-
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V4", props);
-
-            return result;
         }
     }
 }

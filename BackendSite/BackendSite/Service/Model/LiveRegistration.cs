@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -20,6 +21,36 @@ namespace BackendSite.Service.Model
         public string Agent { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+    }
+    public class GetRegLiveStatusRequest : ApiRequestPageModel
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int Status { get; set; }
+        public int DepositStatus { get; set; }
+        public string AffiliatesCode { get; set; }
+        public int AgentCodeType { get; set; }
+        public string UserName { get; set; }
+        public int CallOutStatus { get; set; }
+        public int DormantUser { get; set; }
+        public int DateType { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+        public int Sort { get; set; }
+    }
+
+    public class ExportRegLiveStatusRequest
+    {
+        public IEnumerable<int> SiteIds { get; set; }
+        public int CurrencyId { get; set; }
+        public int DepositStatus { get; set; }
+        public int Status { get; set; }
+        public string User { get; set; }
+        public int Sort { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+        public string AffiliatesCode { get; set; }
+        public int AgentCodeType { get; set; }
     }
     public class RegLiveStatusPageResult
     {
@@ -50,6 +81,11 @@ namespace BackendSite.Service.Model
         public int DepositStatus { get; set; }
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
+    }
+    public class TeleCsdUpdateReq
+    {
+        public int CustId { get; set; }
+        public int SiteId { get; set; }
     }
     public class SetRegLiveStatusRequest
     {

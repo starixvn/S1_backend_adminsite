@@ -71,9 +71,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
+        public async Task<int> AddCallingRecord(int siteId, int custId, string @operator)
         {
-            return await _liveRegistration.UpdateCustomerTele(siteId, custId, @operator);
+            return await _liveRegistration.AddCallingRecord(siteId, custId, @operator);
         }
 
         public async Task<IEnumerable<CustRegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)

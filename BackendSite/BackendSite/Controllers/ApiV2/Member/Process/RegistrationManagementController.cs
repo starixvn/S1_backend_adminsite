@@ -26,44 +26,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = excelBll;
             _registrationBll = registrationBll;
         }
-
-        public class RegLiveStatusReq : ApiRequestPageModel
-        {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public int Status { get; set; }
-            public int DepositStatus { get; set; }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-            public string UserName { get; set; }
-            public int CallOutStatus { get; set; }
-            public int DormantUser { get; set; }
-            public int DateType { get; set; }
-            public DateTimeOffset StartDate { get; set; }
-            public DateTimeOffset EndDate { get; set; }
-            public int Sort { get; set; }
-        }
-
-        public class ExportRegLiveStatusListReq
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public int CurrencyId { get; set; }
-            public int DepositStatus { get; set; }
-            public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public DateTimeOffset StartDate { get; set; }
-            public DateTimeOffset EndDate { get; set; }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-        }
-        
-        public class TeleCsdUpdateReq
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
-
         /// <summary>
         /// RegistrationManagement/GetRegLiveStatusList 取得會員註冊資料
         /// </summary>
@@ -74,8 +36,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="custInfoReq"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
-        [HttpPost("GetRegLiveStatusList")]
-        public async Task<ApiListResult<LiveRegistration>> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
+        [HttpPost("GetList")]
+        public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest custInfoReq)
         {
             var apiResult = new ApiListResult<LiveRegistration>();
             try
@@ -101,6 +63,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// RegistrationManagement/ExportRegLiveStatus 匯出會員註冊資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
+        [HttpPost("Export")]
+        public IActionResult Export(ExportRegLiveStatusRequest req)
+        {
+            var exportData = _registrationBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
+            var stream = _excelBll.Export(exportData);
+            return _excelBll.ExcelFile(stream, "Registration");
+        }
+
+        /// <summary>
         /// RegistrationManagement/SetRegLiveStatus 更新會員註冊資料狀態
         /// </summary>
         /// <remarks>
@@ -108,10 +88,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
         /// </remarks>
-        /// <param name="para"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
-        [HttpPost("SetRegLiveStatus")]
-        public async Task<ApiResult> SetRegLiveStatus(SetRegLiveStatusRequest req)
+        [HttpPost("Set")]
+        public async Task<ApiResult> Set(SetRegLiveStatusRequest req)
         {
             try
             {
@@ -127,9 +107,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
         }
-        
+
         /// <summary>
-        /// RegistrationManagement/CallMark 寫入客服致電紀錄
+        /// RegistrationManagement/CallingRecord 寫入客服致電紀錄
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -139,12 +119,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
-        [HttpPost("CallRecord")]
-        public async Task<ApiResult> CallRecord(TeleCsdUpdateReq req)
+        [HttpPost("CallingRecord")]
+        public async Task<ApiResult> CallingRecord(TeleCsdUpdateReq req)
         {
             try
             {
-                if (await _registrationBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
+                if (await _registrationBll.AddCallingRecord(req.SiteId, req.CustId, User.Identity.Name) > 0)
                 {
                     return new ApiResult
                     {
@@ -266,24 +246,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = "Update fail.";
             }
             return apiResult;
-        }
-
-        /// <summary>
-        /// RegistrationManagement/ExportRegLiveStatus 匯出會員註冊資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
-        /// </remarks>
-        /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
-        [HttpPost]
-        public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
-        {
-            var exportData = _registrationBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
-            var stream = _excelBll.Export(exportData);
-            return _excelBll.ExcelFile(stream, "Registration");
         }
     }
 }
