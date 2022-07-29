@@ -56,4 +56,26 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int Status { get; set; }
     }
+    
+    public class AddRegLiveStatusNoteRequest
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
+
+    public class EditRegLiveStatusNoteRequest
+    {
+        public int CustId { get; set; }
+        public int Id { get; set; }
+        public string Note { get; set; }
+    }
+
+    public class DeleteRegLiveStatusNoteRequest
+    {
+        public int CustId { get; set; }
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string Note { get; set; }
+    }
 }

@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
-    [Route("apiV2/[controller]/[action]")]
+    [Route("apiV2/[controller]")]
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
@@ -86,7 +86,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="custInfoReq"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
-        [HttpPost]
+        [HttpPost("GetRegLiveStatusList")]
         public async Task<ApiListResult<LiveRegistration>> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
         {
             var apiResult = new ApiListResult<LiveRegistration>();
@@ -122,7 +122,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="para"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
-        [HttpPost]
+        [HttpPost("SetRegLiveStatus")]
         public async Task<ApiResult> SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
         {
             try
@@ -151,7 +151,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="req"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
-        [HttpPost]
+        [HttpPost("CallRecord")]
         public async Task<ApiResult> CallRecord(TeleCsdUpdateReq req)
         {
             try
@@ -181,13 +181,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
         /// </remarks>
-        /// <param name="addCustNoteReq"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
-        [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
+        [HttpPost("Note/Get")]
+        public async Task<ApiResult<IEnumerable<RegLiveStatusNotes>>> GetNote(GetRegLiveStatusNotesReq req)
         {
-            var result = _custInfoBll.GetRegLiveStatusNotes(req.CustId).ToList();
-            foreach (var data in result)
+            var result = await _registrationBll.GetRegLiveStatusNotes(req.CustId);
+            var notes = result.ToList();
+            foreach (var data in notes)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
@@ -195,7 +196,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
             {
-                Data = result,
+                Data = notes,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -210,13 +211,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
         /// </remarks>
-        /// <param name="addCustNoteReq"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 5 })]
         [HttpPost]
-        public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
+        [Route("Note/Add")]
+        public async Task<ApiResult> AddNote(AddRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.AddRegLiveStatusNote(req.CustId, req.Note, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.AddRegLiveStatusNote(new ParamsWithLog<AddRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -236,14 +239,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
         /// </remarks>
-        /// <param name="deleteCustNoteReq"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 4 })]
         [HttpPost]
-        public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
+        [Route("Note/Delete")]
+        public async Task<ApiResult> DeleteNote(DeleteRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.DeleteRegLiveStatusNote(req.CustId, req.Id, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.DeleteRegLiveStatusNote(
-                    new ParamsWithLog<DeleteRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -263,13 +267,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Edit] > [Submit]
         /// </remarks>
-        /// <param name="editRegLiveStatusNote"></param>
+        /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost]
-        public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
+        [Route("Note/Edit")]
+        public async Task<ApiResult> EditNote(EditRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.EditRegLiveStatusNote(req.CustId, req.Id, req.Note, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.EditRegLiveStatusNote(new ParamsWithLog<EditRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }

@@ -78,5 +78,36 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_RegLiveStatus_Set", props);
         }
+        
+        public async Task<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            return await _reportDbClient.QueryAsync<RegLiveStatusNotes>("Admin_CustRegLiveStatusNotes_Get_V2", props);
+        }
+        public async Task<int> AddRegLiveStatusNote(int custId, string note, string @operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("Note",  string.IsNullOrWhiteSpace(note) ? "" : note);
+            props.Add("Operator", @operator);
+            return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Ins", props);
+        }
+        public async Task<int> DeleteRegLiveStatusNote(int custId, int id)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("Id",  id);
+            return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Del", props);
+        }
+        public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("Id", id);
+            props.Add("Note",  note);
+            props.Add("Operator", @operator);
+            return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Set", props);
+        }
     }
 }

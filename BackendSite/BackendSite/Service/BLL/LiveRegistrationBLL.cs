@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
@@ -87,6 +88,26 @@ namespace BackendSite.Service.BLL
         public async Task<int> UpdateCustomerTele(int siteId, int custId, string @operator)
         {
             return await _registrationService.UpdateCustomerTele(siteId, custId, @operator);
+        }
+
+        public async Task<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(int custId)
+        {
+            return await _registrationService.GetRegLiveStatusNotes(custId);
+        }
+
+        public async Task<int> AddRegLiveStatusNote(int custId, string note, string @operator)
+        {
+            return await _registrationService.AddRegLiveStatusNote(custId, note, @operator);
+        }
+
+        public async Task<int> DeleteRegLiveStatusNote(int custId, int id, string @operator)
+        {
+            return await _registrationService.DeleteRegLiveStatusNote(custId, id);
+        }
+
+        public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
+        {
+            return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
         }
     }
 }
