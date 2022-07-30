@@ -7,6 +7,8 @@ using BackendSite.ExceptionHandling;
 using NSwag;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
 
@@ -75,6 +77,8 @@ namespace BackendSite
 
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
