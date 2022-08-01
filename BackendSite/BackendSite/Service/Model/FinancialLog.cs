@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BackendSite.Service.Model
 {
@@ -208,7 +209,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int CategoryId { get; set; }
         public string Name { get; set; }
-        public IEnumerable<TierAmount> TierAmountList
+        public IEnumerable<TierAmount> TierAmountList;
     }
     public class CheckBalanceAdjustData
     {
@@ -233,6 +234,24 @@ namespace BackendSite.Service.Model
 
                 return JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(TierAmount);
             }
+        }
+
+        public TierAmount CalculateTierAmount(decimal actualDeposit)
+        {
+            if (!TierAmountList.Any())
+            {
+                return null;
+            }
+                    
+            var tierAmountList = TierAmountList.OrderByDescending(i => i.RequiredAmount);
+            foreach (var item in tierAmountList)
+            {
+                if (actualDeposit >= item.RequiredAmount)
+                {
+                    return item;
+                }
+            }
+            return null;
         }
     }
     public class BalanceAdjustBonusCodeBatchRep
