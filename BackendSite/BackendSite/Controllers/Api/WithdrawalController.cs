@@ -94,13 +94,13 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
-
+            var userNames = FormatExtension.SplitRemoveSpace(withdrawalListReq.UserName, ',');
             var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
                 withdrawalListReq.withdrawalType, startTime, endTime,
-                withdrawalListReq.WithdrawalId, withdrawalListReq.UserName, withdrawalListReq.CurrencyId,
+                withdrawalListReq.WithdrawalId, userNames, withdrawalListReq.CurrencyId,
                 withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.PageSize, withdrawalListReq.AmountType, withdrawalListReq.Amount, pageNumber, withdrawalListReq.WithdrawalMethod
                 , out totalPages,
                 out rowCount, ref CurrencyAmount);

@@ -512,7 +512,7 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                     <th>{moment.utc(row.registerDate).add(8,'hour').format('l LTS')}</th>
                     {/* <th>{row.registerDate}</th> */}
                     <th>{row.totalDeposit}/{row.depositC}</th>
-                    <th>{row.totalBet}/{row.vaildBetC}</th>
+                    <th>{row.totalBet}/{row.validBetC}</th>
                     <th>{row.bonusAmount}</th>
                     {/* <th>{row.rewardTime}</th> */}
                     <th>{row.rewardTime ? moment.utc(row.rewardTime).add(8,'hour').format('l LTS') : null}</th>
