@@ -41,13 +41,13 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
-        public int SetBlockIP(string ip, string memo, string Operator)
+        public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
         {
-            return _blockService.SetBlockIP(ip, memo, Operator);
+            return _blockService.SetBlockIP(input);
         }
-        public int DeleteBlockIP(string ip)
+        public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
-            return _blockService.DeleteBlockIP(ip);
+            return _blockService.DeleteBlockIP(input);
         }
         public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
@@ -58,9 +58,9 @@ namespace BackendSite.Service.BLL
             return _blockService.GetBlockBankAccList(sysId, accountNum);
         }
 
-        public int BlockAccountSet(int sysId, string accountNum, BlockAccountStatus status, string Operator, string memo)
+        public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
-            return _blockService.BlockAccountSet(sysId, accountNum, status, Operator, memo);
+            return _blockService.BlockAccountSet(input);
         }
         private IEnumerable<IPCountry> GetIPCountryList()
         {
@@ -71,9 +71,9 @@ namespace BackendSite.Service.BLL
             return _blockService.GetIPUserList(ip);
         }
 
-        public int ReleaseAccount(int custId, int sysId, string accountNum, string iFSCCode)
+        public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
-            return _blockService.ReleaseAccount(custId, sysId, accountNum, iFSCCode);
+            return _blockService.ReleaseAccount(input);
         }
     }
 }
