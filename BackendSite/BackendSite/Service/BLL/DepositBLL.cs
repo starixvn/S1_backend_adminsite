@@ -54,7 +54,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, 
             DateTime endDate,
             string depositId,
-            string userName,
+            IEnumerable<string> userNames,
             IEnumerable<int> currencyId, 
             IEnumerable<int> status,
             IEnumerable<int> levelStatus, 
@@ -64,7 +64,7 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> payIds,
             int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
-            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userNames, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,
