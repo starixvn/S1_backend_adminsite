@@ -1052,5 +1052,10 @@ namespace BackendSite.Service.DAL
             return await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
 
         }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
+        }
     }
 }

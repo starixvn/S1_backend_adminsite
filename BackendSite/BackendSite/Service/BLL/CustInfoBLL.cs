@@ -874,6 +874,21 @@ namespace BackendSite.Service.BLL
         {
             return await _tpBll.GetTpWalletAsync(custId);
         }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
+        {
+            var custProfile = GetCustProfile(custId);
+            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                return Task.FromResult<IEnumerable<USDTDetail>>(Enumerable.Empty<USDTDetail>());
+            else
+                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+        }
+
         private bool IsWithdrawalInfoTransId(string transId)
         {
             if (string.IsNullOrWhiteSpace(transId))
