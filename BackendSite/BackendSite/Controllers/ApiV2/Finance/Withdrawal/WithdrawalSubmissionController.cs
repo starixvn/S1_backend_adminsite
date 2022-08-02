@@ -1,19 +1,14 @@
-﻿using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
+﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
-using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalSubmissionController : ControllerBase
@@ -83,6 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 125, 1 })]
         [HttpPost]
         public async Task<ApiResult<object>> VerifyAsync(GetCustBankListRequest request)
         {
@@ -151,6 +147,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 125, 3 })]
         [HttpPost]
         public async Task<ApiResult> SubmitAsync(WithdrawalSubmissionRequest request)
         {
@@ -165,8 +162,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.AccountHolderName,
                 request.Amount,
                 request.Memo,
-                "admin");
-                //authData.UserName);
+                authData.UserName);
 
             var apiResult = new ApiResult();
             if (result.Item1)
