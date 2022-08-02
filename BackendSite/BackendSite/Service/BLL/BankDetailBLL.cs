@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,6 +19,7 @@ namespace BackendSite.Service.BLL
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
         private readonly IMemoryCache cache;
+        private readonly ICacheHelper _redisHelper;
 
         public BankDetailBLL(IServiceProvider provider)
         {
@@ -26,6 +28,7 @@ namespace BackendSite.Service.BLL
             localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
             cache = provider.GetRequiredService<IMemoryCache>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -120,6 +123,14 @@ namespace BackendSite.Service.BLL
             var sysBankList = GetSysBankList().Where(x => x.CurrencyId == currencyId);
 
             return sysBankList;
+        }
+        
+        public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
+        {
+            var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
+            
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+                () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
 
         public IEnumerable<BankInfoOff> GetAllBankInfoOff()
