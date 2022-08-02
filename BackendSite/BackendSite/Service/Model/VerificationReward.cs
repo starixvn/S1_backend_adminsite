@@ -21,6 +21,7 @@ namespace BackendSite.Service.Model
         public int VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
+        public decimal MinDeposit { get; set; }
         public int Status { get; set; }
 
         public DateTimeOffset CreateTime
@@ -68,6 +69,7 @@ namespace BackendSite.Service.Model
         public VerificationTypeEnum VerificationType { get; set; }
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
+        public decimal MinDeposit { get; set; }
     }
 
     public class QueryVerificationRewardReport : ApiRequestPageModel

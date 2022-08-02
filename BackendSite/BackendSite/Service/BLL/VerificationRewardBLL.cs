@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
@@ -11,11 +13,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly VerificationRewardService _verificationRewardService;
         private readonly AdjustmentInfoLogService _adjustmentInfoLogService;
+        private readonly ILogger<VerificationRewardBLL> _logger;
 
         public VerificationRewardBLL(IServiceProvider provider)
         {
             _verificationRewardService = provider.GetService<VerificationRewardService>();
             _adjustmentInfoLogService = provider.GetService<AdjustmentInfoLogService>();
+            _logger = provider.GetService<ILogger<VerificationRewardBLL>>();
         }
         public async Task<VerificationRewardModel> GetVerificationReward(int siteId, int currencyId)
         {
@@ -44,6 +48,20 @@ namespace BackendSite.Service.BLL
             }
 
             return result;
+        }
+        
+        public async Task<bool> SetVerificationReward(int siteId, int currencyId, SetVerificationRewardParams input, string updateOperator)
+        {
+            var result = await _verificationRewardService
+                .InsertOrUpdate(siteId, currencyId, input, updateOperator);
+            var success = result == 1 || result == 2;
+            
+            if (!success)
+            {
+                _logger.LogError("SetVerificationReward Failed, result: " + result);
+            }
+            
+            return success;
         }
         
         public async Task<int> UpdateStatus(int siteId, int currencyId, int status, string updateOperator)

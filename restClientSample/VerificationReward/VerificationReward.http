@@ -31,9 +31,18 @@ Content-Type: application/json
 {
     "siteId": 1,
     "currencyId": 2,
-    "verificationType": 0,
-    "phoneReward": 30,
-    "emailReward": 40
+	"before":{
+		"verificationType": 0,
+		"phoneReward": 30,
+		"emailReward": 40,
+        "minDeposit": 0
+	},
+    "after":{
+		"verificationType": 0,
+		"phoneReward": 30,
+		"emailReward": 30,
+        "minDeposit": 500
+	}
 }
 
 ###
@@ -44,5 +53,10 @@ Content-Type: application/json
 {
     "siteId": 1,
     "currencyId": 2,
-    "status": 1
+	"before":{
+		"status": 0
+	},
+    "after":{
+		"status": 1
+	}
 }

@@ -68,10 +68,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             
             var updateOperator = User.Identity.Name;
-            var result = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
-                (int)request.After.VerificationType, request.After.PhoneReward, request.After.EmailReward, updateOperator);
+            var success = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
+                request.After, updateOperator);
 
-            var success = result == 1 || result == 2;
             if (success)
             {
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
@@ -85,13 +84,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     {
                         VerificationType = request.Before.VerificationType.ToString(),
                         request.Before.EmailReward,
-                        request.Before.PhoneReward
+                        request.Before.PhoneReward,
+                        request.Before.MinDeposit
                     }) : null,
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
                         VerificationType = request.After.VerificationType.ToString(),
                         request.After.EmailReward,
-                        request.After.PhoneReward
+                        request.After.PhoneReward,
+                        request.After.MinDeposit
                     })
                 });
             }
