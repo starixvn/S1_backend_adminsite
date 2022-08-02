@@ -48,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string BounsCode { get; set; }
             public int RollOver { get; set; }
             public PromotionTypeEnum PromotionType { get; set; }
+            public string DepositId { get; set; }
         }
 
         public class CheckTierRedepositBonusReq
@@ -96,7 +97,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     BonusCode = request.BounsCode,
                     Memo = request.Memo,
                     Amount = request.Amount,
-                    PromotionType = request.PromotionType.ToString()
+                    PromotionType = request.PromotionType.ToString(),
+                    request.DepositId,
                 };
                 
                 var logResult =
@@ -126,7 +128,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     Memo = request.Memo,
                     Operator = authData.UserName,
                     Amount = request.Amount,
-                    PromotionType = (int) request.PromotionType
+                    PromotionType = (int)request.PromotionType,
+                    DepositId = request.DepositId,
                 };
                 var apiOnlineResult =
                     await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
