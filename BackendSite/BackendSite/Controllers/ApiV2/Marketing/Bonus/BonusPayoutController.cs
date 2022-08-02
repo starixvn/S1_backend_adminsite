@@ -24,6 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly BonusPayoutBLL _bonusPayoutBLL;
         #endregion
 
         #region Constructors
@@ -34,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _bonusPayoutBLL = provider.GetRequiredService<BonusPayoutBLL>();
         }
         #endregion
 
@@ -46,6 +48,26 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public string BounsCode { get; set; }
             public int RollOver { get; set; }
             public PromotionTypeEnum PromotionType { get; set; }
+            public string DepositId { get; set; }
+        }
+
+        public class CheckTierRedepositBonusReq
+        {
+            public int CustId { get; set; }
+            public string BonusCode { get; set; }
+            public int PromotionType { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public string DepositId { get; set; }
+        }
+    
+
+        public class CheckTierRedepositBonusRep
+        {
+            public bool IsSuccess { get; set; }
+            public decimal RequiredAmount { get; set; }
+            public decimal ActualDeposit { get; set; }
+            public decimal BonusAmount { get; set; }
         }
         #endregion
 
@@ -75,7 +97,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     BonusCode = request.BounsCode,
                     Memo = request.Memo,
                     Amount = request.Amount,
-                    PromotionType = request.PromotionType.ToString()
+                    PromotionType = request.PromotionType.ToString(),
+                    request.DepositId,
                 };
                 
                 var logResult =
@@ -105,7 +128,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     Memo = request.Memo,
                     Operator = authData.UserName,
                     Amount = request.Amount,
-                    PromotionType = (int) request.PromotionType
+                    PromotionType = (int)request.PromotionType,
+                    DepositId = request.DepositId,
                 };
                 var apiOnlineResult =
                     await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
@@ -126,6 +150,26 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 apiResult.Message = ex.ToString();
             }
             return apiResult;
+        }
+
+        /// <summary>
+        /// BonusPayout/CheckTierRedepositBonus 檢查 Tier Redeposit Bonus
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance  > BonusPayout > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        [HttpPost]
+        public async Task<ApiResult<CheckTierRedepositBonusRep>> CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
+        {
+            return new ApiResult<CheckTierRedepositBonusRep>()
+            {         
+                Data = _bonusPayoutBLL.CheckTierRedepositBonus(request),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
     }
 }

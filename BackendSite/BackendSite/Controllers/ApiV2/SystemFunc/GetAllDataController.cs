@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _adminBll = provider.GetRequiredService<AdminBLL>();
-
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
         }
 
         #endregion
@@ -577,13 +577,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionType>> GetPromotionType()
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
-                Data = _bonusManageBll.GetPromotionType(),
+                Data = _bonusManageBll.GetPromotionType(request.isPayout),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+
+        public class GetPromotionTypeRequest
+        {
+            public bool isPayout { get; set; } = false;
         }
 
         #endregion
