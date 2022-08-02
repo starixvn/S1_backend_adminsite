@@ -20,39 +20,41 @@ namespace BackendSite.Service.BLL
 
         public CheckTierRedepositBonusRep CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
         {
+            var result = new CheckTierRedepositBonusRep
+            {
+                IsSuccess = false,
+                DepositId = request.DepositId,
+            };
+
             //get bonus detail
             var tierRedepositBonus = _adjustmentService.CheckBalanceAdjustBonusCode(request.BonusCode, request.PromotionType, request.SiteId, request.CurrencyId);
             if (tierRedepositBonus == null || !tierRedepositBonus.TierAmountList.Any())
             {
-                return new CheckTierRedepositBonusRep
-                {
-                    IsSuccess = false
-                };
+                return result;
             }
             
             //check deposit
             var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request);
             if (!checkResult.IsSuccess)
             {
-                return new CheckTierRedepositBonusRep
-                {
-                    IsSuccess = false
-                };
+                return result;
             }
 
             //calculate bonus
-            var actualDeposit = checkResult.ActualDeposit;
-            var tierAmount = tierRedepositBonus.CalculateTierAmount(actualDeposit);
-
-            return new CheckTierRedepositBonusRep
+            result.ActualDeposit = checkResult.ActualDeposit;
+            var tierAmount = tierRedepositBonus.CalculateTierAmount(result.ActualDeposit);
+            if (tierAmount == null)
             {
-                IsSuccess = tierAmount != null,
-                ActualDeposit = actualDeposit,
-                BonusAmount = tierAmount != null ? tierAmount.Bonus : 0,
-                RequiredAmount = tierAmount != null ? tierAmount.RequiredAmount : 0,
-            };
+                return result;
+            }
+
+            result.BonusAmount = tierAmount.Bonus;
+            result.LockAmount = tierAmount.RequiredAmount;
+            result.RolloverAmount = tierAmount.RequiredAmount;
 
 
+            result.IsSuccess = true;
+            return result;
         }
     }
 }

@@ -65,9 +65,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public class CheckTierRedepositBonusRep
         {
             public bool IsSuccess { get; set; }
-            public decimal RequiredAmount { get; set; }
+            public string DepositId { get; set; }
             public decimal ActualDeposit { get; set; }
+            public decimal LockAmount { get; set; }          
             public decimal BonusAmount { get; set; }
+            public decimal RolloverAmount { get; set; }
         }
         #endregion
 
