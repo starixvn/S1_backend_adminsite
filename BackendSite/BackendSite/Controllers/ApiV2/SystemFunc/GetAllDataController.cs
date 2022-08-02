@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _adminBll = provider.GetRequiredService<AdminBLL>();
-
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
         }
 
         #endregion
