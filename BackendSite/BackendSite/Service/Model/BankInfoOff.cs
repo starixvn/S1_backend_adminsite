@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Google.Protobuf.WellKnownTypes;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -30,6 +32,27 @@ namespace BackendSite.Service.Model
         public int Ver { get; set; }
     }
     
+    public class OfflineBankAccount
+    {
+        public int Id { get; set; }
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public string AccountName { get; set; }
+        public string AccountNo { get; set; }
+        public string AccountCode { get; set; }
+        public TransferAccountStatusEnum AccountStatus { get; set; }
+        public BankCardManagementStatusEnum SettingStatus { get; set; }
+        public string Purpose { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes =>
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{Purpose??string.Empty}]");
+        
+        public int SysId { get; set; }
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+    }
+    
     public class BankCodeModel
     {
         public string BankCode { get; set; }
@@ -39,6 +62,8 @@ namespace BackendSite.Service.Model
     public class CalCodeModel
     {
         public int Id { set; get; }
+        public int SiteId { set; get; }
+        public int CurrencyId { set; get; }
         public int SysId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }

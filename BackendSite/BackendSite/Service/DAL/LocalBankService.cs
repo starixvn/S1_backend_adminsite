@@ -21,6 +21,20 @@ namespace BackendSite.Service.DAL
              _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
             _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
+        
+        /// <summary>
+        /// API V2 使用，取代 GetAllBankAccountOff、GetBankAccountOff
+        /// </summary>
+        public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
+        {
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _CurrencyId = currencyId
+            });
+            
+            return _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+        }
 
         public IEnumerable<BankInfoOff> GetAllBankAccountOff()
         {
