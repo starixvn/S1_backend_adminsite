@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -161,9 +162,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+            var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
-                request.WithdrawalId, request.UserName, request.CurrencyIds,
+                request.WithdrawalId, userNames, request.CurrencyIds,
                 request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber, out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
