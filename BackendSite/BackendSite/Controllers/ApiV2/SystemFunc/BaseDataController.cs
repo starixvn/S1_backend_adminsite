@@ -209,6 +209,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int CurrencyId { get; set; }
         }
+        
+        public class GetBankCodeListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+        
+        public class GetCalCodeListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+        }
 
         #endregion
 
@@ -632,6 +652,59 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = sysBankList,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+        
+        /// <summary>
+        /// BaseData/GetBankCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankCodeModel>> GetBankCodeList(GetBankCodeListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
+            var bankInfoOff =
+                _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId);
+            var data = bankInfoOff
+                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetCalCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// Func Path：Deposit Request > CalCode DropDownList
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<CalCodeModel>> GetCalCodeList(GetCalCodeListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
+            var bankInfoOff = 
+                _bankDetailBll.GetOfflineBankAccount(request.SiteId);
+            bankInfoOff = bankInfoOff
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit))
+                .OrderBy(x => x.Id);
+            var data = bankInfoOff
+                .Select(x => new CalCodeModel
+                {
+                    Id = x.Id,
+                    SysId = x.SysId,
+                    CurrencyId = x.CurrencyId,
+                    AccountName = x.AccountName,
+                    AccountNo = x.AccountNo,
+                    BankCode = x.BankCode, 
+                    SiteName = x.SiteName
+                });
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
         }
 
         #region Private Methods
