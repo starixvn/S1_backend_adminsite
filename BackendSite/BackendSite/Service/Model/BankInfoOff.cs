@@ -62,7 +62,6 @@ namespace BackendSite.Service.Model
     public class CalCodeModel
     {
         public int Id { set; get; }
-        public int SiteId { set; get; }
         public int CurrencyId { set; get; }
         public int SysId { set; get; }
         public string AccountName { set; get; }
