@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -85,6 +86,7 @@ namespace BackendSite.Service.Model
             set => _flowEndTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string ChannelName { set; get; }
+        public int? DeviceScore { set; get; }
     }
     public class WithdrawalInfo
     {
@@ -214,6 +216,17 @@ namespace BackendSite.Service.Model
 
         public int Times { get; set; }
     }
+    
+    public class SetWithdrawalLimitInfo
+    {
+        [LogIgnore]
+        public int VipLevel { get; set; }
+        public string VipLevelName { get; set; }
+        public int WithdrawalMin { get; set; }
+        public int WithdrawalMax { get; set; }
+        [LogPropertyName("WithdrawalFrequency")]
+        public int Times { get; set; }
+    }
 
     public class WithdrawalKYC
     {
@@ -221,6 +234,10 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public double Amount { get; set; }
 
+    }
+    public class WithdrawalKYCAmount
+    {
+        public double Amount { get; set; }
     }
     public class WithdrawalData
     {

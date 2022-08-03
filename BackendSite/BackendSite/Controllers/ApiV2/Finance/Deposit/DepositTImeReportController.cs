@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositTimeReportController : ControllerBase

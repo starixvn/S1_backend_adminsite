@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
         {
-            return _reportDbClient.Query<CommonTpInfo>("Common_TpList_Get");
+            return _reportDbClient.Query<CommonTpInfo>("Common_TpList_Get").Where(i => i.Id > 0);
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()

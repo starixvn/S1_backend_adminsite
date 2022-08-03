@@ -82,6 +82,7 @@ const Result = (props) => {
   const [currnecyData, setcurrnecyData] = useState(null);
   const [isOpen, setOpen] = useState(false);
   const [editValue, setEditValue] = useState(null);
+  const [origValue, setOrigValue] = useState(null);
   const [isEdit, setEdit] = useState(false);
   let row = "";
 
@@ -105,6 +106,7 @@ const Result = (props) => {
           if (mounted) {
             if (response.data.data) {
               setcurrnecyData(response.data.data);
+              setOrigValue(response.data.data.adjustmentMax);
             }
           }
         } else {
@@ -149,9 +151,14 @@ const Result = (props) => {
     if (editValue !== null) {
       api
         .post("/api/Payment/AddAdjustmentLimitInfo", {
-          SiteId: props.siteId,
-          CurrencyId: props.currId,
-          AdjustmentMax: parseFloat(editValue),
+          siteId: props.siteId,
+          currencyId: props.currId,
+          before:{
+            adjustmentMax: origValue
+          },
+          after:{
+            adjustmentMax: parseFloat(editValue)
+          }
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {

@@ -368,15 +368,49 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
+        public bool SetAdjustmentLimitInfo(ParamsWithLog<AdjustmentLimit> input)
         {
-            var props = new DynamicParameters();
-            props.Add("SiteId", SiteId);
-            props.Add("CurrencyId", CurrencyId);
-            props.Add("AdjustmentMax", AdjustmentMax);
-            props.Add("Operator", Operator);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
 
-            return _mainDbClient.Execute("Admin_AdjustmentLimitInfo_Set", props);
+            using var tran = conn.BeginTransaction();
+            var props = new DynamicParameters();
+            props.Add("SiteId", input.SiteId);
+            props.Add("CurrencyId", input.CurrencyId);
+            props.Add("AdjustmentMax", input.After.AdjustmentMax);
+            props.Add("Operator", input.Operator);
+
+            var logParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Menu = (int) AdminAdjustmentLogMenuEnum.AdjustmentLimitation,
+                _ActionType = (int) ActionType.Update,
+                _RefTransId = string.Empty,
+                _BeforeDetailInfo = JsonConvert.SerializeObject(input.Before),
+                _AfterDetailInfo = JsonConvert.SerializeObject(input.After),
+                _Operator = input.Operator
+            };
+
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_AdjustmentLimitInfo_Set", props, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
         }
         public CheckBalanceAdjustData CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
         {

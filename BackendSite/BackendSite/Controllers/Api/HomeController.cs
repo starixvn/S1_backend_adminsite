@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -129,7 +129,7 @@ namespace BackendSite.Controllers.Api
 
             //if (userLoginResult != 0)
             //{
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
             //   return apiResult;
             //}
 
@@ -140,8 +140,8 @@ namespace BackendSite.Controllers.Api
                     //new Claim("LangId",? ),
                 };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            var claimsIdentity = new ClaimsIdentity(claims, "backend");
+            await HttpContext.SignInAsync("backend",
                                  new ClaimsPrincipal(claimsIdentity));
 
             return new ApiResult
@@ -190,7 +190,7 @@ namespace BackendSite.Controllers.Api
         public async Task<ApiResult> Signout()
         {
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("backend");
 
             return new ApiResult
             {

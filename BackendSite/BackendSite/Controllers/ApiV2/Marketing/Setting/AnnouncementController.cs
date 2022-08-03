@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AnnouncementController : ControllerBase
@@ -248,7 +248,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
             try
             {
-                var result = _messageBll.DeleteAnnouncement(para.Id);
+                var result = _messageBll.DeleteAnnouncement(para.Id, User.Identity.Name);
                 if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

@@ -1,39 +1,33 @@
-using System;
-using System.IO;
-using System.Linq;
 using BackendSite.Service.Library;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
-using Microsoft.AspNetCore.Http;
 using BackendSite.ExceptionHandling;
 using NSwag;
-using System.Collections.Generic;
+using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
+using StackExchange.Redis;
 using BackendSite.Service.Model;
 
 namespace BackendSite
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection")));
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
 
@@ -43,8 +37,11 @@ namespace BackendSite
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
-            services.AddDatabaseConnection(Configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(Configuration.GetSection("SiteConfig"));
+            services.AddDatabaseConnection(_configuration);
+            services.Configure<Dictionary<string, SiteConfig>>(_configuration.GetSection("SiteConfig"));          
+            services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
+            services.AddSingleton<AWSS3Helper>();
+            services.AddSingleton<AWSCloudFrontHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -78,6 +75,10 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -88,12 +89,23 @@ namespace BackendSite
             });
 
             services.AddHttpContextAccessor();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            services.AddAuthentication(option => 
+            {
+                option.DefaultScheme = "backend";
+            })
+            .AddCookie("backend", "backend", option =>
             {
                 //option.AccessDeniedPath
                 option.LoginPath = "/Home/Signin";
                 option.Cookie.Name = ".backend";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
+                option.Cookie.SameSite = SameSiteMode.Unspecified;
+            })
+            .AddCookie("backendV2", "backendV2", option =>
+            {
+                option.LoginPath = "/Home/AuthorizedFailed";
+                option.Cookie.Name = ".backendV2";
+                option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
             });
             services.AddDataProtection().DisableAutomaticKeyGeneration();

@@ -7,15 +7,21 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using BackendSite.Extensions;
+using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class LineChannelService
     {
+        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         public LineChannelService(IServiceProvider provider)
         {
+            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -40,24 +46,90 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int Set(LineChannelDto data)
+        public bool Set(ParamsWithLog<SetLineChannel> input)
         {
-            var p = new DynamicParameters();
-            p.Add("_Id", data.Id);
-            p.Add("_SiteId", data.SiteId);
-            p.Add("_CurrencyId", data.CurrencyId);
-            p.Add("_Link", data.Link);
-            p.Add("_Status", data.Status);
-            p.Add("_Operator", data.LastOperator);
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
 
-            return _mainDbClient.Execute("Admin_LineChannel_Set", p); ;
+            using var tran = conn.BeginTransaction();
+            var p = new DynamicParameters();
+            p.Add("_Id", input.After.Id);
+            p.Add("_SiteId", input.SiteId);
+            p.Add("_CurrencyId", input.CurrencyId);
+            p.Add("_Link", input.After.Link);
+            p.Add("_Status", input.After.Status);
+            p.Add("_Operator", input.Operator);
+
+            var isAdd = input.After.Id == 0;
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LineDepositChannel);
+            logParam.Add("_ActionType", (int) (isAdd ? ActionType.Create : ActionType.Update));
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", isAdd ? null : input.Before.ToLog(), DbType.String);
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_LineChannel_Set", p, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
         }
 
-        public int Delete(int id)
+        public bool Delete(ParamsWithLog<DeleteLineChannel> input)
         {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var tran = conn.BeginTransaction();
+            
             var p = new DynamicParameters();
-            p.Add("_Id", id);
-            return _mainDbClient.Execute("Admin_LineChannel_Del", p); 
+            p.Add("_Id", input.Before.Id);
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LineDepositChannel);
+            logParam.Add("_ActionType", (int) ActionType.Delete);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
+            logParam.Add("_Operator", input.Operator);
+
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_LineChannel_Del", p, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
         }
     }
 }

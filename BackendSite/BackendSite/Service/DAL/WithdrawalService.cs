@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             string WithdrawalId,
-            string UserName,
+            IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelstatus,
@@ -66,7 +66,7 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
-            var withdrawalId = 0;
+            var strUserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null; var withdrawalId = 0;
             var tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
                 _EndDate = endDate,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
-                _UserName = UserName,
+                _UserNames = strUserNames,
                 _CurrencyIds = CurrencyId,
                 _Statuses = Status,
                 _VipStatuses = VipStatus,
@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
             #region GetCurrencyTotalAmount
 
             var CurrencyTotalAmount =
-                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V3", p, commandType: CommandType.StoredProcedure)
+                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V4", p, commandType: CommandType.StoredProcedure)
                     .ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -118,7 +118,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V6", p,
+            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V8", p,
                 commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -250,9 +250,47 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<WithdrawalKYC>("Admin_WithdrawalKyc_Get", new DynamicParameters(new { SiteId = siteId }));
         }
 
-        public bool EditWithdrawalKYC(WithdrawalKYC withdrawalKYC)
+        public bool EditWithdrawalKYC(ParamsWithLog<WithdrawalKYCAmount> input)
         {
-            return _mainDbClient.Execute("Admin_WithdrawalKyc_Set", new DynamicParameters(new { withdrawalKYC.SiteId, withdrawalKYC.CurrencyId, withdrawalKYC.Amount })) > 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new
+            {
+                input.SiteId,
+                input.CurrencyId,
+                input.After.Amount
+            };
+
+            var success = conn
+                .Execute("Admin_WithdrawalKyc_Set", p, commandType: CommandType.StoredProcedure) > 0;
+
+            if (success)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalKycControl);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+                if (logSuccess)
+                {
+                    trans.Commit();
+                    return true;
+                }
+
+            }
+
+            trans.Rollback();
+
+            return false;
         }
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
