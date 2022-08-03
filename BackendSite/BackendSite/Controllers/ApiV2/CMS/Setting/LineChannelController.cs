@@ -10,7 +10,7 @@ using System;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class LineChannelController : ControllerBase
@@ -34,6 +34,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public class GetListRequest : ApiRequestPageModel
         {
             public int SiteId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
         public class GetByIdRequest
@@ -50,11 +51,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Http Method：POST
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 1 })]
         [HttpPost]
         public ApiListResult<LineChannelModel> GetList(GetListRequest request)
         {
             var datas = _lineChannelBll.GetList(request.SiteId,
+                request.CurrencyIds,
                 request.PageNumber,
                 request.PageSize,
                 out int totalPages,
@@ -77,7 +79,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Http Method：POST
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 1 })]
         [HttpPost]
         public ApiResult<LineChannelModel> GetById(GetByIdRequest request)
         {
@@ -97,7 +99,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Http Method：POST
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 3 })]
         [HttpPost]
         public ApiResult Set(ApiRequestWithLog<SetLineChannel> request)
         {
@@ -114,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Http Method：POST
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 3 })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DeleteLineChannel> request)
         {
