@@ -2980,7 +2980,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             UserName = custInfo.UserName,
                             Status = status,
                             Balance = balance,
-                            TpWalletList = custTPWallet
+                            TpWalletList = custTPWallet.Where(x=>x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
                         },
                         ErrorCode = (int) ErrorCodeEnum.Success
                     },
