@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }
         public string Agent { get; set; }
