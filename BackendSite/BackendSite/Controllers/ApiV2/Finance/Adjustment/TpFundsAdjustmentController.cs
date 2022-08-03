@@ -211,7 +211,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 if (isDeposit)
                 {
                     var log = _paymentBll.GetAdjustmentDepositLogByTransId(result.Data.TransId);
-                    JsonConvert.SerializeObject(new
+                    strDetail = JsonConvert.SerializeObject(new
                     {
                         request.TpName,
                         request.UserName,
@@ -244,6 +244,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     Operator = user,
                     ActionType = ActionType.Create,
                     MenuEnum = AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment,
+                    BeforeDetailInfo = null,
                     AfterDetailInfo = strDetail,
                     RefTransId = result.Data.TransId
                 });

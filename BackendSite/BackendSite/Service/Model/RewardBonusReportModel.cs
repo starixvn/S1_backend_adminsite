@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }
         public string Agent { get; set; }
@@ -34,7 +35,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string TpUserName { get; set; }
         public string TransId { get; set; }
-        public IEnumerable<int> EventTypeIds { get; set; }
+        public int EventTypeId { get; set; }
         public string BonusCode { get; set; }
         public IEnumerable<string> EventNames { get; set; }
         public DateTime StartDate { get; set; }
