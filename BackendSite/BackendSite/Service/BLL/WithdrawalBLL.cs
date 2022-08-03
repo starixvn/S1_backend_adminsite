@@ -754,8 +754,8 @@ namespace BackendSite.Service.BLL
                     CustId = custInfo.CustId,
                     UserName = custInfo.UserName,
                     Payment = paymentId.ToString(),
-                    MemberCard = isExistBankCard,
-                    AccountInfo = convertData.LogDetail,
+                    UsedCard = isExistBankCard ? "Member Card" : "Manual Card",
+                    AccountInfo = JsonConvert.SerializeObject(convertData.LogDetail),
                     Amount = amount,
                     Memo = memo,
                     Operator = updater
@@ -1411,10 +1411,9 @@ namespace BackendSite.Service.BLL
                         };
                         logDetail = new
                         {
-                            SysId = sysId,
-                            SysName = bankCode,
+                            BankName = $"{sysId}-{bankCode}",
                             AccountNo = accountNo,
-                            accountName = accountName,
+                            AccountName = accountName,
                         };
                         break;
                     }
@@ -1432,11 +1431,10 @@ namespace BackendSite.Service.BLL
                         };
                         logDetail = new
                         {
-                            Currency = cryptoCurrency,
-                            Network = network,
+                            Channel = $"{cryptoCurrency}-{network}",
                             AccountNo = accountNo,
                             AccountName = accountName,
-                            AccountNickName = accountNickName
+                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName
                         };
                         break;
                     }
