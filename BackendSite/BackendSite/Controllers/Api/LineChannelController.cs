@@ -36,8 +36,6 @@ namespace BackendSite.Controllers.Api
         public class GetListRequest : ApiRequestPageModel
         {
             public int SiteId { get; set; }
-
-            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
         public class GetByIdRequest
