@@ -52,7 +52,7 @@ POST {{url}}/apiV2/BankTransferAccount/GetById HTTP/1.1
 Content-Type: application/json
 
 {
-    "id": 23
+    "id": 366
 }
 
 ###
@@ -84,7 +84,10 @@ Content-Type: application/json
     "maxBalanceAlertAmount": 0,
     "reason": 16,
     "remark": null,
-    "status": 1
+    "status": 1,
+    "bankLoginUrl": "https://fake.bank.co",
+    "bankLoginAccount": "test_test",
+    "bankLoginPassword": "!@#$ertDFG"
 }
 
 ###
@@ -123,3 +126,12 @@ Content-Type: application/json
 # 取得金流商列表
 POST {{url}}/apiV2/BankTransferAccount/GetPayList HTTP/1.1
 Content-Type: application/json
+
+###
+# 取得 Agent 列表
+POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}

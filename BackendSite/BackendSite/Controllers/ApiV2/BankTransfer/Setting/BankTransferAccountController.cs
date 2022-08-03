@@ -158,7 +158,10 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 MaxBalanceAlertAmount = req.MaxBalanceAlertAmount,
                 PayId = req.PayId,
                 SysId = req.SysId,
-                Updator = authData.UserId
+                Updator = authData.UserId,
+                BankLoginUrl = req.BankLoginUrl,
+                BankLoginAccount = req.BankLoginAccount,
+                BankLoginPassword = req.BankLoginPassword
             }, authData.UserName);
 
             if (status)
@@ -202,6 +205,17 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             }
 
             return apiResult;
+        }
+        
+        public ApiResult GetAgentList(GetAgentListRequest req)
+        {
+            var result = _bankFinancialBll.GetTransferAccountAgentList(req.SiteId);
+
+            return new ApiResult<IEnumerable<string>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion
