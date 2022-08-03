@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency6: "EURO",
     lbl_Currency9: "AUD",
     lbl_Currency12: "GBP",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency20: "UUS",
     lbl_Currency32: "JPY",
@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency45: "WON",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
     lbl_Save: "Save",
     lbl_Success: "Success",
     lbl_Action: "Action",
@@ -119,8 +120,16 @@ const Result = (props) => {
 
   const handleDelete = (idx) => {
     if (window.confirm("Are you sure ?") === true) {
+      let data = {
+        siteId: props.siteId,
+        currencyId: props.currId,
+        before:{
+          Id: lineChannelList[idx].id,
+          link: lineChannelList[idx].link
+        }
+      };
       api
-        .post("/api/LineChannel/Delete", { Id: lineChannelList[idx].id })
+        .post("/api/LineChannel/Delete", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
             handleSetLineChannelList(idx, "Delete");
@@ -147,15 +156,24 @@ const Result = (props) => {
           : editValue.status
           ? 1
           : 0;
-      api
-        .post("/api/LineChannel/Set", {
-          isAdd: false,
-          id: lineChannelList[idx].id,
-          siteId: props.siteId,
-          currencyId: props.currId,
+
+      let data = {
+        siteId: props.siteId,
+        currencyId: props.currId,
+        before:{
+          Id: lineChannelList[idx].id,
+          link: lineChannelList[idx].link,
+          status: lineChannelList[idx].status
+        },
+        after:{
+          Id: lineChannelList[idx].id,
           link: Link,
-          status: parseInt(Status),
-        })
+          status: parseInt(Status)
+        }
+      };
+      
+      api
+        .post("/api/LineChannel/Set", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
             handleSetLineChannelList(idx, "Update", Link, Status);
@@ -179,21 +197,24 @@ const Result = (props) => {
       status = _newData ? 1 : 0;
     tmp[idx].status = status;
     setLineChannelList(tmp);
-    let param = {
-      Id: lineChannelList[idx].id,
-      link: lineChannelList[idx].link,
-      status: status,
+
+    let data = {
+      siteId: props.siteId,
+      currencyId: props.currId,
+      before:{
+        Id: lineChannelList[idx].id,
+        link: lineChannelList[idx].link,
+        status: lineChannelList[idx].status
+      },
+      after:{
+        Id: lineChannelList[idx].id,
+        link: lineChannelList[idx].link,
+        status: parseInt(status)
+      }
     };
 
     api
-      .post("/api/LineChannel/Set", {
-        isAdd: false,
-        id: lineChannelList[idx].id,
-        siteId: props.siteId,
-        currencyId: props.currId,
-        link: lineChannelList[idx].link,
-        status: parseInt(status),
-      })
+      .post("/api/LineChannel/Set", data)
       .then(function (response) {
         if (response.data.errorCode === 0) {
           alert("update successful.");

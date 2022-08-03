@@ -11,7 +11,7 @@ using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HotGameController : ControllerBase
@@ -40,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<IEnumerable<GetHotGameListResponse>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _hotGame.Get(request.SiteId, request.CurrencyId)
+                Data = await _hotGame.Get(request.SiteId, request.CurrencyId, request.RefreshCache)
             };
             return apiResult;
         }

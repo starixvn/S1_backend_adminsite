@@ -44,9 +44,9 @@ module.exports = {
     // "Finance/WithdrawalLimitAdjust.min": [
     //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     // ],
-    // "CSD/PersonalMsgBatch.min": [
-    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
-    // ],
+    "CSD/PersonalMsgBatch.min": [
+    	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -157,10 +157,10 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    // "Marketing/VipRebateMangetment.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/VipRebateMangetment/index.jsx"
-    // ],
+    "Marketing/VipRebateMangetment.min": [
+      "@babel/polyfill",
+      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
+    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
@@ -173,7 +173,6 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-
     // "Marketing/DomainManage.min": [
     // 	"./src/pages/Marketing/DomainManage/index.js"
     // ],
@@ -182,10 +181,10 @@ module.exports = {
     // 	"./src/pages/Finance/WithdrawalLimitManage/index.js"
     // ],
     // "Home/DashBoardNew.min": ["./src/pages/Home/DashBoardNew/index.js"],
-    "BankFinancial/TransferInfoReport.min": [
-      "@babel/polyfill",
-      "./src/pages/BankFinancial/TransferInfoReport/index.js",
-    ],
+    // "BankFinancial/TransferInfoReport.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/BankFinancial/TransferInfoReport/index.js",
+    // ],
     // "BankFinancial/BankFinancialReport.min": [
     //   "@babel/polyfill",
     //   "./src/pages/BankFinancial/BankFinancialReport/index.js",
@@ -257,9 +256,9 @@ module.exports = {
     // "Finance/USDTWithdrawalLimitManagement.min": [
     //   "./src/pages/Finance/USDTWithdrawalLimitManagement/index.js",
     // ],
-    // "Finance/CryptoWithdrawalLimitManagement.min": [
-    //   "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
-    // ],
+    "Finance/CryptoWithdrawalLimitManagement.min": [
+      "./src/pages/Finance/CryptoWithdrawalLimitManagement/index.js",
+    ],
     // "Marketing/VerificationReward.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationReward/index.js",
@@ -268,21 +267,23 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VerificationRewardReport/index.js",
     // ],
-    "Marketing/HotGames.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/HotGames/index.js",
-    ],
+    // "Marketing/HotGames.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/HotGames/index.js",
+    // ],
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
+    // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/HotEventManagement.min": [
     //   "./src/pages/Marketing/HotEventManagement/index.js",
+    //     "./src/pages/Marketing/HotEventManagement/index.js",
     // ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
-    "Marketing/DeepLinkManagement.min": [
-    	 '@babel/polyfill',
-    	"./src/pages/Marketing/DeepLinkManagement/index.js"
-    ],
+    // "Marketing/DeepLinkManagement.min": [
+    // 	 '@babel/polyfill',
+    // 	"./src/pages/Marketing/DeepLinkManagement/index.js"
+    // ],
   },
   output: {
     path: path.resolve(__dirname, "../BackendSite/wwwroot/js/component/"),

@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositLimitController : ControllerBase
@@ -110,9 +110,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Create(DepositLimitInfo req)
+        public ApiResult Create(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = _depositBll.AddDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -138,9 +139,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Update(DepositLimitInfo req)
+        public ApiResult Update(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = _depositBll.EditDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -166,11 +168,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Delete(DepositLimitInfo req)
+        public ApiResult Delete(ApiRequestWithLog<DepositLimitModel> req)
         {
-            var result = _depositBll.DeleteDepositLimit(req, User.Identity.Name);
+            var result =
+                _depositBll.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
-            if (result > 0)
+            if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");

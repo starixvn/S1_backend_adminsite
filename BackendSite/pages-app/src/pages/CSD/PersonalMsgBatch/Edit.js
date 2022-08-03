@@ -15,11 +15,13 @@ const AccountStatus = {
 
 const defCurrencyType = {
   2: "MYR",
+  3: "USD",
   4: "THB",
-  13: "RMB",
+  13: "CNY",
   15: "IDR",
   51: "VND",
   61: "INR",
+  74: "BDT",
 };
 
 const DropDownBox = (props) => {
@@ -143,6 +145,12 @@ const EditPanel = (props) => {
       
       let msg = "";
       let check = true;
+
+      if(props.IsAdding){
+        check = false;
+        msg = "Is still adding ,please add later.";
+      }
+      
       if (!stateData.optSite) {
         check = false;
         msg = "Please check Site.";
@@ -241,18 +249,9 @@ const EditPanel = (props) => {
           .then(function (response) {
             setSubmitStatus(false);
             if (isMountedRef.current) {
-              if (response.data) {
-                let param = {
-                  Url: "Message/ExportSendMessageBatchResultReport",
-                  Data: {
-                    BatchId: response.data.data,
-                  },
-                };
+              if (response.data.errorCode == 0) {
                 props.filterInfo.AccountStatus = 0;
                 props.filterInfo.Currency = 0;
-                
-                WebAPI.DownloadData(param);
-
                 updateData({
                   optSite: "",
                   file: "",
@@ -266,7 +265,7 @@ const EditPanel = (props) => {
                 if (props.FilterInfo) props.FilterSubmit();
                 alert("sent successfully");
               } else {
-                alert("sent error");
+                alert(response.data.message);
               }
               updateSend(false);
             }

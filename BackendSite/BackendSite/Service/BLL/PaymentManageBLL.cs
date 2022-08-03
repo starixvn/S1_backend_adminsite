@@ -2,6 +2,8 @@
 using System.Linq;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -39,25 +41,29 @@ namespace BackendSite.Service.BLL
             return paymentManageService.GetPayCurrencyList();
         }
 
-        public void UpdatePayList(int PayId, int Status,string Operator)
+        public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
-            paymentManageService.UpdatePayList(PayId, Status, Operator);
+            return paymentManageService.UpdatePayList(input);
         }
 
-        public void UpdatePayChannel(int ChannelId, int Sort, int Status, int PointLevel, string Operator)
+        public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
         {
-            paymentManageService.UpdatePayChannel(ChannelId, Sort, Status, PointLevel, Operator);
+            return paymentManageService.UpdatePayChannel(input);
         }
 
-        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, int AmountRule, string AmountShow, string Operator)
+        public bool UpdatePayCurrency(ParamsWithLog<UpdatePayCurrency> input)
         {
-            AmountShow = string.IsNullOrEmpty(AmountShow) ? null : AmountShow;
-            paymentManageService.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, AmountRule, AmountShow, Operator);
+            string amountShow = null;
+            if (input.After.AmountRule == AmountRuleEnum.Fixed)
+            {
+                amountShow = JsonConvert.SerializeObject(input.After.FixedAmountList);
+            }
+            return paymentManageService.UpdatePayCurrency(input, amountShow);
         }
 
-        public void UpdatePayCurrency(int ChannelId, int CurrencyId, decimal MinAmount, decimal MaxAmount, string Operator)
+        public bool UpdatePayCurrencyAmount(ParamsWithLog<UpdatePayCurrency> input)
         {
-            paymentManageService.UpdatePayCurrencyAmount(ChannelId, CurrencyId, MinAmount, MaxAmount, Operator);
+            return paymentManageService.UpdatePayCurrencyAmount(input);
         }
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)

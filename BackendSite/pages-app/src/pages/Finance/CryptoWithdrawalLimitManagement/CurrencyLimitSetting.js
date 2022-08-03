@@ -126,9 +126,12 @@ const Result = (props) => {
         Data: {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          cryptoCurrency: levelList[idx].cryptoCurrencyId,
-          networkType: levelList[idx].networkType
+          before: {
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType
+          }
         }
       };
       WebAPI.PostData(param)
@@ -161,17 +164,30 @@ const Result = (props) => {
         typeof editValue.times === "undefined"
           ? levelList[idx].times
           : editValue.times;
+      
       let param = {
         Url: "apiV2/WithdrawalLimitCrypto/Update",
         Data: {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          cryptoCurrency: levelList[idx].cryptoCurrencyId,
-          networkType: levelList[idx].networkType,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
-          times: times * 1
+          before:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType,
+            withdrawalMin: levelList[idx].withdrawalMin,
+            withdrawalMax: levelList[idx].withdrawalMax,
+            times: levelList[idx].times
+          },
+          after:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            cryptoCurrency: levelList[idx].cryptoCurrencyId,
+            networkType: levelList[idx].networkType,
+            withdrawalMin: parseInt(withdrawalMin),
+            withdrawalMax: parseInt(withdrawalMax),
+            times: times * 1
+          }
         }
       };
       WebAPI.PostData(param)

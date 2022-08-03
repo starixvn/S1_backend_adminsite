@@ -341,7 +341,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
         {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }));
+            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }),60);
             return result;
         }
     }

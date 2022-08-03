@@ -10,11 +10,13 @@ import * as Loading from '../commJS/Loading.jsx';
 
     const defCurrencyType = {
         2: "MYR",
+        3: "USD",
         4: "THB",
-        13: "RMB",
+        13: "CNY",
         15: "IDR",
         51: "VND",
         61: "INR",
+        74: "BDT"
     };
     const defStatusType = {
         1: "Running",
@@ -51,6 +53,8 @@ import * as Loading from '../commJS/Loading.jsx';
                     <td>{data.sabaID}</td> 
                     <td>{data.affiliateCode}</td>
                     <td>{tagList.map(x => <TagComponent tagInfo={x} />)}</td>
+                    <td className={data.deviceScore > 74 ? "low-risk" : "high-risk"}>{data.deviceScore != null ? (data.deviceScore > 74 ? "Low Risk(" + data.deviceScore + ")"  : "High Risk(" + data.deviceScore + ")")  : "" }</td>
+                    <td>{data.shieldId}</td>
                     <td>{data.levelName}</td>
                     <td>{data.userLevel}</td>
                     <td>{i18n["lbl_Currency" + data.currencyId]}</td>
@@ -118,6 +122,8 @@ import * as Loading from '../commJS/Loading.jsx';
                                     <th scope="col">Saba ID</th>  
                                     <th scope="col">Affiliates Code</th>
                                     <th scope="col">Tag</th>
+                                    <th scope="col">Device Score</th>
+                                    <th scope="col">Shiled ID</th>
                                     <th scope="col">Vip Level</th>
                                     <th scope="col">Point Level</th>
                                     <th scope="col">Currency</th>
@@ -432,11 +438,13 @@ import * as Loading from '../commJS/Loading.jsx';
                 },
                 onInitialized: function () {
                     state.selectCurrency.push(2);
+                    state.selectCurrency.push(3);
                     state.selectCurrency.push(4);
                     state.selectCurrency.push(13);
                     state.selectCurrency.push(15);
                     state.selectCurrency.push(51);
                     state.selectCurrency.push(61);
+                    state.selectCurrency.push(74);
                 }
             });
             $('#selectCurrency').multiselect('updateButtonText');

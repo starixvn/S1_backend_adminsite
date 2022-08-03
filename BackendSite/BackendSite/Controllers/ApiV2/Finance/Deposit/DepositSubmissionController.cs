@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositSubmissionController : ControllerBase
@@ -20,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         private readonly DepositBLL _depositBll;
         private readonly SelLangBLL _selLangBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         #endregion
 
@@ -29,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         {
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         #endregion
@@ -60,10 +63,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public async Task<ApiResult> SubmitAsync([FromForm] DepositSubmissionRequest request)
         {
             var result = await _depositBll.CreateDeposit(request.Detail, request.Receipt);
-
+            
             var apiResult = new ApiResult();
             if (result == 1)
             {
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = User.Identity.Name,
+                    SiteId = request.Detail.SiteId,
+                    CurrencyId = request.Detail.CurrencyId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.DepositSubmission,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = request.Detail.ToLog()
+                });
+                
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertSuccessful");
             }

@@ -115,7 +115,7 @@ namespace BackendSite.Service.Library
             isInnerIp = isInner(ipNum, aBegin, aEnd) || isInner(ipNum, bBegin, bEnd) || isInner(ipNum, cBegin, cEnd) || ipAddress == "127.0.0.1";
             return isInnerIp;
         }
-        private long getIpNum(string ipAddress)
+        public long getIpNum(string ipAddress)
         {
             var ip = ipAddress.Split('.');
             long a = Convert.ToInt32(ip[0]);
@@ -204,23 +204,6 @@ namespace BackendSite.Service.Library
             }
         }
 
-    }
-
-    public static class GetEnumDescription
-    {
-        /// <summary>
-        /// 取得列舉說明文字
-        /// </summary>
-        /// <param name="value">列舉值</param>
-        /// <returns></returns>
-        public static string GetDescription(this Enum value)
-        {
-            var fi = value.GetType().GetField(value.ToString());
-            var attributes = (DescriptionAttribute[])fi.GetCustomAttributes(
-             typeof(DescriptionAttribute), false);
-            if (attributes.Length > 0) return attributes[0].Description;
-            else return value.ToString();
-        }
     }
 
 }

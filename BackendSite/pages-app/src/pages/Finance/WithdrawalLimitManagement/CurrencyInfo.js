@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency6: "EURO",
     lbl_Currency9: "AUD",
     lbl_Currency12: "GBP",
-    lbl_Currency13: "RMB",
+    lbl_Currency13: "CNY",
     lbl_Currency15: "IDR",
     lbl_Currency20: "UUS",
     lbl_Currency32: "JPY",
@@ -21,6 +21,7 @@ if (process.env.NODE_ENV !== "production") {
     lbl_Currency45: "WON",
     lbl_Currency51: "VND",
     lbl_Currency61: "INR",
+    lbl_Currency74: "BDT",
     lbl_Save: "Save",
     lbl_Success: "Success",
     lbl_Action: "Action",
@@ -106,7 +107,13 @@ const Result = (props) => {
         .post("/api/Withdrawal/DeleteWithdrawalLimitInfo", {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
+          before:{
+            vipLevel: levelList[idx].vipLevel,
+            vipLevelName: levelList[idx].levelName,
+            withdrawalMin: levelList[idx].withdrawalMin,
+            withdrawalMax: levelList[idx].withdrawalMax,
+            times: levelList[idx].times
+          }
         })
         .then(function (response) {
           if (response.data.errorCode === 0) {
@@ -136,15 +143,28 @@ const Result = (props) => {
         typeof editValue.times === "undefined"
           ? levelList[idx].times
           : editValue.times;
-      api
-        .post("/api/Withdrawal/EditWithdrawalLimitInfo", {
+      let level = levelList[idx].vipLevel;
+      let levelName = levelList[idx].levelName;
+      var data = {
           siteId: levelList[idx].siteId,
           currencyId: levelList[idx].currencyId,
-          vipLevel: levelList[idx].vipLevel,
-          times: times,
-          withdrawalMin: parseInt(withdrawalMin),
-          withdrawalMax: parseInt(withdrawalMax),
-        })
+          before: {
+              vipLevel: level,
+              vipLevelName: levelName,
+              withdrawalMin: levelList[idx].withdrawalMin,
+              withdrawalMax: levelList[idx].withdrawalMax,
+              times: levelList[idx].times
+          },
+          after: {
+              vipLevel: level,
+              vipLevelName: levelName,
+              withdrawalMin: parseInt(withdrawalMin),
+              withdrawalMax: parseInt(withdrawalMax),
+              times: times
+          }
+      };
+      api
+        .post("/api/Withdrawal/EditWithdrawalLimitInfo", data)
         .then(function (response) {
           if (response.data.errorCode === 0) {
             handleSetLevelList(idx, "Update", withdrawalMin, withdrawalMax, times);

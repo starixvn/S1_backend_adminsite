@@ -28,9 +28,7 @@ export const AddLevel = (props) => {
       return alert("VIP level error!");
     }
     let newLevelList = {
-      siteId: props.siteId,
-      currencyId: props.currencyId,
-      //vipLevel: level,
+      vipLevel: level,
       withdrawalMin: withdrawalMin,
       withdrawalMax: withdrawalMax,
       times: times,
@@ -39,7 +37,11 @@ export const AddLevel = (props) => {
     };
     let param = {
       Url: "apiV2/WithdrawalLimitCrypto/Create",
-      Data: newLevelList,
+      Data: {
+        siteId: props.siteId,
+        currencyId: props.currencyId,
+        after: newLevelList
+      },
     };
     WebAPI.PostData(param)
       .then(function (response) {

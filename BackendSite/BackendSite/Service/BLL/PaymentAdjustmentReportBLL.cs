@@ -88,6 +88,8 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new PaymentAdjustmentFrontEnd
                     {
+                        SiteId = row.SiteId,
+                        CurrencyId = row.CurrencyId,
                         CustId = row.CustId,
                         TransId = row.TransId,
                         CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
@@ -192,7 +194,7 @@ namespace BackendSite.Service.BLL
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
 
-        public bool SetAdjustment(SetAdjustment input)
+        public bool SetAdjustment(ParamsWithLog<SetAdjustment> input)
         {
             var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
 
@@ -201,29 +203,17 @@ namespace BackendSite.Service.BLL
                 _logger.LogError("FuncKey: Finance/PaymentAdjustment, GetReason has no data.");
                 return false;
             }
-
+            input.Before.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.Before.Category)?.Description;
+            input.After.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.After.Category)?.Description;
+            
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);
             
-            var beforeCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.BeforeCategory)?.Description;
-            var afterCategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.AfterCategory)?.Description;
-
-            var logDetail = new Dictionary<string, string>
-            {
-                { "TransId", input.TransId },
-                { "BeforeAdjustReason", beforeCategoryName },
-                { "AfterAdjustReason", afterCategoryName },
-                { "BeforeMemo", input.BeforeMemo },
-                { "AfterMemo", input.AfterMemo }
-            };
-
-            var strLogDetail = JsonConvert.SerializeObject(logDetail);
-
             // 依 prefix 判斷更新哪張表
             if (input.TransId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
-                return paymentAdjustmentService.SetAdjustmentInfo(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
+                return paymentAdjustmentService.SetAdjustmentInfo(input, id);
 
-            return paymentAdjustmentService.SetLogAdminAdjustWallet(id, input.AfterCategory, input.AfterMemo, strLogDetail, input.Operator);
+            return paymentAdjustmentService.SetLogAdminAdjustWallet(input, id);
         }
         #region Private Methods
 

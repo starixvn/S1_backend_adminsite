@@ -2,10 +2,23 @@
 
 namespace BackendSite.Service.Model
 {
+    public class HotGameData
+    {
+        public int TpId { get; set; }
+        public string GameId { get; set; }
+        public int TpGameType { get; set; }
+        public int TpCategory { get; set; }
+        public string GameName { get; set; }
+        public string GameLogo { get; set; }
+        public string TpName { get; set; }
+        public string TpLogo { get; set; }
+    }
+    
     public class GetHotGameListRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public bool RefreshCache { get; set; }
     }
     public class GetHotGameListDto
     {
@@ -35,7 +48,6 @@ namespace BackendSite.Service.Model
         public DateTime LastUpdateTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
-
     public class SetHotGameRequest
     {
         public int Id { get; set; }

@@ -17,6 +17,7 @@ const App = () => {
     TagColour: "#fff",
     Description: "",
   });
+  const [origData, setOrigData] = useState({});
   const [stateDatas, setDatas] = useState({
     PageInfo: { pageNumber: 1 },
     Datas: null,
@@ -50,11 +51,22 @@ const App = () => {
   };
 
   const EditSubmit = () => {
+
     let Data = {
-      Id: editData.Id,
-      Description: editData.Description,
-      TagName: editData.TagName,
-      TagColour: editData.TagColour,
+      currencyId: 0,
+      siteId: 0,
+      before: {
+        id: origData.id,
+        description: origData.description,
+        tagName: origData.tagName,
+        tagColour: origData.tagColour
+      },
+      after: {
+        id: editData.Id,
+        description: editData.Description,
+        tagName: editData.TagName,
+        tagColour: editData.TagColour
+      }
     };
     api
       .post("/api/CustManage/EditTagManagement", Data)
@@ -69,6 +81,7 @@ const App = () => {
           });
           Resubmit();
           setstate(0);
+          setOrigData({});
         } else {
           alert(res.data.message ?? "failed to get data.");
         }
@@ -86,6 +99,7 @@ const App = () => {
     });
     //Resubmit();
     setstate(0);
+    setOrigData({});
   };
 
   const ClickSubmit = () => {
@@ -196,12 +210,30 @@ const App = () => {
       Description: Data.description,
     });
     setstate(1);
+    setOrigData({
+      id: Data.id,
+      tagName: Data.tagName,
+      tagColour: Data.tagColour,
+      description: Data.description,
+    });
   };
 
   const StatusChange = (value) => {
     if (window.confirm(`Are you sure change ${value.tagName} ?`)) {
+      let afterStatus = value.status * 1 === 0 ? 1 : 0;
       let Data = {
-        Id: value.id,
+        currencyId: 0,
+        siteId: 0,
+        before: {
+          id: value.id,
+          tagName: value.tagName,
+          status: value.status
+        },
+        after: {
+          id: value.id,
+          tagName: value.tagName,
+          status: afterStatus
+        }
       };
       api
         .post("/api/CustManage/SetTagStatus", Data)
