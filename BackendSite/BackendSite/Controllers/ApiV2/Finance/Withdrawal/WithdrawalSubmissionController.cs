@@ -116,7 +116,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         EligibleWithdrawal = availableBalance,
                         ExistLocalBankList = AccountInfoList,
                         ExistCryptoList = cryptoAccountInfoList,
-                        LocalBankSysList = sysLocalBankList
+                        LocalBankSysList = sysLocalBankList,
+                        //EWalletSysList = sysLocalBankList
                     };
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
