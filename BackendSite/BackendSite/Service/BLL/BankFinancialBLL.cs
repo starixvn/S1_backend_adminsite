@@ -74,6 +74,12 @@ namespace BackendSite.Service.BLL
         {
             return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
+        
+        public IEnumerable<string> GetTransferAccountAgentList(int siteId)
+        {
+            return _bankFinancialService.GetTransferAccountAgentList(siteId)
+                .Where(x => !string.IsNullOrEmpty(x));
+        }
 
         public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel input, string updater)
         {
@@ -116,14 +122,15 @@ namespace BackendSite.Service.BLL
                 AccountNo = input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
+                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? null : input.BankLoginUrl,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? null : input.BankLoginAccount,
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? null : input.BankLoginPassword,
                 InitialAmount = input.InitialAmount,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                 Reason = input.Reason == 0 ? null : input.Reason,
                 Remark = input.Remark,
                 Status = input.Status,
-                //CreateTime = bankFinancialTransferAccount.CreateTime,
                 Creator = isCreate ? input.Updator : oldData.Creator,
-                //UpdateTime = bankFinancialTransferAccount.UpdateTime,
                 Updator = input.Updator
             };
 
@@ -143,6 +150,9 @@ namespace BackendSite.Service.BLL
                     AccountNo = oldData.AccountNo,
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
+                    oldData.BankLoginUrl,
+                    oldData.BankLoginAccount,
+                    oldData.BankLoginPassword,
                     InitialAmount = oldData.InitialAmount,
                     MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
                     Remark = oldData.Remark,
@@ -156,6 +166,9 @@ namespace BackendSite.Service.BLL
                     AccountNo = input.AccountNo,
                     AccountName = input.AccountName,
                     DisplayName = input.DisplayName,
+                    input.BankLoginUrl,
+                    input.BankLoginAccount,
+                    input.BankLoginPassword,
                     InitialAmount = input.InitialAmount,
                     MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                     Remark = input.Remark,

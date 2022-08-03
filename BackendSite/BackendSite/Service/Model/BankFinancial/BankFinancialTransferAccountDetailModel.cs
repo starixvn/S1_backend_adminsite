@@ -145,6 +145,10 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName { get; set; }
+
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
     }
     
     public class BankFinancialTransferAccountExportModel
