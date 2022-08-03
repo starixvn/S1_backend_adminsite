@@ -103,9 +103,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             ErrorCode = -1,
                             Message = $"Available Balance is Insufficient. Available Balance={availableBalance}"
                         };
-                    var AccountInfoList = _custInfoBll.GetCustBankDetailAsync(custInfo.CustId).Result;
-                    var cryptoAccountInfoList = _custInfoBll.GetCustCryptoInfoListAsync(custInfo.CustId).Result;
-                    var sysLocalBankList = _bankDetailBll.GetSysBankList().ToList()
+                    var AccountInfoList = await _custInfoBll.GetCustBankDetailAsync(custInfo.CustId);
+                    var cryptoAccountInfoList = await _custInfoBll.GetCustCryptoInfoListAsync(custInfo.CustId);
+                    var sysLocalBankList = _bankDetailBll.GetSysBankList()
                         .Where(x => x.CurrencyId == custInfo.CurrencyId)
                         .Select(x => new { Value = x.SysId, Content = $"{x.BankCode}-{x.BankName}" });
                     apiResult.Data = new
@@ -166,10 +166,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 authData.UserName);
 
             var apiResult = new ApiResult();
-            if (result.Item1)
+            if (result.isSuccess)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = $"{_selLangBll.GetMsg("msg_InsertSuccessful")}, TransId = {result.Item2}";
+                apiResult.Message = $"{_selLangBll.GetMsg("msg_InsertSuccessful")}, TransId = {result.TransId}";
             }
             else
             {

@@ -269,10 +269,6 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
         }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            return _custInfoService.GetWithdrawalAvailableBalance(custId);
-        }
         public int CancelBonusByBonusId(int bonusId)
         {
             var statusList = new List<int>
@@ -896,7 +892,7 @@ namespace BackendSite.Service.BLL
         {
             var custProfile = GetCustProfile(custId);
             if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
-                return Task.FromResult<IEnumerable<USDTDetail>>(Enumerable.Empty<USDTDetail>());
+                return Task.FromResult(Enumerable.Empty<USDTDetail>());
             else
                 return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
         }
