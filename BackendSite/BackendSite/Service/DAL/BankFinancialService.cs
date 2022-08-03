@@ -111,6 +111,17 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
         }
 
+        public IEnumerable<string> GetTransferAccountAgentList(int siteId)
+        {
+            var p = new DynamicParameters(
+                new
+                {
+                    _SiteId = siteId
+                });
+            
+            return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
+        }
+
         public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
             var parameters = new DynamicParameters(
@@ -127,6 +138,9 @@ namespace BackendSite.Service.DAL
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
+                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
+                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
+                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
@@ -160,6 +174,9 @@ namespace BackendSite.Service.DAL
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
+                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
+                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
@@ -194,7 +211,6 @@ namespace BackendSite.Service.DAL
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_OperateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Operator = bankFinancialTransferAccount.Updator,
                     _Action = action
                 });

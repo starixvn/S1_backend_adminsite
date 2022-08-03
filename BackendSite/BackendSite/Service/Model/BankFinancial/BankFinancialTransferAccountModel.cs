@@ -67,6 +67,9 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 目前只 for INR IFSC. 使用
         /// </summary>
         public string AccountCode { get; set; }
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱

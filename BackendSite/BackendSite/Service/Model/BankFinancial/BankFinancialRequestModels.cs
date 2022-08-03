@@ -100,5 +100,14 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料狀態
         /// </summary>
         public TransferAccountStatusEnum Status { get; set; }
+
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
+    }
+    
+    public class GetAgentListRequest
+    {
+        public int SiteId { get; set; }
     }
 }
