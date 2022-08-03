@@ -708,7 +708,7 @@ namespace BackendSite.Service.BLL
         public decimal GetWithdrawalAvailableBalance(int custId)
             => _withdrawalService.GetWithdrawalAvailableBalance(custId);
 
-        public async Task<(bool, string)> CreateWithdrawalAsync(int custId, ApplicationAccountTypeEnum paymentId, string cryptoNetwork, int cryptoCurrencyId,
+        public async Task<(bool isSuccess, string TransId)> CreateWithdrawalAsync(int custId, ApplicationAccountTypeEnum paymentId, string cryptoNetwork, int cryptoCurrencyId,
             bool isExistBankCard, int sysId, string accountNo, string accountHolderName, decimal amount, string memo, string updater)
         {
             var IFSCCode = string.Empty;
@@ -721,7 +721,7 @@ namespace BackendSite.Service.BLL
             CheckCustInfo(custInfo);
 
             if (isExistBankCard)
-                CheckCustBankInfo(paymentId, cryptoCurrencyId, cryptoNetwork, custInfo, sysId, accountNo,
+                CheckCustAccount(paymentId, cryptoCurrencyId, cryptoNetwork, custInfo, sysId, accountNo,
                 out accountHolderName, out IFSCCode, out cryptoAccountNickName);
 
             CheckWithdrawalLimit(custInfo, paymentId, cryptoCurrencyId, cryptoNetwork, amount);
@@ -1258,7 +1258,7 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.Fail, "Haven't deposit yet.");
         }
 
-        private void CheckCustBankInfo(ApplicationAccountTypeEnum paymentId, int cryptoCurrencyId, string network,
+        private void CheckCustAccount(ApplicationAccountTypeEnum paymentId, int cryptoCurrencyId, string network,
             Customer custInfo, int sysId, string accountNo, out string accountName, out string IFSCCode, out string cryptoAccountNickName)
         {
             accountName = string.Empty;
@@ -1275,7 +1275,7 @@ namespace BackendSite.Service.BLL
                         if (custBankList == null
                             || !custBankList.Any()
                             || !custBankList.Any(x => x.SysId == sysId && x.AccountNo == accountNo))
-                            throw new AdminException(ErrorCodeEnum.Fail, "This LocalBank AccountNo Not Exist.Please Check.");
+                            throw new AdminException(ErrorCodeEnum.Fail, "This LocalBank AccountNo is not exist. Please Check.");
                         else
                         {
                             var accountInfo = custBankList.First(x => x.SysId == sysId && x.AccountNo == accountNo);
@@ -1290,7 +1290,7 @@ namespace BackendSite.Service.BLL
                         if (custCryptoInfoList == null
                             || !custCryptoInfoList.Any()
                             || !custCryptoInfoList.Any(x => x.USDTAddress == accountNo && x.CurrencyId == cryptoCurrencyId && x.Network == network))
-                            throw new AdminException(ErrorCodeEnum.Fail, "This Crypto AccountNo Not Exist.Please Check.");
+                            throw new AdminException(ErrorCodeEnum.Fail, "This Crypto AccountNo is not exist. Please Check.");
                         else
                         {
                             var accountInfo = custCryptoInfoList.First(x => x.USDTAddress == accountNo && x.CurrencyId == cryptoCurrencyId && x.Network == network);
@@ -1325,7 +1325,7 @@ namespace BackendSite.Service.BLL
                 //check withdrawal count and daily and withdrawal limit
                 case ApplicationAccountTypeEnum.LocalBank:
                     {
-                        var withdrawalLimitInfo = GetWithdrawalLimitInfos(new List<int> { custInfo.SiteId }, new List<int> { custInfo.UserLevel }, 1, 100, out _, out _).First(x => x.VipLevel == custInfo.UserLevel);
+                        var withdrawalLimitInfo = GetWithdrawalLimitInfos(new List<int> { custInfo.SiteId }, new List<int> { custInfo.CurrencyId }, 1, 100, out _, out _).First(x => x.VipLevel == custInfo.UserLevel);
 
                         if (withdrawalLimitInfo != null)
                             IsValidWithWithdrawalLimit(amount, custDailySum.Amount, custDailySum.Count,
@@ -1334,7 +1334,7 @@ namespace BackendSite.Service.BLL
                     }
                 case ApplicationAccountTypeEnum.Crypto:
                     {
-                        var withdrawalCryptoLimitInfo = GetCryptoWithdrawalLimitInfos(new List<int> { custInfo.SiteId }, new List<int> { custInfo.UserLevel }, cryptoCurrencyId, network, 1, 100, out _, out _).First(x => x.VipLevel == custInfo.UserLevel);
+                        var withdrawalCryptoLimitInfo = GetCryptoWithdrawalLimitInfos(new List<int> { custInfo.SiteId }, new List<int> { custInfo.CurrencyId }, cryptoCurrencyId, network, 1, 100, out _, out _).First(x => x.VipLevel == custInfo.UserLevel);
 
                         if (withdrawalCryptoLimitInfo != null)
                             IsValidWithWithdrawalLimit(amount, custDailySum.Amount, custDailySum.Count,
@@ -1356,8 +1356,8 @@ namespace BackendSite.Service.BLL
         private void CheckWithdrawalAmount(int custId, int currencyId, decimal amount)
         {
             var checkedAmount = amount;
-            var balance = _walletService.GetBalance(custId);
-            var WithdrawalAvailableBalance = _withdrawalService.GetWithdrawalAvailableBalance(custId);
+            var balance = _custInfoBLL.GetBalance(custId);
+            var WithdrawalAvailableBalance = GetWithdrawalAvailableBalance(custId);
 
             if (WithdrawalAvailableBalance < amount)
                 throw new AdminException(ErrorCodeEnum.Fail, $"Withdrawal Available Balance={WithdrawalAvailableBalance} < Amount={amount}. Please Check.");
@@ -1370,7 +1370,6 @@ namespace BackendSite.Service.BLL
 
             if (Math.Ceiling(checkedAmount) != Math.Floor(checkedAmount))
                 throw new AdminException(ErrorCodeEnum.Fail, $"Check Amount Fail. Please Check.");
-
         }
 
 
@@ -1427,7 +1426,7 @@ namespace BackendSite.Service.BLL
                             Network = network,
                             AccountNo = accountNo,
                             AccountName = accountName,
-                            NickName = accountNickName
+                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName
                         };
                         logDetail = new
                         {
