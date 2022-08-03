@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.Api
     public class LineChannelController : ControllerBase
     {
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly LineChannelBLL _lineChannelBll;
 
 
@@ -24,6 +25,7 @@ namespace BackendSite.Controllers.Api
         public LineChannelController(IServiceProvider provider)
         {
             _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _serverInfoBll = provider.GetService<ServerInfoBLL>();
             _lineChannelBll = provider.GetService<LineChannelBLL>();
         }
 
@@ -34,6 +36,8 @@ namespace BackendSite.Controllers.Api
         public class GetListRequest : ApiRequestPageModel
         {
             public int SiteId { get; set; }
+
+            public IEnumerable<int> CurrencyIds { get; set; }
         }
 
         public class GetByIdRequest
@@ -54,7 +58,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<LineChannelModel> GetList(GetListRequest request)
         {
+            var serverInfo = _serverInfoBll.GetSiteList().First(x => x.SiteId == request.SiteId);
             var datas = _lineChannelBll.GetList(request.SiteId,
+                serverInfo.ICurrencyList,
                 request.PageNumber,
                 request.PageSize,
                 out int totalPages,
