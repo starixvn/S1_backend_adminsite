@@ -34,7 +34,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string TpUserName { get; set; }
         public string TransId { get; set; }
-        public IEnumerable<int> EventTypeIds { get; set; }
+        public int EventTypeId { get; set; }
         public string BonusCode { get; set; }
         public IEnumerable<string> EventNames { get; set; }
         public DateTime StartDate { get; set; }
