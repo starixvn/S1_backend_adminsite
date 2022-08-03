@@ -244,6 +244,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     Operator = user,
                     ActionType = ActionType.Create,
                     MenuEnum = AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment,
+                    BeforeDetailInfo = null,
                     AfterDetailInfo = strDetail,
                     RefTransId = result.Data.TransId
                 });
