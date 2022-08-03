@@ -75,6 +75,21 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region Withdrawal Submission For Frontend Use
+
+    /// <summary>
+    /// 申請提款類型
+    /// </summary>
+    public enum ApplicationAccountTypeEnum
+    {
+        Undefine = 0, //No Use
+        LocalBank = 1,
+        Crypto = 4,
+        //EWallet = 5
+    }
+
+    #endregion
+
     #region AdminModule
 
     public enum AdminModuleStatusEnum
@@ -636,7 +651,8 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         SetBlockEWallet = 55,
-        ReleaseEWalletAccount = 56
+        ReleaseEWalletAccount = 56,
+        WithdrawalSubmission = 57
     }
 
     #region BankFinancialTransferInfoLog
@@ -1245,8 +1261,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-    
-     public enum ShieldRiskTagged
+    public enum ShieldRiskTagged
     {
         IsBot = 1,
         IsIncognito = 2,
@@ -1265,16 +1280,16 @@ namespace BackendSite.Service.Model.enums
         VirtualOs = 15,
         Hooking = 16
     }
-    
+
     public enum TriggeredPoints
     {
-        Registration = 1, 
+        Registration = 1,
         Login = 2,
         Deposit = 3,
         Withdrawal = 4,
         ClaimBonus = 5,
     }
-    
+
     public enum TaggedIssue
     {
         HighRisk = 1
