@@ -45,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string UserName { get; set; }
             public string TpUserName { get; set; }
             public string TransId { get; set; }
-            public IEnumerable<int> EventTypeIds { get; set; }
+            public int EventTypeId { get; set; }
             public string BonusCode { get; set; }
             public List<string> EventNames { get; set; }
             public DateTimeOffset StartDate
@@ -70,7 +70,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string UserName { get; set; }
             public string TpUserName { get; set; }
             public string TransId { get; set; }
-            public IEnumerable<int> EventTypeIds { get; set; }
+            public int EventTypeId { get; set; }
             public string BonusCode { get; set; }
             public List<string> EventNames { get; set; }
             public DateTimeOffset StartDate
@@ -99,7 +99,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                     UserName = request.UserName,
                     TpUserName = request.TpUserName,
                     TransId = request.TransId,
-                    EventTypeIds = request.EventTypeIds,
+                    EventTypeId = request.EventTypeId,
                     BonusCode = request.BonusCode,
                     EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null ,
                     StartDate = request.StartDate.DateTime,
@@ -129,7 +129,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 UserName = request.UserName,
                 TpUserName = request.TpUserName,
                 TransId = request.TransId,
-                EventTypeIds = request.EventTypeIds,
+                EventTypeId = request.EventTypeId,
                 BonusCode = request.BonusCode,
                 EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null ,
                 StartDate = request.StartDate.DateTime,
