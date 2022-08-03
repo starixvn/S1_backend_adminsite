@@ -392,19 +392,6 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status, TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
         }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-            var result = GetWithdrawalAvailableBalance(custId, conn, trans);
-            trans.Rollback();
-            return result;
-        }
-        public decimal GetWithdrawalAvailableBalance(int custId, MySqlConnection conn, MySqlTransaction trans)
-        {
-            return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
-        }
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
             int startIndex,
             int pageSize,
