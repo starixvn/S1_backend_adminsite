@@ -182,6 +182,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public DateTime RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
+        public decimal FreeCreditSum { get; set; }
         public DateTime? RewardTime { get; set; }
         public int Status { get; set; }
     }
@@ -193,6 +194,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public DateTimeOffset RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
+        public decimal FreeCreditSum { get; set; }
         public DateTimeOffset? RewardTime { get; set; }
         public string Status { get; set; }
     }
