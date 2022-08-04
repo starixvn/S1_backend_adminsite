@@ -116,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Http Method：POST
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 4 })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DeleteLineChannel> request)
         {
