@@ -92,6 +92,7 @@ namespace BackendSite.Service.BLL
                 RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
                 RewardTime = Convert(x.RewardTime, TimeSpan.Zero),
                 ReferralAmount = x.ReferralAmount,
+                FreeCreditSum = x.FreeCreditSum,
                 Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
             }).ToList();
             return result;
