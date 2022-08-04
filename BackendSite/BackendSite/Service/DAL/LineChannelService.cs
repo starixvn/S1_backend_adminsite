@@ -26,7 +26,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<LineChannelDto> GetList(bool isList,int id,int siteId, string currencyIds,
+        public IEnumerable<LineChannelViewModel> GetList(bool isList,int id,int siteId, string currencyIds,
             int startIndex, int pageSize,
             out int totalPages, out int rowCount)
         {
@@ -39,7 +39,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<LineChannelDto>("Admin_LineChannel_Get_V2", props);
+            var result = _reportDbClient.Query<LineChannelViewModel>("Admin_LineChannel_Get_V2", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
