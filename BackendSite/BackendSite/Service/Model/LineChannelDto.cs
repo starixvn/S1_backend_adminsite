@@ -21,7 +21,7 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
-        public int IsoCode { get; set; }
+        public string IsoCode { get; set; }
         public string Link { get; set; }
         public int Status { get; set; }
         public DateTime CreateTime { get; set; }
