@@ -75,12 +75,11 @@ namespace BackendSite.Service.Model
     /// </summary>
     public class SocialDataListResponse : SocialDataListBase
     {
-        [JsonProperty("lastUpdateTime",Order = 99)]
-        public string LastUpdateTime { get; set; }
-
-        [JsonProperty("linkType")]
+        [JsonProperty("linkType", Order = 98)]
         public bool LinkType { get; set; }
 
+        [JsonProperty("lastUpdateTime",Order = 99)]
+        public string LastUpdateTime { get; set; }
     }
 
     #endregion
