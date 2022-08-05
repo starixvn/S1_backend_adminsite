@@ -42,9 +42,21 @@ namespace BackendSite.Service.Model
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
 
+        /// <summary>
+        /// 是否排序
+        /// </summary>
         public bool OrderBy { get; set; }
+        /// <summary>
+        /// 排序欄位名稱
+        /// </summary>
         public string OrderByProperty { get; set; }
+        /// <summary>
+        /// 排序類型:
+        /// 0=升序
+        /// 1=降序
+        /// </summary>
         public OrderByDirection OrderByDirection { get; set; }
+
         public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
