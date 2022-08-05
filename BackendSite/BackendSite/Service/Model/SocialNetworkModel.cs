@@ -54,6 +54,9 @@ namespace BackendSite.Service.Model
         [JsonProperty("iosLink")]
         public string IosLink { get; set; }
 
+        [JsonProperty("linkType")]
+        public byte LinkType { get; set; }
+
         [JsonProperty("lastUpdateUser")]
         public string LastUpdateUser { get; set; }
     }
@@ -139,6 +142,9 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("iosLink")]
         public string IosLink { get; set; }
+
+        [JsonProperty("linkType")]
+        public byte LinkType { get; set; }
     }
 
     #endregion
