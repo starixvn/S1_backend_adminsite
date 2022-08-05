@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -26,13 +27,13 @@ namespace BackendSite.Service.Model
         [Required]
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> Tags { get; set; } = new List<int>();
-        public int VIPlevel { get; set; } = 0;
+        public int? VIPlevel { get; set; } = 0;
         public int TpId { get; set; } = 0;
+        public int GameType { get; set; } = 0;
+        public string TransId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string TpUserName { get; set; } = string.Empty;
         public string RefNo { get; set; } = string.Empty;
-        public string Provider { get; set; } = string.Empty;
-        public string Product { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public string Game { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
@@ -70,8 +71,31 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public string TransId { get; set; }
         public int GameType { get; set; }
-        public DateTimeOffset TransTime { get; set; }
-        public DateTimeOffset SettledTime { get; set; }
+        public DateTimeOffset TransTime 
+        {
+            get
+            {
+                return new DateTimeOffset(_transTime,TimeSpan.Zero);
+            }
+            set
+            {
+                _transTime = value.DateTime;
+            }
+        }
+        private DateTime _transTime { get; set; }
+        public DateTimeOffset SettledTime 
+        {
+            get
+            {
+                return new DateTimeOffset(_settledTime, TimeSpan.Zero);
+            }
+            set
+            {
+                _settledTime = value.DateTime;
+            }
+
+        }
+        private DateTime _settledTime { get; set; }
         public decimal Stake { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }

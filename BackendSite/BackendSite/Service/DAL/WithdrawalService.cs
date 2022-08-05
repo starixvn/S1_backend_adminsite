@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             string WithdrawalId,
-            string UserName,
+            IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelstatus,
@@ -67,7 +67,7 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
-            var withdrawalId = 0;
+            var strUserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null; var withdrawalId = 0;
             var tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
                 _EndDate = endDate,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
-                _UserName = UserName,
+                _UserNames = strUserNames,
                 _CurrencyIds = CurrencyId,
                 _Statuses = Status,
                 _VipStatuses = VipStatus,

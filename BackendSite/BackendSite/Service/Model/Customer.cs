@@ -170,6 +170,9 @@ namespace BackendSite.Service.Model
         public string AddressCity { get; set; }
         public string AddressLineFirst { get; set; }
         public string AddressLineSecond { get; set; }
+        public int EnableRebate { get; set; }
+        public int? DeviceScore { set; get; }
+        public string ShieldId { get; set; }
     }
 
     public class CustInfoDetailForExport

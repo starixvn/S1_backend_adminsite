@@ -12,6 +12,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -286,6 +287,71 @@ namespace BackendSite.Service.BLL
                                  $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
+        }
+        
+         public (bool,string) CheckBatchMessage(int currency , string personalMsg)
+        {
+            var result = true;
+            var errorMsg = "";
+            
+            switch (currency) 
+            {
+                case (int)CurrencyEnum.MYR:
+                    if (JObject.Parse(personalMsg)["cs"] == null ||
+                        JObject.Parse(personalMsg)["my"] == null)
+                    {
+                        result = false;
+                        errorMsg = "Missing 'cs' or 'my' Msg";
+                    }
+                    break;
+                    
+                case (int)CurrencyEnum.USD:
+                case (int)CurrencyEnum.CNY:
+                    if (JObject.Parse(personalMsg)["cs"] == null )
+                    {
+                        result = false;
+                        errorMsg = "Missing 'cs' Msg";
+                    }
+                    break;
+                
+                case (int)CurrencyEnum.THB :
+                    if (JObject.Parse(personalMsg)["th"] == null ||
+                        JObject.Parse(personalMsg)["th_en"] == null)
+                    {
+                        errorMsg = "Missing 'th' or 'th_en' Msg";
+                        result = false;
+                    }
+                    break;
+                    
+                
+                case (int)CurrencyEnum.IDR :
+                    if (JObject.Parse(personalMsg)["id"] == null ||
+                        JObject.Parse(personalMsg)["id_en"] == null)
+                    {
+                        errorMsg = "Missing 'id' or 'id_en' Msg";
+                        result = false;
+                    }
+                    break;
+                    
+                case (int)CurrencyEnum.INR : 
+                    if (JObject.Parse(personalMsg)["hi"] == null || 
+                        JObject.Parse(personalMsg)["hi_en"] == null)
+                    {
+                        errorMsg = "Missing 'hi' or 'hi_en' Msg";
+                        result = false;
+                    }
+                    break;
+                    
+                case (int)CurrencyEnum.BDT : 
+                    if (JObject.Parse(personalMsg)["bd"] == null)
+                    {
+                        errorMsg = "Missing 'bd' Msg";
+                        result = false;
+                    }
+                    break;
+                }
+            
+            return (result,errorMsg);
         }
     }
 }

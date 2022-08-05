@@ -51,12 +51,12 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request)
         {
-            var siteMaintainObject = new SiteMaintainResponse()
+            var siteMaintainObject = new 
             {
-                Maintain = request.Maintain,
-                DateTimeStart = new DateTimeOffset(request.BeginTime.ToUniversalTime().DateTime, new TimeSpan(8,0,0)).ToString("yyyy-MM-dd HH:mm:ss"),
+                request.Maintain,
+                DateTimeStart = request.BeginTime.ToOffset(new TimeSpan(8,0,0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeStart = request.BeginTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
-                DateTimeEnd = new DateTimeOffset(request.EndTime.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
+                DateTimeEnd = request.EndTime.ToOffset(new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeEnd = request.EndTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
             };
 
@@ -98,18 +98,46 @@ namespace BackendSite.Service.BLL
             /// 是否在維護中
             /// </summary>
             public bool Maintain { get; set; }
+
             /// <summary>
             /// 維護開始時間(+8)
             /// </summary>
-            public string DateTimeStart { get; set; }
+            public DateTimeOffset DateTimeStart 
+            {
+                get
+                {
+                    return new DateTimeOffset(_dateTimeStart, new TimeSpan(8, 0, 0));
+                }
+                set 
+                {
+                    _dateTimeStart = value.DateTime;
+                }
+            }
+
+            private DateTime _dateTimeStart { get; set; }
+
             /// <summary>
             /// 維護開始時間 UnixTime Seconds (+0)
             /// </summary>
             public string UTCTimeStart { get; set; }
+
             /// <summary>
             /// 維護結束時間(+8)
             /// </summary>
-            public string DateTimeEnd { get; set; }
+            public DateTimeOffset DateTimeEnd
+            {
+                get
+                {
+                    return new DateTimeOffset(_dateTimeEnd, new TimeSpan(8, 0, 0));
+                }
+                set
+                {
+                    _dateTimeEnd = value.DateTime;
+                }
+            }
+
+            private DateTime _dateTimeEnd { get; set; }
+
             /// <summary>
             /// 維護結束時間 UnixTime Seconds (+0)
             /// </summary>
