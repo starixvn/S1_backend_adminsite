@@ -36,6 +36,7 @@ namespace BackendSite.Service.BLL
                 Link = r.Link,
                 AndroidLink = r.AndroidLink,
                 IosLink = r.IosLink,
+                LinkType = r.LinkType,
                 LastUpdateUser = r.LastUpdateUser,
                 LastUpdateTime = ParseDateTime(r.LastUpdateTime)
             });
