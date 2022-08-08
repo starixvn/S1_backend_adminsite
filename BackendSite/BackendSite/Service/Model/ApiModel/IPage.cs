@@ -57,7 +57,7 @@
         /// <param name="pageNumber">資料頁數</param>
         /// <param name="pageSize">每頁數量</param>
         /// <returns></returns>
-        public (long startIndex, long count) RedisPagination(int totalCount, int pageNumber, int pageSize)
+        public (long startIndex, long endIndex) RedisPagination(int totalCount, int pageNumber, int pageSize)
         {
             //Pagination
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
