@@ -27,7 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _registrationBll = registrationBll;
         }
         /// <summary>
-        /// RegistrationManagement/GetRegLiveStatusList 取得會員註冊資料
+        /// RegistrationManagement/GetRegLiveStatusList 取得註冊會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -63,7 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/ExportRegLiveStatus 匯出會員註冊資料
+        /// RegistrationManagement/ExportRegLiveStatus 匯出註冊會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -81,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/SetRegLiveStatus 更新會員註冊資料狀態
+        /// RegistrationManagement/SetRegLiveStatus 更新註冊會員資料狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -142,7 +142,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/GetRegLiveStatusNotes 取得會員註冊資料註記
+        /// RegistrationManagement/GetRegLiveStatusNotes 取得會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -165,7 +165,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/AddRegLiveStatusNote 新增會員註冊資料註記
+        /// RegistrationManagement/AddRegLiveStatusNote 新增會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -193,7 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/DeleteRegLiveStatusNote 刪除會員註冊資料註記
+        /// RegistrationManagement/DeleteRegLiveStatusNote 刪除會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -221,7 +221,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/EditRegLiveStatusNote 更新會員註冊資料註記
+        /// RegistrationManagement/EditRegLiveStatusNote 更新會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
