@@ -686,7 +686,9 @@ import DateTimePicker from 'react-datetime';
                             </tr>
                             : null}
                             <tr>
-                                <th scope="row">Account No</th>
+                                {data.eWalletName != null ?
+                                    <th scope="row">E-Wallet Account</th>
+                                : <th scope="row">Account No</th>}
                                 <td>
                                     {data.accountNo}
                                     <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.accountNo}>Copy</button>

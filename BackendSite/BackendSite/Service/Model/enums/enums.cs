@@ -1216,6 +1216,7 @@ namespace BackendSite.Service.Model.enums
         BirthdayRewardPoint = 1,
         SpecialRewardPoint = 2
     }
+    
     public enum CustBankInfoLogStatus
     {
         Create = 1,
@@ -1256,6 +1257,7 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
