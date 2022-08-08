@@ -185,6 +185,17 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetAdjustmentTpLog(siteId, tpId, custId, pageSize, ref pageNumber, ref totalPages, ref rowCount);
         }
+        
+        public IEnumerable<TpAdjustmentLog> GetCustAdjustmentTpLog(GetCustTpAdjustmentLogParams input,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var absPageSize = Math.Abs(pageSize);
+            var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
+            return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
+        }
 
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
         {
