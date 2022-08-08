@@ -1294,4 +1294,11 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
 }

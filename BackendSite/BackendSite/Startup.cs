@@ -80,6 +80,9 @@ namespace BackendSite
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
 
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<IHotEventService, HotEventService>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
