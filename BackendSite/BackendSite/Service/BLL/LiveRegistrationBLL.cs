@@ -41,7 +41,7 @@ namespace BackendSite.Service.BLL
                 DepositStatus = a.ActStatus,
                 Status = a.Status,
                 RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                UpdateRemark = ZipRemark(a.UpdateAt.Split(','), a.Operator.Split(','))
+                UpdateRemark = ZipRemark(a.UpdateAt, a.Operator)
             });
             return new LiveRegistrationResponse()
             {
@@ -120,8 +120,12 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        private List<string> ZipRemark(IEnumerable<string> updateTime, string[] updateOperator)
+        private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator)
         {
+            if (string.IsNullOrEmpty(rawUpdateTime) || string.IsNullOrEmpty(rawUpdateOperator)) return null;
+
+            var updateTime = rawUpdateTime.Split(',');
+            var updateOperator = rawUpdateOperator.Split(',');
             return updateTime.Zip(updateOperator, (c, n) => $"{c}-{n}").ToList();
         }
     }
