@@ -55,7 +55,7 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType)
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);

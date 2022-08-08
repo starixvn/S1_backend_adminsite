@@ -96,10 +96,10 @@ namespace BackendSite.Service.BLL
         {
             return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
         }
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType)
+        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
         {
             var list = new List<RegLiveStatusExport>();
-            var result = _registrationService.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            var result = _registrationService.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType,dormantUser, callOutStatus, dateType);
             result.ToList().ForEach(x =>
             {
                 list.Add(new RegLiveStatusExport()

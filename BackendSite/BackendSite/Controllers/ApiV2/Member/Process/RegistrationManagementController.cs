@@ -77,7 +77,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endTime = req.EndDate.ToUniversalTime().DateTime;
 
             var exportData = _registrationBll.GetExportRegLiveStatus(req.SiteId, req.CurrencyId, req.DepositStatus,
-                req.Status, req.UserName, req.Sort, startTime, endTime, req.AffiliatesCode, req.AgentCodeType);
+                req.Status, req.UserName, req.Sort, startTime, endTime, req.AffiliatesCode, req.AgentCodeType,
+                req.DormantUser, req.CallOutStatus, req.DateType);
             var stream = _excelBll.Export(exportData, offset: req.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "Registration");
         }
