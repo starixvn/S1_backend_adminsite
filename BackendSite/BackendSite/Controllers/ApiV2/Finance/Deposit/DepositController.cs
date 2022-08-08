@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -119,6 +120,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var pageNumber = request.PageNumber;
             var currencyAmount = new List<string>();
+            var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
 
             if (string.IsNullOrWhiteSpace(request.UserName))
                 request.UserName = null;
@@ -130,7 +132,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.DepositId,
-                request.UserName,
+                userNames,
                 request.CurrencyIds,
                 request.Statuses,
                 request.LevelStatuses,
