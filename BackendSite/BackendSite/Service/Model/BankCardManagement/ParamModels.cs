@@ -17,6 +17,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             VipLevels = req.VipLevels;
             PointLevels = req.PointLevels;
             AccountNo = req.AccountNo;
+            Agent = req.Agent;
             PageSize = req.PageSize;
             StartIndex = req.PageSize.GetStartIndex(req.PageNumber);
         }
@@ -28,6 +29,8 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> VipLevels { get; set; }
         public IEnumerable<int> PointLevels { get; set; }
         public string AccountNo { get; set; }
+        
+        public string Agent { get; set; }
     }
     
     public class SetOfflineBankingSettingParams
