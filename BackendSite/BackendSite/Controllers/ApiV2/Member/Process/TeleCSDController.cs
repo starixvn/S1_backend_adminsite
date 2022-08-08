@@ -59,11 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
         }
-        public class TeleCsdUpdateReq
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
+        
 
         public class ExportTeleCsdDataReq
         {
@@ -133,34 +129,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     RowCount = searchResult.RowCount,
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
-            }
-        }
-
-        /// <summary>
-        /// TeleCSD/UpdateCustomerTele 更新客服致電資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > TeleCSD > Submit(Query) > [Complete once]
-        /// </remarks>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        [HttpPost]
-        public ApiResult Update(TeleCsdUpdateReq req)
-        {
-            if (_custInfoBll.UpdateCustomerTele(req.SiteId, req.CustId, User.Identity.Name) > 0)
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success."
-                };
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
             }
         }
 

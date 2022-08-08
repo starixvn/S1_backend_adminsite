@@ -77,11 +77,18 @@ namespace BackendSite
  
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
+
             services.AddTransient<ReferralManagementDecorator>();
+
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
 
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<IHotEventService, HotEventService>();
+
+
+            services.AddTransient<LiveRegistrationDecorator>();
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
