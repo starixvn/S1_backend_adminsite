@@ -34,30 +34,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query)
         /// </remarks>
-        /// <param name="custInfoReq"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
         [HttpPost("GetList")]
-        public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest custInfoReq)
+        public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest request)
         {
-            var apiResult = new ApiListResult<LiveRegistration>();
-            try
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
+            var searchResult = await _registrationBll.GetRegLiveStatusData(request.SiteId,
+                request.CurrencyId, request.DepositStatus, request.Status
+                , request.UserName, request.PageNumber, request.PageSize, request.Sort,
+                startTime, endTime, request.AffiliatesCode, request.AgentCodeType,
+                request.DormantUser, request.CallOutStatus, request.DateType);
+            
+            var apiResult = new ApiListResult<LiveRegistration>
             {
-                var searchResult = await _registrationBll.GetRegLiveStatusData(custInfoReq.SiteId,
-                    custInfoReq.CurrencyId, custInfoReq.DepositStatus, custInfoReq.Status
-                    , custInfoReq.UserName, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort,
-                    custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-                
-                apiResult.Data = searchResult.LiveRegistration;
-                apiResult.PageNumber = searchResult.PageNumber;
-                apiResult.TotalPages = searchResult.TotalPages;
-                apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
+                Data = searchResult.LiveRegistration,
+                PageNumber = searchResult.PageNumber,
+                TotalPages = searchResult.TotalPages,
+                RowCount = searchResult.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
             return apiResult;
         }

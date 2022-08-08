@@ -24,9 +24,9 @@ namespace BackendSite.Service.BLL
             _logger = logger;
         }
 
-        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
         {
-            var searchResult = await _registrationService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
+            var searchResult = await _registrationService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType);
             var regLiveStatus = searchResult.RegLiveStatusData.Select(a => new LiveRegistration()
             {
                 SiteId = a.SiteId,
