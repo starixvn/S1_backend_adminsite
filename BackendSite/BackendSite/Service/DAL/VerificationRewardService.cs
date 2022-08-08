@@ -27,6 +27,12 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new {_SiteId = siteId, _CurrencyId = currencyId});
             return await _reportDbClient.QueryFirstAsync<VerificationRewardModel>("Admin_VerificationReward_Get", p);
         }
+        
+        public async Task<IEnumerable<VerificationRewardModel>> GetVerificationRewardBySiteId(int siteId)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId });
+            return await _reportDbClient.QueryAsync<VerificationRewardModel>("Admin_VerificationReward_GetBySiteId", p);
+        }
 
         public async Task<int> InsertOrUpdate(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
         {
@@ -34,6 +40,22 @@ namespace BackendSite.Service.DAL
                 _VerificationType = verificationType, _PhoneReward = phoneReward, 
                 _EmailReward = emailReward, _Operator = updateOperator});
             return await _mainDbClient.ExecuteAsync("Admin_VerificationReward_Set", p);
+        }
+        
+        public async Task<int> InsertOrUpdate(int siteId, int currencyId, SetVerificationRewardParams input, string updateOperator)
+        {
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _CurrencyId = currencyId,
+                _VerificationType = (int) input.VerificationType,
+                _PhoneReward = input.PhoneReward, 
+                _EmailReward = input.EmailReward,
+                _MinDeposit = input.MinDeposit,
+                _Operator = updateOperator
+            });
+            
+            return await _mainDbClient.ExecuteAsync("Admin_VerificationReward_Set_V2", p);
         }
         
         public async Task<int> UpdateStatus(int siteId, int currencyId, int status, string updateOperator)
