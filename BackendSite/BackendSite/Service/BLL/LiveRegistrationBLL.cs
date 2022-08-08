@@ -40,7 +40,8 @@ namespace BackendSite.Service.BLL
                 PhoneVerified = a.PhoneVerified,
                 DepositStatus = a.ActStatus,
                 Status = a.Status,
-                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero)
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                UpdateRemark = ZipRemark(a.UpdateAt.Split(','), a.Operator.Split(','))
             });
             return new LiveRegistrationResponse()
             {
@@ -117,6 +118,11 @@ namespace BackendSite.Service.BLL
                 });
             });
             return list;
+        }
+
+        private List<string> ZipRemark(IEnumerable<string> updateTime, string[] updateOperator)
+        {
+            return updateTime.Zip(updateOperator, (c, n) => $"{c}-{n}").ToList();
         }
     }
 }
