@@ -231,6 +231,11 @@ namespace BackendSite.Service.BLL
         {
             return _walletService.GetBalance(custId);
         }
+        
+        public Task<decimal> GetBalanceAsync(int custId)
+        {
+            return _walletService.GetBalanceAsync(custId);
+        }
         public int SetCustStatusSwitch(int custId, int Op)
         {
             return _custInfoService.SetCustStatusSwitch(custId, Op);
@@ -263,10 +268,6 @@ namespace BackendSite.Service.BLL
         public bool ResetCustUSDTInfo(int CustId)
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
-        }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            return _custInfoService.GetWithdrawalAvailableBalance(custId);
         }
         public int CancelBonusByBonusId(int bonusId)
         {
@@ -777,7 +778,14 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustId(custId, userName, siteId);
         }
-
+        
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
+        {
+            var strUserNames = JsonConvert.SerializeObject(userNames);
+            
+            return _custInfoService.GetCustInfosAsync(siteId, strUserNames);
+        }
+        
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
             return _custInfoService.GetCustSwitchStatus(custId);
@@ -874,6 +882,21 @@ namespace BackendSite.Service.BLL
         {
             return await _tpBll.GetTpWalletAsync(custId);
         }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
+        {
+            var custProfile = GetCustProfile(custId);
+            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                return Task.FromResult(Enumerable.Empty<USDTDetail>());
+            else
+                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+        }
+
         private bool IsWithdrawalInfoTransId(string transId)
         {
             if (string.IsNullOrWhiteSpace(transId))

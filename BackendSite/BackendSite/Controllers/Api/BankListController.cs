@@ -49,7 +49,7 @@ namespace BackendSite.Controllers.Api
 
             public IEnumerable<int> CurrencyIds { get; set; }
 
-            public List<BankDetailOffStatusEnum> Statuses { get; set; }
+            public List<BankCardManagementStatusEnum> Statuses { get; set; }
         }
 
         [HttpPost]

@@ -50,6 +50,41 @@ namespace BackendSite.Service.Library
                 throw;
             }
         }
+        
+        public async Task<TResponse> PostAsync<TResponse, TRequest>(string url, TRequest request, int timeout = 0)
+        {
+            try
+            {
+                TResponse result = default;
+                using var client = new HttpClient();
+                var jsonReq = JsonConvert.SerializeObject(request);
+                var content = new StringContent(jsonReq, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                if (timeout != 0)
+                {
+                    client.Timeout = TimeSpan.FromSeconds(timeout);
+                }
+                
+                _logger.LogInformation($"url:{url}, request:{jsonReq}");
+                using var response = await client.PostAsync(url, content);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"response:{responseBody}");
+                    result = JsonConvert.DeserializeObject<TResponse>(responseBody);
+                }
+                
+                return result;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
+        }
 
         //public async Task<ApiResult<T>> PostMembersite<T, U>(string url, U oTpInfo)
         //{

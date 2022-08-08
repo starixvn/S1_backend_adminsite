@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using static BackendSite.Controllers.Api.TpController;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.BLL
 {
@@ -21,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly IMemoryCache _cache;
         private readonly int _balanceTimeoutSecond;
+        private CacheHelper _cacheHelper;
 
         public TpBLL(IServiceProvider provider)
         {
@@ -30,6 +33,7 @@ namespace BackendSite.Service.BLL
             _cache = provider.GetRequiredService<IMemoryCache>();
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            _cacheHelper = provider.GetRequiredService<CacheHelper>();
         }
 
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
@@ -152,7 +156,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
-        public async Task<ApiResult<TransferResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
+        public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
             if (amount.ToString().IndexOf(".") > -1)
@@ -169,16 +173,28 @@ namespace BackendSite.Service.BLL
                 inputs = null,
                 Operator = inAdminTpTransfer.Operator,
                 Remarks = inAdminTpTransfer.Remarks,
-                Category = inAdminTpTransfer.Category
+                Category = inAdminTpTransfer.Category,
+                DepositId = inAdminTpTransfer.DepositId
             };
             var myUrl = $"{_apiUrl}AdjustWallet";
-            var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, adminTpTransfer);
+            var data = await _courierAdapter.MyPostAsync<AdjustWalletResult, TpTransfer>(myUrl, adminTpTransfer);
 
             return data;
         }
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int siteId, int tpId, int custId, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
             return _thirdPartyService.GetAdjustmentTpLog(siteId, tpId, custId, pageSize, ref pageNumber, ref totalPages, ref rowCount);
+        }
+        
+        public IEnumerable<TpAdjustmentLog> GetCustAdjustmentTpLog(GetCustTpAdjustmentLogParams input,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var absPageSize = Math.Abs(pageSize);
+            var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
+            return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
         }
 
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
@@ -247,6 +263,35 @@ namespace BackendSite.Service.BLL
                 }
             }
             return tpWalletList;
+        }
+        public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
+        {
+            var key = $"TpCategory_{siteId}";
+
+            return _cacheHelper.TryGetOrCreate(key,
+                new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)),
+                i => GetSiteTpCategoryListAsync(siteId));
+        }
+        private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
+        {
+            var tpList = await _thirdPartyService.GetSiteTpListAllAsync(siteId);
+            var tpGameTypeList = await _thirdPartyService.GetTpGameType();
+            var result = tpGameTypeList
+                .Where(x => tpList.Any(y => y.TpId == x.TpId))
+                .Select(x => new TpCategory
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                })
+                .Distinct(new TpCategoryComparer())
+                .OrderBy(x => x.CategoryId);
+
+            return result;
+        }
+        
+        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        {
+            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
         }
     }
 }

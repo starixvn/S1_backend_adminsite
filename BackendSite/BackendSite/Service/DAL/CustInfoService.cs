@@ -247,6 +247,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+
             return result;
         }
 
@@ -257,6 +258,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -391,19 +393,6 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status, TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
-        }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-            var result = GetWithdrawalAvailableBalance(custId, conn, trans);
-            trans.Rollback();
-            return result;
-        }
-        public decimal GetWithdrawalAvailableBalance(int custId, MySqlConnection conn, MySqlTransaction trans)
-        {
-            return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
         }
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
             int startIndex,
@@ -1035,6 +1024,41 @@ namespace BackendSite.Service.DAL
             return WithdrawalLimitLogData;
         }
 
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, string userNames)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_UserNames", userNames);
+
+            return _reportDbClient.QueryAsync<CustomerInfo>("Admin_CustInfo_GetList", props);
+        }
+
+        //public bool SetEnableRebatePayout(int custId, int enableRebatePayout)
+        //{
+        //    using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+        //    return conn.Execute("Admin_CustInofoEnableRebatePayout_Set", new { CustId = custId, EnableRebatePayout = enableRebatePayout }, commandType: CommandType.StoredProcedure) > 0;
+        //}
+
+        //public CustBankInfo GetCustBankInfo(int custId,int siteId)
+        //{
+        //    return _reportDbClient.QueryFirst<CustBankInfo>("Admin_CustBankInfo_Get", new DynamicParameters(new { CustId = custId , SiteId  = siteId }));
+        //}
+        //public BankLockInfoDetail GetBlockAccount(int SysId, string accountNum)
+        //{
+        //    return _reportDbClient.QueryFirst<BankLockInfoDetail>("Admin_BlockAccount_Get", new DynamicParameters(new { SysId = SysId, AccountNum = accountNum }));
+        //}
+        //public int SetCustBankInfoLog(int custId, int siteId, int sysId, string accountNum, string iFSCCode, string accountName, int status)
+        //{
+        //    return _mainDbClient.Execute("Admin_CustBankInfoLog_Set", new DynamicParameters(new { CustId = custId,
+        //        SiteId = siteId,
+        //        SysId = sysId,
+        //        AccountNum = accountNum,
+        //        IFSCCode = string.IsNullOrWhiteSpace(iFSCCode) ? "": iFSCCode,
+        //        AccountName = accountName,
+        //        Status = status
+        //    }));
+        //}
+
         public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
             int startIndex,
             int pageSize,
@@ -1056,8 +1080,7 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-        
-         public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
+        public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
             AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
 
@@ -1072,6 +1095,12 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", updater);
 
             return await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
+        }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
     }
 }

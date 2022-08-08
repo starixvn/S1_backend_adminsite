@@ -8,11 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.TpMaintain;
 using Microsoft.Extensions.DependencyInjection;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BaseDataController : ControllerBase
@@ -29,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly MarketingBLL _marketingBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
@@ -46,6 +49,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
+            _marketingBll = provider.GetRequiredService<MarketingBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
@@ -187,7 +191,46 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public string FuncKey { get; set; }
         }
-
+        
+        public class GetPointLevelListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+        
+        public class GetBankInfoSysRequest
+        {
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+        
+        public class GetBankCodeListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+        
+        public class GetCalCodeListRequest
+        {
+            /// <summary>
+            /// 品牌ID
+            /// </summary>
+            public int SiteId { get; set; }
+        }
 
         #endregion
 
@@ -571,7 +614,136 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
+        
+        
+        /// <summary>
+        /// BaseData/GetPointLevelList 取得績分等級資訊清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult<IEnumerable<PointLevelInfo>> GetPointLevelList(GetPointLevelListRequest request)
+        {
+            var pointLevelInfos = _marketingBll.GetPointLevelInfos(request.SiteId, request.CurrencyId);
+            
+            return new ApiResult<IEnumerable<PointLevelInfo>>
+            {
+                Data = pointLevelInfos,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// BaseData/BankInfoSys 取得銀行系統資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Bank Card Management.
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys(GetBankInfoSysRequest request)
+        {
+            var sysBankList = _bankDetailBll.GetSysBankList(request.CurrencyId);
+            
+            return new ApiResult<IEnumerable<BankInfoSys>>
+            {
+                Data = sysBankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// BaseData/GetBankCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankCodeModel>> GetBankCodeList(GetBankCodeListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
+            var bankInfoOff =
+                _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId);
+            var data = bankInfoOff
+                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetCalCodeList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// Func Path：Deposit Request > CalCode DropDownList
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<CalCodeModel>> GetCalCodeList(GetCalCodeListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
+            var bankInfoOff = 
+                _bankDetailBll.GetOfflineBankAccount(request.SiteId);
+            bankInfoOff = bankInfoOff
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit))
+                .OrderBy(x => x.Id);
+            var data = bankInfoOff
+                .Select(x => new CalCodeModel
+                {
+                    Id = x.Id,
+                    SysId = x.SysId,
+                    CurrencyId = x.CurrencyId,
+                    AccountName = x.AccountName,
+                    AccountNo = x.AccountNo,
+                    BankCode = x.BankCode, 
+                    SiteName = x.SiteName
+                });
+            apiResult.Data = data;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲分類清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryListAsync(SiteIdRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpCategory>>
+            {
+                Data = await _tpBll.GetTpCategoryListAsync(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲類型清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListByCategoryReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        
         #region Private Methods
 
         private class BankInfoPayComparer : IEqualityComparer<Pay>

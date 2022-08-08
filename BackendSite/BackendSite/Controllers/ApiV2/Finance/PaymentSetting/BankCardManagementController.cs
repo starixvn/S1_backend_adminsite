@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,10 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using BackendSite.Service.Model.BankCardManagement;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankCardManagementController : ControllerBase
@@ -22,6 +24,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         private readonly SelLangBLL _selLangBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly VipLevelBLL _vipLevelBll;
 
         #endregion
 
@@ -31,6 +35,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
         }
 
         #endregion
@@ -43,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             public IEnumerable<int> CurrencyIds { get; set; }
 
-            public List<BankDetailOffStatusEnum> Statuses { get; set; }
+            public List<BankCardManagementStatusEnum> Statuses { get; set; }
         }
 
         #endregion
@@ -51,103 +57,99 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Actions
 
         /// <summary>
-        /// BankCardManagement/GetList 取得指定品牌銀行卡清單
+        /// BankCardManagement/GetList 取得Offline銀行卡設定清單
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiListResult<BankDetail> GetListBySiteId(GetListRequest request)
+        public async Task<ApiListResult<OfflineBankingSetting>> GetList(GetOfflineBankingSettingRequest request)
         {
-            var apiListResult = new ApiListResult<BankDetail>();
-            var statusList = request.Statuses.Select(x => (int)x).ToList();
-            var datas = _bankDetailBll.GetLoaclBankList(request.SiteIds, request.CurrencyIds, statusList,
-                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
-            apiListResult.Data = datas;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.PageNumber = request.PageNumber;
-            apiListResult.RowCount = rowCount;
-            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiListResult;
+            var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
+                new GetOfflineBankingSettingParams(request));
+
+            return new ApiListResult<OfflineBankingSetting>
+            {
+                Data = datas,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
-        /// BankCardManagement/Set 設定銀行卡(新增/更新)
+        /// BankCardManagement/Set Offline銀行卡設定
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Add Bank Card] / [Edit]
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List > [Edit]
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult Set(ApiRequestWithLog<SetBankCard> request)
+        public async Task<ApiResult> SetAsync(SetOfflineBankingSettingRequest request)
         {
-            // if (request.CurrencyId != 61)
-            // {
-            //     request.Before.IFSCCode = "";
-            //     request.After.IFSCCode = "";
-            // }
-            var result = _bankDetailBll.SetBankCardwithIFSC(
-                new ParamsWithLog<SetBankCard>(request, User.Identity.Name));
+            var updater = User.Identity.Name;
+            var oldData = await _bankDetailBll.GetOfflineBankingSettingByIdAsync(request.FinancialAccountId);
+            var success = await _bankDetailBll.SetOfflineBankingSettingAsync(
+                new SetOfflineBankingSettingParams(request, updater));
 
-            var apiResult = new ApiResult();
-            if (result > 0)
+            if (success)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+                var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BankCardManagement,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        oldData.FinancialAccountId,
+                        oldData.BankName,
+                        oldData.AccountNo,
+                        oldData.AccountName,
+                        oldData.MinAmount,
+                        oldData.MaxAmount,
+                        oldData.DailyLimitAmount,
+                        PointLevels = string.Join(", ", oldData.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => oldData.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        oldData.Sort,
+                        Status = oldData.Status.ToString()
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.MinAmount,
+                        request.MaxAmount,
+                        request.DailyLimitAmount,
+                        PointLevels = string.Join(", ", request.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => request.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        request.Sort,
+                        Status = request.Status.ToString(),
+                        request.Memo
+                    }),
+                    Operator = updater
+                });
             }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
+            
+            return success
+                ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
+                : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
-
-        /// <summary>
-        /// BankCardManagement/Delete 刪除銀行卡
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Delete]
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
-        [HttpPost]
-        public ApiResult Delete(ApiRequestWithLog<DeleteBankCard> request)
-        {
-            var result = _bankDetailBll.DelBankCard(
-                new ParamsWithLog<DeleteBankCard>(request, User.Identity.Name));
-            var apiResult = new ApiResult();
-            if (result > 0)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-
         #endregion
 
     }

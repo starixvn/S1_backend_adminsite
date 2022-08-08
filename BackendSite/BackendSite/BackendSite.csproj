@@ -87,6 +87,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.3" />
     <PackageReference Include="AWSSDK.CloudFront" Version="3.7.6.26" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.9.30" />
     <PackageReference Include="Dapper" Version="2.0.123" />

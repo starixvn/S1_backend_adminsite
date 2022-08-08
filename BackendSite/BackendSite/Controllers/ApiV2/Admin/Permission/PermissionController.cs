@@ -1147,6 +1147,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
         }
         #endregion
+
         /// <summary>
         /// Permission/GetLanguageList 取得指定站台幣別對應語系列表
         /// </summary>

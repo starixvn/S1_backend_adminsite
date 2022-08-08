@@ -166,7 +166,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
-                request.WithdrawalId, userNames , request.CurrencyIds,
+                request.WithdrawalId, userNames, request.CurrencyIds,
                 request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber,request.WithdrawalMethod
                 , out totalPages,
                 out rowCount, ref CurrencyAmount);

@@ -171,7 +171,7 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyAdjustment);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment);
                 logParam.Add("_ActionType", (int) ActionType.Update);
                 logParam.Add("_RefTransId", input.TransId);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());

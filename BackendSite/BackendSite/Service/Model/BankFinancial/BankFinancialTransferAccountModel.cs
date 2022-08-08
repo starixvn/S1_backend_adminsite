@@ -62,6 +62,14 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
+        
+        /// <summary>
+        /// 目前只 for INR IFSC. 使用
+        /// </summary>
+        public string AccountCode { get; set; }
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
@@ -112,8 +120,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public DateTimeOffset UpdateTime 
         {
-            get => _createTime;
-            set => _createTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
 
         /// <summary>

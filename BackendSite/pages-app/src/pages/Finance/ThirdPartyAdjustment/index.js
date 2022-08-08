@@ -81,7 +81,7 @@ const App = () => {
     }, [searchData.optSite]);
 
     useEffect(() => {
-        api.post('/apiV2/BaseData/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
+        api.post('/api/PaymentAdjustmentInfo/GetReasonList', { FuncKey: 'Finance/PaymentAdjustment' })
             .then(function (response) {
                 if (response.data.errorCode === 0) {
                     let list = [];

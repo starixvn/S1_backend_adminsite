@@ -251,6 +251,21 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return db.KeyDelete(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
+
         private string RemoveSpecialChars(string key)
         {
             foreach (var c in _charsToRemove)

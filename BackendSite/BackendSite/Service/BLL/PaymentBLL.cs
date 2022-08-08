@@ -254,6 +254,7 @@ namespace BackendSite.Service.BLL
                 result.CategoryId = balanceAdjustBonusCodeData.CategoryId;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
                 result.WalletType = balanceAdjustBonusCodeData.WalletType;
+                result.TierAmountList = balanceAdjustBonusCodeData.TierAmountList;
             }
             else
             {
@@ -299,6 +300,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
             return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
+        }
+        
+        public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
+        {
+            return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
         }
     }
 }

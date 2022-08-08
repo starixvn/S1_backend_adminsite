@@ -46,6 +46,11 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        {
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new DynamicParameters(new { isPayout }));
+        }
+
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
@@ -352,6 +357,11 @@ namespace BackendSite.Service.DAL
 
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
                         s.CashBackList = tempCashBackList.Where(x => x.CurrencyId == s.CurrencyId);
+
+                        if (!string.IsNullOrEmpty(s.TierAmount))
+                        {
+                            s.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(s.TierAmount);
+                        }
                     }
                 }
             }
@@ -518,7 +528,7 @@ namespace BackendSite.Service.DAL
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
                     WinOver = specific.WinOver,
-                    FullFillType = specific.WinOver > 0 ? 2 : 1 ,
+                    FullFillType = specific.WinOver > 0 ? 2 : 1,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
                     MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
@@ -534,7 +544,8 @@ namespace BackendSite.Service.DAL
                     VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes)
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
-                    TotalUsageLimit = specific.TotalUsageLimit
+                    TotalUsageLimit = specific.TotalUsageLimit,
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : string.Empty
                 });
             }
 
