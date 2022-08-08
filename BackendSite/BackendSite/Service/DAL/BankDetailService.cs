@@ -45,6 +45,7 @@ namespace BackendSite.Service.DAL
             para.Add("_VipLevels", JsonConvert.SerializeObject(input.VipLevels));
             para.Add("_PointLevels", JsonConvert.SerializeObject(input.PointLevels));
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
+            para.Add("_Agent", input.Agent ?? string.Empty);
             para.Add("_StartIndex", input.StartIndex);
             para.Add("_PageSize", input.PageSize);
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

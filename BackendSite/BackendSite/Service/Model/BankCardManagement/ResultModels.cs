@@ -13,6 +13,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int FinancialAccountId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
+        public string Agent { set; get; }
         /// <summary>
         /// 目前只有 INR IFSCCode 使用
         /// </summary>
