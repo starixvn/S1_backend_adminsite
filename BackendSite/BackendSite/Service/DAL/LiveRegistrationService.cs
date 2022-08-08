@@ -52,23 +52,22 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
+        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType)
         {
-            var creditSite = new List<string>() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
             var props = new DynamicParameters();
-            props.Add("SelectSite", siteIds);
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("DepositStatus", depositStatus);
-            props.Add("Status", status);
-            props.Add("Sort", sort);
-            props.Add("StartDate", startDate.DateTime);
-            props.Add("EndDate", endDate.DateTime);
-            props.Add("AffCode", string.IsNullOrWhiteSpace(affiliatesCode) ? null : affiliatesCode);
-            props.Add("CreditSite", JsonConvert.SerializeObject(creditSite));
-            props.Add("AgentCodeType", agentCodeType);
+            props.Add("_SiteId", siteId);
+            props.Add("_Currency", currency);
+            props.Add("_UserName", userName);
+            props.Add("_DepositStatus", depositStatus);
+            props.Add("_Status", status);
+            props.Add("_Sort", sort);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_AffCode", affiliatesCode);
+            props.Add("CreditSite", JsonConvert.SerializeObject(_creditSite));
+            props.Add("_AgentCodeType", agentCodeType);
 
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V4", props);
+            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V5", props);
 
             return result;
         }

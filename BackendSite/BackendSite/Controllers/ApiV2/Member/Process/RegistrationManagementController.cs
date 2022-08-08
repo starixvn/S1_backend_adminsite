@@ -75,8 +75,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost("Export")]
         public IActionResult Export(ExportRegLiveStatusRequest req)
         {
-            var exportData = _registrationBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
-            var stream = _excelBll.Export(exportData);
+            var startTime = req.StartDate.ToUniversalTime().DateTime;
+            var endTime = req.EndDate.ToUniversalTime().DateTime;
+
+            var exportData = _registrationBll.GetExportRegLiveStatus(req.SiteId, req.CurrencyId, req.DepositStatus,
+                req.Status, req.UserName, req.Sort, startTime, endTime, req.AffiliatesCode, req.AgentCodeType);
+            var stream = _excelBll.Export(exportData, offset: req.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "Registration");
         }
 
