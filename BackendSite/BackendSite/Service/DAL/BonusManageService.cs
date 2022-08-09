@@ -46,6 +46,11 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        {
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new DynamicParameters(new { isPayout }));
+        }
+        
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
