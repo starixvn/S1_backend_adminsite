@@ -717,6 +717,12 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<CheckSpecialCodeDuplicate>("Admin_PromotionSpecialCode_Get", p);
         }
+        
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        {
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new DynamicParameters(new { isPayout }));
+        }
+        
         #endregion
 
         #region Private Methods
