@@ -934,6 +934,13 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
             => reportService.GetTpFailRecordReportForExport(input);
 
+        public IEnumerable<RewardBonusReportModel> GetRewardBonusReport(GetListInput input,
+            out int totalPages,
+            out int rowCount)
+            => reportService.GetRewardBonusReport(input, out totalPages, out rowCount);
+        
+        public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
+            => reportService.GetRewardBonusReportExport(input);
         
         public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
         {          
