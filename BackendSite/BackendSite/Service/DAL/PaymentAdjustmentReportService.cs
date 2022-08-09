@@ -51,10 +51,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             #region GetCurrencyTotalAmount
 
@@ -100,10 +100,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoExport_Get_V5", props);
 

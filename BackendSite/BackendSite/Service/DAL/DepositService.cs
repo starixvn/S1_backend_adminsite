@@ -149,7 +149,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return _mainDbClient.Query<Comments>("DepositRequestComment_Get_V3",
+            return _mainDbClient.Query<Comments>("Admin_DepositRequestComment_Get",
                 new DynamicParameters(new { _DepositId = depositId, _SiteId = siteId }));
         }
 
