@@ -253,6 +253,7 @@ import DateTimePicker from 'react-datetime';
                                 ? result.data.network
                                 : `${result.data.cryptoCurrency}-${result.data.network}`;
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetEWalletPayList(result.data.currencyId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
                             await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, channelName);
                         }
@@ -373,7 +374,10 @@ import DateTimePicker from 'react-datetime';
             let ChannelId = 0;
             if (parseInt(event.target.value) == 1 && this.state.PayList.length > 0) {
                 SelId = this.state.PayList[0].payId;
-            } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
+            }else if (parseInt(event.target.value) == 1 && this.state.EWalletPayList.length > 0){
+                console.log(this.state.EWalletPayList[0].payId);
+                SelId = this.state.EWalletPayList[0].payId;
+            }else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
                 SelId = this.state.BankInfoOffList[0].bankId;
             } else if (parseInt(event.target.value) == 4 && this.state.CryptoPayList.length > 0) {
             //   console.log(this.state.CryptoPayList);
@@ -409,6 +413,22 @@ import DateTimePicker from 'react-datetime';
                     let result = response.data;
                     if (result.errorCode == 0) {
                         this.setState({ ...Comment,PayList: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        async onGetEWalletPayList(currencyId) {
+            await axios.post('/api/Withdrawal/GetEWalletPayList', { CurrencyId: currencyId })
+                .then(function (response) {
+                    let result = response.data;
+                   console.log(response.data);
+                    if (result.errorCode == 0) {
+                        this.setState({ ...Comment, EWalletPayList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -532,6 +552,9 @@ import DateTimePicker from 'react-datetime';
                     {
                         if (this.state.BankInfoOffList.length > 0)
                             selectOp.push(<option key={2} value="2">Local Bank</option>);
+
+                        if (data.eWalletName != null)
+                            selectOp.push(<option key={1} value="1">Online Payment</option>);
                     }
                     else
                     {
@@ -546,7 +569,12 @@ import DateTimePicker from 'react-datetime';
 
                     selectPay = null;
                     if (this.state.selectType == 1) {
-                        selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        if (data.eWalletName != null){
+                            selectPay = this.state.EWalletPayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        }
+                        else{
+                            selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        }
                         /*if(this.state.PayList.length>0) {
                             this.state.SelId=this.state.PayList[0];
                         }*/
