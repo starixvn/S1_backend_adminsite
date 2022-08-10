@@ -185,12 +185,16 @@ namespace BackendSite.Controllers
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                int length = data.AccountNo.Length;
-                int rightLength = length - 4;
-                if (rightLength > 0)
+                if (!string.IsNullOrWhiteSpace(data.EWalletName))
                 {
-                    data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                    int length = data.AccountNo.Length;
+                    int rightLength = length - 4;
+                    if (rightLength > 0)
+                    {
+                        data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                    }
                 }
+                
                 exportData.Add(new WithdrawalInfoForExportData()
                 {
                     WithdrawalId = data.WithdrawalId,
