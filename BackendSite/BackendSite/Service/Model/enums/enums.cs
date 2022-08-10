@@ -1176,15 +1176,16 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
     #region SlotGameCategory
     public enum SlotGameCategoryEnum
     {
-        All = 0,
-        Jackpot = 1,
-        New = 2,
-        Feature = 3,
-        Favourite = 4
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
     }
     #endregion
 
