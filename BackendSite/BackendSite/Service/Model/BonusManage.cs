@@ -163,12 +163,6 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
     }
 
-    public class PromotionType
-    {
-        public int Type { get; set; }
-        public string PromotionTypeName { get; set; }
-    }
-
     public class PromotionRebate
     {
         public int GameType { get; set; }
