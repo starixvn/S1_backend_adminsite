@@ -39,11 +39,11 @@ namespace BackendSite.Service.DAL
             var para = new DynamicParameters();
             para.Add("_SiteId", input.SiteId);
             para.Add("_CurrencyId", input.CurrencyId);
-            para.Add("_Purposes", JsonConvert.SerializeObject(input.Purposes));
+            para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : null, DbType.String);
             para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
             para.Add("_SysIds", JsonConvert.SerializeObject(input.SysIds));
-            para.Add("_VipLevels", JsonConvert.SerializeObject(input.VipLevels));
-            para.Add("_PointLevels", JsonConvert.SerializeObject(input.PointLevels));
+            para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : null, DbType.String);
+            para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
             para.Add("_Agent", input.Agent ?? string.Empty);
             para.Add("_StartIndex", input.StartIndex);
