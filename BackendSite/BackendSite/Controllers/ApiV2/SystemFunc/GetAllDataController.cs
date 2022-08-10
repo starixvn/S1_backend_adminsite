@@ -515,30 +515,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _custInfoBll.GetAllSiteVipLevelList(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
-        }
-        /// <summary>
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        {
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-        
-        /// GetAllData/GetPromotionType  取得PromotionType List
-        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
-            return new ApiResult<IEnumerable<PromotionType>>
-                Data = _bonusManageBll.GetPromotionType(request.isPayout),
-
-        public class GetPromotionTypeRequest
-        {
-            public bool isPayout { get; set; } = false;
-        }
+        } 
 
         /// <summary>
         /// GetAllData/GetPromotionType  取得PromotionType List

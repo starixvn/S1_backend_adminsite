@@ -1082,39 +1082,6 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    #region SlotGame
-    public enum SlotGameCategoryEnum
-    {
-        All = 0,
-        Jackpot = 1,
-        New = 2,
-        Feature = 3,
-        Favourite = 4
-    }
-    #endregion
-
-    #region SlotGameStatus
-    public enum SlotGameFilterStatusEnum
-    {
-        All = 0,
-        Open = 1,
-        Closed = 2,
-    }
-    public enum SlotGameStatusEnum
-    {
-        Closed = 0,
-        Open = 1
-    }
-    #endregion
-
-    #region SlotGameDetail
-    public enum SlotGameDetailStatusEnum
-    {
-        Closed = 0,
-        Open = 1
-    }
-    #endregion
-
     #region TpCustInfo
 
     public enum TpCustInfoStatusEnum
