@@ -4,15 +4,10 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class SlotGamesManagementController : ControllerBase
@@ -39,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq request)
         {
 
@@ -72,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 3 })]
         public ApiResult SetSlotGame(SetSlotGameReq request)
         {
             var apiResult = new ApiResult();
@@ -106,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request)
         {
             var apiResult = new ApiListResult<SlotGameData>();
@@ -136,7 +131,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 3 })]
         public ApiResult SetSlotGameCategory(SetSlotGameCategoryReq request)
         {
             var apiResult = new ApiResult();

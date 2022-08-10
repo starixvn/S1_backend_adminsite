@@ -319,7 +319,11 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public int SiteId { get; set; }
     }
-
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
+	}
     public class TierAmount
     {
         public decimal Bonus { get; set; }

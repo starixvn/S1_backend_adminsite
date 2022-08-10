@@ -113,7 +113,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
         public int SiteId { get; set; }
-        public int CategoryId { get; set; }
+        public SlotGameCategoryEnum CategoryId { get; set; }
         public SlotGameDetailStatusEnum Status { get; set; }
     }
 }
