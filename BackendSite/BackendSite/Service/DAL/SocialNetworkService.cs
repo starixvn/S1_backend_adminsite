@@ -55,6 +55,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Link", request.Link, dbType: DbType.String);
             p.Add("_AndroidLink", request.AndroidLink, dbType: DbType.String);
             p.Add("_iOSLink", request.IosLink, dbType: DbType.String);
+            p.Add("_LinkType",request.LinkType,dbType: DbType.Int16);
             p.Add("_LastUpdateUser", lastUpdateUser, dbType: DbType.String);
 
             return _mainDbClient.ExecuteAsync("Admin_SocialData_Set", p);

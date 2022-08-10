@@ -54,7 +54,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("iosLink")]
         public string IosLink { get; set; }
 
-        [JsonProperty("lastUpdateUser")]
+        [JsonProperty("lastUpdateUser", Order = 98)]
         public string LastUpdateUser { get; set; }
     }
 
@@ -63,6 +63,9 @@ namespace BackendSite.Service.Model
     /// </summary>
     public class SocialDataListDto: SocialDataListBase
     {
+        [JsonProperty("linkType")]
+        public byte LinkType { get; set; }
+
         [JsonProperty("lastUpdateTime")]
         public DateTime LastUpdateTime { get; set; }
     }
@@ -72,6 +75,9 @@ namespace BackendSite.Service.Model
     /// </summary>
     public class SocialDataListResponse : SocialDataListBase
     {
+        [JsonProperty("linkType", Order = 97)]
+        public bool LinkType { get; set; }
+
         [JsonProperty("lastUpdateTime",Order = 99)]
         public string LastUpdateTime { get; set; }
     }
@@ -139,6 +145,15 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("iosLink")]
         public string IosLink { get; set; }
+
+        [JsonProperty("linkType")]
+        public bool FrontEndLikeType { get; set; }
+
+        /// <summary>
+        /// 真正塞進 DB 是這個欄位
+        /// </summary>
+        [JsonIgnore]
+        public byte LinkType { get; set; }
     }
 
     #endregion

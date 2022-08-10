@@ -135,7 +135,12 @@ namespace BackendSite.Controllers.ApiV2.Report
                 StartDate = request.StartDate.DateTime,
                 EndDate= request.EndDate.DateTime,
             });
-           
+            
+            foreach (var data in exportData)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "RewardBonusReport");
         }

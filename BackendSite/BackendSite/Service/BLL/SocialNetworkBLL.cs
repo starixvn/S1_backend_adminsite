@@ -36,6 +36,7 @@ namespace BackendSite.Service.BLL
                 Link = r.Link,
                 AndroidLink = r.AndroidLink,
                 IosLink = r.IosLink,
+                LinkType = LinkTypeConvertToBoolean(r.LinkType),
                 LastUpdateUser = r.LastUpdateUser,
                 LastUpdateTime = ParseDateTime(r.LastUpdateTime)
             });
@@ -68,14 +69,35 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public async Task SetSocialData(SetSocialDataRequest request,string lastUpdateUser)
+        public async Task SetSocialData(SetSocialDataRequest request, string lastUpdateUser)
         {
+            request.LinkType = (byte)LinkTypeConvertToByte(request.FrontEndLikeType);
             await _socialNetworkService.SetSocialData(request, lastUpdateUser);
         }
 
         private string ParseDateTime(DateTime dateTime)
         {
             return $"{dateTime:yyyy-MM-ddTHH:mm:ss}+00:00";
+        }
+
+        /// <summary>
+        /// PM希望 1:Url連結, 2:QRCode 轉換成 Url:false ，QRCode:true
+        /// </summary>
+        /// <param name="linkType"></param>
+        /// <returns></returns>
+        private bool LinkTypeConvertToBoolean(byte linkType)
+        {
+            return linkType == 1 ? false : true;
+        }
+
+        /// <summary>
+        /// true：QRCode，false:Url連結
+        /// </summary>
+        /// <param name="linkType"></param>
+        /// <returns></returns>
+        private int LinkTypeConvertToByte(bool linkType)
+        {
+            return linkType ? 2 : 1;
         }
     }
 }

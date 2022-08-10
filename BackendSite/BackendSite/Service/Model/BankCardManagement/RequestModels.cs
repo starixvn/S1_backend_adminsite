@@ -14,6 +14,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> VipLevels { get; set; }
         public IEnumerable<int> PointLevels { get; set; }
         public string AccountNo { get; set; }
+        public string Agent { get; set; }
     }
     
     public class SetOfflineBankingSettingRequest
