@@ -186,6 +186,8 @@ namespace BackendSite.Service.Model
                     _flowEndTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
+        public string EWalletName { get; set; }
+        public string CurrencyName { get; set; }
     }
 
     public class WithdrawalLimit
@@ -398,5 +400,39 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public int Status { get; set; }
         public string IsoCode { get; set; }
+    }
+    public class WithdrawalInfoForExportData
+    {
+        public int WithdrawalId { set; get; }
+        public string TransId { set; get; }
+        public string WithdrawalType { set; get; }
+        public int CustId { set; get; }
+        public string UserName { set; get; }
+        public string NetWork { set; get; }
+        public decimal CryptoAmount { set; get; }
+        public string CurrencyId { set; get; }
+        public bool IsTest { set; get; }
+        public decimal Amount { set; get; }
+        public string BankName { set; get; }
+        public string BankCode { set; get; }
+        public string AccountNo { set; get; }
+        public string AccountName { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
+        public string SiteName { set; get; }
+        public string FromBankName { set; get; }
+        public string FromBankCode { set; get; }
+        public string FromAccountNo { set; get; }
+        public string FromAccountName { set; get; }
+        public string PayName { set; get; }
+        public string RefId { set; get; }
+
+        public string CalCode { set; get; }
+        public int IsKyc { set; get; }
+        public int IsRisk { set; get; }
+        public int WithdrawlCnt { set; get; }
+        public string Operator { set; get; }
+        public DateTimeOffset? UpdateTime { set; get; }
+        public DateTimeOffset? FlowEndTime { set; get; }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -159,6 +160,7 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportWithdrawalList(WithdrawalListReq withdrawalListReq)
         {
+            List<WithdrawalInfoForExportData> exportData = new List<WithdrawalInfoForExportData>();
             var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
@@ -183,9 +185,48 @@ namespace BackendSite.Controllers
                     data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+                int length = data.AccountNo.Length;
+                int rightLength = length - 4;
+                if (rightLength > 0)
+                {
+                    data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                }
+                exportData.Add(new WithdrawalInfoForExportData()
+                {
+                    WithdrawalId = data.WithdrawalId,
+                    TransId = data.TransId,
+                    WithdrawalType = Enum.GetName(typeof(WithdrawalTypeEnum), data.WithdrawalType),
+                    CustId = data.CustId,
+                    UserName = data.UserName,
+                    NetWork = data.NetWork,
+                    CryptoAmount = data.CryptoAmount,
+                    CurrencyId = data.CurrencyName,
+                    IsTest = data.IsTest,
+                    Amount = data.Amount,
+                    BankName = !string.IsNullOrWhiteSpace(data.EWalletName) ? data.EWalletName: data.BankName,
+                    BankCode = data.BankCode,
+                    AccountNo = data.AccountNo,
+                    AccountName = data.AccountName,
+                    CreateTime = data.CreateTime,
+                    Status = data.Status,
+                    SiteName = data.SiteName,
+                    FromBankName = data.FromBankName,
+                    FromBankCode = data.FromBankCode,
+                    FromAccountNo = data.FromAccountNo,
+                    FromAccountName = data.FromAccountName,
+                    PayName = data.PayName,
+                    RefId = data.RefId,
+                    CalCode = data.CalCode,
+                    IsKyc = data.IsKyc,
+                    IsRisk = data.IsRisk,
+                    WithdrawlCnt = data.WithdrawlCnt,
+                    Operator = data.Operator,
+                    UpdateTime = data.UpdateTime,
+                    FlowEndTime = data.FlowEndTime
+                });
             }
 
-            var stream = excelBLL.ExportV2(exportWithdrawal);
+             var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 

@@ -111,6 +111,7 @@ import DateTimePicker from 'react-datetime';
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         {(row.bankName == null&& row.accountType != null)?
+                            row.accountType == "ewallet" ?<td>{row.eWalletName}</td>:
                             <td>{row.cryptoCurrency || row.accountType}</td>:<td>{row.bankName}</td>}
                         {/* <td>{row.accountNo}</td>
                         <td>{row.accountName}</td> */}
