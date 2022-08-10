@@ -219,12 +219,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             foreach (var data in exportWithdrawal)
             {
-                int length = data.AccountNo.Length;
-                int rightLength = length - 4;
-                if (rightLength > 0)
+                if (!string.IsNullOrWhiteSpace(data.EWalletName))
                 {
-                    data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                    int length = data.AccountNo.Length;
+                    int rightLength = length - 4;
+                    if (rightLength > 0)
+                    {
+                        data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                    }
                 }
+
                 exportData.Add(new WithdrawalInfoForExportData()
                 {
                     WithdrawalId = data.WithdrawalId,
