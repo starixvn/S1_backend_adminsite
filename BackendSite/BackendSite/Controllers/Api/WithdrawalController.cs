@@ -307,7 +307,8 @@ namespace BackendSite.Controllers.Api
                             ChannelId = withdrawalInfo.ChannelId ?? 0,
                             AccountName = withdrawalInfo.AccountName,
                             AccountNo = withdrawalInfo.AccountNo,
-                            IFSCCode = withdrawalInfo.IFSCCode
+                            IFSCCode = withdrawalInfo.IFSCCode,
+                            EWalletSysId = withdrawalInfo.EWalletSysId
                             //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
@@ -315,6 +316,8 @@ namespace BackendSite.Controllers.Api
                         var myUrl = "";
                         if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
                             myUrl = $"{payApiUrl}CryptoWithdrawal";
+                        else if (withdrawalInfo.EWalletSysId != null)
+                            myUrl = $"{payApiUrl}EWalletWithdrawal";
                         else
                             myUrl = $"{payApiUrl}Withdrawal";
 
@@ -386,6 +389,7 @@ namespace BackendSite.Controllers.Api
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
             //public string ReturnUrl { set; get; }
+            public int? EWalletSysId { get; set; }
         }
 
         public class WithdrawalReq3
@@ -430,6 +434,29 @@ namespace BackendSite.Controllers.Api
                                 PayName = x.PayName
                             }).Distinct(bankInfoPayComparer);
             apiResult.Data = _payInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
+        public class WithdrawalEWalletReq
+        {
+            public int CurrencyId { get; set; }
+        }
+        
+        [HttpPost]
+        public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq withdrawalReq)
+        {
+            var apiResult = new ApiResult<IEnumerable<EWalletPay>>();
+            var eWalletPay = bankDetailBLL.GetEWalletPayList();
+            var _eWalletPayInfo = (from x in eWalletPay
+                            where x.CurrencyId == withdrawalReq.CurrencyId
+                            select new EWalletPay
+                            {
+                                PayId = x.PayId,
+                                PayName = x.PayName,
+                                CurrencyId = x.CurrencyId
+                            });
+            apiResult.Data = _eWalletPayInfo;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
