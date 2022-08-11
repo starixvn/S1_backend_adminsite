@@ -519,12 +519,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int GameTypeId { get; set; }
         }
 
-        public class GetCustDetailRequest
+        public class GetCustInfoWithBalanceRequest
         {
             public int SiteId { get; set; }
             public string UserName { get; set; }
             public string SabaId { get; set; }
 
+        }
+        
+        public class GetCustInfoWithBalanceResult
+        {
+            public int SiteId { get; set; }
+            public string SiteName { get; set; }
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public int CurrencyId { get; set; }
+            public CustomerStatusEnum Status { get; set; }
+            public decimal Balance { get; set; }
+        }
+        
+        public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
+        {
+            public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
 
         #endregion
@@ -2879,7 +2895,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region Finance > Balance Adjustment
 
         /// <summary>
-        /// CustomerManage/GetCustDetail 取得客戶明細
+        /// CustomerManage/GetCustInfoWithBalance 取得客戶資料及主錢包餘額
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -2888,41 +2904,92 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentAdjustment" })]
         [HttpPost]
-        public ApiResult<CustInfoDetail> GetCustDetail(GetCustDetailRequest request)
+        public ApiResult<GetCustInfoWithBalanceResult> GetCustInfoWithBalance(GetCustInfoWithBalanceRequest request)
         {
-            var apiResult = new ApiResult<CustInfoDetail>();
-
-            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-
+            var result =
+                _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+            
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
             }
 
-            if (custInfo != null)
+            var balance = _custInfoBll.GetBalance(custInfo.CustId);
+            var status = (CustomerStatusEnum) custInfo.Status;
+            return status switch
             {
-                if (custInfo.Status == (int)CustomerStatusEnum.Running)
-                {
-                    apiResult.Data = custInfo;
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                }
-                else if (custInfo.Status == (int)CustomerStatusEnum.Suspend)
-                {
-                    throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend);
-                }
-                else
-                {
-                    throw new AdminException(ErrorCodeEnum.CustStatusIsClosed);
-                }
-            }
-            else
+                CustomerStatusEnum.Running
+                    => new ApiResult<GetCustInfoWithBalanceResult>
+                    {
+                        Data = new GetCustInfoWithBalanceResult
+                        {
+                            SiteId = custInfo.SiteId,
+                            SiteName = custInfo.SiteName,
+                            CustId = custInfo.CustId,
+                            CurrencyId = custInfo.CurrencyId,
+                            UserName = custInfo.UserName,
+                            Status = status,
+                            Balance = balance
+                        },
+                        ErrorCode = (int) ErrorCodeEnum.Success
+                    },
+                    
+                CustomerStatusEnum.Suspend
+                    => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
+                    
+                _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
+            };
+        }
+        
+        /// <summary>
+        /// CustomerManage/GetCustInfoWithTpBalance 取得客戶資料、主錢包餘額及三方錢包餘額
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Balance Adjustment > [Search] 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<GetCustInfoWithTpBalanceResult>> GetCustInfoWithTpBalanceAsync(GetCustInfoWithBalanceRequest request)
+        {
+            var result =
+                _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+            
+            if (result != ErrorCodeEnum.Success)
             {
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
+                throw new AdminException(result);
             }
 
-            return apiResult;
+            var balance = await _custInfoBll.GetBalanceAsync(custInfo.CustId);
+            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(custInfo.CustId);
+            var status = (CustomerStatusEnum) custInfo.Status;
+            return status switch
+            {
+                CustomerStatusEnum.Running
+                    => new ApiResult<GetCustInfoWithTpBalanceResult>
+                    {
+                        Data = new GetCustInfoWithTpBalanceResult
+                        {
+                            SiteId = custInfo.SiteId,
+                            SiteName = custInfo.SiteName,
+                            CustId = custInfo.CustId,
+                            CurrencyId = custInfo.CurrencyId,
+                            UserName = custInfo.UserName,
+                            Status = status,
+                            Balance = balance,
+                            TpWalletList = custTPWallet.Where(x=>x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
+                        },
+                        ErrorCode = (int) ErrorCodeEnum.Success
+                    },
+                    
+                CustomerStatusEnum.Suspend
+                    => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
+                    
+                _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
+            };
         }
 
         #endregion
