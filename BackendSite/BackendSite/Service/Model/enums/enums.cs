@@ -1270,7 +1270,9 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         All = 2,
     }
-    #region SlotGameCategory
+    
+    #region SlotGamesManagement
+    
     public enum SlotGameCategoryEnum
     {
         AllAndSetStatus = 0,
@@ -1280,9 +1282,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
     }
-    #endregion
 
-    #region SlotGameStatus
     public enum SlotGameFilterStatusEnum
     {
         All = 0,
@@ -1294,13 +1294,6 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    #endregion
 
-    #region SlotGameDetail
-    public enum SlotGameDetailStatusEnum 
-    {
-        Closed = 0,
-        Open = 1
-    }
     #endregion
 }

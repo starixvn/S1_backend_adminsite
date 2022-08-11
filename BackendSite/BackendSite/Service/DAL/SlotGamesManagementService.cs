@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
             rowCount = parameter.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        public int SetSlotGameCategory(int siteId, int currencyId, int slotGameId, int categoryId, SlotGameDetailStatusEnum status,string Operator)
+        public int SetSlotGameCategory(int siteId, int currencyId, int slotGameId, int categoryId, SlotGameStatusEnum status,string Operator)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
