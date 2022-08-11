@@ -622,11 +622,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<IEnumerable<PointLevelInfo>> GetPointLevelList(GetPointLevelListRequest request)
+        public ApiResult<IEnumerable<int>> GetPointLevelList(GetPointLevelListRequest request)
         {
-            var pointLevelInfos = _marketingBll.GetPointLevelInfos(request.SiteId, request.CurrencyId);
+            var pointLevelInfos = _marketingBll
+                .GetPointLevelInfos(request.SiteId, request.CurrencyId)
+                .Select(x => x.PointLevel)
+                .Union(new []{ 0, 1 })
+                .Distinct()
+                .OrderBy(x => x);
             
-            return new ApiResult<IEnumerable<PointLevelInfo>>
+            return new ApiResult<IEnumerable<int>>
             {
                 Data = pointLevelInfos,
                 ErrorCode = (int)ErrorCodeEnum.Success
