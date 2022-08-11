@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq request)
         {
 
@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
         public ApiResult SetSlotGame(SetSlotGameReq request)
         {
             var apiResult = new ApiResult();
@@ -101,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request)
         {
             var apiResult = new ApiListResult<SlotGameData>();
@@ -131,7 +131,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { 126, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
         public ApiResult SetSlotGameCategory(SetSlotGameCategoryReq request)
         {
             var apiResult = new ApiResult();
