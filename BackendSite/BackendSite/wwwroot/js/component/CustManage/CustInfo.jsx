@@ -2907,32 +2907,32 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 dataContainer = <WithdrawalLimitLog />
             } else if (TabName == this._Tabs[9]) {
                 dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[10]) {
-                dataContainer = <TpAdjustmentInfo GetTpAdjustmentInfoByCust={this.GetTpAdjustmentInfoByCust.bind(this)} searchData={this.state.TpAdjustmentInfoData} TpAdjustmentInfo={this.state.TpAdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[11]) {
+            }  else if (TabName == this._Tabs[10]) {
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[12]) {
+            } else if (TabName == this._Tabs[11]) {
                 dataContainer = <ResetPwd />;
-            } else if (TabName == this._Tabs[13]) {
+            } else if (TabName == this._Tabs[12]) {
                 dataContainer = <Notes AddCustNote={this.AddCustNote.bind(this)} Notes={this.state.Notes} GetCustNotes={this.GetCustNotes.bind(this)} SetCustNote={this.SetCustNote.bind(this)} />;
-            } else if (TabName == this._Tabs[14]) {
+            } else if (TabName == this._Tabs[13]) {
                 dataContainer = <PersonalMsg />
-            } else if (TabName == this._Tabs[15]) {
+            } else if (TabName == this._Tabs[14]) {
                 dataContainer = <TurnoverReport />
-            } else if (TabName == this._Tabs[16]) {
+            } else if (TabName == this._Tabs[15]) {
                 dataContainer = <AdminUserLog GetAdminUserLogByCust={this.GetAdminUserLogByCust.bind(this)} searchData={this.state.AdminUserLogData} AdminUserLog={this.state.AdminUserLog} onChangeValue={this.onChangeValue.bind(this)} />
-            } else if (TabName == this._Tabs[17]) {
+            } else if (TabName == this._Tabs[16]) {
                 dataContainer = <BankLog GetBankLog={this.GetBankLog.bind(this)} searchData={this.state.BankLogData} CurrencyId={this.state.CustInfoData.currencyId}/>
-            } else if (TabName == this._Tabs[18]) {
+            } else if (TabName == this._Tabs[17]) {
                 dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
-            } else if (TabName == this._Tabs[19]) {
+            } else if (TabName == this._Tabs[18]) {
                 dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
-            } else if (TabName == this._Tabs[20]) {
+            } else if (TabName == this._Tabs[19]) {
                 dataContainer = <VipLevel />
-            } else if (TabName == this._Tabs[21]) {
+            } else if (TabName == this._Tabs[20]) {
                 dataContainer = <PromotionReport />
-            } else if (TabName == this._Tabs[22]) {
+            } else if (TabName == this._Tabs[21]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
+            } else if (TabName == this._Tabs[22]) {
+                dataContainer = <TpAdjustmentInfo GetTpAdjustmentInfoByCust={this.GetTpAdjustmentInfoByCust.bind(this)} searchData={this.state.TpAdjustmentInfoData} TpAdjustmentInfo={this.state.TpAdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             let authSubKeys = {
