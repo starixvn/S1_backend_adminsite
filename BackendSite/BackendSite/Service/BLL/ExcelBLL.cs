@@ -27,9 +27,9 @@ namespace BackendSite.Service.BLL
 
     public class ExcelBLL
     {
-        private readonly List<string> _excelContentType = new List<string>() 
+        private readonly List<string> _excelContentType = new List<string>()
         {
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.ms-excel",
             "application/octet-stream"
         };
@@ -40,7 +40,7 @@ namespace BackendSite.Service.BLL
 
         public bool IsValidFile(string contentType)
         {
-            return _excelContentType.Exists(a=> a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+            return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
@@ -118,6 +118,7 @@ namespace BackendSite.Service.BLL
                     propertyInfo = t.FirstOrDefault().GetType().GetProperties()
                     	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
+                propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }
@@ -219,7 +220,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public FileContentResult ExcelFile (byte[] data, string fileName)
+        public FileContentResult ExcelFile(byte[] data, string fileName)
         {
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
