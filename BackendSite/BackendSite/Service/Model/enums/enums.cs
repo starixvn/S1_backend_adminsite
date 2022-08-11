@@ -613,6 +613,7 @@ namespace BackendSite.Service.Model.enums
         SetAdminUserStatus = 41,
         SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
+        VerificationRewardSetting = 49,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
