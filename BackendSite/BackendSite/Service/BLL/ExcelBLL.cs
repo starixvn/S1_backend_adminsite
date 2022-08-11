@@ -215,9 +215,9 @@ namespace BackendSite.Service.BLL
                 var cell = ws.Cells[currentRow, i + 1];
                 cell.Value = titles.ElementAt(i);
                 cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                // cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                //cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 // cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
-                ws.Column(i + 1).AutoFit();
+                //ws.Column(i + 1).AutoFit();
             }
         }
 
