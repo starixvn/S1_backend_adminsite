@@ -356,7 +356,7 @@ namespace BackendSite.Service.DAL
                 Amount = tempAmount,
                 PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V10", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V11", p);
             return depositList;
         }
 
