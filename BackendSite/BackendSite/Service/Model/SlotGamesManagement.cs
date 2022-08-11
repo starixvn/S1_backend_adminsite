@@ -1,9 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Model
 {
@@ -53,12 +49,6 @@ namespace BackendSite.Service.Model
         public string EName { get; set; }
         public string CName { get; set; }
         public string Operator { get; set; }
-        //public SlotGameStatusEnum MYR { get; set; }
-        //public SlotGameStatusEnum THB { get; set; }
-        //public SlotGameStatusEnum RMB { get; set; }
-        //public SlotGameStatusEnum IDR { get; set; }
-        //public SlotGameStatusEnum INR { get; set; }
-        //public SlotGameStatusEnum VND { get; set; }
         public List<CurrencyStatus> CurrencyStatusList { get; set; }
     }
     public class CurrencyStatus
@@ -71,6 +61,11 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
         public int SiteId { get; set; }
+        /// <summary>
+        ///  SlotGame 狀態：
+        ///  Closed = 0,
+        ///  Open = 1
+        /// </summary>
         public SlotGameStatusEnum Status { get; set; }
     }
     public class GetSlotGameCategoryListReq : ApiRequestPageModel
@@ -78,6 +73,16 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
+
+        /// <summary>
+        /// SlotGame 手動設定類別：
+        /// AllAndSetStatus = 0,
+        /// Featured = 1,
+        /// Jackpot = 2,
+        /// TableAndCards = 3,
+        /// BuyFeaturesGames = 4,
+        /// Megaways = 5,
+        /// </summary>
         public SlotGameCategoryEnum Category { get; set; }
         public GetSlotGameCategoryListReq()
         {
@@ -113,7 +118,21 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
         public int SiteId { get; set; }
+        /// <summary>
+        /// SlotGame 手動設定類別：
+        /// AllAndSetStatus = 0,
+        /// Featured = 1,
+        /// Jackpot = 2,
+        /// TableAndCards = 3,
+        /// BuyFeaturesGames = 4,
+        /// Megaways = 5,
+        /// </summary>
         public SlotGameCategoryEnum CategoryId { get; set; }
-        public SlotGameDetailStatusEnum Status { get; set; }
+        /// <summary>
+        ///  SlotGame 狀態：
+        ///  Closed = 0,
+        ///  Open = 1
+        /// </summary>
+        public SlotGameStatusEnum Status { get; set; }
     }
 }
