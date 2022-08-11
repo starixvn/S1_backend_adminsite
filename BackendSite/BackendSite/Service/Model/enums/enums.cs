@@ -610,7 +610,13 @@ namespace BackendSite.Service.Model.enums
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
         Referral = 36,
+        SetAdminUserStatus = 41,
+        SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
+        SetBlockAccount = 51,
+        ReleaseAccount = 52,
+        DeleteBlockIP = 53,
+        SetBlockIP = 54
     }
 
     #region BankFinancialTransferInfoLog
@@ -1152,5 +1158,44 @@ namespace BackendSite.Service.Model.enums
         VND = 51,
         INR = 61,
         BDT = 74
+    }
+    public enum AdminUserV2StatusEnum
+    {
+        Disable = 0,
+        Able = 1,
+    }
+    
+    public enum ShieldRiskTagged
+    {
+        IsBot = 1,
+        IsIncognito = 2,
+        IsEmulated = 3,
+        IsTor = 4,
+        IsAntiFingerprinting = 5,
+        IsProxy = 6,
+        RunningCloneApps = 7,
+        RunningGpsSpoofers = 8,
+        RunningVpnSpoofers = 9,
+        AutoClickerEnabled = 10,
+        IsDeviceMasked = 11,
+        IsJailBroken = 12,
+        AppTampering = 13,
+        SuspiciousFactoryReset = 14,
+        VirtualOs = 15,
+        Hooking = 16
+    }
+    
+    public enum TriggeredPoints
+    {
+        Registration = 1, 
+        Login = 2,
+        Deposit = 3,
+        Withdrawal = 4,
+        ClaimBonus = 5,
+    }
+    
+    public enum TaggedIssue
+    {
+        HighRisk = 1
     }
 }

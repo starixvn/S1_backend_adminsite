@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             string WithdrawalId,
-            string UserName,
+            IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelstatus,
@@ -66,7 +66,7 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
-            var withdrawalId = 0;
+            var strUserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null; var withdrawalId = 0;
             var tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
                 _EndDate = endDate,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
-                _UserName = UserName,
+                _UserNames = strUserNames,
                 _CurrencyIds = CurrencyId,
                 _Statuses = Status,
                 _VipStatuses = VipStatus,
@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
             #region GetCurrencyTotalAmount
 
             var CurrencyTotalAmount =
-                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V3", p, commandType: CommandType.StoredProcedure)
+                conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V4", p, commandType: CommandType.StoredProcedure)
                     .ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
@@ -118,7 +118,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V6", p,
+            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V8", p,
                 commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
