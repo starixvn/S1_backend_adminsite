@@ -273,7 +273,8 @@ namespace BackendSite.Service.DAL
         /// <param name="rowCount"></param>
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
-            string promotionTypes,
+            string currencyIds,
+            string promotionTypes,         
             int status,
             long startDate,
             long endDate,
@@ -288,6 +289,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
             p.Add("_PromotionTypes", promotionTypes);
             p.Add("_Status", status);
             p.Add("_StartDate", startDate);
@@ -301,7 +303,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V5", p);
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V6", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;

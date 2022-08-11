@@ -189,6 +189,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -317,6 +318,7 @@ namespace BackendSite.Controllers.Api
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -393,6 +395,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,

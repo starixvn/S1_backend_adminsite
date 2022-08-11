@@ -11,6 +11,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
+        public string CategoryName { get; set; }
         public int? CategoryId { get; set; }
         public DateTimeOffset? PeriodFrom
         {
@@ -198,6 +199,7 @@ namespace BackendSite.Service.Model
     public class GetPromotionListReq
     {
         public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> PromotionTypes { get; set; }
         public int Status { get; set; }
         public long StartDate { get; set; }
