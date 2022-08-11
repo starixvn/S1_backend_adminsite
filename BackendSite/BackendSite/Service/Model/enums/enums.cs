@@ -44,21 +44,6 @@ namespace BackendSite.Service.Model.enums
         ThirdMinus = 6
     }
 
-    public enum AdjustCategoryEnum
-    {
-        None = 1,
-        RetentionBonus = 2,
-        ManualBonus = 3,
-        VipUpgradeReward = 4,
-        PrizeDrop = 5,
-        TechIssueNoneAffected = 6,
-        Test = 7,
-        VendorMistake = 8,
-        Deposit = 9,
-        Withdrawal = 10,
-        Other = 11
-    }
-
     #endregion
 
     #region Bonus Management For Frontend Use
@@ -393,9 +378,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
@@ -409,6 +398,40 @@ namespace BackendSite.Service.Model.enums
         Rejected = 3,
         OnHold = 4,
         Error = 99
+    }
+    
+    public enum TpAdjustmentOptionEnum
+    {
+        Add = 1,
+        Minus = 2
+    }
+    
+    public enum AdjustWalletTypeEnum
+    {
+        Main = 1,
+        ThirdParty = 2
+    }
+    
+    public enum AdjustmentCategoryEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     #endregion
@@ -555,7 +578,7 @@ namespace BackendSite.Service.Model.enums
         SetDepositRequestAmount = 2,
         WithdrawalAccounting = 3,
         BalanceAdjustment = 4,
-        ThirdPartyAdjustment = 5,
+        ThirdPartyFundsAdjustment = 5,
         IssueBonusManagement = 6,
         PaymentGateway = 7,
         DepositLimitation = 8,
