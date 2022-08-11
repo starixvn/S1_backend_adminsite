@@ -26,6 +26,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
             IEnumerable<int> promotionTypes,
             int status,
             long startDate,
@@ -40,7 +41,9 @@ namespace BackendSite.Service.BLL
         {
             var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
 
-            return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
+            return _bonusManageService.GetPromotionList(
+                        JsonConvert.SerializeObject(siteIds),
+                        currencyIds: currencyIds != null ? JsonConvert.SerializeObject(currencyIds) : "[]",
                         JsonConvert.SerializeObject(promotionTypes),
                         status,
                         startDate,

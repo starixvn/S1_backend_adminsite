@@ -222,6 +222,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
         public string TierAmount { get; set; }
+        public int BonusType { get; set; }
 
         public IEnumerable<TierAmount> TierAmountList
         {
