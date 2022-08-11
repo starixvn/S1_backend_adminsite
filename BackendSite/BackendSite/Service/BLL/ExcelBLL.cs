@@ -151,8 +151,8 @@ namespace BackendSite.Service.BLL
                         // 標題列
                         var title = ws.Cells[1, 1, 1, cols];
                         title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                        title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
-                        title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        // title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        // title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
                     }
                 }
             }
@@ -215,8 +215,8 @@ namespace BackendSite.Service.BLL
                 var cell = ws.Cells[currentRow, i + 1];
                 cell.Value = titles.ElementAt(i);
                 cell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                // cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                // cell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
                 ws.Column(i + 1).AutoFit();
             }
         }
