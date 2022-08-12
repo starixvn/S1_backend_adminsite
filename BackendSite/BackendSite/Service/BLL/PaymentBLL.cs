@@ -1,11 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

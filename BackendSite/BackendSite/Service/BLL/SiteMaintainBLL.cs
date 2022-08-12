@@ -1,19 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using Amazon.S3.Model;
 using System.Text;
-using System.IO;
 using BackendSite.Service.Model.enums;
 using Amazon.CloudFront.Model;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 using BackendSite.Service.Model;
 using BackendSite.Extensions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 namespace BackendSite.Service.BLL
 {

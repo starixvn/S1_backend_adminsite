@@ -1,5 +1,4 @@
 ﻿using BackendSite.Extensions.Middlewares;
-using Microsoft.AspNetCore.Builder;
 
 namespace BackendSite.Extensions
 {
