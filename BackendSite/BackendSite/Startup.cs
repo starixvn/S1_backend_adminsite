@@ -171,10 +171,6 @@ namespace BackendSite
 
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
 
             app.UseEndpoints(endpoints =>
             {
