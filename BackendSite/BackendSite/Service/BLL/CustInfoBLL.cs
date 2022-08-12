@@ -269,10 +269,6 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
         }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            return _custInfoService.GetWithdrawalAvailableBalance(custId);
-        }
         public int CancelBonusByBonusId(int bonusId)
         {
             var statusList = new List<int>
@@ -879,6 +875,21 @@ namespace BackendSite.Service.BLL
         {
             return await _tpBll.GetTpWalletAsync(custId);
         }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
+        {
+            var custProfile = GetCustProfile(custId);
+            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                return Task.FromResult(Enumerable.Empty<USDTDetail>());
+            else
+                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+        }
+
         private bool IsWithdrawalInfoTransId(string transId)
         {
             if (string.IsNullOrWhiteSpace(transId))
