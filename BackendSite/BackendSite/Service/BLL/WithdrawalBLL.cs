@@ -1377,7 +1377,7 @@ namespace BackendSite.Service.BLL
             decimal withdrawalMin, decimal withdrawalMax, int withdrawalTimes)
         {
             if (withdrawalMin > amount)
-                throw new AdminException(ErrorCodeEnum.Fail, $"Amount={amount} > WithdrawalMin={withdrawalMin}. Please Check.");
+                throw new AdminException(ErrorCodeEnum.Fail, $"Amount={amount} < WithdrawalMin={withdrawalMin}. Please Check.");
 
 
             if (withdrawalMax != 0 && (dailyAmount + amount) > withdrawalMax)
