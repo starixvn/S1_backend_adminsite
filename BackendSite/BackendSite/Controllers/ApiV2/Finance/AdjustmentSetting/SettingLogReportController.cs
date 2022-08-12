@@ -1,10 +1,8 @@
-﻿using System;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {

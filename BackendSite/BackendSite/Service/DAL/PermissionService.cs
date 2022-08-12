@@ -2,18 +2,9 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using System.Data;
-using static BackendSite.Controllers.ApiV2.Admin.Permission.PermissionController;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL

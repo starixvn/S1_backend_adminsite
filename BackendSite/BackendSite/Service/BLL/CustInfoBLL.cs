@@ -5,14 +5,7 @@ using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Transactions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
