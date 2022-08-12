@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BackendSite.Service.Model.WithdrawalBankAccounting
+﻿namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {
     public class GetWithdrawalInfoAndAccountingListModel
     {

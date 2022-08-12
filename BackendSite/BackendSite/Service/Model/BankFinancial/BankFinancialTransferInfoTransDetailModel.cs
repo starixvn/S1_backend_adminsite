@@ -1,6 +1,4 @@
-﻿using System;
-using BackendSite.Service.Model.enums;
-using Microsoft.AspNetCore.Http;
+﻿using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.BankFinancial
 {

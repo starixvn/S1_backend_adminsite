@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
