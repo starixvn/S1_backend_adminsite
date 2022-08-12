@@ -198,9 +198,9 @@ namespace BackendSite.Service.Model
 
         public int VipLevel { get; set; }
 
-        public double WithdrawalMin { get; set; }
+        public decimal WithdrawalMin { get; set; }
 
-        public double WithdrawalMax { get; set; }
+        public decimal WithdrawalMax { get; set; }
 
         public DateTimeOffset UpdateTime
         {
