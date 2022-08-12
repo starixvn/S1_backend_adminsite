@@ -13,7 +13,7 @@ namespace BackendSite.Service.Library
     {
         private readonly ILogger<ICacheHelper> _logger;
         private readonly IConnectionMultiplexer _multiplexer;
-        private readonly string[] _charsToRemove = { "[", "]", "/", " ", "," };
+        private readonly string[] _charsToRemove = { "[", "]", "/", " ", ",", "\r\n" };
         
         public RedisCacheHelper(IServiceProvider provider)
         {
@@ -263,6 +263,23 @@ namespace BackendSite.Service.Library
             {
                 _logger.LogError(ex, $"{key} | {ex.Message}");
                 return false;
+            }
+        }
+
+        public long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
+                var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                return db.KeyDelete(keys);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{keyPattern} | {ex.Message}");
+                return 0;
             }
         }
 
