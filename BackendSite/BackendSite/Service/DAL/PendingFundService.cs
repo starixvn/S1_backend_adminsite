@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System.Data;
 
 namespace BackendSite.Service.DAL

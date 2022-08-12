@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {

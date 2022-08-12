@@ -1,8 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BackendSiteTests.Service.Model
 {

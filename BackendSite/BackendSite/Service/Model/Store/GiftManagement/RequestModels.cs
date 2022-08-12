@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model.Store.GiftManagement
 {

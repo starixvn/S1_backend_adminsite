@@ -1,10 +1,6 @@
-﻿using System;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {

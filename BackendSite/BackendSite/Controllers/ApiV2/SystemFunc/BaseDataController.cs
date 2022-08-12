@@ -3,13 +3,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.Model.TpMaintain;
-using Microsoft.Extensions.DependencyInjection;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc

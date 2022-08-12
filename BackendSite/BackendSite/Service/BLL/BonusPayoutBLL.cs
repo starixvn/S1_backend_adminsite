@@ -1,9 +1,4 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusPayoutController;
 
 namespace BackendSite.Service.BLL

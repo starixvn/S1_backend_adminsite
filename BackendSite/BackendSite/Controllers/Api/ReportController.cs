@@ -6,9 +6,6 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.Api

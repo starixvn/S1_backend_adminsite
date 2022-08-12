@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial

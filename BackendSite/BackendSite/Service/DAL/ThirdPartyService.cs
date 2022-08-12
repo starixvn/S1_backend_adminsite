@@ -1,13 +1,8 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using BackendSite.Service.Model.TpMaintain;
 using static BackendSite.Controllers.Api.TpController;
 using TpGameType = BackendSite.Service.Model.TpGameType;

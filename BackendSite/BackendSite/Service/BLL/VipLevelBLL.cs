@@ -1,10 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using System;
-using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
 
