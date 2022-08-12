@@ -49,9 +49,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<int> PromotionTypes { get; set; }
+
+            /// <summary>
+            /// Bonus狀態：
+            /// 0=All
+            /// 1=Active
+            /// 1=Inactive
+            /// </summary>
             public int Status { get; set; }
             public DateTimeOffset StartDate
             {
@@ -63,6 +70,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            /// <summary>
+            /// Bonus支援裝置：
+            /// 0=Select All
+            /// 1=Web&App
+            /// 2=Web
+            /// 3=App
+            /// </summary>
             public int Device { get; set; }
             public string BonusCode { get; set; }
             public bool IsSpecial { get; set; }
@@ -144,7 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromotionList(request.SiteIds,
+                apiResult.Data = _bonusManageBll.GetPromotionList(new List<int> { request.SiteId },
                     request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
