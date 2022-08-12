@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             /// <summary>
             /// Bonus支援裝置：
             /// 0=Select All
-            /// 1=Web&App
+            /// 1=Web and App
             /// 2=Web
             /// 3=App
             /// </summary>
