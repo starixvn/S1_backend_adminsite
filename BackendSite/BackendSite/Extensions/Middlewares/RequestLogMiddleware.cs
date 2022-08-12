@@ -42,6 +42,7 @@ namespace BackendSite.Extensions.Middlewares
 
         public async Task Invoke(HttpContext context,IWebHostEnvironment env)
         {
+            context.Request.EnableBuffering();
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
             

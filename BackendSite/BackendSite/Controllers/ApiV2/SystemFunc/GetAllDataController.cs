@@ -36,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
+        private readonly BonusManageBLL _bonusManageBll;
 
         #endregion
 
@@ -57,6 +58,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
         }
 
         #endregion
@@ -512,6 +514,29 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _custInfoBll.GetAllSiteVipLevelList(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+        
+        /// <summary>
+        /// GetAllData/GetPromotionType  取得PromotionType List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
+        {
+            return new ApiResult<IEnumerable<PromotionType>>
+            {
+                Data = _bonusManageBll.GetPromotionType(request.isPayout),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        public class GetPromotionTypeRequest
+        {
+            public bool isPayout { get; set; } = false;
         }
 
         #endregion

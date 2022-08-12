@@ -9,6 +9,7 @@ import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
+import { TpAdjustmentInfo } from './CustInfo_TpAdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import { CryptoWalletLog } from './CustInfo_CryptoWalletLog.jsx';
@@ -511,7 +512,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <th>{moment.utc(row.registerDate).add(8,'hour').format('l LTS')}</th>
                     {/* <th>{row.registerDate}</th> */}
                     <th>{row.totalDeposit}/{row.depositC}</th>
-                    <th>{row.totalBet}/{row.vaildBetC}</th>
+                    <th>{row.totalBet}/{row.validBetC}</th>
                     <th>{row.bonusAmount}</th>
                     {/* <th>{row.rewardTime}</th> */}
                     <th>{row.rewardTime ? moment.utc(row.rewardTime).add(8,'hour').format('l LTS') : null}</th>
@@ -1150,6 +1151,28 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onSetEnableRebate(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Rebate Payout ?')) {
+                axios.post('/api/CustManage/SetEnableRebate', { 
+                    CustId: this.props.CustInfoData.custId,
+                    status: e
+                })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert("Update Success!");
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
@@ -1506,6 +1529,8 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
                             {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
                             {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
+                            {(data.enableRebate == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,1)}>Enable Rebate Payout</button> : null}
+                            {(data.enableRebate == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,0)}>Disable Rebate Payout</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -2083,7 +2108,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag", "3rd Adjustment Info"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         _isShowRewardBotton = { SMS: false, EMAIL: false };
@@ -2339,6 +2364,36 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ AdjustmentInfoData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetTpAdjustmentInfoByCust(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.TpAdjustmentInfoData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.TpAdjustmentInfo;
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Tp/GetCustTpAdjustmentLog',{
+                    StartTime: UTCStartDate,
+                    EndTime: UTCEndDate, 
+                    TpId: 0, 
+                    CustId: iCustId, 
+                    PageNumber: pageNumber
+                })
+                    .then(function (response) {
+                        //console.log(response);
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ TpAdjustmentInfoData: result });
                         } else {
                             alert(result.message);
                         }
@@ -2852,7 +2907,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 dataContainer = <WithdrawalLimitLog />
             } else if (TabName == this._Tabs[9]) {
                 dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[10]) {
+            }  else if (TabName == this._Tabs[10]) {
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[11]) {
                 dataContainer = <ResetPwd />;
@@ -2876,6 +2931,8 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 dataContainer = <PromotionReport />
             } else if (TabName == this._Tabs[21]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
+            } else if (TabName == this._Tabs[22]) {
+                dataContainer = <TpAdjustmentInfo GetTpAdjustmentInfoByCust={this.GetTpAdjustmentInfoByCust.bind(this)} searchData={this.state.TpAdjustmentInfoData} TpAdjustmentInfo={this.state.TpAdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             let authSubKeys = {

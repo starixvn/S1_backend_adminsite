@@ -44,21 +44,6 @@ namespace BackendSite.Service.Model.enums
         ThirdMinus = 6
     }
 
-    public enum AdjustCategoryEnum
-    {
-        None = 1,
-        RetentionBonus = 2,
-        ManualBonus = 3,
-        VipUpgradeReward = 4,
-        PrizeDrop = 5,
-        TechIssueNoneAffected = 6,
-        Test = 7,
-        VendorMistake = 8,
-        Deposit = 9,
-        Withdrawal = 10,
-        Other = 11
-    }
-
     #endregion
 
     #region Bonus Management For Frontend Use
@@ -149,6 +134,12 @@ namespace BackendSite.Service.Model.enums
     }
 
     public enum EnablePromotionEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    public enum EnableRebateEnum
     {
         Disable = 0,
         Enable = 1
@@ -387,9 +378,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustmentInfoAdjustTypeEnum
     {
+        [Description("Balance(+)")]
         BalancePlus = 1,
+        [Description("Balance(-)")]
         BalanceMinus = 2,
+        [Description("Bonus(+)")]
         BonusPlus = 3,
+        [Description("Bonus(-)")]
         BonusMinus = 4,
         RetentionBonus = 5,
         ManualBonus = 6
@@ -403,6 +398,40 @@ namespace BackendSite.Service.Model.enums
         Rejected = 3,
         OnHold = 4,
         Error = 99
+    }
+    
+    public enum TpAdjustmentOptionEnum
+    {
+        Add = 1,
+        Minus = 2
+    }
+    
+    public enum AdjustWalletTypeEnum
+    {
+        Main = 1,
+        ThirdParty = 2
+    }
+    
+    public enum AdjustmentCategoryEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     #endregion
@@ -549,7 +578,7 @@ namespace BackendSite.Service.Model.enums
         SetDepositRequestAmount = 2,
         WithdrawalAccounting = 3,
         BalanceAdjustment = 4,
-        ThirdPartyAdjustment = 5,
+        ThirdPartyFundsAdjustment = 5,
         IssueBonusManagement = 6,
         PaymentGateway = 7,
         DepositLimitation = 8,
@@ -580,7 +609,16 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
-        SetFinanceAccount = 50
+        Referral = 36,
+        SetAdminUserStatus = 41,
+        SetAdminUserPassword = 42,
+        SetCustInfoEnableRebate = 45,
+        VerificationRewardSetting = 49,
+        SetFinanceAccount = 50,
+        SetBlockAccount = 51,
+        ReleaseAccount = 52,
+        DeleteBlockIP = 53,
+        SetBlockIP = 54
     }
 
     #region BankFinancialTransferInfoLog
@@ -1094,13 +1132,13 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
-	}
-	
+    }
+
     public enum SiteEnum
     {
         [Description("Nova88")]
         NOVA88 = 1,
-        [Description("Goal123")]     
+        [Description("Goal123")]
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
@@ -1125,7 +1163,7 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
-    
+
     public enum CurrencyEnum
     {
         MYR = 2,
@@ -1136,5 +1174,44 @@ namespace BackendSite.Service.Model.enums
         VND = 51,
         INR = 61,
         BDT = 74
+    }
+    public enum AdminUserV2StatusEnum
+    {
+        Disable = 0,
+        Able = 1,
+    }
+    
+    public enum ShieldRiskTagged
+    {
+        IsBot = 1,
+        IsIncognito = 2,
+        IsEmulated = 3,
+        IsTor = 4,
+        IsAntiFingerprinting = 5,
+        IsProxy = 6,
+        RunningCloneApps = 7,
+        RunningGpsSpoofers = 8,
+        RunningVpnSpoofers = 9,
+        AutoClickerEnabled = 10,
+        IsDeviceMasked = 11,
+        IsJailBroken = 12,
+        AppTampering = 13,
+        SuspiciousFactoryReset = 14,
+        VirtualOs = 15,
+        Hooking = 16
+    }
+    
+    public enum TriggeredPoints
+    {
+        Registration = 1, 
+        Login = 2,
+        Deposit = 3,
+        Withdrawal = 4,
+        ClaimBonus = 5,
+    }
+    
+    public enum TaggedIssue
+    {
+        HighRisk = 1
     }
 }

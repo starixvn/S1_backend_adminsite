@@ -8,7 +8,7 @@ import moment from "moment-timezone";
 import { initBannerType, initActionModeType, initShowStatusType , initCurrencyLangMap } from "./defCols";
 
 export default ({ state, action, IsAdd, CurrencyId, processing }) => {
-	let TitleDetail = "https://docs.google.com/spreadsheets/d/1f2ONaTvR5Bj3nBuWK4W7fkuZO24pYVh41IThrrieqB8/edit#gid=0";
+	let TitleDetail = "https://docs.google.com/spreadsheets/d/1l2QM60tZiTJAcirk69_yhfLjLTVAj-aWi4lCH-pyqpA/edit#gid=0";
 	const newActionModeType = initActionModeType
 		.filter(i => {
 			if (state.bannerType == 2 && i.value !== 2) {

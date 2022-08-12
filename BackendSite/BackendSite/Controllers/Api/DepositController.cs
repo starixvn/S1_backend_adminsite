@@ -78,6 +78,7 @@ namespace BackendSite.Controllers.Api
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+            var userNames = FormatExtension.SplitRemoveSpace(depositListReq.UserName, ',');
             
             var depositRequestList = depositBLL.GetDepositRequestList(
                 depositListReq.SelectSite, 
@@ -87,7 +88,7 @@ namespace BackendSite.Controllers.Api
                 startTime, 
                 endTime, 
                 depositListReq.DepositId,
-                depositListReq.UserName, 
+                userNames, 
                 depositListReq.CurrencyId, 
                 depositListReq.status, 
                 depositListReq.LevelStatus,

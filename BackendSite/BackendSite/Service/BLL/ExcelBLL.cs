@@ -27,9 +27,9 @@ namespace BackendSite.Service.BLL
 
     public class ExcelBLL
     {
-        private readonly List<string> _excelContentType = new List<string>() 
+        private readonly List<string> _excelContentType = new List<string>()
         {
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.ms-excel",
             "application/octet-stream"
         };
@@ -40,7 +40,7 @@ namespace BackendSite.Service.BLL
 
         public bool IsValidFile(string contentType)
         {
-            return _excelContentType.Exists(a=> a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+            return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null) where T : notnull, new()
+        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -117,10 +117,10 @@ namespace BackendSite.Service.BLL
                 {
                     propertyInfo = t.FirstOrDefault().GetType().GetProperties();
                 }
-                
+
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
-                
-                ExportBody(ws, t, propertyInfo);
+
+                ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }
             p.Save();
@@ -163,7 +163,8 @@ namespace BackendSite.Service.BLL
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,
-            IEnumerable<PropertyInfo> propertyInfo)
+            IEnumerable<PropertyInfo> propertyInfo,
+            TimeSpan? offset = null)
         {
             var currentRow = 2;
             for (var i = 0; i < data.Count(); i++)
@@ -184,7 +185,8 @@ namespace BackendSite.Service.BLL
                     else if (propValue != null && propValue.GetType().Name == "DateTimeOffset" && ((DateTimeOffset)propValue).Year > 1)
                     {
                         var time = (DateTimeOffset)propValue;
-                        ws.Cells[currentRow, j + 1].Value = time.DateTime;
+                        var value = offset != null ? time.ToOffset(offset.Value).DateTime : time.DateTime;
+                        ws.Cells[currentRow, j + 1].Value = value;
                         ws.Cells[currentRow, j + 1].Style.Numberformat.Format = "mm/dd/yyyy h:mm:ss\\ AM/PM";
                     }
                     else
@@ -219,7 +221,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public FileContentResult ExcelFile (byte[] data, string fileName)
+        public FileContentResult ExcelFile(byte[] data, string fileName)
         {
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
