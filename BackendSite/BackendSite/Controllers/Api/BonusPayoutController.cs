@@ -5,10 +5,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api

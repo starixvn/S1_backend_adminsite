@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -9,7 +6,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -59,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Home/DashboardNew" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
         public ApiResult<DashBoardData> GetData(GetDataRequest request)
         {

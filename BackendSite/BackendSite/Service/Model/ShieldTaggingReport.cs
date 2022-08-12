@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model

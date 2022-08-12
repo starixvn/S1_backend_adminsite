@@ -189,6 +189,9 @@
   <data name="msg_OldpwdNotMatch" xml:space="preserve">
     <value>Old password does not match</value>
   </data>
+  <data name="msg_OrderByInvalid" xml:space="preserve">
+    <value>OrderBy Property Invalid.</value>
+  </data>
   <data name="msg_Paid" xml:space="preserve">
     <value>Paid</value>
   </data>

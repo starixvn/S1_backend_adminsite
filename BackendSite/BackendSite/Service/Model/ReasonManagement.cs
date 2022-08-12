@@ -1,6 +1,4 @@
 ﻿using BackendSite.Service.Model.ApiModel;
-using System;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {

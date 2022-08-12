@@ -2,19 +2,11 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.ApiModel;
-using Microsoft.Extensions.DependencyInjection;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace BackendSite.Service.DAL
 {
@@ -149,7 +141,8 @@ namespace BackendSite.Service.DAL
         public IEnumerable<Comments> GetDepositRequestComment(int depositId, int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return _mainDbClient.Query<Comments>("DepositRequestComment_Get_V2", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
+            return _mainDbClient.Query<Comments>("Admin_DepositRequestComment_Get",
+                new DynamicParameters(new { _DepositId = depositId, _SiteId = siteId }));
         }
 
         public string InsertDepositRequest(DepositDetailInfo deposit)
