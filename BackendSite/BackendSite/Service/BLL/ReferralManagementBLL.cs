@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 using Org.BouncyCastle.X509;
 
@@ -77,6 +78,22 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
+        {
+            var key = $"{siteId}:{userName}:{currencyId}:{startDate.ToString("yyyyMMddHHmmss")}:{endDate.ToString("yyyyMMddHHmmss")}"; 
+            var masterKey = $"referralReport:{key}";
+            var sortKey = $"referralReport:{orderByProperty}:{orderByDirection}";
+            
+            var data = await referralManagementService.GetReferralCustList(siteId, userName, currencyId, startDate, endDate);
+            var custReferralPageData = new ReferralCustListPageData()
+            {
+                ReferralCustList = data,
+                PageSize = pageSize,
+                PageNumber = pageNumber
+            };
+            return custReferralPageData;
         }
         
         public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)

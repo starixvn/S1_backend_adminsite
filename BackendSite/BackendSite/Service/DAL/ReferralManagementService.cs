@@ -108,6 +108,18 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public async Task<IEnumerable<ReferralCustList>> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_UserName", userName);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            var result = await _reportDbClient.QueryAsync<ReferralCustList>("Admin_ReferralCustlist_Get_V3", p);
+            return result;
+        }
+        
         public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
             var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId, StartDate = startDate, EndDate = endDate });

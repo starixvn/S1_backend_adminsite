@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -35,13 +37,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel, IOrderBy
         {
             public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public int CurrencyId { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
+            public bool OrderBy { get; set; }
+            public string OrderByProperty { get; set; }
+            public OrderByDirection OrderByDirection { get; set; }
         }
 
         public class GetByCustIdRequest : ApiRequestPageModel
@@ -73,20 +78,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 77, 1 })]
         [HttpPost]
-        public ApiListResult<ReferralCustList> GetList(GetListRequest request)
+        public async Task<ApiListResult<ReferralCustList>> GetList(GetListRequest request)
         {
-            var apiResult = new ApiListResult<ReferralCustList>();
-
+            var siteId = request.SiteIds.First();
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            var pageNumber = request.PageNumber;
-            apiResult.Data = _referralManagementBll.GetReferralCustList(request.SiteIds,
-                request.UserName, request.CurrencyId, startTime, endTime, request.PageSize,
-                ref pageNumber, out var totalPages, out var rowCount);
-            apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
-            apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            var data = await _referralManagementBll.GetReferralCustList(siteId, request.UserName, request.CurrencyId, startTime, endTime, request.PageSize, request.PageNumber, request.OrderBy, request.OrderByProperty, request.OrderByDirection);
+            
+            var apiResult = new ApiListResult<ReferralCustList>
+            {
+                Data = data.ReferralCustList,
+                TotalPages = data.TotalPages,
+                PageNumber = data.PageNumber,
+                RowCount = data.TotalCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
             return apiResult;
         }
