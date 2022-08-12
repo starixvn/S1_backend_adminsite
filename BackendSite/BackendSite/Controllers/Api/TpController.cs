@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +7,6 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {

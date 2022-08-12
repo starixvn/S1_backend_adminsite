@@ -1,7 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Library
 {

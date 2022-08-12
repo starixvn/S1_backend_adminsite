@@ -2,15 +2,9 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using BackendSite.Extensions;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {

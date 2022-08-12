@@ -1,19 +1,12 @@
-﻿using System;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using LazZiya.ImageResize;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 
 namespace BackendSite.Service.BLL
 {

@@ -2,12 +2,8 @@
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.Model.enums;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
