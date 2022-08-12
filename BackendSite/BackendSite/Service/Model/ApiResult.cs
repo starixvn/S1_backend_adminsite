@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -64,6 +65,14 @@ namespace BackendSite.Service.Model
         public ApiListResult() : this(9000, "") { }
         public ApiListResult(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
         public ApiListResult(int ErrorCode, string Message) : base(ErrorCode, Message) { }
+        public ApiListResult(ErrorCodeEnum errorCode, IPageInfo pageInfo, IEnumerable<TData> data) : base((int)errorCode, "") 
+        {
+            Data = data;
+            PageNumber = pageInfo.PageNumber;
+            RowCount = pageInfo.RowCount;
+            TotalPages = pageInfo.TotalPages;
+            PageRange = pageInfo.PageRange;
+        }
         public IEnumerable<TData> Data { get; set; }
         public int TotalPages { get; set; }
         public int PageNumber { get; set; }

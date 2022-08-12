@@ -42,15 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var data = _betListBll.GetBetListReport(request, out var pageInfo);
 
-            return new ApiListResult<BetListReport>
-            {
-                Data = data,
-                PageNumber = pageInfo.PageNumber,
-                RowCount = pageInfo.RowCount,
-                TotalPages = pageInfo.TotalPages,
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                PageRange = pageInfo.PageRange
-            };
+            return new ApiListResult<BetListReport>(ErrorCodeEnum.Success, pageInfo, data);
         }
 
         /// <summary>
@@ -72,7 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             request.PageNumber = -1; //export all
             var data = _betListBll.GetBetListReport(request, out var _);
-        
+
             var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
