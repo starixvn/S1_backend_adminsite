@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -10,15 +6,11 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
-using System.IO;
 using System.Net;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.Api
 {

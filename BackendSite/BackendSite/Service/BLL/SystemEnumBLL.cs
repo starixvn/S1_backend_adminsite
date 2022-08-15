@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace BackendSite.Service.BLL
+﻿namespace BackendSite.Service.BLL
 {
     public class SystemEnumBLL
     {

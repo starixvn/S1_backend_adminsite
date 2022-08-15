@@ -124,10 +124,10 @@
     <value>GBP</value>
   </data>
   <data name="Currency_13" xml:space="preserve">
-    <value>RMB</value>
+    <value>CNY</value>
   </data>
   <data name="CurrencyWithdrawal_13" xml:space="preserve">
-    <value>RMB GMT({0})</value>
+    <value>CNY GMT({0})</value>
   </data>
   <data name="Currency_15" xml:space="preserve">
     <value>IDR</value>
@@ -329,6 +329,9 @@
   </data>
   <data name="lbl_DepositStatus7" xml:space="preserve">
     <value>On Hold</value>
+  </data>
+  <data name="lbl_DepositStatus98" xml:space="preserve">
+    <value>Adjustment</value>
   </data>
   <data name="lbl_DepositStatus99" xml:space="preserve">
     <value>Error</value>
@@ -698,6 +701,9 @@
   </data>
   <data name="lbl_CancelBonusTitle" xml:space="preserve">
     <value>Promotion expiration notice.</value>
+  </data>
+  <data name="Currency_74" xml:space="preserve">
+    <value>BDT</value>
   </data>
   <data name="CurrencyWithdrawal_3" xml:space="preserve">
     <value>USD GMT({0})</value>

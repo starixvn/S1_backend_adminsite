@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL;
 using BackendSite.Attributes;
@@ -8,7 +6,6 @@ using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {
@@ -28,8 +25,8 @@ namespace BackendSite.Controllers.Api
         {
             this.paymentAdjustmentBLL = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             this.excelBLL = provider.GetRequiredService<ExcelBLL>();
-            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
             this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            this._permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         public ApiListResultCurrencyAmount<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentReport([FromForm] string TransId, [FromForm] int CurrencyId, [FromForm] string UserName, [FromForm] int AdjustType, [FromForm] long StartDate, [FromForm] long EndDate, [FromForm] int PageNumber)

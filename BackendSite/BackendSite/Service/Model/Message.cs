@@ -1,7 +1,5 @@
-﻿using System;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
-using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model
 {

@@ -1,15 +1,12 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AdjustmentPasswordController : ControllerBase
@@ -59,7 +56,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/SpecialPasswordManagement" })]
         [HttpPost]
         public ApiResult<SpecialPasswordManagement> GetList(GetBySiteIdRequest request)
         {
@@ -81,7 +77,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/SpecialPasswordManagement" })]
         [HttpPost]
         public ApiResult Set(SetPasswordBySiteIdRequest request)
         {

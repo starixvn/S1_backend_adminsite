@@ -2,15 +2,9 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.DAL
@@ -23,19 +17,15 @@ namespace BackendSite.Service.DAL
         private readonly WithdrawalLimitService withdrawalLimitService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly string _connectionString;
+        private readonly ILogger<AdjustmentService> _logger;
 
-        public AdjustmentService(IConfiguration configuration,
-            IServiceProvider provider,
-            Common common,
-            WalletService walletService,
-            WithdrawalLimitService withdrawalLimitService,
-            ILogger<MySqlClient> logger)
+        public AdjustmentService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            this.common = common;
-            this.walletService = walletService;
-            this.withdrawalLimitService = withdrawalLimitService;
+            configuration = provider.GetRequiredService<IConfiguration>();
+            common = provider.GetRequiredService<Common>();
+            walletService = provider.GetRequiredService<WalletService>();
+            withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _logger = provider.GetRequiredService<ILogger<AdjustmentService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -279,8 +269,25 @@ namespace BackendSite.Service.DAL
                 if (result > 0)
                 {
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
+                    var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
+                    
+                    // 調帳類型為 Deposit 時變更存款單實際存款金額
+                    if (adjustmentAndWithdrawalLimit.Category == (int)AdjustmentCategoryEnum.Deposit)
+                    {
+                        var adjustAmount = isAdd
+                            ? adjustmentAndWithdrawalLimit.Amount
+                            : adjustmentAndWithdrawalLimit.Amount * -1;
 
-                    if (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/  && adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 1 && adjustmentAndWithdrawalLimit.WithdrawalLimitAmount > 0)
+                        result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, Adjustment_transId,
+                            adjustAmount, conn, trans);
+                        
+                        
+                    }
+
+                    if (result > 0
+                        && isAdd
+                        && adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 1
+                        && adjustmentAndWithdrawalLimit.WithdrawalLimitAmount > 0)
                     {
                         var walletInfo = conn.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", new { adjustmentAndWithdrawalLimit.CustId }, trans, commandType: CommandType.StoredProcedure).FirstOrDefault();
                         decimal deduction = 0;
@@ -344,6 +351,63 @@ namespace BackendSite.Service.DAL
 
             }
             return result;
+        }
+        
+        public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount,
+            MySqlConnection conn, MySqlTransaction trans)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositId", input.DepositId);
+            props.Add("_AdjustAmount", adjustAmount);
+            props.Add("_BeforeAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            props.Add("_AfterAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            _ = conn.Execute("Admin_AdjustmentActualDeposit_Set", props, trans, commandType: CommandType.StoredProcedure);
+
+            var beforeAmount = props.Get<decimal>("_BeforeAmount");
+            var afterAmount = props.Get<decimal>("_AfterAmount");
+            var resultCode = props.Get<int>("_Result");
+
+            if (resultCode != (int) ErrorCodeEnum.Success)
+            {
+                _logger.LogError($"AdjustmentActualDeposit update ActualDeposit failed, resultCode: {resultCode}, depositId: {input.DepositId}");
+                
+                return resultCode;
+            }
+            
+            props = new DynamicParameters();
+            props.Add("_TransId", transId);
+            props.Add("_DepositId", input.DepositId);
+            props.Add("_AdjustType", (int) AdjustWalletTypeEnum.Main);
+            props.Add("_BeforeAmount", beforeAmount);
+            props.Add("_AfterAmount", afterAmount);
+
+            if (conn.Execute("Admin_AdjustmentDepositLog_Ins", props, trans, commandType: CommandType.StoredProcedure) < 1)
+            {
+                _logger.LogError($"AdjustmentDepositLog insert failed, depositId: {input.DepositId}");
+                
+                return -1;
+            }
+            
+            props.Add("_SiteId", input.SiteId);
+            props.Add("_CurrencyId", input.CurrencyId);
+            props.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BalanceAdjustment);
+            props.Add("_ActionType", (int) ActionType.Create);
+            props.Add("_RefTransId", transId);
+            props.Add("_BeforeDetailInfo", null, DbType.String);
+            props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                input.UserName,
+                Category = AdjustmentCategoryEnum.Deposit.ToString(),
+                input.Memo,
+                DepositTransId = input.TransId,
+                BeforeActualDeposit = beforeAmount,
+                AfterActualDeposit = afterAmount
+            }), DbType.String);
+            props.Add("_Operator", input.Operator);
+            
+            return conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", props, trans, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(string siteId, string currencyId,
@@ -429,6 +493,15 @@ namespace BackendSite.Service.DAL
             props.Add("PromotionType", promotionType);
             props.Add("CurrencyId", 0);
             return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get_V2", props);
+        }
+        
+        public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_TransId", transId);
+            
+            return _reportDbClient.Query<AdjustmentDepositLog>("Admin_AdjustmentDepositLog_GetByTransId", props)
+                .FirstOrDefault();
         }
     }
 }

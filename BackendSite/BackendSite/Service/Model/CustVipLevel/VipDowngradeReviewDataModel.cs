@@ -1,5 +1,4 @@
-﻿using System;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.CustVipLevel
 {

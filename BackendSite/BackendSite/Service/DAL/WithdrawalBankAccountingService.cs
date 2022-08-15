@@ -1,13 +1,8 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System;
 using System.Data;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL

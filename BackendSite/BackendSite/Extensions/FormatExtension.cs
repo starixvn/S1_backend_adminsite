@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace BackendSite.Extensions
 {
     public static class FormatExtension

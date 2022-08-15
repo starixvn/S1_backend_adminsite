@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BackendSite.Service.Model.CustVipLevel
+﻿namespace BackendSite.Service.Model.CustVipLevel
 {
     public class VipSettingModel
     {

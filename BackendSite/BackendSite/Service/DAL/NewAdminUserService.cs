@@ -1,14 +1,9 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
-using System;
 using System.Data;
-using System.Linq;
 using Dapper;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.DAL
 {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Controllers.ApiV2.Report;
+﻿using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
