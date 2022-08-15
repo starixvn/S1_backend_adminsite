@@ -1016,7 +1016,29 @@ namespace BackendSite.Service.DAL
             return WithdrawalLimitLogData;
         }
 
-        public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
+        public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            var parameter = new DynamicParameters();
+
+            parameter.Add("_CustId", custId);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = conn.Query<CustEWalletLog>("Admin_EWalletLogList_Get", parameter, commandType: CommandType.StoredProcedure);
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
+        }
+        
+         public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
             AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
 
@@ -1031,7 +1053,6 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", updater);
 
             return await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
-
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
