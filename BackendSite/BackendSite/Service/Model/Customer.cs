@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -22,6 +20,8 @@ namespace BackendSite.Service.Model
         public DateTime LastLoginTime { get; set; }
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
+        public bool PhoneVerified { get; set; }
+        public string AccountName { get; set; }
     }
     public class CustInfoDetail
     {
@@ -589,6 +589,7 @@ namespace BackendSite.Service.Model
     public class USDTDetail
     {
         public string Network { set; get; }
+        public int CurrencyId { set; get; }
         public string CurrencyName { set; get; }
         public string NickName { set; get; }
         public string USDTAddress { set; get; }

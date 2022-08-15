@@ -1,15 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -51,10 +46,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             #region GetCurrencyTotalAmount
 
@@ -100,10 +95,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoExport_Get_V5", props);
 
@@ -171,7 +166,7 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyAdjustment);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment);
                 logParam.Add("_ActionType", (int) ActionType.Update);
                 logParam.Add("_RefTransId", input.TransId);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());

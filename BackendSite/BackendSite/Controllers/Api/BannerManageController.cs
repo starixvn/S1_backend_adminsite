@@ -6,8 +6,6 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api

@@ -1,7 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
@@ -206,9 +204,9 @@ namespace BackendSite.Service.Model
 
         public int VipLevel { get; set; }
 
-        public double WithdrawalMin { get; set; }
+        public decimal WithdrawalMin { get; set; }
 
-        public double WithdrawalMax { get; set; }
+        public decimal WithdrawalMax { get; set; }
 
         public DateTimeOffset UpdateTime
         {

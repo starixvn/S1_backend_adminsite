@@ -1,7 +1,5 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BackendSite.Service.BLL
 {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BackendSite.Service.Model.AdminMenu
+﻿namespace BackendSite.Service.Model.AdminMenu
 {
     public class AdminMenuFuncModel
     {
