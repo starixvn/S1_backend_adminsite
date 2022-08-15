@@ -77,17 +77,7 @@ namespace BackendSite.Service.BLL
         
         public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
         {
-            var key = $"{siteId}:{userName}:{currencyId}:{startDate.ToString("yyyyMMddHHmmss")}:{endDate.ToString("yyyyMMddHHmmss")}"; 
-            var masterKey = $"referralReport:{key}";
-            var sortKey = $"referralReport:{orderByProperty}:{orderByDirection}";
-            
-            var data = await referralManagementService.GetReferralCustList(siteId, userName, currencyId, startDate, endDate);
-            var custReferralPageData = new ReferralCustListPageData()
-            {
-                ReferralCustList = data,
-                PageSize = pageSize,
-                PageNumber = pageNumber
-            };
+            var custReferralPageData = await referralManagementService.GetReferralCustList(siteId, userName, currencyId, startDate, endDate, pageSize, pageNumber, orderByProperty, orderByDirection);
             return custReferralPageData;
         }
         
