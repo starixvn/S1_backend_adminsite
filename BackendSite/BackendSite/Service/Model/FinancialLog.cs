@@ -209,7 +209,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public int CategoryId { get; set; }
         public string Name { get; set; }
-        public IEnumerable<TierAmount> TierAmountList;
+        public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
     }
     public class CheckBalanceAdjustData
     {
