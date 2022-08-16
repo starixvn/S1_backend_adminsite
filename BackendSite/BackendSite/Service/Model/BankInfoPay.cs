@@ -19,4 +19,12 @@
         public int MSort { get; set; }
         public int SSort { get; set; }
     }
+    
+    public class EWalletPay
+    {
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public int CurrencyId { get; set; }
+    }
+    
 }

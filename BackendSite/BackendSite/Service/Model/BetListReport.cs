@@ -1,15 +1,12 @@
-﻿using BackendSite.Extensions;
-using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace BackendSite.Service.Model
 {
-    public class GetBetListRequest
+    public class GetBetListRequest : IOrderBy
     {
         /// <summary>
         /// 頁數, -1 = export all
@@ -27,13 +24,13 @@ namespace BackendSite.Service.Model
         [Required]
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> Tags { get; set; } = new List<int>();
-        public int VIPlevel { get; set; } = 0;
+        public int? VIPlevel { get; set; } = 0;
         public int TpId { get; set; } = 0;
+        public int GameType { get; set; } = 0;
+        public string TransId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string TpUserName { get; set; } = string.Empty;
         public string RefNo { get; set; } = string.Empty;
-        public string Provider { get; set; } = string.Empty;
-        public string Product { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public string Game { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
@@ -44,15 +41,32 @@ namespace BackendSite.Service.Model
         public DateTimeOffset EndTime { get; set; }
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
-
+        /// <summary>
+        /// 是否排序
+        /// </summary>
+        public bool OrderBy { get; set; }
+        /// <summary>
+        /// 排序欄位名稱
+        /// </summary>
+        public string OrderByProperty { get; set; }
+        /// <summary>
+        /// 排序類型:
+        /// 0=升序
+        /// 1=降序
+        /// </summary>
+        public OrderByDirection OrderByDirection { get; set; }
         public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
             jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
             jObject["EndTime"] = EndTime.ToString("yyyyMMddHHmmssfff");
+            //移除排序跟分頁
             jObject.Remove("PageSize");
             jObject.Remove("PageNumber");
-            
+            jObject.Remove("OrderBy");
+            jObject.Remove("OrderByProperty");
+            jObject.Remove("OrderByDirection");
+
             var key = new StringBuilder();          
             foreach (var item in jObject.Properties())
             {

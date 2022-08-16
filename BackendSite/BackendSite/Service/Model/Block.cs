@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -73,5 +71,30 @@ namespace BackendSite.Service.Model
     {
         public int CustId { get; set; }
         public string UserName { get; set; }
+    }
+    public class BlockAccountSetRequest
+    {
+        public int SysId { get; set; }
+        public string AccountNum { get; set; }
+        [LogIgnore]
+        public BlockAccountStatus Status { get; set; }
+        public string StatusName => Status.ToString();
+        [LogIgnore]
+        public string Memo { get; set; }
+    }
+    public class ReleaseAccountRequest
+    {
+        public int SysId { get; set; }
+        public string AccountNum { get; set; }
+        public int CustId { get; set; }
+        public string IFSCCode { get; set; }
+    }
+    public class BlockIPRequest
+    {
+        public String IP { get; set; }
+    }
+    public class SetBlockIPRequest : BlockIPRequest
+    {
+        public string Memo { get; set; }
     }
 }

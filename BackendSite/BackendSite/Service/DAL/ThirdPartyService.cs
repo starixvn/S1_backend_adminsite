@@ -1,13 +1,8 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
 using BackendSite.Service.Model.TpMaintain;
 using static BackendSite.Controllers.Api.TpController;
 using TpGameType = BackendSite.Service.Model.TpGameType;
@@ -76,6 +71,28 @@ namespace BackendSite.Service.DAL
             pageNumber = props.Get<int?>("@PageNumber") ?? 0;
             totalPages = props.Get<int?>("@TotalPages") ?? 0;
             rowCount = props.Get<int?>("@RowCount") ?? 0;
+
+            return result;
+        }
+        
+        public IEnumerable<TpAdjustmentLog> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogParams input,
+            int pageSize,
+            int startIndex,
+            out int totalPages,
+            out int rowCount)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", input.CustId, dbType: DbType.Int32);
+            p.Add("_StartTime", input.StartTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", input.EndTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _mainDbClient.Query<TpAdjustmentLog>("Admin_CustLogAdminAdjustWallet_Get", p);
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }

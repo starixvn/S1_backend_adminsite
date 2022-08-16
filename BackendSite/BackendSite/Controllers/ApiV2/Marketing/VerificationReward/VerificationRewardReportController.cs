@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VerificationRewardReportController : Controller
@@ -61,7 +56,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
         public ApiListResult<CustVerificationRewardModel> Get(QueryVerificationRewardReport request)
         {
             var apiResult = new ApiListResult<CustVerificationRewardModel>();
@@ -94,7 +88,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationRewardReport" })]
         public async Task<IActionResult> Export(ExportRequest request)
         {
             var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(JsonConvert.SerializeObject(request.SiteIds),

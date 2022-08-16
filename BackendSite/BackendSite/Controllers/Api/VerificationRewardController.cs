@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -33,7 +31,6 @@ namespace BackendSite.Controllers.Api
         #region Action
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult<VerificationRewardModel>> Get(GetVerificationRewardRequest request)
         {
             var apiResult = new ApiResult<VerificationRewardModel>
@@ -45,7 +42,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult> Set(SetVerificationRewardRequest request)
         {
             var updateOperator = User.Identity.Name;
@@ -61,7 +57,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VerificationReward" })]
         public async Task<ApiResult> UpdateStatus(UpdateVerificationRewardStatusReq request)
         {
             var updateOperator = User.Identity.Name;

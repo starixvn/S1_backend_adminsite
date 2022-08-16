@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     /// <summary>
     /// 代表 第三方下注紀錄資料

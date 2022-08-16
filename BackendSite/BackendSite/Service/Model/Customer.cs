@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -22,6 +20,8 @@ namespace BackendSite.Service.Model
         public DateTime LastLoginTime { get; set; }
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
+        public bool PhoneVerified { get; set; }
+        public string AccountName { get; set; }
     }
     public class CustInfoDetail
     {
@@ -170,6 +170,9 @@ namespace BackendSite.Service.Model
         public string AddressCity { get; set; }
         public string AddressLineFirst { get; set; }
         public string AddressLineSecond { get; set; }
+        public int EnableRebate { get; set; }
+        public int? DeviceScore { set; get; }
+        public string ShieldId { get; set; }
     }
 
     public class CustInfoDetailForExport
@@ -586,6 +589,7 @@ namespace BackendSite.Service.Model
     public class USDTDetail
     {
         public string Network { set; get; }
+        public int CurrencyId { set; get; }
         public string CurrencyName { set; get; }
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
@@ -625,4 +629,11 @@ namespace BackendSite.Service.Model
         }
     }
 
+    public class CustEWalletLog
+    {
+        public string AccountNum { set; get; }
+        public string AccountName { set; get; }
+        public string EWalletName { set; get; }
+        public DateTimeOffset CreateTime { set; get; }
+    }
 }

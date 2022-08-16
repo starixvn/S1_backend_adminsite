@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -16,12 +13,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class BetListReportController : ControllerBase
     {
-        private readonly ReportBLL _reportBll;
+        private readonly BetListBLL _betListBll;
         private readonly ExcelBLL _excelBll;
 
         public BetListReportController(IServiceProvider provider)
         {
-            _reportBll = provider.GetRequiredService<ReportBLL>();
+            _betListBll = provider.GetRequiredService<BetListBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -42,16 +39,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             DateCheck(request);
 
-            var data = _reportBll.GetBetListReport(request, out int totalPages, out int rowCount);
+            var data = _betListBll.GetBetListReport(request, out var pageInfo);
 
-            return new ApiListResult<BetListReport>
-            {
-                Data = data,
-                PageNumber = request.PageNumber,
-                RowCount = rowCount,
-                TotalPages = totalPages,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+            return new ApiListResult<BetListReport>(ErrorCodeEnum.Success, pageInfo, data);
         }
 
         /// <summary>
@@ -72,9 +62,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             DateCheck(request);
 
             request.PageNumber = -1; //export all
-            var data = _reportBll.GetBetListReport(request, out var _, out var _);
-        
-            var stream = _excelBll.Export(data);
+            var data = _betListBll.GetBetListReport(request, out var _);
+
+            var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 

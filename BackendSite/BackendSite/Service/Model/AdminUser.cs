@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class AdminUserWithAllowSite : AdminUser
     {
@@ -84,5 +81,11 @@ namespace BackendSite.Service.Model
         public bool IsSuper { set; get; }
         public DateTime? LoginTime { set; get; }
         public int Status { set; get; }
+    }
+
+    public class GetLanguageListRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
     }
 }

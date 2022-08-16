@@ -2,8 +2,6 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BackendSite.Service.BLL
 {

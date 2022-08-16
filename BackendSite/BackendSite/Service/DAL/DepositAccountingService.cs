@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.DAL
 {

@@ -4,12 +4,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
 

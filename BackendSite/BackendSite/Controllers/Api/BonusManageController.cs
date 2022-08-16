@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using OfficeOpenXml;
@@ -540,7 +532,7 @@ namespace BackendSite.Controllers.Api
                     CurrencyId = currencyId,
                     PeriodDays = referral == null ? string.Empty : referral.PeriodDays.ToString(),
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
-                    VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
+                    ValidBet = referral == null ? string.Empty : referral.ValidBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
                     Status = referral?.Status ?? false

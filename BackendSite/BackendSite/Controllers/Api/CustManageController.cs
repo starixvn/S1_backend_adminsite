@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -14,9 +10,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -104,7 +98,7 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> SelectTag { get; set; }
             public bool ExportTransferWallet { get; set; } = false;
         }
-        
+
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
@@ -112,7 +106,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             public string Reason { get; set; }
         }
-        
+
         public class SetCustomerStatusRequest : CustIdWithReasonRequest
         {
 
@@ -281,7 +275,7 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
-        
+
         public class CustIdRequest
         {
             public int SiteId { get; set; }
@@ -293,7 +287,12 @@ namespace BackendSite.Controllers.Api
         {
             public EnablePromotionEnum Status { get; set; }
         }
-        
+
+        public class SetEnableDisableRebatePayoutRequest : CustIdRequest
+        {
+            public EnableRebateEnum Status { get; set; }
+        }
+
         public class VerificationRewardReq
         {
             /// <summary>
@@ -338,6 +337,11 @@ namespace BackendSite.Controllers.Api
         }
 
         #endregion
+
+        public class EWalletLogListReq
+        {
+            public int CustId { get; set; }
+        }
 
         #endregion
 
@@ -718,8 +722,15 @@ namespace BackendSite.Controllers.Api
 
             if (data)
             {
+                // 補回 LogAdminOperateInfo
+                var menu = "CustManage/CustInfoList";
+                var info = new Dictionary<string, dynamic>();
+                info.Add("MenuName", "Customer Info");
+                
                 if (custStatus.Level != null)
                 {
+                    info.Add("Action", $"Change Level To {custStatus.Level}");
+                    info.Add("Before Change Level", custProfile.UserLevel);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -741,6 +752,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.FullName != null)
                 {
+                    info.Add("Action", $"Change Full Name To {custStatus.FullName}");
+                    info.Add("Before Change Full Name", custProfile.AccountName);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -762,6 +775,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.Birthday_Y != null || custStatus.Birthday_M != null || custStatus.Birthday_D != null)
                 {
+                    info.Add("Action", $"Change Birthday To {custStatus.Birthday_Y}/{custStatus.Birthday_M}/{custStatus.Birthday_D}");
+                    info.Add("Before Change Birthday", $"{custProfile.Birth_y}/{custProfile.Birth_m}/{custProfile.Birth_d}");
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -783,6 +798,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.PhoneNumber != null)
                 {
+                    info.Add("Action", $"Change Phone Number To {custStatus.PhoneNumber}");
+                    info.Add("Before Change Phone Number", custProfile.PhoneNo);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -804,6 +821,8 @@ namespace BackendSite.Controllers.Api
                 }
                 else if (custStatus.EMail != null)
                 {
+                    info.Add("Action", $"Change EMail To {custStatus.EMail}");
+                    info.Add("Before Change EMail", custProfile.Email);
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -835,6 +854,8 @@ namespace BackendSite.Controllers.Api
                             beforeAddressDictionary.Add(jToken.Path, jToken.ToString());
                         });
                     }
+                    info.Add("Action", $"Change Address To {JsonConvert.SerializeObject(custStatus.Address)}");
+                    info.Add("Before Change Address", JsonConvert.SerializeObject(beforeAddressDictionary));
                     _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
                         Operator = User.Identity.Name,
@@ -854,6 +875,8 @@ namespace BackendSite.Controllers.Api
                         })
                     });
                 }
+
+                _serverInfoBll.AdminOperateLog(null, custStatus.CustId, menu, ActionType.Update, info, User.Identity.Name);
 
                 return new ApiResult
                 {
@@ -1048,7 +1071,7 @@ namespace BackendSite.Controllers.Api
                 {
                     throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                
+
                 before = new
                 {
                     AccountName = custProfile.AccountName,
@@ -1056,7 +1079,7 @@ namespace BackendSite.Controllers.Api
                     USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
                 }.ToLog();
             }
-            
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
@@ -1090,12 +1113,12 @@ namespace BackendSite.Controllers.Api
                 {
                     throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
                 }
-                
+
                 var usdtDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
                 before = usdtDetailList.ToLog();
-                
+
             }
-            
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
@@ -1172,14 +1195,14 @@ namespace BackendSite.Controllers.Api
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Unlock Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Set Unlock Fail.Please Contact admin.");
         }
 
@@ -1222,14 +1245,14 @@ namespace BackendSite.Controllers.Api
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Lock Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Set Lock Fail.Please Contact admin.");
         }
 
@@ -1272,14 +1295,14 @@ namespace BackendSite.Controllers.Api
                         request.Reason
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Close Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Set Close Fail.Please Contact admin.");
         }
 
@@ -1315,15 +1338,33 @@ namespace BackendSite.Controllers.Api
                         Status = request.Status.ToString()
                     })
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Set Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Set Fail.");
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo [Enable/Disable Rebate Payout]
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_promotion" })]
+        [HttpPost]
+        public async Task<ApiResult> SetEnableRebateAsync(SetEnableDisableRebatePayoutRequest request)
+        {
+            if (!await _custInfoBll.SetEnableRebateAsync(request.CustId, request.Status, User.Identity.Name))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
         #endregion
 
@@ -1353,14 +1394,14 @@ namespace BackendSite.Controllers.Api
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.KickOutCustomer
                 });
-                
+
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Kick Out Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
         }
 
@@ -2623,6 +2664,40 @@ namespace BackendSite.Controllers.Api
             }
         }
         
+        #region CSD > Customer Administration > CustInfo > E Wallet Log
+
+        /// <summary>
+        /// CustManage/GetEWalletLog 取得加密錢包紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > E Wallet Log > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="EWalletLogListReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<CustEWalletLog> GetEWalletLog(EWalletLogListReq EWalletLogListReq)
+        {
+            var apiListResult = new ApiListResult<CustEWalletLog>();
+            var custInfo = _custInfoBll.GetCustInfoWithCache(EWalletLogListReq.CustId);
+            apiListResult.ErrorCode = 0;
+            var eWalletInfo = _custInfoBll.GetCustEWalletLogList(EWalletLogListReq.CustId,
+                1000,
+                1,
+                out var totalPages,
+                out var rowCount);
+            apiListResult.Data = eWalletInfo;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+            return apiListResult;
+        }
+
+        #endregion
+
         #endregion
 
         #region Private Methods
