@@ -1,5 +1,6 @@
 ﻿using BackendSite.Extensions;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -72,6 +73,14 @@ namespace BackendSite.Service.Model
         public int? PromotionAction { get; set; }
         public int AutoExtend { get; set; }
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
+        public IEnumerable<string> CurrencyList
+        {
+            get 
+            {
+                return JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
+            }
+        }
+        public string Currencys { get; set; }
     }
 
     public class PromotionInfoReq 
