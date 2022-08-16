@@ -75,8 +75,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 }
                 apiResult.Data = new
                 {
-                    allcurrency = normalCurrencyList,
-                    rewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList)
+                    Allcurrency = normalCurrencyList,
+                    RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList)
                 };
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
