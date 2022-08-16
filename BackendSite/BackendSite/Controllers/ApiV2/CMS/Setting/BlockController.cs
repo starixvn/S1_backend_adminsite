@@ -108,9 +108,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult SetBlockIP(ApiRequestWithLog<SetBlockIPRequest> request)
+        public async Task<ApiResult> SetBlockIP(ApiRequestWithLog<SetBlockIPRequest> request)
         {
-            var result = _blockBLL.SetBlockIP(new ParamsWithLog<SetBlockIPRequest>(request, User.Identity.Name));
+            var result = await _blockBLL.SetBlockIP(new ParamsWithLog<SetBlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult
