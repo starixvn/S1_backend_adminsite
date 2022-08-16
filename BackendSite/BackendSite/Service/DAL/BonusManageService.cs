@@ -259,6 +259,7 @@ namespace BackendSite.Service.DAL
         /// 取得促銷資料清單
         /// </summary>
         /// <param name="siteIds"></param>
+        /// <param name="currencyIds"></param>
         /// <param name="promotionTypes"></param>
         /// <param name="status"></param>
         /// <param name="startDate"></param>
