@@ -79,7 +79,7 @@ namespace BackendSite.Service.Model
         {
             get 
             {
-                return JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
+                return string.IsNullOrEmpty(Currencys) ? default: JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
             }
         }
         public string Currencys { get; set; }
