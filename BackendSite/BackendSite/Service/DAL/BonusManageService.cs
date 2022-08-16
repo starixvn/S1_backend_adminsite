@@ -548,7 +548,7 @@ namespace BackendSite.Service.DAL
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
                     TotalUsageLimit = specific.TotalUsageLimit,
-                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : string.Empty
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]"
                 });
             }
 
