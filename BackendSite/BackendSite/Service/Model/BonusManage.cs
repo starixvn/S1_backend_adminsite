@@ -152,7 +152,7 @@ namespace BackendSite.Service.Model
         public int TotalUsageLimit { get; set; }
         public IEnumerable<PromotionCashBack> CashBackList { get; set; }
         public string TierAmount { get; set; } = string.Empty;
-        public IEnumerable<TierAmount> TierAmountList { get; set; }
+        public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
     }
 
     public class TpGameType
