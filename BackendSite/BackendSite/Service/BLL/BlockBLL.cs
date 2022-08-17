@@ -24,19 +24,6 @@ namespace BackendSite.Service.BLL
             DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
         {
             var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), Math.Abs(pageSize), out totalPages, out rowCount);
-            if(result != null)
-            {
-                var ipCountryList = GetIPCountryList().ToList();
-                result.ToList().ForEach(x =>
-                {
-                    var ip = _tools.getIpNum(x.IP);
-                    var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
-                    if(location != null)
-                    {
-                        x.Location = location.Country;
-                    }
-                });
-            }
             return result;
         }
         public async Task<int> SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
