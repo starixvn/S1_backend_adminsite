@@ -39,11 +39,11 @@ namespace BackendSite.Service.Model.BankCardManagement
         [JsonIgnore]
         public string JsonPointLevels { set; get; }
         public IEnumerable<int> PointLevels =>
-            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels);
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels ?? "[]");
         [JsonIgnore]
         public string JsonVipLevels { set; get; }
         public IEnumerable<int> VipLevels =>
-            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels);
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
         public IEnumerable<string> VipLevelNames { set; get; }
         public decimal Dummy { set; get; }
         public string Memo { set; get; }

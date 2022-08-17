@@ -30,10 +30,12 @@ namespace BackendSite.Service.DAL
                 _CurrencyId = currencyId
             });
             
-            return _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+
+            return a;
         }
 
-        public IEnumerable<BankInfoOff> GetAllBankAccountOff()
+        /*public IEnumerable<BankInfoOff> GetAllBankAccountOff()
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoOff>("Admin_BankAccountOff_Get", commandType: CommandType.StoredProcedure);
@@ -43,7 +45,7 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        }
+        }*/
 
         public IEnumerable<BankInfoPay> GetBankInfoPayList()
         {

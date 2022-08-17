@@ -125,15 +125,18 @@ namespace BackendSite.Service.BLL
             return sysBankList;
         }
         
+        /// <summary>
+        /// 取代 GetAllBankInfoOff，GetBankInfoOff，GetBankAccountOffByCurrency
+        /// </summary>
         public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
             var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
             
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
-
-        public IEnumerable<BankInfoOff> GetAllBankInfoOff()
+        
+        /*public IEnumerable<BankInfoOff> GetAllBankInfoOff()
         {
             var sBankInfoOffListKey = $"BankInfoOffList_All";
             var bankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
@@ -165,7 +168,7 @@ namespace BackendSite.Service.BLL
 
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoOffList;
-        }
+        }*/
         public IEnumerable<BankInfoPay> GetBankInfoPay()
         {
             var sBankInfoPayListKey = "BankInfoPayForPayout";

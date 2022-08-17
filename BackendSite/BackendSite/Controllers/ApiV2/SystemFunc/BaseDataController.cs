@@ -63,7 +63,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// <summary>
             /// 1. Deposit, 2. Withdrawal
             /// </summary>
-            public int Purpose { get; set; }
+            public TransferAccountPurposeEnum Purpose { get; set; }
         }
 
         public class GetPayListRequest
@@ -248,17 +248,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <returns></returns>
         //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetBankInfoOffListRequest request)
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(GetBankInfoOffListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId);
-            // request.Purpose = 1 => x.purpose = 1,3
-            // request.Purpose = 2 => x.purpose = 2,3
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & request.Purpose) > 0)
-                .OrderBy(x => x.BSort);
-            apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
+            var data = _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
+                .Where(x => x.Purposes.Contains(request.Purpose)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.SettingStatus == BankCardManagementStatusEnum.Open);
+            
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -368,9 +369,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
+            var apiResult = new ApiResult<IEnumerable<OfflineBankAccount>>();
             var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
 
             if (result != ErrorCodeEnum.Success)
@@ -380,7 +381,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             if (custInfo != null)
             {
-                var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId).Where(x => x.CurrencyId == custInfo.CurrencyId);
+                var bankInfoOff = _bankDetailBll
+                    .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
+                    .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit)
+                                && x.AccountStatus == TransferAccountStatusEnum.Open
+                                && x.SettingStatus == BankCardManagementStatusEnum.Open);
 
                 if (bankInfoOff != null)
                 {
@@ -702,10 +707,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
             var bankInfoOff =
-                _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId);
-            var data = bankInfoOff
-                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
-            apiResult.Data = data;
+                _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
+                    .Select(x => new BankCodeModel
+                    {
+                        SysId = x.SysId,
+                        BankCode = x.BankCode ,
+                        BankName = x.BankName
+                    }).Distinct(new BankCodeModelComparer());
+            apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
@@ -726,17 +735,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 _bankDetailBll.GetOfflineBankAccount(request.SiteId);
             bankInfoOff = bankInfoOff
                 .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit))
-                .OrderBy(x => x.Id);
+                .OrderBy(x => x.BankId);
             var data = bankInfoOff
                 .Select(x => new CalCodeModel
                 {
-                    Id = x.Id,
-                    SysId = x.SysId,
-                    CurrencyId = x.CurrencyId,
-                    AccountName = x.AccountName,
-                    AccountNo = x.AccountNo,
-                    BankCode = x.BankCode, 
-                    SiteName = x.SiteName
+                    BankId = x.BankId,
+                    CalCodeName = x.DisplayName
                 });
             apiResult.Data = data;
             apiResult.ErrorCode = 0;
