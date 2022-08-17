@@ -124,7 +124,7 @@ namespace BackendSite.Controllers.Api
                             if (disableGame.TpId == tp.TpId)
                             {
                                 tp.Checked = true;
-                                var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                                var games = await _gameCasinoBll.GetGameCasinoByTpId(tp.TpId);
                                 tp.GameList = games.Select(a=> new TpGameCasino()
                                 {
                                     GameId = a.GameId,
@@ -327,7 +327,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(tpId);
+                var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(tpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = 0;
             }

@@ -21,9 +21,9 @@ namespace BackendSite.Service.BLL
             return await _gameCasinoService.GetTpList();
         }
         
-        public async Task<IEnumerable<RiskGameCasinoData>> GameCasinoByTPIdV3(int tpId)
+        public async Task<IEnumerable<RiskGameCasinoData>> GetGameCasinoByTpId(int tpId)
         {
-            var casinoGames = await _gameCasinoService.GetGameCasinoV4ByTpId(tpId);
+            var casinoGames = await _gameCasinoService.GetGameCasinoByTpId(tpId);
 
             return (from game in casinoGames
                 let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
