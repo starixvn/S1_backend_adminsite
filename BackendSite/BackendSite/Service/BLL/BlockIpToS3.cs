@@ -31,8 +31,21 @@ public class BlockIpToS3
             return 0;
         await AddIp(filePath, ip);
         
+        return await UploadToS3(filePath);
+    }
+
+    public async Task<int> DeleteIp(string ip)
+    {
+        var filePath = Path.Combine(_folder, _fileName);
+        //檢查檔案存不存在
+        if (!File.Exists(filePath))
+            await InitialConfig(filePath);
+
+        await DeleteIp(filePath, ip);
+        
         return await UploadToS3(filePath);;
     }
+
     private async Task InitialConfig(string filePath)
     {
         Directory.CreateDirectory(_folder);
@@ -69,5 +82,11 @@ public class BlockIpToS3
         };
         var putResponse = await _s3Helper.PutObjectAsync(putRequest);
         return !putResponse.HttpStatusCode.IsSuccess() ? 0 : 1;
+    }
+
+    private async Task DeleteIp(string filePath, string ip)
+    {
+        var temp = (await File.ReadAllLinesAsync(filePath)).Where(blockIp => blockIp != ip).ToList();
+        if (temp != null) await File.WriteAllLinesAsync(filePath, temp);
     }
 }

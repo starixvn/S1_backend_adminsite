@@ -139,9 +139,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult DeleteBlockIP(ApiRequestWithLog<BlockIPRequest> request)
+        public async Task<ApiResult> DeleteBlockIP(ApiRequestWithLog<BlockIPRequest> request)
         {
-            var result = _blockBLL.DeleteBlockIP(new ParamsWithLog<BlockIPRequest>(request, User.Identity.Name));
+            var result = await _blockBLL.DeleteBlockIP(new ParamsWithLog<BlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult

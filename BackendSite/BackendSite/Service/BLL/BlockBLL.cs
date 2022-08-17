@@ -51,9 +51,13 @@ namespace BackendSite.Service.BLL
             }
             return returnValue;
         }
-        public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
+        public async Task<int> DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
-            var returnValue = _blockService.DeleteBlockIP(input);
+            var returnValue = await _blockIpToS3.DeleteIp(input.Before.IP);
+            if (returnValue > 0)
+            {
+                returnValue = _blockService.DeleteBlockIP(input);
+            }
             return returnValue;
         }
         public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
