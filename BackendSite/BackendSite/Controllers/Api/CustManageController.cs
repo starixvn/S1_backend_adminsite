@@ -338,6 +338,11 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
+        public class EWalletLogListReq
+        {
+            public int CustId { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -2658,6 +2663,40 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
+        
+        #region CSD > Customer Administration > CustInfo > E Wallet Log
+
+        /// <summary>
+        /// CustManage/GetEWalletLog 取得加密錢包紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > E Wallet Log > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="EWalletLogListReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiListResult<CustEWalletLog> GetEWalletLog(EWalletLogListReq EWalletLogListReq)
+        {
+            var apiListResult = new ApiListResult<CustEWalletLog>();
+            var custInfo = _custInfoBll.GetCustInfoWithCache(EWalletLogListReq.CustId);
+            apiListResult.ErrorCode = 0;
+            var eWalletInfo = _custInfoBll.GetCustEWalletLogList(EWalletLogListReq.CustId,
+                1000,
+                1,
+                out var totalPages,
+                out var rowCount);
+            apiListResult.Data = eWalletInfo;
+            apiListResult.PageNumber = 1;
+            apiListResult.TotalPages = totalPages;
+            apiListResult.RowCount = rowCount;
+            return apiListResult;
+        }
+
+        #endregion
 
         #endregion
 
