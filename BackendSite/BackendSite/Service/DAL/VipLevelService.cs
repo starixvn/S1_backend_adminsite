@@ -2,6 +2,8 @@
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;

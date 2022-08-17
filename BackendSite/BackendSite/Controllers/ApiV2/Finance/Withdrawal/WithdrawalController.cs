@@ -390,7 +390,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             case (int)WithdrawalTypeEnum.LocalBank:
                                 {
                                     var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                                    var bankInfoOff = _bankDetailBll.GetBankInfoOff(withdrawalRequest.SiteId)
+                                    var bankInfoOff = _bankDetailBll
+                                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
                                         .FirstOrDefault(x => x.BankId == request.SelId);
 
                                     if (bankInfoOff != null)
