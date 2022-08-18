@@ -49,7 +49,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<int> PromotionTypes { get; set; }
 
