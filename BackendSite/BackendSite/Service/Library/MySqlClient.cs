@@ -192,7 +192,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
+        public IEnumerable<T> Query<T>(string name, object parameters, int? timeOut = 30)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
