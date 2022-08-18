@@ -20,21 +20,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly ServerInfoBLL _serverInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+
         private readonly ExcelBLL _excelBll;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
+
         #endregion
 
         #region Constructors
 
         public BonusController(IServiceProvider provider)
         {
-            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();         
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -45,7 +45,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<int> PromotionTypes { get; set; }
 
@@ -154,7 +153,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromotionList(new List<int> { request.SiteId },
+                var siteId = _newAuthorizeBLL.CheckBrand();
+                apiResult.Data = _bonusManageBll.GetPromotionList(new List<int> { siteId },
                     request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
@@ -413,7 +413,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var apiResult = new ApiResult<dynamic>();
 
-            apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(request.SpecialCode, request.Num, _authorizeBll.GetAuthData().UserName);
+            apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(request.SpecialCode, request.Num, _newAuthorizeBLL.GetAuthData().UserName);
 
             return apiResult;
         }
