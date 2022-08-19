@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model;
 
@@ -37,4 +38,27 @@ public class CustomerDto
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
     public string TagList { get; set; }
+}
+
+public class GetCustInfoWithBalanceRequest
+{
+    public int SiteId { get; set; }
+    public string UserName { get; set; }
+    public string SabaId { get; set; }
+}
+
+public class GetCustInfoWithBalanceResult
+{
+    public int SiteId { get; set; }
+    public string SiteName { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public int CurrencyId { get; set; }
+    public CustomerStatusEnum Status { get; set; }
+    public decimal Balance { get; set; }
+}
+        
+public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
+{
+    public IEnumerable<TpWallet> TpWalletList { get; set; }
 }
