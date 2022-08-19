@@ -4,5 +4,5 @@ namespace BackendSite.Service.DAL.Interface;
 
 public interface ICustomerService
 {
-    CustomerDto GetCustomerBasicInfo(int custId);
+    Task<CustomerDto> GetCustomerBasicInfo(int custId);
 }

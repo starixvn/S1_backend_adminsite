@@ -10,6 +10,8 @@ public class GetCustomerBasicInfoRequest
 
 public class CustomerDto
 {
+    public int CustId { get; set; }
+    public string UserName { get; set; }
     public string AccountName { get; set; }
     public bool IsPhoneVerified { get; set; }
     public bool IsEmailVerified { get; set; }

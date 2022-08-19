@@ -13,9 +13,9 @@ public class CustomerBLL : ICustomerBLL
         _customerService = customerService;
     }
 
-    public CustomerDto GetCustomerBasicInfo(int custId)
+    public async Task<CustomerDto> GetCustomerBasicInfo(int custId)
     {
-        var customerBasicInfo = _customerService.GetCustomerBasicInfo(custId);
+        var customerBasicInfo = await _customerService.GetCustomerBasicInfo(custId);
 
         return customerBasicInfo;
     }
