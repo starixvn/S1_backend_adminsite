@@ -75,26 +75,19 @@ namespace BackendSite
 
             }
 
+            //¤â°Êµù¥U
+            services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
+            services.AddTransient<ReferralManagementDecorator>();
+
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ReferralManagementDecorator>();
-
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
-
-            services.AddTransient<ReferralManagementDecorator>();
-
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
-
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<IHotEventService, HotEventService>();
-
-
-            services.AddTransient<LiveRegistrationDecorator>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-
             services.AddTransient<IBonusReportService, BonusReportService>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
