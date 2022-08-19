@@ -76,10 +76,12 @@ namespace BackendSite
             }
 
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ICustomerBLL, CustomerBLL>();
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<ICustomerService, CustomerService>();
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
