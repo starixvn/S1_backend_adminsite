@@ -1,9 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Drawing;
 using System.Text.RegularExpressions;
-using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
@@ -131,59 +129,11 @@ namespace BackendSite.Service.BLL
 
         private int InsertDepositReceipt(int custId, string transId, string fileName, byte[] fileBytes)
         {
-            //var processedReceipt = ProcessImage(depositReceipt);
-
             var depositId = ValidateDepositReceiptPic(transId);
 
             return depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
         }
-
-        private ProcessedDepositReceipt ProcessImage(IFormFile depositReceipt)
-        {
-            var processedDepositReceipt = new ProcessedDepositReceipt();
-            if (_contentTypesCheck.ContainsKey(depositReceipt.ContentType))
-            {
-                var xSize = 500m;
-                var apiResult = new ApiResult();
-                decimal xCell = 1;
-
-                using var fileStream = depositReceipt.OpenReadStream();
-                using var uploadedImage = Image.FromStream(fileStream);
-                using var ms = new System.IO.MemoryStream();
-
-                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
-                {
-                    if (uploadedImage.Width > uploadedImage.Height)
-                    {
-                        xCell = xSize / uploadedImage.Width;
-                    }
-                    else
-                    {
-                        xCell = xSize / uploadedImage.Height;
-                    }
-                }
-
-                var graphicOptions = new GraphicOptions
-                {
-                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
-                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
-                };
-                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
-                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var fileName = depositReceipt.FileName;
-                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
-
-                var fileBytes = ms.ToArray();
-
-                processedDepositReceipt.FileName = fileName;
-                processedDepositReceipt.FileBytes = fileBytes;
-            }
-
-            return processedDepositReceipt;
-        }
-
+        
         private int ValidateDepositReceiptPic(string transId)
         {
             var depositId = 0;
@@ -191,13 +141,7 @@ namespace BackendSite.Service.BLL
             int.TryParse(m.Value, out depositId);
             return depositId;
         }
-
-        public class ProcessedDepositReceipt
-        {
-            public string FileName { get; set; }
-            public byte[] FileBytes { get; set; }
-        }
-
+        
         public DepositRequest GetDepositRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -339,17 +283,30 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
+        
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfosV2(int siteId, int currencyId)
+            => depositService.GetDepositLimitInfosV2(siteId, currencyId);
 
         public bool AddDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             return depositService.AddDepositLimitInfo(input);
+        }
+        
+        public bool AddDepositLimitV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        {
+            return depositService.AddDepositLimitInfoV2(input);
         }
 
         public bool EditDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             return depositService.EditDepositLimitInfo(input);
         }
-
+        
+        public bool EditDepositLimitV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        {
+            return depositService.EditDepositLimitInfoV2(input);
+        }
+        
         public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             var currentUpperPoint =
@@ -360,14 +317,12 @@ namespace BackendSite.Service.BLL
 
             return depositService.DeleteDepositLimitInfo(input);
         }
-
-        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new Dictionary<string, System.Drawing.Imaging.ImageFormat>(comparer: StringComparer.OrdinalIgnoreCase)
+        
+        public bool DeleteDepositLimitV2(ParamsWithLog<DepositLimitModel> input)
         {
-            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
-            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
-            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
-        };
-
+            return depositService.DeleteDepositLimitInfoV2(input);
+        }
+        
         public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,
             out int totalPages, out int rowCount)
         {
