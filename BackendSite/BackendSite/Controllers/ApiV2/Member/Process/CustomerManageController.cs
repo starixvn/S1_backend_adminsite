@@ -38,11 +38,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
-        public async Task<ApiResult<CustomerDto>> GetBasicInfo(GetCustomerBasicInfoRequest request)
+        public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
             var data = await _customerBll.GetCustomerBasicInfo(request.CustId);
 
-            var apiResult = new ApiResult<CustomerDto>()
+            var apiResult = new ApiResult<CustomerBasicInfo>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = data

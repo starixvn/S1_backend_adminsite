@@ -4,5 +4,5 @@ namespace BackendSite.Service.BLL.Interface;
 
 public interface ICustomerBLL
 {
-    Task<CustomerDto> GetCustomerBasicInfo(int custId);
+    Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId);
 }
