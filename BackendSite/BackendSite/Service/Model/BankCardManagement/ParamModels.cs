@@ -46,6 +46,8 @@ namespace BackendSite.Service.Model.BankCardManagement
             Memo = req.Memo;
             Sort = req.Sort;
             Status = req.Status;
+            SupportQr = req.SupportQr;
+            QrCodeUrl = string.IsNullOrWhiteSpace(req.QrCodeUrl) ? null : req.QrCodeUrl;
             Operator = updater;
         }
         public int FinancialAccountId { get; set; }
@@ -58,5 +60,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int Sort { get; set; }
         public BankCardManagementStatusEnum Status { get; set; }
         public string Operator { get; set; }
+        public bool SupportQr { get; set; }
+        public string QrCodeUrl { get; set; }
     }
 }

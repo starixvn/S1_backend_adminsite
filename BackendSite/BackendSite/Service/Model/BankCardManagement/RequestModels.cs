@@ -30,5 +30,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public string Memo { get; set; }
         public int Sort { get; set; }
         public BankCardManagementStatusEnum Status { get; set; }
+        public bool SupportQr { get; set; }
+        public string QrCodeUrl { get; set; }
     }
 }
