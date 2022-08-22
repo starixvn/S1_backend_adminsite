@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         public ApiResult<IEnumerable<DepositLimitInfo>> GetList(GetListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
-            var depositLimitInfos = _depositBll.GetDepositLimitInfosV2(request.SiteId, request.CurrencyId);
+            var depositLimitInfos = _depositBll.GetDepositLimitInfos(request.SiteId, request.CurrencyId);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             
@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         public ApiResult Create(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
             var result =
-                _depositBll.AddDepositLimitV2(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
+                _depositBll.AddDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -127,7 +127,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         public ApiResult Update(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
             var result =
-                _depositBll.EditDepositLimitV2(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
+                _depositBll.EditDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

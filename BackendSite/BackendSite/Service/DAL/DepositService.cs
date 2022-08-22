@@ -377,7 +377,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfosV2(int siteId, int currencyId)
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
         {
             var props = new DynamicParameters();
 
@@ -428,7 +428,7 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
-        public bool AddDepositLimitInfoV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        public bool AddDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -506,7 +506,7 @@ namespace BackendSite.Service.DAL
             return false;
         }
         
-        public bool EditDepositLimitInfoV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        public bool EditDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
