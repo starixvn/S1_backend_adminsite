@@ -284,17 +284,17 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         
-        public IEnumerable<DepositLimitInfo> GetDepositLimitInfosV2(int siteId, int currencyId)
-            => depositService.GetDepositLimitInfosV2(siteId, currencyId);
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
+            => depositService.GetDepositLimitInfos(siteId, currencyId);
 
         public bool AddDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             return depositService.AddDepositLimitInfo(input);
         }
         
-        public bool AddDepositLimitV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        public bool AddDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            return depositService.AddDepositLimitInfoV2(input);
+            return depositService.AddDepositLimitInfo(input);
         }
 
         public bool EditDepositLimit(ParamsWithLog<DepositLimitModel> input)
@@ -302,9 +302,9 @@ namespace BackendSite.Service.BLL
             return depositService.EditDepositLimitInfo(input);
         }
         
-        public bool EditDepositLimitV2(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        public bool EditDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            return depositService.EditDepositLimitInfoV2(input);
+            return depositService.EditDepositLimitInfo(input);
         }
         
         public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
