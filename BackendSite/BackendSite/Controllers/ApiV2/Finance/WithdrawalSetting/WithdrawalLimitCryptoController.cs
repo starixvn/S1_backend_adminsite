@@ -32,12 +32,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest 
         {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public NetworkTypeEnum NetworkType { get; set; }
-            public CryptoCurrencyEnum CryptoCurrency { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -56,24 +54,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiListResult<CryptoWithdrawalLimitInfo> GetList(GetListRequest request)
+        public ApiResult GetList(GetListRequest request)
         {
-            var result = _withdrawalBll.GetCryptoWithdrawalLimitInfos(request.SiteIds,
-                request.CurrencyIds,
-                (int)request.CryptoCurrency,
-                Enum.GetName(typeof(NetworkTypeEnum), request.NetworkType),
-                request.PageNumber,
-                request.PageSize,
-                out int totalPages,
-                out int rowCount);
+            var result = _withdrawalBll.GetCryptoWithdrawalLimitInfos(request.SiteId, request.CurrencyId);
 
-            var apiResult = new ApiListResult<CryptoWithdrawalLimitInfo>
+            var apiResult = new ApiResult<IEnumerable<CryptoWithdrawalLimitInfo>>
             {
                 Data = result,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount,
-                ErrorCode = 0
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -114,10 +102,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(ApiRequestWithLog<UpdateCryptoWithdrawalLimitInfo> request)
+        public ApiResult Update(ApiRequestWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> request)
         {
             var success = _withdrawalBll.EditCryptoWithdrawalLimit(
-                new ParamsWithLog<UpdateCryptoWithdrawalLimitInfo>(request, User.Identity.Name));
+                new ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>>(request, User.Identity.Name));
 
             if (success)
                 return new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
