@@ -220,6 +220,7 @@ namespace BackendSite.Service.Model
         public string LevelName { get; set; }
 
         public int Times { get; set; }
+        public decimal TotalWithdrawalMax { get; set; }
     }
     
     public class SetWithdrawalLimitInfo
@@ -229,6 +230,7 @@ namespace BackendSite.Service.Model
         public string VipLevelName { get; set; }
         public int WithdrawalMin { get; set; }
         public int WithdrawalMax { get; set; }
+        public int TotalWithdrawalMax { get; set; }
         [LogPropertyName("WithdrawalFrequency")]
         public int Times { get; set; }
     }
