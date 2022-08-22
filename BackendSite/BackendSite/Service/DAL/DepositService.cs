@@ -452,7 +452,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", null, DbType.String);
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-                logParam.Add("_Operator", "TEST");
+                logParam.Add("_Operator", input.Operator);
 
                 var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
                 if (logResult)
@@ -608,7 +608,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", null, DbType.String);
-                logParam.Add("_Operator", "TEST");
+                logParam.Add("_Operator", input.Operator);
 
                 var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
                 if (logResult)

@@ -127,7 +127,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         public ApiResult Update(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
             var result =
-                _depositBll.EditDepositLimitV2(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, "TEST"));
+                _depositBll.EditDepositLimitV2(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
