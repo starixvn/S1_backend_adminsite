@@ -75,6 +75,8 @@ namespace BackendSite.Service.DAL
             para.Add("_Memo", input.Memo);
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
+            para.Add("_SupportQR", input.SupportQr);
+            para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
             

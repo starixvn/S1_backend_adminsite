@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
 
@@ -43,13 +44,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetQrCodeUrlRequest
         {
-            public IEnumerable<int> SiteIds { get; set; }
-
-            public IEnumerable<int> CurrencyIds { get; set; }
-
-            public List<BankCardManagementStatusEnum> Statuses { get; set; }
+            public IFormFile File { get; set; }
+        }
+        
+        public class GetQrCodeUrlResult
+        {
+            public string QrCodeUrl { get; set; }
         }
 
         #endregion
@@ -127,7 +129,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                             .Where(x => oldData.VipLevels.Contains(x.Level))
                             .Select(x => x.LevelName)),
                         oldData.Sort,
-                        Status = oldData.Status.ToString()
+                        Status = oldData.Status.ToString(),
+                        SupportQr = oldData.SupportQr.ToString(),
+                        oldData.QrCodeUrl
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -140,7 +144,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                             .Select(x => x.LevelName)),
                         request.Sort,
                         Status = request.Status.ToString(),
-                        request.Memo
+                        request.Memo,
+                        SupportQr = request.SupportQr.ToString(),
+                        request.QrCodeUrl
                     }),
                     Operator = updater
                 });
@@ -150,6 +156,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                 ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
                 : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
+        
+        [HttpPost]
+        public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
+        {
+            var result = await QrCodeExtension.DecodeFromImage(request.File);
+
+            return new ApiResult<GetQrCodeUrlResult>
+            {
+                Data = new GetQrCodeUrlResult
+                {
+                    QrCodeUrl = result
+                },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
         #endregion
 
     }
