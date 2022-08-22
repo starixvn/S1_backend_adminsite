@@ -71,6 +71,7 @@ namespace BackendSite.Service.DAL
                 _VipLevel = input.After.VipLevel,
                 _WithdrawalMin = input.After.WithdrawalMin,
                 _WithdrawalMax = input.After.WithdrawalMax,
+                _TotalWithdrawalMax = input.After.TotalWithdrawalMax,
                 _UpdateOperator = input.Operator,
                 _Times = input.After.Times
             };

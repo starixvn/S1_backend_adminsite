@@ -367,6 +367,7 @@ namespace BackendSite.Service.BLL
         public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
             if (input.After.WithdrawalMax < 0
+                || input.After.TotalWithdrawalMax < 0
                 || input.After.WithdrawalMin < 0
                 || input.After.Times < 0)
             {
