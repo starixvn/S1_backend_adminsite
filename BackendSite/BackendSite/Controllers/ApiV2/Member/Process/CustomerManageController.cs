@@ -5,7 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using BackendSite.Service.BLL.Interface;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -14,42 +14,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class CustomerManageController : ControllerBase
     {
+        private readonly ICustomerBLL _customerBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly CustVerifyBLL _custVerifyBll;
 
-        public CustomerManageController(IServiceProvider provider)
+        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll)
         {
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
+            _customerBll = customerBll;
+            _custInfoBll = custInfoBll;
+            _custVerifyBll = custVerifyBll;
         }
-
-        #region Model 
-
-        public class GetCustInfoWithBalanceResult
-        {
-            public int SiteId { get; set; }
-            public string SiteName { get; set; }
-            public int CustId { get; set; }
-            public string UserName { get; set; }
-            public int CurrencyId { get; set; }
-            public CustomerStatusEnum Status { get; set; }
-            public decimal Balance { get; set; }
-        }
-
-        public class GetCustInfoWithBalanceRequest
-        {
-            public int SiteId { get; set; }
-            public string UserName { get; set; }
-            public string SabaId { get; set; }
-        }
-
-        public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
-        {
-            public IEnumerable<TpWallet> TpWalletList { get; set; }
-        }
-
-        #endregion
-
+        
         // todo 待確認權限
         [HttpPost]
         public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
@@ -73,6 +48,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+        
+        /// <summary>
+        /// CustomerManage/GetCustomerBasicInfo 取得客戶基本資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustomerDto>> GetBasicInfo(GetCustomerBasicInfoRequest request)
+        {
+            var data = await _customerBll.GetCustomerBasicInfo(request.CustId);
+
+            var apiResult = new ApiResult<CustomerDto>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = data
+            };
+            return apiResult;
+        }
+        
+        #region Finance > Balance Adjustment
 
         /// <summary>
         /// CustomerManage/GetCustInfoWithBalance 取得客戶資料及主錢包餘額
@@ -171,6 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
+        #endregion
     }
 }
 
