@@ -48,6 +48,16 @@ namespace BackendSite.Service.DAL
             return result;
 
         }
+        
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyId", currencyId);
+            var result = _reportDbClient.Query<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoReNew_Get", props);
+            
+            return result;
+        }
 
         public bool AddWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
@@ -128,6 +138,49 @@ namespace BackendSite.Service.DAL
             }
             
             var result = conn.Execute("Admin_WithdrawalLimitInfo_Set_V2", param, commandType: CommandType.StoredProcedure) > 0;
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+            
+            tran.Commit();
+
+            return true;
+        }
+
+        public bool EditWithdrawalLimitInfo(ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>> input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            
+            var param = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Infos = JsonConvert.SerializeObject(input.After),
+                _UpdateOperator = input.Operator
+            };
+            
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalLimitation);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+            
+            var result = conn.Execute("Admin_WithdrawalLimitInfoReNew_Set", param, commandType: CommandType.StoredProcedure) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -314,6 +367,16 @@ namespace BackendSite.Service.DAL
 
         }
 
+        public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(int siteId, int currencyId)
+        {
+            var param = new DynamicParameters();
+            param.Add("_SiteId", siteId);
+            param.Add("_CurrencyId", currencyId);
+            var result = _reportDbClient.Query<CryptoWithdrawalLimitInfo>("Admin_USDTWithdrawalLimitInfoReNew_Get", param);
+            
+            return result;
+        }
+        
         public bool AddCryptoWithdrawalLimitInfo(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
@@ -463,6 +526,53 @@ namespace BackendSite.Service.DAL
             }
 
             var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V3", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!result)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            tran.Commit();
+
+            return true;
+        }
+        
+        public bool EditCryptoWithdrawalLimitInfo(ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> input)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var tran = conn.BeginTransaction();
+            var insParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Infos = JsonConvert.SerializeObject(input.After),
+                _UpdateOperator = input.Operator
+            };
+
+            var logParam = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Menu = (int) AdminAdjustmentLogMenuEnum.CryptoWithdrawalLimitation,
+                _ActionType = (int) ActionType.Update,
+                _RefTransId = string.Empty,
+                _BeforeDetailInfo = input.Before.ToLog(),
+                _AfterDetailInfo = input.After.ToLog(),
+                _Operator = input.Operator
+            };
+
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+
+            if (!logResult)
+            {
+                tran.Rollback();
+                return false;
+            }
+
+            var result = conn.Execute("Admin_USDTWithdrawalLimitInfoReNew_Set", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
 
             if (!result)
             {

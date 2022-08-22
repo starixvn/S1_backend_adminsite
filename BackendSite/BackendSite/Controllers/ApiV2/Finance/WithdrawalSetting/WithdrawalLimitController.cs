@@ -31,11 +31,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         #endregion
 
         #region API Model
-        public class GetListRequest : ApiRequestPageModel
+        
+        public class GetListRequest 
         {
-            public IEnumerable<int> SiteIds { get; set; }
-
-            public IEnumerable<int> CurrencyIds { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
         }
         
         #endregion
@@ -54,21 +54,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiListResult<WithdrawalLimitInfoManage> GetList(GetListRequest request)
+        public ApiResult GetList(GetListRequest request)
         {
-            var apiResult = new ApiListResult<WithdrawalLimitInfoManage>();
-
-            apiResult.Data = _withdrawalBll.GetWithdrawalLimitInfos(request.SiteIds,
-                request.CurrencyIds,
-                request.PageNumber,
-                request.PageSize,
-                out int totalPages,
-                out int rowCount);
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            apiResult.PageNumber = request.PageNumber;
-            apiResult.TotalPages = totalPages;
-            apiResult.RowCount = rowCount;
+            var data = _withdrawalBll.GetWithdrawalLimitInfos(request.SiteId, request.CurrencyId);
+            var apiResult = new ApiResult<IEnumerable<WithdrawalLimitInfoManage>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
             return apiResult;
         }
@@ -116,10 +109,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(ApiRequestWithLog<SetWithdrawalLimitInfo> request)
+        public ApiResult Update(ApiRequestWithLog<IEnumerable<SetWithdrawalLimitInfo>> request)
         {
-            var result = _withdrawalBll.EditWithdrawalLimit(
-                new ParamsWithLog<SetWithdrawalLimitInfo>(request, User.Identity.Name));
+            var result = _withdrawalBll.EditWithdrawalLimit(new ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>>(request, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

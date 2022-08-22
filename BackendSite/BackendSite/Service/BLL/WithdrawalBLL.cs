@@ -354,6 +354,9 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
+        
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) 
+            => _withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
         public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
@@ -376,6 +379,11 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
+            return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
+        }
+        
+        public bool EditWithdrawalLimit(ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>> input)
+        {
             return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
 
@@ -631,6 +639,12 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(int siteId, int currencyId)
+        {
+            var result = _withdrawalLimitService.GetCryptoWithdrawalLimitInfos(siteId,currencyId);
+            return result;
+        }
 
         public bool AddCryptoWithdrawalLimit(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
@@ -674,6 +688,12 @@ namespace BackendSite.Service.BLL
 
             return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
+        
+        public bool EditCryptoWithdrawalLimit(ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> input)
+        {
+            return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
+        }
+        
 
         public CryptoInfoData GetCryptoInfoData()
         {
