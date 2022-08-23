@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
                     if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
-                    }                 
+                    }
                     var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, input.PageNumber, input.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
@@ -85,6 +85,26 @@ namespace BackendSite.Service.BLL
 
             var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
             return list.GetRange(index, count);
+        }
+     
+        public List<TpBetRecord> GetTpBetRecord(GetTpBetRecordRequest input)
+        {
+            return _cacheHelper.TryGetOrCreate(
+                key: $"TpBetRecord:{input.GetRedisKey()}",
+                timeSpan: TimeSpan.FromMinutes(15),
+                factory:() =>
+                {
+                    var StartDate = input.StartTime.ToUniversalTime().DateTime;
+                    var EndDate = input.EndTime.ToUniversalTime().DateTime;
+                    var parameters = new
+                    {
+                        input.CustId,
+                        StartDate,
+                        EndDate,
+                    };
+                    var data = _partitionService.GetTpBetRecord(StartDate, EndDate, "Admin_TpBetRecord_Get", parameters);
+                    return data;
+                });
         }
 
         private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)

@@ -68,6 +68,18 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 1 })]
+        public ApiListResult<TpBetRecord> GetTpBetRecord(GetTpBetRecordRequest request)
+        {
+            var data = _betListBll.GetTpBetRecord(request);
+            return new ApiListResult<TpBetRecord> 
+            { 
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
         private void DateCheck(GetBetListRequest request)
         {
             var startDate = new DateTimeOffset(request.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);
