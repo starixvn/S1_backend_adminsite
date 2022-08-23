@@ -1,4 +1,4 @@
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
@@ -78,7 +78,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var siteId = request.SiteIds.First();
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            var data = await _referralManagementBll.GetReferralCustList(siteId, request.UserName, request.CurrencyId, startTime, endTime, request.PageSize, request.PageNumber, request.OrderBy, request.OrderByProperty, request.OrderByDirection);
+            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "referralCount" : request.OrderByProperty;
+            var data = await _referralManagementBll.GetReferralCustList(siteId, request.UserName, request.CurrencyId, startTime, endTime, request.PageSize, request.PageNumber, request.OrderBy, orderByProperty, request.OrderByDirection);
             
             var apiResult = new ApiListResult<ReferralCustList>
             {
