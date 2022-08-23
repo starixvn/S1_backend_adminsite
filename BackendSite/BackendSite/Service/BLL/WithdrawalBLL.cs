@@ -1350,7 +1350,7 @@ namespace BackendSite.Service.BLL
 
                         if (withdrawalLimitInfo != null)
                             IsValidWithWithdrawalLimit(amount, custDailySum.Amount, custDailySum.Count,
-                                withdrawalLimitInfo.WithdrawalMin, withdrawalLimitInfo.WithdrawalMax, withdrawalLimitInfo.Times);
+                                withdrawalLimitInfo.WithdrawalMin, withdrawalLimitInfo.TotalWithdrawalMax, withdrawalLimitInfo.Times);
                         break;
                     }
                 case ApplicationAccountTypeEnum.Crypto:
