@@ -18,12 +18,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustomerBLL _customerBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly CustVerifyBLL _custVerifyBll;
-
-        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll)
+        private readonly CustPhotoIdBLL _custPhotoIdBll;
+        
+        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll, CustPhotoIdBLL custPhotoIdBll)
         {
             _customerBll = customerBll;
             _custInfoBll = custInfoBll;
             _custVerifyBll = custVerifyBll;
+            _custPhotoIdBll = custPhotoIdBll;
         }
 
         /// <summary>
@@ -48,6 +50,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = data
             };
             return apiResult;
+        }
+        
+        /// <summary>
+        /// Upload
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> UploadCustPhotoId(UploadCustomerIdPhotoRequest request)
+        {
+            var result = await _custPhotoIdBll.UploadIdPhoto(request.CustId, request.Photo);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Upload Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
+
         }
         
         #region Finance > Balance Adjustment

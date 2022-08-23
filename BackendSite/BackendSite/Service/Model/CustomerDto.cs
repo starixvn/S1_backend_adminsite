@@ -107,3 +107,9 @@ public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
 {
     public IEnumerable<TpWallet> TpWalletList { get; set; }
 }
+
+public class UploadCustomerIdPhotoRequest
+{
+    public int CustId { get; set; }
+    public IFormFile Photo { get; set; }
+}
