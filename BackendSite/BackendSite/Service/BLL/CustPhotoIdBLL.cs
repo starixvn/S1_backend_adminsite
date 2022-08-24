@@ -48,7 +48,7 @@ public class CustPhotoIdBLL
 
             var site = (SiteEnum)custInfo.SiteId;
             var stream = new MemoryStream(fileBytes);
-            var key = $"{_environment}/{site}/{custId}/{sq}.jpeg";
+            var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
             var putRequest = new PutObjectRequest
             {
                 BucketName = "ailab-backoffice",
