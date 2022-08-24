@@ -179,7 +179,7 @@ namespace BackendSite.Service.BLL
                     {
                         scope.Dispose();
 
-                        return (false, count, "Insert Transfer Account Fail.");
+                        return (false, count, "Insert Transfer Account Fail. Duplicate AccountNo.");
                     };
 
                     if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
