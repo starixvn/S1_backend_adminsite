@@ -66,6 +66,19 @@ namespace BackendSite.Service.Model
         public string OriginalState { get; set; }
         public long TicketKey { get; set; }
         public int BonusId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get
+            {
+                return new DateTimeOffset(_createTime, TimeSpan.Zero);
+            }
+            set
+            {
+                _createTime = value.DateTime;
+            }
+
+        }
+        private DateTime _createTime { get; set; }
     }
 
 }

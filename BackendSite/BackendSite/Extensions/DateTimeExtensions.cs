@@ -53,5 +53,11 @@
         {
             return partitionTime.ToString("yyyyMM");
         }
+
+        /// <param name="timeZone">format:+08:00</param>
+        public static DateTimeOffset ToOffset(this DateTime time, string timeZone)
+        {
+            return DateTimeOffset.Parse(time.ToString() + timeZone);
+        }
     }
 }
