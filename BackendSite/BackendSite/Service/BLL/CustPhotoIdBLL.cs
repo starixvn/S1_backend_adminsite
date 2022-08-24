@@ -56,7 +56,7 @@ public class CustPhotoIdBLL
             return 0;
         }
 
-        if (await _custPhotoIdService.GetCount(custId) > 5)
+        if (await _custPhotoIdService.GetCount(custId) >= 5)
         {
             _logger.LogError("reach the upload photo limit");
             return 0;
@@ -92,5 +92,26 @@ public class CustPhotoIdBLL
             return 0;
         }
         return 1;
+    }
+
+    public async Task<int> DeleteCustPhotoId(int custId, int id)
+    {
+        var result = await _custPhotoIdService.Delete(id);
+        if (result > 0)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
+            var site = (SiteEnum)custInfo.SiteId;
+            var key = $"{_environment}/{site}/CustPhotoId/{custId}/{id}.jpeg";
+            var deleteObject = new DeleteObjectRequest()
+            {
+                BucketName = "ailab-backoffice",
+                Key = key
+            };
+
+            await _s3Helper.DeleteObjectAsync(deleteObject);
+            return 1;
+        }
+
+        return 0;
     }
 }

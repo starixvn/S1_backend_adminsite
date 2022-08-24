@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> UploadCustPhotoId(UploadCustPhotoIdRequest request)
+        public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
         {
             var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
@@ -88,6 +88,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
 
+        }
+        
+        /// <summary>
+        /// Ask Re-Upload
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> DeleteCustPhotoId(DeleteCustPhotoIdRequest request)
+        {
+            var result = await _custPhotoIdBll.DeleteCustPhotoId(request.CustId, request.Id);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Delete Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
         
         #region Finance > Balance Adjustment

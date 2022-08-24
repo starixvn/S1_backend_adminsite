@@ -124,3 +124,9 @@ public class UploadCustPhotoIdRequest
     public int CustId { get; set; }
     public IFormFile Photo { get; set; }
 }
+
+public class DeleteCustPhotoIdRequest
+{
+    public int CustId { get; set; }
+    public int Id { get; set; }
+}

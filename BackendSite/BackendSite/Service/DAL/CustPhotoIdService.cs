@@ -45,4 +45,11 @@ public class CustPhotoIdService
         var sq = p.Get<long>("SQ");
         return sq > 0 ? sq : 0;
     }
+    
+    public async Task<int> Delete(int sq)
+    {
+        var p = new DynamicParameters();
+        p.Add("_SQ", sq);
+        return  await _mainDbClient.ExecuteAsync("Admin_CustPhotoId_Del_V2", p);
+    }
 }
