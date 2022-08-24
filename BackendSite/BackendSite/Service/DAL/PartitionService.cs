@@ -1,5 +1,6 @@
 ﻿using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
 
@@ -39,6 +40,26 @@ namespace BackendSite.Service.DAL
             {
                 result.AddRange(item.Result);
             }
+            return result;
+        }
+
+        public List<TpBetRecord> GetTpBetRecord(DateTime startTime, DateTime endTime, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        {
+            var result = new List<TpBetRecord>();
+
+            foreach (var partitionKey in startTime.GetTpBetRecordPartitionRange(endTime))
+            {
+                var p = new DynamicParameters(parameters);
+                p.Add("_YYYYMM", partitionKey);
+                var data = dataBase switch
+                {
+                    DataBase.Report => _reportDbClient.Query<TpBetRecord>(spName, p),
+                    DataBase.Main => _mainDbClient.Query<TpBetRecord>(spName, p),
+                    _ => throw new NotImplementedException(),
+                };
+                result.AddRange(data);
+            }
+
             return result;
         }
     }

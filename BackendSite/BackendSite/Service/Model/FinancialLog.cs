@@ -123,6 +123,7 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int CategoryId { get; set; }
     }
     public class TpBetRecordbyCategoryIdRes
     {

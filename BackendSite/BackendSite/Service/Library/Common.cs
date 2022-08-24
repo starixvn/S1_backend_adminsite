@@ -1,13 +1,23 @@
-﻿using System.Text.RegularExpressions;
+﻿using BackendSite.Service.BLL;
+using BackendSite.Service.Model.Option;
+using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Library
 {
     public class Common
     {
-        private readonly IWebHostEnvironment environment;
-        public Common(IWebHostEnvironment environment)
+        private readonly IWebHostEnvironment _environment;
+        private readonly IReadOnlyDictionary<int, TpListOption> _tpList;
+        private readonly IReadOnlyDictionary<int, CurrencyOption> _currencyList;
+        private readonly IReadOnlyDictionary<int, string> _siteNameList;
+        private readonly ServerInfoBLL serverInfoBLL;
+
+        public Common(IServiceProvider provider)
         {
-            this.environment = environment;
+            _environment = provider.GetRequiredService<IWebHostEnvironment>();
+            _tpList = provider.GetRequiredService<IEnumerable<TpListOption>>().ToDictionary(d => d.Id, d => d);
+            _currencyList = provider.GetRequiredService<IEnumerable<CurrencyOption>>().ToDictionary(d => d.CurrencyId, d => d);
+            _siteNameList = provider.GetRequiredService<ServerInfoBLL>().GetSiteList().ToDictionary(d => d.SiteId, d => d.SiteName);
         }
         public string CreateSerialId()
         {
@@ -15,19 +25,19 @@ namespace BackendSite.Service.Library
         }
         public string GetEnv()
         {
-            if (environment.EnvironmentName == "Development")
+            if (_environment.EnvironmentName == "Development")
             {
                 return "D";
             }
-            else if (environment.EnvironmentName == "Staging")
+            else if (_environment.EnvironmentName == "Staging")
             {
                 return "S";
             }
-            else if (environment.EnvironmentName == "Production")
+            else if (_environment.EnvironmentName == "Production")
             {
                 return "P";
             }
-            else if (environment.EnvironmentName == "QA")
+            else if (_environment.EnvironmentName == "QA")
             {
                 return "Q";
             }
@@ -69,6 +79,21 @@ namespace BackendSite.Service.Library
             int newPageSize = Math.Abs(pageSize);
             int startIndex = (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize);
             return (startIndex, newPageSize);
+        }
+
+        public string GetCurrencyIsoCode(int currencyId)
+        {
+            return _currencyList.GetValueOrDefault(currencyId).IsoCode;
+        }
+
+        public string GetTpName(int tpId)
+        {
+            return _tpList.TryGetValue(tpId, out var result) ? result.TpName : string.Empty;
+        }
+
+        public string GetSiteName(int siteId)
+        {
+            return _siteNameList.GetValueOrDefault(siteId, string.Empty);
         }
     }
 }

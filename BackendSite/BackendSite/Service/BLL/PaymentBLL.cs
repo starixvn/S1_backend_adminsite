@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -13,6 +14,8 @@ namespace BackendSite.Service.BLL
         private readonly TpMaintainService _tpMaintainService;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly BonusManageService _bonusManageService;
+        private readonly BetListBLL _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
 
         public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
         {
@@ -22,6 +25,8 @@ namespace BackendSite.Service.BLL
             _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
+            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -126,23 +131,42 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate,
             int categoryId, DateTime startDate, DateTime endDate)
         {
-            var result = walletService.GetCustTpBetRecordListbyCategoryId(custId, selDate, categoryId, startDate, endDate).GroupBy(x => new
-            {
-                SettledDate = x.SettledDate,
-                GameTypeName = x.GameTypeName,
-                GameTypeID = x.GameTypeID
-            }).Select(x => new TpBetRecordbyCategoryIdRes
-            {
-                SettledDate = x.Key.SettledDate,
-                GameTypeName = x.Key.GameTypeName,
-                GameTypeID = x.Key.GameTypeID,
-                TotalTO = x.Where(y => (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
-                WinLoss = x.Sum(y => y.WinlostAmount)
-            }).ToList();
+            var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
+            var result = betList
+                .Join(_tpGameTypeList,
+                  tpBetRecord => tpBetRecord.GameType,
+                  tpGameType => tpGameType.Type,
+                  (tpBetRecord, tpGameType) => new TpBetRecordbyCategoryId
+                  {
+                      SettledDate = selDate,
+                      GameTypeName = tpGameType.TypeName,
+                      GameTypeID = tpBetRecord.GameType,
+                      TurnOver = tpBetRecord.Stake,
+                      ValidBet = tpBetRecord.ValidBet,
+                      WinlostAmount = tpBetRecord.WinlostAmount,
+                      SettlementType = tpBetRecord.SettlementType,
+                      CategoryId = tpGameType.CategoryId,
+                  })
+                .Where(i => i.CategoryId == categoryId)
+                .GroupBy(x => new
+                {
+                    SettledDate = x.SettledDate,
+                    GameTypeName = x.GameTypeName,
+                    GameTypeID = x.GameTypeID
+                })
+                .Select(x => new TpBetRecordbyCategoryIdRes
+                {
+                    SettledDate = x.Key.SettledDate,
+                    GameTypeName = x.Key.GameTypeName,
+                    GameTypeID = x.Key.GameTypeID,
+                    TotalTO = x.Where(y => (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                    ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                    InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                    TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                    RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet)),
+                    WinLoss = x.Sum(y => y.WinlostAmount)
+                })
+                .ToList();
             return result;
         }
 
@@ -217,22 +241,24 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
         {
-            var result = walletService.GetCustTpBetRecordList(custId, startDate, endDate).ToList().GroupBy(x => new
-            {
-                SettledDate = x.SettledDate.AddHours(8).Date
-            }).Select(x => new TpBetRecordByDate
-            {
-                SettledDate = x.Key.SettledDate,
-                TotalTO = x.Where(y => (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
-                ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
-                InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
-                TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
-                RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
-                WinLoss = x.Sum(y => y.WinlostAmount)
-            }).OrderBy(i => i.SettledDate).ToList();
-
+            var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
+            var result = dataList
+                .GroupBy(x => new { SettledDate = x.SettledTime.AddHours(8).Date })
+                .Select(x => new TpBetRecordByDate
+                {
+                    SettledDate = x.Key.SettledDate,
+                    TotalTO = x.Where(y => (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
+                    ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
+                    InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
+                    TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
+                    RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => (y.ValidBet.Equals(null) ? y.Stake : y.ValidBet)),
+                    WinLoss = x.Sum(y => y.WinlostAmount)
+                })
+                .OrderBy(i => i.SettledDate)
+                .ToList();
             return result;
         }
+
         public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode,int promotionType, int siteId,int currencyId)
         {
             var result = new BalanceAdjustBonusCodeRep();

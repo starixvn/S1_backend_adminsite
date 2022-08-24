@@ -1,7 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 
@@ -13,6 +15,8 @@ namespace BackendSite.Service.BLL
 
         private readonly ReportService reportService;
         private readonly Common _common;
+        private readonly BetListBLL _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
 
         #endregion
 
@@ -22,6 +26,8 @@ namespace BackendSite.Service.BLL
         {
             reportService = provider.GetRequiredService<ReportService>();
             _common = provider.GetRequiredService<Common>();
+            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
         }
 
         #endregion
@@ -909,8 +915,46 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
         {
-            var detailList = reportService.GetCustomerDetail(custId, gameId, date, timeZone);
-            return detailList;
+            var baseDate = DateTime.ParseExact($"{date} 00:00", "yyyy-MM-dd HH:mm", null).ToOffset(timeZone);           
+            var startDate = baseDate.ToUniversalTime().DateTime;
+            var endDate = baseDate.ToUniversalTime().AddDays(1).AddMilliseconds(-1).DateTime;
+           
+            var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
+            var result = betList
+                .Where(i => i.GameType == gameId && (i.SettlementType == 1 || i.SettlementType == 3))
+                .Join(_tpGameTypeList,
+                  tpBetRecord => tpBetRecord.GameType,
+                  tpGameType => tpGameType.Type,
+                  (tpBetRecord, tpGameType) => new TpBetRecordDataModel
+                  {
+                        TpId = tpBetRecord.TpId,
+                        TpName= _common.GetTpName(tpBetRecord.TpId),
+                        TransId= tpBetRecord.TransId,
+                        CategoryId= tpGameType.CategoryId,
+                        CategoryName= tpGameType.CategoryName,
+                        GameId= tpBetRecord.GameType,
+                        GameName= tpGameType.TypeName,
+                        CustId= tpBetRecord.CustId,
+                        UserName= tpBetRecord.UserName,
+                        CurrencyId= tpBetRecord.CurrencyId,
+                        Code= _common.GetCurrencyIsoCode(tpBetRecord.CurrencyId),
+                        SiteId= tpBetRecord.SiteId,
+                        SiteName= _common.GetSiteName(tpBetRecord.SiteId),
+                        TpUserName= tpBetRecord.TpUserName,
+                        TransTime= tpBetRecord.TransTime.ToOffset(baseDate.Offset).DateTime,
+                        SettledTime= tpBetRecord.SettledTime.ToOffset(baseDate.Offset).DateTime,
+                        Stake= tpBetRecord.Stake,
+                        ValidBet= tpBetRecord.ValidBet,
+                        Revenue= tpBetRecord.Revenue,
+                        WinLostAmount= tpBetRecord.WinlostAmount,
+                        SettlementType= tpBetRecord.SettlementType,
+                        TicketStatus= tpBetRecord.TicketStatus,
+                        OriginalState= tpBetRecord.OriginalState,
+                        TicketKey= (int)tpBetRecord.TicketKey,
+                        BonusId= tpBetRecord.BonusId,
+                        CreateTime= tpBetRecord.CreateTime.ToOffset(baseDate.Offset).DateTime
+                  });
+            return result;
         }
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,

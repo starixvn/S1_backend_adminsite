@@ -34,6 +34,30 @@
         {
             return partitionTime.ToString("yyyyMMdd");
         }
-       
+
+        public static IEnumerable<string> GetTpBetRecordPartitionRange(this DateTime startDate, DateTime endDate)
+        {
+            var result = new List<string>
+            {
+                string.Empty,
+            };
+            while (startDate <= endDate)
+            {
+                result.Add($"_{startDate.GetPartitionKey()}");
+                startDate = startDate.AddMonths(1);
+            }
+            return result;
+        }
+
+        public static string GetPartitionKey(this DateTime partitionTime)
+        {
+            return partitionTime.ToString("yyyyMM");
+        }
+
+        /// <param name="timeZone">format:+08:00</param>
+        public static DateTimeOffset ToOffset(this DateTime time, string timeZone)
+        {
+            return DateTimeOffset.Parse(time.ToString() + timeZone);
+        }
     }
 }
