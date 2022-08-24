@@ -43,11 +43,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public List<TpBetRecord> GetTpBetRecord(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        public List<TpBetRecord> GetTpBetRecord(DateTime startTime, DateTime endTime, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
             var result = new List<TpBetRecord>();
 
-            foreach (var partitionKey in StartDate.GetTpBetRecordPartitionRange(endDate))
+            foreach (var partitionKey in startTime.GetTpBetRecordPartitionRange(endTime))
             {
                 var p = new DynamicParameters(parameters);
                 p.Add("_YYYYMM", partitionKey);

@@ -9,19 +9,15 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
+        /// <summary>
+        /// 頁數
+        /// </summary>
+        public int PageNumber { get; set; } = 1;
 
-        public string GetRedisKey()
-        {
-            var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
-            jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
-            jObject["EndTime"] = EndTime.ToString("yyyyMMddHHmmssfff");
-            var key = new StringBuilder();
-            foreach (var item in jObject.Properties())
-            {
-                key.Append($"{item.Name}:{item.Value}:");
-            }
-            return key.ToString();
-        }
+        /// <summary>
+        /// 每頁資料筆數
+        /// </summary>
+        public int PageSize { get; set; } = 25;
     }
 
     public class TpBetRecord

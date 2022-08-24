@@ -86,24 +86,21 @@ namespace BackendSite.Service.BLL
             var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
             return list.GetRange(index, count);
         }
-     
-        public List<TpBetRecord> GetTpBetRecord(GetTpBetRecordRequest input)
+
+        public List<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
         {
             return _cacheHelper.TryGetOrCreate(
-                key: $"TpBetRecord:{input.GetRedisKey()}",
+                key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
                 timeSpan: TimeSpan.FromMinutes(15),
-                factory:() =>
+                factory: () =>
                 {
-                    var StartDate = input.StartTime.ToUniversalTime().DateTime;
-                    var EndDate = input.EndTime.ToUniversalTime().DateTime;
-                    var parameters = new
+                    var data = _partitionService.GetTpBetRecord(StartTime, EndTime, "Admin_TpBetRecord_Get", new
                     {
-                        input.CustId,
-                        StartDate,
-                        EndDate,
-                    };
-                    var data = _partitionService.GetTpBetRecord(StartDate, EndDate, "Admin_TpBetRecord_Get", parameters);
-                    return data;
+                        CustId,
+                        StartTime,
+                        EndTime,
+                    });
+                    return data.OrderByDescending(i => i.SettledTime).ToList();
                 });
         }
 
