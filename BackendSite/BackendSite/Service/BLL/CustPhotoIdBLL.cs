@@ -3,6 +3,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL;
@@ -14,15 +15,31 @@ public class CustPhotoIdBLL
     private readonly AWSS3Helper _s3Helper;
     private readonly CustPhotoIdService _custPhotoIdService;
     private readonly ILogger<CustPhotoIdBLL> _logger;
+    private readonly string _backofficeS3Url;
     private readonly string _environment;
-    public CustPhotoIdBLL(ImageEditorBLL imageEditorBll, CustInfoBLL custInfoBll, AWSS3Helper s3Helper, CustPhotoIdService custPhotoIdService, IWebHostEnvironment env, ILogger<CustPhotoIdBLL> logger)
+    public CustPhotoIdBLL(ImageEditorBLL imageEditorBll, CustInfoBLL custInfoBll, AWSS3Helper s3Helper, CustPhotoIdService custPhotoIdService, IConfiguration configuration, IWebHostEnvironment env, ILogger<CustPhotoIdBLL> logger)
     {
         _imageEditorBll = imageEditorBll;
         _custInfoBll = custInfoBll;
         _s3Helper = s3Helper;
         _custPhotoIdService = custPhotoIdService;
+        _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
         _logger = logger;
         _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
+    }
+
+    public async Task<IEnumerable<GetCustPhotoIdResponse>> GetPhotoIdAsync(int custId)
+    {
+        var photos = await _custPhotoIdService.Get(custId);
+        var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
+        var site = (SiteEnum)custInfo.SiteId;
+        
+        var data = photos.Select(sq => new GetCustPhotoIdResponse()
+        {
+            Id = sq,
+            PhotoUrl = $"{_backofficeS3Url}/{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg"
+        });
+        return data;
     }
 
     public async Task<int> UploadPhotoIdAsync(int custId, IFormFile photo)

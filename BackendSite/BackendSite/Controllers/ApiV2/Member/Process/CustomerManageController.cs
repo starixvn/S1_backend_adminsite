@@ -52,13 +52,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
         
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
+        {
+            var custPhotoId = await _custPhotoIdBll.GetPhotoIdAsync(request.CustId);
+            if (custPhotoId == null) throw new AdminException(ErrorCodeEnum.NoData);
+            
+            var apiResult = new ApiResult<IEnumerable<GetCustPhotoIdResponse>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = custPhotoId
+            };
+            return apiResult;
+
+        }
+        
         /// <summary>
         /// Upload
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> UploadCustPhotoId(UploadCustomerIdPhotoRequest request)
+        public async Task<ApiResult> UploadCustPhotoId(UploadCustPhotoIdRequest request)
         {
             var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
