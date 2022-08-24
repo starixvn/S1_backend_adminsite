@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId(UploadCustomerIdPhotoRequest request)
         {
-            var result = await _custPhotoIdBll.UploadIdPhoto(request.CustId, request.Photo);
+            var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
             if (result > 0)
             {

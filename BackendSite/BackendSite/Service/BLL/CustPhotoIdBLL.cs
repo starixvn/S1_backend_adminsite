@@ -1,4 +1,5 @@
 ﻿using Amazon.S3.Model;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -12,58 +13,67 @@ public class CustPhotoIdBLL
     private readonly CustInfoBLL _custInfoBll;
     private readonly AWSS3Helper _s3Helper;
     private readonly CustPhotoIdService _custPhotoIdService;
+    private readonly ILogger<CustPhotoIdBLL> _logger;
     private readonly string _environment;
-    public CustPhotoIdBLL(ImageEditorBLL imageEditorBll, CustInfoBLL custInfoBll, AWSS3Helper s3Helper, CustPhotoIdService custPhotoIdService, IWebHostEnvironment env)
+    public CustPhotoIdBLL(ImageEditorBLL imageEditorBll, CustInfoBLL custInfoBll, AWSS3Helper s3Helper, CustPhotoIdService custPhotoIdService, IWebHostEnvironment env, ILogger<CustPhotoIdBLL> logger)
     {
         _imageEditorBll = imageEditorBll;
         _custInfoBll = custInfoBll;
         _s3Helper = s3Helper;
         _custPhotoIdService = custPhotoIdService;
-        _environment = env.IsProduction() ? "PRD" : "DEV";
+        _logger = logger;
+        _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
     }
 
-    public async Task<int> UploadIdPhoto(int custId, IFormFile photo)
+    public async Task<int> UploadPhotoIdAsync(int custId, IFormFile photo)
     {
-        //檢查數量
-        //檢查檔案格式
-        //調整圖片大小
-        //寫入DB
-        //上傳至S3
+        if (photo.Length <= 0)
+        {
+            _logger.LogError("empty photo id");
+            return 0;
+        }
 
         if (!_imageEditorBll.IsValidImageFormat(photo.ContentType))
         {
+            _logger.LogError("wrong contentType");
             return 0;
         }
-        
-        var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
 
-        if (photo.Length <= 0) return 0;
-
-        var sq = await _custPhotoIdService.Add(custId, custInfo.SiteId);
-        if (sq > 0)
+        if (await _custPhotoIdService.GetCount(custId) > 5)
         {
-            await using var fileStream = photo.OpenReadStream();
-            using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
-            var fileBytes = await _imageEditorBll.Resize(uploadedImage);
-
-            var site = (SiteEnum)custInfo.SiteId;
-            var stream = new MemoryStream(fileBytes);
-            var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
-            var putRequest = new PutObjectRequest
-            {
-                BucketName = "ailab-backoffice",
-                ContentType = "image/jpeg",
-                InputStream = stream,
-                Key = key
-            };
-
-            var putResponse = await _s3Helper.PutObjectAsync(putRequest);
-            if (putResponse.HttpStatusCode.IsSuccess())
-            {
-                return 1;
-            }
+            _logger.LogError("reach the upload photo limit");
+            return 0;
         }
-        
-        return 0;
+
+        var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
+        var sq = await _custPhotoIdService.Add(custId, custInfo.SiteId);
+        if (sq <= 0)
+        {
+            _logger.LogError("insert CustPhotoId failed");
+            return 0;
+        }
+
+        await using var fileStream = photo.OpenReadStream();
+        using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
+        var fileBytes = await _imageEditorBll.Resize(uploadedImage);
+
+        var site = (SiteEnum)custInfo.SiteId;
+        var stream = new MemoryStream(fileBytes);
+        var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
+        var putRequest = new PutObjectRequest
+        {
+            BucketName = "ailab-backoffice",
+            ContentType = "image/jpeg",
+            InputStream = stream,
+            Key = key
+        };
+
+        var result = await _s3Helper.PutObjectAsync(putRequest);
+        if (!result.HttpStatusCode.IsSuccess())
+        {
+            _logger.LogError("upload PhotoId to S3 failed");
+            return 0;
+        }
+        return 1;
     }
 }
