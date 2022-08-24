@@ -401,7 +401,8 @@ namespace BackendSite.Controllers.Api
                 .GetOfflineBankAccount(withdrawalReq.SiteId, withdrawalReq.CurrencyId)
                 .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.SettingStatus == BankCardManagementStatusEnum.Open);
+                            && x.SettingStatus == BankCardManagementStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.LocalBank);
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {

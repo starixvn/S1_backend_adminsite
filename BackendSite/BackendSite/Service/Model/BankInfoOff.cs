@@ -39,6 +39,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
+        public TransferChannelEnum Channel { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public string AccountCode { get; set; }
