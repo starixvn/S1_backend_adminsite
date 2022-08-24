@@ -83,12 +83,14 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal TotalTO { get; set; }
+        public decimal TotalTO { get; set; }  
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
 
     }
     public class TpBetRecordListOneDay
@@ -100,6 +102,7 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int BonusId { get; set; }
     }
     public class TpBetRecordListOneDayRes
     {
@@ -112,6 +115,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
     }
     public class TpBetRecordbyCategoryId
     {
