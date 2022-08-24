@@ -160,16 +160,11 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 BankLoginPassword = req.BankLoginPassword
             }, authData.UserName);
 
-            if (status)
+            return new ApiResult
             {
-                return new ApiResult
-                {
-                    Message = message,
-                    ErrorCode = (int) ErrorCodeEnum.Success
-                };
-            }
-            
-            throw new AdminException(ErrorCodeEnum.Fail, message);
+                Message = message,
+                ErrorCode = (int) (status ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
         }
         
         public ApiResult GetTransferAccountReason()
