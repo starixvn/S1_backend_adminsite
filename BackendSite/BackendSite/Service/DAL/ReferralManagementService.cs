@@ -3,6 +3,7 @@ using Dapper;
 using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
@@ -99,6 +100,33 @@ namespace BackendSite.Service.DAL
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
+        }
+        
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection )
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_UserName", userName);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_OrderByProperty", orderByProperty);
+            p.Add("_OrderByDirection", (int)orderByDirection);
+            p.Add("_PageSize", Math.Abs(pageSize));
+            p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<ReferralCustList>("Admin_ReferralCustlist_Get_V3", p);
+            var referralCustData = new ReferralCustListPageData()
+            {
+                ReferralCustList = data,
+                PageSize = pageSize,
+                PageNumber = p.Get<int?>("_PageNumber") ?? 0,
+                TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+                TotalCount = p.Get<int?>("_RowCount") ?? 0
+            };
+            return referralCustData;
         }
         
         public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
