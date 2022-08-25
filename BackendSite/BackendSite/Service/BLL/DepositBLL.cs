@@ -7,6 +7,7 @@ using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.BLL
 {
