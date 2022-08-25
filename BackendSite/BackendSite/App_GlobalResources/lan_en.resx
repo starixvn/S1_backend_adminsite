@@ -330,6 +330,9 @@
   <data name="lbl_DepositStatus7" xml:space="preserve">
     <value>On Hold</value>
   </data>
+  <data name="lbl_DepositStatus98" xml:space="preserve">
+    <value>Adjustment</value>
+  </data>
   <data name="lbl_DepositStatus99" xml:space="preserve">
     <value>Error</value>
   </data>
@@ -704,5 +707,8 @@
   </data>
   <data name="CurrencyWithdrawal_74" xml:space="preserve">
     <value>BDT GMT({0})</value>
+  </data>
+  <data name="lbl_WithdrawalType5" xml:space="preserve">
+    <value>E-Wallet</value>
   </data>
 </root>

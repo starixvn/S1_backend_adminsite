@@ -5,17 +5,10 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using OfficeOpenXml;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Controllers.Api
 {

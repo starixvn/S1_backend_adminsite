@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
@@ -252,6 +248,11 @@ namespace BackendSite.Service.BLL
         public bool CheckSpecialCodeDuplicate(string specialCode)
         {
             return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
+        }
+
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        {
+            return _bonusManageService.GetPromotionType(isPayout);
         }
     }
 }

@@ -2,9 +2,6 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 
 namespace BackendSite.Service.BLL
@@ -192,6 +189,11 @@ namespace BackendSite.Service.BLL
                     permissionLoop(s.FuncKeys, ref dictKeys);
                 }
             }
+        }
+
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
 
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()

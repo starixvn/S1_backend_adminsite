@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using BackendSite.Service.Model.enums;
+using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -222,5 +221,24 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public string SiteName { get; set; }
+    }
+    public class SetAdminUserStatusReq
+    {
+        public int UserId { get; set; }
+        [LogIgnore]
+        public AdminUserV2StatusEnum Status { get; set; }
+        public string StatusName => Status.ToString();
+    }
+    public class SetAdminUserPasswordReq
+    {
+        public int UserId { get; set; }
+        [LogIgnore]
+        public string Password { get; set; }
+    }
+    public class SetAdminBrandReq
+    {
+        public int SiteId { get; set; }
+        public AdminBrandTypeEnum Status { get; set; }
+        public int UserId { get; set; }
     }
 }

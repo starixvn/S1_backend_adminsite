@@ -1,21 +1,12 @@
-﻿using System;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using LazZiya.ImageResize;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
-using System.Threading.Tasks;
-using System.Linq;
-using BackendSite.Extensions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
@@ -57,7 +48,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, 
             DateTime endDate,
             string depositId,
-            string userName,
+            IEnumerable<string> userNames,
             IEnumerable<int> currencyId, 
             IEnumerable<int> status,
             IEnumerable<int> levelStatus, 
@@ -67,7 +58,7 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> payIds,
             int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
         {
-            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userName, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userNames, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,

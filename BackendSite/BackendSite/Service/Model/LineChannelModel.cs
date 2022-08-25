@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class LineChannelModel
     {
@@ -16,11 +14,25 @@ namespace BackendSite.Service.Model
             LastOperator = dto.LastOperator;
         }
 
+        public LineChannelModel(LineChannelViewModel dto)
+        {
+            Id = dto.Id;
+            SiteId = dto.SiteId;
+            CurrencyId = dto.CurrencyId;
+            IsoCode = dto.IsoCode;
+            Link = dto.Link;
+            Status = dto.Status;
+            CreateTime = dto.CreateTime;
+            UpdateTime = dto.UpdateTime;
+            LastOperator = dto.LastOperator;
+        }
+
         private DateTimeOffset _createTime { get; set; }
         private DateTimeOffset _updateTime { get; set; }
         public int Id { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public string Link { get; set; }
         public int Status { get; set; }
         public DateTimeOffset CreateTime

@@ -1,11 +1,7 @@
-﻿using System;
-using BackendSite.Service.Model.TpMaintain;
+﻿using BackendSite.Service.Model.TpMaintain;
 using Dapper;
-using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 using TpCategory = BackendSite.Service.Model.TpMaintain.TpCategory;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 using System.Data;
