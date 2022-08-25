@@ -235,7 +235,15 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
         {
-            return _bonusInfoService.GetBonusCodeList(bonusIdList);
+            var result = new List<BonusCodeInfo>()
+            {
+                new BonusCodeInfo(){ BonusId = 0 , BonusCode = string.Empty }
+            };
+            if (bonusIdList.Any(i => i > 0))
+            {
+                result.AddRange(_bonusInfoService.GetBonusCodeList(bonusIdList));
+            }          
+            return result;
         }
     }
 }
