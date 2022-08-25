@@ -56,8 +56,8 @@ namespace BackendSite.Service.Model
         }
         private DateTime _settledTime { get; set; }
         public decimal Stake { get; set; }
-        public decimal ValidBet { get; set; }
-        public decimal Revenue { get; set; }
+        public decimal? ValidBet { get; set; }
+        public decimal? Revenue { get; set; }
         public decimal WinlostAmount { get; set; }
         public decimal ProgressiveBet { get; set; }
         public decimal ProgressiveWin { get; set; }

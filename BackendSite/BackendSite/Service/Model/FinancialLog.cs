@@ -124,7 +124,7 @@ namespace BackendSite.Service.Model
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
         public decimal TurnOver { get; set; }
-        public decimal ValidBet { get; set; }
+        public decimal? ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
         public int CategoryId { get; set; }

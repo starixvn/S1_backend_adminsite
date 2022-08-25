@@ -3,6 +3,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Transactions;
@@ -28,6 +29,9 @@ namespace BackendSite.Service.BLL
         private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly BetListBLL _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -48,6 +52,8 @@ namespace BackendSite.Service.BLL
             _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -274,42 +280,39 @@ namespace BackendSite.Service.BLL
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
-            string GameTypes,
+            IEnumerable<int> GameTypes,
             DateTimeOffset StartTime,
             DateTimeOffset EndTime)
         {
-            var datas = _custTurnoverService.GetCustTurnover(CustId,
-                GameTypes,
-                StartTime,
-                EndTime);
-
-            var result = new List<CustTurnoverRes>();
-
-            foreach (var data in datas)
-            {
-                var item = result.FirstOrDefault(x => x.GameType == data.GameType);
-                if (item == null)
-                {
-                    result.Add(new CustTurnoverRes
+            var result = _betListBll
+                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .Where(i => GameTypes.Contains(i.GameType))
+                .Join(_tpGameTypeList,
+                    tpBetRecord => tpBetRecord.GameType,
+                    tpGameType => tpGameType.Type,
+                    (tpBetRecord, tpGameType) => new CustTurnover
                     {
-                        UserName = data.UserName,
-                        GameType = data.GameType,
-                        GameName = data.GameName,
-                        StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
-                        StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
-                        WinlostAmount = data.WinlostAmount
-                    });
-                }
-                else
+                        UserName = tpBetRecord.UserName,
+                        GameType = tpBetRecord.GameType,
+                        GameName = tpGameType.TypeName,
+                        Stake = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
+                        WinlostAmount = tpBetRecord.WinlostAmount,
+                        SettlementType = tpBetRecord.SettlementType,
+                    })
+                .Select(i => new CustTurnoverRes
                 {
-                    item.StakeSettled += data.SettlementType == 1 ? data.Stake : 0;
-                    item.StakeNotRollover += data.SettlementType == 3 ? data.Stake : 0;
-                    item.WinlostAmount += data.WinlostAmount;
-                }
-            }
+                    UserName = i.UserName,
+                    GameType = i.GameType,
+                    GameName = i.GameName,
+                    StakeSettled = i.SettlementType == (int)SettlementType.SettledForValid ? i.Stake : 0,
+                    StakeNotRollover = i.SettlementType == (int)SettlementType.SettledForValidNotRollover ? i.Stake : 0,
+                    WinlostAmount = i.WinlostAmount
+                })
+                .ToList();
 
             return result;
         }
+
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
             int pageSize,
             int pageNumber,
