@@ -1644,7 +1644,7 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    startTime,
                                                    endTime);
 

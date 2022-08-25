@@ -10,7 +10,6 @@ namespace BackendSite.Service.Library
         private readonly IReadOnlyDictionary<int, TpListOption> _tpList;
         private readonly IReadOnlyDictionary<int, CurrencyOption> _currencyList;
         private readonly IReadOnlyDictionary<int, string> _siteNameList;
-        private readonly ServerInfoBLL serverInfoBLL;
 
         public Common(IServiceProvider provider)
         {
