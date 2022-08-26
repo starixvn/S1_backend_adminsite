@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
-    public class GetTransferAccountInfoListParams
+    public class GetTransferAccountInfoParams
     {
-        public GetTransferAccountInfoListParams(int id)
+        public GetTransferAccountInfoParams(int id)
         {
             IsSetting = true;
             StrCurrencyIds = "[]";
@@ -17,7 +18,7 @@ namespace BackendSite.Service.Model.BankFinancial
             AccountNo = string.Empty;
             Id = id;
         }
-        public GetTransferAccountInfoListParams(GetTransferAccountInfoListRequest req)
+        public GetTransferAccountInfoParams(GetTransferAccountInfoListRequest req)
         {
             IsSetting = false;
             SiteId = req.SiteId;
@@ -40,5 +41,65 @@ namespace BackendSite.Service.Model.BankFinancial
         public string StrSysIds { get; set; }
         public string AccountNo { get; set; }
         public int Id { get; set; }
+    }
+    
+    public class GetTransferInfoListParams
+    {
+        public GetTransferInfoListParams(string id)
+        {
+            IsSetting = true;
+            TransferId = id;
+        }
+        public GetTransferInfoListParams(GetTransferInfoListRequest req)
+        {
+            SiteId = req.SiteId;
+            StartTime = req.StartTime;
+            EndTime = req.EndTime;
+            FromCurrencyId = req.FromCurrencyId;
+            ToCurrencyId = req.ToCurrencyId;
+            StrTransferTypes = JsonConvert.SerializeObject(req.TransferTypes);
+            FromAccountNo = string.IsNullOrWhiteSpace(req.FromAccountNo) ? null : req.FromAccountNo;
+            ToAccountNo = string.IsNullOrWhiteSpace(req.ToAccountNo) ? null : req.ToAccountNo;
+            FromChannel = req.FromChannel;
+            ToChannel = req.ToChannel;
+            FromAgent = string.IsNullOrWhiteSpace(req.FromAgent) ? null : req.FromAgent;
+            ToAgent = string.IsNullOrWhiteSpace(req.ToAgent) ? null : req.ToAgent;
+            Reason = req.Reason;
+        }
+        
+        public GetTransferInfoListParams(ExportTransferInfoListRequest req)
+        {
+            IsExport = true;
+            SiteId = req.SiteId;
+            StartTime = req.StartTime;
+            EndTime = req.EndTime;
+            FromCurrencyId = req.FromCurrencyId;
+            ToCurrencyId = req.ToCurrencyId;
+            StrTransferTypes = JsonConvert.SerializeObject(req.TransferTypes);
+            FromAccountNo = string.IsNullOrWhiteSpace(req.FromAccountNo) ? null : req.FromAccountNo;
+            ToAccountNo = string.IsNullOrWhiteSpace(req.ToAccountNo) ? null : req.ToAccountNo;
+            FromChannel = req.FromChannel;
+            ToChannel = req.ToChannel;
+            FromAgent = string.IsNullOrWhiteSpace(req.FromAgent) ? null : req.FromAgent;
+            ToAgent = string.IsNullOrWhiteSpace(req.ToAgent) ? null : req.ToAgent;
+            Reason = req.Reason;
+        }
+        
+        public bool IsSetting { get; set; }
+        public bool IsExport { get; set; }
+        public int SiteId { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public int? FromCurrencyId { get; set; }
+        public int? ToCurrencyId { get; set; }
+        public string StrTransferTypes { get; set; }
+        public string FromAccountNo { get; set; }
+        public string ToAccountNo { get; set; }
+        public int? FromChannel { get; set; }
+        public int? ToChannel { get; set; }
+        public int? Reason { get; set; }
+        public string FromAgent { get; set; }
+        public string ToAgent { get; set; }
+        public string TransferId { get; set; }
     }
 }

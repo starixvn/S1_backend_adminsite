@@ -255,4 +255,50 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public IFormFile UploadReceipt { get; set; }
     }
+    
+    public class BankTransferInfoSetRequest
+    {
+        private DateTimeOffset _transDate;
+        public string TransferId { get; set; }
+        public TransferTypeEnum TransferType { get; set; }
+        public DateTimeOffset TransDate
+        {
+            get => _transDate;
+            set => _transDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            
+        }
+        public SiteEnum SiteId { get; set; }
+
+        #region From Data
+
+        public TransferChannelEnum FromChannel { get; set; }
+        public string FromAgent { get; set; }
+        public int? FromPayId { get; set; }
+        public int FromCurrencyId { get; set; }
+        public int FromSysId { get; set; }
+        public string FromAccountNo { get; set; }
+        public string FromAccountDisplayName { get; set; }
+        public decimal FromAmount { get; set; }
+        public decimal FromFee { get; set; }
+
+        #endregion
+
+        #region To Data
+
+        public TransferChannelEnum ToChannel { get; set; }
+        public string ToAgent { get; set; }
+        public int? ToPayId { get; set; }
+        public int ToCurrencyId { get; set; }
+        public int ToSysId { get; set; }
+        public string ToAccountNo { get; set; }
+        public string ToAccountDisplayName { get; set; }
+        public decimal ToAmount { get; set; }
+        public decimal ToFee { get; set; }
+
+        #endregion
+
+        public int? Reason { get; set; }
+        public string Remark { get; set; }
+        public IFormFile UploadReceipt { get; set; }
+    }
 }

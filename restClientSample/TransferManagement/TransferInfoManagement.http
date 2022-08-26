@@ -1,0 +1,53 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得 TransferType 列表
+POST {{url}}/apiV2/BankTransfer/GetTransferTypeList HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得列表
+# fromCurrencyId | Number | Nullable
+# toCurrencyId | Number | Nullable
+# transferTypes | Number Array
+# fromAccountNo | String | Nullable
+# toAccountNo | String | Nullable
+# fromChannel | Number | Nullable
+# toChannel | Number | Nullable
+# reason | Number | Nullable
+# fromAgent | String | Nullable
+# toAgent | String | Nullable
+POST {{url}}/apiV2/BankTransfer/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "startTime": "2022-01-01T00:00:00+08:00",
+    "endTime": "2022-09-01T00:00:00+08:00",
+    "fromCurrencyId": null,
+    "toCurrencyId": null,
+    "transferTypes": [0,1,2,3,4,5],
+    "fromAccountNo": null,
+    "toAccountNo": null,
+    "fromChannel": null,
+    "toChannel": null,
+    "reason": null,
+    "fromAgent": null,
+    "toAgent": null,
+    "pageNumber": 1,
+    "pageSize": 10
+}
