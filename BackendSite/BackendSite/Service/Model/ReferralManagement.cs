@@ -135,8 +135,17 @@ namespace BackendSite.Service.Model
         public decimal FreeCreditSum { get; set; }
         public int PendingCount { get; set; }
         public int ExpiredCount { get; set; }
-
     }
+
+    public class ReferralCustListPageData
+    {
+        public IEnumerable<ReferralCustList> ReferralCustList { get; set; }
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+
     public class ReferralFriend
     {
         public int CustId { get; set; }
