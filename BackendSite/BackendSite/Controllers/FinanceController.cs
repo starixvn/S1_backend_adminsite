@@ -91,7 +91,6 @@ namespace BackendSite.Controllers
             public long endDate { get; set; }
             public string Status { get; set; }
             public string LevelStatus { get; set; }
-            public int AmountType { get; set; }
             public string Amount { get; set; }
         }
 
@@ -120,11 +119,12 @@ namespace BackendSite.Controllers
                 startTime, endTime,
                 depositListReq.DepositId,
                 depositListReq.UserName,
+                null,
                 depositListReq.CurrencyId,
                 depositListReq.Status,
                 depositListReq.LevelStatus,
-                depositListReq.AmountType,
-                depositListReq.Amount,
+                -1,
+                -1,
                 depositListReq.SelectPayId);
 
             foreach (var data in exportDeposit)
