@@ -652,7 +652,8 @@ namespace BackendSite.Service.Model.enums
         SetBlockIP = 54,
         SetBlockEWallet = 55,
         ReleaseEWalletAccount = 56,
-        WithdrawalSubmission = 57
+        WithdrawalSubmission = 57,
+        TransferInfoManagement = 60
     }
 
     #region BankFinancialTransferInfoLog
@@ -817,25 +818,51 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferTypeEnum
     {
-        /// <summary>
-        /// 存款(客戶戶頭=>公司戶頭)
-        /// </summary>
+        Undefined = 0,
+        [Description("DEPOSIT")]
         Deposit = 1,
-
-        /// <summary>
-        /// 提款(公司戶頭=>客戶戶頭)
-        /// </summary>
+        [Description("WITHDRAWAL")]
         Withdrawal = 2,
-
-        /// <summary>
-        /// 轉帳(公司戶頭=>公司戶頭)
-        /// </summary>
-        Transfer = 3,
-
-        /// <summary>
-        /// 其他(手續費、利息...)
-        /// </summary>
-        Other = 4
+        [Description("LOCAL BANK")]
+        LocalBank = 3,
+        [Description("OPENING BAL")]
+        OpeningBal = 4,
+        [Description("CLOSING BAL")]
+        ClosingBal = 5,
+        [Description("PSP")]
+        Psp = 6,
+        [Description("BOUNC BACK")]
+        BounceBack = 7,
+        [Description("MARKETING")]
+        Marketing = 8,
+        [Description("BONUS")]
+        Bonus = 9,
+        [Description("INTEREST")]
+        Interest = 10,
+        [Description("TOP UP PHONE")]
+        ToUpPhone = 11,
+        [Description("FEES")]
+        Fees = 12,
+        [Description("UNCLAIM")]
+        Unclaimed = 13,
+        [Description("OVERCREDIT")]
+        OverCredit = 14,
+        [Description("OVERPAID")]
+        OverPaid = 15,
+        [Description("FRAUD")]
+        Fraud = 16,
+        [Description("FREEZE")]
+        Freeze = 17,
+        [Description("CURRENCY CONVERSION")]
+        CurrencyConversion = 18,
+        [Description("HEAD OFFICE")]
+        HeadOffice = 19,
+        [Description("FINANCE")]
+        Finance = 20,
+        [Description("TEST")]
+        Test = 21,
+        [Description("OTHER")]
+        Other = 99
     }
 
     /// <summary>
@@ -1194,18 +1221,6 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-    public enum CurrencyEnum
-    {
-        MYR = 2,
-        USD = 3,
-        THB = 4,
-        CNY = 13,
-        IDR = 15,
-        VND = 51,
-        INR = 61,
-        BDT = 74
-    }
-
     public enum WithdrawalMethodEnum
     {
         All = 0,
@@ -1238,12 +1253,6 @@ namespace BackendSite.Service.Model.enums
         BDT = 74
     }
 
-    public enum ManualRewardPointCategoryEnum
-    {
-        Default = 0,
-        BirthdayRewardPoint = 1,
-        SpecialRewardPoint = 2
-    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
