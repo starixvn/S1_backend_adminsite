@@ -9,7 +9,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly CourierAdapter _courierAdapter;
         private readonly string _storeSiteUrl;
-        private readonly AwsS3BLL _awsS3Bll;
+        private readonly AWSS3Helper _awsS3Helper;
         private readonly string _bucketName;
         private readonly string _folder;
 
@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
             _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
             _folder = configuration.GetValue<string>("AwsStoreFolder");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            _awsS3Bll = provider.GetRequiredService<AwsS3BLL>();
+            _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -132,7 +132,7 @@ namespace BackendSite.Service.BLL
             var ext = Path.GetExtension(file.FileName);
             var path = $"/store/gift/{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
             var key = _folder + path;
-            var success = await _awsS3Bll.UploadFileAsync(file, _bucketName, key);
+            var success = await _awsS3Helper.UploadFileAsync(file, _bucketName, key);
             var result = success ? path : string.Empty;
             
             return result;
