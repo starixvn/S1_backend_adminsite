@@ -154,6 +154,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int? WalletType { get; set; }
         public int? TpId { get; set; }
+        [Obsolete("rebate移至其他地方，此參數不需要")]
         public int? RedeemHours { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
@@ -173,9 +174,14 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SiteId { get; set; }
         public int Usage { get; set; }
+
+        [Obsolete("計算次數使用不需要要帶")]
         public int? BeenUsed { get; set; }
         public int RollOver { get; set; }
         public int WinOver { get; set; }
+        /// <summary>
+        /// 後端設定不需要帶
+        /// </summary>
         public int FullFillType { get; set; }
         public decimal Bonus { get; set; }
         public int BonusType { get; set; }
@@ -184,6 +190,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }
+        /// <summary>
+        /// 目前應該都固定帶1
+        /// </summary>
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
         public string VN_AffIds { get; set; }
