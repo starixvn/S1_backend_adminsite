@@ -39,7 +39,7 @@ namespace BackendSite.Service.Model
             }
         }
         public long? UnixPeriodTo { get; set; }
-        public DateTimeOffset? DisplayFromFrom
+        public DateTimeOffset? DisplayFrom
         {
             get
             {
