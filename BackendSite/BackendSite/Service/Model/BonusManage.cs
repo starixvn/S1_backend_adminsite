@@ -52,7 +52,7 @@ namespace BackendSite.Service.Model
         }
         public long? UnixDisplayFrom { get; set; }
 
-        public DateTimeOffset? DisplaytTo
+        public DateTimeOffset? DisplayTo
         {
             get
             {
