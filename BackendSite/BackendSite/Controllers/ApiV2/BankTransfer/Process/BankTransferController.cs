@@ -115,7 +115,7 @@ public class BankTransferController : ControllerBase
         {
             var receipt = _bankFinancialBll.GetTransferIngoReceipt(result.TransferId);
             var authData = _authorizeBll.GetAuthData();
-            result.ReceiptUrl = receipt.PicFileName;
+            result.ReceiptUrl = receipt?.PicFileName;
             result.Updator = authData.UserId;
             result.UpdatorName = authData.UserName;
 
