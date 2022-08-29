@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class StatisticalReportModel
     {

@@ -2,8 +2,6 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
 using System.Security.Claims;
 
 namespace BackendSite.Service.BLL

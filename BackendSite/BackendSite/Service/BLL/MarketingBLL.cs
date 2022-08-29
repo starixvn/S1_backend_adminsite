@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL

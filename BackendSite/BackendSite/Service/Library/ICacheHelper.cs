@@ -1,8 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Library
 {
@@ -19,5 +16,6 @@ namespace BackendSite.Service.Library
         List<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
     }
 }

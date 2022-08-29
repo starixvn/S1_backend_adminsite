@@ -25,7 +25,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var key = input.GetRedisKey();
             var masterKey = $"BetList:{key}";
-            var sortKey = $"BetList:{key}:{input.OrderByProperty}:{input.OrderByDirection}";
+            var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
             var cacheTime = TimeSpan.FromMinutes(15);
 
             if (_cacheHelper.KeyExists(masterKey))
@@ -36,7 +36,7 @@ namespace BackendSite.Service.BLL
                     //取出全部資料重新排序
                     var sortData = _cacheHelper.GetListByRange<BetListReport>(masterKey, 0, -1).OrderBy(input);
                     //刪除舊資料重設cache
-                    if (_cacheHelper.KeyDelete(masterKey))
+                    if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
                     }                 

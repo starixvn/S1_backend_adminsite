@@ -75,6 +75,21 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region Withdrawal Submission For Frontend Use
+
+    /// <summary>
+    /// 申請提款類型
+    /// </summary>
+    public enum ApplicationAccountTypeEnum
+    {
+        Undefine = 0, //No Use
+        LocalBank = 1,
+        Crypto = 4,
+        //EWallet = 5
+    }
+
+    #endregion
+
     #region AdminModule
 
     public enum AdminModuleStatusEnum
@@ -609,6 +624,16 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
+        EditEWalletWithdrawalLimitInfo = 37,
+        SetEWalletWithdrawalLimitInfoStatus = 38,
+        SetBlockEWallet = 55,
+        ReleaseEWalletAccount = 56,
         Referral = 36,
         SetAdminUserStatus = 41,
         SetAdminUserPassword = 42,
@@ -619,6 +644,7 @@ namespace BackendSite.Service.Model.enums
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
+        WithdrawalSubmission = 57,
         TransferInfoManagement = 60
     }
 
@@ -1109,7 +1135,17 @@ namespace BackendSite.Service.Model.enums
         FundTransfer = 0,
         SeamlessWallet = 1
     }
-
+    public enum CustBankDetailStatus
+    {
+        Disable = 0,
+        Able = 1,
+        BODelete = 2
+    }
+    public enum BlockAccountStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1170,17 +1206,14 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-
-    public enum CustBankDetailStatus
-    {
-        Disable = 0,
-        Able = 1,
-        BODelete = 2
-    }
-    public enum BlockAccountStatus
+    
+    public enum WithdrawalMethodEnum
     {
         Lock = 1,
         UnLock = 2,
+        All = 0,
+        EWallet = 1,
+        BankCard = 2
     }
     public enum CustBankInfoLogStatus
     {
@@ -1190,8 +1223,21 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+    public enum EWalletStatusEnum
+    {
+        Disable = 0,
+        Able = 1
+    }
+    public enum EWalletinfoLogStatusEnum
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+    }
 
-    public enum CurrencyEnum
+	public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1202,12 +1248,19 @@ namespace BackendSite.Service.Model.enums
         INR = 61,
         BDT = 74
     }
+
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
         Able = 1,
     }
-    
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1227,18 +1280,19 @@ namespace BackendSite.Service.Model.enums
         VirtualOs = 15,
         Hooking = 16
     }
-    
+
     public enum TriggeredPoints
     {
-        Registration = 1, 
+        Registration = 1,
         Login = 2,
         Deposit = 3,
         Withdrawal = 4,
         ClaimBonus = 5,
     }
-    
+
     public enum TaggedIssue
     {
         HighRisk = 1
     }
+    
 }

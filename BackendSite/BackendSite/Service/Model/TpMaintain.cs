@@ -1,6 +1,4 @@
 ﻿using BackendSite.Extensions;
-using System;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.Model.TpMaintain
 {
@@ -145,6 +143,20 @@ namespace BackendSite.Service.Model.TpMaintain
     {
         public int CategoryId { set; get; }
         public string CategoryName { set; get; }
+    }
+    
+    public class TpCategoryComparer : IEqualityComparer<TpCategory>
+    {
+        public bool Equals(TpCategory t1, TpCategory t2)
+        {
+            return (t1.CategoryId == t2.CategoryId
+                    && t1.CategoryName == t2.CategoryName);
+        }
+
+        public int GetHashCode(TpCategory t)
+        {
+            return t.CategoryName.GetHashCode();
+        }
     }
 
     public class FilterInfo

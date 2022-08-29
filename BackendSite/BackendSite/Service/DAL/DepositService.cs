@@ -2,19 +2,11 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.ApiModel;
-using Microsoft.Extensions.DependencyInjection;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace BackendSite.Service.DAL
 {
@@ -356,7 +348,7 @@ namespace BackendSite.Service.DAL
                 Amount = tempAmount,
                 PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V10", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V11", p);
             return depositList;
         }
 
@@ -568,6 +560,34 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.Query<PaymentGateWayOptions>("Admin_PaymentGateWayOptions_Get");
+        }
+
+        public int InsertDepositRewardPointQueue(string transId)
+        {
+            var para = new DynamicParameters();
+            para.Add("_TransId", transId);
+            para.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+
+            using var trans = conn.BeginTransaction();
+            _ = conn.Execute("Service_DepositRewardPointQueue_Ins", para, transaction: trans,
+                commandType: CommandType.StoredProcedure);
+            var resultCode = para.Get<int?>("_Result") ?? -9;
+                
+            if (resultCode == 0)
+            {
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            conn.CloseAsync();
+            
+            return resultCode;
         }
     }
 }

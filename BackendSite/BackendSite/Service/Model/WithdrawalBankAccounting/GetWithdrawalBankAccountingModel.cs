@@ -1,5 +1,4 @@
-﻿using System;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model.WithdrawalBankAccounting
 {

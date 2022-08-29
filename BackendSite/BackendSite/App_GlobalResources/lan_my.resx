@@ -681,4 +681,7 @@
   <data name="lbl_CancelBonusTitle" xml:space="preserve">
     <value>Promotion expiration notice.</value>
   </data>
+  <data name="lbl_WithdrawalType5" xml:space="preserve">
+    <value>E-Wallet</value>
+  </data>
 </root>
