@@ -17,12 +17,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustomerBLL _customerBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly CustVerifyBLL _custVerifyBll;
-
-        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll)
+        private readonly CustPhotoIdBLL _custPhotoIdBll;
+        
+        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll, CustPhotoIdBLL custPhotoIdBll)
         {
             _customerBll = customerBll;
             _custInfoBll = custInfoBll;
             _custVerifyBll = custVerifyBll;
+            _custPhotoIdBll = custPhotoIdBll;
         }
         
         // todo 待確認權限
@@ -71,6 +73,66 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = data
             };
             return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
+        {
+            var custPhotoId = await _custPhotoIdBll.GetPhotoIdAsync(request.CustId);
+            if (custPhotoId == null) throw new AdminException(ErrorCodeEnum.NoData);
+            
+            var apiResult = new ApiResult<IEnumerable<GetCustPhotoIdResponse>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = custPhotoId
+            };
+            return apiResult;
+
+        }
+        
+        /// <summary>
+        /// Upload
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
+        {
+            var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Upload Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
+
+        }
+        
+        /// <summary>
+        /// Ask Re-Upload
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> DeleteCustPhotoId(DeleteCustPhotoIdRequest request)
+        {
+            var result = await _custPhotoIdBll.DeleteCustPhotoId(request.CustId, request.Id);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Delete Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
         
         #region Finance > Balance Adjustment
