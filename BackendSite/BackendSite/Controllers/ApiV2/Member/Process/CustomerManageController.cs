@@ -26,8 +26,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _custVerifyBll = custVerifyBll;
             _custPhotoIdBll = custPhotoIdBll;
         }
-        
-        // todo 待確認權限
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
         [HttpPost]
         public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
         {
