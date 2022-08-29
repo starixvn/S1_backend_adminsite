@@ -20,6 +20,44 @@ POST {{url}}/apiV2/BankTransfer/GetTransferTypeList HTTP/1.1
 Content-Type: application/json
 
 ###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferChannelEnum"
+}
+
+###
+# 取得原因列表
+POST {{url}}/apiV2/BaseData/GetReasonList HTTP/1.1
+Content-Type: application/json
+
+{
+    "FuncKey": "BankFinancial/TransferManage"
+}
+
+###
+# 取得 Agent 列表
+POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得轉帳帳戶列表
+# 列表下拉選單顯示全部(Value=>accountNo, Name=>displayName)
+# 編輯只顯示status === 2的項目
+POST {{url}}/apiV2/BankTransferAccount/GetTransferAccountList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
 # 取得轉帳資訊列表
 # fromCurrencyId | Number | Nullable
 # toCurrencyId | Number | Nullable
@@ -82,15 +120,6 @@ Content-Type: application/json
 
 {
     "transferId": "T202202150002"
-}
-
-###
-# 以轉帳單號取得轉帳資訊
-POST {{url}}/apiV2/BaseData/GetReasonList HTTP/1.1
-Content-Type: application/json
-
-{
-    "FuncKey": "BankFinancial/TransferManage"
 }
 
 ###
