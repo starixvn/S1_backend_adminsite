@@ -1226,24 +1226,6 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
-    {
-        MYR = 2,
-        USD = 3,
-        THB = 4,
-        CNY = 13,
-        IDR = 15,
-        VND = 51,
-        INR = 61,
-        BDT = 74
-    }
-
-    public enum ManualRewardPointCategoryEnum
-    {
-        Default = 0,
-        BirthdayRewardPoint = 1,
-        SpecialRewardPoint = 2
-    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
