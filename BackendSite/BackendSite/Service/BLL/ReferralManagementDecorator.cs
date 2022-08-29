@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -113,6 +108,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
+        {
+            return await _referralManagementBll.GetReferralCustList(siteId, userName, currencyId, startDate, endDate , pageSize, pageNumber, isOrder, orderByProperty, orderByDirection);
         }
 
         public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)

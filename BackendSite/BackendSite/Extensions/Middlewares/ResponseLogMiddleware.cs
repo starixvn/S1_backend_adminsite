@@ -1,9 +1,5 @@
-﻿using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Serilog.Context;
 
 namespace BackendSite.Extensions.Middlewares

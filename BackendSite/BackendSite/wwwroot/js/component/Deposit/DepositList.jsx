@@ -120,7 +120,7 @@ import DateTimePicker from 'react-datetime';
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
                         {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td>{row.depositType === 4 ? row.channelName : ""}</td>
-                        <td>{JSON.parse(row.depositInfo).ExchangeAmount}</td>
+                        <td>{JSON.parse(row.depositInfo).ActualExchangeAmount!= undefined ? JSON.parse(row.depositInfo).ActualExchangeAmount : JSON.parse(row.depositInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         <td className="text-right">{number_format(row.actualDeposit)}</td>

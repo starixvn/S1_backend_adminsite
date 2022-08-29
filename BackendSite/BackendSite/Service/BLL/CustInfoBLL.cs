@@ -5,14 +5,7 @@ using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Transactions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Service.BLL
 {
@@ -268,10 +261,6 @@ namespace BackendSite.Service.BLL
         public bool ResetCustUSDTInfo(int CustId)
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
-        }
-        public decimal GetWithdrawalAvailableBalance(int custId)
-        {
-            return _custInfoService.GetWithdrawalAvailableBalance(custId);
         }
         public int CancelBonusByBonusId(int bonusId)
         {
@@ -879,6 +868,21 @@ namespace BackendSite.Service.BLL
         {
             return await _tpBll.GetTpWalletAsync(custId);
         }
+
+        public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
+        {
+            var custProfile = GetCustProfile(custId);
+            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+                return Task.FromResult(Enumerable.Empty<USDTDetail>());
+            else
+                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+        }
+
         private bool IsWithdrawalInfoTransId(string transId)
         {
             if (string.IsNullOrWhiteSpace(transId))
@@ -914,6 +918,18 @@ namespace BackendSite.Service.BLL
                 return false;
             }
             return true;
+        }
+        public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            return _custInfoService.GetCustEWalletLogList(custId,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount); ;
         }
     }
 }

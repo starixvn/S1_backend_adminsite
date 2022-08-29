@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace BackendSite.Service.BLL
 {
@@ -130,6 +126,23 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoPayList;
         }
+        
+        public IEnumerable<EWalletPay> GetEWalletPayList()
+        {
+            var sEWalletPayList = "EWalletPayList";
+            var eWalletPayList = cache.Get<IEnumerable<EWalletPay>>(sEWalletPayList);
+            if (eWalletPayList == null)
+            {
+                eWalletPayList = localBankService.GetEWalletPayList();
+                if (eWalletPayList != null)
+                {
+                    cache.Set(sEWalletPayList, eWalletPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                }
+            }
+            
+            return eWalletPayList;
+        }
+        
         public IEnumerable<BankInfoPay> GetCryptoPay()
         {
             var sCryptoPayListKey = "CryptoPayForPayout";

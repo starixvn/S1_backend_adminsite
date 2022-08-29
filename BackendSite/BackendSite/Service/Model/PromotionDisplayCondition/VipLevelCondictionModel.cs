@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BackendSite.Service.Model.PromotionDisplayCondition
+﻿namespace BackendSite.Service.Model.PromotionDisplayCondition
 {
     public class VipLevelCondictionModel
     {
