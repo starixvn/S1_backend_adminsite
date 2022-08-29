@@ -41,11 +41,11 @@
             {
                 string.Empty,
             };
-            while (startDate <= endDate)
+            while (startDate.EarlierThan(endDate)) 
             {
                 result.Add($"_{startDate.GetPartitionKey()}");
                 startDate = startDate.AddMonths(1);
-            }
+            }        
             return result;
         }
 
@@ -59,5 +59,14 @@
         {
             return DateTimeOffset.Parse(time.ToString() + timeZone);
         }
+
+        public static bool EarlierThan(this DateTime startMonth, DateTime endMonth)
+        {
+            var start = int.Parse(startMonth.ToString("yyyyMM"));
+            var end = int.Parse(endMonth.ToString("yyyyMM"));
+            return start <= end;
+        }
+
+
     }
 }
