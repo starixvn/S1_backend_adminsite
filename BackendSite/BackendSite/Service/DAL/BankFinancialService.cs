@@ -220,6 +220,13 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
+        {
+            var parameters = new DynamicParameters(new { _SiteId = siteId });
+            return _reportDbClient
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V2", parameters);
+        }
 
         public int GetTransferDataCount(string accountNo)
         {
@@ -552,7 +559,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<BankFinancialTransferInfoReceiptModel>(SpName, parameters);
         }
 
-        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
+        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic = null)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(

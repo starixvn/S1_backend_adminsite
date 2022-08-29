@@ -113,6 +113,11 @@ namespace BackendSite.Service.Model.BankFinancial
         public int SiteId { get; set; }
     }
     
+    public class GetAccountListRequest
+    {
+        public int SiteId { get; set; }
+    }
+
     public class GetTransferInfoListRequest : ApiRequestPageModel
     {
         public int SiteId { get; set; }

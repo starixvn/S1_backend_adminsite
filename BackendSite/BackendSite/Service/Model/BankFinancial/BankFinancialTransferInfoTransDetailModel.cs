@@ -237,21 +237,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName { get; set; }
-
-        /// <summary>
-        /// 圖檔名稱
-        /// </summary>
-        public string UploadReceiptName { get; set; }
-
-        /// <summary>
-        /// 圖檔Binary
-        /// </summary>
-        public byte[] TransferPic { get; set; }
-
-        /// <summary>
-        /// 讀寫 上傳收據
-        /// </summary>
-        public IFormFile UploadReceipt { get; set; }
+        
+        public string ReceiptUrl { get; set; }
     }
     
     public class BankTransferInfoSetRequest

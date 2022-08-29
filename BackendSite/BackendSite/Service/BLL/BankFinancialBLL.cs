@@ -2,6 +2,7 @@
 using System.Transactions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
@@ -19,6 +20,9 @@ namespace BackendSite.Service.BLL
         private readonly PaymentManageService _paymentManageService;
         private readonly ReportService _reportService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly AWSS3Helper _awsS3Helper;
+        private readonly string _bucketName;
+        private readonly string _folder;
 
         #endregion
 
@@ -26,10 +30,14 @@ namespace BackendSite.Service.BLL
 
         public BankFinancialBLL(IServiceProvider provider)
         {
+            var configuration = provider.GetRequiredService<IConfiguration>();
             _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
             _paymentManageService = provider.GetRequiredService<PaymentManageService>();
             _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
+            _folder = configuration.GetValue<string>("AwsFinanceFolder");
         }
 
         #endregion
@@ -49,6 +57,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
         {
             return _bankFinancialService.GetTransferAccountList();
+        }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId);
         }
 
 
@@ -567,7 +580,7 @@ namespace BackendSite.Service.BLL
             return result.FirstOrDefault();
         }
 
-        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
+        public async Task<(bool Status, int Count, string Message)> SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
             var count = 0;
 
@@ -603,7 +616,7 @@ namespace BackendSite.Service.BLL
 
             if (bankFinancialTransferInfoDetail.TransferId == null)
             {
-                using (var scope = new TransactionScope())
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var transferId = GetTransferId();
                     transferInfoFromModel.TransferId = transferId;
@@ -647,7 +660,7 @@ namespace BackendSite.Service.BLL
 
                     if (transferReceipt != null)
                     {
-                        if (InsertTransferReceipt(transferReceipt, transferId) != 1)
+                        if (!await InsertTransferReceipt(transferReceipt, transferId))
                         {
                             scope.Dispose();
 
@@ -663,7 +676,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                using (var scope = new TransactionScope())
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
                     var before = GetFinancialTransferInfoById(bankFinancialTransferInfoDetail.TransferId);
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
@@ -706,7 +719,7 @@ namespace BackendSite.Service.BLL
 
                     if (transferReceipt != null)
                     {
-                        if (InsertTransferReceipt(transferReceipt, bankFinancialTransferInfoDetail.TransferId) > 2)
+                        if (!await InsertTransferReceipt(transferReceipt, bankFinancialTransferInfoDetail.TransferId))
                         {
                             scope.Dispose();
 
@@ -792,7 +805,7 @@ namespace BackendSite.Service.BLL
 
                     #endregion
                     
-                    if (_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
                     {
                         scope.Dispose();
 
@@ -917,7 +930,7 @@ namespace BackendSite.Service.BLL
                         AfterDetailInfo = null
                     };
                     
-                    if (_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
                     {
                         scope.Dispose();
 
@@ -1507,12 +1520,20 @@ namespace BackendSite.Service.BLL
             return _bankFinancialService.GetTransferInfoReceipt(transferId);
         }
 
-        private int InsertTransferReceipt(IFormFile transferReceipt, string transferId)
+        private async Task<bool> InsertTransferReceipt(IFormFile transferReceipt, string transferId)
         {
-            // todo: 這段查了線上沒圖片，改用AWS S3
-            var processedReceipt = ProcessImage(transferReceipt);
+            var ext = Path.GetExtension(transferReceipt.FileName);
+            var path = $"/transfer/receipt/{transferId}{ext}";
+            var key = _folder + path;
+            var success = await _awsS3Helper.UploadFileAsync(transferReceipt, _bucketName, key);
+            var result = success ? path : string.Empty;
 
-            return _bankFinancialService.SetTransferInfoReceipt(transferId, processedReceipt.FileName, processedReceipt.FileBytes);
+            if (success)
+            {
+                return _bankFinancialService.SetTransferInfoReceipt(transferId, key) > 0;
+            }
+
+            return false;
         }
 
         public ProcessedImage ProcessImage(IFormFile image)

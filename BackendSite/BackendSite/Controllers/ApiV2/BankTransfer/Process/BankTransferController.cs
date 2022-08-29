@@ -115,13 +115,7 @@ public class BankTransferController : ControllerBase
         {
             var receipt = _bankFinancialBll.GetTransferIngoReceipt(result.TransferId);
             var authData = _authorizeBll.GetAuthData();
-
-            if (receipt != null)
-            {
-                result.UploadReceiptName = receipt.PicFileName;
-                result.TransferPic = receipt.TransferPic;
-            }
-
+            result.ReceiptUrl = receipt.PicFileName;
             result.Updator = authData.UserId;
             result.UpdatorName = authData.UserName;
 
@@ -147,12 +141,13 @@ public class BankTransferController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
-    public ApiResult Set([FromForm] BankTransferInfoSetRequest request)
+    public async Task<ApiResult> Set([FromForm] BankTransferInfoSetRequest request)
     {
         var authData = _authorizeBll.GetAuthData();
         var detail = new BankFinancialTransferInfoTransDetailModel
         {
             TransferId = request.TransferId,
+            TransDate = request.TransDate,
             TransactionType = TransactionTypeEnum.PlusAndMinus,
             TransferType = request.TransferType,
             FromSiteId = (int) request.SiteId,
@@ -182,7 +177,7 @@ public class BankTransferController : ControllerBase
             Updator = authData.UserId
         };
         
-        var (success, count, message) = _bankFinancialBll.SetTransferInfo(detail, request.UploadReceipt);
+        var (success, count, message) = await _bankFinancialBll.SetTransferInfo(detail, request.UploadReceipt);
 
         return new ApiResult
         {
