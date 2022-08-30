@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BackendSite.Extensions
+﻿namespace BackendSite.Extensions
 {
     public static class DateTimeExtensions
     {

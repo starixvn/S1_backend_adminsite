@@ -1,11 +1,7 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {

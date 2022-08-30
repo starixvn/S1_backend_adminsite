@@ -1,13 +1,9 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
-using Org.BouncyCastle.X509;
 
 namespace BackendSite.Service.BLL
 {
@@ -79,6 +75,12 @@ namespace BackendSite.Service.BLL
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
         }
         
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
+        {
+            var custReferralPageData = await referralManagementService.GetReferralCustList(siteId, userName, currencyId, startDate, endDate, pageSize, pageNumber, orderByProperty, orderByDirection);
+            return custReferralPageData;
+        }
+        
         public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
         {
             var referralCustList =  referralManagementService.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate).ToList();
@@ -92,6 +94,7 @@ namespace BackendSite.Service.BLL
                 RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
                 RewardTime = Convert(x.RewardTime, TimeSpan.Zero),
                 ReferralAmount = x.ReferralAmount,
+                FreeCreditSum = x.FreeCreditSum,
                 Status = Enum.GetName(typeof(ReferralCustStatusEnum), x.Status)
             }).ToList();
             return result;

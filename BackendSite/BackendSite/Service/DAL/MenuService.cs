@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System.IO;
-
-namespace BackendSite.Service.DAL
+﻿namespace BackendSite.Service.DAL
 {
     public class MenuService
     {

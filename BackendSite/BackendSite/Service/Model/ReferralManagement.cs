@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -137,8 +135,17 @@ namespace BackendSite.Service.Model
         public decimal FreeCreditSum { get; set; }
         public int PendingCount { get; set; }
         public int ExpiredCount { get; set; }
-
     }
+
+    public class ReferralCustListPageData
+    {
+        public IEnumerable<ReferralCustList> ReferralCustList { get; set; }
+        public int TotalPages { get; set; }
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+    }
+
     public class ReferralFriend
     {
         public int CustId { get; set; }
@@ -182,6 +189,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public DateTime RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
+        public decimal FreeCreditSum { get; set; }
         public DateTime? RewardTime { get; set; }
         public int Status { get; set; }
     }
@@ -193,6 +201,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public DateTimeOffset RegTime { get; set; }
         public decimal ReferralAmount { get; set; }
+        public decimal FreeCreditSum { get; set; }
         public DateTimeOffset? RewardTime { get; set; }
         public string Status { get; set; }
     }

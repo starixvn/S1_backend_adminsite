@@ -5,8 +5,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace BackendSite.Controllers.Api
 {
@@ -16,6 +14,7 @@ namespace BackendSite.Controllers.Api
     public class LineChannelController : ControllerBase
     {
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly LineChannelBLL _lineChannelBll;
 
 
@@ -24,6 +23,7 @@ namespace BackendSite.Controllers.Api
         public LineChannelController(IServiceProvider provider)
         {
             _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _serverInfoBll = provider.GetService<ServerInfoBLL>();
             _lineChannelBll = provider.GetService<LineChannelBLL>();
         }
 
@@ -54,7 +54,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<LineChannelModel> GetList(GetListRequest request)
         {
+            var serverInfo = _serverInfoBll.GetSiteList().First(x => x.SiteId == request.SiteId);
             var datas = _lineChannelBll.GetList(request.SiteId,
+                serverInfo.ICurrencyList,
                 request.PageNumber,
                 request.PageSize,
                 out int totalPages,

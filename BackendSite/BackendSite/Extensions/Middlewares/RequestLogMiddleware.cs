@@ -1,13 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Context;
 
@@ -42,6 +36,7 @@ namespace BackendSite.Extensions.Middlewares
 
         public async Task Invoke(HttpContext context,IWebHostEnvironment env)
         {
+            context.Request.EnableBuffering();
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
             
