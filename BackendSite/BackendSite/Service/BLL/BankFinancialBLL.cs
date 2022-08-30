@@ -22,6 +22,7 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly AWSS3Helper _awsS3Helper;
         private readonly string _bucketName;
+        private readonly string _bucketUrl;
         private readonly string _folder;
 
         #endregion
@@ -37,6 +38,7 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
             _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
+            _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
             _folder = configuration.GetValue<string>("AwsFinanceFolder");
         }
 
@@ -735,7 +737,7 @@ namespace BackendSite.Service.BLL
                     {
                         SiteId = bankFinancialTransferInfoDetail.FromSiteId,
                         CurrencyId = bankFinancialTransferInfoDetail.FromCurrencyId,
-                        Operator = bankFinancialTransferInfoDetail.CreatorName,
+                        Operator = bankFinancialTransferInfoDetail.UpdatorName,
                         ActionType = ActionType.Update,
                         MenuEnum = AdminAdjustmentLogMenuEnum.TransferInfoManagement,
                         BeforeDetailInfo = JsonConvert.SerializeObject(new
@@ -885,6 +887,8 @@ namespace BackendSite.Service.BLL
 
                             return (false, count, "Delete Transfer Info Receipt Fail.");
                         }
+
+                        _ = _awsS3Helper.DeleteFileAsync(_bucketName, transferInfoReceiptModel.PicFileName);
                     }
 
                     var logParams = new CreateAdminAdjustmentInfoLogInput
@@ -1517,7 +1521,14 @@ namespace BackendSite.Service.BLL
 
         public BankFinancialTransferInfoReceiptModel GetTransferIngoReceipt(string transferId)
         {
-            return _bankFinancialService.GetTransferInfoReceipt(transferId);
+            var result = _bankFinancialService.GetTransferInfoReceipt(transferId);
+            
+            if (result != null)
+            {
+                result.PicFileName = _bucketUrl + result.PicFileName;
+            }
+            
+            return result;
         }
 
         private async Task<bool> InsertTransferReceipt(IFormFile transferReceipt, string transferId)

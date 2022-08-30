@@ -174,7 +174,8 @@ public class BankTransferController : ControllerBase
             ToFee = request.ToFee,
             Reason = request.Reason,
             Remark = request.Remark,
-            Updator = authData.UserId
+            Updator = authData.UserId,
+            UpdatorName = authData.UserName
         };
         
         var (success, count, message) = await _bankFinancialBll.SetTransferInfo(detail, request.UploadReceipt);
