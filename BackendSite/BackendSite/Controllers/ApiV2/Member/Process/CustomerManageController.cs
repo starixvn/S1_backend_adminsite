@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.Extensions;
-
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly Common _common;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -72,6 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion
@@ -205,6 +207,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public string Reason { get; set; }
+        }
+
+        public class CustInfosReq : CustInfoReq
+        {
+            public string sabaId { get; set; }
+            public int SiteId { get; set; }
+        }
         #endregion
 
         public class CustInfoListRequest : ApiRequestPageModel
