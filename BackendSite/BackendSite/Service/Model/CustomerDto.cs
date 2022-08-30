@@ -229,14 +229,8 @@ public class GetIpListRequest
     public int CustId { get; set; }
 }
 
-public class CustomerIpList
+public class CustomerLoginIp
 {
-    public string Ip { get; set; }
-    public int Count { get; set; }
-}
-
-public class CustomerIpDto
-{
-    public string Ip { get; set; }
-    public int Count { get; set; }
+    public string LoginIp { get; set; }
+    public int UserCount { get; set; }
 }

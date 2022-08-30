@@ -15,9 +15,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process;
 public class MemberController : ControllerBase
 {
     private readonly ICustomerBLL _customerBll;
-    private readonly CustPhotoIdBLL _custPhotoIdBll;
+    private readonly ICustPhotoIdBLL _custPhotoIdBll;
 
-    public MemberController(ICustomerBLL customerBll, CustPhotoIdBLL custPhotoIdBll)
+    public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll)
     {
         _customerBll = customerBll;
         _custPhotoIdBll = custPhotoIdBll;
@@ -118,10 +118,10 @@ public class MemberController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<IEnumerable<CustomerIpList>>> GetIpList(GetIpListRequest request)
+    public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
     {
         var data = await _customerBll.GetIpListByCustId(request.CustId);
-        var apiResult = new ApiResult<IEnumerable<CustomerIpList>>()
+        var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
         {
             ErrorCode = (int)ErrorCodeEnum.Success,
             Data = data
