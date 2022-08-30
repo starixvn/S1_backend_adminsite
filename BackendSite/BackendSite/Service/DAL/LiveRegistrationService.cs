@@ -23,7 +23,8 @@ namespace BackendSite.Service.DAL
             _mainDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Main);
         }
 
-        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
+        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, 
+            int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var searchData = new RegLiveStatusPageResult();
             var props = new DynamicParameters();
@@ -38,9 +39,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AffCode", affiliatesCode);
             props.Add("CreditSite", JsonConvert.SerializeObject(_creditSite));
             props.Add("_AgentCodeType", agentCodeType);
-            props.Add("_dormantUser", dormantUser);
-            props.Add("_callOutStatus", callOutStatus);
-            props.Add("_dateType", dateType);
+            props.Add("_DormantFrequency", dormantFrequency);
+            props.Add("_DormantType", dormantType);
+            props.Add("_CallOutStatus", callOutStatus);
+            props.Add("_DateType", dateType);
             props.Add("_PageSize", Math.Abs(pageSize));
             props.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);

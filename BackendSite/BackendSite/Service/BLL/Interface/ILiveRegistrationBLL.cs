@@ -7,7 +7,7 @@ namespace BackendSite.Service.BLL.Interface
 {
     public interface ILiveRegistrationBLL
     {
-        Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType);
+        Task<LiveRegistrationResponse> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone);
         Task<CustRegLiveStatus> GetRegLiveStatus(int custId);
         Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator);
         Task<int> AddCallingRecord(int siteId, int custId, string @operator);

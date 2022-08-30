@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CurrencyId, request.DepositStatus, request.Status
                 , request.UserName, request.PageNumber, request.PageSize, request.Sort,
                 startTime, endTime, request.AffiliatesCode, request.AgentCodeType,
-                request.DormantUser, request.CallOutStatus, request.DateType);
+                request.DormantUser, request.CallOutStatus, request.DateType, request.StartDate.Offset);
             
             var apiResult = new ApiListResult<LiveRegistration>
             {

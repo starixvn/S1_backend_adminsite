@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendSite.Service.BLL.Interface;
@@ -8,6 +9,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities;
 
 namespace BackendSite.Service.BLL
 {
@@ -24,9 +26,11 @@ namespace BackendSite.Service.BLL
             _logger = logger;
         }
 
-        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
+        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
         {
-            var searchResult = await _registrationService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType);
+            var (dormantFrequency, dormantType) = Getdormant(dormantUser);
+            
+            var searchResult = await _registrationService.GetRegLiveStatusData(siteId, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantFrequency, dormantType, callOutStatus, dateType);
             var regLiveStatus = searchResult.RegLiveStatusData.Select(a => new LiveRegistration()
             {
                 SiteId = a.SiteId,
@@ -41,7 +45,7 @@ namespace BackendSite.Service.BLL
                 DepositStatus = a.ActStatus,
                 Status = a.Status,
                 RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                UpdateRemark = ZipRemark(a.UpdateAt, a.Operator)
+                UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
             });
             return new LiveRegistrationResponse()
             {
@@ -51,6 +55,14 @@ namespace BackendSite.Service.BLL
                 RowCount = searchResult.RowCount
             };
         }
+
+        private (int dormantFrequency, int dormantType) Getdormant(int dormantUser)
+        {
+            var frequency = dormantUser / 10;
+            var type = dormantUser % 10;
+            return (frequency, type);
+        }
+
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
             return await _registrationService.GetRegLiveStatus(custId);
@@ -120,13 +132,19 @@ namespace BackendSite.Service.BLL
             return list;
         }
 
-        private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator)
+        private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator, TimeSpan timezone)
         {
             if (string.IsNullOrEmpty(rawUpdateTime) || string.IsNullOrEmpty(rawUpdateOperator)) return null;
 
             var updateTime = rawUpdateTime.Split(',');
             var updateOperator = rawUpdateOperator.Split(',');
-            return updateTime.Zip(updateOperator, (c, n) => $"{c}-{n}").ToList();
+            return updateTime.Zip(updateOperator, (c, n) =>
+            {
+                var originTime = DateTime.Parse(c);
+                var timeOffset = new DateTimeOffset(originTime, TimeSpan.Zero);
+                var datetime = timeOffset.ToOffset(timezone).DateTime;
+                return $"{datetime:yyyy-MM-dd HH:mm:ss}-{n}";
+            }).ToList();
         }
     }
 }
