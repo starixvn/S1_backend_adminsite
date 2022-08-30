@@ -1,4 +1,5 @@
-﻿using BackendSite.Attributes;
+﻿using System.Text.RegularExpressions;
+using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
@@ -15,17 +16,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class CustomerManageController : ControllerBase
     {
+        private readonly PermissionBLL _permissionBll;
         private readonly ICustomerBLL _customerBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly CustPhotoIdBLL _custPhotoIdBll;
         
-        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll, CustPhotoIdBLL custPhotoIdBll)
+        public CustomerManageController(ICustomerBLL customerBll, CustInfoBLL custInfoBll, CustVerifyBLL custVerifyBll, CustPhotoIdBLL custPhotoIdBll, PermissionBLL permissionBll)
         {
             _customerBll = customerBll;
             _custInfoBll = custInfoBll;
             _custVerifyBll = custVerifyBll;
             _custPhotoIdBll = custPhotoIdBll;
+            _permissionBll = permissionBll;
         }
 
         /// <summary>
@@ -213,5 +216,155 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         #endregion
+        
+        #region CSD > Customer Administration > CustInfo
+
+        /// <summary>
+        /// CustomerManage/GetCustInfoList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
+        public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
+        {
+            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
+            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var tagStartDate = request.TagStartDate != new DateTimeOffset() ? request.TagStartDate?.DateTime : null;
+            var tagEndDate = request.TagEndDate != new DateTimeOffset() ? request.TagEndDate?.DateTime : null;
+            var statusStartDate = request.StatusStartDate != new DateTimeOffset() ? request.StatusStartDate?.DateTime : null;
+            var statusEndDate = request.StatusEndDate != new DateTimeOffset() ? request.StatusEndDate?.DateTime : null;
+
+            if (string.IsNullOrWhiteSpace(request.UserName))
+                request.UserName = null;
+
+            var pageNumber = request.PageNumber;
+            var data = _custInfoBll.GetCustInfoList(request.SiteIds,
+                request.BirDate,
+                request.BirMonth,
+                request.BirYear,
+                request.UserName?.Trim(),
+                request.AccountName?.Trim(),
+                request.LoginIp?.Trim(),
+                request.TransId?.Trim(),
+                request.TpUserName?.Trim(),
+                request.Email?.Trim(),
+                request.PhoneNo?.Trim(),
+                startDate,
+                endDate,
+                tagStartDate,
+                tagEndDate,
+                statusStartDate,
+                statusEndDate,
+                request.PageSize,
+                request.AffCode,
+                request.CurrencyIds,
+                request.BankAccountNumber?.Trim(),
+                request.Statuses,
+                request.SelectTag,
+                ref pageNumber,
+                out var totalPages,
+                out var rowCount);
+
+            var custInfoDetails = data.ToList();
+            if (!custInfoDetails.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            return new ApiListResult<CustInfoDetail>
+            {
+                Data = custInfoDetails,
+                TotalPages = totalPages,
+                PageNumber = pageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// CustomerManage/GetCustInfoDetail 取得客戶資料明細
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustInfoDetail(CustIdRequest request)
+        {
+
+            var custInfoDetail = _custInfoBll.GetCustInfoDetail(request.CustId, null);
+
+            if (custInfoDetail != null)
+            {
+                if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                {
+                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
+                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                    custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                }
+
+                return new ApiResult<CustInfoDetail>
+                {
+                    Data = custInfoDetail,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+
+            }
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+        }
+        
+        #endregion
+        
+        /// <summary>
+        /// 電話遮罩
+        /// </summary>
+        /// <param name="phone">電話</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskPhone(string phone)
+        {
+            if (string.IsNullOrEmpty(phone))
+                return phone;
+
+            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            return Regex.Replace(phone, pattern, m => new string('*', m.Length));
+        }
+        /// <summary>
+        /// EMail遮罩
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return email;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+        /// <summary>
+        /// LineUserId遮罩
+        /// </summary>
+        /// <param name="data">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        private static string MaskLineId(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(data, pattern, m => new string('*', m.Length));
+        }
     }
 }
