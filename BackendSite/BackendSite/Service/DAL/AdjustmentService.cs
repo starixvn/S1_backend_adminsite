@@ -15,6 +15,7 @@ namespace BackendSite.Service.DAL
         private readonly Common common;
         private readonly WalletService walletService;
         private readonly WithdrawalLimitService withdrawalLimitService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<AdjustmentService> _logger;
@@ -25,6 +26,7 @@ namespace BackendSite.Service.DAL
             common = provider.GetRequiredService<Common>();
             walletService = provider.GetRequiredService<WalletService>();
             withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<AdjustmentService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
@@ -154,6 +156,77 @@ namespace BackendSite.Service.DAL
             RowCount = props.Get<int?>("RowCount") ?? 0;
 
             return result;
+        }
+
+        public (int ResultCode, string TransId) SetAdjustWithdrawalLimitV2(SetAdjustWithdrawalLimitParams input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            
+            var p = new DynamicParameters(new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _AdjustType = (int)input.AdjustType,
+                _ReasonId = input.ReasonId,
+                _CustId = input.CustId,
+                _UserName = input.UserName,
+                _Amount = input.Amount,
+                _Memo = input.Memo,
+                _Prefix = $"L{common.GetEnv()}",
+                _Operator = input.Operator
+            });
+            p.Add("_TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+            p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            _ = conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", p, trans, commandType: CommandType.StoredProcedure);
+            
+            var transId = p.Get<string>("_TransId") ?? string.Empty;
+            var resultCode = p.Get<int>("_Result");
+
+            if (resultCode != 0)
+            {
+                trans.Rollback();
+            }
+            
+            var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
+            var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
+                amount, input.Memo, transId, out var afterAmount, conn, trans);
+
+            if (result < 1)
+            {
+                trans.Rollback();
+                return (-2, string.Empty);
+            }
+            
+            var logResult = _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalLimitAdjustment,
+                CurrencyId = input.CurrencyId,
+                SiteId = input.SiteId,
+                AfterDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    input.UserName,
+                    input.Amount,
+                    AdjustType = input.AdjustType.ToString(),
+                    Reason = input.ReasonId.ToString(),
+                    input.Memo
+                }),
+                RefTransId = transId
+            });
+
+            if (!logResult)
+            {
+                trans.Rollback();
+                return (-3, string.Empty);
+            }
+            
+            trans.Commit();
+
+            return (resultCode, transId);
         }
 
         public int SetAdjustWithdrawalLimit(AdjustWithdrawalLimit withdrawalLimitInfo,
