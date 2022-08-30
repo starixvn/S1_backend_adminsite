@@ -1,7 +1,100 @@
 ﻿using System.Security.Cryptography;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model;
+/// <summary>
+/// 客戶ID要求
+/// </summary>
+/// <remarks>
+/// 只需要傳參數CustId
+/// </remarks>
+public class CustIdRequest
+{
+    public int SiteId { get; set; }
+    public int CurrencyId { get; set; }
+    public int CustId { get; set; }
+}
+public class CustInfoListRequest : ApiRequestPageModel
+{
+    private DateTimeOffset _startDate;
+    private DateTimeOffset _endDate;
+    private DateTimeOffset _tagStartDate;
+    private DateTimeOffset _tagEndDate;
+    private DateTimeOffset _statusStartDate;
+    private DateTimeOffset _statusEndDate;
+    public IEnumerable<int> SiteIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
+    public DateTimeOffset? StartDate
+    {
+        get => _startDate;
+        set
+        {
+            if (value != null)
+                _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public DateTimeOffset? EndDate
+    {
+        get => _endDate;
+        set
+        {
+            if (value != null)
+                _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public DateTimeOffset? TagStartDate
+    {
+        get => _tagStartDate;
+        set
+        {
+            if (value != null)
+                _tagStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public DateTimeOffset? TagEndDate
+    {
+        get => _tagEndDate;
+        set
+        {
+            if (value != null)
+                _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public DateTimeOffset? StatusStartDate
+    {
+        get => _statusStartDate;
+        set
+        {
+            if (value != null)
+                _statusStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public DateTimeOffset? StatusEndDate
+    {
+        get => _statusEndDate;
+        set
+        {
+            if (value != null)
+                _statusEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public int? BirDate { get; set; }
+    public int? BirMonth { get; set; }
+    public int? BirYear { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+    public string LoginIp { get; set; }
+    public string TransId { get; set; }
+    public string TpUserName { get; set; }
+    public string Email { get; set; }
+    public string PhoneNo { get; set; }
+    public string AffCode { get; set; }
+    public string BankAccountNumber { get; set; }
+    public IEnumerable<int> Statuses { get; set; }
+    public IEnumerable<int> SelectTag { get; set; }
+    public bool ExportTransferWallet { get; set; } = false;
+}
 
 public class GetCustomerBasicInfoRequest
 {
