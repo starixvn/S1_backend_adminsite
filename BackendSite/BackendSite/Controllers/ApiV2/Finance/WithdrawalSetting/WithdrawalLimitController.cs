@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitController : ControllerBase

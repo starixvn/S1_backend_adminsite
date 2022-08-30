@@ -190,6 +190,7 @@ namespace BackendSite.Service.Model
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
+        [Obsolete("rebate移至其他地方，此參數不需要")]
         public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }

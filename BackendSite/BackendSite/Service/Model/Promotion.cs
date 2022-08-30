@@ -5,10 +5,8 @@ namespace BackendSite.Service.Model
     public class Promotion
     {
         private DateTimeOffset _expiryTime { get; set; }
-
         public DateTimeOffset _claimDate { get; set; }
         public DateTimeOffset _updateTime { get; set; }
-
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
@@ -69,7 +67,6 @@ namespace BackendSite.Service.Model
     public class PromotionDto
     {
         private DateTimeOffset _expiryTime { get; set; }
-
         public DateTimeOffset _claimDate { get; set; }
         public DateTimeOffset _updateTime { get; set; }
 
@@ -111,7 +108,14 @@ namespace BackendSite.Service.Model
 
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
-
         public string DepositInfo { get; set; }
+    }
+
+    public class CancelBonusRequest
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public int BonusId { get; set; }
     }
 }
