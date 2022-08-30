@@ -510,8 +510,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _custInfoBll.GetAllSiteVipLevelList(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
-        } 
-
+        }
+        
         /// <summary>
         /// GetAllData/GetPromotionType  取得PromotionType List
         /// </summary>
