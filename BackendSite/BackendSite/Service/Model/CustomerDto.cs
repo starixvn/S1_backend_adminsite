@@ -223,3 +223,20 @@ public class DeleteCustPhotoIdRequest
     public int CustId { get; set; }
     public int Id { get; set; }
 }
+
+public class GetIpListRequest
+{
+    public int CustId { get; set; }
+}
+
+public class CustomerIpList
+{
+    public string Ip { get; set; }
+    public int Count { get; set; }
+}
+
+public class CustomerIpDto
+{
+    public string Ip { get; set; }
+    public int Count { get; set; }
+}

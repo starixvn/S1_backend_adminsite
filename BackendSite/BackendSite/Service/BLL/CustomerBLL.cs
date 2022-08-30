@@ -80,4 +80,9 @@ public class CustomerBLL : ICustomerBLL
 
         return sb.ToString();
     }
+
+    public async Task<IEnumerable<CustomerIpList>> GetIpListByCustId(int custId)
+    {
+        return await _customerService.GetCustomerIpListByCustId(custId);
+    }
 }

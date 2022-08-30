@@ -24,7 +24,7 @@ public class MemberController : ControllerBase
     }
     
     /// <summary>
-    /// CustomerManage/GetCustomerBasicInfo 取得客戶基本資料
+    /// Member/GetCustomerBasicInfo 取得客戶基本資料
     /// </summary>
     /// <remarks>
     /// Http Method：POST
@@ -105,5 +105,27 @@ public class MemberController : ControllerBase
         }
 
         throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
+    }
+
+    /// <summary>
+    /// Member/GetIpList 取得會員登入過的Ip
+    /// </summary>
+    /// <remarks>
+    /// Http Method：POST
+    /// 
+    /// Func Path：CSD >  Member Administration > Click[UserName] > CustInfo
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<IEnumerable<CustomerIpList>>> GetIpList(GetIpListRequest request)
+    {
+        var data = await _customerBll.GetIpListByCustId(request.CustId);
+        var apiResult = new ApiResult<IEnumerable<CustomerIpList>>()
+        {
+            ErrorCode = (int)ErrorCodeEnum.Success,
+            Data = data
+        };
+        return apiResult;
     }
 }
