@@ -534,7 +534,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string SabaId { get; set; }
 
         }
-        
+
         public class GetCustInfoWithBalanceResult
         {
             public int SiteId { get; set; }
@@ -545,7 +545,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public CustomerStatusEnum Status { get; set; }
             public decimal Balance { get; set; }
         }
-        
+
         public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
@@ -2917,14 +2917,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result =
                 _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-            
+
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
             }
 
             var balance = _custInfoBll.GetBalance(custInfo.CustId);
-            var status = (CustomerStatusEnum) custInfo.Status;
+            var status = (CustomerStatusEnum)custInfo.Status;
             return status switch
             {
                 CustomerStatusEnum.Running
@@ -2940,16 +2940,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             Status = status,
                             Balance = balance
                         },
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     },
-                    
+
                 CustomerStatusEnum.Suspend
                     => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
-                    
+
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
-        
+
         /// <summary>
         /// CustomerManage/GetCustInfoWithTpBalance 取得客戶資料、主錢包餘額及三方錢包餘額
         /// </summary>
@@ -2965,7 +2965,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result =
                 _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-            
+
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
@@ -2973,7 +2973,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var balance = await _custInfoBll.GetBalanceAsync(custInfo.CustId);
             var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(custInfo.CustId);
-            var status = (CustomerStatusEnum) custInfo.Status;
+            var status = (CustomerStatusEnum)custInfo.Status;
             return status switch
             {
                 CustomerStatusEnum.Running
@@ -2988,14 +2988,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             UserName = custInfo.UserName,
                             Status = status,
                             Balance = balance,
-                            TpWalletList = custTPWallet.Where(x=>x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
+                            TpWalletList = custTPWallet.Where(x => x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
                         },
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     },
-                    
+
                 CustomerStatusEnum.Suspend
                     => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
-                    
+
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
