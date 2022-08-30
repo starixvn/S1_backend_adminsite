@@ -87,6 +87,11 @@ namespace BackendSite.Service.Model
         public bool IsSpecial { get; set; }
         public bool OnlyRegistered { get; set; }
         public int PromotionDeviceType { get; set; }
+        /// <summary>
+        /// Promotion行為：
+        /// 0=Link
+        /// 1=Detail
+        /// </summary>
         public int? PromotionAction { get; set; }
         public int AutoExtend { get; set; }
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
@@ -193,6 +198,7 @@ namespace BackendSite.Service.Model
         /// </summary>
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
+        [Obsolete("VN_AffIds是舊欄位目前都寫到新欄位VN_AffCodes")]
         public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
