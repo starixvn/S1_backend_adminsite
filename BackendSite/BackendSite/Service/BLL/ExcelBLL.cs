@@ -14,13 +14,6 @@ namespace BackendSite.Service.BLL
 
     }
 
-    public class File
-    {
-        public byte[] FileContents { get; set; }
-        public string ContentType { get; set; }
-        public string FileName { get; set; }
-    }
-
     public class ExcelBLL
     {
         private readonly List<string> _excelContentType = new List<string>()
@@ -111,11 +104,10 @@ namespace BackendSite.Service.BLL
             {
                 if (propertyInfo == null)
                 {
-                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
-
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
-
                 ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }

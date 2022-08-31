@@ -22,6 +22,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
             IEnumerable<int> promotionTypes,
             int status,
             long startDate,
@@ -36,7 +37,9 @@ namespace BackendSite.Service.BLL
         {
             var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
 
-            return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
+            return _bonusManageService.GetPromotionList(
+                        JsonConvert.SerializeObject(siteIds),
+                        currencyIds: currencyIds != null ? JsonConvert.SerializeObject(currencyIds) : "[]",
                         JsonConvert.SerializeObject(promotionTypes),
                         status,
                         startDate,
@@ -250,9 +253,10 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
         }
 
-        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _bonusManageService.GetPromotionType(isPayout);
+            return _bonusManageService.GetPromotionType(isPayout, isNew);
         }
     }
+
 }

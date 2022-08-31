@@ -1,5 +1,6 @@
 ﻿using BackendSite.Extensions;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -9,6 +10,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
+        public string CategoryName { get; set; }
         public int? CategoryId { get; set; }
         public DateTimeOffset? PeriodFrom
         {
@@ -20,12 +22,9 @@ namespace BackendSite.Service.Model
                 }
                 return null;
             }
-            set
-            {
-                if (UnixPeriodFrom != null) 
-                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodFrom.Value);
-            }
         }
+        public long? UnixPeriodFrom { get; set; }
+
         public DateTimeOffset? PeriodTo 
         {
             get
@@ -36,13 +35,33 @@ namespace BackendSite.Service.Model
                 }
                 return null;
             }
-            set
-            {
-                if (UnixPeriodTo != null) 
-                    DateTimeExtensions.UnixToDateTimeOffset(UnixPeriodTo.Value); }
         }
-        public long? UnixPeriodFrom { get; set; }
         public long? UnixPeriodTo { get; set; }
+        public DateTimeOffset? DisplayFrom
+        {
+            get
+            {
+                if (UnixDisplayFrom != null)
+                {
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayFrom.Value);
+                }
+                return null;
+            }
+        }
+        public long? UnixDisplayFrom { get; set; }
+
+        public DateTimeOffset? DisplayTo
+        {
+            get
+            {
+                if (UnixDisplaytTo != null)
+                {
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplaytTo.Value);
+                }
+                return null;
+            }
+        }
+        public long? UnixDisplaytTo { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }
         public int ExpiryDays { get; set; }
@@ -68,15 +87,30 @@ namespace BackendSite.Service.Model
         public bool IsSpecial { get; set; }
         public bool OnlyRegistered { get; set; }
         public int PromotionDeviceType { get; set; }
+        /// <summary>
+        /// Promotion行為：
+        /// 0=Link
+        /// 1=Detail
+        /// </summary>
         public int? PromotionAction { get; set; }
         public int AutoExtend { get; set; }
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
+        public IEnumerable<string> CurrencyList
+        {
+            get 
+            {
+                return string.IsNullOrEmpty(Currencys) ? default: JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
+            }
+        }
+        public string Currencys { get; set; }
     }
 
     public class PromotionInfoReq 
     {
         private DateTimeOffset? _periodFromTime;
         private DateTimeOffset? _periodToTime;
+        private DateTimeOffset? _displayFromTime;
+        private DateTimeOffset? _displayToTime;
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
@@ -87,7 +121,7 @@ namespace BackendSite.Service.Model
             set
             {
                 if (value != null)
-                    _periodFromTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    _periodFromTime = value.Value.ToUniversalTime();
             }
         }
         public DateTimeOffset? PeriodToTime 
@@ -96,7 +130,25 @@ namespace BackendSite.Service.Model
             set
             {
                 if (value != null)
-                    _periodToTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+                    _periodToTime = value.Value.ToUniversalTime();
+            }
+        }
+        public DateTimeOffset? DisplayFromTime
+        {
+            get => _displayFromTime;
+            set
+            {
+                if (value != null)
+                    _displayFromTime = value.Value.ToUniversalTime();
+            }
+        }
+        public DateTimeOffset? DisplayToTime
+        {
+            get => _displayToTime;
+            set
+            {
+                if (value != null)
+                    _displayToTime = value.Value.ToUniversalTime();
             }
         }
         public int ExpiryDays { get; set; }
@@ -105,6 +157,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int? WalletType { get; set; }
         public int? TpId { get; set; }
+        [Obsolete("rebate移至其他地方，此參數不需要")]
         public int? RedeemHours { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
@@ -124,23 +177,35 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int SiteId { get; set; }
         public int Usage { get; set; }
+
+        [Obsolete("計算次數使用不需要要帶")]
         public int? BeenUsed { get; set; }
         public int RollOver { get; set; }
         public int WinOver { get; set; }
+        /// <summary>
+        /// 後端設定不需要帶
+        /// </summary>
         public int FullFillType { get; set; }
         public decimal Bonus { get; set; }
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
+        [Obsolete("rebate移至其他地方，此參數不需要")]
         public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }
+        /// <summary>
+        /// 目前應該都固定帶1
+        /// </summary>
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
+        [Obsolete("VN_AffIds是舊欄位目前都寫到新欄位VN_AffCodes")]
         public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
         public IEnumerable<PromotionCashBack> CashBackList { get; set; }
+        public string TierAmount { get; set; } = string.Empty;
+        public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
     }
 
     public class TpGameType
@@ -188,6 +253,7 @@ namespace BackendSite.Service.Model
     public class GetPromotionListReq
     {
         public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> PromotionTypes { get; set; }
         public int Status { get; set; }
         public long StartDate { get; set; }
@@ -309,9 +375,19 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public int SiteId { get; set; }
     }
+
     public class PromotionType
     {
         public int Type { get; set; }
         public string PromotionTypeName { get; set; }
     }
+
+    public class TierAmount
+    {
+        public decimal Bonus { get; set; }
+        public decimal MaxBonus { get; set; }
+        public decimal RequiredAmount { get; set; }
+    }
+
+
 }

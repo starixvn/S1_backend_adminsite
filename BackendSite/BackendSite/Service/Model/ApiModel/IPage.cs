@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model.ApiModel
+﻿using BackendSite.Extensions;
+
+namespace BackendSite.Service.Model.ApiModel
 {
     public interface IPageInfo
     {
@@ -44,9 +46,8 @@
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
             RowCount = totalCount;
             PageNumber = pageNumber;
-            var index = (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize);
-            var count = index + pageSize <= totalCount ? pageSize : totalCount - index;
-            PageRange = $"{index + 1}-{index + count}";
+            var (pageRange, index, count) = pageNumber.GetPageRangeInfo(pageSize, totalCount);
+            PageRange = pageRange;
             return (index, count);
         }
 

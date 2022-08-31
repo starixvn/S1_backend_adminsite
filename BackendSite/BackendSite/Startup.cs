@@ -11,6 +11,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite
 {
@@ -75,11 +76,20 @@ namespace BackendSite
 
             }
 
-            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            //¤â°Êµù¥U
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
+
+            services.AddTransient<BlockIpToS3, BlockIpToS3>();
+            services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ICustomerBLL, CustomerBLL>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-            
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IBonusReportService, BonusReportService>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -120,6 +130,9 @@ namespace BackendSite
 
             services.AddOpenApiDocument();//Swagger Setting
 
+            services.AddOptionListByDB<TpGameTypeOption>("Admin_TpGameType_Get");
+            services.AddOptionListByDB<TpListOption>("Common_TpList_Get");
+            services.AddOptionListByDB<CurrencyOption>("Common_Currency_Get");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -160,10 +173,6 @@ namespace BackendSite
                 #endregion
 
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseEndpoints(endpoints =>

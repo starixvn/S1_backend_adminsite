@@ -1,9 +1,3 @@
-
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 ﻿using System.Text.RegularExpressions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -360,10 +354,13 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
+        
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) 
+            => _withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
         public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (input.After.WithdrawalMax < 0
+            if (input.After.TotalWithdrawalMax < 0
                 || input.After.WithdrawalMin < 0
                 || input.After.Times < 0)
             {
@@ -382,6 +379,11 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
+            return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
+        }
+        
+        public bool EditWithdrawalLimit(ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>> input)
+        {
             return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
 
@@ -637,12 +639,18 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(int siteId, int currencyId)
+        {
+            var result = _withdrawalLimitService.GetCryptoWithdrawalLimitInfos(siteId,currencyId);
+            return result;
+        }
 
         public bool AddCryptoWithdrawalLimit(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
+            if (input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}");
                 return false;
             }
 
@@ -680,6 +688,12 @@ namespace BackendSite.Service.BLL
 
             return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
+        
+        public bool EditCryptoWithdrawalLimit(ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> input)
+        {
+            return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
+        }
+        
 
         public CryptoInfoData GetCryptoInfoData()
         {
@@ -1329,7 +1343,7 @@ namespace BackendSite.Service.BLL
 
                         if (withdrawalLimitInfo != null)
                             IsValidWithWithdrawalLimit(amount, custDailySum.Amount, custDailySum.Count,
-                                withdrawalLimitInfo.WithdrawalMin, withdrawalLimitInfo.WithdrawalMax, withdrawalLimitInfo.Times);
+                                withdrawalLimitInfo.WithdrawalMin, withdrawalLimitInfo.TotalWithdrawalMax, withdrawalLimitInfo.Times);
                         break;
                     }
                 case ApplicationAccountTypeEnum.Crypto:

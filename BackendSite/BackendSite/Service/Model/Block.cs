@@ -8,9 +8,9 @@ namespace BackendSite.Service.Model
     }
     public class BlockIP
     {
-        public String IP { get; set; }
-        public String Memo { get; set; }
-        public String Operator { get; set; }
+        public string IP { get; set; }
+        public string Memo { get; set; }
+        public string Operator { get; set; }
         private DateTimeOffset _createTime { get; set; }
         public DateTimeOffset CreateTime
         {

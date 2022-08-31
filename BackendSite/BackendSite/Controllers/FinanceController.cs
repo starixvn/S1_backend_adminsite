@@ -91,7 +91,6 @@ namespace BackendSite.Controllers
             public long endDate { get; set; }
             public string Status { get; set; }
             public string LevelStatus { get; set; }
-            public int AmountType { get; set; }
             public string Amount { get; set; }
         }
 
@@ -120,11 +119,12 @@ namespace BackendSite.Controllers
                 startTime, endTime,
                 depositListReq.DepositId,
                 depositListReq.UserName,
+                null,
                 depositListReq.CurrencyId,
                 depositListReq.Status,
                 depositListReq.LevelStatus,
-                depositListReq.AmountType,
-                depositListReq.Amount,
+                -1,
+                -1,
                 depositListReq.SelectPayId);
 
             foreach (var data in exportDeposit)
@@ -293,13 +293,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }

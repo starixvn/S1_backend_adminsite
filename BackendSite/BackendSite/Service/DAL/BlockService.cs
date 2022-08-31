@@ -24,9 +24,15 @@ namespace BackendSite.Service.DAL
             _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate, int startIndex,
-            int pageSize, out int totalPages,out int rowCount)
+
+        public async Task<IEnumerable<BlockIP>> GetBlockIPList()
+        {
+            var p = new DynamicParameters();
+            p.Add("IP", null);
+            return await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+        }
+
+        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int startIndex, int pageSize, out int totalPages,out int rowCount)
         {
             var p = new DynamicParameters(new
             {

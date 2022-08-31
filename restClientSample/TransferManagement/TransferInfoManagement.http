@@ -1,0 +1,164 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得 TransferType 列表
+POST {{url}}/apiV2/BankTransfer/GetTransferTypeList HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferChannelEnum"
+}
+
+###
+# 取得原因列表
+POST {{url}}/apiV2/BaseData/GetReasonList HTTP/1.1
+Content-Type: application/json
+
+{
+    "FuncKey": "BankFinancial/TransferManage"
+}
+
+###
+# 取得 Agent 列表
+POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得轉帳帳戶列表
+# 列表下拉選單顯示全部(Value=>accountNo, Name=>displayName)
+# 編輯只顯示status === 2的項目
+POST {{url}}/apiV2/BankTransferAccount/GetTransferAccountList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得轉帳資訊列表
+# fromCurrencyId | Number | Nullable
+# toCurrencyId | Number | Nullable
+# transferTypes | Number Array
+# fromAccountNo | String | Nullable
+# toAccountNo | String | Nullable
+# fromChannel | Number | Nullable
+# toChannel | Number | Nullable
+# reason | Number | Nullable
+# fromAgent | String | Nullable
+# toAgent | String | Nullable
+POST {{url}}/apiV2/BankTransfer/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "startTime": "2022-01-01T00:00:00+08:00",
+    "endTime": "2022-09-01T00:00:00+08:00",
+    "fromCurrencyId": null,
+    "toCurrencyId": null,
+    "transferTypes": [0,1,2,3,4,5],
+    "fromAccountNo": null,
+    "toAccountNo": null,
+    "fromChannel": null,
+    "toChannel": null,
+    "reason": null,
+    "fromAgent": null,
+    "toAgent": null,
+    "pageNumber": 1,
+    "pageSize": 10
+}
+
+###
+# 匯出轉帳資訊列表
+POST {{url}}/apiV2/BankTransfer/Export HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "startTime": "2022-01-01T00:00:00+08:00",
+    "endTime": "2022-09-01T00:00:00+08:00",
+    "fromCurrencyId": null,
+    "toCurrencyId": null,
+    "transferTypes": [0,1,2,3,4,5],
+    "fromAccountNo": null,
+    "toAccountNo": null,
+    "fromChannel": null,
+    "toChannel": null,
+    "reason": null,
+    "fromAgent": null,
+    "toAgent": null,
+    "pageNumber": 1,
+    "pageSize": 10
+}
+
+###
+# 以轉帳單號取得轉帳資訊
+POST {{url}}/apiV2/BankTransfer/GetByTransferId HTTP/1.1
+Content-Type: application/json
+
+{
+    "transferId": "T202202150002"
+}
+
+###
+# 新增/更新轉帳資料
+# 請用 postman
+POST {{url}}/apiV2/BankTransfer/Set HTTP/1.1
+Content-Type: multipart/form-data;
+
+TransferId:
+TransferType:3
+TransDate:2022-08-30T00:00:00+08:00
+SiteId:1
+FromChannel:1
+FromAgent:Elmo
+FromPayId:0
+FromCurrencyId:4
+FromSysId:8
+FromAccountNo:0561983933
+FromAccountDisplayName:Nova88-KBANK-Kattiya-3933
+FromAmount:1000
+FromFee:0
+ToChannel:1
+ToAgent:mango
+ToPayId:0
+ToCurrencyId:4
+ToSysId:11
+ToAccountNo:5527314057
+ToAccountDisplayName:Nova88-BBL-Natthanon-4057
+ToAmount:1000
+ToFee:0
+Reason:25
+Remark:TEST
+UploadReceipt:
+
+###
+# 刪除轉帳單資訊
+POST {{url}}/apiV2/BankTransfer/Delete HTTP/1.1
+Content-Type: application/json
+
+{
+    "transferId": "T202208290002"
+}

@@ -1,169 +1,54 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
-    [Route("apiV2/[controller]/[action]")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Route("apiV2/[controller]")]
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
-        #region Fields
-
-        private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
+        private readonly LiveRegistrationDecorator _registrationBll;
 
-        #endregion
-
-        #region Constructor
-
-        public RegistrationManagementController(IServiceProvider provider)
+        public RegistrationManagementController(ExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
         {
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _excelBll = excelBll;
+            _registrationBll = registrationBll;
         }
-
-        #endregion
-
-        #region Model
-
-        public class RegLiveStatusReq : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public int CurrencyId { get; set; }
-            public int DepositStatus { get; set; }
-            public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-        }
-        public class GetRegLiveStatusNotesReq
-        {
-            public int CustId { get; set; }
-        }
-        public class ExportRegLiveStatusListReq
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public int CurrencyId { get; set; }
-            public int DepositStatus { get; set; }
-            public int Status { get; set; }
-            public string User { get; set; }
-            public int Sort { get; set; }
-            public DateTimeOffset StartDate { get; set; }
-            public DateTimeOffset EndDate { get; set; }
-            public string AffiliatesCode { get; set; }
-            public int AgentCodeType { get; set; }
-        }
-
-        #endregion
-
-        #region Action
-
         /// <summary>
-        /// RegistrationManagement/GetRegLiveStatusList 取得會員註冊資料
+        /// RegistrationManagement/GetRegLiveStatusList 取得註冊會員資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query)
         /// </remarks>
-        /// <param name="custInfoReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
-        [HttpPost]
-        public ApiListResult<RegLiveStatus> GetRegLiveStatusList(RegLiveStatusReq custInfoReq)
+        /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
+        [HttpPost("GetList")]
+        public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest request)
         {
-            var apiResult = new ApiListResult<RegLiveStatus>();
-            try
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
+            var searchResult = await _registrationBll.GetRegLiveStatusData(request.SiteId,
+                request.CurrencyId, request.DepositStatus, request.Status
+                , request.UserName, request.PageNumber, request.PageSize, request.Sort,
+                startTime, endTime, request.AffiliatesCode, request.AgentCodeType,
+                request.DormantUser, request.CallOutStatus, request.DateType, request.StartDate.Offset);
+            
+            var apiResult = new ApiListResult<LiveRegistration>
             {
-                var searchResult = _custInfoBll.GetRegLiveStatusData(custInfoReq.SiteIds, custInfoReq.CurrencyId, custInfoReq.DepositStatus, custInfoReq.Status
-                , custInfoReq.User, custInfoReq.PageNumber, custInfoReq.PageSize, custInfoReq.Sort, custInfoReq.StartDate, custInfoReq.EndDate, custInfoReq.AffiliatesCode, custInfoReq.AgentCodeType);
-                foreach (var data in searchResult.RegLiveStatusDatas)
-                {
-                    data.RegTime = new DateTimeOffset(data.RegTime.DateTime, TimeSpan.Zero);
-                }
-                apiResult.Data = searchResult.RegLiveStatusDatas;
-                apiResult.PageNumber = searchResult.PageNumber;
-                apiResult.TotalPages = searchResult.TotalPages;
-                apiResult.RowCount = searchResult.RowCount;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// RegistrationManagement/SetRegLiveStatus 更新會員註冊資料狀態
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
-        /// </remarks>
-        /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
-        [HttpPost]
-        public ApiResult SetRegLiveStatus(ApiRequestWithLog<SetRegLiveStatus> req)
-        {
-            var apiResult = new ApiResult();
-            if (_custInfoBll.SetRegLiveStatus(new ParamsWithLog<SetRegLiveStatus>(req, User.Identity.Name)))
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                apiResult.Message = "update fail";
-            }
-            return apiResult;
-        }
-
-        /// <summary>
-        /// RegistrationManagement/GetRegLiveStatusNotes 取得會員註冊資料註記
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
-        /// </remarks>
-        /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
-        [HttpPost]
-        public ApiResult<IEnumerable<RegLiveStatusNotes>> GetRegLiveStatusNotes(GetRegLiveStatusNotesReq req)
-        {
-            var result = _custInfoBll.GetRegLiveStatusNotes(req.CustId).ToList();
-            foreach (var data in result)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            var apiResult = new ApiResult<IEnumerable<RegLiveStatusNotes>>
-            {
-                Data = result,
+                Data = searchResult.LiveRegistration,
+                PageNumber = searchResult.PageNumber,
+                TotalPages = searchResult.TotalPages,
+                RowCount = searchResult.RowCount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -171,20 +56,129 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/AddRegLiveStatusNote 新增會員註冊資料註記
+        /// RegistrationManagement/ExportRegLiveStatus 匯出註冊會員資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
+        [HttpPost("Export")]
+        public IActionResult Export(ExportRegLiveStatusRequest req)
+        {
+            var startTime = req.StartDate.ToUniversalTime().DateTime;
+            var endTime = req.EndDate.ToUniversalTime().DateTime;
+
+            var exportData = _registrationBll.GetExportRegLiveStatus(req.SiteId, req.CurrencyId, req.DepositStatus,
+                req.Status, req.UserName, req.Sort, startTime, endTime, req.AffiliatesCode, req.AgentCodeType,
+                req.DormantUser, req.CallOutStatus, req.DateType);
+            var stream = _excelBll.Export(exportData, offset: req.StartDate.Offset);
+            return _excelBll.ExcelFile(stream, "Registration");
+        }
+
+        /// <summary>
+        /// RegistrationManagement/SetRegLiveStatus 更新註冊會員資料狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
+        [HttpPost("Set")]
+        public async Task<ApiResult> Set(SetRegLiveStatusRequest req)
+        {
+            try
+            {
+                var result = await _registrationBll.SetRegLiveStatus(req, User.Identity.Name);
+                var apiResult = new ApiResult
+                {
+                    ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail
+                };
+                return apiResult;
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+        }
+
+        /// <summary>
+        /// RegistrationManagement/CallingRecord 寫入客服致電紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > Submit(Query) > [Complete once]
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
+        [HttpPost("CallingRecord")]
+        public async Task<ApiResult> CallingRecord(TeleCsdUpdateReq req)
+        {
+            try
+            {
+                if (await _registrationBll.AddCallingRecord(req.SiteId, req.CustId, User.Identity.Name) > 0)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Message = "Update Success."
+                    };
+                }
+
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+            }
+        }
+
+        /// <summary>
+        /// RegistrationManagement/GetRegLiveStatusNotes 取得會員註記
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 1 })]
+        [HttpPost("Note/Get")]
+        public async Task<ApiResult<IEnumerable<CustRegLiveStatusNotes>>> GetNote(GetRegLiveStatusNoteRequest req)
+        {
+            var notes = await _registrationBll.GetRegLiveStatusNotes(req.CustId);
+            var apiResult = new ApiResult<IEnumerable<CustRegLiveStatusNotes>>
+            {
+                Data = notes,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// RegistrationManagement/AddRegLiveStatusNote 新增會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
         /// </remarks>
-        /// <param name="addCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_add_note" })]
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 5 })]
         [HttpPost]
-        public ApiResult AddRegLiveStatusNote(ApiRequestWithLog<AddRegLiveStatusNote> req)
+        [Route("Note/Add")]
+        public async Task<ApiResult> AddNote(AddRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.AddRegLiveStatusNote(req.CustId, req.Note, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.AddRegLiveStatusNote(new ParamsWithLog<AddRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -197,21 +191,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/DeleteRegLiveStatusNote 刪除會員註冊資料註記
+        /// RegistrationManagement/DeleteRegLiveStatusNote 刪除會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
         /// </remarks>
-        /// <param name="deleteCustNoteReq"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_delete_note" })]
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 4 })]
         [HttpPost]
-        public ApiResult DeleteRegLiveStatusNote(ApiRequestWithLog<DeleteRegLiveStatusNote> req)
+        [Route("Note/Delete")]
+        public async Task<ApiResult> DeleteNote(DeleteRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.DeleteRegLiveStatusNote(req.CustId, req.Id, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.DeleteRegLiveStatusNote(
-                    new ParamsWithLog<DeleteRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -224,20 +219,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// RegistrationManagement/EditRegLiveStatusNote 更新會員註冊資料註記
+        /// RegistrationManagement/EditRegLiveStatusNote 更新會員註記
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Edit] > [Submit]
         /// </remarks>
-        /// <param name="editRegLiveStatusNote"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"}, "rm_edit_note" })]
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost]
-        public ApiResult EditRegLiveStatusNote(ApiRequestWithLog<EditRegLiveStatusNote> req)
+        [Route("Note/Edit")]
+        public async Task<ApiResult> EditNote(EditRegLiveStatusNoteRequest req)
         {
+            var result = await _registrationBll.EditRegLiveStatusNote(req.CustId, req.Id, req.Note, User.Identity.Name);
             var apiResult = new ApiResult();
-            if (_custInfoBll.EditRegLiveStatusNote(new ParamsWithLog<EditRegLiveStatusNote>(req, User.Identity.Name)))
+            if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -248,25 +245,5 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             return apiResult;
         }
-
-        /// <summary>
-        /// RegistrationManagement/ExportRegLiveStatus 匯出會員註冊資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
-        /// </remarks>
-        /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { new[]{"CustManage/RegistrationManagement","Marketing/RegistrationForMarketing"} })]
-        [HttpPost]
-        public IActionResult ExportRegLiveStatusList(ExportRegLiveStatusListReq req)
-        {
-            var exportData = _custInfoBll.GetExportRegLiveStatus(JsonConvert.SerializeObject(req.SiteIds), req.CurrencyId, req.DepositStatus, req.Status, req.User, req.Sort, req.StartDate, req.EndDate, req.AffiliatesCode, req.AgentCodeType);
-            var stream = _excelBll.Export(exportData);
-            return _excelBll.ExcelFile(stream, "Registration");
-        }
-
-        #endregion
     }
 }

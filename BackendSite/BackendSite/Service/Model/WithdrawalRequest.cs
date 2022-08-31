@@ -56,10 +56,11 @@ namespace BackendSite.Service.Model
         public int VipLevel { set; get; }
         public string Operator { set; get; }
         public bool SameOperator { get; set; }
+        private string FromAccountDisplayName { set; get; }
         public string CalCode => WithdrawalType switch
         {
-            (int)enums.WithdrawalTypeEnum.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)enums.WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            (int)WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -219,6 +220,7 @@ namespace BackendSite.Service.Model
         public string LevelName { get; set; }
 
         public int Times { get; set; }
+        public decimal TotalWithdrawalMax { get; set; }
     }
     
     public class SetWithdrawalLimitInfo
@@ -228,6 +230,7 @@ namespace BackendSite.Service.Model
         public string VipLevelName { get; set; }
         public int WithdrawalMin { get; set; }
         public int WithdrawalMax { get; set; }
+        public int TotalWithdrawalMax { get; set; }
         [LogPropertyName("WithdrawalFrequency")]
         public int Times { get; set; }
     }

@@ -84,6 +84,38 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferAccount_Get";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
         }
+        
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _IsSetting = input.IsSetting,
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.StrCurrencyIds,
+                    _Channels = input.StrChannels,
+                    _Agent = input.Agent,
+                    _Status = input.StrStatus,
+                    _Purposes = input.StrPurposes,
+                    _SysIds = input.StrSysIds,
+                    _AccountNo = input.AccountNo,
+                    _Id = input.Id
+                });
+
+            var spName = "Admin_BankFinancialTransferAccount_Get_V2";
+            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
+        }
+
+        public IEnumerable<string> GetTransferAccountAgentList(int siteId)
+        {
+            var p = new DynamicParameters(
+                new
+                {
+                    _SiteId = siteId
+                });
+            
+            return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
+        }
 
         public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
@@ -100,19 +132,21 @@ namespace BackendSite.Service.DAL
                     _PayId = bankFinancialTransferAccount.PayId,
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
+                    _AccountCode = bankFinancialTransferAccount.AccountCode,
+                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
+                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
+                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_CreateTime = bankFinancialTransferAccount.CreateTime.DateTime,
                     _Creator = bankFinancialTransferAccount.Creator,
-                    //_UpdateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Ins_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_Ins_V3";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -133,17 +167,20 @@ namespace BackendSite.Service.DAL
                     _PayId = bankFinancialTransferAccount.PayId,
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
+                    _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
+                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
+                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_UpdateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V3";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -169,7 +206,6 @@ namespace BackendSite.Service.DAL
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
-                    //_OperateTime = bankFinancialTransferAccount.UpdateTime.DateTime,
                     _Operator = bankFinancialTransferAccount.Updator,
                     _Action = action
                 });
@@ -181,8 +217,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
         {
-            var SpName = "Admin_BankFinancialTransferAccount_GetForList";
+            var SpName = "Admin_BankFinancialTransferAccount_GetForList_V2";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
+        }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
+        {
+            var parameters = new DynamicParameters(new { _SiteId = siteId });
+            return _reportDbClient
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V2", parameters);
         }
 
         public int GetTransferDataCount(string accountNo)
@@ -270,6 +313,47 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferInfo_Get_V2";
             return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
         }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(GetTransferInfoListParams input,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _IsSetting = input.IsSetting,
+                    _IsExport = input.IsExport,
+                    _SiteId = input.SiteId,
+                    _TransferTypes = input.StrTransferTypes,
+                    _TransFromDate = input.StartTime.ToUniversalTime().DateTime,
+                    _TransToDate = input.EndTime.ToUniversalTime().DateTime,
+                    _FromCurrencyId = input.FromCurrencyId,
+                    _ToCurrencyId = input.ToCurrencyId,
+                    _FromAccountNo = input.FromAccountNo,
+                    _ToAccountNo = input.ToAccountNo,
+                    _FromChannel = input.FromChannel,
+                    _ToChannel = input.ToChannel,
+                    _Reason = input.Reason,
+                    _FromAgent = input.FromAgent,
+                    _ToAgent = input.ToAgent,
+                    _TransferId = input.TransferId,
+                    _StartIndex = startIndex,
+                    _PageSize = pageSize
+                });
+            
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_Get_V3", parameters);
+            
+            totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameters.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
 
         public int InsertTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
@@ -296,9 +380,7 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    //_CreateTime = bankFinancialTransferInfo.CreateTime.DateTime,
-                    _Creator = bankFinancialTransferInfo.Creator,
-                    //_UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
+                    _Creator = bankFinancialTransferInfo.Updator,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
@@ -477,7 +559,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<BankFinancialTransferInfoReceiptModel>(SpName, parameters);
         }
 
-        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
+        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic = null)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(

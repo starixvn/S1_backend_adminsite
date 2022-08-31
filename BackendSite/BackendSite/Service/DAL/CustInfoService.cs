@@ -241,6 +241,7 @@ namespace BackendSite.Service.DAL
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+
             return result;
         }
 
@@ -251,6 +252,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -1015,6 +1017,15 @@ namespace BackendSite.Service.DAL
 
             return WithdrawalLimitLogData;
         }
+        
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, string userNames)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_UserNames", userNames);
+
+            return _reportDbClient.QueryAsync<CustomerInfo>("Admin_CustInfo_GetList", props);
+        }
 
         public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
             int startIndex,
@@ -1037,8 +1048,7 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-        
-         public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
+        public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
             AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
 
@@ -1053,6 +1063,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", updater);
 
             return await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)

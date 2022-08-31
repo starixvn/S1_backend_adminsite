@@ -40,11 +40,11 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new DynamicParameters(new { isPayout }));
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new { isPayout, isNew });
         }
-        
+
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
@@ -253,6 +253,7 @@ namespace BackendSite.Service.DAL
         /// 取得促銷資料清單
         /// </summary>
         /// <param name="siteIds"></param>
+        /// <param name="currencyIds"></param>
         /// <param name="promotionTypes"></param>
         /// <param name="status"></param>
         /// <param name="startDate"></param>
@@ -267,7 +268,8 @@ namespace BackendSite.Service.DAL
         /// <param name="rowCount"></param>
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
-            string promotionTypes,
+            string currencyIds,
+            string promotionTypes,         
             int status,
             long startDate,
             long endDate,
@@ -282,6 +284,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
             p.Add("_PromotionTypes", promotionTypes);
             p.Add("_Status", status);
             p.Add("_StartDate", startDate);
@@ -295,7 +298,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V5", p);
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V6", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -351,6 +354,11 @@ namespace BackendSite.Service.DAL
 
                         s.RebateList = rebateList.Where(x => x.CurrencyId == s.CurrencyId);
                         s.CashBackList = tempCashBackList.Where(x => x.CurrencyId == s.CurrencyId);
+
+                        if (!string.IsNullOrEmpty(s.TierAmount))
+                        {
+                            s.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(s.TierAmount);
+                        }
                     }
                 }
             }
@@ -517,7 +525,7 @@ namespace BackendSite.Service.DAL
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
                     WinOver = specific.WinOver,
-                    FullFillType = specific.WinOver > 0 ? 2 : 1 ,
+                    FullFillType = specific.WinOver > 0 ? 2 : 1,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
                     MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
@@ -533,7 +541,8 @@ namespace BackendSite.Service.DAL
                     VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes)
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
-                    TotalUsageLimit = specific.TotalUsageLimit
+                    TotalUsageLimit = specific.TotalUsageLimit,
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]"
                 });
             }
 
@@ -738,6 +747,8 @@ namespace BackendSite.Service.DAL
             p.Add("_CategoryId", promotion.CategoryId);
             p.Add("_PeriodFrom", promotion.PeriodFromTime?.ToUnixTimeSeconds());
             p.Add("_PeriodTo", promotion.PeriodToTime?.ToUnixTimeSeconds());
+            p.Add("_DisplayFrom", promotion.DisplayFromTime?.ToUnixTimeSeconds() ?? promotion.PeriodFromTime?.ToUnixTimeSeconds());
+            p.Add("_DisplayTo", promotion.DisplayToTime?.ToUnixTimeSeconds() ?? promotion.PeriodToTime?.ToUnixTimeSeconds());
             p.Add("_ExpiryDays", promotion.ExpiryDays);
             p.Add("_Sort", promotion.Sort);
             p.Add("_Status", promotion.Status);

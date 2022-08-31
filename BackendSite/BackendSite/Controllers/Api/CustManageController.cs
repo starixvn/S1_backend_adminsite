@@ -1644,7 +1644,7 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    startTime,
                                                    endTime);
 
@@ -2663,7 +2663,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
-        
+
         #region CSD > Customer Administration > CustInfo > E Wallet Log
 
         /// <summary>

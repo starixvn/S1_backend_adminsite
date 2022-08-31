@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -83,12 +84,14 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal TotalTO { get; set; }
+        public decimal TotalTO { get; set; }  
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
 
     }
     public class TpBetRecordListOneDay
@@ -100,6 +103,7 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int BonusId { get; set; }
     }
     public class TpBetRecordListOneDayRes
     {
@@ -112,6 +116,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
     }
     public class TpBetRecordbyCategoryId
     {
@@ -119,9 +125,10 @@ namespace BackendSite.Service.Model
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
         public decimal TurnOver { get; set; }
-        public decimal ValidBet { get; set; }
+        public decimal? ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int CategoryId { get; set; }
     }
     public class TpBetRecordbyCategoryIdRes
     {
@@ -206,6 +213,7 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string Name { get; set; }
     }
+
     public class CheckBalanceAdjustData
     {
         public string BonusCode { get; set; }
@@ -216,6 +224,7 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
+        public int BonusType { get; set; }
     }
     public class BalanceAdjustBonusCodeBatchRep
     {
@@ -230,5 +239,79 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
         public string Currency { get; set; }
+    }
+
+    public class CheckPayoutBonusCodeRep
+    {
+        /// <summary>
+        /// Promotion類型
+        /// </summary>
+        public int PromotionType { get; set; }
+        /// <summary>
+        /// 紅利種類
+        /// 1 = Percentage,
+        /// 2 = Amount
+        /// </summary>
+        public int BonusType { get; set; }
+        public bool HasBonusCode { get; set; }
+        public string BonusCode { get; set; }
+        public decimal Bonus { get; set; }
+        public int RollOver { get; set; }
+        /// <summary>
+        /// Promotion的錢包類型：
+        /// 0 = Transfer Wallet
+        /// 1 = Seamless Wallet
+        /// </summary>
+        public int WalletType { get; set; }
+        public int TpId { get; set; }
+        public int CategoryId { get; set; }
+        public string Name { get; set; }
+        public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
+    }
+
+    public class CheckPayoutBonusCodeData
+    {
+        public int PromotionType { get; set; }
+        public string BonusCode { get; set; }
+        public decimal Bonus { get; set; }
+        public int RollOver { get; set; }
+        public int WalletType { get; set; }
+        public int TpId { get; set; }
+        public int CategoryId { get; set; }
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public string TierAmount { get; set; }
+        public int BonusType { get; set; }
+
+        public IEnumerable<TierAmount> TierAmountList
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(TierAmount))
+                {
+                    return default;
+                }
+
+                return JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(TierAmount);
+            }
+        }
+
+        public TierAmount CalculateTierAmount(decimal actualDeposit)
+        {
+            if (!TierAmountList.Any())
+            {
+                return null;
+            }
+
+            var tierAmountList = TierAmountList.OrderByDescending(i => i.RequiredAmount);
+            foreach (var item in tierAmountList)
+            {
+                if (actualDeposit >= item.RequiredAmount)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
     }
 }
