@@ -3099,5 +3099,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            var custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : _common.TpIdToCustId(custInfosReq.sabaId);
+
+            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
+
+            if (custInfosDetail != null)
+            {
+                if (custInfosDetail.Status == 1)
+                {
+                    apiResult.Data = custInfosDetail;
+                    apiResult.ErrorCode = 0;
+                }
+                else if (custInfosDetail.Status == 2)
+                {
+                    apiResult.Message = "Suspend Status.";
+                    apiResult.ErrorCode = 999;
+                }
+                else
+                {
+                    apiResult.Message = "Closed Status.";
+                    apiResult.ErrorCode = 999;
+                }
+            }
+            else
+            {
+                apiResult.Message = "No find";
+            }
+
+            return apiResult;
+        }
     }
 }
