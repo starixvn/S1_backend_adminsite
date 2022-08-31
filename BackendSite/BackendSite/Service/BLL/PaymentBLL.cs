@@ -249,7 +249,6 @@ namespace BackendSite.Service.BLL
                 result.CategoryId = balanceAdjustBonusCodeData.CategoryId;
                 result.Name = promoCategories == null ? string.Empty : promoCategories.Name;
                 result.WalletType = balanceAdjustBonusCodeData.WalletType;
-                result.TierAmountList = balanceAdjustBonusCodeData.TierAmountList;
             }
             else
             {
@@ -300,6 +299,35 @@ namespace BackendSite.Service.BLL
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
             return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+        }
+
+        public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
+        {   
+            var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
+            if (checkData == null)
+            {
+                return new CheckPayoutBonusCodeRep
+                {
+                    HasBonusCode = false
+                };
+            }
+
+            var promoCategories = _bonusManageService.GetPromoCategories(checkData.WalletType)
+                .FirstOrDefault(x => x.Id == checkData.CategoryId && x.TpId == checkData.TpId);
+            return new CheckPayoutBonusCodeRep
+            {
+                HasBonusCode = true,
+                BonusCode = bonusCode,
+                RollOver = checkData.RollOver,
+                Bonus = checkData.Bonus,
+                TpId = checkData.TpId,
+                CategoryId = checkData.CategoryId,
+                Name = promoCategories?.Name ?? string.Empty,
+                WalletType = checkData.WalletType,
+                TierAmountList = checkData.TierAmountList,
+                BonusType = checkData.BonusType,
+                PromotionType =checkData.PromotionType,            
+            };
         }
     }
 }

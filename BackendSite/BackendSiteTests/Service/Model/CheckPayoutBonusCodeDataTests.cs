@@ -1,20 +1,17 @@
 ﻿using BackendSite.Service.Model;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BackendSiteTests.Service.Model
 {
     [TestFixture()]
-    public class CheckBalanceAdjustDataTests
+    public class CheckPayoutBonusCodeDataTests
     {
-        private CheckBalanceAdjustData _checkBalanceAdjustData;
+        private CheckPayoutBonusCodeData _checkPayoutBonusCodeData;
 
         [SetUp]
         public void Setup()
         {
-            _checkBalanceAdjustData = new CheckBalanceAdjustData
+            _checkPayoutBonusCodeData = new CheckPayoutBonusCodeData
             {
                 TierAmount ="[{\"Bonus\":100,\"MaxBonus\":100,\"RequiredAmount\":100},{\"Bonus\":200,\"MaxBonus\":200,\"RequiredAmount\":200},{\"Bonus\":300,\"MaxBonus\":300,\"RequiredAmount\":300}]"
             };
@@ -27,6 +24,6 @@ namespace BackendSiteTests.Service.Model
         [TestCase(250, ExpectedResult = 200)]
         [TestCase(300, ExpectedResult = 300)]
         [TestCase(400, ExpectedResult = 300)]
-        public decimal? CalculateTierAmountTest(decimal actualDeposit) => _checkBalanceAdjustData.CalculateTierAmount(actualDeposit)?.Bonus;
+        public decimal? CalculateTierAmountTest(decimal actualDeposit) => _checkPayoutBonusCodeData.CalculateTierAmount(actualDeposit)?.Bonus;
     }
 }

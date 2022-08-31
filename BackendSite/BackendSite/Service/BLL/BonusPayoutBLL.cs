@@ -1,9 +1,4 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusPayoutController;
 
 namespace BackendSite.Service.BLL
@@ -12,6 +7,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly BonusPayoutService _bonusPayoutService;
         private readonly AdjustmentService _adjustmentService;
+
         public BonusPayoutBLL(IServiceProvider provider)
         {
             _bonusPayoutService = provider.GetRequiredService<BonusPayoutService>();
@@ -27,14 +23,14 @@ namespace BackendSite.Service.BLL
             };
 
             //get bonus detail
-            var tierRedepositBonus = _adjustmentService.CheckBalanceAdjustBonusCode(request.BonusCode, request.PromotionType, request.SiteId, request.CurrencyId);
+            var tierRedepositBonus = _adjustmentService.CheckPayoutBonusCode(request.BonusCode, request.SiteId, request.CurrencyId);
             if (tierRedepositBonus == null || !tierRedepositBonus.TierAmountList.Any())
             {
                 return result;
             }
             
             //check deposit
-            var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request);
+            var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request, tierRedepositBonus.PromotionType);
             if (!checkResult.IsSuccess)
             {
                 return result;
@@ -51,8 +47,6 @@ namespace BackendSite.Service.BLL
             result.BonusAmount = tierAmount.Bonus;
             result.LockAmount = tierAmount.RequiredAmount;
             result.RolloverAmount = tierAmount.RequiredAmount;
-
-
             result.IsSuccess = true;
             return result;
         }
