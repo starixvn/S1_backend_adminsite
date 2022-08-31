@@ -505,6 +505,12 @@ namespace BackendSite.Service.Model.enums
         StaticPage = 8,
         RetentionBonus = 9
     }
+    
+    public enum FullFillTypeEnum
+    {
+        RollOver = 1,
+        WinOver = 2
+    }
 
     public enum PromotionStatusEnum
     {
