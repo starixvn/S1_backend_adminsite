@@ -614,7 +614,7 @@ namespace BackendSite.Service.DAL
 
                 foreach (var specific in promotion.Specific)
                 {
-                    foreach (var cashBack in specific.CashBackList)
+                    foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
                     {
                         var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;
                         cashBackList.Add(new PromotionCashBackSetting
