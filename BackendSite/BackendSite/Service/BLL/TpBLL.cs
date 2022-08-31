@@ -15,6 +15,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly IMemoryCache _cache;
         private readonly int _balanceTimeoutSecond;
+   
 
         public TpBLL(IServiceProvider provider)
         {

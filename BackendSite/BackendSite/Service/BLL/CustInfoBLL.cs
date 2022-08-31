@@ -28,6 +28,9 @@ namespace BackendSite.Service.BLL
         private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly ICacheHelper _redisHelper;
+
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -48,6 +51,7 @@ namespace BackendSite.Service.BLL
             _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -956,6 +960,21 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount); ;
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
         }
     }
 }
