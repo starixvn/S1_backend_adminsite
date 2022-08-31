@@ -1059,5 +1059,14 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
+
+        public IEnumerable<BlockBankAcc> GetBankList(int custId)
+        {
+            return _reportDbClient.Query<BlockBankAcc>("Admin_CustBankDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
+        public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
+        {
+            return _reportDbClient.Query<BlockEWalletAcc>("Admin_CustEWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
     }
 }
