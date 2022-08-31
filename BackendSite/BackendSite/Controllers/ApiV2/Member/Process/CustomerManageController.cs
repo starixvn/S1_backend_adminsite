@@ -3055,6 +3055,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        #region CSD > Customer Administration > CustInfo > Bank list
+        public ApiListResult<BlockBankAcc> GetBankList(CustIdRequest request)
+        {
+            var BankList = _custInfoBll.GetBankList(request.CustId);
+            return new ApiListResult<BlockBankAcc>
+            {
+                Data = BankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet List
+        public ApiListResult<BlockEWalletAcc> GetEWalletList(CustIdRequest request)
+        {
+            var EWalletList = _custInfoBll.GetEWalletList(request.CustId);
+            return new ApiListResult<BlockEWalletAcc>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet Log
+        public ApiListResult<CustEWalletLog> GetEWalletLog(CustIdWithDateRangeAndPageRequest request)
+        {
+            var EWalletList = _custInfoBll.GetCustEWalletLogList(request.CustId,
+                request.PageSize,
+                request.PageNumber,
+                out var totalPages,
+                out var rowCount);
+            return new ApiListResult<CustEWalletLog>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount,
+                TotalPages = totalPages
+            };
+        }
+        #endregion
+
         #region Private Methods
 
         /// <summary>

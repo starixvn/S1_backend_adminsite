@@ -967,5 +967,15 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount); ;
         }
+
+        public IEnumerable<BlockBankAcc> GetBankList(int custId)
+        {
+            return _custInfoService.GetBankList(custId);
+        }
+
+        public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
+        {
+            return _custInfoService.GetEWalletList(custId);
+        }
     }
 }
