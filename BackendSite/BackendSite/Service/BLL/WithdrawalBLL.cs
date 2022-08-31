@@ -360,8 +360,7 @@ namespace BackendSite.Service.BLL
 
         public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            if (input.After.WithdrawalMax < 0
-                || input.After.TotalWithdrawalMax < 0
+            if (input.After.TotalWithdrawalMax < 0
                 || input.After.WithdrawalMin < 0
                 || input.After.Times < 0)
             {
@@ -649,9 +648,9 @@ namespace BackendSite.Service.BLL
 
         public bool AddCryptoWithdrawalLimit(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
-            if (input.After.WithdrawalMax < 0 || input.After.WithdrawalMin < 0)
+            if (input.After.WithdrawalMin < 0)
             {
-                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}, max: {input.After.WithdrawalMax}");
+                _logger.LogInformation($"Incorrect withdrawal limit min: {input.After.WithdrawalMin}");
                 return false;
             }
 
