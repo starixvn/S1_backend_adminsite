@@ -14,9 +14,11 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
-        public CheckTierRedepositBonusRep CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
+        public CheckTierRedepositBonusRep CheckTierRedepositBonus(CheckTierRedepositBonusReq request, int promotionType)
         {
-            return _mainDbClient.QueryFirst<CheckTierRedepositBonusRep>("Admin_CheckTierRedepositBonus_Get", new DynamicParameters(request));
+            var p = new DynamicParameters(request);
+            p.Add("PromotionType", promotionType);
+            return _mainDbClient.QueryFirst<CheckTierRedepositBonusRep>("Admin_CheckTierRedepositBonus_Get", p);
         }
     }
 }

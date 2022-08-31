@@ -51,7 +51,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int CustId { get; set; }
             public string BonusCode { get; set; }
-            public int PromotionType { get; set; }
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public string DepositId { get; set; }

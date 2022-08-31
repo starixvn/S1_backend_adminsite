@@ -81,7 +81,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public string BonusCode { get; set; }
-            public PromotionTypeEnum PromotionType { get; set; }
         }
 
         public class CheckBonusCodeForBatchRequest
@@ -158,18 +157,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// 
         /// Func Path：Finance > Balance Adjustment > [Submit] > [Check Bonus Code]
         /// 
-        /// Memo：當調整選項選擇為Retention Bonus或Manual Bonus，才需要有此步驟。
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<BalanceAdjustBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
+        public ApiResult<CheckPayoutBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
         {
-            var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
-            var data = _paymentBll.CheckBalanceAdjustBonusCode(request.BonusCode, (int) request.PromotionType,
-                request.SiteId, request.CurrencyId);
-            apiResult.Data = data;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
+            return new ApiResult<CheckPayoutBonusCodeRep>
+            { 
+                Data = _paymentBll.CheckPayoutBonusCode(request.BonusCode, request.SiteId, request.CurrencyId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
