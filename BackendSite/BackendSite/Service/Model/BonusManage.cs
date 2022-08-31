@@ -376,10 +376,18 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
     }
 
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
+    }
+
     public class TierAmount
     {
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public decimal RequiredAmount { get; set; }
     }
+
+
 }
