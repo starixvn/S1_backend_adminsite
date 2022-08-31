@@ -32,6 +32,9 @@ namespace BackendSite.Service.BLL
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
 
+        private readonly ICacheHelper _redisHelper;
+
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -54,6 +57,7 @@ namespace BackendSite.Service.BLL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -976,6 +980,21 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
         {
             return _custInfoService.GetEWalletList(custId);
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
         }
     }
 }
