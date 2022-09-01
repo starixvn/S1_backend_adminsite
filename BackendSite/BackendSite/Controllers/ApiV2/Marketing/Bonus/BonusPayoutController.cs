@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BonusPayoutController : ControllerBase
@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Finance  > BonusPayout > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 127, 5 })]
         [HttpPost]
         public async Task<ApiResult> SetBonusPayout(BonusPayoutReq request)
         {
@@ -158,9 +158,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Finance  > BonusPayout > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 127, 5 })]
         [HttpPost]
-        public async Task<ApiResult<CheckTierRedepositBonusRep>> CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
+        public ApiResult<CheckTierRedepositBonusRep> CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
         {
             return new ApiResult<CheckTierRedepositBonusRep>()
             {         
