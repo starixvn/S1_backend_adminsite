@@ -26,6 +26,16 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferTpWallet(int custId)
+        {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId
+            }); 
+            return await _reportDbClient.QueryAsync<TpWallet>("Admin_TransferTpWalletInfo_Get", p);
+        }
+        
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
             string TransId,
             DateTimeOffset startDate,
