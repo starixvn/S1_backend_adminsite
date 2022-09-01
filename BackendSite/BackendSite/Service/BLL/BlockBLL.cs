@@ -20,11 +20,9 @@ namespace BackendSite.Service.BLL
             _tools = provider.GetRequiredService<Tools>();
             
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
+        public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
         {
-            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), Math.Abs(pageSize), out totalPages, out rowCount);
-            return result;
+            return await _blockService.GetBlockIPList(ip, startDate, endDate, pageNumber, Math.Abs(pageSize));
         }
         public async Task<int> SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
         {
@@ -59,10 +57,6 @@ namespace BackendSite.Service.BLL
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
             return _blockService.BlockAccountSet(input);
-        }
-        private IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _blockService.GetIPCountryList();
         }
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {

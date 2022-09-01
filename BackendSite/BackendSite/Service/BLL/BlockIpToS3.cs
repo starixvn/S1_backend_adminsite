@@ -16,7 +16,7 @@ public class BlockIpToS3
     {
         _s3Helper = s3Helper;
         _blockService = blockService;
-        _fileName = env.IsProduction() ? "blockIp.txt" : "blockIp_test.txt";
+        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "blockIp.txt" : "blockIp_test.txt";
         _folder = Path.Combine(env.ContentRootPath, "NginxConfig");
     }
     public async Task<int> Upload(string ip)
