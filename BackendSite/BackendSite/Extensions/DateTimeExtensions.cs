@@ -8,6 +8,10 @@
                dt >= startDate && dt <= endDate :
                dt.Date >= startDate.Date && dt.Date <= endDate.Date;
         }
+        public static DateTime FromUnixTimeSeconds(this long unixTime)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
+        }
 
         public static DateTime UnixToDateTime(long unixTime)
         {
@@ -19,7 +23,7 @@
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
 
-        public static IEnumerable<string> GetPartitionRange(this DateTime startDate, DateTime endDate)
+        public static IEnumerable<string> GetDailyPartitionRange(this DateTime startDate, DateTime endDate)
         {
             var result = new List<string>();
             while (startDate.Date <= endDate.Date)
@@ -41,15 +45,26 @@
             {
                 string.Empty,
             };
-            while (startDate.EarlierThan(endDate)) 
+            while (startDate.EarlierThan(endDate))
             {
-                result.Add($"_{startDate.GetPartitionKey()}");
+                result.Add($"_{startDate.GetMonthlyPartitionKey()}");
                 startDate = startDate.AddMonths(1);
-            }        
+            }
             return result;
         }
 
-        public static string GetPartitionKey(this DateTime partitionTime)
+        public static IEnumerable<string> GetMonthlyPartitionRange(this DateTime startDate, DateTime endDate)
+        {
+            var result = new List<string>();
+            while (startDate.EarlierThan(endDate))
+            {
+                result.Add(startDate.GetMonthlyPartitionKey());
+                startDate = startDate.AddMonths(1);
+            }
+            return result;
+        }
+
+        public static string GetMonthlyPartitionKey(this DateTime partitionTime)
         {
             return partitionTime.ToString("yyyyMM");
         }
@@ -67,6 +82,9 @@
             return start <= end;
         }
 
-
+        public static DateTime GetMonthBeginning(this DateTime datetime)
+        {
+            return new DateTime(datetime.Year, datetime.Month, 1);
+        }
     }
 }

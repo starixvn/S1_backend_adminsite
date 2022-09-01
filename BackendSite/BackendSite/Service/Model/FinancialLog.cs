@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model
     public class FinancialLog
     {
         private DateTimeOffset _createTime { get; set; }
-        public int Id { get; set; }
+        public long Id { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
