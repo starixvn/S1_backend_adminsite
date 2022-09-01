@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -72,6 +73,12 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             return referralManagementService.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+        }
+        
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
+        {
+            var custReferralPageData = await referralManagementService.GetReferralCustList(siteId, userName, currencyId, startDate, endDate, pageSize, pageNumber, orderByProperty, orderByDirection);
+            return custReferralPageData;
         }
         
         public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)

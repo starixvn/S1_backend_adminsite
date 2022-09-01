@@ -381,6 +381,32 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+
+        public async Task<PromotionResponseWrapper> GetPromotionListByCustIdAndDateAsync(CustIdWithDateRangeAndPageRequest request)
+        {
+            var result = await _promotionService.GetPromotionListByCustIdAndDateAsync(request);
+            if (result.PromotionList != null)
+            {
+                foreach (var promotion in result.PromotionList)
+                {
+                    if (promotion.BonusInfoStatus == 1 || promotion.BonusInfoStatus == 5)
+                    {
+                        promotion.custRollOver = _rolloverService.GetCustRollOver(request.CustId, promotion.BonusCode);
+                        if (promotion.BonusInfoStatus == 5)
+                        {
+                            promotion.BonusInfoStatus = 1;
+                        }
+                    }
+                    else
+                    {
+                        promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0, TurnOver = 0 };
+                    };
+
+                }
+            }
+            return result;
+        }
+
         #region
 
         #endregion
