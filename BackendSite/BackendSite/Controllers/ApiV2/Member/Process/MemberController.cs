@@ -7,23 +7,69 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
-namespace BackendSite.Controllers.ApiV2.Member.Process;
-
-[Authorize(AuthenticationSchemes = "backendV2")]
-[Route("apiV2/[controller]/[action]")]
-[ApiController]
-public class MemberController : ControllerBase
+namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    private readonly ICustomerBLL _customerBll;
-    private readonly ICustPhotoIdBLL _custPhotoIdBll;
-
-    public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll)
+    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Route("apiV2/[controller]/[action]")]
+    [ApiController]
+    public class MemberController : ControllerBase
     {
-        _customerBll = customerBll;
-        _custPhotoIdBll = custPhotoIdBll;
-    }
-    
-    /// <summary>
+        private readonly ICustomerBLL _customerBll;
+        private readonly ICustPhotoIdBLL _custPhotoIdBll;
+        private readonly CustInfoBLL _custInfoBll;
+        private readonly ServerInfoBLL _serverInfoBll;
+
+        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        {
+            _customerBll = customerBll;
+            _custPhotoIdBll = custPhotoIdBll;
+            _custInfoBll = custInfoBll;
+            _serverInfoBll = serverInfoBll;
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
+        [HttpPost]
+        public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
+        {
+            var apiResult = new ApiListResultCurrencyAmount<PromotionDto>();
+            try
+            {
+                var queryResult = await _custInfoBll.GetPromotionListByCustIdAndDateAsync(request);
+                apiResult.Data = queryResult.PromotionList;
+                apiResult.PageNumber = queryResult.PageNumber;
+                apiResult.TotalPages = queryResult.TotalPages;
+                apiResult.RowCount = queryResult.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 49 })]
+        [HttpPost]
+        public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
+        {
+            var apiResult = new ApiResult();
+            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            const string menu = "CustManage/CustInfoList";
+            var info = new Dictionary<string, dynamic>
+            {
+                { "MenuName", "Customer Info" },
+                { "Action", "Cancel Bonus" }
+            };
+            _serverInfoBll.AdminOperateLog(null, request.CustId, menu, ActionType.Update, info, User.Identity.Name);
+
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            return apiResult;
+        }
+        
+        /// <summary>
     /// Member/GetCustomerBasicInfo 取得客戶基本資料
     /// </summary>
     /// <remarks>
@@ -127,5 +173,6 @@ public class MemberController : ControllerBase
             Data = data
         };
         return apiResult;
+    }
     }
 }
