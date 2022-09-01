@@ -55,7 +55,7 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.BlockAccountSet(input);
         }
-        public IEnumerable<IPCountry> GetIPCountryList()
+        private IEnumerable<IPCountry> GetIPCountryList()
         {
             return _blockService.GetIPCountryList();
         }
