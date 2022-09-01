@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -16,6 +17,8 @@ namespace BackendSite.Service.BLL
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly BonusInfoBLL _bonusInfoBLL;
+        private readonly PartitionService _partitionService;
+        private readonly ICacheHelper _cacheHelper;
 
         public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
         {
@@ -26,6 +29,8 @@ namespace BackendSite.Service.BLL
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _bonusInfoBLL = provider.GetRequiredService<BonusInfoBLL>();
+            _partitionService = provider.GetRequiredService<PartitionService>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -33,11 +38,40 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime? startDate, DateTime? endDate, string refTransId,
-            int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId,
+            int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
-            return walletService.GetFinancialLog(custId, startDate, endDate, refTransId, pageSize, ref pageNumber,
-                out totalPages, out rowCount);
+            pageInfo = new PageInfo();
+            var key = $"FinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}:{refTransId}";
+            var cacheTime = TimeSpan.FromMinutes(15);
+
+            if (_cacheHelper.KeyExists(key))
+            {
+                //Redis Pagination
+                var total = (int)_cacheHelper.GetListLength(key);
+                var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
+                return _cacheHelper.GetListByRange<FinancialLog>(key, startIndex, endIndex);
+            }
+
+            //Search range table
+            var parameters = new
+            {
+                CustId = custId,
+                StartDate  = startDate,
+                EndDate = endDate,
+                RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
+            };
+            var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Admin_FinancialLogList_Get_V4", parameters);
+            var list = data.OrderByDescending(i => i.Id).ToList();
+
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(key, cacheTime, list);
+            });
+
+            var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
+            return list.GetRange(index, count);
         }
 
         public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,

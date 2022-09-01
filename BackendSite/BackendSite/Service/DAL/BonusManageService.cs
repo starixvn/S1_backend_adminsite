@@ -483,10 +483,9 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedDelConditionRow"></param>
         /// <returns></returns>
         public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion,
-            List<PromotionDisplayConditionModel> promotionDisplayConditionList, int expectedDelSpecificRow,
-            int expectedDelRebateRow, int expectedDelConditionRow, string Operator, DisplayConditionAboutVipLevel vipLevelCondition)
+            List<PromotionDisplayConditionModel> promotionDisplayConditionList, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -504,6 +503,8 @@ namespace BackendSite.Service.DAL
                 trans.Rollback();
                 return false;
             }
+            
+            var isUpdate = setAffectCount == 2;
 
             //Setp:inset AdjustmentinfoLog
             #region
@@ -525,19 +526,16 @@ namespace BackendSite.Service.DAL
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
                     WinOver = specific.WinOver,
-                    FullFillType = specific.WinOver > 0 ? 2 : 1,
+                    FullFillType = specific.WinOver > 0 ? (int)FullFillTypeEnum.WinOver : (int)FullFillTypeEnum.RollOver,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
-                    MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,
+                    MaxBonus = specific.BonusType == (int)BonusTypeEnum.Amount ? specific.Bonus : specific.MaxBonus,
                     Status = specific.Status,
                     Usage = specific.Usage,
                     Details = specific.Details,
                     RequiredAmount = specific.RequiredAmount,
                     LockedType = specific.LockedType,
                     MinPayout = specific.MinPayout,
-                    VN_AffIds = !string.IsNullOrEmpty(specific.VN_AffIds)
-                        ? JsonConvert.SerializeObject(specific.VN_AffIds.Split(","))
-                        : null,
                     VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes)
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
@@ -554,10 +552,9 @@ namespace BackendSite.Service.DAL
             }
 
             //Step2-2:If Update,Delete old Promotion Specific
-            if (setAffectCount == 2)
+            if (isUpdate)
             {
                 DeletePromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList,
-                    expectedDelSpecificRow,
                     conn, trans);
             }
 
@@ -573,26 +570,25 @@ namespace BackendSite.Service.DAL
             }
 
             //Step3-2:If Update,Delete old Promotion Display Condition
-            if (setAffectCount == 2)
+            if (isUpdate)
             {
                 DeletePromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList,
-                    expectedDelConditionRow,
                     conn, trans);
             }
 
-            if (promotion.PromotionType == 6)
+            if (promotion.PromotionType == (int)PromotionTypeEnum.Rebate)
             {
                 var rebateList = new List<PromotionRebate1>();
-                foreach (var s in promotion.Specific)
+                foreach (var specific in promotion.Specific)
                 {
-                    foreach (var r in s.RebateList)
+                    foreach (var rebate in specific.RebateList)
                     {
                         rebateList.Add(new PromotionRebate1
                         {
-                            CurrencyId = s.CurrencyId,
-                            GameType = r.GameType,
-                            Percentage = r.Percentage,
-                            Status = r.Status,
+                            CurrencyId = specific.CurrencyId,
+                            GameType = rebate.GameType,
+                            Percentage = rebate.Percentage,
+                            Status = rebate.Status,
                         });
                     }
                 }
@@ -605,45 +601,47 @@ namespace BackendSite.Service.DAL
                 }
 
                 //Step4-2:If Update,Delete old Rebate
-                if (setAffectCount == 2)
+                if (isUpdate)
                 {
-                    DeletePromotionRebate(promotion.BonusCode, promotion.SiteId, rebateList, expectedDelRebateRow,
-                        conn, trans);
+                    DeletePromotionRebate(promotion.BonusCode, promotion.SiteId, rebateList, conn, trans);
                 }
             }
 
-            if (promotion.PromotionType == 7)
+            if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
             {
                 var cashBackList = new List<PromotionCashBackSetting>();
                 var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList(); ;
 
-                foreach (var s in promotion.Specific)
+                foreach (var specific in promotion.Specific)
                 {
-                    foreach (var r in s.CashBackList)
+                    foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
                     {
-                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == r.GameType).CategoryId : r.GameType;
-                        vipLevelCondition.SelectedVipLevel.ToList().ForEach(x =>
+                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;
+                        cashBackList.Add(new PromotionCashBackSetting
                         {
-                            cashBackList.Add(new PromotionCashBackSetting
-                            {
-                                CurrencyId = s.CurrencyId,
-                                CategoryId = tempCategoryId,
-                                Level = x,
-                                Percentage = r.Percentage,
-                                LossAmount = r.LossAmount,
-                                Status = r.Status,
-                                TpId = promotion.TpId == 0 ? r.GameType : promotion.TpId
-                            });
+                            CurrencyId = specific.CurrencyId,
+                            CategoryId = tempCategoryId,
+                            Level = 0,//0代表包含所有 VIP 等級
+                            Percentage = cashBack.Percentage,
+                            LossAmount = cashBack.LossAmount,
+                            Status = cashBack.Status,
+                            TpId = promotion.TpId == 0 ? cashBack.GameType : promotion.TpId
                         });
                     }
                 }
-                if (setAffectCount == 2)
+
+                if (isUpdate && !DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId, conn, trans))
                 {
-                    DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId,
-                        conn, trans);
+                    trans.Rollback();
+                    return false;
                 }
-                InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList,
-                    conn, trans);
+
+                if (!InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList, conn,
+                        trans))
+                {
+                    trans.Rollback();
+                    return false;
+                }
             }
 
             trans.Commit();
@@ -812,8 +810,7 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
-            int expectedRow,
+        private int DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -829,7 +826,7 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedRow;
+            return affectCount;
         }
 
         /// <summary>
@@ -870,8 +867,7 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DeletePromotionRebate(string bonusCode, int siteId, List<PromotionRebate1> rebateList,
-            int expectedRow,
+        private int DeletePromotionRebate(string bonusCode, int siteId, List<PromotionRebate1> rebateList,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -887,7 +883,7 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedRow;
+            return affectCount;
         }
 
         /// <summary>
@@ -929,9 +925,8 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DeletePromotionDisplayCondition(string bonusCode, int siteId,
+        private int DeletePromotionDisplayCondition(string bonusCode, int siteId,
             List<PromotionDisplayConditionModel> conditionData,
-            int expectedRow,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -947,7 +942,7 @@ namespace BackendSite.Service.DAL
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
-            return affectCount == expectedRow;
+            return affectCount;
         }
 
         /// <summary>
@@ -1103,7 +1098,7 @@ namespace BackendSite.Service.DAL
             return connection.Execute("Admin_PromotionCashBack_Del", p, transaction, commandType: CommandType.StoredProcedure) > 0;
         }
 
-        private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbacklist,
+        private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbackList,
             MySqlConnection connection,
             MySqlTransaction transaction)
         {
@@ -1112,7 +1107,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
             p.Add("_Operator", Operator);
-            p.Add("_CashBackList", JsonConvert.SerializeObject(cashbacklist));
+            p.Add("_CashBackList", JsonConvert.SerializeObject(cashbackList));
 
             return connection.Execute("Admin_PromotionCashBack_Set", p, transaction, commandType: CommandType.StoredProcedure) > 0;
         }

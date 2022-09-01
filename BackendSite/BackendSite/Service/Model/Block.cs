@@ -1,11 +1,24 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
-    public class Block
+    public class GetBlockIPListRequest : ApiRequestPageModel
     {
+        public string IP { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
     }
+    public class BlockIPPageData
+    {
+        public IEnumerable<BlockIP> BlockIP { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
     public class BlockIP
     {
         public string IP { get; set; }
