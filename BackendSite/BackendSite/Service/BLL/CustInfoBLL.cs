@@ -28,6 +28,7 @@ namespace BackendSite.Service.BLL
         private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly BlockBLL _blockBLL;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -48,6 +49,7 @@ namespace BackendSite.Service.BLL
             _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _blockBLL = provider.GetRequiredService<BlockBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -940,6 +942,25 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
         {
             return _custInfoService.GetEWalletList(custId);
+        }
+
+        public IEnumerable<CustLoginLog> GetIPLog(int custId)
+        {
+            var result =  _custInfoService.GetIPLog(custId);
+            if (result != null)
+            {
+                var ipCountryList = _blockBLL.GetIPCountryList().ToList();
+                result.ToList().ForEach(x =>
+                {
+                    var ip = _tools.getIpNum(x.LoginIp);
+                    var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
+                    if (location != null)
+                    {
+                        x.Location = location.Country;
+                    }
+                });
+            }
+            return result;
         }
     }
 }
