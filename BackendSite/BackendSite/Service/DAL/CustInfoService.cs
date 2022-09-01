@@ -1079,5 +1079,9 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BlockEWalletAcc>("Admin_CustEWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
         }
+        public IEnumerable<CustLoginLog> GetIPLog(int custId)
+        {
+            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { CustId = custId }));
+        }
     }
 }
