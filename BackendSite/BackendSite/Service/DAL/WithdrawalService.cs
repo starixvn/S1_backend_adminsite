@@ -500,6 +500,10 @@ namespace BackendSite.Service.DAL
                                 {
                                     specialResult = SetWithdrawalAccounting(transId,accountingModelString,userId,conn,trans) > 0 ? 1 : 0;
                                 }
+                                else
+                                {
+                                    specialResult = 1;
+                                }
                                 
                                 break;
                             
