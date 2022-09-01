@@ -21,4 +21,11 @@ public class CustomerService : ICustomerService
         p.Add("_CustId", custId);
         return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get", p);
     }
+
+    public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustId(int custId)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        return await _sqlClienct.QueryAsync<CustomerLoginIp>("Admin_CustLoginIp_Get", p);
+    }
 }

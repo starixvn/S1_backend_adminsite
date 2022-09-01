@@ -15,23 +15,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     public class MemberController : ControllerBase
     {
         private readonly ICustomerBLL _customerBll;
+        private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly CustPhotoIdBLL _custPhotoIdBll;
         private readonly ServerInfoBLL _serverInfoBll;
 
-        public MemberController(ICustomerBLL customerBll, CustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll,
-            ServerInfoBLL serverInfoBll)
+        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
         {
             _customerBll = customerBll;
-            _custInfoBll = custInfoBll;
             _custPhotoIdBll = custPhotoIdBll;
+            _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
         [HttpPost]
-        public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(
-            CustIdWithDateRangeAndPageRequest request)
+        public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
         {
             var apiResult = new ApiListResultCurrencyAmount<PromotionDto>();
             try
@@ -175,6 +173,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        /// <summary>
+        /// Member/GetIpList 取得會員登入過的Ip
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Member Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
+        {
+            var data = await _customerBll.GetIpListByCustId(request.CustId);
+            var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = data
+            };
             return apiResult;
         }
     }
