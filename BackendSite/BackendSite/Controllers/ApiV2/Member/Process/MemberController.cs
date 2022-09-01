@@ -14,11 +14,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     {
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
 
-        public MemberController(CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+
+        public MemberController(CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll)
         {
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _newAuthorizeBll = newAuthorizeBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -60,6 +63,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _serverInfoBll.AdminOperateLog(null, request.CustId, menu, ActionType.Update, info, User.Identity.Name);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<ApiListResult<TpAdjustmentLogV2>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequestV2 request)
+        {
+            var apiResult = new ApiListResult<TpAdjustmentLogV2>();
+
+            try
+            {
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var result = await _custInfoBll.GetCustAdjustmentTpLogV2(request, siteId);
+                apiResult.Data = result.Data;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.RowCount = result.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
             return apiResult;
         }
     }
