@@ -75,6 +75,7 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
