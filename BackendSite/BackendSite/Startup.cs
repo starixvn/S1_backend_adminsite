@@ -83,6 +83,8 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ICustomerBLL, CustomerBLL>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
+            services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();

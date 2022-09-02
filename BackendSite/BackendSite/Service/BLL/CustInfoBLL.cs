@@ -890,7 +890,7 @@ namespace BackendSite.Service.BLL
         public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
         {
             var result = custInfoDetailForExport;
-            var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
+            var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
             if (sabaWallet != null)
@@ -906,7 +906,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
         {
-            return await _tpBll.GetTpWalletAsync(custId);
+            return await _tpBll.GetTransferTpWalletWithCacheAsync(custId);
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)

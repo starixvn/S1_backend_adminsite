@@ -302,46 +302,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public bool ExportTransferWallet { get; set; } = false;
         }
 
-        public class ExportCustInfoListRequest
-        {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? BirDate { get; set; }
-            public int? BirMonth { get; set; }
-            public int? BirYear { get; set; }
-            public string UserName { get; set; }
-            public string AccountName { get; set; }
-            public string LoginIp { get; set; }
-            public string TransId { get; set; }
-            public string TpUserName { get; set; }
-            public string Email { get; set; }
-            public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
-            public string BankAccountNumber { get; set; }
-            public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
-        }
-
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
@@ -548,6 +508,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
         {
+            public IEnumerable<TpWallet> TpWalletList { get; set; }
+        }
+        
+        public class GetCustTPWalletResult
+        {
+            public decimal TotalTpWalletBalance { get; set; }
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
 
@@ -3031,16 +2997,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpWallet>>> GetCustTPWalletAsync(CustIdRequest request)
+        public async Task<ApiResult<GetCustTPWalletResult>> GetCustTPWalletAsync(CustIdRequest request)
         {
+            var wallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
 
-            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
-
-            return new ApiResult<IEnumerable<TpWallet>>
+            return new ApiResult<GetCustTPWalletResult>
             {
-                Data = custTPWallet,
+                Data = new GetCustTPWalletResult
+                {
+                    TotalTpWalletBalance = wallet.Sum(x => x.Balance),
+                    TpWalletList = wallet
+                },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

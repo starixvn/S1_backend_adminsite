@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int CustId { get; set; }
             public decimal Amount { get; set; }
             public string Memo { set; get; }
-            public string BounsCode { get; set; }
+            public string BonusCode { get; set; }
             public int RollOver { get; set; }
             public PromotionTypeEnum PromotionType { get; set; }
             public string DepositId { get; set; }
@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var detailInfo = new
                 {
                     UserName = custInfo.UserName,
-                    BonusCode = request.BounsCode,
+                    BonusCode = request.BonusCode,
                     Memo = request.Memo,
                     Amount = request.Amount,
                     PromotionType = request.PromotionType.ToString(),
@@ -121,7 +121,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var setAdjustBonusReq = new SetAdjustBonusReq()
                 {
                     CustId = custInfo.CustId,
-                    BonusCode = request.BounsCode,
+                    BonusCode = request.BonusCode,
                     Memo = request.Memo,
                     Operator = authData.UserName,
                     Amount = request.Amount,
