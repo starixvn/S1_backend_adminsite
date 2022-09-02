@@ -1,15 +1,8 @@
-﻿using BackendSite.Extensions;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Dapper;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 
 namespace BackendSite.Service.BLL
@@ -19,10 +12,7 @@ namespace BackendSite.Service.BLL
         #region Fields
 
         private readonly ReportService reportService;
-        private readonly SelLangBLL selLangBLL;
         private readonly Common _common;
-        private readonly PartitionService _partitionService;
-        private readonly ICacheHelper _cacheHelper;
 
         #endregion
 
@@ -31,10 +21,7 @@ namespace BackendSite.Service.BLL
         public ReportBLL(IServiceProvider provider)
         {
             reportService = provider.GetRequiredService<ReportService>();
-            selLangBLL = provider.GetRequiredService<SelLangBLL>();
             _common = provider.GetRequiredService<Common>();
-            _partitionService = provider.GetRequiredService<PartitionService>();
-            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #endregion
@@ -942,63 +929,5 @@ namespace BackendSite.Service.BLL
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
         
-        public List<BetListReport> GetBetListReport(GetBetListRequest input, out int totalPages, out int rowCount)
-        {          
-            totalPages = 0;
-            rowCount = 0;
-            var key = $"BetList:{input.GetRedisKey()}";
-
-            if (_cacheHelper.KeyExists(key))
-            {
-                //Export
-                if (input.PageNumber == -1)
-                {
-                    return _cacheHelper.GetListByRange<BetListReport>(key, 0, input.PageNumber);
-                }
-
-                //Pagination
-                var total = (int)_cacheHelper.GetListLength(key);
-                totalPages = (int)Math.Ceiling(total / (float)input.PageSize);
-                rowCount = total;
-                var startIndex = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
-                var endIndex = startIndex + input.PageSize <= total ? startIndex + input.PageSize : total;
-                return _cacheHelper.GetListByRange<BetListReport>(key, startIndex, endIndex - 1);
-            }
-
-            //Search range table
-            input.VIPlevel = input.VIPlevel == 1 ? null : input.VIPlevel;
-            var StartDate = input.StartTime.ToUniversalTime().DateTime;
-            var EndDate = input.EndTime.ToUniversalTime().DateTime;
-            var parameters = new DynamicParameters(input);
-            parameters.AddDynamicParams(new
-            {
-                SiteIdJson = JsonConvert.SerializeObject(input.SiteIds),
-                CurrencyIdJson = JsonConvert.SerializeObject(input.CurrencyIds),
-                TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
-                StartDate,
-                EndDate,
-            });
-
-            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
-
-            // Add Cache by List      
-            _ = Task.Run(() =>
-            {
-                _cacheHelper.InsertList(key, TimeSpan.FromMinutes(15), data.OrderByDescending(i => i.SettledTime));
-            });
-
-            //Export
-            if (input.PageNumber == -1 || data.Count == 0)
-            {
-                return data;
-            }
-
-            //Pagination
-            totalPages = (int)Math.Ceiling(data.Count / (float)input.PageSize);
-            rowCount = data.Count;
-            var index = (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize);
-            var count = index + input.PageSize <= data.Count ? input.PageSize : data.Count - index;
-            return data.GetRange(index, count);
-        }
     }
 }

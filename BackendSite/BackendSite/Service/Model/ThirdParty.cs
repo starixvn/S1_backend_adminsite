@@ -1,6 +1,4 @@
 ﻿using BackendSite.Service.Model.enums;
-using System;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -33,6 +31,7 @@ namespace BackendSite.Service.Model
         public string Operator { set; get; }
         public string Remarks { set; get; }
         public int Category { set; get; }
+        public int DepositId { set; get; }
     }
     public class TpTransferInfo
     {
@@ -92,6 +91,12 @@ namespace BackendSite.Service.Model
         public string ThirdId { get; set; }
         public decimal Difference { get; set; }
     }
+    
+    public class AdjustWalletResult:TransferResult
+    {
+        public string TransId { get; set; }
+    }
+    
     public enum TransferStatus
     {
         Success = 0, Fail = 1, Pending = 2, PendingD = 3

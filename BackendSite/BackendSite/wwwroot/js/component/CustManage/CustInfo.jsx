@@ -9,6 +9,7 @@ import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
+import { TpAdjustmentInfo } from './CustInfo_TpAdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import { CryptoWalletLog } from './CustInfo_CryptoWalletLog.jsx';
@@ -22,6 +23,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import Tag from './Tag/index';
 import { NewPagination } from '../commJS/NewPagination.jsx';
 import WithdrawalLimitLog from './WithdrawalLimitLog/index';
+import {EWalletLog} from './CustInfo_EWalletLog.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -2107,13 +2109,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "E Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag", "3rd Adjustment Info"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         _isShowRewardBotton = { SMS: false, EMAIL: false };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton),isTempTPWallet:false };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton),isTempTPWallet:false, EWalletLogData :[] };
         }
 
         onTab(idx, tabName) {
@@ -2363,6 +2365,36 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         let result = response.data;
                         if (result.errorCode == 0) {
                             this.setState({ AdjustmentInfoData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
+        GetTpAdjustmentInfoByCust(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.TpAdjustmentInfoData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.TpAdjustmentInfo;
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Tp/GetCustTpAdjustmentLog',{
+                    StartTime: UTCStartDate,
+                    EndTime: UTCEndDate, 
+                    TpId: 0, 
+                    CustId: iCustId, 
+                    PageNumber: pageNumber
+                })
+                    .then(function (response) {
+                        //console.log(response);
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ TpAdjustmentInfoData: result });
                         } else {
                             alert(result.message);
                         }
@@ -2852,6 +2884,28 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     }.bind(this));
             }
         }
+
+        GetEWalletLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                Loading.OnLoading();
+                axios.post('/api/CustManage/GetEWalletLog', { CustId: iCustId })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ EWalletLogData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
+
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
@@ -2876,7 +2930,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 dataContainer = <WithdrawalLimitLog />
             } else if (TabName == this._Tabs[9]) {
                 dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[10]) {
+            }  else if (TabName == this._Tabs[10]) {
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[11]) {
                 dataContainer = <ResetPwd />;
@@ -2893,13 +2947,17 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             } else if (TabName == this._Tabs[17]) {
                 dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
             } else if (TabName == this._Tabs[18]) {
-                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <EWalletLog GetEWalletLog={this.GetEWalletLog.bind(this)} searchData={this.state.EWalletLogData}/>
             } else if (TabName == this._Tabs[19]) {
-                dataContainer = <VipLevel />
+                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[20]) {
-                dataContainer = <PromotionReport />
+                dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[21]) {
+                dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[22]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
+            } else if (TabName == this._Tabs[23]) {
+                dataContainer = <TpAdjustmentInfo GetTpAdjustmentInfoByCust={this.GetTpAdjustmentInfoByCust.bind(this)} searchData={this.state.TpAdjustmentInfoData} TpAdjustmentInfo={this.state.TpAdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             let authSubKeys = {

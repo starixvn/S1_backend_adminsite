@@ -2,12 +2,7 @@
 using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.Library
 {

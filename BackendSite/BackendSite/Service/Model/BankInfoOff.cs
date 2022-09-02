@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using BackendSite.Service.Model;
-using Google.Protobuf.WellKnownTypes;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class BankInfoOff
     {
