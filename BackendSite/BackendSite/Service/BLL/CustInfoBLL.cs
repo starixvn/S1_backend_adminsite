@@ -996,5 +996,18 @@ namespace BackendSite.Service.BLL
                     TpUserName = r.TpUserName
                 });
         }
+
+        public IEnumerable<CustLoginLog> GetIPLog(int custId)
+        {
+            var result =  _custInfoService.GetIPLog(custId);
+            if (result != null)
+            {
+                result.ToList().ForEach(x =>
+                {
+                    x.IsBlock = !string.IsNullOrWhiteSpace(x.UpdateOperator);
+                });
+            }
+            return result;
+        }
     }
 }

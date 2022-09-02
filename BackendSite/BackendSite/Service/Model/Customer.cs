@@ -681,4 +681,21 @@ namespace BackendSite.Service.Model
         public string EWalletName { set; get; }
         public DateTimeOffset CreateTime { set; get; }
     }
+
+    public class CustLoginLog 
+    {
+        private DateTimeOffset _loginTime { get; set; }
+        public string LoginIp { set; get; }
+        public string UpdateOperator { set; get; }
+        public string Memo { set; get; }
+        public bool IsBlock { get; set; }
+        public string Location { set; get; }
+        public int Count { get; set; }
+        public DateTimeOffset LoginTime
+        {
+            get => _loginTime;
+            set => _loginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+
 }
