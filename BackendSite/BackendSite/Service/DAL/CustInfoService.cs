@@ -1070,7 +1070,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<CustLoginLog> GetIPLog(int custId)
         {
-            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { CustId = custId }));
+            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { _CustId = custId }));
         }
     }
 }
