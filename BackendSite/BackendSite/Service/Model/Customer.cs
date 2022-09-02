@@ -690,6 +690,7 @@ namespace BackendSite.Service.Model
         public string Memo { set; get; }
         public bool IsBlock { get; set; }
         public string Location { set; get; }
+        public int Count { get; set; }
         public DateTimeOffset LoginTime
         {
             get => _loginTime;
