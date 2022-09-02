@@ -1,5 +1,4 @@
-﻿using System;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -15,7 +14,20 @@ namespace BackendSite.Service.Model
         public DateTime UpdateTime { get; set; }
         public string LastOperator { get; set; }
     }
-    
+
+    public class LineChannelViewModel
+    {
+        public int Id { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public string Link { get; set; }
+        public int Status { get; set; }
+        public DateTime CreateTime { get; set; }
+        public DateTime UpdateTime { get; set; }
+        public string LastOperator { get; set; }
+    }
+
     public class SetLineChannel
     {
         [LogIgnore]
@@ -23,7 +35,6 @@ namespace BackendSite.Service.Model
         public string Link { get; set; }
         [LogIgnore]
         public LineChannelStatusEnum Status { get; set; }
-        public string StatusName => Status.ToString();
     }
     
     public class DeleteLineChannel

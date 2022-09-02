@@ -1,0 +1,100 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得客戶資料及主錢包餘額
+POST {{url}}/apiV2/CustomerManage/GetCustInfoWithBalance HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "userName": "anisetestmyr01",
+    "sabaId": ""
+}
+
+###
+# 取得調帳原因
+POST {{url}}/apiV2/BalanceAdjustment/GetReasonList HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得調帳類型
+POST {{url}}/apiV2/BalanceAdjustment/GetAdjustmentType HTTP/1.1
+Content-Type: application/json
+
+
+###
+# 主錢包調帳送出
+# withdrawalLimitOption 1: checked, 0: unchecked
+# transId: Deposit Id，reasonId=9 才需要帶
+POST {{url}}/apiV2/BalanceAdjustment/Submit HTTP/1.1
+Content-Type: application/json
+
+{
+    "custId": 643973,
+    "adjustmentType": 3,
+    "amount": 20,
+    "withdrawalLimitAmount": 0,
+    "withdrawalLimitOption": 0,
+    "memo": "test",
+    "reasonId": 9,
+    "transId": "DD1401280",
+}
+
+###
+# 主錢包批次調帳送出(用postman打吧)
+POST {{url}}/apiV2/BalanceAdjustment/SubmitBatch
+Content-Type: multipart/form-data
+
+siteId | Number
+adjustmentType | Number | 調帳類型
+withdrawalLimitAmount | Number | 提款限額倍數
+withdrawalLimitOption | Number | 選項，是否增加提款限額
+excelUpload | File | Excel檔案
+reasonId | Number | 調帳原因 Id
+
+
+###
+# 取得客戶資料、主錢包餘額及三方錢包餘額
+POST {{url}}/apiV2/CustomerManage/GetCustInfoWithTpBalance HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "userName": "anisetestinr01",
+    "sabaId": ""
+}
+
+###
+# 三方錢包調帳送出
+# option: 1: Add, 2: Minus
+# transId: Deposit Id，reasonId=9 才需要帶
+POST {{url}}/apiV2/TpFundsAdjustment/Submit HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "custId": 643973,
+    "tpId": 1,
+    "tpName": "Saba",
+    "userName": "anisetestmyr01",
+    "option": 1,
+    "amount": 20,
+    "memo": "test",
+    "reasonId": 9,
+    "transId": "DD1401280",
+}

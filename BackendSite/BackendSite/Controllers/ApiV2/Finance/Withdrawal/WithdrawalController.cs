@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -14,8 +10,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
@@ -94,6 +88,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public IEnumerable<int> LevelStatuses { get; set; }
             public int AmountType { get; set; }
             public string Amount { get; set; }
+            public WithdrawalMethodEnum WithdrawalMethod { get; set; }
         }
 
         public class GetByTransIdRequest
@@ -161,10 +156,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var totalPages = 0;
             var rowCount = 0;
             var CurrencyAmount = new List<string>();
+            var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
                 request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
-                request.WithdrawalId, request.UserName, request.CurrencyIds,
-                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber, out totalPages,
+                request.WithdrawalId, userNames , request.CurrencyIds,
+                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber,request.WithdrawalMethod
+                , out totalPages,
                 out rowCount, ref CurrencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -190,8 +187,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         [HttpPost]
         public IActionResult Export(GetListRequest request)
         {
-
-            var data = _withdrawalBll.GetWithdrawalExportList(JsonConvert.SerializeObject(request.SiteIds),
+            List<WithdrawalInfoForExportData> exportData = new List<WithdrawalInfoForExportData>();
+            var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(JsonConvert.SerializeObject(request.SiteIds),
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
@@ -201,7 +198,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 JsonConvert.SerializeObject(request.Statuses),
                 JsonConvert.SerializeObject(request.LevelStatuses),
                 request.AmountType,
-                request.Amount);
+                request.Amount,
+                request.WithdrawalMethod);
 
             //foreach (var item in data)
             //{
@@ -212,7 +210,54 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             //        item.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
             //}
 
-            var stream = _excelBll.ExportV2(data);
+            foreach (var data in exportWithdrawal)
+            {
+                if (!string.IsNullOrWhiteSpace(data.EWalletName))
+                {
+                    int length = data.AccountNo.Length;
+                    int rightLength = length - 4;
+                    if (rightLength > 0)
+                    {
+                        data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
+                    }
+                }
+
+                exportData.Add(new WithdrawalInfoForExportData()
+                {
+                    WithdrawalId = data.WithdrawalId,
+                    TransId = data.TransId,
+                    WithdrawalType = Enum.GetName(typeof(WithdrawalTypeEnum), data.WithdrawalType),
+                    CustId = data.CustId,
+                    UserName = data.UserName,
+                    NetWork = data.NetWork,
+                    CryptoAmount = data.CryptoAmount,
+                    CurrencyId = data.CurrencyName,
+                    IsTest = data.IsTest,
+                    Amount = data.Amount,
+                    BankName = !string.IsNullOrWhiteSpace(data.EWalletName) ? data.EWalletName : data.BankName,
+                    BankCode = data.BankCode,
+                    AccountNo = data.AccountNo,
+                    AccountName = data.AccountName,
+                    CreateTime = data.CreateTime,
+                    Status = data.Status,
+                    SiteName = data.SiteName,
+                    FromBankName = data.FromBankName,
+                    FromBankCode = data.FromBankCode,
+                    FromAccountNo = data.FromAccountNo,
+                    FromAccountName = data.FromAccountName,
+                    PayName = data.PayName,
+                    RefId = data.RefId,
+                    CalCode = data.CalCode,
+                    IsKyc = data.IsKyc,
+                    IsRisk = data.IsRisk,
+                    WithdrawlCnt = data.WithdrawlCnt,
+                    Operator = data.Operator,
+                    UpdateTime = data.UpdateTime,
+                    FlowEndTime = data.FlowEndTime
+                });
+            }
+
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WithdrawalRequestList");
         }
 

@@ -1,27 +1,20 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
     public class ReferralManagementService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public ReferralManagementService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -30,23 +23,20 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
+        
+        public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
+        {
+            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
+                new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
+        }
+        
         public void SetReferral(List<ReferralManagement> referralList)
         {
             var para = new List<ReferralList>();
             referralList.ForEach(x =>
             {
-                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.VaildBet) && !string.IsNullOrWhiteSpace(x.Deposit))
+                if (!string.IsNullOrWhiteSpace(x.PeriodDays) && !string.IsNullOrWhiteSpace(x.BonusAmount) && !string.IsNullOrWhiteSpace(x.ValidBet) && !string.IsNullOrWhiteSpace(x.Deposit))
                 {
-                    //原本的寫法改用新的連線方式會有問題，先用迴圈Set
-                    //para.Add(new ReferralList
-                    //{
-                    //    SiteId = x.SiteId,
-                    //    CurrencyId = x.CurrencyId,
-                    //    PeriodDays = int.Parse(x.PeriodDays),
-                    //    BonusAmount = decimal.Parse(x.BonusAmount),
-                    //    VaildBet = decimal.Parse(x.VaildBet),
-                    //    Deposit = decimal.Parse(x.Deposit)
-                    //});
                     var param = new DynamicParameters(
                     new
                     {
@@ -54,18 +44,41 @@ namespace BackendSite.Service.DAL
                         CurrencyId = x.CurrencyId,
                         PeriodDays = int.Parse(x.PeriodDays),
                         BonusAmount = decimal.Parse(x.BonusAmount),
-                        VaildBet = decimal.Parse(x.VaildBet),
+                        ValidBet = decimal.Parse(x.ValidBet),
                         Deposit = decimal.Parse(x.Deposit)
                     });
                     _mainDbClient.Execute("Admin_Referral_Set", param);
                 }
-                //_mainDbClient.Execute("Admin_Referral_Set", new DynamicParameters(para));
             });
         }
-        public void SetReferralStatus(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
         {
-            _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+            var p = new DynamicParameters();
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_BonusAmount", setReferralRequest.BonusAmount);
+            p.Add("_InvitationLimit", setReferralRequest.InvitationLimit);
+            p.Add("_AgentValidBet", setReferralRequest.AgentValidBet);
+            p.Add("_AgentDeposit", setReferralRequest.AgentDeposit);
+            p.Add("_ReferralFreeCredit", setReferralRequest.ReferralFreeCredit);
+            p.Add("_ValidBet", setReferralRequest.ValidBet);
+            p.Add("_Deposit", setReferralRequest.Deposit);
+            p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
+
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
+        
+        public int SetReferralStatus(int siteId, int currencyId, int status)
+        {
+            return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+        }
+        
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        {
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
+        }
+
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             string SelectSite = null;
@@ -82,13 +95,38 @@ namespace BackendSite.Service.DAL
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.Query<ReferralCustList>("Admin_ReferralCustlist_Get_V2", p, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<ReferralCustList>("Admin_ReferralCustlist_Get_V2", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
+        }
+        
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection )
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_UserName", userName);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_OrderByProperty", orderByProperty);
+            p.Add("_OrderByDirection", (int)orderByDirection);
+            p.Add("_PageSize", Math.Abs(pageSize));
+            p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<ReferralCustList>("Admin_ReferralCustlist_Get_V3", p);
+            var referralCustData = new ReferralCustListPageData()
+            {
+                ReferralCustList = data,
+                PageSize = pageSize,
+                PageNumber = p.Get<int?>("_PageNumber") ?? 0,
+                TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+                TotalCount = p.Get<int?>("_RowCount") ?? 0
+            };
+            return referralCustData;
         }
         
         public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
@@ -109,7 +147,6 @@ namespace BackendSite.Service.DAL
             bool byRewardTime)
         {
             var SpName = string.Empty;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             if (byRewardTime)
             {
                 SpName = "Admin_ReferralFriendListByRewardTime_Get";

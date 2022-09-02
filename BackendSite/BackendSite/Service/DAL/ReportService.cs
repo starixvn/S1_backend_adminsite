@@ -1,15 +1,9 @@
-﻿using System;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -229,6 +223,63 @@ namespace BackendSite.Service.DAL
 
             var spName = "Admin_TpBetFailureRecordForExport_Get_V2";
             var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+
+            return result;
+        }
+        
+        public IEnumerable<RewardBonusReportModel> GetRewardBonusReport(GetListInput input,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                    _BaseCurrencyId = input.BaseCurrencyId,
+                    _UserName = input.UserName,
+                    _TpUserName = input.TpUserName,
+                    _TransId = input.TransId,
+                    _EventTypeId = input.EventTypeId,
+                    _BonusCode = input.BonusCode,
+                    _EventName = input.EventNames != null ? JsonConvert.SerializeObject(input.EventNames) : null,
+                    _StartDate = input.StartDate,
+                    _EndDate = input.EndDate,
+                    _PageSize = input.PageSize,
+                    _StartIndex = input.StartIndex
+                });
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var spName = "Admin_RewardBonusReport_Get";
+            var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
+            rowCount = parameters.Get<int>("_RowCount");
+            totalPages = parameters.Get<int>("_TotalPages");
+
+            return result;
+        }
+        
+        public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
+        {
+            var parameters = new DynamicParameters( 
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                    _BaseCurrencyId = input.BaseCurrencyId,
+                    _UserName = input.UserName,
+                    _TpUserName = input.TpUserName,
+                    _TransId = input.TransId,
+                    _EventTypeId = input.EventTypeId,
+                    _BonusCode = input.BonusCode,
+                    _EventName = input.EventNames != null ? JsonConvert.SerializeObject(input.EventNames) : null,
+                    _StartDate = input.StartDate,
+                    _EndDate = input.EndDate,
+                });
+            
+            var spName = "Admin_RewardBonusReport_Export";
+            var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
+           
 
             return result;
         }

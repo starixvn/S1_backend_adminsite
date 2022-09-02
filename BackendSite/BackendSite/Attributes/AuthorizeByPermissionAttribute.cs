@@ -1,14 +1,9 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 
 namespace BackendSite.Attributes
