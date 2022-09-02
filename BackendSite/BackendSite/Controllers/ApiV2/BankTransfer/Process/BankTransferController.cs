@@ -65,15 +65,7 @@ public class BankTransferController : ControllerBase
             data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
         }
 
-        return new ApiListResult<BankFinancialTransferInfoTransDetailModel>
-        {
-            Data = result,
-            PageNumber = pageInfo.PageNumber,
-            RowCount = pageInfo.RowCount,
-            TotalPages = pageInfo.TotalPages,
-            ErrorCode = (int) ErrorCodeEnum.Success,
-            PageRange = pageInfo.PageRange
-        };
+        return new ApiListResult<BankFinancialTransferInfoTransDetailModel>(ErrorCodeEnum.Success, pageInfo, result);
     }
 
     /// <summary>
