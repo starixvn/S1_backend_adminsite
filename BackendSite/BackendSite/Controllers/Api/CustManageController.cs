@@ -1848,8 +1848,8 @@ namespace BackendSite.Controllers.Api
                     case PromotionTypeEnum.WalletBonus:
                     case PromotionTypeEnum.Rebate:
                     case PromotionTypeEnum.Cashback:
-                    case PromotionTypeEnum.StaticPage:
-                    case PromotionTypeEnum.RetentionBonus:
+                    case PromotionTypeEnum.SpecialBonus:
+                    case PromotionTypeEnum.RetentionFreeBet:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;

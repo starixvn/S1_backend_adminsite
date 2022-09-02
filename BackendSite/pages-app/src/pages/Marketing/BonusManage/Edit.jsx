@@ -92,27 +92,7 @@ export default props => {
 						for (let f_key in state[key][c_key]) {
 							if (skipField.includes(f_key)) continue;
 							let column = state[key][c_key][f_key];
-							if (f_key === "tpGames" && (state.promotionType == 6)) {
-								if (Object.keys(state[key][c_key][f_key]).length === 0) {
-									alert(
-										`${window.i18n[`lbl_Currency${c_key}`]
-										} Please open at least one TpGame.` );
-									checked = false;
-									break;
-								}
-								for (let t_key in state[key][c_key][f_key]) {
-									let tpcolumn = state[key][c_key][f_key][t_key];
-									if (Boolean(tpcolumn?.status) && !Boolean(tpcolumn?.percentage)) {
-										alert(
-											`${window.i18n[`lbl_Currency${c_key}`]
-											}'s ${f_key} ${tpcolumn.gameName} percentage does not allow null.`
-										);
-										checked = false;
-										break;
-									}
-								}
-							}
-							else if(f_key === "cashbackGames" && state.promotionType == 7){
+							if(f_key === "cashbackGames" && state.promotionType == 7){
 								if (Object.keys(state[key][c_key][f_key]).length === 0) {
 									alert(
 										`${window.i18n[`lbl_Currency${c_key}`]
@@ -267,17 +247,6 @@ export default props => {
 		});
 	};
 
-	const EditTpGameCategoryValue = (currencyId, gameName, gameType, value, dataColumn) => {
-		dispatch({
-			type: defActionType.CURRENCY_SET_TpGame_VALUE,
-			value,
-			dataColumn,
-			currencyId,
-			gameName,
-			gameType
-		});
-	};
-
 	const EditCashbackGameCategoryValue = (currencyId, gameName, gameType, value, dataColumn) => {
 		dispatch({
 			type: defActionType.CURRENCY_SET_CashBackGame_VALUE,
@@ -370,7 +339,6 @@ export default props => {
 					GetPromoCategories,
 					SelectTpId,
 					EditCurrencyAmountValue,
-					EditTpGameCategoryValue,
 					EditOnlyRegisteredValue,
 					EditAutoExtendValue,
 					EditForVipLevelValue,
