@@ -28,6 +28,7 @@ namespace BackendSite.Service.BLL
         private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly WinLostReportService _winLostReportService;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -48,6 +49,7 @@ namespace BackendSite.Service.BLL
             _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _winLostReportService = provider.GetRequiredService<WinLostReportService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -953,6 +955,12 @@ namespace BackendSite.Service.BLL
                 });
             }
             return result;
+        }
+
+        public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
+        {
+           var AllGameType =  _winLostReportService.GetAllGameType().ToList();
+           return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
     }
 }
