@@ -8,19 +8,17 @@ namespace BackendSite.Service.BLL
     public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
         private readonly LiveRegistrationService _registrationService;
-        private readonly AdjustmentLogReportService _adjustmentLogReportService;
-        private readonly ILogger<LiveRegistrationBLL> _logger;
         
-        public LiveRegistrationBLL(LiveRegistrationService registrationService, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationBLL> logger)
+        public LiveRegistrationBLL(LiveRegistrationService registrationService)
         {
             _registrationService = registrationService;
-            _adjustmentLogReportService = adjustmentLogReportService;
-            _logger = logger;
         }
 
-        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
+        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int siteId, int currency, int depositStatus, 
+            int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, 
+            string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
         {
-            var (dormantFrequency, dormantType) = Getdormant(dormantUser);
+            var (dormantFrequency, dormantType) = GetDormant(dormantUser);
             
             var searchResult = await _registrationService.GetRegLiveStatusData(siteId, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantFrequency, dormantType, callOutStatus, dateType);
             var regLiveStatus = searchResult.RegLiveStatusData.Select(a => new LiveRegistration()
@@ -37,6 +35,7 @@ namespace BackendSite.Service.BLL
                 DepositStatus = a.ActStatus,
                 Status = a.Status,
                 RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
                 UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
             });
             return new LiveRegistrationResponse()
@@ -47,14 +46,7 @@ namespace BackendSite.Service.BLL
                 RowCount = searchResult.RowCount
             };
         }
-
-        private (int dormantFrequency, int dormantType) Getdormant(int dormantUser)
-        {
-            var frequency = dormantUser / 10;
-            var type = dormantUser % 10;
-            return (frequency, type);
-        }
-
+        
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
             return await _registrationService.GetRegLiveStatus(custId);
@@ -137,6 +129,13 @@ namespace BackendSite.Service.BLL
                 var datetime = timeOffset.ToOffset(timezone).DateTime;
                 return $"{datetime:yyyy-MM-dd HH:mm:ss}-{n}";
             }).ToList();
+        }
+        
+        private (int dormantFrequency, int dormantType) GetDormant(int dormantUser)
+        {
+            var frequency = dormantUser / 10;
+            var type = dormantUser % 10;
+            return (frequency, type);
         }
     }
 }

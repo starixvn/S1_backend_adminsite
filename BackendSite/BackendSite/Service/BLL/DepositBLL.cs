@@ -319,6 +319,12 @@ namespace BackendSite.Service.BLL
         {
             return depositService.EditDepositLimitInfo(input);
         }
+
+        public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
+        {
+            var currentUpperPoint = depositService.GetDepositLimitInfo(siteId, depositType ,currencyId, vipLevel);
+            return currentUpperPoint;
+        }
         
         public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {

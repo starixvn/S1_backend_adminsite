@@ -40,15 +40,16 @@ namespace BackendSite.Service.Model.ApiModel
         /// <param name="pageNumber">資料頁數</param>
         /// <param name="pageSize">每頁數量</param>
         /// <returns></returns>
-        public (int index, int count) ListPagination(int totalCount, int pageNumber, int pageSize)
+        public (int startIndex, int count) ListPagination(int totalCount, int pageNumber, int pageSize)
         {
             //Pagination
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
             RowCount = totalCount;
             PageNumber = pageNumber;
-            var (pageRange, index, count) = pageNumber.GetPageRangeInfo(pageSize, totalCount);
-            PageRange = pageRange;
-            return (index, count);
+            var startIndex = pageNumber.GetStartIndex(pageSize).StartIndex;
+            var count = startIndex + pageSize <= totalCount ? pageSize : totalCount - startIndex;
+            PageRange = $"{startIndex + (totalCount == 0 ? 0 : 1)}-{startIndex + count}";
+            return (startIndex, count);
         }
 
         /// <summary>
@@ -64,9 +65,9 @@ namespace BackendSite.Service.Model.ApiModel
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
             RowCount = totalCount;
             PageNumber = pageNumber;
-            var startIndex = (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize);
+            var startIndex = pageNumber.GetStartIndex(pageSize).StartIndex;
             var endIndex = startIndex + pageSize <= totalCount ? startIndex + pageSize : totalCount;
-            PageRange = $"{startIndex + 1}-{endIndex}";
+            PageRange = $"{startIndex + (totalCount == 0 ? 0 : 1)}-{endIndex}";
             return (startIndex, endIndex - 1);
         }
     }

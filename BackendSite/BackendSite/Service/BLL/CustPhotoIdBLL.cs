@@ -1,6 +1,7 @@
 ﻿using Amazon.S3.Model;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -8,7 +9,7 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL;
 
-public class CustPhotoIdBLL
+public class CustPhotoIdBLL : ICustPhotoIdBLL
 {
     private readonly ImageEditorBLL _imageEditorBll;
     private readonly CustInfoBLL _custInfoBll;
