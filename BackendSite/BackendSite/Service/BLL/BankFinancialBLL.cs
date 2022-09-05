@@ -555,12 +555,12 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(
             GetTransferInfoListParams input, int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
-            var (startIndex, absPageSize) = pageNumber.GetStartIndex(pageSize);
+            pageInfo = new PageInfo();
+            var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
             var result =
-                _bankFinancialService.GetFinancialTransferInfoList(input, startIndex, pageSize, out var totalPages, out var rowCount);
+                _bankFinancialService.GetFinancialTransferInfoList(input, startIndex, pageSize, out _, out var rowCount);
 
-            pageInfo = new PageInfo(pageNumber, pageSize, totalPages, rowCount);
-            
+            pageInfo.SetPageInfo(rowCount, pageNumber, pageSize);
             return result;
         }
         

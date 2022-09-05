@@ -190,8 +190,6 @@ namespace BackendSite.Service.Model
         public int BonusType { get; set; }
         public decimal MaxBonus { get; set; }
         public string Details { get; set; }
-        [Obsolete("rebate移至其他地方，此參數不需要")]
-        public IEnumerable<PromotionRebate> RebateList { get; set; }
         public int Status { get; set; }
         public decimal RequiredAmount { get; set; }
         /// <summary>
@@ -199,8 +197,6 @@ namespace BackendSite.Service.Model
         /// </summary>
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
-        [Obsolete("VN_AffIds是舊欄位目前都寫到新欄位VN_AffCodes")]
-        public string VN_AffIds { get; set; }
         public string VN_AffCodes { get; set; }
         public int TotalUsageLimit { get; set; }
         public IEnumerable<PromotionCashBack> CashBackList { get; set; }
@@ -240,10 +236,6 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
     }
 
-    public class PromotionRebate1 : PromotionRebate
-    {
-        public int CurrencyId { get; set; }
-    }
     public class PromotionCashBack1 : PromotionCashBack 
     {
         public int CurrencyId { get; set; }

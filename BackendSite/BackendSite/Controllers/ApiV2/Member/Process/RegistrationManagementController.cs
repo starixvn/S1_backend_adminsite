@@ -38,8 +38,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             
             var searchResult = await _registrationBll.GetRegLiveStatusData(request.SiteId,
-                request.CurrencyId, request.DepositStatus, request.Status
-                , request.UserName, request.PageNumber, request.PageSize, request.Sort,
+                request.CurrencyId, request.DepositStatus, request.Status,
+                request.UserName, request.PageNumber, request.PageSize, request.Sort,
                 startTime, endTime, request.AffiliatesCode, request.AgentCodeType,
                 request.DormantUser, request.CallOutStatus, request.DateType, request.StartDate.Offset);
             
@@ -172,8 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 5 })]
-        [HttpPost]
-        [Route("Note/Add")]
+        [HttpPost("Note/Add")]
         public async Task<ApiResult> AddNote(AddRegLiveStatusNoteRequest req)
         {
             var result = await _registrationBll.AddRegLiveStatusNote(req.CustId, req.Note, User.Identity.Name);
@@ -200,8 +199,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 4 })]
-        [HttpPost]
-        [Route("Note/Delete")]
+        [HttpPost("Note/Delete")]
         public async Task<ApiResult> DeleteNote(DeleteRegLiveStatusNoteRequest req)
         {
             var result = await _registrationBll.DeleteRegLiveStatusNote(req.CustId, req.Id, User.Identity.Name);
@@ -228,8 +226,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
-        [HttpPost]
-        [Route("Note/Edit")]
+        [HttpPost("Note/Edit")]
         public async Task<ApiResult> EditNote(EditRegLiveStatusNoteRequest req)
         {
             var result = await _registrationBll.EditRegLiveStatusNote(req.CustId, req.Id, req.Note, User.Identity.Name);
