@@ -31,10 +31,8 @@ namespace BackendSite.Service.BLL
         private readonly MySqlClient _mainDbClient;
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
-
         private readonly ICacheHelper _redisHelper;
-
-
+        private readonly WinLostReportService _winLostReportService;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -58,6 +56,7 @@ namespace BackendSite.Service.BLL
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _winLostReportService = provider.GetRequiredService<WinLostReportService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -1008,6 +1007,12 @@ namespace BackendSite.Service.BLL
                 });
             }
             return result;
+        }
+
+        public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
+        {
+           var AllGameType =  _winLostReportService.GetAllGameType().ToList();
+           return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
     }
 }
