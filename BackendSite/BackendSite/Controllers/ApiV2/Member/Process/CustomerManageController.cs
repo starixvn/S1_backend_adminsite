@@ -523,6 +523,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CurrencyId { get; set; }
         }
 
+        public class GetGameTypeListRequset
+        {
+            public IEnumerable<int> TPCategoryList { get; set; }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -2417,7 +2421,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         [HttpPost]
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
@@ -3084,6 +3087,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Turnover
+        public ApiListResult<GameType> GetGameTypeList(GetGameTypeListRequset request)
+        {
+            var GameTypeList = _custInfoBll.GetGameTypeList(request.TPCategoryList);
+            return new ApiListResult<GameType>
+            {
+                Data = GameTypeList,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
