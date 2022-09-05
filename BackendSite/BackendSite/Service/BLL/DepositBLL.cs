@@ -231,7 +231,7 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             var result = depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null);
 
-            //InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
+            InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
             
             return result;
         }
