@@ -97,9 +97,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         [HttpPost]
         public ApiResult Create(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
+            var apiResult = new ApiResult();
+            
+            foreach (var input in req.After)
+            {
+                var currentUpperPoint = _depositBll.GetDepositLimitInfo(req.SiteId, (int)input.DepositType, req.CurrencyId, (int)input.VipLevel);
+                if (currentUpperPoint != null)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = _selLangBll.GetMsg("msg_DuplicateData");
+                    return apiResult;
+                }
+            }
+           
             var result =
                 _depositBll.AddDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
-            var apiResult = new ApiResult();
+           
             if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
