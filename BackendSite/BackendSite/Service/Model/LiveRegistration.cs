@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int ActStatus { get; set; }
         public DateTime RegTime { get; set; }
+        public DateTime LastActiveTime { get; set; }
         public string AccountName { get; set; }
         public int CustId { get; set; }
         public int SiteId { get; set; }
@@ -81,6 +82,7 @@ namespace BackendSite.Service.Model
         public string PhoneNo { get; set; }
         public int PhoneVerified { get; set; }
         public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset LastActiveTime { get; set; }
         public int DepositStatus { get; set; }
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }

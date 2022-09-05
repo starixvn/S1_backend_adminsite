@@ -43,6 +43,7 @@ namespace BackendSite.Service.BLL
                 DepositStatus = a.ActStatus,
                 Status = a.Status,
                 RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
                 UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
             });
             return new LiveRegistrationResponse()
