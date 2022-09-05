@@ -100,25 +100,22 @@ namespace BackendSite.Service.BLL
         {
             return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
         }
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
+        public IEnumerable<ExportLiveRegistration> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
         {
-            var list = new List<RegLiveStatusExport>();
-            var result = _registrationService.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType,dormantUser, callOutStatus, dateType);
+            var (dormantFrequency, dormantType) = GetDormant(dormantUser);
+            
+            var list = new List<ExportLiveRegistration>();
+            var result = _registrationService.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType,dormantFrequency, dormantType, callOutStatus, dateType);
             result.ToList().ForEach(x =>
             {
-                list.Add(new RegLiveStatusExport()
+                list.Add(new ExportLiveRegistration()
                 {
-                    Site = x.SiteName,
-                    Currency = x.Currency,
                     UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
+                    RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
-                    AffCode = x.AffCode,
-                    Agent = x.Agent
+                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, timezone)
                 });
             });
             return list;

@@ -183,9 +183,9 @@ namespace BackendSite.Service.BLL
             return editResult;
         }
 
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
+        public IEnumerable<ExportLiveRegistration> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
         {
-            return _liveRegistration.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType);
+            return _liveRegistration.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType, timezone);
         }
     }
 }

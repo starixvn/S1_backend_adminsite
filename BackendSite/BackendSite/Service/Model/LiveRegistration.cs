@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BackendSite.Attributes;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
@@ -55,6 +56,15 @@ namespace BackendSite.Service.Model
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public int Sort { get; set; }
+    }
+    public class ExportLiveRegistration
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public string PhoneNo { get; set; }
+        public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult
     {

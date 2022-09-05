@@ -16,6 +16,6 @@ namespace BackendSite.Service.BLL.Interface
         Task<int> AddRegLiveStatusNote(int custId, string note, string @operator);
         Task<int> DeleteRegLiveStatusNote(int custId, int id, string @operator);
         Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator);
-        IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType);
+        IEnumerable<ExportLiveRegistration> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone);
     }
 }
