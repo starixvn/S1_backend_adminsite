@@ -931,5 +931,10 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount); ;
         }
+        
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+        }
     }
 }

@@ -1059,5 +1059,14 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
+        
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_CurrencyId", currencyId);
+            
+            return await _reportDbClient.QueryFirstAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get", p);
+        }
     }
 }

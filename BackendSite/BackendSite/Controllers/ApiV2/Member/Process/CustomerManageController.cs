@@ -502,6 +502,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public decimal TotalTpWalletBalance { get; set; }
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
+        
+        public class GetTodayDashboardRequest
+        {
+            public int CustId { get; set; }
+            public int CurrencyId { get; set; }
+        }
 
         #endregion
 
@@ -2949,6 +2955,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
                     
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
+            };
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result =
+                await _custInfoBll.GetCustDashBoardTodayAsync(request.CustId, custInfo.CurrencyId);
+
+            return new ApiResult<CustDashBoardTodayModel>
+            {
+                ErrorCode = (int) ErrorCodeEnum.Success,
+                Data = result
             };
         }
 
