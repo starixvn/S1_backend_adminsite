@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -18,6 +18,18 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public string AffCode { get; set; }
         public string Agent { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+    }
+    public class ExportRegLiveStatusData
+    {
+        public string UserName { get; set; }
+        public int ActStatus { get; set; }
+        public DateTime RegTime { get; set; }
+        public DateTime LastActiveTime { get; set; }
+        public string AccountName { get; set; }
+        public string PhoneNo { get; set; }
+        public string Note { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
     }
@@ -53,6 +65,17 @@ namespace BackendSite.Service.Model
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public int Sort { get; set; }
+    }
+    public class ExportLiveRegistration
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset LastActiveTime { get; set; }
+        public string PhoneNo { get; set; }
+        public string Note { get; set; }
+        public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult
     {

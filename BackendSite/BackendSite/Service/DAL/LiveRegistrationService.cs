@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public IEnumerable<RegLiveStatus> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -66,8 +66,12 @@ namespace BackendSite.Service.DAL
             props.Add("_AffCode", affiliatesCode);
             props.Add("CreditSite", JsonConvert.SerializeObject(_creditSite));
             props.Add("_AgentCodeType", agentCodeType);
+            props.Add("_DormantFrequency", dormantFrequency);
+            props.Add("_DormantType", dormantType);
+            props.Add("_CallOutStatus", callOutStatus);
+            props.Add("_DateType", dateType);
 
-            var result = _reportDbClient.Query<RegLiveStatus>("Admin_CustRegLiveStatusExport_Get_V5", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V5", props);
 
             return result;
         }
