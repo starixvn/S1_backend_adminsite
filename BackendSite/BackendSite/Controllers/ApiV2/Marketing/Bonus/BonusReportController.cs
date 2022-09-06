@@ -1,88 +1,25 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BonusReportController : ControllerBase
     {
-        #region Fields
-
-        private readonly BonusInfoBLL _bonusInfoBll;
+        private readonly BonusReportBLL _bonusReportBll;
         private readonly ExcelBLL _excelBll;
-
-        #endregion
-
-        #region Constructor
 
         public BonusReportController(IServiceProvider provider)
         {
-            _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _bonusReportBll = provider.GetRequiredService<BonusReportBLL>();
         }
-
-        #endregion
-
-        #region Model
-
-        public class GetListRequest : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public string BonusCode { get; set; }
-            public string TransId { get; set; }
-            public int CurrencyId { get; set; }
-            public string UserName { get; set; }
-            public PromotionTypeEnum PromotionType { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public int BaseCurrencyId { get; set; }
-            public int PromotionCategoryId { get; set; }
-            public IEnumerable<BonusInfoStatusEnum> Statuses { get; set; }
-        }
-
-        public class ExportRequest
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public string BonusCode { get; set; }
-            public string TransId { get; set; }
-            public int CurrencyId { get; set; }
-            public string UserName { get; set; }
-            public PromotionTypeEnum PromotionType { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public int BaseCurrencyId { get; set; }
-            public int PromotionCategoryId { get; set; }
-            public IEnumerable<BonusInfoStatusEnum> Statuses { get; set; }
-        }
-
-        #endregion
 
         /// <summary>
         /// BonusReport/GetList 取得獎金報表資料清單
@@ -93,40 +30,29 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Bonus Report > [Submit]
         /// </param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 73, 1 })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<BonusInfoFrontEnd> GetList(GetListRequest request)
+        public async Task<ApiListResultCurrencyAmount<BonusReportResponse>> GetDataList(BonusReportRequest request)
         {
-            var result = new ApiListResultCurrencyAmount<BonusInfoFrontEnd>();
+            var apiResult = new ApiListResultCurrencyAmount<BonusReportResponse>();
+            try
+            {
+                var result = await _bonusReportBll.GetBonusReportAsync(request);
+                apiResult.Data = result.Data;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.RowCount = result.RowCount;
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.CurrencyAmount = result.TempCurrencyTotalAmount;
+            }
+            catch (Exception ex)
+            {
 
-            var statusList = request.Statuses.Select(x => (int)x);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
 
-            result.Data = _bonusInfoBll.GetBonusInfoReport(
-                request.SiteIds,
-                request.BonusCode,
-                request.TransId,
-                request.CurrencyId,
-                request.UserName,
-                (int)request.PromotionType,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                request.BaseCurrencyId,
-                request.PromotionCategoryId,
-                statusList,
-                request.PageNumber,
-                   request.PageSize,
-                out var totalPages,
-                out var rowCount,
-                out var currencyAmount
-            );
-            result.PageNumber = request.PageNumber;
-            result.RowCount = rowCount;
-            result.TotalPages = totalPages;
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-            result.CurrencyAmount = currencyAmount;
-
-
-            return result;
+            return apiResult;
         }
 
         /// <summary>
@@ -138,26 +64,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Bonus Report > [Submit] > [Export Excel] 
         /// </param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusInfoReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 73, 2 })]
         [HttpPost]
-        public IActionResult Export(ExportRequest request)
+        public async Task<IActionResult> Export(BonusReportExportRequest request)
         {
-            var statusList = request.Statuses.Select(x => (int)x);
-
-            var exportData = _bonusInfoBll.GetBonusInfoExportReport(request.SiteIds,
-                request.BonusCode,
-                request.TransId,
-                request.CurrencyId,
-                request.UserName,
-                (int)request.PromotionType,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                request.BaseCurrencyId, 
-                request.PromotionCategoryId,
-                statusList);
+            var exportData = await _bonusReportBll.GetBonusReportExportData(request);
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "BonusReport");
         }
-
     }
 }
