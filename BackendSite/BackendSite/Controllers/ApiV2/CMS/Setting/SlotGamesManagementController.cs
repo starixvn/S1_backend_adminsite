@@ -14,12 +14,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
+        private readonly GameCasinoManageBLL _gameCasinoManageBLL;
         #endregion
 
         #region Constructors
         public SlotGamesManagementController(IServiceProvider provider)
         {
-            _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>(); ;
+            _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>();
+            _gameCasinoManageBLL = provider.GetRequiredService<GameCasinoManageBLL>();
         }
         #endregion
 
@@ -29,7 +31,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
-                Data = gameCasinoManageBLL.GetTpList(),
+                Data = _gameCasinoManageBLL.GetTpList(),
                 ErrorCode = 0
             };
 
