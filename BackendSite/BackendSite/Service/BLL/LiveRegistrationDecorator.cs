@@ -20,16 +20,18 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportService = adjustmentLogReportService;
             _logger = logger;
         }
-        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType, TimeSpan timezone)
+        public async Task<LiveRegistrationResponse> GetRegLiveStatusData(GetRegLiveStatusRequest request)
         {
-            return await _liveRegistration.GetRegLiveStatusData(siteId, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType, timezone);
+            return await _liveRegistration.GetRegLiveStatusData(request);
         }
-
+        public async Task<IEnumerable<ExportLiveRegistration>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
+        {
+            return await _liveRegistration.GetExportRegLiveStatus(request);
+        }
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {
             return await _liveRegistration.GetRegLiveStatus(custId);
         }
-
         public async Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator)
         {
             var customer = _custInfoBll.GetCustInfoWithCache(input.CustId);
@@ -65,7 +67,6 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-
         public async Task<int> AddCallingRecord(int siteId, int custId, string @operator)
         {
             return await _liveRegistration.AddCallingRecord(siteId, custId, @operator);
@@ -176,11 +177,6 @@ namespace BackendSite.Service.BLL
             }
 
             return editResult;
-        }
-
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string user, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantUser, int callOutStatus, int dateType)
-        {
-            return _liveRegistration.GetExportRegLiveStatus(siteId, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType, dormantUser, callOutStatus, dateType);
         }
     }
 }
