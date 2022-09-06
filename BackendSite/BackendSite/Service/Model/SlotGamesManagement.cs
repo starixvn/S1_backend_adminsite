@@ -8,6 +8,11 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
+        /// <summary>
+        /// All = 0,
+        /// Open = 1,
+        /// Closed = 2,
+        /// </summary>
         public SlotGameFilterStatusEnum Status { get; set; }
         public GetSlotGameListReq()
         {
