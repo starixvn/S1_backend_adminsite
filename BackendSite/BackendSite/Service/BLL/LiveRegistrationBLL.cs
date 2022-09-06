@@ -61,7 +61,7 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<ExportLiveRegistration> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
+        public async Task<IEnumerable<ExportLiveRegistration>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
@@ -70,7 +70,7 @@ namespace BackendSite.Service.BLL
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
             
             
-            var result = _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
+            var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
                 request.DepositStatus, request.Status, request.UserName, request.Sort, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
                 request.DateType);

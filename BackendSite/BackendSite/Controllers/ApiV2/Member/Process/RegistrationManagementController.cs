@@ -59,9 +59,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
         [HttpPost("Export")]
-        public IActionResult Export(ExportRegLiveStatusRequest request)
+        public async Task<IActionResult> Export(ExportRegLiveStatusRequest request)
         {
-            var exportData = _registrationBll.GetExportRegLiveStatus(request);
+            var exportData = await _registrationBll.GetExportRegLiveStatus(request);
             var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "Registration");
         }

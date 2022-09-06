@@ -31,7 +31,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        private void SetHeader(ExcelWorksheet ws, IEnumerable<string> titles, int extraColCount)
+        private new void SetHeader(ExcelWorksheet ws, IEnumerable<string> titles, int extraColCount)
         {
             var idx = 1;
             var count = titles.Count();

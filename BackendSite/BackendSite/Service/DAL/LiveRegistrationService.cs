@@ -57,7 +57,7 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public IEnumerable<RegLiveStatusData> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<RegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             return new List<RegLiveStatusData>()
             {
