@@ -24,6 +24,18 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #endregion
 
         #region Actions
+        [HttpPost]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
+        {
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = gameCasinoManageBLL.GetTpList(),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
         /// <summary>
         /// SlotGamesManagement/GetSlotGameList 
         /// </summary>
