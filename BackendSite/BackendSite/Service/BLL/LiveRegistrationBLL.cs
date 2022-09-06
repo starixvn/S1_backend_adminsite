@@ -35,23 +35,24 @@ namespace BackendSite.Service.BLL
                 request.Sort, startTime, endTime, request.AffiliatesCode, request.AgentCodeType, dormantFrequency,
                 dormantType, request.CallOutStatus, request.DateType);
             
-            var regLiveStatus = searchResult.RegLiveStatusData.Select(a => new LiveRegistration()
-            {
-                SiteId = a.SiteId,
-                CustId = a.CustId,
-                Currency = a.Currency,
-                UserName = a.UserName,
-                AccountName = a.AccountName,
-                Agent = a.Agent,
-                AffiliatesCode = a.AffCode,
-                PhoneNo = a.PhoneNo,
-                PhoneVerified = a.PhoneVerified,
-                DepositStatus = a.ActStatus,
-                Status = a.Status,
-                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
-                UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
-            });
+            var regLiveStatus = searchResult.RegLiveStatusData.Select(a => 
+                new LiveRegistration() 
+                {
+                    SiteId = a.SiteId,
+                    CustId = a.CustId,
+                    Currency = a.Currency,
+                    UserName = a.UserName,
+                    AccountName = a.AccountName,
+                    Agent = a.Agent,
+                    AffiliatesCode = a.AffCode,
+                    PhoneNo = a.PhoneNo,
+                    PhoneVerified = a.PhoneVerified,
+                    DepositStatus = a.ActStatus,
+                    Status = a.Status,
+                    RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                    LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
+                    UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
+                });
             return new LiveRegistrationResponse()
             {
                 LiveRegistration = regLiveStatus.ToList(),
@@ -69,25 +70,23 @@ namespace BackendSite.Service.BLL
             
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
             
-            
             var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
                 request.DepositStatus, request.Status, request.UserName, request.Sort, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
                 request.DateType);
             
-            var list = new List<ExportLiveRegistration>();
-            result.ToList().ForEach(x =>
-            {
-                list.Add(new ExportLiveRegistration()
+            var list = result.Select(x => 
+                new ExportLiveRegistration() 
                 {
                     UserName = x.UserName,
                     FullName = x.AccountName,
                     PhoneNo = x.PhoneNo,
                     RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
+                    LastActiveTime = new DateTimeOffset(x.LastActiveTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, timezone)
+                    Note = x.Note,
+                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, timezone) 
                 });
-            });
             return list;
         }
 

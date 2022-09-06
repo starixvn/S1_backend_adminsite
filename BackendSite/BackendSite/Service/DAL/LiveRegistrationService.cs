@@ -57,29 +57,8 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public async Task<IEnumerable<RegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
-            return new List<RegLiveStatusData>()
-            {
-                new RegLiveStatusData()
-                {
-                    UserName = "alicecny07", AccountName = "", ActStatus = 2, RegTime = new DateTime(2022, 5, 7),
-                    LastActiveTime = new DateTime(2022, 9, 1), PhoneNo = "12345678", Operator = "hulk",
-                    UpdateAt = "2022-01-01"
-                },
-                new RegLiveStatusData()
-                {
-                    UserName = "alicecny08", AccountName = "", ActStatus = 2, RegTime = new DateTime(2022, 7, 23),
-                    LastActiveTime = new DateTime(2022, 9, 1), PhoneNo = "226545", Operator = "admin,test",
-                    UpdateAt = "2022-07-07,2022-06-01"
-                },
-                new RegLiveStatusData()
-                {
-                    UserName = "mickey1128", AccountName = "mickeyshiue", ActStatus = 1, RegTime = new DateTime(2022, 8, 1),
-                    LastActiveTime = new DateTime(2022, 9, 1), PhoneNo = "1461875421", Operator = "admin,hulk,test",
-                    UpdateAt = "2022-01-01,2022-02-02,2022-03-03"
-                }
-            };
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_Currency", currency);
@@ -97,7 +76,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CallOutStatus", callOutStatus);
             props.Add("_DateType", dateType);
 
-            var result = _reportDbClient.Query<RegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V5", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V5", props);
 
             return result;
         }
