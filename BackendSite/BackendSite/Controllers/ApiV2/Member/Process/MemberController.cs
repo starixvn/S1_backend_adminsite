@@ -14,14 +14,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class MemberController : ControllerBase
     {
-        private readonly ICustomerBLL _customerBll;
+        private readonly IMemberBLL _memberBll;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
 
-        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(IMemberBLL memberBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
         {
-            _customerBll = customerBll;
+            _memberBll = memberBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [HttpPost]
     public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
     {
-        var data = await _customerBll.GetCustomerBasicInfo(request.CustId);
+        var data = await _memberBll.GetCustomerBasicInfo(request.CustId);
 
         var apiResult = new ApiResult<CustomerBasicInfo>()
         {
@@ -166,7 +166,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [HttpPost]
     public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
     {
-        var data = await _customerBll.GetIpListByCustId(request.CustId);
+        var data = await _memberBll.GetIpListByCustId(request.CustId);
         var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
         {
             ErrorCode = (int)ErrorCodeEnum.Success,

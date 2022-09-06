@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.BLL.Interface;
 
-public interface ICustomerBLL
+public interface IMemberBLL
 {
     Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustId(int custId);
