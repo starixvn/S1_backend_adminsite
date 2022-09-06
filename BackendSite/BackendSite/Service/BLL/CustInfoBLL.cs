@@ -7,6 +7,7 @@ using BackendSite.Service.Model.Option;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Transactions;
+using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -235,7 +236,7 @@ namespace BackendSite.Service.BLL
         {
             return _walletService.GetBalance(custId);
         }
-        
+
         public Task<decimal> GetBalanceAsync(int custId)
         {
             return _walletService.GetBalanceAsync(custId);
@@ -971,6 +972,30 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount); ;
+        }
+
+
+        public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request,int siteId)
+        {
+            var dbParams = new GetCustTpAdjustmentLogParamsV2()
+            {
+                CustId = request.CustId,
+                TpId = request.TpId,
+                SiteId = siteId,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
+            };
+            var queryResult = await _thirdPartyService.GetCustTpAdjustmentLogV2(dbParams);
+            
+            foreach (var data in queryResult.Data)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
+            return queryResult;
         }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)

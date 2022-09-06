@@ -60,10 +60,15 @@ namespace BackendSite.Service.BLL
             AuthData authData = null;
             if (httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
-                authData = new AuthData();
                 int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out var userId);
-                authData.UserId = userId;
-                authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
+                int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var siteId);
+
+                authData = new AuthData
+                {
+                    UserId = userId,
+                    UserName = httpContextAccessor.HttpContext.User.Identity.Name,
+                    SiteId = siteId
+                };
             }
 
             return authData;
