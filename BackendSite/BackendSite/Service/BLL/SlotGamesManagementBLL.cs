@@ -20,11 +20,11 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
         }
 
-        public GetSlotGameListRep GetSlotGameList(int siteId, int tpId, string name, SlotGameFilterStatusEnum status,int pageNumber,int pageSize, out int totalPages, out int rowCount)
+        public GetSlotGameListRep GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status,int pageNumber,int pageSize, out int totalPages, out int rowCount)
         {
             GetSlotGameListRep rep = new GetSlotGameListRep();
             List<SlotGameData> slotGames = new List<SlotGameData>();
-            var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, status, pageNumber, pageSize, out totalPages, out rowCount);
+            var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, gameId, status, pageNumber, pageSize, out totalPages, out rowCount);
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
             result.ForEach(x =>
             {
@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x => x.SiteId == siteId);
             if (category == (int)SlotGameCategoryEnum.AllAndSetStatus)
             {
-                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
+                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, null, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator, userSiteData));
