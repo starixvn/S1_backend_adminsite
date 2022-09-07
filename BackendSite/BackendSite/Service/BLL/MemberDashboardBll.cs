@@ -93,7 +93,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
                 DeviceId = a.DeviceId,
                 Risk = $"{a.Iovation}({a.Score})",
                 Frequency = a.Frequency,
-                AssociateCount = a.AssociateAccount,
+                AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
             });
         }
@@ -104,7 +104,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             DeviceId = a.DeviceId,
             Risk = a.DeviceScore < 75 ? $"High Risk({a.DeviceScore})" : $"Low Risk({a.DeviceScore})",
             Frequency = a.Frequency,
-            AssociateCount = a.AssociateAccount,
+            AssociateCount = a.AssociateCount,
             LastUpdateTime = a.LastUpdateTime
         });
     }
