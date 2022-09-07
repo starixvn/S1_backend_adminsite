@@ -14,15 +14,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class MemberController : ControllerBase
     {
-        private readonly ICustomerBLL _customerBll;
+        private readonly IMemberDashboardBLL _memberDashboardBll;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
 
-        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll)
         {
-            _customerBll = customerBll;
+            _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
@@ -72,7 +72,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetCustomerBasicInfo 取得客戶基本資料
+        /// Member/GetCustomerBasicInfo 取得客戶基本資料
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -85,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
-            var data = await _customerBll.GetCustomerBasicInfo(request.CustId);
+            var data = await _memberDashboardBll.GetCustomerBasicInfo(request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -116,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> UploadCustPhotoId([FromForm] UploadCustPhotoIdRequest request)
+        public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
         {
             var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
@@ -177,6 +177,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+
+        /// <summary>
+        /// Member/GetDeviceList 取得會員使用過的裝置
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Member Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<MemberLoginDevice>>> GetDeviceList(GetIpListRequest request)
+        {
+            var data = await _memberDashboardBll.GetDeviceListByCustId(request.CustId);
+            var apiResult = new ApiResult<IEnumerable<MemberLoginDevice>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = data
+            };
+            return apiResult;
+        }
+        
         /// <summary>
         /// Member/GetIpList 取得會員登入過的Ip
         /// </summary>
@@ -190,7 +213,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
         {
-            var data = await _customerBll.GetIpListByCustId(request.CustId);
+            var data = await _memberDashboardBll.GetIpListByCustId(request.CustId);
             var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
