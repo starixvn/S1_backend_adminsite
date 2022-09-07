@@ -18,13 +18,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
 
-        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(ICustomerBLL customerBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll)
         {
             _customerBll = customerBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _newAuthorizeBll = newAuthorizeBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -194,6 +196,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = data
             };
+            return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<ApiListResult<TpAdjustmentLogV2>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequestV2 request)
+        {
+            var apiResult = new ApiListResult<TpAdjustmentLogV2>();
+
+            try
+            {
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var result = await _custInfoBll.GetCustAdjustmentTpLogV2(request, siteId);
+                apiResult.Data = result.Data;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.RowCount = result.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
             return apiResult;
         }
     }
