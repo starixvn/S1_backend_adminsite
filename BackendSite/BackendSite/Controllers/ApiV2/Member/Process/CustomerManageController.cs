@@ -3111,6 +3111,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        #region CSD > Customer Administration > CustInfo > DashboardWinLossGroup
+        public ApiResult<DashboardWinLossGroupData> GetDashboardWinLossGroup(CustIdRequest request)
+        {
+            var dashboardWinLossGroup = _custInfoBll.GetDashboardWinLossGroup(request.CustId);
+            return new ApiResult<DashboardWinLossGroupData>
+            {
+                Data = dashboardWinLossGroup,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
         #region Private Methods
 
         /// <summary>

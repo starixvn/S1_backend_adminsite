@@ -962,5 +962,20 @@ namespace BackendSite.Service.BLL
            var AllGameType =  _winLostReportService.GetAllGameType().ToList();
            return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
+
+        public DashboardWinLossGroupData GetDashboardWinLossGroup(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var tempDashboardWinLossGroup = _custInfoService.GetDashboardWinLossGroup(custId, Convert.ToDateTime(Date));
+
+            return new DashboardWinLossGroupData()
+            {
+                Winnings = tempDashboardWinLossGroup.Winnings,
+                Losses = tempDashboardWinLossGroup.Losses,
+                WinLoss = tempDashboardWinLossGroup.Winnings + tempDashboardWinLossGroup.Losses,
+                OutstandingAmount = tempDashboardWinLossGroup.OutstandingAmount,
+                ValidBet = tempDashboardWinLossGroup.TpBetRecordStake + tempDashboardWinLossGroup.RelayStake
+            };
+        }
     }
 }

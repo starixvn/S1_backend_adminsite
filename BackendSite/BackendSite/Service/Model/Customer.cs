@@ -652,5 +652,20 @@ namespace BackendSite.Service.Model
             set => _loginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-
+    public class DashboardWinLossGroup
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal RelayStake { set; get; }
+        public decimal TpBetRecordStake { set; get; }
+    }
+    public class DashboardWinLossGroupData
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal ValidBet { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal WinLoss { set; get; }
+    }
 }

@@ -1072,5 +1072,9 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { _CustId = custId }));
         }
+        public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
+        {
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+        }
     }
 }
