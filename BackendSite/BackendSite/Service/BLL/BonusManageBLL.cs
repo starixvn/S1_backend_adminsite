@@ -100,7 +100,6 @@ namespace BackendSite.Service.BLL
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string Operator, string newSpecialCode, bool isSpecial)
         {
             var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
-            var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
             var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
             var expectedCashBackRow = _bonusManageService.GetPromotionCashBack(bonusCode, siteId).Count();
 
@@ -108,7 +107,6 @@ namespace BackendSite.Service.BLL
                  siteId,
                  newBonusCode,
                  expectedSpecificRow,
-                 expectedRebateRow,
                  expectedConditionRow,
                  expectedCashBackRow,
                  Operator,

@@ -231,7 +231,7 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             var result = depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null);
 
-            //InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
+            InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
             
             return result;
         }
@@ -318,6 +318,12 @@ namespace BackendSite.Service.BLL
         public bool EditDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
             return depositService.EditDepositLimitInfo(input);
+        }
+
+        public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
+        {
+            var currentUpperPoint = depositService.GetDepositLimitInfo(siteId, depositType ,currencyId, vipLevel);
+            return currentUpperPoint;
         }
         
         public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
