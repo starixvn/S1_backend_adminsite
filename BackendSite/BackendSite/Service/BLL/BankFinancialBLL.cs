@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly ReportService _reportService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly AWSS3Helper _awsS3Helper;
+        private readonly ICacheHelper _cacheHelper;
         private readonly string _bucketName;
         private readonly string _bucketUrl;
         private readonly string _folder;
@@ -37,6 +38,7 @@ namespace BackendSite.Service.BLL
             _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
             _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
             _folder = configuration.GetValue<string>("AwsFinanceFolder");
@@ -48,7 +50,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialReasonModel> GetReason(string funcKey)
         {
-            return _bankFinancialService.GetReason(funcKey);
+            var key = $"Reason:{funcKey}";
+            
+            return _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => _bankFinancialService.GetReason(funcKey));
         }
 
         public IEnumerable<PayList> GetPayList()
