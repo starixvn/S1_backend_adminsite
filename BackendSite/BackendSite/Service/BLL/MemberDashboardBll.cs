@@ -8,13 +8,13 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL;
 
-public class MemberBll : IMemberBLL
+public class MemberDashboardBll : IMemberDashboardBLL
 {
     private readonly ICustomerService _customerService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
 
-    public MemberBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;

@@ -76,7 +76,7 @@ namespace BackendSite
             }
 
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<IMemberBLL, MemberBll>();
+            services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
