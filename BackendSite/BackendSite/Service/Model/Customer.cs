@@ -705,4 +705,20 @@ namespace BackendSite.Service.Model
         public decimal TodayWinLoss { get; set; }
         public decimal TodayBetting { get; set; }
     }
+    public class DashboardWinLossGroup
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal RelayStake { set; get; }
+        public decimal TpBetRecordStake { set; get; }
+    }
+    public class DashboardWinLossGroupData
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal ValidBet { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal WinLoss { set; get; }
+    }
 }

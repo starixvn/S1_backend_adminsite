@@ -1091,5 +1091,9 @@ namespace BackendSite.Service.DAL
             
             return await _reportDbClient.QueryFirstAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get", p);
         }
+        public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
+        {
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+        }
     }
 }
