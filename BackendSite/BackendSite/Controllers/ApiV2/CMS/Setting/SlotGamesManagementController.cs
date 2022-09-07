@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name,request.GameId, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;

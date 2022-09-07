@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
+        public string GameId { get; set; }
         /// <summary>
         /// All = 0,
         /// Open = 1,
