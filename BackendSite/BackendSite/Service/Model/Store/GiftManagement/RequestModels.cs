@@ -16,15 +16,11 @@ namespace BackendSite.Service.Model.Store.GiftManagement
 
     public class GetTagsRequest
     {
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<string> LangCodes { get; set; }
     }
 
     public class GetCategoriesRequest
     {
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<string> LangCodes { get; set; }
     }
     
@@ -62,31 +58,23 @@ namespace BackendSite.Service.Model.Store.GiftManagement
 
     public class CreateCategoryRequest
     {
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<LangNameModel> Infos { get; set; }
     }
 
     public class UpdateCategoryRequest
     {
         public int CategoryId { get; set; }
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<LangNameModel> Infos { get; set; }
     }
 
     public class CreateTagRequest
     {
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<LangNameModel> Infos { get; set; }
     }
 
     public class UpdateTagRequest
     {
         public int TagId { get; set; }
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
         public IEnumerable<LangNameModel> Infos { get; set; }
     }
 
