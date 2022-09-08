@@ -34,20 +34,22 @@ Content-Type: application/json
 ###
 # 修改原因描述
 # id: GetList.id
+# 測試時請用 FunKey/Test 這個 key 下的資料
 POST {{url}}/apiV2/Reason/Set HTTP/1.1
 Content-Type: application/json
 
 {
-    "id": 3,
+    "id": 111,
     "description": "test_msg"
 }
 
 ###
 # 新增原因
+# 測試時請用 FunKey/Test 這個 key
 POST {{url}}/apiV2/Reason/Insert HTTP/1.1
 Content-Type: application/json
 
 {
-    "funcKey": "BankFinancial/TransferAccountManage",
-    "description": "test_msg999"
+    "funcKey": "FunKey/Test",
+    "description": "test_msg2"
 }
