@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.SiteId, req.TpId, req.Name, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
+                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.SiteId, req.TpId, req.Name, req.GameId, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;
