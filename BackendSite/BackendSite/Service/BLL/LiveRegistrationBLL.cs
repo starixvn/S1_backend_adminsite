@@ -23,9 +23,9 @@ namespace BackendSite.Service.BLL
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
             var searchResult = await _registrationService.GetRegLiveStatusData(request.SiteId, request.CurrencyId,
-                request.DepositStatus, request.Status, request.UserName, request.PageNumber, request.PageSize,
-                request.Sort, startTime, endTime, request.AffiliatesCode, request.AgentCodeType, dormantFrequency,
-                dormantType, request.CallOutStatus, request.DateType);
+                request.DepositStatus, request.Status, request.UserName, request.DateType, startTime, endTime,
+                request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
+                request.OrderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
             
             var regLiveStatus = searchResult.RegLiveStatusData.Select(a => 
                 new LiveRegistration() 

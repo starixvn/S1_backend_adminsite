@@ -18,26 +18,28 @@ namespace BackendSite.Service.DAL
             _mainDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Main);
         }
 
-        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, 
-            int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currencyId, int depositStatus, 
+            int status, string username, int dateType, DateTime startDate, DateTime endDate, 
+            string affiliatesCode, int agentCodeType, int dormantType, int dormantFrequency, int callOutStatus, 
+            string orderByProperty, int orderByDirection, int pageNumber, int pageSize)
         {
-            var searchData = new RegLiveStatusPageResult();
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
-            props.Add("_Currency", currency);
+            props.Add("_CurrencyId", currencyId);
             props.Add("_UserName", username);
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
-            props.Add("_Sort", sort);
+            props.Add("_DateType", dateType);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_AffCode", affiliatesCode);
-            props.Add("CreditSite", JsonConvert.SerializeObject(_creditSite));
+            props.Add("_CreditSite", JsonConvert.SerializeObject(_creditSite));
             props.Add("_AgentCodeType", agentCodeType);
-            props.Add("_DormantFrequency", dormantFrequency);
             props.Add("_DormantType", dormantType);
+            props.Add("_DormantFrequency", dormantFrequency);
             props.Add("_CallOutStatus", callOutStatus);
-            props.Add("_DateType", dateType);
+            props.Add("_OrderByProperty", orderByProperty);
+            props.Add("_OrderByDirection", orderByDirection);
             props.Add("_PageSize", Math.Abs(pageSize));
             props.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
@@ -45,10 +47,13 @@ namespace BackendSite.Service.DAL
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V6", props);
-            searchData.RegLiveStatusData = result.ToList();
-            searchData.PageNumber = props.Get<int?>("_PageNumber") ?? 0;
-            searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
-            searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
+            var searchData = new RegLiveStatusPageResult
+            {
+                RegLiveStatusData = result.ToList(),
+                PageNumber = props.Get<int?>("_PageNumber") ?? 0,
+                TotalPages = props.Get<int?>("_TotalPages") ?? 0,
+                RowCount = props.Get<int?>("_RowCount") ?? 0
+            };
 
             return searchData;
         }
