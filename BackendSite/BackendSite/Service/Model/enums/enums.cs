@@ -456,28 +456,6 @@ namespace BackendSite.Service.Model.enums
         ThirdParty = 2
     }
     
-    public enum AdjustmentCategoryEnum
-    {
-        [Description("None - (Default)")]
-        None = 1,
-        [Description("Retention Bonus")]
-        RetentionBonus = 2,
-        [Description("Manual Bonus(Special Bonus)")]
-        ManualBonus = 3,
-        [Description("Vip Upgrade Reward")]
-        VipUpgradeReward = 4,
-        [Description("Prize Drop")]
-        PrizeDrop = 5,
-        [Description("Tech Issue None Affected")]
-        TechIssueNoneAffected = 6,
-        Test = 7,
-        [Description("Vendor Mistake")]
-        VendorMistake = 8,
-        Deposit = 9,
-        Withdrawal = 10,
-        Other = 11
-    }
-
     #endregion
 
     #region AdminUser
