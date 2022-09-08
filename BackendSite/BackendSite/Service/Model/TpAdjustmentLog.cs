@@ -41,8 +41,8 @@ public class TpAdjustmentLog: TpTransferInfo
     public string UserName { set; get; }
     public string Operator { set; get; }
     public string Remarks { set; get; }
-    public AdjustmentCategoryEnum Category { set; get; }
-    public string CategoryName => Category.GetDescription();
+    public int Category { set; get; }
+    public string CategoryName { set; get; }
 }
 
 public class TpAdjustmentLogV2 : TpTransferInfo
@@ -51,8 +51,8 @@ public class TpAdjustmentLogV2 : TpTransferInfo
     public string UserName { set; get; }
     public string Operator { set; get; }
     public string Remarks { set; get; }
-    public AdjustmentCategoryEnum Category { set; get; }
-    public string CategoryName => Category.GetDescription();
+    public int Category { set; get; }
+    public string CategoryName { set; get; }
 
     public string DepositId { get; set; }
 }
