@@ -36,7 +36,7 @@ namespace BackendSite.Service.Model
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
     }
-    public class GetRegLiveStatusRequest : ApiRequestPageModel
+    public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -50,7 +50,9 @@ namespace BackendSite.Service.Model
         public int DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        public int Sort { get; set; }
+        public bool OrderBy { get; set; }
+        public string OrderByProperty { get; set; }
+        public OrderByDirection OrderByDirection { get; set; }
     }
 
     public class ExportRegLiveStatusRequest
