@@ -188,6 +188,7 @@ namespace BackendSite.Service.Model
         public decimal RetentionBonus { get; set; }
         public decimal ManualBonus { get; set; }
         public decimal CancelBonusAmount { get; set; }
+        public decimal RewardPoint { get; set; }
         public decimal TotalBonus
         {
             get => FirstDeposit + ReDeposit + FreeBet + CashBack + RetentionBonus + ManualBonus;
