@@ -14,16 +14,30 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
+        private readonly GameCasinoManageBLL _gameCasinoManageBLL;
         #endregion
 
         #region Constructors
         public SlotGamesManagementController(IServiceProvider provider)
         {
-            _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>(); ;
+            _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>();
+            _gameCasinoManageBLL = provider.GetRequiredService<GameCasinoManageBLL>();
         }
         #endregion
 
         #region Actions
+        [HttpPost]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
+        {
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = _gameCasinoManageBLL.GetTpList(),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
         /// <summary>
         /// SlotGamesManagement/GetSlotGameList 
         /// </summary>
@@ -41,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name,request.GameId, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameDataList;
@@ -107,7 +121,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
+                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.GameId, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
                 apiResult.TotalPages = TotalPages;
                 apiResult.RowCount = RowCount;
                 apiResult.Data = result.SlotGameCategoryList;

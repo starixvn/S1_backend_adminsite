@@ -8,15 +8,17 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL;
 
-public class CustomerBLL : ICustomerBLL
+public class MemberDashboardBll : IMemberDashboardBLL
 {
     private readonly ICustomerService _customerService;
+    private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
 
-    public CustomerBLL(ICustomerService customerService, ICacheHelper cacheHelper)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
+        _deviceService = deviceService;
     }
 
     public async Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId)
@@ -51,9 +53,7 @@ public class CustomerBLL : ICustomerBLL
             Email = customer.Email,
             MobileNumber = $"({customer.AreaCode}) {customer.PhoneNo}",
             Address = CreateAddress(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity, customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
-            DeviceScore = customer.DeviceScore,
             IsRisk = customer.IsRisk,
-            Iovation = customer.Iovation,
             IsKyc = customer.IsKyc,
             IsTest = customer.IsTest,
             TagList = string.IsNullOrEmpty(customer.TagList) ? null : JsonConvert.DeserializeObject<List<int>>(customer.TagList)
@@ -76,9 +76,37 @@ public class CustomerBLL : ICustomerBLL
         if (!string.IsNullOrEmpty(state))
             sb.Append($"{state},");
         if (!string.IsNullOrEmpty(country))
-            sb.Append($"{country},");
+            sb.Append($"{country}");
 
         return sb.ToString();
+    }
+
+    public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustId(int custId)
+    {
+        var custInfo = await _customerService.GetCustomerBasicInfo(custId);
+
+        if (custInfo.SiteId == (int)SiteEnum.NOVA88)
+        {
+            var iovationList = await _deviceService.GetCustIovationList(custId);
+            return iovationList.Select(a => new MemberLoginDevice()
+            {
+                DeviceId = a.DeviceId,
+                Risk = $"{a.Iovation}({a.Score})",
+                Frequency = a.Frequency,
+                AssociateCount = a.AssociateCount,
+                LastUpdateTime = a.LastUpdateTime
+            });
+        }
+
+        var shield = await _deviceService.GetCustShieldRiskInfoList(custId);
+        return shield.Select(a => new MemberLoginDevice()
+        {
+            DeviceId = a.DeviceId,
+            Risk = a.DeviceScore < 75 ? $"High Risk({a.DeviceScore})" : $"Low Risk({a.DeviceScore})",
+            Frequency = a.Frequency,
+            AssociateCount = a.AssociateCount,
+            LastUpdateTime = a.LastUpdateTime
+        });
     }
 
     public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustId(int custId)

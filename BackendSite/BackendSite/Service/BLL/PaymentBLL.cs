@@ -419,6 +419,7 @@ namespace BackendSite.Service.BLL
                 HasBonusCode = true,
                 BonusCode = bonusCode,
                 RollOver = checkData.RollOver,
+                WinOver = checkData.WinOver,
                 Bonus = checkData.Bonus,
                 TpId = checkData.TpId,
                 CategoryId = checkData.CategoryId,

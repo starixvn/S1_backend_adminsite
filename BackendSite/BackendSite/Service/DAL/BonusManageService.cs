@@ -324,31 +324,48 @@ namespace BackendSite.Service.DAL
 
                 if (promotion.Specific != null)
                 {
-                    var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn);
-                    var tempCashBackList = cashBackList.GroupBy(x => new { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x => new PromotionCashBack1
+                    if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
                     {
-                        CurrencyId = x.Key.CurrencyId,
-                        GameType = x.Key.GameType,
-                        LossAmount = x.Key.LossAmount,
-                        Percentage = x.Key.Percentage,
-                        Status = x.Key.Status,
-                        TpId = x.Key.TpId
-                    }).ToList();
+                        var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn);
+                        var tempCashBackList = cashBackList
+                            .GroupBy(x => new
+                                { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
+                                new PromotionCashBack1
+                                {
+                                    CurrencyId = x.Key.CurrencyId,
+                                    GameType = x.Key.GameType,
+                                    LossAmount = x.Key.LossAmount,
+                                    Percentage = x.Key.Percentage,
+                                    Status = x.Key.Status,
+                                    TpId = x.Key.TpId
+                                }).ToList();
 
-                    foreach (var s in promotion.Specific)
-                    {
-                        if (!string.IsNullOrEmpty(s.VN_AffCodes))
+                        foreach (var specific in promotion.Specific)
                         {
-                            s.VN_AffCodes = JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes) == null
+                            specific.CashBackList = tempCashBackList.Where(x => x.CurrencyId == specific.CurrencyId);
+                        
+                            var cashBack = specific.CashBackList.FirstOrDefault();
+                            specific.CashBackSetting = new CashBackSetting
+                            {
+                                CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo{ TpId = i.TpId, CategoryId = i.GameType }),
+                                Percentage = cashBack.Percentage,
+                                LossAmount = cashBack.LossAmount
+                            };
+                        }
+                    }
+
+                    foreach (var specific in promotion.Specific)
+                    {
+                        if (!string.IsNullOrEmpty(specific.VN_AffCodes))
+                        {
+                            specific.VN_AffCodes = JsonConvert.DeserializeObject<string[]>(specific.VN_AffCodes) == null
                                 ? null
-                                : string.Join(',', JsonConvert.DeserializeObject<string[]>(s.VN_AffCodes));
+                                : string.Join(',', JsonConvert.DeserializeObject<string[]>(specific.VN_AffCodes));
                         }
 
-                        s.CashBackList = tempCashBackList.Where(x => x.CurrencyId == s.CurrencyId);
-
-                        if (!string.IsNullOrEmpty(s.TierAmount))
+                        if (!string.IsNullOrEmpty(specific.TierAmount))
                         {
-                            s.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(s.TierAmount);
+                            specific.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(specific.TierAmount);
                         }
                     }
                 }
@@ -543,10 +560,27 @@ namespace BackendSite.Service.DAL
             if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
             {
                 var cashBackList = new List<PromotionCashBackSetting>();
-                var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList(); ;
+                var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList();
 
                 foreach (var specific in promotion.Specific)
                 {
+                    if (specific.CashBackSetting.CashBackTpInfos != null)
+                    {
+                        var promotionCashBacks = new List<PromotionCashBack>();
+                        foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
+                        {
+                            promotionCashBacks.Add(new PromotionCashBack
+                            {
+                                TpId = tpInfo.TpId,
+                                GameType = tpInfo.TpId,
+                                Percentage = specific.CashBackSetting.Percentage,
+                                LossAmount = specific.CashBackSetting.LossAmount,
+                                Status = 1
+                            });
+                        }
+                        specific.CashBackList = promotionCashBacks;
+                    }
+
                     foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
                     {
                         var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;

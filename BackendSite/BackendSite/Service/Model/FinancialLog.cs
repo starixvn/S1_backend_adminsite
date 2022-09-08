@@ -257,6 +257,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
+        public int WinOver { get; set; }
         /// <summary>
         /// Promotion的錢包類型：
         /// 0 = Transfer Wallet
@@ -275,6 +276,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
+        public int WinOver { get; set; } 
         public int WalletType { get; set; }
         public int TpId { get; set; }
         public int CategoryId { get; set; }

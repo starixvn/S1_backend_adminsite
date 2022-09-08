@@ -344,8 +344,8 @@ namespace BackendSite.Service.DAL
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
                     
-                    // 調帳類型為 Deposit 時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == (int)AdjustmentCategoryEnum.Deposit)
+                    // 調帳類型為 Deposit(9) 時變更存款單實際存款金額
+                    if (adjustmentAndWithdrawalLimit.Category == 9)
                     {
                         var adjustAmount = isAdd
                             ? adjustmentAndWithdrawalLimit.Amount
@@ -472,7 +472,7 @@ namespace BackendSite.Service.DAL
             props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
                 input.UserName,
-                Category = AdjustmentCategoryEnum.Deposit.ToString(),
+                Category = "Deposit",
                 input.Memo,
                 DepositTransId = input.TransId,
                 BeforeActualDeposit = beforeAmount,
