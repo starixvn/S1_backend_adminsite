@@ -57,7 +57,7 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, int sort, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -65,7 +65,6 @@ namespace BackendSite.Service.DAL
             props.Add("_UserName", userName);
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
-            props.Add("_Sort", sort);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_AffCode", affiliatesCode);
