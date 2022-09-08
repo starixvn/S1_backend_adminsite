@@ -27,13 +27,14 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
+            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
             
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
             var searchResult = await _registrationService.GetRegLiveStatusData(request.SiteId, request.CurrencyId,
                 request.DepositStatus, request.Status, request.UserName, request.DateType, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
-                request.OrderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
+                orderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
             
             var regLiveStatus = searchResult.RegLiveStatusData.Select(a => 
                 new LiveRegistration() 
