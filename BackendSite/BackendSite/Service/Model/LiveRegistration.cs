@@ -69,7 +69,6 @@ namespace BackendSite.Service.Model
         public int DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        public int Sort { get; set; }
     }
     public class ExportLiveRegistration
     {
