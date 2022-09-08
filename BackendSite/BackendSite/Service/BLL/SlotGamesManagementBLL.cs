@@ -22,8 +22,8 @@ namespace BackendSite.Service.BLL
 
         public GetSlotGameListRep GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status,int pageNumber,int pageSize, out int totalPages, out int rowCount)
         {
-            GetSlotGameListRep rep = new GetSlotGameListRep();
-            List<SlotGameData> slotGames = new List<SlotGameData>();
+            var rep = new GetSlotGameListRep();
+            var slotGames = new List<SlotGameData>();
             var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, gameId, status, pageNumber, pageSize, out totalPages, out rowCount);
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
             result.ForEach(x =>
@@ -40,14 +40,14 @@ namespace BackendSite.Service.BLL
             return slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId,req.Status, Operator);
         }
 
-        public GetSlotGameCategoryListRep GetSlotGameCategoryList(int siteId, int tpId, string name, SlotGameCategoryEnum category,int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        public GetSlotGameCategoryListRep GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category,int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            GetSlotGameCategoryListRep rep = new GetSlotGameCategoryListRep();
-            List<SlotGameData> slotGames = new List<SlotGameData>();
+            var rep = new GetSlotGameCategoryListRep();
+            var slotGames = new List<SlotGameData>();
             var userSiteData = serverInfoService.GetSiteList().ToList().Find(x => x.SiteId == siteId);
             if (category == (int)SlotGameCategoryEnum.AllAndSetStatus)
             {
-                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, null, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
+                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, gameId, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator, userSiteData));
@@ -55,7 +55,7 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                var result = slotGamesManagementService.GetSlotGameCategoryList(siteId, tpId, name, category, pageNumber, pageSize, out totalPages, out rowCount);
+                var result = slotGamesManagementService.GetSlotGameCategoryList(siteId, tpId, name, gameId, category, pageNumber, pageSize, out totalPages, out rowCount);
                 result.ForEach(x =>
                 {
                     slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator, userSiteData));

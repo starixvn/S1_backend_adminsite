@@ -79,7 +79,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int TpId { get; set; }
         public string Name { get; set; }
-
+        public string GameId { get; set; }
         /// <summary>
         /// SlotGame 手動設定類別：
         /// AllAndSetStatus = 0,
