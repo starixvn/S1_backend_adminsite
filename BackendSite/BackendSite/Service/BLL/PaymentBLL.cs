@@ -10,8 +10,6 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentService adjustmentService;
         private readonly WalletService walletService;
         private readonly AdminService adminService;
-        private readonly TpMaintainService _tpMaintainService;
-        private readonly ThirdPartyService _thirdPartyService;
         private readonly BonusManageService _bonusManageService;
 
         public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
@@ -19,8 +17,6 @@ namespace BackendSite.Service.BLL
             adjustmentService = provider.GetRequiredService<AdjustmentService>();
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
-            _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
-            _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
         }
 
@@ -41,42 +37,6 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize,
-            ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber,
-                out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
-        {
-            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                currencyId, baseCurrencyId, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount,
-                ref currencyAmount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
-        {
-            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate, currencyId,
-                baseCurrencyId, rebateCategoriesId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate)
-        {
-            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()

@@ -2130,27 +2130,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
             }
         }
 
-        // GetRebateLog(PageNumber) {
-        //     Loading.OnLoading();
-        //     let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
-        //     let CustId = getUrlParameter("custId");
-        //     if (!isNaN(CustId)) {
-        //         let iCustId = parseInt(CustId);
-        //         axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
-        //             .then(function (response) {
-        //                 Loading.UnLoading();
-        //                 let result = response.data;
-        //                 if (result.errorCode == 0) {
-        //                     this.setState({ RebateLogData: result });
-        //                 } else {
-        //                     alert(result.message);
-        //                 }
-        //             }.bind(this)).catch(function (error) {
-        //                 Loading.UnLoading();
-        //                 alert(error);
-        //             }.bind(this));
-        //     }
-        // }
         GetRebateLog(PageNumber) {
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
