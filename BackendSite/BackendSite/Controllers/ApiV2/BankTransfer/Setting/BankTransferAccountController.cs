@@ -165,6 +165,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
+        [HttpPost]
         public ApiResult GetTransferAccountReason()
         {
             var result = _bankFinancialBll.GetReason("BankFinancial/TransferAccountManage");
@@ -176,6 +177,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
+        [HttpPost]
         public ApiResult GetPayList()
         {
             var apiResult = new ApiResult<IEnumerable<PayList>>();
@@ -196,6 +198,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return apiResult;
         }
         
+        [HttpPost]
         public ApiResult GetAgentList(GetAgentListRequest req)
         {
             var result = _bankFinancialBll.GetTransferAccountAgentList(req.SiteId);
