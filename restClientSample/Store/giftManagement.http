@@ -4,6 +4,9 @@
 # AdminSite DEV
 @url=http://admin.n88dev.com
 
+# AdminSite RLS
+#@url=https://backofficerelease.nova88asia.com/
+
 ###
 # Login V2
 POST {{url}}/apiV2/Home/Signin HTTP/1.1
@@ -113,8 +116,6 @@ POST {{url}}/apiV2/GiftManagement/GetCategories HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 2,
     "langCodes": ["en", "my"]
 }
 
@@ -124,56 +125,14 @@ POST {{url}}/apiV2/GiftManagement/CreateCategory HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 4,
     "infos": [
         {
             "lang": "th",
-            "name": "เครื่องใช้ในบ้าน"
+            "name": "test_c_th"
         },
         {
             "lang": "en",
-            "name": "HOME APPLIANCES"
-        },
-        {
-            "lang": "th",
-            "name": "สุขภาพและการดูแลส่วนบุคคล"
-        },
-        {
-            "lang": "en",
-            "name": "HEALTH & PERSONAL CARE"
-        },
-        {
-            "lang": "th",
-            "name": "ระบบเครื่องเสียงและลำโพง"
-        },
-        {
-            "lang": "en",
-            "name": "HOME THEATRE SYSTEM & SPEAKERS"
-        },
-        {
-            "lang": "th",
-            "name": "คอมพิวเตอร์และโทรศัพท์มือถือ"
-        },
-        {
-            "lang": "en",
-            "name": "COPUTING & PHONE"
-        },
-        {
-            "lang": "th",
-            "name": "เสื้อผ้าและอุปกรณ์กีฬา"
-        },
-        {
-            "lang": "en",
-            "name": "SPORTS APPAREL & ACCERSORIES"
-        },
-        {
-            "lang": "th",
-            "name": "ไลฟ์สไตล์และการเดินทาง"
-        },
-        {
-            "lang": "en",
-            "name": "LIFESTYLE & TRAVEL"
+            "name": "test_c_en"
         }
     ]
 }
@@ -184,17 +143,15 @@ POST {{url}}/apiV2/GiftManagement/UpdateCategory HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 2,
     "categoryId": 6,
     "infos": [
         {
-            "lang": "en",
-            "name": "test6_c_en"
+            "lang": "id",
+            "name": "GAYA HIDUP & PERJALANAN"
         },
         {
-            "lang": "my",
-            "name": "test6_c_my"
+            "lang": "th",
+            "name": "ไลฟ์สไตล์และการเดินทาง"
         }
     ]
 }
@@ -205,8 +162,6 @@ POST {{url}}/apiV2/GiftManagement/GetTags HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 2,
     "langCodes": ["en", "my"]
 }
 
@@ -216,8 +171,6 @@ POST {{url}}/apiV2/GiftManagement/CreateTag HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 2,
     "infos": [
         {
             "lang": "en",
@@ -236,17 +189,15 @@ POST {{url}}/apiV2/GiftManagement/UpdateTag HTTP/1.1
 Content-Type: application/json
 
 {
-    "siteId": 1,
-    "currencyId": 2,
-    "tagId": 5,
+    "tagId": 3,
     "infos": [
         {
-            "lang": "en",
-            "name": "test_t5_en"
+            "lang": "id",
+            "name": "FITUR"
         },
         {
-            "lang": "my",
-            "name": "test_t5_my"
+            "lang": "th",
+            "name": "จุดเด่น"
         }
     ]
 }
