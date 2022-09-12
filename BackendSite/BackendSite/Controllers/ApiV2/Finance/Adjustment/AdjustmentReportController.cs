@@ -34,27 +34,35 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public async Task<ApiListResultCurrencyAmount<PaymentAdjustmentReportResponse>> GetDataList(PaymentAdjustmentReportRequest request)
         {
-            var aipResult = new ApiListResultCurrencyAmount<PaymentAdjustmentReportResponse>();
+            var apiResult = new ApiListResultCurrencyAmount<PaymentAdjustmentReportResponse>();
 
-            var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
-            var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(request.SiteId,
-                request.CurrencyIds,
-                request.UserName,
-                adjustTypeList,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                request.TransId,
-                request.PageNumber,
-                request.PageSize);
+            try
+            {
+                var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
+                var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(request.SiteId,
+                    request.CurrencyIds,
+                    request.UserName,
+                    adjustTypeList,
+                    request.StartDate.DateTime,
+                    request.EndDate.DateTime,
+                    request.TransId,
+                    request.PageNumber,
+                    request.PageSize);
 
-            aipResult.Data = queryResult.Data;
-            aipResult.PageNumber = request.PageNumber;
-            aipResult.RowCount = queryResult.RowCount;
-            aipResult.TotalPages = queryResult.TotalPages;
-            aipResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            aipResult.CurrencyAmount = queryResult.CurrencyAmount;
+                apiResult.Data = queryResult.Data;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.RowCount = queryResult.RowCount;
+                apiResult.TotalPages = queryResult.TotalPages;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
 
-            return aipResult;
+            return apiResult;
         }
 
         /// <summary>

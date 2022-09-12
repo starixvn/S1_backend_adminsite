@@ -117,9 +117,6 @@ namespace BackendSite.Service.BLL
         int pageNumber,
         int pageSize)
         {
-
-            var siteList = serverInfoBLL.GetSiteList();
-
             #region AdjustType
 
             var adjustTypesForAi = new List<int>();
@@ -151,36 +148,18 @@ namespace BackendSite.Service.BLL
                     (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                     Math.Abs(pageSize));
 
+            var siteList = serverInfoBLL.GetSiteList();
             queryResult.Data = new List<PaymentAdjustmentReportResponse>();
-
+       
             foreach (var row in queryResult.QueryResult)
             {
-                queryResult.Data.Add(new PaymentAdjustmentReportResponse
-                {
-                    SiteId = row.SiteId,
-                    CurrencyId = row.CurrencyId,
-                    CustId = row.CustId,
-                    TransId = row.TransId,
-                    CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
-                    AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
-                    AdjustCategory = row.Category,
-                    AdjustCategoryName = row.CategoryName,
-                    SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
-                    UserName = row.UserName,
-                    Amount = row.Amount,
-                    CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
-                    StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
-                    Memo = row.Memo,
-                    SabaID = row.SabaID,
-                    Operator = row.Operator,
-                    WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
-                    CategoryName = row.CategoryName,
-                    DepositId = row.DepositId
-                });
+                queryResult.Data.Add(ComposePaymentAdjustmentReportResponse(row, siteList));
             }
 
             return queryResult;
         }
+
+      
 
         public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
@@ -344,6 +323,34 @@ namespace BackendSite.Service.BLL
             }
             return true;
         }
+
+
+        private PaymentAdjustmentReportResponse ComposePaymentAdjustmentReportResponse(PaymentAdjustmentV2 row, IEnumerable<ServerInfo> siteList)
+        {
+            return new PaymentAdjustmentReportResponse
+            {
+                SiteId = row.SiteId,
+                CurrencyId = row.CurrencyId,
+                CustId = row.CustId,
+                TransId = row.TransId,
+                CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
+                AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                AdjustCategory = row.Category,
+                AdjustCategoryName = row.CategoryName,
+                SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
+                UserName = row.UserName,
+                Amount = row.Amount,
+                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
+                StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                Memo = row.Memo,
+                SabaID = row.SabaID,
+                Operator = row.Operator,
+                WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
+                CategoryName = row.CategoryName,
+                DepositId = row.DepositId
+            };
+        }
+
         #endregion
     }
 }
