@@ -541,6 +541,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<int> TPCategoryList { get; set; }
         }
+
+        public class GetWinLoseSummaryDetailRequset : CustIdWithDateRangeRequest
+        {
+            public IEnumerable<int> GameTypes { get; set; }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -3118,6 +3123,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult<DashboardWinLossGroupData>
             {
                 Data = dashboardWinLossGroup,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary
+        public ApiListResult<WinLoseSummary> GetWinLoseSummary(CustIdRequest request)
+        {
+            var winLoseSummary = _custInfoBll.GetWinLoseSummary(request.CustId);
+            return new ApiListResult<WinLoseSummary>
+            {
+                Data = winLoseSummary,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary > Detail
+        public ApiListResult<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(GetWinLoseSummaryDetailRequset request)
+        {
+            var winLoseSummaryDetail = _custInfoBll.GetWinLoseSummaryDetail(request.CustId, JsonConvert.SerializeObject(request.GameTypes));
+            return new ApiListResult<WinLoseSummaryDetailResult>
+            {
+                Data = winLoseSummaryDetail,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

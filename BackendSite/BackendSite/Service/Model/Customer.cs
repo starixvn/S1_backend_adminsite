@@ -668,4 +668,27 @@ namespace BackendSite.Service.Model
         public decimal OutstandingAmount { set; get; }
         public decimal WinLoss { set; get; }
     }
+
+    public class WinLoseSummary
+    {
+        public decimal WinlostAmount { set; get; }
+        public int CategoryId { set; get; }
+        public string Name { get; set; }
+    }
+    public class WinLoseSummaryDetail
+    {
+        public decimal WinlostAmount { set; get; }
+        public decimal Stake { set; get; }
+        public int GameType { set; get; }
+        public string GameName { get; set; }
+        public int SettlementType { set; get; }
+    }
+    public class WinLoseSummaryDetailResult
+    {
+        public decimal WinlostAmount { set; get; }
+        public decimal StakeSettled { set; get; }
+        public decimal StakeNotRollover { set; get; }
+        public int GameType { set; get; }
+        public string GameName { get; set; }
+    }
 }
