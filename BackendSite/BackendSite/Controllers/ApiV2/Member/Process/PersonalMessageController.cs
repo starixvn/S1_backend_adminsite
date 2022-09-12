@@ -489,7 +489,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                resultMessage = ex.ToString();
+                resultMessage = ex.Message;
                 errorCode = (int)SendMessageStatus.Failed;
             }
         }
