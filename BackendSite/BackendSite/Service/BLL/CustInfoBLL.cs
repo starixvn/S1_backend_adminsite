@@ -34,6 +34,7 @@ namespace BackendSite.Service.BLL
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
         private readonly WinLostReportService _winLostReportService;
+        private readonly RebateManageService _rebateManageService;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -58,6 +59,7 @@ namespace BackendSite.Service.BLL
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
+            _rebateManageService = provider.GetRequiredService<RebateManageService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -1045,6 +1047,64 @@ namespace BackendSite.Service.BLL
         {
            var AllGameType =  _winLostReportService.GetAllGameType().ToList();
            return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
+        }
+
+        public DashboardWinLossGroupData GetDashboardWinLossGroup(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var tempDashboardWinLossGroup = _custInfoService.GetDashboardWinLossGroup(custId, Convert.ToDateTime(Date));
+
+            return new DashboardWinLossGroupData()
+            {
+                Winnings = tempDashboardWinLossGroup.Winnings,
+                Losses = tempDashboardWinLossGroup.Losses,
+                WinLoss = tempDashboardWinLossGroup.Winnings + tempDashboardWinLossGroup.Losses,
+                OutstandingAmount = tempDashboardWinLossGroup.OutstandingAmount,
+                ValidBet = tempDashboardWinLossGroup.TpBetRecordStake + tempDashboardWinLossGroup.RelayStake
+            };
+        }
+
+        public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummary = _custInfoService.GetWinLoseSummary(custId, Convert.ToDateTime(Date)).ToList();
+            List<WinLoseSummary> result = winLoseSummary.GroupBy(x => x.CategoryId).Select(y => new WinLoseSummary
+            {
+                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                Name = y.First().Name,
+                CategoryId = y.Key
+            }).ToList();
+            var tPCategoryList = _rebateManageService.GetTPCategoryList().ToList();
+
+            tPCategoryList.ForEach(x =>
+            {
+                if (!result.Any(y => y.CategoryId == x.CategoryId))
+                {
+                    result.Add(new WinLoseSummary()
+                    {
+                        WinlostAmount = 0,
+                        Name = x.CategoryName,
+                        CategoryId = x.CategoryId
+                    });
+                }
+            });
+
+            return result.OrderBy(x=> x.CategoryId);
+        }
+        public IEnumerable<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(int custId, string GameTypes)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummaryDetail = _custInfoService.GetWinLoseSummaryDetail(custId, Convert.ToDateTime(Date), GameTypes).ToList();
+            List<WinLoseSummaryDetailResult> result = winLoseSummaryDetail.GroupBy(x => x.GameType).Select(y => new WinLoseSummaryDetailResult
+            {
+                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                GameName = y.First().GameName,
+                GameType = y.Key,
+                StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
+                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0)
+            }).ToList();
+
+            return result;
         }
     }
 }
