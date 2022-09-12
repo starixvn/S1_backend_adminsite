@@ -98,14 +98,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
 
-        public class GetRebateLogByCustReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
-
         public class CustTpBetRecordListOneWeekReq
         {
             public int CustId { get; set; }
@@ -139,31 +131,12 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
-        public class BonusCashBackInfoListDetail
-        {
-            public int errorCode { set; get; }
-            public string custName { set; get; }
-            public string massage { set; get; }
-            public decimal WinlostAmountCountCalculation { set; get; }
-            public decimal Percentage { set; get; }
-        }
-
         public class VipRebateInfoByCustIdPara
         {
             public int CustId { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int PageNumber { get; set; }
-        }
-
-        public class VipRebateInfoParaExport
-        {
-            public string SelectSite { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string User { get; set; }
-            public int CategoryId { get; set; }
         }
 
         public class CustTpBetRecordListReq
@@ -322,48 +295,6 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        public ApiListResult<RebateLog> GetRebateLogByCust(GetRebateLogByCustReq getRebateLogByCustReq)
-        {
-            var pageNumber = getRebateLogByCustReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
-            var apiListResult = new ApiListResult<RebateLog>
-            {
-                Data = _paymentBLL.GetRebateLogByCust(getRebateLogByCustReq.CustId,
-                    getRebateLogByCustReq.StartDate, getRebateLogByCustReq.EndDate, 10, ref pageNumber, out totalPages,
-                    out rowCount),
-                ErrorCode = 0,
-                PageNumber = pageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount
-            };
-
-            return apiListResult;
-        }
-
-        public ApiListResultCurrencyAmount<RebateLog> GetRebateLog([FromForm] IEnumerable<int> SelectSite,
-            [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate,
-            [FromForm] int PageNumber, [FromForm] int CurrencyId, [FromForm] int BaseCurrencyId,
-            [FromForm] int RebateCategoriesId)
-        {
-            var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
-            var PageSize = 10;
-            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
-            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
-            var currencyAmount = new List<string>();
-            apiListResult.Data = _paymentBLL.GetRebateLog(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
-                PageSize,
-                CurrencyId, BaseCurrencyId, RebateCategoriesId, ref PageNumber, out var TotalPages, out var RowCount,
-                ref currencyAmount);
-            apiListResult.PageNumber = PageNumber;
-            apiListResult.RowCount = RowCount;
-            apiListResult.TotalPages = TotalPages;
-            apiListResult.ErrorCode = 0;
-            apiListResult.CurrencyAmount = currencyAmount;
-
-            return apiListResult;
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -387,62 +318,6 @@ namespace BackendSite.Controllers.Api
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-        [HttpPost]
-        public IActionResult ExportRebateLog(string SelectSite, string UserName, int RebateType, long StartDate,
-            long EndDate, int CurrencyId, int BaseCurrencyId, int RebateCategoriesId)
-        {
-            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
-            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
-            
-            var exportData = _paymentBLL.GetRebateLogExport(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
-                CurrencyId, BaseCurrencyId, RebateCategoriesId);
-            
-            foreach (var data in exportData)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-            }
-            
-            var stream = _excelBLL.ExportV2(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
-        }
-
-        public ApiListResult<RebateInfo> GetRebateInfoList([FromForm] IEnumerable<int> SelectSite,
-            [FromForm] string UserName, [FromForm] int RebateType, [FromForm] long StartDate, [FromForm] long EndDate,
-            [FromForm] int PageNumber)
-        {
-            var apiListResult = new ApiListResult<RebateInfo>();
-            var PageSize = 10;
-            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
-            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
-            
-            apiListResult.Data = _paymentBLL.GetRebateInfoList(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime,
-                PageSize, ref PageNumber, out var TotalPages, out var RowCount);
-            apiListResult.PageNumber = PageNumber;
-            apiListResult.RowCount = RowCount;
-            apiListResult.TotalPages = TotalPages;
-            apiListResult.ErrorCode = 0;
-
-            return apiListResult;
-        }
-
-        [HttpPost]
-        public IActionResult ExportRebateInfo(string SelectSite, string UserName, int RebateType, long StartDate,
-            long EndDate)
-        {
-            var startTime = DateTimeExtensions.UnixToDateTimeOffset(StartDate);
-            var endTime =DateTimeExtensions.UnixToDateTimeOffset(EndDate);
-            
-            var exportData = _paymentBLL.GetRebateInfoExport(SelectSite, UserName, RebateType, startTime.DateTime, endTime.DateTime);
-            foreach (var data in exportData)
-            {
-                data.ClaimTime = new DateTimeOffset(data.ClaimTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-            }
-            var stream = _excelBLL.ExportV2(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         /// <summary>
