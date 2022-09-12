@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
                     (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                     Math.Abs(pageSize));
 
-            var siteList = serverInfoBLL.GetSiteList();
+            var siteList = serverInfoBLL.GetSiteList().ToList();
             queryResult.Data = new List<PaymentAdjustmentReportResponse>();
        
             foreach (var row in queryResult.QueryResult)
