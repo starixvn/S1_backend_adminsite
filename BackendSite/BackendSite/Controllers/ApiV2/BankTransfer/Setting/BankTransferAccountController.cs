@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -104,7 +103,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
         public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoListByIdRequest req)
         {
