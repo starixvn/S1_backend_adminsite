@@ -1,6 +1,11 @@
-﻿using BackendSite.Extensions;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+using Microsoft.VisualStudio.Web.CodeGeneration.CommandLine;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace BackendSite.Service.Model
 {
@@ -11,7 +16,10 @@ namespace BackendSite.Service.Model
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public string CategoryName { get; set; }
+        
+        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
         public int? CategoryId { get; set; }
+        
         public DateTimeOffset? PeriodFrom
         {
             get
@@ -113,7 +121,11 @@ namespace BackendSite.Service.Model
         private DateTimeOffset? _displayToTime;
         public string BonusCode { get; set; }
         public string Description { get; set; }
+        
+        [Description("1.1st Deposit, 2.Re-Deposit, 3.FreeBet, 5.Wallet bonus, 6.Rebate, 7.CashBack, 8.Special Bonus 9.Retention free bet")]
         public int PromotionType { get; set; }
+        
+        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
         public int? CategoryId { get; set; }
         public DateTimeOffset? PeriodFromTime 
         {
@@ -151,21 +163,40 @@ namespace BackendSite.Service.Model
                     _displayToTime = value.Value.ToUniversalTime();
             }
         }
+        
+        [Description("領取後過多少天過期")]
         public int ExpiryDays { get; set; }
         public int? Sort { get; set; }
+        
+        [Description("Bonus 啟用開關: 1.開 2.關")]
         public int Status { get; set; }
         public int SiteId { get; set; }
+        
+        /// <summary>
+        /// 1. Seamless, 2. Transfer
+        /// </summary>
         public int? WalletType { get; set; }
         public int? TpId { get; set; }
+        
         [Obsolete("rebate移至其他地方，此參數不需要")]
         public int? RedeemHours { get; set; }
         public int? PeriodType { get; set; }
         public int? PeriodDay { get; set; }
         public string SpecialCode { get; set; }
+        
+        [Description("是否為特殊紅利: 1.true 2.false")]
         public bool IsSpecial { get; set; }
+        
+        [Description("新註冊會員才可以領: 1.true 2.false, PromotionType = 1 且 IsSpecial = 1 才需要這個值")]
         public bool OnlyRegistered { get; set; }
+        
+        [Description("顯示在哪個頁面上: 1.All, 2.Web, 3.App")]
         public int PromotionDeviceType { get; set; }
+        
+        [Description("點擊前台 More Info 後的反應: 0.Link, 1.Detail, PromotionType=8 才能設定，其餘皆傳1")]
         public int? PromotionAction { get; set; }
+        
+        [Description("是否自動延長有效期限: 0.不延長 1.延長")]
         public int AutoExtend { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
@@ -176,21 +207,40 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public int CurrencyId { get; set; }
         public int SiteId { get; set; }
+        
+        [Description("當日領取數量限制,0不限制")]
         public int Usage { get; set; }
 
         [Obsolete("計算次數使用不需要要帶")]
         public int? BeenUsed { get; set; }
+        
+        [Description("幾倍 Bonus 流水才 fulfill")]
         public int RollOver { get; set; }
+        
+        [Description("贏錢贏幾倍才 fulfill")]
         public int WinOver { get; set; }
+        
         /// <summary>
         /// 後端設定不需要帶
         /// </summary>
         public int FullFillType { get; set; }
+        
+        [Description("Bonus 領取%數或領取金額")]
         public decimal Bonus { get; set; }
+        
+        [Description("Bonus Amount Type, 1=Percentage, 2=Amount")]
         public int BonusType { get; set; }
+        
+        [Description("Bonus Amount 領取上限")]
         public decimal MaxBonus { get; set; }
+        
+        [Description("HTML 細節內容, JSON format")]
         public string Details { get; set; }
+        
+        [Description("幣別啟用開關, 1.開, 2.關")]
         public int Status { get; set; }
+        
+        [Description("達到多少存款金額才可領, PromotionType = 1,2 時必填, 其餘皆傳0")]
         public decimal RequiredAmount { get; set; }
         /// <summary>
         /// 目前應該都固定帶1
@@ -198,8 +248,15 @@ namespace BackendSite.Service.Model
         public int LockedType { get; set; }
         public decimal MinPayout { get; set; }
         public string VN_AffCodes { get; set; }
+        
+        [Description("總共領取數量限制，0為不限制")]
         public int TotalUsageLimit { get; set; }
-        public IEnumerable<PromotionCashBack> CashBackList { get; set; }
+
+        [Obsolete("V2 Cashback 不需要此參數")]
+        public IEnumerable<PromotionCashBack> CashBackList { get; set; } = new List<PromotionCashBack>();
+        
+        [Description("V2 Cashback 使用參數")]
+        public CashBackSetting CashBackSetting { get; set; } = new();
         public string TierAmount { get; set; } = string.Empty;
         public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
     }
@@ -234,6 +291,24 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public decimal LossAmount { get; set; }
         public int TpId { get; set; }
+    }
+    
+    public class CashBackSetting
+    {
+        public IEnumerable<CashBackTpInfo> CashBackTpInfos { get; set; }
+        
+        public decimal Percentage { get; set; }
+        
+        [Description("總共輸多少才計算")]
+        public decimal LossAmount { get; set; }
+    }
+
+    public class CashBackTpInfo
+    {
+        public int TpId { get; set; }
+
+        [Description("Tp CategoryId: 1=Sports, 2=Casino (Slot Game), 3=Live Casino, 4=Fishing, 5=Cockfighting, 6=Lottery, 7=Virtual Sports, 8=Poker")]
+        public int CategoryId { get; set; }
     }
 
     public class PromotionCashBack1 : PromotionCashBack 
@@ -360,6 +435,8 @@ namespace BackendSite.Service.Model
     public class GetCashBackGamerep
     {
         public string GameName { get; set; }
+        
+        [Description("TpId 傳入參數為0回傳 key 為 TpId，TpId 傳入參數大於0回傳 key 代表 Tp CategoryId")]
         public int Key { get; set; }
     }
     public class CheckSpecialCodeDuplicate

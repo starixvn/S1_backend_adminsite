@@ -17,13 +17,14 @@ namespace BackendSite.Service.DAL
             _reportDbClient = dbClient.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
 
-        public List<SlotGameList> GetSlotGameList(int siteId, int tpId, string name, SlotGameFilterStatusEnum status, int pageNumber, int pageSize,out int totalPages,out int rowCount)
+        public List<SlotGameList> GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status, int pageNumber, int pageSize,out int totalPages,out int rowCount)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
             parameter.Add("TpId", tpId, DbType.Int32);
             parameter.Add("Status", (int)status, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
+            parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
             parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
             parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -47,13 +48,14 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
 
-        public List<SlotGameCategoryList> GetSlotGameCategoryList(int siteId, int tpId, string name, SlotGameCategoryEnum category, int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        public List<SlotGameCategoryList> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
             parameter.Add("TpId", tpId, DbType.Int32);
             parameter.Add("CategoryId", (int)category, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
+            parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
             parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
             parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
             parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

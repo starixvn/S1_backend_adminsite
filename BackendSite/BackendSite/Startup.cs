@@ -82,7 +82,7 @@ namespace BackendSite
 
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ICustomerBLL, CustomerBLL>();
+            services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
@@ -91,6 +91,7 @@ namespace BackendSite
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
+            services.AddTransient<IDeviceService, DeviceService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

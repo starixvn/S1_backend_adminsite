@@ -13,10 +13,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
-        private readonly ExcelBLL _excelBll;
+        private readonly LiveReigstrationExcelBLL _excelBll;
         private readonly LiveRegistrationDecorator _registrationBll;
 
-        public RegistrationManagementController(ExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
+        public RegistrationManagementController(LiveReigstrationExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
         {
             _excelBll = excelBll;
             _registrationBll = registrationBll;
@@ -34,14 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost("GetList")]
         public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest request)
         {
-            var startTime = request.StartDate.ToUniversalTime().DateTime;
-            var endTime = request.EndDate.ToUniversalTime().DateTime;
-            
-            var searchResult = await _registrationBll.GetRegLiveStatusData(request.SiteId,
-                request.CurrencyId, request.DepositStatus, request.Status,
-                request.UserName, request.PageNumber, request.PageSize, request.Sort,
-                startTime, endTime, request.AffiliatesCode, request.AgentCodeType,
-                request.DormantUser, request.CallOutStatus, request.DateType, request.StartDate.Offset);
+            var searchResult = await _registrationBll.GetRegLiveStatusData(request);
             
             var apiResult = new ApiListResult<LiveRegistration>
             {
@@ -63,18 +56,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// 
         /// Func Path：CSD > Registration Management > [Submit](Query) > [Export Excel]
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 2 })]
         [HttpPost("Export")]
-        public IActionResult Export(ExportRegLiveStatusRequest req)
+        public async Task<IActionResult> Export(ExportRegLiveStatusRequest request)
         {
-            var startTime = req.StartDate.ToUniversalTime().DateTime;
-            var endTime = req.EndDate.ToUniversalTime().DateTime;
-
-            var exportData = _registrationBll.GetExportRegLiveStatus(req.SiteId, req.CurrencyId, req.DepositStatus,
-                req.Status, req.UserName, req.Sort, startTime, endTime, req.AffiliatesCode, req.AgentCodeType,
-                req.DormantUser, req.CallOutStatus, req.DateType);
-            var stream = _excelBll.Export(exportData, offset: req.StartDate.Offset);
+            var exportData = await _registrationBll.GetExportRegLiveStatus(request);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "Registration");
         }
 

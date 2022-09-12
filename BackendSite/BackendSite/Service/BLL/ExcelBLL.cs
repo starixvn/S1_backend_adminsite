@@ -94,7 +94,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
+        public virtual byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -108,6 +108,7 @@ namespace BackendSite.Service.BLL
                     	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
+
                 ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }
@@ -147,7 +148,9 @@ namespace BackendSite.Service.BLL
             p.Save();
             return ms.ToArray();
         }
-
+        
+        
+        
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,

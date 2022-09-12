@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -21,7 +21,19 @@ namespace BackendSite.Service.Model
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
     }
-    public class GetRegLiveStatusRequest : ApiRequestPageModel
+    public class ExportRegLiveStatusData
+    {
+        public string UserName { get; set; }
+        public int ActStatus { get; set; }
+        public DateTime RegTime { get; set; }
+        public DateTime LastActiveTime { get; set; }
+        public string AccountName { get; set; }
+        public string PhoneNo { get; set; }
+        public string Note { get; set; }
+        public string UpdateAt { get; set; }
+        public string Operator { get; set; }
+    }
+    public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -35,7 +47,9 @@ namespace BackendSite.Service.Model
         public int DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        public int Sort { get; set; }
+        public bool OrderBy { get; set; }
+        public string OrderByProperty { get; set; }
+        public OrderByDirection OrderByDirection { get; set; }
     }
 
     public class ExportRegLiveStatusRequest
@@ -52,7 +66,17 @@ namespace BackendSite.Service.Model
         public int DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        public int Sort { get; set; }
+    }
+    public class ExportLiveRegistration
+    {
+        public string UserName { get; set; }
+        public string FullName { get; set; }
+        public string DepositStatus { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public DateTimeOffset LastActiveTime { get; set; }
+        public string PhoneNo { get; set; }
+        public string Note { get; set; }
+        public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult
     {
