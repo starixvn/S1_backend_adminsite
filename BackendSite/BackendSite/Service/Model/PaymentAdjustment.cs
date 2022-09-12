@@ -70,9 +70,6 @@ namespace BackendSite.Service.Model
         }
     }
 
-
-
-
     public class PaymentAdjustmentFrontEnd
     {
         public int SiteId { get; set; }

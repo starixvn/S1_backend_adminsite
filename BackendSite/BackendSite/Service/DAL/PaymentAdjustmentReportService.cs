@@ -77,6 +77,61 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<PaymentAdjustmentReportResponseWrapper> GetPaymentAdjustmentReportV2Async(string siteIds,
+         string currencyIds,
+         bool getFromAdjustmentInfo,
+         string AdjustTypesForAI,
+         bool getFromLogAdminAdjustWallet,
+         string AdjustTypesForLAAW,
+         string userName,
+         DateTime startDate,
+         DateTime endDate,
+         string transId,
+         int startIndex,
+         int pageSize)
+        {
+
+            var result = new PaymentAdjustmentReportResponseWrapper();
+            var tempCurrencyTotalAmount = new List<string>();
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_GetFromAdjustmentInfo", getFromAdjustmentInfo);
+            props.Add("_AdjustTypesForAI", AdjustTypesForAI);
+            props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
+            props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+
+            #region GetCurrencyTotalAmount
+
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V5", props)).ToList();
+            if (currencyTotalAmount.Count > 0)
+            {
+                currencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                });
+            }
+            result.CurrencyAmount = tempCurrencyTotalAmount;
+
+            #endregion
+
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V6", props);
+            result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            result.RowCount = props.Get<int?>("_RowCount") ?? 0;
+            
+            return result;
+        }
+
+
         public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string siteIds,
             string currencyIds,
             bool getFromAdjustmentInfo,

@@ -107,6 +107,81 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public async Task<PaymentAdjustmentReportResponseWrapper> GetPaymentAdjustmentReportV2Async(int siteId,
+        IEnumerable<int> currencyIds,
+        string userName,
+        IEnumerable<int> adjustTypes,
+        DateTime startDate,
+        DateTime endDate,
+        string transId,
+        int pageNumber,
+        int pageSize)
+        {
+
+            var siteList = serverInfoBLL.GetSiteList();
+
+            #region AdjustType
+
+            var adjustTypesForAi = new List<int>();
+            var adjustTypesForLaaw = new List<int>();
+
+            if (!AdjustTypeCheck(adjustTypes,
+            out var getFromAdjustmentInfo,
+            out adjustTypesForAi,
+            out var getFromLogAdminAdjustWallet,
+            out adjustTypesForLaaw))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            #endregion
+
+            //取 DB 資料
+            var queryResult = await paymentAdjustmentService.GetPaymentAdjustmentReportV2Async(
+                    JsonConvert.SerializeObject(new List<int>() { siteId }),
+                    JsonConvert.SerializeObject(currencyIds),
+                    getFromAdjustmentInfo,
+                    JsonConvert.SerializeObject(adjustTypesForAi),
+                    getFromLogAdminAdjustWallet,
+                    JsonConvert.SerializeObject(adjustTypesForLaaw),
+                    userName,
+                    startDate,
+                    endDate,
+                    transId,
+                    (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                    Math.Abs(pageSize));
+
+            queryResult.Data = new List<PaymentAdjustmentReportResponse>();
+
+            foreach (var row in queryResult.QueryResult)
+            {
+                queryResult.Data.Add(new PaymentAdjustmentReportResponse
+                {
+                    SiteId = row.SiteId,
+                    CurrencyId = row.CurrencyId,
+                    CustId = row.CustId,
+                    TransId = row.TransId,
+                    CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
+                    AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                    AdjustCategory = row.Category,
+                    AdjustCategoryName = row.CategoryName,
+                    SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
+                    UserName = row.UserName,
+                    Amount = row.Amount,
+                    CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
+                    StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                    Memo = row.Memo,
+                    SabaID = row.SabaID,
+                    Operator = row.Operator,
+                    WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
+                    CategoryName = row.CategoryName,
+                    DepositId = row.DepositId
+                });
+            }
+
+            return queryResult;
+        }
+
         public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
             string userName,
@@ -210,16 +285,17 @@ namespace BackendSite.Service.BLL
             }
             input.Before.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.Before.Category)?.Description;
             input.After.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.After.Category)?.Description;
-            
+
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);
-            
+
             // 依 prefix 判斷更新哪張表
             if (input.TransId.StartsWith("a", StringComparison.OrdinalIgnoreCase))
                 return paymentAdjustmentService.SetAdjustmentInfo(input, id);
 
             return paymentAdjustmentService.SetLogAdminAdjustWallet(input, id);
         }
+
         #region Private Methods
 
         private bool AdjustTypeCheck(IEnumerable<int> adjustTypes,
@@ -236,7 +312,6 @@ namespace BackendSite.Service.BLL
             //先暫時寫死
             //原本是1234抓AdjustmentInfo,56抓LogAdminAdjustWallet
             //但是現在AdjustmentInfo也有56了......後續打算要怎麼規劃呢
-
             foreach (var adjustType in adjustTypes)
             {
                 switch (adjustType)
@@ -269,8 +344,6 @@ namespace BackendSite.Service.BLL
             }
             return true;
         }
-
         #endregion
-
     }
 }
