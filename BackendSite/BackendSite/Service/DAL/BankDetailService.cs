@@ -41,6 +41,7 @@ namespace BackendSite.Service.DAL
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
             para.Add("_Agent", input.Agent ?? string.Empty);
+            para.Add("_Channels", input.SupportChannels.Any() ? JsonConvert.SerializeObject(input.SupportChannels) : null, DbType.String);
             para.Add("_StartIndex", input.StartIndex);
             para.Add("_PageSize", input.PageSize);
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -77,7 +78,7 @@ namespace BackendSite.Service.DAL
             para.Add("_Memo", input.Memo);
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
-            para.Add("_SupportQR", input.SupportQr);
+            para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 

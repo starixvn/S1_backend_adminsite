@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                             .Select(x => x.LevelName)),
                         oldData.Sort,
                         Status = oldData.Status.ToString(),
-                        SupportQr = oldData.SupportQr.ToString(),
+                        SupportChannels = string.Join(", ", oldData.SupportChannels.Select(x => x.ToString())),
                         oldData.QrCodeUrl
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
@@ -145,7 +145,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         request.Sort,
                         Status = request.Status.ToString(),
                         request.Memo,
-                        SupportQr = request.SupportQr.ToString(),
+                        SupportChannels = string.Join(", ", request.SupportChannels.Select(x => x.ToString())),
                         request.QrCodeUrl
                     }),
                     Operator = updater
