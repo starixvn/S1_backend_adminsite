@@ -17,7 +17,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             PointLevels = req.PointLevels;
             AccountNo = req.AccountNo;
             Agent = req.Agent;
-            
+            SupportChannels = req.SupportChannels.Select(x => (int) x);
             var (startIndex, absPageSize) = req.PageNumber.GetStartIndex(req.PageSize);
             PageSize = absPageSize;
             StartIndex = startIndex;
@@ -29,6 +29,8 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> SysIds { get; set; }
         public IEnumerable<int> VipLevels { get; set; }
         public IEnumerable<int> PointLevels { get; set; }
+        
+        public IEnumerable<int> SupportChannels { get; set; }
         public string AccountNo { get; set; }
         
         public string Agent { get; set; }
@@ -47,7 +49,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             Memo = req.Memo;
             Sort = req.Sort;
             Status = req.Status;
-            SupportQr = req.SupportQr;
+            SupportChannels = req.SupportChannels.Select(x => (int) x);
             QrCodeUrl = string.IsNullOrWhiteSpace(req.QrCodeUrl) ? null : req.QrCodeUrl;
             Operator = updater;
         }
@@ -61,7 +63,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int Sort { get; set; }
         public BankCardManagementStatusEnum Status { get; set; }
         public string Operator { get; set; }
-        public bool SupportQr { get; set; }
+        public IEnumerable<int> SupportChannels { get; set; }
         public string QrCodeUrl { get; set; }
     }
 }

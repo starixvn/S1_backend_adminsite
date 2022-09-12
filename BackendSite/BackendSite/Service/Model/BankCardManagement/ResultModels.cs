@@ -44,7 +44,12 @@ namespace BackendSite.Service.Model.BankCardManagement
         public decimal Dummy { set; get; }
         public string Memo { set; get; }
         public int Sort { set; get; }
-        public bool SupportQr { set; get; }
+        [JsonIgnore]
+        public string JsonSupportChannels { set; get; }
+        public IEnumerable<BankCardManagementSupportChannelEnum> SupportChannels
+            => JsonConvert.DeserializeObject<IEnumerable<BankCardManagementSupportChannelEnum>>(JsonSupportChannels ?? "[]");
+        public IEnumerable<string> SupportChannelNames =>
+            SupportChannels.Select(x => x.ToString());
         public string QrCodeUrl { set; get; }
         public DateTimeOffset LastUpdateTime
         {
