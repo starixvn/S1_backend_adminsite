@@ -189,6 +189,16 @@ namespace BackendSite.Service.BLL
             return paymentAdjustmentService.GetAdjustmentInfoByCust(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), out totalPages, out rowCount, ref CurrencyAmount);
         }
 
+
+        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2(int CustId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int pageNumber)
+        {
+            return await paymentAdjustmentService.GetAdjustmentInfoByCustV2Async(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
+        }
+
         public bool SetAdjustment(ParamsWithLog<SetAdjustment> input)
         {
             var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");

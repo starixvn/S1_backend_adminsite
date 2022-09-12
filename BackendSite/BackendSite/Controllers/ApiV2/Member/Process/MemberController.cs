@@ -15,13 +15,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
 
 
-        public MemberController(CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll)
+        public MemberController(CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, NewAuthorizeBLL newAuthorizeBll,
+            PaymentAdjustmentReportBLL paymentAdjustmentReportBll)
         {
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
             _newAuthorizeBll = newAuthorizeBll;
+            _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -66,12 +69,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+
         /// <summary>
         /// 取得玩家第三方調帳Log
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 53 })]
         public async Task<ApiListResult<TpAdjustmentLogV2>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequestV2 request)
         {
@@ -86,6 +91,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.TotalPages = result.TotalPages;
                 apiResult.RowCount = result.RowCount;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// 取得玩家主錢包調帳Log
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 52 })]
+        public async Task<ApiListResultCurrencyAmount<PaymentAdjustmentV2>> GetAdjustmentInfoByCustId(AdjustmentInfoByCustIdRequest request)
+        {
+            var pageNumber = request.PageNumber;
+            var apiResult = new ApiListResultCurrencyAmount<PaymentAdjustmentV2>();
+
+            try
+            {
+                var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(request.CustId,
+                    request.StartDate.DateTime,
+                    request.EndDate.DateTime,
+                    request.PageSize, request.PageNumber);
+
+                apiResult.Data = queryResult.Data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.PageNumber = pageNumber;
+                apiResult.TotalPages = queryResult.TotalPages;
+                apiResult.RowCount = queryResult.RowCount;
+                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+
             }
             catch (Exception ex)
             {

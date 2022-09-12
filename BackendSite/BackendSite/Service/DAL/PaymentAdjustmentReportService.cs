@@ -147,6 +147,46 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
+        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2Async(int custId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int startIndex)
+        {
+            var result = new PaymentAdjustmentWrapper();
+
+            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+          
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate, dbType: DbType.DateTime);
+
+            #region GetCurrencyTotalAmount
+            var tempCurrencyTotalAmount = new List<string>();
+            var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p, commandType: CommandType.StoredProcedure)).ToList();
+            if (currencyTotalAmount.Count > 0)
+            {
+                currencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                });
+            }
+            result.CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result.Data = await conn.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
+            result.RowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+
         public bool SetLogAdminAdjustWallet(ParamsWithLog<SetAdjustment> input, int transferId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
