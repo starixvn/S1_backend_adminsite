@@ -9,15 +9,13 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class LatestHighlightVideoController : ControllerBase
     {
         #region Fields
-
-        private readonly GameCasinoManageBLL _gameCasinoManageBll;
-        private readonly ServerInfoBLL _serverInfoBll;
+        
         private readonly LatestHighlightVideoManagementBLL _highlightVideoManagementBll;
 
         #endregion
@@ -26,19 +24,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public LatestHighlightVideoController(IServiceProvider provider)
         {
-            _gameCasinoManageBll = provider.GetRequiredService<GameCasinoManageBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _highlightVideoManagementBll = provider.GetRequiredService<LatestHighlightVideoManagementBLL>();
         }
 
         #endregion
 
-
         #region API Model
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             /// <summary>
             /// 日期-起
             /// </summary>
@@ -46,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             /// 單位為年月日，不會到小時，故不會有時區概念。
             /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
             /// </remarks>
-            public DateTimeOffset StartDate { get; set; }
+            public string StartDate { get; set; }
             /// <summary>
             /// 日期-迄
             /// </summary>
@@ -54,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             /// 單位為年月日，不會到小時，故不會有時區概念。
             /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
             /// </remarks>
-            public DateTimeOffset EndDate { get; set; }
+            public string EndDate { get; set; }
             public int Lang { get; set; }
         }
 
@@ -67,7 +62,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             /// 單位為年月日，不會到小時，故不會有時區概念。
             /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
             /// </remarks>
-            public DateTimeOffset Date { get; set; }
+            public string Date { get; set; }
             public string Title { get; set; }
             public string Link { get; set; }
             public int VideoId { get; set; }
@@ -76,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public class CreateRequest
         {
             public int SiteId { get; set; }
-            public DateTimeOffset Date { get; set; }
+            public string Date { get; set; }
             public IEnumerable<VideoDetail> Detail { get; set; }
         }
 
@@ -108,9 +103,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             var param = new GetLatestHighlightVideoDataPara
             {
-                SelectSite = request.SiteIds,
-                StartDate = request.StartDate.DateTime.ToString(),
-                EndDate = request.EndDate.DateTime.ToString(),
+                SelectSite = new List<int>{request.SiteId},
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
                 Lang = request.Lang,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
@@ -145,7 +140,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 var param = new SetLatestHighlightVideoPara()
                 {
                     VideoId = request.VideoId,
-                    Date = request.Date.DateTime.ToString(),
+                    Date = request.Date,
                     Title = request.Title,
                     Link = request.Link,
                 };
@@ -181,7 +176,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 var param = new InsrtLatestHighlightVideoPara()
                 {
                     SiteId = request.SiteId,
-                    Date = request.Date.DateTime.ToString(),
+                    Date = request.Date,
                     Detail = JsonConvert.SerializeObject(request.Detail)
                 };
 
