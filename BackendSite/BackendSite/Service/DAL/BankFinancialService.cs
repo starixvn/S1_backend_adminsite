@@ -132,7 +132,7 @@ namespace BackendSite.Service.DAL
                     _PayId = bankFinancialTransferAccount.PayId,
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
-                    _AccountCode = bankFinancialTransferAccount.AccountCode,
+                    _AccountCode = bankFinancialTransferAccount.AccountCode ?? string.Empty,
                     _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
