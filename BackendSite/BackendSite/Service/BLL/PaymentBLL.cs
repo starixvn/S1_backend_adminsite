@@ -104,11 +104,6 @@ namespace BackendSite.Service.BLL
                 baseCurrencyId, rebateCategoriesId);
         }
 
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            return walletService.GetRebateInfoByCust(CustId);
-        }
-
         public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
             DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {

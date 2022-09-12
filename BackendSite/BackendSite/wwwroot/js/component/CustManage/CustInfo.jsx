@@ -874,45 +874,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
         }
     }
 
-    class RebateInfo extends React.Component {
-        render() {
-            let RebateInfoRows = this.props.RebateInfo != null ?
-                <tbody>
-                    {
-                        this.props.RebateInfo.map(x => {
-                            return (
-                                <tr>
-                                    <td>{x.bonusCode}</td>
-                                    <td>{x.description}</td>
-                                    <td>{x.rebateTypeName}</td>
-                                    <td>{moment(x.claimTime).format('l LTS')}</td>
-                                </tr>
-                            )
-                        }
-                        )
-                    }
-                </tbody>
-                :
-                null;
-            return (
-                <div className="table-responsive-md table">
-                    <span class="label">Rebate Info</span>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Bonus Code</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Rebate Type Name</th>
-                                <th scope="col">Claim Time</th>
-                            </tr>
-                        </thead>
-                        {RebateInfoRows != null ? RebateInfoRows : null}
-                    </table>
-                </div>
-            )
-        }
-    }
-
     class CustInfo extends React.Component {
         constructor(props) {
             super(props);
@@ -1130,7 +1091,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                console.log(data);
                 axios.post('/api/CustManage/SetEnableDisablePromotion', { 
                     CustId: data.custId ,
                     siteId: data.siteId,
@@ -1512,7 +1472,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -2052,7 +2011,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                     </tr>
                                 </tbody>
                             </table>
-                            {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
                             <div className="table-responsive-md table">
@@ -2529,7 +2487,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
                             this.GetBonusWalletLog();
-                            this.GetRebateInfoLog();
                             this.onGetRewardBottonStatus();
                             this.GetTPWalletData();
                         } else {
@@ -2794,35 +2751,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                 {
                                     ...this.state.CustInfoData,
                                     BonusWallet: result.data
-                                }
-                            }
-                            );
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        // Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
-        }
-
-        GetRebateInfoLog() {
-            let CustId = getUrlParameter("custId");
-            if (!isNaN(CustId)) {
-                let iCustId = parseInt(CustId);
-                // Loading.OnLoading();
-                axios.post('/api/CustManage/GetRebateInfoByCust', { CustId: iCustId })
-                    .then(function (response) {
-                        // Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.setState({
-                                ...this.state,
-                                CustInfoData:
-                                {
-                                    ...this.state.CustInfoData,
-                                    RebateInfo: result.data
                                 }
                             }
                             );

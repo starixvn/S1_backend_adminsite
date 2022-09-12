@@ -162,12 +162,7 @@ namespace BackendSite.Service.DAL
             var rebateLogList = _mainDbClient.Query<RebateLog>("Admin_RebateLogListExport_Get_V4", p);
             return rebateLogList;
         }
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get_V2", new { CustId }, commandType: CommandType.StoredProcedure);
-            return rebateInfoList;
-        }
+        
         public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize) });

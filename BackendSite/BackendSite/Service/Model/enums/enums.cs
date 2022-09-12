@@ -476,7 +476,6 @@ namespace BackendSite.Service.Model.enums
         FstDeposit = 1,
         ReDeposit = 2,
         FreeBet = 3,
-        WalletBonus = 5,
         Rebate = 6,
         Cashback = 7,
         SpecialBonus = 8,
