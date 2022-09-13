@@ -719,7 +719,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     {
                         SysId = x.SysId,
                         BankCode = x.BankCode ,
-                        BankName = x.BankName
+                        BankName = x.BankName ,
+                        CurrencyId = x.CurrencyId
                     }).Distinct(new BankCodeModelComparer());
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;
