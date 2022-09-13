@@ -116,6 +116,19 @@ namespace BackendSite.Service.DAL
             
             return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
         }
+        
+        public bool CheckTransferAccountExists(string accountNo)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _AccountNo = accountNo,
+                });
+            
+            var result = _mainDbClient.Query<int>("Admin_BankFinancialTransferAccount_Check", parameters);
+
+            return result.Any();
+        }
 
         public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
