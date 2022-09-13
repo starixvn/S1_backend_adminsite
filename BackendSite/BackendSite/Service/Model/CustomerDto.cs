@@ -138,6 +138,12 @@ public class SetEmailRequest
     public string Email { get; set; }
 }
 
+public class SetPhoneNoRequest
+{
+    public int CustId { get; set; }
+    public string PhoneNo { get; set; }
+}
+
 public class SetBirthdayRequest
 {
     public int CustId { get; set; }

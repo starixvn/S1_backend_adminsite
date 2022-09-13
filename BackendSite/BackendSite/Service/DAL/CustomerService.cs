@@ -10,6 +10,7 @@ public class CustomerService : ICustomerService
 {
     private readonly MySqlClient _sqlClienct;
     private readonly MySqlClient _mainSqlClient;
+    private ICustomerService _customerServiceImplementation;
 
     public CustomerService(IEnumerable<MySqlClient> sqlCliencts)
     {
@@ -45,6 +46,14 @@ public class CustomerService : ICustomerService
         p.Add("_CustId", custId);
         p.Add("_Email", email);
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileEmail_Set", p);
+    }
+
+    public async Task<int> SetPhoneNo(int custId, string phoneNo)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_PhoneNo", phoneNo);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustProfilePhoneNo_Set", p);
     }
 
     public async Task<int> SetBirthday(int custId, int year, int month, int date)

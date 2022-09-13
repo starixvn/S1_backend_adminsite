@@ -124,6 +124,11 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return await _customerService.SetEmail(custId, email);
     }
 
+    public async Task<int> SetPhoneNo(int custId, string phoneNo)
+    {
+        return await _customerService.SetPhoneNo(custId, phoneNo);
+    }
+
     public async Task<int> SetBirthday(int custId, int year, int month, int date)
     {
         var isValid = DateTime.TryParse($"{year}-{month}-{date}", out _);
