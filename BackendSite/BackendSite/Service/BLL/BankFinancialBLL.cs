@@ -174,6 +174,11 @@ namespace BackendSite.Service.BLL
 
             if (isCreate)
             {
+                if (_bankFinancialService.CheckTransferAccountExists(transferAccountModel.AccountNo))
+                {
+                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
+                }
+                
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
