@@ -114,13 +114,13 @@ namespace BackendSite.Service.BLL
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
-                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? null : input.AccountCode,
+                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
                 AccountNo = input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
-                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? null : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? null : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? null : input.BankLoginPassword,
+                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
                 InitialAmount = input.InitialAmount,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                 Reason = input.Reason == 0 ? null : input.Reason,
@@ -174,6 +174,11 @@ namespace BackendSite.Service.BLL
 
             if (isCreate)
             {
+                if (_bankFinancialService.CheckTransferAccountExists(transferAccountModel.AccountNo))
+                {
+                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
+                }
+                
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
