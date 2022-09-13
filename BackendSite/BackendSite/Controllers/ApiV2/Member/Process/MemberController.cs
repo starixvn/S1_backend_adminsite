@@ -200,6 +200,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// Member/SetFullName 修改用戶Email
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> SetEmail(SetEmailRequest request)
+        {
+            var result = await _memberDashboardBll.SetEmail(request.CustId, request.Email);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
         /// <remarks>

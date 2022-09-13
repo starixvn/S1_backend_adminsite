@@ -8,4 +8,5 @@ public interface IMemberDashboardBLL
     Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustId(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustId(int custId);
     Task<int> SetFullName(int custId, string fullName);
+    Task<int> SetEmail(int custId, string email);
 }

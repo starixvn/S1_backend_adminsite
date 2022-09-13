@@ -132,6 +132,12 @@ public class SetFullNameRequest
     public string FullName { get; set; }
 }
 
+public class SetEmailRequest
+{
+    public int CustId { get; set; }
+    public string Email { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

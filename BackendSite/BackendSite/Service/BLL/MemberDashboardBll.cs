@@ -118,4 +118,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SetFullName(custId, fullName);
     }
+
+    public async Task<int> SetEmail(int custId, string email)
+    {
+        return await _customerService.SetEmail(custId, email);
+    }
 }

@@ -38,4 +38,12 @@ public class CustomerService : ICustomerService
         p.Add("_FullName", fullName);
         return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p);
     }
+
+    public async Task<int> SetEmail(int custId, string email)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_Email", email);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustProfileEmail_Set", p);
+    }
 }
