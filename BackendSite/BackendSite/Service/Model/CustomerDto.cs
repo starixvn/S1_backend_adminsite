@@ -138,6 +138,14 @@ public class SetEmailRequest
     public string Email { get; set; }
 }
 
+public class SetBirthdayRequest
+{
+    public int CustId { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

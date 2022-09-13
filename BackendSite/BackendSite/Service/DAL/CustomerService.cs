@@ -46,4 +46,14 @@ public class CustomerService : ICustomerService
         p.Add("_Email", email);
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileEmail_Set", p);
     }
+
+    public async Task<int> SetBirthday(int custId, int year, int month, int date)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_BirthYear", year);
+        p.Add("_BirthMonth", month);
+        p.Add("_BirthDate", date);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustProfileBirthday_Set", p);
+    }
 }
