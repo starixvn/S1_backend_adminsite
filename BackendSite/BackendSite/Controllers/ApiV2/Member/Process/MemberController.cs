@@ -93,6 +93,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
         
+        /// <summary>
+        /// Member/GetCustPhotoId 取得客戶證件照列表
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
         {
@@ -109,8 +119,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Upload
+        /// Member/UploadCustPhotoId 上傳用戶證件照
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
@@ -132,8 +147,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Ask Re-Upload
+        /// Member/DeleteCustPhotoId 刪除用戶證件照
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
