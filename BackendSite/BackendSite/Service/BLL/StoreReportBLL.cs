@@ -98,10 +98,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/GetTurnoverPointReport";
-            var result = _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
+            var result = await _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
 
             return result;
         }
