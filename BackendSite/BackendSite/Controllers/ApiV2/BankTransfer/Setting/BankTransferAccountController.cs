@@ -214,18 +214,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
-        [HttpPost]
-        public ApiResult GetTransferAccountList(GetAccountListRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
-            {
-                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
         #endregion
     }
 }
