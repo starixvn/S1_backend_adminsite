@@ -230,7 +230,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
         {
-            var SpName = "Admin_BankFinancialTransferAccount_GetForList_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
 
