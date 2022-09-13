@@ -113,4 +113,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.GetCustomerIpListByCustId(custId);
     }
+
+    public async Task<int> SetFullName(int custId, string fullName)
+    {
+        return await _customerService.SetFullName(custId, fullName);
+    }
 }

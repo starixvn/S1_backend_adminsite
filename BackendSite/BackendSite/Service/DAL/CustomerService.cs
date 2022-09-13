@@ -9,10 +9,12 @@ namespace BackendSite.Service.DAL;
 public class CustomerService : ICustomerService
 {
     private readonly MySqlClient _sqlClienct;
+    private readonly MySqlClient _mainSqlClient;
 
     public CustomerService(IEnumerable<MySqlClient> sqlCliencts)
     {
         _sqlClienct = sqlCliencts.FirstOrDefault(a=>a.DataBase == DataBase.Report);
+        _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
     public async Task<CustomerDto> GetCustomerBasicInfo(int custId)
@@ -27,5 +29,13 @@ public class CustomerService : ICustomerService
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
         return await _sqlClienct.QueryAsync<CustomerLoginIp>("Admin_CustLoginIp_Get", p);
+    }
+
+    public async Task<int> SetFullName(int custId, string fullName)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_FullName", fullName);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p);
     }
 }

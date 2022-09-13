@@ -126,6 +126,12 @@ public class DeleteCustPhotoIdRequest
     public int Id { get; set; }
 }
 
+public class SetFullNameRequest
+{
+    public int CustId { get; set; }
+    public string FullName { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

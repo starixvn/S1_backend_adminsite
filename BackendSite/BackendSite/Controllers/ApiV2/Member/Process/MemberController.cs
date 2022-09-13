@@ -172,7 +172,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
-        
+
+        /// <summary>
+        /// Member/SetFullName 修改用戶真實姓名
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> SetFullName(SetFullNameRequest request)
+        {
+            var result = await _memberDashboardBll.SetFullName(request.CustId, request.FullName);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
         /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
