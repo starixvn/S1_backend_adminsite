@@ -163,6 +163,12 @@ public class SetMemberAddressRequest
     public string Line2 { get; set; }
 }
 
+public class SetMemberKycStatusRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

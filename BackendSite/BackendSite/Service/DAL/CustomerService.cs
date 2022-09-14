@@ -78,4 +78,12 @@ public class CustomerService : ICustomerService
         p.Add("_Line2", line2);
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileAddress_Set", p);
     }
+
+    public async Task<int> SetKycStatus(int custId, int status)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_Status", status);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustomerKyc_Set", p);
+    }
 }

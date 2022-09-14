@@ -142,4 +142,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SetAddress(custId, country, state, postCode, city, line1, line2);
     }
+
+    public async Task<int> SetKycStatus(int custId, int status)
+    {
+        return await _customerService.SetKycStatus(custId, status);
+    }
 }
