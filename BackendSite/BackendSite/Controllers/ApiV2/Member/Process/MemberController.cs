@@ -183,6 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
             var result = await _memberDashboardBll.EditFullName(request.CustId, request.FullName);
@@ -209,6 +210,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
             var result = await _memberDashboardBll.EditEmail(request.CustId, request.Email);
@@ -235,6 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
             var result = await _memberDashboardBll.EditPhoneNo(request.CustId, request.PhoneNo);
@@ -261,6 +264,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
             var result = await _memberDashboardBll.EditBirthday(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
@@ -287,6 +291,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
             var result = await _memberDashboardBll.EditAddress(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
@@ -313,6 +318,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
             var result = await _memberDashboardBll.SwitchKyc(request.CustId, request.Status);
@@ -339,6 +345,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
         {
             var result = await _memberDashboardBll.SwitchRisk(request.CustId, request.Status);
@@ -365,6 +372,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
         {
             var result = await _memberDashboardBll.SwitchEmailVerified(request.CustId, request.Status);
@@ -391,6 +399,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
         {
             var result = await _memberDashboardBll.SwitchPhoneVerified(request.CustId, request.Status);
@@ -417,6 +426,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [HttpPost]
         public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
         {
             var newPassword = await _memberDashboardBll.ResetPassword(request.CustId);
@@ -428,6 +438,58 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Data = newPassword,
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Reset Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/LockAccount 鎖/解鎖會員帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 21 })]
+        [HttpPost]
+        public async Task<ApiResult> Lock(LockMemberRequest request)
+        {
+            if (await _memberDashboardBll.SetCustStatus(request.CustId, request.Status, request.Reason) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/Close 關閉會員帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 26 })]
+        [HttpPost]
+        public async Task<ApiResult> Close(CloseMemberRequest request)
+        {
+            if (await _memberDashboardBll.SetCustStatus(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
                 };
             }
 

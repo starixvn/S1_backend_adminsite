@@ -192,6 +192,20 @@ public class ResetMemberPasswordRequest
     public int CustId { get; set; }
 }
 
+public class LockMemberRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+    public string Reason { get; set; }
+}
+
+public class CloseMemberRequest
+{
+    public int CustId { get; set; }
+    public string Reason { get; set; }
+}
+
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

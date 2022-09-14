@@ -176,4 +176,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var md5NewPassword = _tools.MD5Encrypt(newPassword);
         return await _customerService.ResetPassword(custId, md5NewPassword) > 0 ? md5NewPassword : "";
     }
+
+    public async Task<int> SetCustStatus(int custId, int status, string reason)
+    {
+        return await _customerService.SetCustStatus(custId, status, (int)CustTaskType.LastStatusUpdateTime);
+    }
 }

@@ -16,4 +16,5 @@ public interface ICustomerService
     Task<int> SwitchPhoneVerified(int custId, int status);
     Task<int> SwitchEmailVerified(int custId, int status);
     Task<int> ResetPassword(int custId, string newPassword);
+    Task<int> SetCustStatus(int custId, int status, int taskId);
 }

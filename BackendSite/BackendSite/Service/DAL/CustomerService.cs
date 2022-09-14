@@ -118,4 +118,13 @@ public class CustomerService : ICustomerService
         p.Add("Md5NewPassword", newPassword);
         return await _mainSqlClient.ExecuteAsync("Admin_ResetPwd_Set", p);
     }
+
+    public async Task<int> SetCustStatus(int custId, int status, int taskId)
+    {
+        var p = new DynamicParameters();
+        p.Add("CustId", custId);
+        p.Add("Status", status);
+        p.Add("TaskId", taskId);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
+    }
 }
