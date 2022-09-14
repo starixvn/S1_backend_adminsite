@@ -35,7 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest
         {
             public int SiteId { get; set; }
         }
