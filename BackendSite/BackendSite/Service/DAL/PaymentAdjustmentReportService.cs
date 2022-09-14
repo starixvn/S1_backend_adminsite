@@ -77,6 +77,61 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<PaymentAdjustmentReportResponseWrapper> GetPaymentAdjustmentReportV2Async(string siteIds,
+         string currencyIds,
+         bool getFromAdjustmentInfo,
+         string AdjustTypesForAI,
+         bool getFromLogAdminAdjustWallet,
+         string AdjustTypesForLAAW,
+         string userName,
+         DateTime startDate,
+         DateTime endDate,
+         string transId,
+         int startIndex,
+         int pageSize)
+        {
+
+            var result = new PaymentAdjustmentReportResponseWrapper();
+            var tempCurrencyTotalAmount = new List<string>();
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_GetFromAdjustmentInfo", getFromAdjustmentInfo);
+            props.Add("_AdjustTypesForAI", AdjustTypesForAI);
+            props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
+            props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+
+            #region GetCurrencyTotalAmount
+
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V5", props)).ToList();
+            if (currencyTotalAmount.Count > 0)
+            {
+                currencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                });
+            }
+            result.CurrencyAmount = tempCurrencyTotalAmount;
+
+            #endregion
+
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V6", props);
+            result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            result.RowCount = props.Get<int?>("_RowCount") ?? 0;
+            
+            return result;
+        }
+
+
         public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string siteIds,
             string currencyIds,
             bool getFromAdjustmentInfo,
@@ -104,6 +159,35 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+
+        public async Task<IEnumerable<PaymentAdjustmentV2>> GetPaymentAdjustmentExportReportV2(string siteIds,
+            string currencyIds,
+            bool getFromAdjustmentInfo,
+            string AdjustTypesForAI,
+            bool getFromLogAdminAdjustWallet,
+            string AdjustTypesForLAAW,
+            string userName,
+            DateTime startDate,
+            DateTime endDate,
+            string transId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_GetFromAdjustmentInfo", getFromAdjustmentInfo);
+            props.Add("_AdjustTypesForAI", AdjustTypesForAI);
+            props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
+            props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+
+            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V6", props);
+            return result;
+        }
+
 
         public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int custId,
             DateTime? startDate,
@@ -145,6 +229,48 @@ namespace BackendSite.Service.DAL
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
+        }
+
+        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2Async(int siteId,
+            int custId,
+            DateTime? startDate,
+            DateTime? endDate,
+            int pageSize,
+            int startIndex)
+        {
+            var result = new PaymentAdjustmentWrapper();
+
+            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+          
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate, dbType: DbType.DateTime);
+
+            #region GetCurrencyTotalAmount
+            var tempCurrencyTotalAmount = new List<string>();
+            var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p, commandType: CommandType.StoredProcedure)).ToList();
+            if (currencyTotalAmount.Count > 0)
+            {
+                currencyTotalAmount.ForEach(x =>
+                {
+                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                });
+            }
+            result.CurrencyAmount = tempCurrencyTotalAmount;
+            #endregion
+
+            p.Add("_PageSize", pageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            result.Data = await conn.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
+            result.RowCount = p.Get<int?>("_RowCount") ?? 0;
+
+            return result;
         }
 
         public bool SetLogAdminAdjustWallet(ParamsWithLog<SetAdjustment> input, int transferId)
