@@ -137,4 +137,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         
         return await _customerService.SetBirthday(custId, year, month, date);
     }
+
+    public async Task<int> SetAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    {
+        return await _customerService.SetAddress(custId, country, state, postCode, city, line1, line2);
+    }
 }

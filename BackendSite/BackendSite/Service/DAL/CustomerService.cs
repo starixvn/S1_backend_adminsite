@@ -65,4 +65,17 @@ public class CustomerService : ICustomerService
         p.Add("_BirthDate", date);
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileBirthday_Set", p);
     }
+
+    public async Task<int> SetAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_Country", country);
+        p.Add("_State", state);
+        p.Add("_PostCode", postCode);
+        p.Add("_City", city);
+        p.Add("_Line1", line1);
+        p.Add("_Line2", line2);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustProfileAddress_Set", p);
+    }
 }

@@ -152,6 +152,17 @@ public class SetBirthdayRequest
     public int BirthYear { get; set; }
 }
 
+public class SetMemberAddressRequest
+{
+    public int CustId { get; set; }
+    public string Country { get; set; }
+    public string State { get; set; }
+    public string PostCode { get; set; }
+    public string City { get; set; }
+    public string Line1 { get; set; }
+    public string Line2 { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }
