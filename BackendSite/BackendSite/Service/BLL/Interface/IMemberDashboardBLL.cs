@@ -15,4 +15,5 @@ public interface IMemberDashboardBLL
     Task<int> SetKycStatus(int custId, int status);
     Task<int> SetRiskStatus(int custId, int status);
     Task<int> SwitchPhoneVerified(int custId, int status);
+    Task<int> SwitchEmailVerified(int custId, int status);
 }

@@ -157,4 +157,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SwitchPhoneVerified(custId, status);
     }
+
+    public async Task<int> SwitchEmailVerified(int custId, int status)
+    {
+        return await _customerService.SwitchEmailVerified(custId, status);
+    }
 }

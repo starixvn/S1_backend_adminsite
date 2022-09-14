@@ -175,7 +175,13 @@ public class SetMemberRiskStatusRequest
     public int Status { get; set; }
 }
 
-public class SwitchMemberPhoneVerifiedStatusRequest
+public class SwitchMemberPhoneVerifiedRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
+public class SwitchMemberEmailVerifiedRequest
 {
     public int CustId { get; set; }
     public int Status { get; set; }
