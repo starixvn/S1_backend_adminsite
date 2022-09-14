@@ -175,6 +175,12 @@ public class SetMemberRiskStatusRequest
     public int Status { get; set; }
 }
 
+public class SwitchMemberPhoneVerifiedStatusRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

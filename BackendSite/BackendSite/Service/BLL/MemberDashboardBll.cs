@@ -152,4 +152,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SetRiskStatus(custId, status);
     }
+
+    public async Task<int> SwitchPhoneVerified(int custId, int status)
+    {
+        return await _customerService.SwitchPhoneVerified(custId, status);
+    }
 }

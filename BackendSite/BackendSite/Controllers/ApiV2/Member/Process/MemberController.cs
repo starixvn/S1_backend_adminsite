@@ -356,6 +356,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
+        /// Member/SwitchPhoneVerified 切換會員電話驗證狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedStatusRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchPhoneVerified(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
         /// <remarks>

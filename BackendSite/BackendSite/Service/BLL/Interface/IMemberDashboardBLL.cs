@@ -14,4 +14,5 @@ public interface IMemberDashboardBLL
     Task<int> SetAddress(int custId, string country, string state, string postCode, string city, string line1, string line2);
     Task<int> SetKycStatus(int custId, int status);
     Task<int> SetRiskStatus(int custId, int status);
+    Task<int> SwitchPhoneVerified(int custId, int status);
 }
