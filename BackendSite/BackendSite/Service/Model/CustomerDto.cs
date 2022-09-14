@@ -169,6 +169,12 @@ public class SetMemberKycStatusRequest
     public int Status { get; set; }
 }
 
+public class SetMemberRiskStatusRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

@@ -304,7 +304,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SetAddress 修改會員地址
+        /// Member/SetKycStatus 修改會員Kyc狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -316,6 +316,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> SetKycStatus(SetMemberKycStatusRequest request)
         {
             var result = await _memberDashboardBll.SetKycStatus(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SetRiskStatus 修改會員Risk狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> SetRiskStatus(SetMemberRiskStatusRequest request)
+        {
+            var result = await _memberDashboardBll.SetRiskStatus(request.CustId, request.Status);
 
             if (result > 0)
             {

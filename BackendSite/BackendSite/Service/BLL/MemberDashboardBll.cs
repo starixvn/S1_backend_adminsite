@@ -147,4 +147,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SetKycStatus(custId, status);
     }
+
+    public async Task<int> SetRiskStatus(int custId, int status)
+    {
+        return await _customerService.SetRiskStatus(custId, status);
+    }
 }
