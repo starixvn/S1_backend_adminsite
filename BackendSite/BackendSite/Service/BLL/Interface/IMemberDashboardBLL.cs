@@ -16,4 +16,5 @@ public interface IMemberDashboardBLL
     Task<int> SwitchRisk(int custId, int status);
     Task<int> SwitchPhoneVerified(int custId, int status);
     Task<int> SwitchEmailVerified(int custId, int status);
+    Task<string> ResetPassword(int custId);
 }

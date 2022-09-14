@@ -408,6 +408,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
+        /// Member/ResetPassword 重置會員密碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
+        {
+            var newPassword = await _memberDashboardBll.ResetPassword(request.CustId);
+
+            if (!string.IsNullOrEmpty(newPassword))
+            {
+                return new ApiResult<string>
+                {
+                    Data = newPassword,
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
         /// <remarks>

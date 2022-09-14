@@ -13,12 +13,16 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly ICustomerService _customerService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
+    private readonly CodeGenerator _codeGenerator;
+    private readonly Tools _tools;
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
         _deviceService = deviceService;
+        _codeGenerator = codeGenerator;
+        _tools = tools;
     }
 
     public async Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId)
@@ -161,5 +165,15 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<int> SwitchEmailVerified(int custId, int status)
     {
         return await _customerService.SwitchEmailVerified(custId, status);
+    }
+
+    public async Task<string> ResetPassword(int custId)
+    {
+        _codeGenerator.Maximum = 8;
+        _codeGenerator.Minimum = 6;
+        _codeGenerator.RepeatCharacters = true;
+        var newPassword = _codeGenerator.Generate();
+        var md5NewPassword = _tools.MD5Encrypt(newPassword);
+        return await _customerService.ResetPassword(custId, md5NewPassword) > 0 ? md5NewPassword : "";
     }
 }

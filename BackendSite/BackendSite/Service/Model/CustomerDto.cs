@@ -187,6 +187,11 @@ public class SwitchMemberEmailVerifiedRequest
     public int Status { get; set; }
 }
 
+public class ResetMemberPasswordRequest
+{
+    public int CustId { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

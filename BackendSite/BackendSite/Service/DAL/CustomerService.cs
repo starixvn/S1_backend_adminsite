@@ -110,4 +110,12 @@ public class CustomerService : ICustomerService
         p.Add("_Status", status);
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileEmailVerified_Set", p);
     }
+
+    public async Task<int> ResetPassword(int custId, string newPassword)
+    {
+        var p = new DynamicParameters();
+        p.Add("CustId", custId);
+        p.Add("Md5NewPassword", newPassword);
+        return await _mainSqlClient.ExecuteAsync("Admin_ResetPwd_Set", p);
+    }
 }

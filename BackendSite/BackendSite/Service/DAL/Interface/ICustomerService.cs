@@ -15,4 +15,5 @@ public interface ICustomerService
     Task<int> SwitchRisk(int custId, int status);
     Task<int> SwitchPhoneVerified(int custId, int status);
     Task<int> SwitchEmailVerified(int custId, int status);
+    Task<int> ResetPassword(int custId, string newPassword);
 }
