@@ -114,43 +114,43 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return await _customerService.GetCustomerIpListByCustId(custId);
     }
 
-    public async Task<int> SetFullName(int custId, string fullName)
+    public async Task<int> EditFullName(int custId, string fullName)
     {
-        return await _customerService.SetFullName(custId, fullName);
+        return await _customerService.EditFullName(custId, fullName);
     }
 
-    public async Task<int> SetEmail(int custId, string email)
+    public async Task<int> EditEmail(int custId, string email)
     {
-        return await _customerService.SetEmail(custId, email);
+        return await _customerService.EditEmail(custId, email);
     }
 
-    public async Task<int> SetPhoneNo(int custId, string phoneNo)
+    public async Task<int> EditPhoneNo(int custId, string phoneNo)
     {
         return await _customerService.SetPhoneNo(custId, phoneNo);
     }
 
-    public async Task<int> SetBirthday(int custId, int year, int month, int date)
+    public async Task<int> EditBirthday(int custId, int year, int month, int date)
     {
         var isValid = DateTime.TryParse($"{year}-{month}-{date}", out _);
         if (!isValid)
             return 0;
         
-        return await _customerService.SetBirthday(custId, year, month, date);
+        return await _customerService.EditBirthday(custId, year, month, date);
     }
 
-    public async Task<int> SetAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    public async Task<int> EditAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
     {
-        return await _customerService.SetAddress(custId, country, state, postCode, city, line1, line2);
+        return await _customerService.EditAddress(custId, country, state, postCode, city, line1, line2);
     }
 
-    public async Task<int> SetKycStatus(int custId, int status)
+    public async Task<int> SwitchKyc(int custId, int status)
     {
-        return await _customerService.SetKycStatus(custId, status);
+        return await _customerService.SwitchKyc(custId, status);
     }
 
-    public async Task<int> SetRiskStatus(int custId, int status)
+    public async Task<int> SwitchRisk(int custId, int status)
     {
-        return await _customerService.SetRiskStatus(custId, status);
+        return await _customerService.SwitchRisk(custId, status);
     }
 
     public async Task<int> SwitchPhoneVerified(int custId, int status)

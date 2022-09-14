@@ -174,7 +174,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Member/SetFullName 修改用戶真實姓名
+        /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -183,9 +183,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetFullName(SetFullNameRequest request)
+        public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberDashboardBll.SetFullName(request.CustId, request.FullName);
+            var result = await _memberDashboardBll.EditFullName(request.CustId, request.FullName);
 
             if (result > 0)
             {
@@ -200,7 +200,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Member/SetEmail 修改用戶Email
+        /// Member/EditEmail 修改用戶Email
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -209,35 +209,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetEmail(SetEmailRequest request)
+        public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberDashboardBll.SetEmail(request.CustId, request.Email);
-
-            if (result > 0)
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success."
-                };
-            }
-
-            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
-        }
-        
-        /// <summary>
-        /// Member/SetPhoneNo 修改用戶電話
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public async Task<ApiResult> SetPhoneNo(SetPhoneNoRequest request)
-        {
-            var result = await _memberDashboardBll.SetPhoneNo(request.CustId, request.PhoneNo);
+            var result = await _memberDashboardBll.EditEmail(request.CustId, request.Email);
 
             if (result > 0)
             {
@@ -252,7 +226,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SetBirthday 修改用戶生日
+        /// Member/EditPhoneNo 修改用戶電話
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -261,9 +235,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetBirthday(SetBirthdayRequest request)
+        public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberDashboardBll.SetBirthday(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
+            var result = await _memberDashboardBll.EditPhoneNo(request.CustId, request.PhoneNo);
 
             if (result > 0)
             {
@@ -278,7 +252,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SetAddress 修改會員地址
+        /// Member/EditBirthday 修改用戶生日
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -287,9 +261,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetAddress(SetMemberAddressRequest request)
+        public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
-            var result = await _memberDashboardBll.SetAddress(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+            var result = await _memberDashboardBll.EditBirthday(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
 
             if (result > 0)
             {
@@ -304,7 +278,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SetKycStatus 修改會員Kyc狀態
+        /// Member/EditAddress 修改會員地址
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -313,9 +287,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetKycStatus(SetMemberKycStatusRequest request)
+        public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
-            var result = await _memberDashboardBll.SetKycStatus(request.CustId, request.Status);
+            var result = await _memberDashboardBll.EditAddress(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
 
             if (result > 0)
             {
@@ -330,7 +304,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SetRiskStatus 修改會員Risk狀態
+        /// Member/SwitchKyc 修改會員Kyc狀態
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -339,9 +313,35 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<ApiResult> SetRiskStatus(SetMemberRiskStatusRequest request)
+        public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
-            var result = await _memberDashboardBll.SetRiskStatus(request.CustId, request.Status);
+            var result = await _memberDashboardBll.SwitchKyc(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchRisk 切換會員Risk狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchRisk(request.CustId, request.Status);
 
             if (result > 0)
             {

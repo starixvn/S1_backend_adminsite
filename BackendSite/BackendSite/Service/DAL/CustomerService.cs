@@ -32,7 +32,7 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryAsync<CustomerLoginIp>("Admin_CustLoginIp_Get", p);
     }
 
-    public async Task<int> SetFullName(int custId, string fullName)
+    public async Task<int> EditFullName(int custId, string fullName)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -40,7 +40,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p);
     }
 
-    public async Task<int> SetEmail(int custId, string email)
+    public async Task<int> EditEmail(int custId, string email)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -56,7 +56,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfilePhoneNo_Set", p);
     }
 
-    public async Task<int> SetBirthday(int custId, int year, int month, int date)
+    public async Task<int> EditBirthday(int custId, int year, int month, int date)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -66,7 +66,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileBirthday_Set", p);
     }
 
-    public async Task<int> SetAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    public async Task<int> EditAddress(int custId, string country, string state, string postCode, string city, string line1, string line2)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -79,7 +79,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustProfileAddress_Set", p);
     }
 
-    public async Task<int> SetKycStatus(int custId, int status)
+    public async Task<int> SwitchKyc(int custId, int status)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -87,7 +87,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustomerKyc_Set", p);
     }
 
-    public async Task<int> SetRiskStatus(int custId, int status)
+    public async Task<int> SwitchRisk(int custId, int status)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
