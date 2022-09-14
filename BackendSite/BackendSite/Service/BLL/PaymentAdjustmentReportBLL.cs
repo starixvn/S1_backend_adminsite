@@ -231,6 +231,69 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public async  Task<List<PaymentAdjustmentReportResponse>> GetPaymentAdjustmentExportReportV2(int siteId,
+          IEnumerable<int> currencyIds,
+          string userName,
+          IEnumerable<int> adjustTypes,
+          DateTime startDate,
+          DateTime endDate,
+          string transId)
+        {
+            #region AdjustType
+
+            if (!AdjustTypeCheck(adjustTypes,
+                    out var getFromAdjustmentInfo,
+                    out var AdjustTypesForAI,
+                    out var getFromLogAdminAdjustWallet,
+                    out var AdjustTypesForLAAW))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
+
+            #endregion
+
+            // DB 取資料
+            var queryResult = (await paymentAdjustmentService.GetPaymentAdjustmentExportReportV2(
+                    JsonConvert.SerializeObject(new List<int>{ siteId }),
+                    JsonConvert.SerializeObject(currencyIds),
+                    getFromAdjustmentInfo,
+                    JsonConvert.SerializeObject(AdjustTypesForAI),
+                    getFromLogAdminAdjustWallet,
+                    JsonConvert.SerializeObject(AdjustTypesForLAAW),
+                    userName,
+                    startDate,
+                    endDate,
+                    transId)).ToList();
+
+        
+            var result = new List<PaymentAdjustmentReportResponse>();
+            if (!queryResult.Any()) return result;
+
+            var siteList = serverInfoBLL.GetSiteList();
+            result.AddRange(queryResult.Select(row => new PaymentAdjustmentReportResponse
+            {
+                TransId = row.TransId,
+                CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
+                AdjustTypeName = selLangBLL.GetResourceValue($"lbl_AdjustmentType{row.AdjustType}"),
+                AdjustCategory = row.Category,
+                AdjustCategoryName = row.CategoryName,
+                SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
+                UserName = row.UserName,
+                SabaID = row.SabaID,
+                Amount = row.Amount,
+                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
+                StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                Memo = row.Memo,
+                Operator = row.Operator,
+                WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
+                DepositId = row.DepositId
+            }));
+
+            return result;
+        }
+
+
+
         public IEnumerable<PaymentAdjustment> GetAdjustmentInfoByCust(int CustId,
             DateTime? startDate,
             DateTime? endDate,

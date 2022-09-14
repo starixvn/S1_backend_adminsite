@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -16,12 +15,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         public AdjustmentReportController(IServiceProvider provider)
         {
             _paymentAdjustmentBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         /// <summary>
@@ -39,7 +40,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             try
             {
                 var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
-                var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(request.SiteId,
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(siteId,
                     request.CurrencyIds,
                     request.UserName,
                     adjustTypeList,
@@ -69,28 +71,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// AdjustmentReport/Export 匯出調整資訊報表
         /// </summary>
         /// <remarks>
-        /// Http Method：POST
-        /// 
         /// Func Path：Finance > Adjustment Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentReport" })]
         [HttpPost]
-        public IActionResult Export(PaymentAdjustmentReportExportRequest request)
+        public async Task<IActionResult> Export(PaymentAdjustmentReportExportRequest request)
         {
             var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
-            var exportData = _paymentAdjustmentBll.GetPaymentAdjustmentExportReport(request.SiteIds,
+            var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+            var exportData = await _paymentAdjustmentBll.GetPaymentAdjustmentExportReportV2(siteId,
                 request.CurrencyIds,
                 request.UserName,
                 adjustTypeList,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.TransId);
-
-            foreach (var data in exportData)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-            }
 
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");

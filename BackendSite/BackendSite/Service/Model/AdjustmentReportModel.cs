@@ -11,7 +11,6 @@ namespace BackendSite.Service.Model
 
     public class PaymentAdjustmentReportRequest : ApiRequestPageModel
     {
-        public int SiteId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
@@ -36,7 +35,6 @@ namespace BackendSite.Service.Model
 
     public class PaymentAdjustmentReportExportRequest
     {
-        public IEnumerable<int> SiteIds { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
