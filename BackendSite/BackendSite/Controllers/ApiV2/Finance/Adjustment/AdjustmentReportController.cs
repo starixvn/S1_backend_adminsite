@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -33,6 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 36, 1 })]
         public async Task<ApiListResultCurrencyAmount<PaymentAdjustmentReportResponse>> GetDataList(PaymentAdjustmentReportRequest request)
         {
             var apiResult = new ApiListResultCurrencyAmount<PaymentAdjustmentReportResponse>();
@@ -75,6 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 36, 2 })]
         public async Task<IActionResult> Export(PaymentAdjustmentReportExportRequest request)
         {
             var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
@@ -101,6 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 36, 3 })]
         public ApiResult SetAdjustment(ApiRequestWithLog<SetAdjustment> request)
         {
             try
