@@ -156,8 +156,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// <summary>
             /// 0=All, 1=Seamless Wallet, 2=Transfer Wallet
             /// </summary>
-            public int WalletType { get; set; }
-
+            public int? WalletType { get; set; }
         }
 
         public class GameTypeListReq
@@ -595,7 +594,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(request.WalletType);
+                apiResult.Data = _bonusManageBll.GetPromoCategories(Convert.ToInt32(request.WalletType));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
