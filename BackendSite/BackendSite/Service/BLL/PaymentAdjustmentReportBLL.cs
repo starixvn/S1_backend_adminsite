@@ -307,13 +307,14 @@ namespace BackendSite.Service.BLL
         }
 
 
-        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2(int CustId,
+        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2(int siteId,
+            int custId,
             DateTime? startDate,
             DateTime? endDate,
             int pageSize,
             int pageNumber)
         {
-            return await paymentAdjustmentService.GetAdjustmentInfoByCustV2Async(CustId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
+            return await paymentAdjustmentService.GetAdjustmentInfoByCustV2Async(siteId, custId, startDate, endDate, Math.Abs(pageSize), (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
         }
 
         public bool SetAdjustment(ParamsWithLog<SetAdjustment> input)

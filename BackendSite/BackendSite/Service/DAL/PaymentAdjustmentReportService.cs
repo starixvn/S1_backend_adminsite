@@ -231,7 +231,8 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2Async(int custId,
+        public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2Async(int siteId,
+            int custId,
             DateTime? startDate,
             DateTime? endDate,
             int pageSize,
@@ -242,6 +243,7 @@ namespace BackendSite.Service.DAL
             await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
           
             var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_CustId", custId, dbType: DbType.Int32);
             p.Add("_StartDate", startDate, dbType: DbType.DateTime);
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);

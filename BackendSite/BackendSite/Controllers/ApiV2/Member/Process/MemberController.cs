@@ -115,7 +115,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             try
             {
-                var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(request.CustId,
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(siteId,
+                    request.CustId,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     request.PageSize, request.PageNumber);
