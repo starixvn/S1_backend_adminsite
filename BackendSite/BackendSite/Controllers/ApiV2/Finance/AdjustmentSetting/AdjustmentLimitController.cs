@@ -61,20 +61,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 43, 1 })]
         [HttpPost]
-        public ApiListResult<AdjustmentLimitData> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<AdjustmentLimitData>> GetList(GetListRequest request)
         {
-            var siteIds = new List<int>(request.SiteId);
+            var siteIds = new List<int>(); siteIds.Add(request.SiteId);
             var serverInfo = _serverInfoBll.GetSiteList().Where(x => x.SiteId == request.SiteId).First();
-            var result = _paymentBll.GetAdjustmentData(siteIds, serverInfo.ICurrencyList, request.PageNumber, request.PageSize,
+            var result = _paymentBll.GetAdjustmentData(siteIds, serverInfo.ICurrencyList, 1, 100,
                 out int totalPages, out int rowCount);
 
-            var apiResult = new ApiListResult<AdjustmentLimitData>
+            var apiResult = new ApiResult<IEnumerable<AdjustmentLimitData>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount
             };
             return apiResult;
         }
