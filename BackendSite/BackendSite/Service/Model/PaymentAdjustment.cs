@@ -49,7 +49,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<PaymentAdjustmentV2> Data { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
-        public List<string> CurrencyAmount { get; set; }
+        public List<TotalAmount> CurrencyAmount { get; set; }
     }
 
     public class AdjustmentInfoByCustIdRequest : ApiRequestPageModel

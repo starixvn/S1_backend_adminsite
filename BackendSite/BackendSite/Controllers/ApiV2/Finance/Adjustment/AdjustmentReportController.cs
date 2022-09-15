@@ -58,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 apiResult.RowCount = queryResult.RowCount;
                 apiResult.TotalPages = queryResult.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+                apiResult.CurrencyAmountRecord = queryResult.CurrencyAmount;
             }
             catch (Exception ex)
             {
