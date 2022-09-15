@@ -5,11 +5,11 @@ namespace BackendSite.Service.Model
 {
     #region Request
 
-    public class BonusReportRequest : ApiRequestPageModel
+    public class BonusReportRequestV2 : ApiRequestPageModel
     {
         private DateTimeOffset _startDate { get; set; }
         private DateTimeOffset _endDate { get; set; }
-        public IEnumerable<int> SiteIds { get; set; }
+        public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
@@ -30,11 +30,11 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> Statuses { get; set; }
     }
 
-    public class BonusReportExportRequest
+    public class BonusReportExportRequestV2
     {
         private DateTimeOffset _startDate { get; set; }
         private DateTimeOffset _endDate { get; set; }
-        public IEnumerable<int> SiteIds { get; set; }
+        public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }

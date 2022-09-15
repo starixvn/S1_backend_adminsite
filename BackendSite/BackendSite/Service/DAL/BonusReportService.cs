@@ -17,12 +17,12 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public async Task<BonusReportDtoWrapper> GetBonusReportAsync(BonusReportRequest request)
+        public async Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
         {
-            SetBonusReportRequest(request, out var siteIds, out var statuses, out var pageSize, out var startIndex);
+            SetBonusReportRequest(request, out var siteId, out var statuses, out var pageSize, out var startIndex);
 
             var p = new DynamicParameters();
-            p.Add("_SiteIds", siteIds);
+            p.Add("_SiteIds", siteId);
             p.Add("_BonusCode", request.BonusCode);
             p.Add("_TransId", request.TransId);
             p.Add("_CurrencyId", request.CurrencyId);
@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequest request)
+        public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request)
         {
             SetBonusReportExportRequest(request, out var siteIds, out var statuses);
 
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
         /// <param name="request"></param>
         /// <param name="siteIds"></param>
         /// <param name="statuses"></param>
-        private static void SetBonusReportExportRequest(BonusReportExportRequest request, out string siteIds, out string statuses)
+        private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, out string siteIds, out string statuses)
         {
             request.Statuses = new List<BonusInfoStatusEnum>()
             {
@@ -99,7 +99,7 @@ namespace BackendSite.Service.DAL
                 BonusInfoStatusEnum.Fulfill,
                 BonusInfoStatusEnum.TrasferOut
             }.Select(r => (int)r);
-            siteIds = JsonConvert.SerializeObject(request.SiteIds);
+            siteIds = JsonConvert.SerializeObject(new List<int>(){ request.SiteId });
             statuses = JsonConvert.SerializeObject(request.Statuses);
         }
 
@@ -111,7 +111,7 @@ namespace BackendSite.Service.DAL
         /// <param name="statuses"></param>
         /// <param name="pageSize"></param>
         /// <param name="startIndex"></param>
-        private static void SetBonusReportRequest(BonusReportRequest request,
+        private static void SetBonusReportRequest(BonusReportRequestV2 request,
             out string siteIds,
             out string statuses,
             out int pageSize,
@@ -126,7 +126,7 @@ namespace BackendSite.Service.DAL
                 BonusInfoStatusEnum.Fulfill,
                 BonusInfoStatusEnum.TrasferOut
             }.Select(r => (int)r);
-            siteIds = JsonConvert.SerializeObject(request.SiteIds);
+            siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
             statuses = JsonConvert.SerializeObject(request.Statuses);
             pageSize = Math.Abs(request.PageSize);
             startIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize);
