@@ -285,7 +285,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.PageNumber = pageNumber;
                 apiResult.TotalPages = queryResult.TotalPages;
                 apiResult.RowCount = queryResult.RowCount;
-                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+                apiResult.CurrencyAmountRecord = queryResult.CurrencyAmount;
 
             }
             catch (Exception ex)

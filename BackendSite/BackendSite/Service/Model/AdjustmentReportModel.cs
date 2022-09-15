@@ -68,7 +68,7 @@ namespace BackendSite.Service.Model
 
         public int RowCount { get; set; }
 
-        public List<string> CurrencyAmount { get; set; }
+        public List<TotalAmount> CurrencyAmount { get; set; }
     }
 
 

@@ -92,7 +92,7 @@ namespace BackendSite.Service.DAL
         {
 
             var result = new PaymentAdjustmentReportResponseWrapper();
-            var tempCurrencyTotalAmount = new List<string>();
+
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
             props.Add("_CurrencyIds", currencyIds);
@@ -107,15 +107,16 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V5", props)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V6", props)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.Add(new TotalAmount()
                 {
-                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                    Currency = "Total",
+                    Amount = Math.Round(currencyTotalAmount.Sum(r => r.Amount), 2),
+                    Record = currencyTotalAmount.Sum(r => r.Record)
                 });
             }
-            result.CurrencyAmount = tempCurrencyTotalAmount;
 
             #endregion
 
@@ -125,9 +126,10 @@ namespace BackendSite.Service.DAL
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V6", props);
+            result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = props.Get<int?>("_RowCount") ?? 0;
-            
+
             return result;
         }
 
@@ -241,7 +243,7 @@ namespace BackendSite.Service.DAL
             var result = new PaymentAdjustmentWrapper();
 
             await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-          
+
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_CustId", custId, dbType: DbType.Int32);
@@ -249,16 +251,18 @@ namespace BackendSite.Service.DAL
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var tempCurrencyTotalAmount = new List<string>();
-            var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p, commandType: CommandType.StoredProcedure)).ToList();
+
+            var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V4", p, commandType: CommandType.StoredProcedure)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.Add(new TotalAmount()
                 {
-                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                    Currency = "Total",
+                    Amount = Math.Round(currencyTotalAmount.Sum(r => r.Amount), 2),
+                    Record = currencyTotalAmount.Sum(r => r.Record)
                 });
             }
-            result.CurrencyAmount = tempCurrencyTotalAmount;
+
             #endregion
 
             p.Add("_PageSize", pageSize, dbType: DbType.Int32);
@@ -267,6 +271,7 @@ namespace BackendSite.Service.DAL
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             result.Data = await conn.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -292,21 +297,21 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", input.TransId);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
                 var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
-            
+
                 if (logSuccess)
                 {
                     trans.Commit();
                     return true;
                 }
-                
+
             }
 
             trans.Rollback();
@@ -333,8 +338,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BalanceAdjustment);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BalanceAdjustment);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", input.TransId);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
