@@ -90,15 +90,6 @@ namespace BackendSite.Service.DAL
         /// <param name="statuses"></param>
         private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, out string siteIds, out string statuses)
         {
-            request.Statuses = new List<BonusInfoStatusEnum>()
-            {
-                BonusInfoStatusEnum.Initial,
-                BonusInfoStatusEnum.Running,
-                BonusInfoStatusEnum.Canceled,
-                BonusInfoStatusEnum.Expiry,
-                BonusInfoStatusEnum.Fulfill,
-                BonusInfoStatusEnum.TrasferOut
-            }.Select(r => (int)r);
             siteIds = JsonConvert.SerializeObject(new List<int>(){ request.SiteId });
             statuses = JsonConvert.SerializeObject(request.Statuses);
         }
@@ -117,15 +108,6 @@ namespace BackendSite.Service.DAL
             out int pageSize,
             out int startIndex)
         {
-            request.Statuses = new List<BonusInfoStatusEnum>()
-            {
-                BonusInfoStatusEnum.Initial,
-                BonusInfoStatusEnum.Running,
-                BonusInfoStatusEnum.Canceled,
-                BonusInfoStatusEnum.Expiry,
-                BonusInfoStatusEnum.Fulfill,
-                BonusInfoStatusEnum.TrasferOut
-            }.Select(r => (int)r);
             siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
             statuses = JsonConvert.SerializeObject(request.Statuses);
             pageSize = Math.Abs(request.PageSize);
