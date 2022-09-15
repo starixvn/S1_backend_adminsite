@@ -32,12 +32,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 73, 1 })]
         [HttpPost]
-        public async Task<ApiListResultCurrencyAmount<BonusReportResponse>> GetDataList(BonusReportRequest request)
+        public async Task<ApiListResultCurrencyAmount<BonusReportResponse>> GetDataList(BonusReportRequestV2 request)
         {
             var apiResult = new ApiListResultCurrencyAmount<BonusReportResponse>();
             try
             {
-                var result = await _bonusReportBll.GetBonusReportAsync(request);
+                var result = await _bonusReportBll.GetBonusReportV2Async(request);
                 apiResult.Data = result.Data;
                 apiResult.PageNumber = request.PageNumber;
                 apiResult.RowCount = result.RowCount;
@@ -66,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 73, 2 })]
         [HttpPost]
-        public async Task<IActionResult> Export(BonusReportExportRequest request)
+        public async Task<IActionResult> Export(BonusReportExportRequestV2 request)
         {
             var exportData = await _bonusReportBll.GetBonusReportExportData(request);
             var stream = _excelBll.Export(exportData);
