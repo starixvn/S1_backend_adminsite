@@ -43,11 +43,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 apiResult.RowCount = result.RowCount;
                 apiResult.TotalPages = result.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.CurrencyAmount = result.TempCurrencyTotalAmount;
+                apiResult.CurrencyAmountRecord = result.TotalAmountSummary;
             }
             catch (Exception ex)
             {
-
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }

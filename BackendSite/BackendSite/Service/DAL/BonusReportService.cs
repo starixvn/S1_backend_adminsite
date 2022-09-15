@@ -34,15 +34,20 @@ namespace BackendSite.Service.DAL
             p.Add("_CategoryType", request.PromotionCategoryId);
             p.Add("_Statuses", statuses);
 
-            var tempCurrencyTotalAmount = new List<string>();
+            #region totalAmountSummary
+
             var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V5", p)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                currencyTotalAmount.Add(new TotalAmount()
                 {
-                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                    Currency = "Total",
+                    Amount = Math.Round(currencyTotalAmount.Sum(r => r.Amount), 2),
+                    Record = currencyTotalAmount.Sum(r => r.Record)
                 });
             }
+
+            #endregion
 
             p.Add("_PageSize", pageSize);
             p.Add("_StartIndex", startIndex);
@@ -54,7 +59,7 @@ namespace BackendSite.Service.DAL
                 Data = await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfo_Get_V9", p),
                 TotalPages = p.Get<int?>("_TotalPages") ?? 0,
                 RowCount = p.Get<int?>("_RowCount") ?? 0,
-                TempCurrencyTotalAmount = tempCurrencyTotalAmount
+                TotalAmountSummary = currencyTotalAmount
             };
 
             return result;
@@ -90,7 +95,7 @@ namespace BackendSite.Service.DAL
         /// <param name="statuses"></param>
         private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, out string siteIds, out string statuses)
         {
-            siteIds = JsonConvert.SerializeObject(new List<int>(){ request.SiteId });
+            siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
             statuses = JsonConvert.SerializeObject(request.Statuses);
         }
 
