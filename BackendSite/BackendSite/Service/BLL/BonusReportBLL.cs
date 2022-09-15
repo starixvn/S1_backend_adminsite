@@ -55,7 +55,7 @@ namespace BackendSite.Service.BLL
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages,
-                TempCurrencyTotalAmount = queryResult.TempCurrencyTotalAmount
+                TotalAmountSummary = queryResult.TotalAmountSummary
             };
 
             return result;
