@@ -284,10 +284,16 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            var result = depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest);
+            var result = depositService.SetDepositInfo(transId,
+                depositRequest.SiteId,
+                depositRequest.Amount,
+                comment,
+                Operator,
+                forStatus,
+                DepositStatusEnum.Approved,
+                depositRequest,
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
 
-            InsertDepositRewardPointQueue(transId, depositRequest.SiteId, depositRequest.CurrencyId);
-            
             return result;
         }
 
@@ -534,18 +540,6 @@ namespace BackendSite.Service.BLL
             var url = $"{payApiUrl}DepositManual";
             var response = await _courierAdapter.MyPostAsync<DepositManualResponse, DepositManualRequest>(url, depositManualRequest);
             return response;
-        }
-
-        private void InsertDepositRewardPointQueue(string transId, int siteId, int currencyId)
-        {
-            if (CommonExtension.CanRewardPoint(siteId, currencyId))
-            {
-                var resultCode = depositService.InsertDepositRewardPointQueue(transId);
-                if (resultCode != (int) ErrorCodeEnum.Success)
-                {
-                    _logger.LogError($"{transId} InsertDepositRewardPointQueue failed, resultCode: {resultCode}");
-                }
-            }
         }
 
         /// <summary>
