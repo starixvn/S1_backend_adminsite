@@ -185,6 +185,7 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _updateTime { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public int CurrencyName { get; set; }
         public decimal AdjustmentMax { get; set; }
         public DateTimeOffset UpdateTime 
         {
