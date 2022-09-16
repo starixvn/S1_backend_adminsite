@@ -626,16 +626,6 @@
         "Childs": null
       },
       {
-        "Key": "VipRebateMangetment",
-        "Title": "Vip Rebate Mangetment",
-        "FuncKey": "Marketing/VipRebateMangetment",
-        "Controller": "Marketing",
-        "Action": "VipRebateMangetment",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "VerificationReward",
         "Title": "Verification Reward",
         "FuncKey": "Marketing/VerificationReward",
