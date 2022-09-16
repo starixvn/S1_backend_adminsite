@@ -24,7 +24,7 @@ namespace BackendSite.Service.BLL
             if (queryResult == null || !queryResult.Data.Any())
                 return new BonusReportResponseWrapper()
                 {
-                    TempCurrencyTotalAmount = new List<string>()
+                    Data = new List<BonusReportResponse>() // 前端希望給預設空陣列[]，不要 null
                 };
 
             var siteList = _serverInfoBll.GetSiteList();
