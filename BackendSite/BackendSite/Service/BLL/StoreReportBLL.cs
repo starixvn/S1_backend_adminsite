@@ -1,15 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.Report;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -98,10 +92,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/GetTurnoverPointReport";
-            var result = _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
+            var result = await _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
 
             return result;
         }

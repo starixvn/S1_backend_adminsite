@@ -191,11 +191,6 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
-        {
-            return await serverInfoService.GetLanguageList(siteId, currencyId);
-        }
-
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
         {
             List<AssignBrand> assignSites = new List<AssignBrand>();
@@ -214,7 +209,7 @@ namespace BackendSite.Service.BLL
                     else
                     {
                         assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
-                        if (assignSites !=  null)
+                        if (assignSites != null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
                             assignSites.ToList().ForEach(z =>
@@ -239,15 +234,22 @@ namespace BackendSite.Service.BLL
 
                     if (userSiteList != null)
                     {
-                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                        cache.Set(sServerInfoListKey, userSiteList,
+                            new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
                     }
                 }
+
                 return userSiteList;
             }
             else
             {
                 return null;
             }
+        }
+
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
     }
 }

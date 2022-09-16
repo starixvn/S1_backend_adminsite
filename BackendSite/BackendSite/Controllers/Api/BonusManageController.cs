@@ -60,8 +60,8 @@ namespace BackendSite.Controllers.Api
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
             _rebateManageBLL = rebateManageBLL;
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             this.courierAdapter = courierAdapter;
+            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
@@ -181,6 +181,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -309,6 +310,7 @@ namespace BackendSite.Controllers.Api
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -385,6 +387,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,

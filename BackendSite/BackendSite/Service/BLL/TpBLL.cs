@@ -15,7 +15,7 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _apiUrl;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly IMemoryCache _cache;
+        private readonly ICacheHelper _redisHelper;
         private readonly int _balanceTimeoutSecond;
         private CacheHelper _cacheHelper;
 
@@ -24,7 +24,7 @@ namespace BackendSite.Service.BLL
             _serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
             _cacheHelper = provider.GetRequiredService<CacheHelper>();
@@ -48,36 +48,38 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         }
-        public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferTpWalletWithCacheAsync(int custId)
         {
-            var sKey = $"TpWallet_{custId}";
-            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
-            if (tpWalletList == null)
-            {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId);
-                var tasks = tpWalletList.Select(async x =>
+            var key = $"TransferTpWallet_{custId}";
+            
+            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
+                () => GetTransferTpWalletAsync(custId));
+        }
+        
+        private async Task<IEnumerable<TpWallet>> GetTransferTpWalletAsync(int custId)
+        {
+            var tpWalletList = await _thirdPartyService.GetTransferTpWallet(custId);
+            
+            var tasks = tpWalletList
+                .Where(x => !string.IsNullOrEmpty(x.TpUserName))
+                .Select(async x =>
                 {
-                    if(x.WalletType == (int)TpListWalletTypeEnum.FundTransfer) 
+                    var tpInfo = new TpInfo
                     {
-                        var tpInfo = new TpInfo
-                        {
-                            TpId = x.TpId,
-                            CustId = custId,
-                        };
-                        var apiResult = await GetBalanceAsync(tpInfo);
-                        if(apiResult.Data != null)
-                        {
-                            x.Balance = apiResult.Data.balance;
-                        }                    
+                        TpId = x.TpId,
+                        CustId = custId,
+                    };
+                    
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    
+                    if(apiResult.Data != null)
+                    {
+                        x.Balance = apiResult.Data.balance;
                     }
                 });
-                await Task.WhenAll(tasks);
-
-                if (tpWalletList != null)
-                {
-                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
-                }
-            }
+            
+            await Task.WhenAll(tasks);
 
             return tpWalletList;
         }
@@ -150,7 +152,6 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
-        
         public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
@@ -230,35 +231,6 @@ namespace BackendSite.Service.BLL
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
         
-        public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
-        {
-            var sKey = $"TpWallet_{custId}";
-            var tpWalletList = _cache.Get<IEnumerable<TpWallet>>(sKey);
-            if (tpWalletList == null)
-            {
-                tpWalletList = _thirdPartyService.GetTpWallet(custId).Where(x => x.WalletType == (int)TpListWalletTypeEnum.FundTransfer);
-                var tasks = tpWalletList.Select(async x =>
-                {
-                    var tpInfo = new TpInfo
-                    {
-                        TpId = x.TpId,
-                        CustId = custId,
-                    };
-                    var apiResult = await GetBalanceAsync(tpInfo);
-                    if (apiResult.ErrorCode == 0)
-                    {
-                        x.Balance = apiResult.Data.balance;
-                    }
-                });
-                await Task.WhenAll(tasks);
-
-                if (tpWalletList != null)
-                {
-                    _cache.Set(sKey, tpWalletList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(5)));
-                }
-            }
-            return tpWalletList;
-        }
         public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
         {
             var key = $"TpCategory_{siteId}";

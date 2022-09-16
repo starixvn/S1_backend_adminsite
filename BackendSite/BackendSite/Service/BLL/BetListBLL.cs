@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
                     if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
-                    }                 
+                    }
                     var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, input.PageNumber, input.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
@@ -70,7 +70,7 @@ namespace BackendSite.Service.BLL
                 EndDate,
             });
 
-            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
+            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
 
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).ToList();
@@ -85,6 +85,23 @@ namespace BackendSite.Service.BLL
 
             var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
             return list.GetRange(index, count);
+        }
+
+        public List<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
+        {
+            return _cacheHelper.TryGetOrCreate(
+                key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
+                timeSpan: TimeSpan.FromMinutes(5),
+                factory: () =>
+                {
+                    var data = _partitionService.GetTpBetRecord(StartTime, EndTime, "Admin_TpBetRecord_Get", new
+                    {
+                        CustId,
+                        StartTime,
+                        EndTime,
+                    });
+                    return data.OrderByDescending(i => i.SettledTime).ToList();
+                });
         }
 
         private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
