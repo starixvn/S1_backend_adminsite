@@ -112,6 +112,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
+        
+        public class GetTpListByCategoryReq
+        {
+            public int CategoryId { get; set; }
+        }
 
         public class GameCasinoByTpIdReq
         {
@@ -383,6 +388,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
+        /// <summary>
+        /// BaseData/GetTpListbyCategory 取得指定第三方遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
+        {
+            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiResult;
+        }
+        
         /// <summary>
         /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>

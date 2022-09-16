@@ -28,14 +28,14 @@ namespace BackendSite.Service.DAL
             p.Add("BannerType", bannerInfo.BannerType);
             p.Add("ActionMode", bannerInfo.ActionMode);
             p.Add("ShowStatus", bannerInfo.ShowStatus);
-            p.Add("UnixStartTime", bannerInfo.UnixStartTime);
-            p.Add("UnixEndTime", bannerInfo.UnixEndTime);
+            p.Add("StartTime", bannerInfo.StartTime?.DateTime);
+            p.Add("EndTime", bannerInfo.EndTime?.DateTime);
             p.Add("BonusCode", bannerInfo.BonusCode);
             p.Add("MatchId", bannerInfo.MatchId);
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
             p.Add("UrlRouter", bannerInfo.UrlRouter);
-            p.Add("UnixSportBattleDateTime", bannerInfo.UnixSportBattleDateTime);
+            p.Add("SportBattleDateTime", bannerInfo.SportBattleDateTime?.DateTime);
             p.Add("SportCategoryId", bannerInfo.SportCategoryId);
             p.Add("SportLeaguesId", bannerInfo.SportLeaguesId);
             p.Add("SportTeamsId", JsonConvert.SerializeObject(bannerInfo.SportTeamsId));
@@ -43,7 +43,7 @@ namespace BackendSite.Service.DAL
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
             
-            return _mainDbClient.Execute("Admin_Banner_Set_V2", p);
+            return _mainDbClient.Execute("Admin_Banner_Set_V3", p);
         }
         public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
             string status,string currencies ,int startIndex,
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V5", props);
+            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V6", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -132,6 +132,22 @@ namespace BackendSite.Service.DAL
 
             return errorCode;
         }
+        
+        public int DeleteBanner(int siteId, string bannerName , int currency)
+        {
+            var errorCode = 0;
+            try
+            {
+                _mainDbClient.Execute("Admin_Banner_Del", new DynamicParameters(new { _SiteId = siteId, _BannerName = bannerName, _CurrencyId = currency }));
+            }
+            catch (Exception)
+            {
+                errorCode = 999;
+            }
+
+            return errorCode;
+        }
+        
         public IEnumerable<HotEventList> GetHotEventList(string siteIds,
             string status, int startIndex,
             int pageSize, out int totalPages, out int rowCount)
