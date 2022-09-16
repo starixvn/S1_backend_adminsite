@@ -24,35 +24,35 @@ namespace BackendSite.Service.BLL
             if (queryResult == null || !queryResult.Data.Any())
                 return new BonusReportResponseWrapper()
                 {
-                    TempCurrencyTotalAmount = new List<string>()
+                    Data = new List<BonusReportResponse>() // 前端希望給預設空陣列[]，不要 null
                 };
 
             var siteList = _serverInfoBll.GetSiteList();
             var result = new BonusReportResponseWrapper
             {
                 Data = queryResult.Data.Select(r => new BonusReportResponse
-                {
-                    CustId = r.CustId,
-                    TransId = r.TransId,
-                    CurrencyName = _selLangBll.GetResourceValue($"Currency_{r.CurrencyId}"),
-                    PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
-                    SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
-                    UserName = r.UserName,
-                    CreateTime = r.CreateTime,
-                    StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{r.Status}"),
-                    Bonus = r.Bonus,
-                    BonusAmount = r.BonusAmount,
-                    BonusCode = r.BonusCode,
-                    ExpiryTime = r.ExpiryTime,
-                    LockedAmount = r.LockedAmount,
-                    MaxBonus = r.MaxBonus,
-                    RollOver = r.RollOver,
-                    WinOver = r.WinOver,
-                    CancelBonusAmount = r.CancelBonusAmount,
-                    ExpiredCancel = r.ExpiredCancel,
-                    Operator = string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
-                    DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
-                }),
+                    {
+                        CustId = r.CustId,
+                        TransId = r.TransId,
+                        CurrencyName = _selLangBll.GetResourceValue($"Currency_{r.CurrencyId}"),
+                        PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
+                        SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
+                        UserName = r.UserName,
+                        CreateTime = r.CreateTime,
+                        StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{r.Status}"),
+                        Bonus = r.Bonus,
+                        BonusAmount = r.BonusAmount,
+                        BonusCode = r.BonusCode,
+                        ExpiryTime = r.ExpiryTime,
+                        LockedAmount = r.LockedAmount,
+                        MaxBonus = r.MaxBonus,
+                        RollOver = r.RollOver,
+                        WinOver = r.WinOver,
+                        CancelBonusAmount = r.CancelBonusAmount,
+                        ExpiredCancel = r.ExpiredCancel,
+                        Operator = string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
+                        DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
+                    }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages,
                 TotalAmountSummary = queryResult.TotalAmountSummary
