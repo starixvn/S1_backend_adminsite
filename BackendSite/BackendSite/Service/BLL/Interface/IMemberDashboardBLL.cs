@@ -4,20 +4,20 @@ namespace BackendSite.Service.BLL.Interface;
 
 public interface IMemberDashboardBLL
 {
-    Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId);
-    Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustId(int custId);
-    Task<IEnumerable<CustomerLoginIp>> GetIpListByCustId(int custId);
-    Task<int> EditFullName(int custId, string fullName);
-    Task<int> EditEmail(int custId, string email);
-    Task<int> EditPhoneNo(int custId, string phoneNo);
-    Task<int> EditBirthday(int custId, int year, int month, int date);
-    Task<int> EditAddress(int custId, string country, string state, string postCode, string city, string line1, string line2);
-    Task<int> SwitchKyc(int custId, int status);
-    Task<int> SwitchRisk(int custId, int status);
-    Task<int> SwitchPhoneVerified(int custId, int status);
-    Task<int> SwitchEmailVerified(int custId, int status);
-    Task<string> ResetPassword(int custId);
-    Task<int> SetCustStatus(int custId, int status, string reason);
+    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId);
+    Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
+    Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
+    Task<int> EditFullNameAsync(int custId, string fullName);
+    Task<int> EditEmailAsync(int custId, string email);
+    Task<int> EditPhoneNoAsync(int custId, string phoneNo);
+    Task<int> EditBirthdayAsync(int custId, int year, int month, int date);
+    Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2);
+    Task<int> SwitchKycAsync(int custId, int status);
+    Task<int> SwitchRiskAsync(int custId, int status);
+    Task<int> SwitchPhoneVerifiedAsync(int custId, int status);
+    Task<int> SwitchEmailVerifiedAsync(int custId, int status);
+    Task<string> ResetPasswordAsync(int custId);
+    Task<int> SetCustStatusAsync(int custId, int status, string reason);
     Task<int> SwitchEnableRebateAsync(int custId, int status);
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);

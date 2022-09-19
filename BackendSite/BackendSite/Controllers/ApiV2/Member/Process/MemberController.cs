@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
-            var data = await _memberDashboardBll.GetCustomerBasicInfo(request.CustId);
+            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberDashboardBll.EditFullName(request.CustId, request.FullName);
+            var result = await _memberDashboardBll.EditFullNameAsync(request.CustId, request.FullName);
 
             if (result > 0)
             {
@@ -213,7 +213,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberDashboardBll.EditEmail(request.CustId, request.Email);
+            var result = await _memberDashboardBll.EditEmailAsync(request.CustId, request.Email);
 
             if (result > 0)
             {
@@ -240,7 +240,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberDashboardBll.EditPhoneNo(request.CustId, request.PhoneNo);
+            var result = await _memberDashboardBll.EditPhoneNoAsync(request.CustId, request.PhoneNo);
 
             if (result > 0)
             {
@@ -267,7 +267,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
-            var result = await _memberDashboardBll.EditBirthday(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
+            var result = await _memberDashboardBll.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
 
             if (result > 0)
             {
@@ -294,7 +294,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
-            var result = await _memberDashboardBll.EditAddress(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+            var result = await _memberDashboardBll.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
 
             if (result > 0)
             {
@@ -321,7 +321,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchKyc(request.CustId, request.Status);
+            var result = await _memberDashboardBll.SwitchKycAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -348,7 +348,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchRisk(request.CustId, request.Status);
+            var result = await _memberDashboardBll.SwitchRiskAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -375,7 +375,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchEmailVerified(request.CustId, request.Status);
+            var result = await _memberDashboardBll.SwitchEmailVerifiedAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -402,7 +402,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchPhoneVerified(request.CustId, request.Status);
+            var result = await _memberDashboardBll.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -429,7 +429,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
         {
-            var newPassword = await _memberDashboardBll.ResetPassword(request.CustId);
+            var newPassword = await _memberDashboardBll.ResetPasswordAsync(request.CustId);
 
             if (!string.IsNullOrEmpty(newPassword))
             {
@@ -458,7 +458,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatus(request.CustId, request.Status, request.Reason) > 0)
+            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
             {
                 return new ApiResult
                 {
@@ -484,7 +484,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Close(CloseMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatus(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
             {
                 return new ApiResult
                 {
@@ -627,7 +627,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<MemberLoginDevice>>> GetDeviceList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetDeviceListByCustId(request.CustId);
+            var data = await _memberDashboardBll.GetDeviceListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<MemberLoginDevice>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -649,7 +649,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetIpListByCustId(request.CustId);
+            var data = await _memberDashboardBll.GetIpListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,

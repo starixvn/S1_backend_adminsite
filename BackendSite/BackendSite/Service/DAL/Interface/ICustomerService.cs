@@ -4,19 +4,19 @@ namespace BackendSite.Service.DAL.Interface;
 
 public interface ICustomerService
 {
-    Task<CustomerDto> GetCustomerBasicInfo(int custId);
-    Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustId(int custId);
-    Task<int> EditFullName(int custId, string fullName);
-    Task<int> EditEmail(int custId, string email);
-    Task<int> SetPhoneNo(int custId, string phoneNo);
-    Task<int> EditBirthday(int custId, int year, int month, int date);
-    Task<int> EditAddress(int custId, string country, string state, string postCode, string city, string line1, string line2);
-    Task<int> SwitchKyc(int custId, int status);
-    Task<int> SwitchRisk(int custId, int status);
-    Task<int> SwitchPhoneVerified(int custId, int status);
-    Task<int> SwitchEmailVerified(int custId, int status);
-    Task<int> ResetPassword(int custId, string newPassword);
-    Task<int> SetCustStatus(int custId, int status, int taskId);
+    Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
+    Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId);
+    Task<int> EditFullNameAsync(int custId, string fullName);
+    Task<int> EditEmailAsync(int custId, string email);
+    Task<int> SetPhoneNoAsync(int custId, string phoneNo);
+    Task<int> EditBirthdayAsync(int custId, int year, int month, int date);
+    Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2);
+    Task<int> SwitchKycAsync(int custId, int status);
+    Task<int> SwitchRiskAsync(int custId, int status);
+    Task<int> SwitchPhoneVerifiedAsync(int custId, int status);
+    Task<int> SwitchEmailVerifiedAsync(int custId, int status);
+    Task<int> ResetPasswordAsync(int custId, string newPassword);
+    Task<int> SetCustStatusAsync(int custId, int status, int taskId);
     Task<int> SwitchEnableRebateAsync(int custId, int status);
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
