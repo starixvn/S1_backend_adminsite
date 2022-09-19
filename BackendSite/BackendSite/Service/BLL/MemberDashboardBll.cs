@@ -13,17 +13,25 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly ICustomerService _customerService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
+    private readonly CodeGenerator _codeGenerator;
+    private readonly Tools _tools;
+    private readonly CourierAdapter _courierAdapter;
+    private readonly string _bonusApiUrl;
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
         _deviceService = deviceService;
+        _codeGenerator = codeGenerator;
+        _tools = tools;
+        _courierAdapter = courierAdapter;
+        _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
-    public async Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId)
+    public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId)
     {
-        var customer = await _customerService.GetCustomerBasicInfo(custId);
+        var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
         var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
         var customerBasicInfo = new CustomerBasicInfo()
         {
@@ -81,9 +89,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return sb.ToString();
     }
 
-    public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustId(int custId)
+    public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId)
     {
-        var custInfo = await _customerService.GetCustomerBasicInfo(custId);
+        var custInfo = await _customerService.GetCustomerBasicInfoAsync(custId);
 
         if (custInfo.SiteId == (int)SiteEnum.NOVA88)
         {
@@ -109,8 +117,105 @@ public class MemberDashboardBll : IMemberDashboardBLL
         });
     }
 
-    public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustId(int custId)
+    public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
     {
-        return await _customerService.GetCustomerIpListByCustId(custId);
+        return await _customerService.GetCustomerIpListByCustIdAsync(custId);
+    }
+
+    public async Task<int> EditFullNameAsync(int custId, string fullName)
+    {
+        return await _customerService.EditFullNameAsync(custId, fullName);
+    }
+
+    public async Task<int> EditEmailAsync(int custId, string email)
+    {
+        return await _customerService.EditEmailAsync(custId, email);
+    }
+
+    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo)
+    {
+        return await _customerService.SetPhoneNoAsync(custId, phoneNo);
+    }
+
+    public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date)
+    {
+        var isValid = DateTime.TryParse($"{year}-{month}-{date}", out _);
+        if (!isValid)
+            return 0;
+        
+        return await _customerService.EditBirthdayAsync(custId, year, month, date);
+    }
+
+    public async Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    {
+        return await _customerService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
+    }
+
+    public async Task<int> SwitchKycAsync(int custId, int status)
+    {
+        return await _customerService.SwitchKycAsync(custId, status);
+    }
+
+    public async Task<int> SwitchRiskAsync(int custId, int status)
+    {
+        return await _customerService.SwitchRiskAsync(custId, status);
+    }
+
+    public async Task<int> SwitchPhoneVerifiedAsync(int custId, int status)
+    {
+        return await _customerService.SwitchPhoneVerifiedAsync(custId, status);
+    }
+
+    public async Task<int> SwitchEmailVerifiedAsync(int custId, int status)
+    {
+        return await _customerService.SwitchEmailVerifiedAsync(custId, status);
+    }
+
+    public async Task<string> ResetPasswordAsync(int custId)
+    {
+        _codeGenerator.Maximum = 8;
+        _codeGenerator.Minimum = 6;
+        _codeGenerator.RepeatCharacters = true;
+        var newPassword = _codeGenerator.Generate();
+        var md5NewPassword = _tools.MD5Encrypt(newPassword);
+        return await _customerService.ResetPasswordAsync(custId, md5NewPassword) > 0 ? md5NewPassword : "";
+    }
+
+    public async Task<int> SetCustStatusAsync(int custId, int status, string reason)
+    {
+        return await _customerService.SetCustStatusAsync(custId, status, (int)CustTaskType.LastStatusUpdateTime);
+    }
+
+    public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
+    {
+        return await _customerService.SwitchRebatePayoutAsync(custId, status);
+    }
+
+    public async Task<int> ResetBankInfoAsync(int custId)
+    {
+        return await _customerService.ResetBankInfoAsync(custId);
+    }
+
+    public async Task<int> ResetCryptoInfoAsync(int custId)
+    {
+        return await _customerService.ResetCryptoInfoAsync(custId);
+    }
+
+    public async Task<int> ResetEWalletAsync(int custId)
+    {
+        return await _customerService.ResetEWalletAsync(custId);
+    }
+
+    public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)
+    {
+        var rewardUrl = $"{_bonusApiUrl}SetVerificationReward";
+        var verificationReq = new SetVerificationRequest()
+        {
+            CustId = custId,
+            OTPType = otpType
+        };
+
+        var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetVerificationRequest>(rewardUrl, verificationReq);
+        return apiResult;
     }
 }
