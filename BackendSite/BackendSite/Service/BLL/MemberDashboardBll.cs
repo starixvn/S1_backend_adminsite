@@ -186,4 +186,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SwitchEnableRebateAsync(custId, status);
     }
+
+    public async Task<int> ResetBankInfoAsync(int custId)
+    {
+        return await _customerService.ResetBankInfoAsync(custId);
+    }
 }

@@ -211,6 +211,10 @@ public class SwitchEnableRebateRequest
     public EnableRebateEnum Status { get; set; }
 }
 
+public class ResetBankInfoRequest
+{
+    public int CustId { get; set; }
+}
 
 public class GetIpListRequest
 {

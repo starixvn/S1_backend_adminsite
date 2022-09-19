@@ -132,4 +132,9 @@ public class CustomerService : ICustomerService
         var p = new DynamicParameters(new { _CustId = custId, _EnableRebate = status });
         return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", p);
     }
+    public async Task<int> ResetBankInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _mainSqlClient.ExecuteAsync("Admin_ResetCustBankInfo_Set", p);
+    }
 }
