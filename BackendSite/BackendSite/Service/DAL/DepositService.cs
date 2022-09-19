@@ -209,7 +209,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest, bool canReward = false)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -264,6 +264,19 @@ namespace BackendSite.Service.DAL
                             {
                                 var pay = (IPay)depositRequest.oDepositInfo;
                                 result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
+                            }
+                        }
+                        
+                        if (result > 0 && canReward)
+                        {
+                            var resultCode = InsertDepositRewardPointQueue(transId, conn, trans);
+                            if (resultCode != (int) ErrorCodeEnum.Success)
+                            {
+                                _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
+                            }
+                            else
+                            {
+                                result = 1;
                             }
                         }
                     }
@@ -560,6 +573,19 @@ namespace BackendSite.Service.DAL
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.Query<PaymentGateWayOptions>("Admin_PaymentGateWayOptions_Get");
+        }
+
+        public int InsertDepositRewardPointQueue(string transId, IDbConnection conn, IDbTransaction trans)
+        {
+            var para = new DynamicParameters();
+            para.Add("_TransId", transId);
+            para.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            _ = conn.Execute("Service_DepositRewardPointQueue_Ins", para, transaction: trans,
+                commandType: CommandType.StoredProcedure);
+            var resultCode = para.Get<int?>("_Result") ?? -9;
+            
+            return resultCode;
         }
     }
 }

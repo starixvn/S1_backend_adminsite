@@ -76,6 +76,7 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
@@ -164,10 +165,6 @@ namespace BackendSite
                 #endregion
 
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseEndpoints(endpoints =>
