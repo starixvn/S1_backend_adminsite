@@ -151,6 +151,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
+                    _InitialTime = bankFinancialTransferAccount.InitialTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -159,9 +160,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Ins_V3";
-
-            return _mainDbClient.Execute(SpName, parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V4", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)

@@ -95,6 +95,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 初始金額
         /// </summary>
         public decimal InitialAmount { get; set; }
+        public DateTimeOffset InitialTime { get; set; }
 
         /// <summary>
         /// 讀寫 超過餘額警示
