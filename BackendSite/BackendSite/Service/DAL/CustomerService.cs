@@ -127,7 +127,7 @@ public class CustomerService : ICustomerService
         return await _mainSqlClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
     }
     
-    public async Task<int> SwitchEnableRebateAsync(int custId, int status)
+    public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
     {
         var p = new DynamicParameters(new { _CustId = custId, _EnableRebate = status });
         return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", p);

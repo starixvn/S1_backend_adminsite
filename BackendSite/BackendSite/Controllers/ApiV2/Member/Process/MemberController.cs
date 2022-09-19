@@ -497,7 +497,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
-        /// Member/SwitchEnableRebate 起停用派發Rebate
+        /// Member/SwitchRebatePayout 起停用派發Rebate
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -508,9 +508,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 26 })]
         [HttpPost]
-        public async Task<ApiResult> SwitchEnableRebateAsync(SwitchEnableRebateRequest request)
+        public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
         {
-            if (await _memberDashboardBll.SwitchEnableRebateAsync(request.CustId, (int)request.Status) > 0)
+            if (await _memberDashboardBll.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
             {
                 return new ApiResult
                 {

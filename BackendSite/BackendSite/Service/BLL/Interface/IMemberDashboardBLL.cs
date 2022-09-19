@@ -18,7 +18,7 @@ public interface IMemberDashboardBLL
     Task<int> SwitchEmailVerifiedAsync(int custId, int status);
     Task<string> ResetPasswordAsync(int custId);
     Task<int> SetCustStatusAsync(int custId, int status, string reason);
-    Task<int> SwitchEnableRebateAsync(int custId, int status);
+    Task<int> SwitchRebatePayoutAsync(int custId, int status);
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
