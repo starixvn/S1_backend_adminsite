@@ -153,45 +153,51 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate, DateTime endDate, string user, int pageSize, int pageNumber,int categoryId, int baseCurrencyId,ref List<string> currencyAmount)
+        public VipRebateReportResult GetVipRebateInfoList(string SiteStr,
+            string currencyStr,
+            DateTime startDate,
+            DateTime endDate,
+            string userName,
+            string categoryIdStr,
+            int baseCurrencyId, int startIndex, int pageSize,
+            ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
-            var searchData = new VipRebateInfoData();
+            var searchData = new VipRebateReportResult();
             var props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("PageSize", Math.Abs(pageSize));
-            props.Add("CategoryId", categoryId);
-            props.Add("BaseCurrencyId", baseCurrencyId);
+            props.Add("_SiteIds", SiteStr);
+            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_UserName", userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_CategoryIds", categoryIdStr);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
 
             #region GetCurrencyTotalAmount
             
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmount_Get_V5", props).ToList();
-            if (currencyTotalAmount.Count > 0)
+            searchData.CurrencyAmount = _reportDbClient.Query<VipRebateReportOverviewResult>("Admin_VipRebateTotalAmount_Get_V6", props);
+
+            if (searchData.CurrencyAmount.Count() > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                searchData.CurrencyAmount.ToList().ForEach(x =>
                 {
-                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                    tempCurrencyTotalAmount.Add($"{x.CurrencyName}:{Math.Round(x.TotalAmount, 2)}");
                 });
             }
             currencyAmount = tempCurrencyTotalAmount;
-            
+
             #endregion
 
-            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V8", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V9", props).ToList();
 
             searchData.VipRebateInfoList = result;
-            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return searchData;
         }
@@ -232,24 +238,24 @@ namespace BackendSite.Service.DAL
             searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite,
-            int currency,
+        public VipRebateInfoData GetVipRebateInfoListExport(string SiteStr,
+            string currencyStr,
             DateTime startDate,
             DateTime endDate, 
-            string user, 
-            int categoryId, 
+            string userName, 
+            string categoryIdStr,
             int baseCurrencyId)
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
-            props.Add("SelectSite", selectSite);
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("CategoryId", categoryId);
-            props.Add("BaseCurrencyId", baseCurrencyId);
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V6", props).ToList();
+            props.Add("_SiteIds", SiteStr);
+            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_UserName", userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_CategoryIds", categoryIdStr);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V7", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.PageNumber = 0;
