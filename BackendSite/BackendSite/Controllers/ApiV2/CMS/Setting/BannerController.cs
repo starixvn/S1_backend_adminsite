@@ -332,7 +332,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Hot Event Management
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
         [HttpPost]
         public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
         {
@@ -368,7 +367,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Hot Event Management > [Edit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
         [HttpPost]
         public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
         {
