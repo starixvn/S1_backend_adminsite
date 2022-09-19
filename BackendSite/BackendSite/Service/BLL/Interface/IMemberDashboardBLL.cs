@@ -20,4 +20,5 @@ public interface IMemberDashboardBLL
     Task<int> SetCustStatus(int custId, int status, string reason);
     Task<int> SwitchEnableRebateAsync(int custId, int status);
     Task<int> ResetBankInfoAsync(int custId);
+    Task<int> ResetCryptoInfoAsync(int custId);
 }

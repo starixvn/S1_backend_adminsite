@@ -191,4 +191,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.ResetBankInfoAsync(custId);
     }
+
+    public async Task<int> ResetCryptoInfoAsync(int custId)
+    {
+        return await _customerService.ResetCryptoInfoAsync(custId);
+    }
 }

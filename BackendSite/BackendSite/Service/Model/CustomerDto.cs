@@ -216,6 +216,11 @@ public class ResetBankInfoRequest
     public int CustId { get; set; }
 }
 
+public class ResetUSDTInfoRequest
+{
+    public int CustId { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }

@@ -548,6 +548,31 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
+        /// Member/ResetCryptoInfo 重置BankInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> ResetCryptoInfoAsync(ResetUSDTInfoRequest request)
+        {
+            if (await _memberDashboardBll.ResetCryptoInfoAsync(request.CustId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
         /// <remarks>
