@@ -108,6 +108,7 @@ namespace BackendSite.Service.BLL
                     	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
+
                 ExportBody(ws, t, propertyInfo, offset);
                 ExportHeader(ws, propertyInfo);
             }

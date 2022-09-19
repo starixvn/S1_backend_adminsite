@@ -1,9 +1,11 @@
-﻿using BackendSite.Service.BLL;
+﻿using System.ComponentModel;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
@@ -114,6 +116,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
+        
+        public class GetTpListByCategoryReq
+        {
+            public int CategoryId { get; set; }
+        }
 
         public class GameCasinoByTpIdReq
         {
@@ -135,7 +142,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetTpGameListReq
         {
+            [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
             public int TpId { get; set; }
+            
+            [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
             public int CategoryId { get; set; }
         }
 
@@ -151,8 +161,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// <summary>
             /// 0=All, 1=Seamless Wallet, 2=Transfer Wallet
             /// </summary>
-            public int WalletType { get; set; }
-
+            public int? WalletType { get; set; }
         }
 
         public class GameTypeListReq
@@ -432,6 +441,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// BaseData/GetTpListbyCategory 取得指定第三方遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
+        {
+            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
         /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>
         /// <remarks>
@@ -590,7 +617,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(request.WalletType);
+                apiResult.Data = _bonusManageBll.GetPromoCategories(Convert.ToInt32(request.WalletType));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -715,7 +742,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     {
                         SysId = x.SysId,
                         BankCode = x.BankCode ,
-                        BankName = x.BankName
+                        BankName = x.BankName ,
+                        CurrencyId = x.CurrencyId
                     }).Distinct(new BankCodeModelComparer());
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;
@@ -784,6 +812,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        [HttpPost]
+        public ApiResult GetTransferAccountList(GetAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
         
         #region Private Methods
 

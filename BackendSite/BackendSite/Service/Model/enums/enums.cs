@@ -213,12 +213,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
-        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5 //No Use
+        LoadCard = 5, //No Use
+        QRPay = 6 ,
+        BankAutoChannel = 7
     }
 
     public enum DepositStatusEnum
@@ -456,28 +457,6 @@ namespace BackendSite.Service.Model.enums
         ThirdParty = 2
     }
     
-    public enum AdjustmentCategoryEnum
-    {
-        [Description("None - (Default)")]
-        None = 1,
-        [Description("Retention Bonus")]
-        RetentionBonus = 2,
-        [Description("Manual Bonus(Special Bonus)")]
-        ManualBonus = 3,
-        [Description("Vip Upgrade Reward")]
-        VipUpgradeReward = 4,
-        [Description("Prize Drop")]
-        PrizeDrop = 5,
-        [Description("Tech Issue None Affected")]
-        TechIssueNoneAffected = 6,
-        Test = 7,
-        [Description("Vendor Mistake")]
-        VendorMistake = 8,
-        Deposit = 9,
-        Withdrawal = 10,
-        Other = 11
-    }
-
     #endregion
 
     #region AdminUser
@@ -498,7 +477,6 @@ namespace BackendSite.Service.Model.enums
         FstDeposit = 1,
         ReDeposit = 2,
         FreeBet = 3,
-        WalletBonus = 5,
         Rebate = 6,
         Cashback = 7,
         SpecialBonus = 8,
@@ -747,7 +725,10 @@ namespace BackendSite.Service.Model.enums
         cs = 2,
         th = 3,
         id = 4,
-        vn = 5
+        vn = 5,
+        hi = 6,
+        my = 7,
+        bd = 8
     }
 
     public enum PromotionDisplayConditionType
@@ -1050,6 +1031,14 @@ namespace BackendSite.Service.Model.enums
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
     }
+    
+    public enum BankCardManagementSupportChannelEnum
+    {
+        [Description("Bank Transfer")]
+        LocalBank = 0,
+        [Description("Mobile E-Wallet")]
+        EWallet = 1
+    }
 
     #endregion
 
@@ -1088,11 +1077,12 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerActionModeEnum
     {
-        GoToGame = 1,
-        GoToBonus = 2,
-        OpenWindow = 3,
-        RedirectPage = 4,
-        NoAction = 5
+        NoAction = 1,
+        GoToGame = 2,
+        GoToBonus = 3,
+        OpenWindow = 4,
+        RedirectPage = 5,
+        RedirectPagesOfThisSite = 6
     }
 
     public enum ShowStatusEnum
@@ -1108,6 +1098,16 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum UrlRouterEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        Referral = 3,
+        LeaderBoard = 4,
+        AngPow = 5,
+        Lottery = 6
+    }
+    
     #endregion
 
     #region AppLinkTable

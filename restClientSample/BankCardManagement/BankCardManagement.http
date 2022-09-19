@@ -1,8 +1,8 @@
 # localhost
-# @url=http://localhost:9158
+@url=http://localhost:9158
 
 # AdminSite DEV
-@url=http://admin.n88dev.com
+# @url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -16,6 +16,7 @@ Content-Type: application/json
 
 ###
 # 取得 Offline 銀行卡設定清單
+# purposes，vipLevels，pointLevels，supportChannels 這幾項要撈全部請帶空陣列 []
 POST {{url}}/apiV2/BankCardManagement/GetList HTTP/1.1
 Content-Type: application/json
 
@@ -29,6 +30,7 @@ Content-Type: application/json
     "pointLevels": [0, 1, 2, 3, 4, 5],
     "accountNo": "",
     "agent": "",
+    "supportChannels": [0],
     "pageNumber": 1,
     "pageSize": 10
 }
@@ -50,7 +52,7 @@ Content-Type: application/json
     "memo": "test",
     "sort": 0,
     "status": 1,
-    "supportQr": true,
+    "supportChannels": [0, 1],
     "qrCodeUrl": "https://wa.me/message/BBRAKWQKUYOFG1?src=qr"
 }
 
@@ -83,12 +85,21 @@ Content-Type: application/json
 }
 
 ###
-# 取得目的列表(這看前端要打API還是直接寫死都可以)
+# 取得目的列表
 POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
 Content-Type: application/json
 
 {
     "enumName": "BankCardManagementPurposeEnum"
+}
+
+###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "BankCardManagementSupportChannelEnum"
 }
 
 ###

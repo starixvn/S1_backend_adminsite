@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly ReportService _reportService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly AWSS3Helper _awsS3Helper;
+        private readonly ICacheHelper _cacheHelper;
         private readonly string _bucketName;
         private readonly string _bucketUrl;
         private readonly string _folder;
@@ -37,6 +38,7 @@ namespace BackendSite.Service.BLL
             _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
             _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
             _folder = configuration.GetValue<string>("AwsFinanceFolder");
@@ -48,7 +50,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialReasonModel> GetReason(string funcKey)
         {
-            return _bankFinancialService.GetReason(funcKey);
+            var key = $"Reason:{funcKey}";
+            
+            return _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => _bankFinancialService.GetReason(funcKey));
         }
 
         public IEnumerable<PayList> GetPayList()
@@ -129,13 +134,13 @@ namespace BackendSite.Service.BLL
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
-                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? null : input.AccountCode,
+                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
                 AccountNo = input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
-                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? null : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? null : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? null : input.BankLoginPassword,
+                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
                 InitialAmount = input.InitialAmount,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                 Reason = input.Reason == 0 ? null : input.Reason,
@@ -189,6 +194,11 @@ namespace BackendSite.Service.BLL
 
             if (isCreate)
             {
+                if (_bankFinancialService.CheckTransferAccountExists(transferAccountModel.AccountNo))
+                {
+                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
+                }
+                
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)

@@ -116,6 +116,19 @@ namespace BackendSite.Service.DAL
             
             return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
         }
+        
+        public bool CheckTransferAccountExists(string accountNo)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _AccountNo = accountNo,
+                });
+            
+            var result = _mainDbClient.Query<int>("Admin_BankFinancialTransferAccount_Check", parameters);
+
+            return result.Any();
+        }
 
         public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
         {
@@ -217,7 +230,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
         {
-            var SpName = "Admin_BankFinancialTransferAccount_GetForList_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
         

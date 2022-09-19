@@ -313,6 +313,8 @@ namespace BackendSite.Service.DAL
         public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
         {
             Adjustment_transId = null;
+            int? depositId = adjustmentAndWithdrawalLimit.DepositId == 0 ? null : adjustmentAndWithdrawalLimit.DepositId;
+
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -327,11 +329,12 @@ namespace BackendSite.Service.DAL
                 adjustmentAndWithdrawalLimit.Amount,
                 Prefix = $"A{common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
-                adjustmentAndWithdrawalLimit.Category
+                adjustmentAndWithdrawalLimit.Category,
+                _DepositId = depositId
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_Adjustment_Ins_V3", adjustmentP, trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
@@ -344,8 +347,8 @@ namespace BackendSite.Service.DAL
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
                     
-                    // 調帳類型為 Deposit 時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == (int)AdjustmentCategoryEnum.Deposit)
+                    // 調帳類型為 Deposit(9) 時變更存款單實際存款金額
+                    if (adjustmentAndWithdrawalLimit.Category == 9)
                     {
                         var adjustAmount = isAdd
                             ? adjustmentAndWithdrawalLimit.Amount
@@ -472,7 +475,7 @@ namespace BackendSite.Service.DAL
             props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
                 input.UserName,
-                Category = AdjustmentCategoryEnum.Deposit.ToString(),
+                Category = "Deposit",
                 input.Memo,
                 DepositTransId = input.TransId,
                 BeforeActualDeposit = beforeAmount,

@@ -42,15 +42,20 @@ namespace BackendSite.Service.BLL
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
-            var key = $"FinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}:{refTransId}";
-            var cacheTime = TimeSpan.FromMinutes(15);
+            var key = $"GetFinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}";
+            if (!string.IsNullOrWhiteSpace(refTransId))
+            {
+                key += $":{refTransId}";
+            }
 
-            if (_cacheHelper.KeyExists(key))
+            var cacheTime = TimeSpan.FromMinutes(5);
+
+            if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
                 //Redis Pagination
-                var total = (int)_cacheHelper.GetListLength(key);
+                var total = (int)_cacheHelper.GetListLength(key, RedisDataBase.Shared);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
-                return _cacheHelper.GetListByRange<FinancialLog>(key, startIndex, endIndex);
+                return _cacheHelper.GetListByRange<FinancialLog>(key, startIndex, endIndex, RedisDataBase.Shared);
             }
 
             //Search range table
@@ -61,13 +66,13 @@ namespace BackendSite.Service.BLL
                 EndDate = endDate,
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
-            var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Admin_FinancialLogList_Get_V4", parameters);
+            var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
             var list = data.OrderByDescending(i => i.Id).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
             {
-                _cacheHelper.InsertList(key, cacheTime, list);
+                _cacheHelper.InsertList(key, cacheTime, list, RedisDataBase.Shared);
             });
 
             var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
@@ -79,47 +84,6 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize,
-            ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber,
-                out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
-        {
-            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                currencyId, baseCurrencyId, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount,
-                ref currencyAmount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
-        {
-            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate, currencyId,
-                baseCurrencyId, rebateCategoriesId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            return walletService.GetRebateInfoByCust(CustId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate)
-        {
-            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()
@@ -419,6 +383,7 @@ namespace BackendSite.Service.BLL
                 HasBonusCode = true,
                 BonusCode = bonusCode,
                 RollOver = checkData.RollOver,
+                WinOver = checkData.WinOver,
                 Bonus = checkData.Bonus,
                 TpId = checkData.TpId,
                 CategoryId = checkData.CategoryId,
