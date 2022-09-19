@@ -4,20 +4,47 @@ namespace BackendSite.Service.Model
 {
     public class BannerInfo
     {
+        private DateTimeOffset _startTime { set; get; }
+        private DateTimeOffset _endTime { set; get; }
+        public DateTimeOffset? StartTime 
+        {
+            get => _startTime;
+            set
+            {
+                if (value != null)
+                    _startTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? EndTime 
+        {
+            get => _endTime;
+            set
+            {
+                if (value != null)
+                    _endTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public int SiteId { get; set; }
         public string BannerName { get; set; }
         public string Currency { get; set; }
         public int BannerType { get; set; }
         public int ActionMode { get; set; }
         public int ShowStatus { get; set; }
-        public DateTimeOffset? StartTime { set; get; }
-        public DateTimeOffset? EndTime { set; get; }
         public string BonusCode { get; set; }
         public int? MatchId { get; set; }
         public int? TpId { get; set; }
         public string GameId { get; set; }
         public string UrlRouter { get; set; }
-        public DateTimeOffset? SportBattleDateTime { set; get; }
+        private DateTimeOffset? _sportBattleDateTime { set; get; }
+        public DateTimeOffset? SportBattleDateTime 
+        {
+            get => _sportBattleDateTime;
+            set
+            {
+                if (value != null)
+                    _sportBattleDateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public int? SportCategoryId { get; set; }
         public int? SportLeaguesId { get; set; }
         public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
