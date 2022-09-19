@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AdjustmentLimitController : ControllerBase
@@ -17,6 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         #region Fields
 
         private readonly PaymentBLL _paymentBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly SelLangBLL _selLangBll;
 
         #endregion
@@ -27,25 +28,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         {
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest
         {
-            public IEnumerable<int> SiteIds { get; set; }
-
-            public IEnumerable<int> CurrencyIds { get; set; }
+            public int SiteId { get; set; }
         }
-
 
         public class SetRequest
         {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public decimal AdjustmentMax { get; set; }
+            public decimal Amount { get; set; }
         }
 
         #endregion
@@ -62,20 +59,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 43, 1 })]
         [HttpPost]
-        public ApiListResult<AdjustmentLimitData> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<AdjustmentLimitData>> GetList(GetListRequest request)
         {
-            var result = _paymentBll.GetAdjustmentData(request.SiteIds, request.CurrencyIds, request.PageNumber, request.PageSize,
+            var siteIds = new List<int>(); siteIds.Add(request.SiteId);
+            var serverInfo = _serverInfoBll.GetSiteList().Where(x => x.SiteId == request.SiteId).First();
+            var result = _paymentBll.GetAdjustmentData(siteIds, serverInfo.ICurrencyList, 1, 100,
                 out int totalPages, out int rowCount);
 
-            var apiResult = new ApiListResult<AdjustmentLimitData>
+            var apiResult = new ApiResult<IEnumerable<AdjustmentLimitData>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount
             };
             return apiResult;
         }
@@ -90,7 +86,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/AdjustmentLimitManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 43, 3 })]
         [HttpPost]
         public ApiResult Set(ApiRequestWithLog<AdjustmentLimit> request)
         {
