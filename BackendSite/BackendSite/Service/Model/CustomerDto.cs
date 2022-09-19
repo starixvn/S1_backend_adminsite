@@ -126,6 +126,118 @@ public class DeleteCustPhotoIdRequest
     public int Id { get; set; }
 }
 
+public class SetFullNameRequest
+{
+    public int CustId { get; set; }
+    public string FullName { get; set; }
+}
+
+public class SetEmailRequest
+{
+    public int CustId { get; set; }
+    public string Email { get; set; }
+}
+
+public class SetPhoneNoRequest
+{
+    public int CustId { get; set; }
+    public string PhoneNo { get; set; }
+}
+
+public class SetBirthdayRequest
+{
+    public int CustId { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+}
+
+public class SetMemberAddressRequest
+{
+    public int CustId { get; set; }
+    public string Country { get; set; }
+    public string State { get; set; }
+    public string PostCode { get; set; }
+    public string City { get; set; }
+    public string Line1 { get; set; }
+    public string Line2 { get; set; }
+}
+
+public class SetMemberKycStatusRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
+public class SetMemberRiskStatusRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
+public class SwitchMemberPhoneVerifiedRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
+public class SwitchMemberEmailVerifiedRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+}
+
+public class ResetMemberPasswordRequest
+{
+    public int CustId { get; set; }
+}
+
+public class LockMemberRequest
+{
+    public int CustId { get; set; }
+    public int Status { get; set; }
+    public string Reason { get; set; }
+}
+
+public class CloseMemberRequest
+{
+    public int CustId { get; set; }
+    public string Reason { get; set; }
+}
+
+public class SwitchEnableRebateRequest
+{
+    public int CustId { get; set; }
+    public EnableRebateEnum Status { get; set; }
+}
+
+public class ResetBankInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class ResetCryptoInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class ResetEwalletRequest
+{
+    public int CustId { get; set; }
+}
+
+public class PayoutVerificationRewardRequest
+{
+    public int CustId { get; set; }
+    public int OTPType { get; set; }
+}
+
+public class SetVerificationRequest
+{
+    public int CustId { get; set; }
+    public int OTPType { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }
