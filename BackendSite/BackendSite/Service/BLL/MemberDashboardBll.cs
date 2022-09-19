@@ -15,14 +15,18 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly ICacheHelper _cacheHelper;
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
+    private readonly CourierAdapter _courierAdapter;
+    private readonly string _bonusApiUrl;
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
         _deviceService = deviceService;
         _codeGenerator = codeGenerator;
         _tools = tools;
+        _courierAdapter = courierAdapter;
+        _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
     public async Task<CustomerBasicInfo> GetCustomerBasicInfo(int custId)
@@ -200,5 +204,18 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<int> ResetEWalletAsync(int custId)
     {
         return await _customerService.ResetEWalletAsync(custId);
+    }
+
+    public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)
+    {
+        var rewardUrl = $"{_bonusApiUrl}SetVerificationReward";
+        var verificationReq = new SetVerificationRequest()
+        {
+            CustId = custId,
+            OTPType = otpType
+        };
+
+        var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetVerificationRequest>(rewardUrl, verificationReq);
+        return apiResult;
     }
 }

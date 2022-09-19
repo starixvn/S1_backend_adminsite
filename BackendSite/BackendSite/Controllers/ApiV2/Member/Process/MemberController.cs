@@ -596,6 +596,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
+        
+        /// <summary>
+        /// Member/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> PayoutVerificationReward(PayoutVerificationRewardRequest request)
+        {
+            var apiResult = await _memberDashboardBll.SetVerificationRewardAsync(request.CustId, request.OTPType);
+            return apiResult;
+        }
 
         /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置

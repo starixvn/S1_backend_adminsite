@@ -226,6 +226,18 @@ public class ResetEwalletRequest
     public int CustId { get; set; }
 }
 
+public class PayoutVerificationRewardRequest
+{
+    public int CustId { get; set; }
+    public int OTPType { get; set; }
+}
+
+public class SetVerificationRequest
+{
+    public int CustId { get; set; }
+    public int OTPType { get; set; }
+}
+
 public class GetIpListRequest
 {
     public int CustId { get; set; }
