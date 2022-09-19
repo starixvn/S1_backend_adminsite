@@ -150,6 +150,15 @@ namespace BackendSite.Service.Model
         public decimal TurnOver_ExcludeValidTO { get; set; }
         public decimal ValidBet_Valid { get; set; }
     }
+
+    public class VipRebateReportOverviewResult
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int TotalRecord { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
+
     public class VipRebateInfo
     {
         public int SiteId { get; set; }
@@ -168,10 +177,19 @@ namespace BackendSite.Service.Model
     public class VipRebateInfoData
     {
         public List<VipRebateInfo> VipRebateInfoList { get; set; }
+        public List<string> CurrencyAmount { get; set; }
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
-        public List<string> CurrencyAmount { get; set; }
+    }
+
+    public class VipRebateReportResult
+    {
+        public List<VipRebateInfo> VipRebateInfoList { get; set; }
+        public IEnumerable<VipRebateReportOverviewResult> CurrencyAmount { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
     public class VipTPCategory
     {
