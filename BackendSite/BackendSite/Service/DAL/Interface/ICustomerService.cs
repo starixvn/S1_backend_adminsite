@@ -17,4 +17,5 @@ public interface ICustomerService
     Task<int> SwitchEmailVerified(int custId, int status);
     Task<int> ResetPassword(int custId, string newPassword);
     Task<int> SetCustStatus(int custId, int status, int taskId);
+    Task<int> SwitchEnableRebateAsync(int custId, int status);
 }

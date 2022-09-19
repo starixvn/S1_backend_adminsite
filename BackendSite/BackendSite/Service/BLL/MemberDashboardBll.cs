@@ -181,4 +181,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.SetCustStatus(custId, status, (int)CustTaskType.LastStatusUpdateTime);
     }
+
+    public async Task<int> SwitchEnableRebateAsync(int custId, int status)
+    {
+        return await _customerService.SwitchEnableRebateAsync(custId, status);
+    }
 }

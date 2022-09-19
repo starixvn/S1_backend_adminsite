@@ -10,7 +10,6 @@ public class CustomerService : ICustomerService
 {
     private readonly MySqlClient _sqlClienct;
     private readonly MySqlClient _mainSqlClient;
-    private ICustomerService _customerServiceImplementation;
 
     public CustomerService(IEnumerable<MySqlClient> sqlCliencts)
     {
@@ -126,5 +125,11 @@ public class CustomerService : ICustomerService
         p.Add("Status", status);
         p.Add("TaskId", taskId);
         return await _mainSqlClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
+    }
+    
+    public async Task<int> SwitchEnableRebateAsync(int custId, int status)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _EnableRebate = status });
+        return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", p);
     }
 }

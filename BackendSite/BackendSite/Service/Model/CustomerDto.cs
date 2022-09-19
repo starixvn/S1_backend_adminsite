@@ -205,6 +205,12 @@ public class CloseMemberRequest
     public string Reason { get; set; }
 }
 
+public class SwitchEnableRebateRequest
+{
+    public int CustId { get; set; }
+    public EnableRebateEnum Status { get; set; }
+}
+
 
 public class GetIpListRequest
 {
