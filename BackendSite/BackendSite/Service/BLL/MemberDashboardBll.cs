@@ -196,4 +196,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.ResetCryptoInfoAsync(custId);
     }
+
+    public async Task<int> ResetEWalletAsync(int custId)
+    {
+        return await _customerService.ResetEWalletAsync(custId);
+    }
 }

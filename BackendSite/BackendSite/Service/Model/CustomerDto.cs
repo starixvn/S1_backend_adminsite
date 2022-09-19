@@ -216,7 +216,12 @@ public class ResetBankInfoRequest
     public int CustId { get; set; }
 }
 
-public class ResetUSDTInfoRequest
+public class ResetCryptoInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class ResetEwalletRequest
 {
     public int CustId { get; set; }
 }

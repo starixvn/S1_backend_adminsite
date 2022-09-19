@@ -20,4 +20,5 @@ public interface ICustomerService
     Task<int> SwitchEnableRebateAsync(int custId, int status);
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
+    Task<int> ResetEWalletAsync(int custId);
 }

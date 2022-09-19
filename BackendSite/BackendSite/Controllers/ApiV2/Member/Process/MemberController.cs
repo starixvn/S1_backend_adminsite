@@ -546,9 +546,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
-        /// Member/ResetCryptoInfo 重置BankInfo
+        /// Member/ResetCryptoInfo 重置CryptoInfo
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -558,7 +558,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult> ResetCryptoInfoAsync(ResetUSDTInfoRequest request)
+        public async Task<ApiResult> ResetCryptoInfoAsync(ResetCryptoInfoRequest request)
         {
             if (await _memberDashboardBll.ResetCryptoInfoAsync(request.CustId) > 0)
             {
@@ -571,7 +571,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
+        /// <summary>
+        /// Member/ResetEWallet 重置E-Wallet
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> ResetEWalletAsync(ResetEwalletRequest request)
+        {
+            if (await _memberDashboardBll.ResetEWalletAsync(request.CustId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
         /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
