@@ -281,7 +281,7 @@ namespace BackendSite.Service.BLL
                 Name = promoCategories?.Name ?? string.Empty,
                 WalletType = checkData.WalletType,
                 TierAmountList = checkData.TierAmountList,
-                BonusType = checkData.BonusType,
+                BonusType = (int)checkData.BonusType,
                 PromotionType =checkData.PromotionType,            
             };
         }
