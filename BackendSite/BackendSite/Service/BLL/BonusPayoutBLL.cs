@@ -47,6 +47,8 @@ namespace BackendSite.Service.BLL
             result.BonusAmount = tierAmount.Bonus;
             result.LockAmount = tierAmount.RequiredAmount;
             result.RolloverAmount = tierAmount.RequiredAmount;
+            result.RollOver = tierAmount.RollOver;
+            result.WinOver = tierAmount.WinOver;
             result.IsSuccess = true;
             return result;
         }
