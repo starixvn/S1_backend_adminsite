@@ -83,7 +83,7 @@ export default function Result (userBetLimit) {
             else if (element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.actionBtn) {
                 body_content = <ActionButtons 
                                   ClickEdit={userBetLimit.ClickEdit.bind(this, data["custId"])}
-                                  ClickDelete={userBetLimit.ClickDelete.bind(this, data["custId"])}/>
+                                  ClickDelete={userBetLimit.ClickDelete.bind(this, data)}/>
 
             }
             else if(element.body && element.body.SpecialItem && element.body.SpecialItem === SpecialItemType.statusBtn) {

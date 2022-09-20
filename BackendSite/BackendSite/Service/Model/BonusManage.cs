@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Extensions;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.Model.PromotionDisplayCondition;
 
 namespace BackendSite.Service.Model
@@ -310,5 +308,10 @@ namespace BackendSite.Service.Model
     {
         public string BonusCode { get; set; }
         public int SiteId { get; set; }
+    }
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
     }
 }

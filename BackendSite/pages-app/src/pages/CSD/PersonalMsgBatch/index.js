@@ -16,13 +16,13 @@ const Panel = () => {
     AccountStatus: 0,
     Currency: 0
   });
-
   const [stateDatas, setDatas] = useState({
     PageInfo: null,
     Datas: null,
     FilterInfo: null,
   });
   const [editMode, setEdit] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [detailDatas, setDetail] = useState(null);
   const [siteList, setSiteList] = useState(null);
 
@@ -97,7 +97,13 @@ const Panel = () => {
     };
 
     WebAPI.PostData(param).then((res) => {
+      setIsAdding(false);
       if (res.data.errorCode === 0) {
+        res.data.data.forEach((element, idx) => {
+          if(element.status === 0){
+            setIsAdding(true);
+          }
+        });
         setDatas({
           ...stateDatas,
           PageInfo: {
@@ -258,6 +264,7 @@ const Panel = () => {
           SetEditMode={SetEditMode}
           FilterSubmit={Filter_Submit}
           onChange={Filter_OnChange}
+          IsAdding={isAdding}
         />
       )}
     </div>

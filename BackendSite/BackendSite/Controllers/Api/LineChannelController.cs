@@ -5,17 +5,16 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class LineChannelController : ControllerBase
     {
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly LineChannelBLL _lineChannelBll;
 
 
@@ -24,6 +23,7 @@ namespace BackendSite.Controllers.Api
         public LineChannelController(IServiceProvider provider)
         {
             _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _serverInfoBll = provider.GetService<ServerInfoBLL>();
             _lineChannelBll = provider.GetService<LineChannelBLL>();
         }
 
@@ -41,16 +41,6 @@ namespace BackendSite.Controllers.Api
             public int Id { get; set; }
         }
 
-        public class SetRequest
-        {
-            public bool IsAdd { get; set; }
-            public int Id { get; set; }
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
-            public string Link { get; set; }
-            public int Status { get; set; }
-        }
-
         #endregion
 
         /// <summary>
@@ -64,7 +54,9 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<LineChannelModel> GetList(GetListRequest request)
         {
+            var serverInfo = _serverInfoBll.GetSiteList().First(x => x.SiteId == request.SiteId);
             var datas = _lineChannelBll.GetList(request.SiteId,
+                serverInfo.ICurrencyList,
                 request.PageNumber,
                 request.PageSize,
                 out int totalPages,
@@ -109,21 +101,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
         [HttpPost]
-        public ApiResult Set(SetRequest request)
+        public ApiResult Set(ApiRequestWithLog<SetLineChannel> request)
         {
             var updator = _authorizeBll.GetAuthData().UserName;
-
-            var setData = new LineChannelDto()
-            {
-                Id = request.IsAdd ? 0 : request.Id,
-                SiteId = request.SiteId,
-                CurrencyId = request.CurrencyId,
-                Link = request.Link,
-                Status = request.Status,
-                LastOperator = updator
-            };
-
-            _lineChannelBll.Set(setData);
+            _lineChannelBll.Set(new ParamsWithLog<SetLineChannel>(request, updator));
 
             return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
         }
@@ -137,11 +118,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/LineChannel" })]
         [HttpPost]
-        public ApiResult Delete(GetByIdRequest request)
+        public ApiResult Delete(ApiRequestWithLog<DeleteLineChannel> request)
         {
             var updator = _authorizeBll.GetAuthData().UserName;
-
-            _lineChannelBll.Delete(request.Id);
+            _lineChannelBll.Delete(new ParamsWithLog<DeleteLineChannel>(request, updator));
 
             return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success };
         }

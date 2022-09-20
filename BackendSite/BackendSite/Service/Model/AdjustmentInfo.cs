@@ -1,4 +1,4 @@
-﻿using System;
+﻿using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -26,6 +26,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public decimal WithdrawalLimitAmount { set; get; }
         public int WithdrawalLimitAmountAdjustType { set; get; }
+        public int DepositId { get; set; }
     }
     public class SetAdjustBonusReq
     { 
@@ -48,12 +49,21 @@ namespace BackendSite.Service.Model
 
     public class SetAdjustment
     {
-        public string Operator { get; set; }
+        [LogIgnore]
+        public int Category { get; set; }
+        
+        [LogPropertyName("AdjustReason")]
+        public string CategoryName { get; set; }
+        public string Memo { get; set; }
+    }
+    
+    public class AdjustmentDepositLog
+    {
         public string TransId { get; set; }
-        public int BeforeCategory { get; set; }
-        public int AfterCategory { get; set; }
-        public string BeforeMemo { get; set; }
-        public string AfterMemo { get; set; }
+        public int AdjustType { get; set; }
+        public int  DepositId { get; set; }
+        public decimal BeforeAmount { get; set; }
+        public decimal AfterAmount { get; set; }
     }
 }
 

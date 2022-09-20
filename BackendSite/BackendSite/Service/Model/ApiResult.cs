@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -53,24 +54,32 @@ namespace BackendSite.Service.Model
     }
     public class ApiResult<TData> : ApiResult
     {
-        public ApiResult() : this(9000, "",  default) { }
+        public ApiResult() : this(9000, "", default) { }
         public ApiResult(ISelLang selLang) : this(9000, "", default) { SelLang = selLang; }
         public ApiResult(int ErrorCode, string Message, TData data) : base(ErrorCode, Message) { Data = data; }
         public TData Data { get; set; }
     }
 
-    public class ApiListResult<TData> : ApiResult
+    public class ApiListResult<TData> : ApiResult, IPageInfo
     {
         public ApiListResult() : this(9000, "") { }
         public ApiListResult(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
         public ApiListResult(int ErrorCode, string Message) : base(ErrorCode, Message) { }
-        public IEnumerable<TData>  Data { get; set; }
-
+        public ApiListResult(ErrorCodeEnum errorCode, IPageInfo pageInfo, IEnumerable<TData> data) : base((int)errorCode, "") 
+        {
+            Data = data;
+            PageNumber = pageInfo.PageNumber;
+            RowCount = pageInfo.RowCount;
+            TotalPages = pageInfo.TotalPages;
+            PageRange = pageInfo.PageRange;
+        }
+        public IEnumerable<TData> Data { get; set; }
         public int TotalPages { get; set; }
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
+        public string PageRange { get; set; }
     }
-    public class ApiListResultTotalAmount<TData> : ApiResult
+    public class ApiListResultTotalAmount<TData> : ApiResult, IPageInfo
     {
         public ApiListResultTotalAmount() : this(9000, "") { }
         public ApiListResultTotalAmount(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
@@ -81,8 +90,9 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
         public decimal TotalAmount { get; set; }
+        public string PageRange { get; set; }
     }
-    public class ApiListResultCurrencyAmount<TData> : ApiResult
+    public class ApiListResultCurrencyAmount<TData> : ApiResult, IPageInfo
     {
         public ApiListResultCurrencyAmount() : this(9000, "") { }
         public ApiListResultCurrencyAmount(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
@@ -93,5 +103,6 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
         public List<string> CurrencyAmount { get; set; }
+        public string PageRange { get; set; }
     }
 }

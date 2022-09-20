@@ -180,7 +180,6 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
         }
         let checked = true;
         let betSetting = [];
-
         tpCategories.forEach(a => {
             if (a.checked) {
                 let tpBetSetting = []
@@ -195,15 +194,15 @@ function Edit({ IsAdd, CustId, ClickBack = f => f, InsertOrUpdate = g => g }) {
                             checked = false;
                             return;
                         }
-                        tpBetSetting.push({ GameTypeId: b.typeId, LimitGroup: b.selectedValue })
+                        let range = b.limitGroup.find(x => x.group === b.selectedValue).range;
+                        tpBetSetting.push({ GameTypeId: b.typeId, GameTypeName: b.typeName, LimitGroup: b.selectedValue, LimitRange: range })
                     }
                 })
-
-                betSetting.push({ TpCategory: a.categoryId, TpBetSetting: tpBetSetting })
+                betSetting.push({ TpCategory: a.categoryId, TpCategoryName: a.categoryName, TpBetSetting: tpBetSetting })
             }
         })
         if (checked) {
-            InsertOrUpdate(customer.userName, customer.siteId, betSetting)
+            InsertOrUpdate(customer, betSetting)
         }
     };
 

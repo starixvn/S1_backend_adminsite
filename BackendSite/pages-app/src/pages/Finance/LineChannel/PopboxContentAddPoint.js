@@ -15,16 +15,24 @@ export const PopBoxContentAddPoint = (props) => {
   const [Link, setLink] = useState(link);
   let newLineChannelList = {
     IsAdd: true,
-    Id: 0,
     siteId: siteId,
     currencyId: currencyId,
     link: Link,
     status: 0,
   };
+  let data = {
+    siteId: siteId,
+    currencyId: currencyId,
+    after:{
+      Id: 0,
+      link: Link,
+      status: 0
+    }
+  };
   const handleSave = (e) => {
     e.preventDefault();
     api
-      .post("/api/LineChannel/Set", newLineChannelList)
+      .post("/api/LineChannel/Set", data)
       .then(function (response) {
         if (response.data.errorCode === 0) {
           props.ClickSave(newLineChannelList);

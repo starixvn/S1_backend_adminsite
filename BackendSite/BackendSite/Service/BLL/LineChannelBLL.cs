@@ -2,11 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -21,10 +17,10 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetService<ILogger<LineChannelBLL>>();
         }
 
-        public IEnumerable<LineChannelModel> GetList(int siteId, int pageNumber, int pageSize,
+        public IEnumerable<LineChannelModel> GetList(int siteId,IEnumerable<int> currencyIds, int pageNumber, int pageSize,
             out int totalPages, out int rowCount)
         {
-            var datas = _lineChannelService.GetList(true, 0, siteId,
+            var datas = _lineChannelService.GetList(true, 0, siteId, JsonConvert.SerializeObject(currencyIds),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize), out totalPages, out rowCount);
 
@@ -33,7 +29,7 @@ namespace BackendSite.Service.BLL
 
         public LineChannelModel GetById(int id)
         {
-            var result = _lineChannelService.GetList(false, id, 0,
+            var result = _lineChannelService.GetList(false, id, 0,string.Empty,
                 0, 10, out _, out _);
 
             if (result.Count() == 0)
@@ -47,14 +43,13 @@ namespace BackendSite.Service.BLL
             return new LineChannelModel(data);
         }
 
-        public bool Set(LineChannelDto newsDatas)
+        public bool Set(ParamsWithLog<SetLineChannel> input)
         {
             try
             {
-                var result = _lineChannelService.Set(newsDatas);
+                var success = _lineChannelService.Set(input);
 
-                if (result != 1)
-                    //Insert Affect Row Should be 1;
+                if (!success)
                     throw new AdminException(ErrorCodeEnum.UpdateFailed);
 
                 return true;
@@ -66,12 +61,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public bool Delete(int id)
+        public bool Delete(ParamsWithLog<DeleteLineChannel> input)
         {
-            var result = _lineChannelService.Delete(id);
+            var success = _lineChannelService.Delete(input);
 
-            if (result != 1)
-                //Delete Affect Row Should be 1;
+            if (!success)
                 throw new AdminException(ErrorCodeEnum.Fail);
 
             return true;

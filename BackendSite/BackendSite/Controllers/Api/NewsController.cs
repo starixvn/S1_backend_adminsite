@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -10,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
     [Route("api/[controller]/[action]")]
     [ApiController]

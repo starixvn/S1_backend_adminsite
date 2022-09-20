@@ -3,16 +3,13 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.ExceptionHandling;
-using Microsoft.Extensions.DependencyInjection;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BaseDataController : ControllerBase
@@ -63,6 +60,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 幣別
             /// </summary>
             public int CurrencyId { get; set; }
+            /// <summary>
+            /// 1. Deposit, 2. Withdrawal
+            /// </summary>
+            public int Purpose { get; set; }
         }
 
         public class GetPayListRequest
@@ -183,8 +184,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public string FuncKey { get; set; }
         }
-
-
+        
+        public class WithdrawalEWalletReq
+        {
+            public int CurrencyId { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -207,7 +212,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
             var bankInfoOff = _bankDetailBll.GetBankInfoOff(request.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & 2) > 0)
+            // request.Purpose = 1 => x.purpose = 1,3
+            // request.Purpose = 2 => x.purpose = 2,3
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == request.CurrencyId && (x.Purpose & request.Purpose) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -244,6 +251,37 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
 
+        /// <summary>
+        /// BaseData/GetPayList 取得指定EWallet清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Global Func.
+        /// 
+        /// Use：Finance > Withdrawal Request > [select Pay], When Type = 1.Online Payment.
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetEWalletPayList
+        [HttpPost]
+        public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<EWalletPay>>();
+            var eWalletPay = _bankDetailBll.GetEWalletPayList();
+            var _eWalletPayInfo = (from x in eWalletPay
+                where x.CurrencyId == request.CurrencyId
+                select new EWalletPay
+                {
+                    PayId = x.PayId,
+                    PayName = x.PayName,
+                    CurrencyId = x.CurrencyId
+                });
+            apiResult.Data = _eWalletPayInfo;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+        
         /// <summary>
         /// BaseData/GetCryptoPayList 取得指定加密支付清單
         /// </summary>
@@ -565,7 +603,42 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
+        
+        /// <summary>
+        /// 取得第三方遊戲分類清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryListAsync(SiteIdRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpCategory>>
+            {
+                Data = await _tpBll.GetTpCategoryListAsync(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
 
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲類型清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListByCategoryReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        
         #region Private Methods
 
         private class BankInfoPayComparer : IEqualityComparer<Pay>

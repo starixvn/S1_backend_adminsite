@@ -1,6 +1,4 @@
 ﻿using BackendSite.Service.Model.enums;
-using System;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -187,6 +185,7 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _updateTime { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public decimal AdjustmentMax { get; set; }
         public DateTimeOffset UpdateTime 
         {

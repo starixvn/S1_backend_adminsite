@@ -1,13 +1,8 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -95,14 +90,14 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SpecialPassword_Set", props);
         }
 
-        public async Task<IEnumerable<AdminMenuDto>> GetAllAdminMenu()
+        public IEnumerable<AdminMenuDto> GetAllAdminMenu()
         {
-            return await _reportDbClient.QueryAsync<AdminMenuDto>("Admin_AdminMenu_GetAll");
+            return  _reportDbClient.Query<AdminMenuDto>("Admin_AdminMenu_GetAll");
         }
 
-        public async Task<IEnumerable<AdminPermissionDto>> GetAllAdminPermission()
+        public IEnumerable<AdminPermissionDto> GetAllAdminPermission()
         {
-            return await _reportDbClient.QueryAsync<AdminPermissionDto>("Admin_AdminPermission_GetAll");
+            return  _reportDbClient.Query<AdminPermissionDto>("Admin_AdminPermission_GetAll");
         }
     }
 }

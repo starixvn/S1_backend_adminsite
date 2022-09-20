@@ -1,5 +1,4 @@
-﻿using System;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -25,6 +24,8 @@ namespace BackendSite.Service.Model
 
     public class PaymentAdjustmentFrontEnd
     {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
         public int CustId { get; set; }
         public string SiteName { get; set; }
         public string TransId { get; set; }

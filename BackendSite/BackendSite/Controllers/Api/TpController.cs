@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +7,10 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -199,6 +195,32 @@ namespace BackendSite.Controllers.Api
 
             return apiResult;
         }
+        
+        [HttpPost]
+        public async Task<ApiListResult<TpAdjustmentLog>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequest request)
+        {
+            var result = tpBLL.GetCustAdjustmentTpLog(new GetCustTpAdjustmentLogParams
+            {
+                CustId = request.CustId,
+                EndTime = request.EndTime,
+                StartTime = request.StartTime
+            }, request.PageSize, request.PageNumber, out var totalPages, out var rowCount);
+            
+            foreach (var data in result)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
+            return new ApiListResult<TpAdjustmentLog>
+            {
+                Data = result,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+        }
+        
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/ThirdPartyAdjustment" })]
         public ApiListResult<AdminTpTransferInfo> GetAdjustmentTpLog([FromForm] int SiteId, [FromForm] int TpId, [FromForm] int CustId, [FromForm] int PageNumber)

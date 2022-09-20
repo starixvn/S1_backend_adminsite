@@ -1,7 +1,4 @@
-﻿
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
@@ -11,7 +8,7 @@ using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class HotGameController : ControllerBase
@@ -40,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<IEnumerable<GetHotGameListResponse>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _hotGame.Get(request.SiteId, request.CurrencyId)
+                Data = await _hotGame.Get(request.SiteId, request.CurrencyId, request.RefreshCache)
             };
             return apiResult;
         }

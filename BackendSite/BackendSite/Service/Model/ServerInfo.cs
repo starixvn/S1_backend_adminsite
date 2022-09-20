@@ -1,7 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.Model
 {
@@ -22,7 +20,9 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyList);
+                return string.IsNullOrWhiteSpace(CurrencyList) ? 
+                    null:
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyList);
             }
         }
         public IEnumerable<string> ILangList
@@ -65,5 +65,6 @@ namespace BackendSite.Service.Model
     public class SiteConfig
     {
         public string BannerURL { get; set; }
+        public string AwsCloudFrontErrorDomainID { get; set; }     
     }
 }

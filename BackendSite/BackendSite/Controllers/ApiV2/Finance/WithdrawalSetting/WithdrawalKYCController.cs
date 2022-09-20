@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalKYCController : ControllerBase
@@ -77,9 +75,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] {"Message/WithdrawalKYCControl"})]
         [HttpPost]
-        public ApiResult Update(WithdrawalKYC req)
+        public ApiResult Update(ApiRequestWithLog<WithdrawalKYCAmount> req)
         {
-            var result = _withdrawalBll.EditWithdrawalKYCList(req);
+            var result = _withdrawalBll.EditWithdrawalKYCList(
+                new ParamsWithLog<WithdrawalKYCAmount>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

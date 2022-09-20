@@ -1,11 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -202,9 +197,9 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
 
-        public int AddAdjustmentLimitInfo(int SiteId, int CurrencyId, decimal AdjustmentMax, string Operator)
+        public bool SetAdjustmentLimitInfo(ParamsWithLog<AdjustmentLimit> input)
         {
-            return adjustmentService.AddAdjustmentLimitInfo(SiteId, CurrencyId, AdjustmentMax, Operator);
+            return adjustmentService.SetAdjustmentLimitInfo(input);
         }
 
         public bool CheckPassWord(string password, int siteId)
@@ -299,6 +294,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
             return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
+        }
+        
+        public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
+        {
+            return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
         }
     }
 }

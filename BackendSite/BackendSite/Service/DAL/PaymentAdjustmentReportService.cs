@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
+using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -49,10 +46,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             #region GetCurrencyTotalAmount
 
@@ -98,10 +95,10 @@ namespace BackendSite.Service.DAL
             props.Add("_AdjustTypesForAI", AdjustTypesForAI);
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", userName);
+            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_TransId", transId);
+            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
 
             var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoExport_Get_V5", props);
 
@@ -150,31 +147,34 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public bool SetLogAdminAdjustWallet(int id, int category, string memo, string logDetail, string userName)
+        public bool SetLogAdminAdjustWallet(ParamsWithLog<SetAdjustment> input, int transferId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
-            p.Add("_TransferId", id);
-            p.Add("_Category", category);
-            p.Add("_Memo", memo ?? string.Empty);
+            p.Add("_TransferId", transferId);
+            p.Add("_Category", input.After.Category);
+            p.Add("_Memo", input.After.Memo ?? string.Empty);
 
             var success = conn
                 .Execute("Admin_LogAdminAdjustWallet_Set", p, commandType: CommandType.StoredProcedure) > 0;
 
             if (success)
             {
-                p = new DynamicParameters();
-                p.Add("Menu", "EditAdjustmentInfo");
-                p.Add("ActionType", 1);
-                p.Add("DetailInfo", logDetail);
-                p.Add("Operator", userName);
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.ThirdPartyFundsAdjustment);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", input.TransId);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn
-                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
-                
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            
                 if (logSuccess)
                 {
                     trans.Commit();
@@ -188,30 +188,33 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
-        public bool SetAdjustmentInfo(int id, int category, string memo, string logDetail, string userName)
+        public bool SetAdjustmentInfo(ParamsWithLog<SetAdjustment> input, int adjustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
-            p.Add("_AdjustId", id);
-            p.Add("_Category", category);
-            p.Add("_Memo", memo);
+            p.Add("_AdjustId", adjustId);
+            p.Add("_Category", input.After.Category);
+            p.Add("_Memo", input.After.Memo);
 
             var success = conn
                 .Execute("Admin_AdjustmentInfo_Set", p, commandType: CommandType.StoredProcedure) > 0;
 
             if (success)
             {
-                p = new DynamicParameters();
-                p.Add("Menu", "EditAdjustmentInfo");
-                p.Add("ActionType", 1);
-                p.Add("DetailInfo", logDetail);
-                p.Add("Operator", userName);
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BalanceAdjustment);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", input.TransId);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn
-                    .Execute("Admin_AdjustmentInfoLog_Set", p, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
 
                 if (logSuccess)
                 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -11,12 +7,10 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpMaintenanceController : ControllerBase

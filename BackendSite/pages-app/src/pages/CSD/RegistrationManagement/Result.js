@@ -117,8 +117,7 @@ const Panel = (props) => {
               selectedValue={data[element.dataColumn]}
               dataColumn="Status"
               onChange={props.UpdateStatus}
-              custId={data["custId"]}
-              siteId={data["siteId"]}
+              data={data}
               // CancelChangeStatus={props.CancelChangeStatus}
             />
             {/* <div className="button-action">
@@ -157,7 +156,7 @@ const Panel = (props) => {
             <button
               className="btn btn-edit"
               type="submit"
-              onClick={props.EditNote.bind(this, data["custId"])}
+              onClick={props.EditNote.bind(this, data)}
             >
               <i className="icon-edit"></i>
             </button>
@@ -258,7 +257,7 @@ const dateFormat = (createTime) => {
 const DropDownBox = (props) => {
   const onChange = (e) => {
     if (props.onChange) {
-      props.onChange(e.target.value, props.custId, props.siteId);
+      props.onChange(e.target.value, props.data);
     }
   };
   let optionRows = props.options.map((item) => {

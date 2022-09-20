@@ -32,6 +32,12 @@ namespace BackendSite.Service.Model.enums
         [Description("msg_DuplicateData")]
         DuplicateData = -5,
 
+        [Description("msg_DateOutOfRange")]
+        DateOutOfRange = -6,
+
+        [Description("msg_OrderByInvalid")]
+        OrderByInvalid = -7,
+
         [Description("msg_UpdateFailed")]
         UpdateFailed = 9,
 

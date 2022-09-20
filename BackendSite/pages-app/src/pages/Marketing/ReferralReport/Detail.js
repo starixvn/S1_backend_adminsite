@@ -116,7 +116,7 @@ const Panel = (props) => {
         </td>
         <td>
           <span className="label">
-            {item.totalBet}/{item.vaildBetC}
+            {item.totalBet}/{item.validBetC}
           </span>
         </td>
         <td>

@@ -1,14 +1,9 @@
-﻿using System;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.DAL
 {
@@ -72,6 +67,14 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
             return adminOperateLogList;
+        }
+        
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            return await _reportDbClient.QueryAsync<string>("Admin_CurrencyListBySiteAndCurrency_Get", p);
         }
     }
 }

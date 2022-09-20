@@ -153,6 +153,9 @@
   <data name="msg_CustStatusIsSuspend" xml:space="preserve">
     <value>Customer's Status is Suspend.</value>
   </data>
+  <data name="msg_DateOutOfRange" xml:space="preserve">
+    <value>Filter date out of range.</value>
+  </data>
   <data name="msg_Draft" xml:space="preserve">
     <value>Draft</value>
   </data>
@@ -185,6 +188,9 @@
   </data>
   <data name="msg_OldpwdNotMatch" xml:space="preserve">
     <value>Old password does not match</value>
+  </data>
+  <data name="msg_OrderByInvalid" xml:space="preserve">
+    <value>OrderBy Property Invalid.</value>
   </data>
   <data name="msg_Paid" xml:space="preserve">
     <value>Paid</value>

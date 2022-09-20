@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using BackendSite.Service.Model;
+﻿using BackendSite.Service.Model;
 using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;

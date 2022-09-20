@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -12,8 +12,20 @@ namespace BackendSite.Service.Model
 
     public class DisableDisableUser
     {
+        [LogIgnore]
         public int CustId { get; set; }
-        public int Status { get; set; }
+        public string UserName { get; set; }
+        [LogIgnore]
+        public GeneralStatusEnum Status { get; set; }
+
+        public string StatusName => Status.ToString();
+    }
+    
+    public class DeleteDisableUser
+    {
+        [LogIgnore]
+        public int CustId { get; set; }
+        public string UserName { get; set; }
     }
 
     public class DisableTpGame
@@ -34,6 +46,8 @@ namespace BackendSite.Service.Model
     
     public class TpDisableUser
     {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }

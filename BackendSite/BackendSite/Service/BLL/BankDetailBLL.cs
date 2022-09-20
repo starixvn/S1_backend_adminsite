@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -35,20 +33,19 @@ namespace BackendSite.Service.BLL
                 out totalPages, out rowCount);
         }
 
-        public int SetBankCard(int siteId, int SysId, string BankAccountName, string BankAccountNo, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
+        public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
-            return bankDetailService.SetBankCard(siteId, SysId, BankAccountName, BankAccountNo, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
+            return bankDetailService.SetBankCard(input);
         }
 
-        public int SetBankCardwithIFSC(int siteId, int SysId, string BankAccountName, string BankAccountNo, string IFSC, decimal MinAmount, decimal MaxAmount, decimal DailyLimitAmount, int PointLevel, int Purpose, int Status, int Sort, string Operator)
+        public int SetBankCardwithIFSC(ParamsWithLog<SetBankCard> input)
         {
-            return bankDetailService.SetBankCardwithIFSC(siteId, SysId, BankAccountName, BankAccountNo, IFSC, MinAmount, MaxAmount, DailyLimitAmount, PointLevel, Purpose, Status, Sort, Operator);
-
+            return bankDetailService.SetBankCardwithIFSC(input);
         }
 
-        public int DelBankCard(int siteId, int bankId, string Operator)
+        public int DelBankCard(ParamsWithLog<DeleteBankCard> input)
         {
-            return bankDetailService.DelBankCard(siteId, bankId, Operator);
+            return bankDetailService.DelBankCard(input);
         }
 
         public bool AddBankInfo(BankDetail bankDetail)
@@ -129,6 +126,23 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoPayList;
         }
+        
+        public IEnumerable<EWalletPay> GetEWalletPayList()
+        {
+            var sEWalletPayList = "EWalletPayList";
+            var eWalletPayList = cache.Get<IEnumerable<EWalletPay>>(sEWalletPayList);
+            if (eWalletPayList == null)
+            {
+                eWalletPayList = localBankService.GetEWalletPayList();
+                if (eWalletPayList != null)
+                {
+                    cache.Set(sEWalletPayList, eWalletPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                }
+            }
+            
+            return eWalletPayList;
+        }
+        
         public IEnumerable<BankInfoPay> GetCryptoPay()
         {
             var sCryptoPayListKey = "CryptoPayForPayout";

@@ -9,6 +9,7 @@ import * as Loading from '../commJS/Loading.jsx';
 import PersonalMsg from './PersonalMsg/CustInfo_PersonalMsg';
 import TurnoverReport from './TurnoverReport/index';
 import { AdjustmentInfo } from './CustInfo_AdjustmentInfo.jsx';
+import { TpAdjustmentInfo } from './CustInfo_TpAdjustmentInfo.jsx';
 import { AdminUserLog } from './CustInfo_AdminUserLog.jsx';
 import { BankLog } from './CustInfo_BankLog.jsx';
 import { CryptoWalletLog } from './CustInfo_CryptoWalletLog.jsx';
@@ -22,6 +23,7 @@ import { PaginationTotalAmount } from '../commJS/PaginationTotalAmount.jsx';
 import Tag from './Tag/index';
 import { NewPagination } from '../commJS/NewPagination.jsx';
 import WithdrawalLimitLog from './WithdrawalLimitLog/index';
+import {EWalletLog} from './CustInfo_EWalletLog.jsx';
 
 (function ($, React, ReactDOM, i18n, axios, moment) {
     const CustStatusOp = {
@@ -511,7 +513,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     <th>{moment.utc(row.registerDate).add(8,'hour').format('l LTS')}</th>
                     {/* <th>{row.registerDate}</th> */}
                     <th>{row.totalDeposit}/{row.depositC}</th>
-                    <th>{row.totalBet}/{row.vaildBetC}</th>
+                    <th>{row.totalBet}/{row.validBetC}</th>
                     <th>{row.bonusAmount}</th>
                     {/* <th>{row.rewardTime}</th> */}
                     <th>{row.rewardTime ? moment.utc(row.rewardTime).add(8,'hour').format('l LTS') : null}</th>
@@ -1128,7 +1130,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetEnableDisablePromotion', { CustId: data.custId ,EnablePromotion: e})
+                console.log(data);
+                axios.post('/api/CustManage/SetEnableDisablePromotion', { 
+                    CustId: data.custId ,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    status: e
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1144,10 +1152,37 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onSetEnableRebate(e){
+            if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Rebate Payout ?')) {
+                axios.post('/api/CustManage/SetEnableRebate', { 
+                    CustId: this.props.CustInfoData.custId,
+                    status: e
+                })
+                    .then(function (response) {
+                        //Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert("Update Success!");
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        //Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onResetCustBankInfo() {
             if (confirm('Are you sure reset Bank Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustBankInfo', { CustId: data.custId })
+                axios.post('/api/CustManage/ResetCustBankInfo', { 
+                    
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1165,7 +1200,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
         onResetCustUSDTnfo() {
             if (confirm('Are you sure reset USDT Info ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/ResetCustUSDTInfo', { CustId: data.custId })
+                axios.post('/api/CustManage/ResetCustUSDTInfo', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId 
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1181,11 +1220,35 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        onUnbindLine() {
+            if (confirm('Are you sure to Unbind Line Profile ?')) {
+                let data = this.props.CustInfoData;
+                axios.post('/api/CustManage/LineUnbind', { CustId: data.custId })
+                    .then(function (response) {
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            alert(result.message);
+                            this.props.onGetCustInfoDetail();
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         onUnlock() {
             if (!this.state.reason) { return alert("Please enter Reason For Unlock！"); }
             if (confirm('Are you sure set Unlock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetUnlock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetUnlock', { 
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    CustId: data.custId,
+                    currentStatus: data.status,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1207,7 +1270,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Lock！"); }
             if (confirm('Are you sure set Lock ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetLock', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetLock', { 
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1277,7 +1346,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For KickOut！"); }
             if (confirm('Are you sure kick Out this Customer?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/KickOut', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/KickOut', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         let result = response.data;
                         if (result.errorCode == 0) {
@@ -1297,7 +1371,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             if (!this.state.reason) { return alert("Please enter Reason For Closed！"); }
             if (confirm('Are you sure set Close ?')) {
                 let data = this.props.CustInfoData;
-                axios.post('/api/CustManage/SetClose', { CustId: data.custId,Reason:this.state.reason })
+                axios.post('/api/CustManage/SetClose', {
+                    CustId: data.custId,
+                    siteId: data.siteId,
+                    currentStatus: data.status,
+                    currencyId: data.currencyId,
+                    Reason:this.state.reason
+                })
                     .then(function (response) {
                         //Loading.UnLoading();
                         let result = response.data;
@@ -1397,11 +1477,11 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             <div className="name"><span>{wallet.tpUserName}</span><button type="button" className="btn btn-copy js-copy" data-clipboard-text={wallet.tpUserName}>Copy</button></div>
                             {isTempTPWllet ? <span>N/A</span>:<span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span>}
                             {/* <span className={wallet.balance < 0 ? "negative-num" : "positive-num"}>{number_format(wallet.balance)}</span> */}
-                            {wallet.tpId == 1 && wallet.balance < 0 ?
+                            {/* {wallet.tpId == 1 && wallet.balance < 0 ?
                                 <div className="button-block">
                                     <button className="btn btn-primary" onClick={this.onFixNegative.bind(this)}>Fix Negative</button>
                                 </div>
-                                : null}
+                                : null} */}
                         </li>;
                     }.bind(this))}</ul>;
 
@@ -1432,7 +1512,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-
+            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -1450,6 +1530,8 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                             {subFuncKeys.indexOf("ca_kickout") > -1 ? <button className="btn btn-primary" onClick={this.setReason.bind(this,"kickout")}>KickOut</button> : null}
                             {(data.enablePromotion == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,1)}>Enable Promotion</button> : null}
                             {(data.enablePromotion == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableDisablePromotion.bind(this,0)}>Disable Promotion</button> : null}
+                            {(data.enableRebate == 0) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,1)}>Enable Rebate Payout</button> : null}
+                            {(data.enableRebate == 1) && subFuncKeys.indexOf("ca_promotion") > -1 ? <button className="btn btn-primary" onClick={this.onSetEnableRebate.bind(this,0)}>Disable Rebate Payout</button> : null}
                         </div>
                         <div className="flex-wrap">
                             <table className="table table-detail ">
@@ -1624,6 +1706,127 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                                 : <td>
                                                     {"(" + ((typeof data.areaCode === 'undefined') ? "N/A" : data.areaCode) + ") " + ((typeof data.phoneNo === 'undefined') ? "N/A" : data.phoneNo)}
                                                 </td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        {data.custLineProfile === null ? <th scope="row">Line UserId</th> : <th scope="row">Line UserId{subFuncKeys.indexOf("ca_lineUnbind") > -1 ? <button className="btn btn-copy js-copy" onClick={this.onUnbindLine.bind(this)}>Unbind</button> : null}</th>}
+                                        {data.custLineProfile === null ? <td></td> : <td>{data.custLineProfile.userId}<button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.custLineProfile.userId}>Copy</button></td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Line Binding Time (Adjusted to GMT+8)</th>
+                                        {data.custLineProfile === null ? <td></td> : <td>{moment.utc(data.custLineProfile.createTime).add(8,'hour').format('l LTS')}</td>}
+                                    </tr>
+                                    <tr>
+                                        <th scope="row"style={{ borderBottom:"none"}}>Shipping Address</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderBottom:"none"}}>
+                                                    <div className="button-action float-right">
+                                                        <button className="btn btn-save" onClick={this.props.editUpdate}>
+                                                            <i className="icon-save"></i>
+                                                        </button>
+                                                        <button className="btn btn-icon-cancel" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Address, "Address")}>
+                                                            <i className="icon-cancel"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderBottom:"none"}}>
+                                                        {
+                                                            subFuncKeys.includes('ca_userEdit') ? (
+                                                                <div className="button-action float-right">
+                                                                    <button className="btn btn-edit" onClick={this.props.onClickEdit.bind(null, this.props.isEdit.Address, "Address")}>
+                                                                        <i className="icon-edit"></i>
+                                                                    </button>
+                                                                </div >
+                                                            ) : null
+                                                        }
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Line 1</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressLineFirst} onChange={(e) => this.props.editOnChange(e.target.value, "AddressLineFirst")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressLineFirst=="" || data.addressLineFirst==null) ? "N/A" : data.addressLineFirst}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Line 2</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressLineSecond} onChange={(e) => this.props.editOnChange(e.target.value, "AddressLineSecond")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressLineSecond=="" || data.addressLineSecond==null) ? "N/A" : data.addressLineSecond}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>City</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressCity} onChange={(e) => this.props.editOnChange(e.target.value, "AddressCity")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressCity=="" || data.addressCity==null) ? "N/A" : data.addressCity}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>Post Code</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressPostCode} onChange={(e) => this.props.editOnChange(e.target.value, "AddressPostCode")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressPostCode=="" || data.addressPostCode==null) ? "N/A" : data.addressPostCode}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none",borderBottom:"none"}}>State</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                    <input type="text" defaultValue={data.addressState} onChange={(e) => this.props.editOnChange(e.target.value, "AddressState")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none",borderBottom:"none"}}>
+                                                        {(data.addressState=="" || data.addressState==null) ? "N/A" : data.addressState}
+                                                    </td>
+                                                )
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" style={{ borderTop:"none"}}>Country</th>
+                                        {
+                                            this.props.isEdit.Address ? (
+                                                <td style={{ borderTop:"none"}}>
+                                                    <input type="text" defaultValue={data.addressCountry} onChange={(e) => this.props.editOnChange(e.target.value, "AddressCountry")} />
+                                                </td>
+                                            ) : (
+                                                <td style={{ borderTop:"none"}}>
+                                                        {(data.addressCountry=="" || data.addressCountry==null) ? "N/A" : data.addressCountry}
+                                                    </td>
+                                                )
                                         }
                                     </tr>
                                     <tr>
@@ -1906,13 +2109,13 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
     }
 
     class CustInfoPanel extends React.Component {
-        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag"];
+        _Tabs = ["Customer Info", "Bonus Log", "Financial Log", "Vip Rebate Log", "Statement", "Deposit Info", "Transfer Info", "Withdrawal Info", "Withdrawal Limit Log", "Adjustment Info", "Login Log", "Reset Password", "Notes", "Personal Message", "Turnover", "Admin User Log", "Bank Info Log", "Crypto Wallet Log", "E Wallet Log", "Referral History", "VIP Level", "Promotion Report","Tag", "3rd Adjustment Info"];
         _isEdit = { Level: false, FullName: false, Birthday: false, PhoneNumber: false, EMail: false, Tag: false };
         _newData = { Level: null, FullName: null, Birthday_Y: null, Birthday_M: null, Birthday_D: null, PhoneNumber: null, EMail: null ,Tag:null};
         _isShowRewardBotton = { SMS: false, EMAIL: false };
         constructor(props) {
             super(props);
-            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton),isTempTPWallet:false };
+            this.state = { CustInfoData: null, TabIdx: 0, BonusLog: {}, FinancialLog: {}, RebateLog: {}, BankLogData: [], CryptoWalletLogData :[], Notes: null, TabName: this._Tabs[0], isEdit: Object.assign({}, this._isEdit), newData: Object.assign({}, this._newData), ReferralHistory: {},TagList:{},isShowRewardBotton: Object.assign({}, this._isShowRewardBotton),isTempTPWallet:false, EWalletLogData :[] };
         }
 
         onTab(idx, tabName) {
@@ -2172,6 +2375,36 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             }
         }
 
+        GetTpAdjustmentInfoByCust(PageNumber) {
+            Loading.OnLoading();
+            let pageNumber = PageNumber || this.state.TpAdjustmentInfoData.pageNumber;
+            let CustId = getUrlParameter("custId");
+            const {UTCStartDate,UTCEndDate} = this.state.TpAdjustmentInfo;
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                axios.post('/api/Tp/GetCustTpAdjustmentLog',{
+                    StartTime: UTCStartDate,
+                    EndTime: UTCEndDate, 
+                    TpId: 0, 
+                    CustId: iCustId, 
+                    PageNumber: pageNumber
+                })
+                    .then(function (response) {
+                        //console.log(response);
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ TpAdjustmentInfoData: result });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                        Loading.UnLoading();
+                        alert(error);
+                    }.bind(this));
+            }
+        }
+
         GetLoginLogByCust(PageNumber) {
             let pageNumber = PageNumber || this.state.LoginLogData.pageNumber;
             let CustId = getUrlParameter("custId");
@@ -2419,10 +2652,50 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                         _isEdit = Object.assign({}, this._isEdit),
                         _newData = Object.assign({}, this._newData);
 
-                    if (Level != data.userLevel || FullName != data.accountName || Birthday_D != data.birth_d || Birthday_M != data.birth_m || Birthday_Y != data.birth_y || PhoneNumber != data.phoneNo || EMail != data.email) {
-                        axios.post('/api/CustManage/SetCustInfo', { CustId: iCustId, Level: Level, FullName: FullName, Birthday_Y: Birthday_Y, Birthday_M: Birthday_M, Birthday_D: Birthday_D, PhoneNumber: PhoneNumber, EMail: EMail })
+
+                    let Address=null;
+                    if((this.state.newData.AddressCountry != data.addressCountry) 
+                    || (this.state.newData.AddressState != data.addressState)
+                    || (this.state.newData.AddressPostCode != data.addressPostCode)
+                    || (this.state.newData.AddressCity != data.addressCity)
+                    || (this.state.newData.AddressLineFirst != data.addressLineFirst)
+                    || (this.state.newData.AddressLineSecond != data.addressLineSecond))
+                    {
+                    Address= 
+                    {
+                        "Country":((this.state.newData.AddressCountry !== undefined && this.state.newData.AddressCountry != data.addressCountry) ? this.state.newData.AddressCountry : data.addressCountry),
+                        "State": ((this.state.newData.AddressState !== undefined && this.state.newData.AddressState != data.addressState) ? this.state.newData.AddressState : data.addressState),
+                        "PostCode": ((this.state.newData.AddressPostCode !== undefined && this.state.newData.AddressPostCode != data.addressPostCode) ? this.state.newData.AddressPostCode : data.addressPostCode),
+                        "City": ((this.state.newData.AddressCity !== undefined && this.state.newData.AddressCity != data.addressCity) ? this.state.newData.AddressCity : data.addressCity),
+                        "LineFirst": ((this.state.newData.AddressLineFirst !== undefined && this.state.newData.AddressLineFirst != data.addressLineFirst) ? this.state.newData.AddressLineFirst : data.addressLineFirst),
+                        "LineSecond": ((this.state.newData.AddressLineSecond !== undefined && this.state.newData.AddressLineSecond != data.addressLineSecond) ? this.state.newData.AddressLineSecond : data.addressLineSecond)
+                    };
+                    }
+                    
+                    if (Level != data.userLevel 
+                        || FullName != data.accountName 
+                        || Birthday_D != data.birth_d 
+                        || Birthday_M != data.birth_m 
+                        || Birthday_Y != data.birth_y 
+                        || PhoneNumber != data.phoneNo
+                        || EMail != data.email
+                        || AddressCountry != data.addressCountry 
+                        || AddressState != data.addressState 
+                        || AddressPostCode != data.addressPostCode 
+                        || AddressCity != data.addressCity 
+                        || AddressLineFirst != data.addressLineFirst 
+                        || AddressLineSecond != data.addressLineSecond) {
+                        axios.post('/api/CustManage/SetCustInfo', 
+                                   { CustId: iCustId,
+                                     Level: Level,
+                                     FullName: FullName,
+                                     Birthday_Y: Birthday_Y,
+                                     Birthday_M: Birthday_M,
+                                     Birthday_D: Birthday_D,
+                                     PhoneNumber: PhoneNumber,
+                                     EMail: EMail,
+                                     Address: Address })
                             .then(function (response) {
-                                //Loading.UnLoading();
                                 let result = response.data;
                                 if (result.errorCode == 0) {
                                     let newCustInfo = { ...this.state.CustInfoData };
@@ -2433,6 +2706,12 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                                     newCustInfo['birth_y'] = (Birthday_Y) ? Birthday_Y : data.birth_y;
                                     newCustInfo['phoneNo'] = (PhoneNumber) ? PhoneNumber : data.phoneNo;
                                     newCustInfo['email'] = (EMail) ? EMail : data.email;
+                                    newCustInfo['addressCountry'] = (Address) ? Address["Country"] : data.addressCountry;
+                                    newCustInfo['addressState'] = (Address) ? Address["State"] : data.addressState;
+                                    newCustInfo['addressPostCode'] = (Address) ? Address["PostCode"] : data.addressPostCode;
+                                    newCustInfo['addressCity'] = (Address) ? Address["City"] : data.addressCity;
+                                    newCustInfo['addressLineFirst'] = (Address) ? Address["LineFirst"] : data.addressLineFirst;
+                                    newCustInfo['addressLineSecond'] = (Address) ? Address["LineSecond"] : data.addressLineSecond;
                                     this.setState({
                                         isEdit: _isEdit,
                                         CustInfoData: newCustInfo,
@@ -2605,6 +2884,28 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                     }.bind(this));
             }
         }
+
+        GetEWalletLog() {
+            let CustId = getUrlParameter("custId");
+            if (!isNaN(CustId)) {
+                let iCustId = parseInt(CustId);
+                Loading.OnLoading();
+                axios.post('/api/CustManage/GetEWalletLog', { CustId: iCustId })
+                    .then(function (response) {
+                        Loading.UnLoading();
+                        let result = response.data;
+                        if (result.errorCode == 0) {
+                            this.setState({ EWalletLogData: result.data });
+                        } else {
+                            alert(result.message);
+                        }
+                    }.bind(this)).catch(function (error) {
+                    Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+            }
+        }
+
         render() {
             let dataContainer = null;
             let TabIdx = this.state.TabIdx;
@@ -2629,7 +2930,7 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
                 dataContainer = <WithdrawalLimitLog />
             } else if (TabName == this._Tabs[9]) {
                 dataContainer = <AdjustmentInfo GetAdjustmentInfoByCust={this.GetAdjustmentInfoByCust.bind(this)} searchData={this.state.AdjustmentInfoData} AdjustmentInfo={this.state.AdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
-            } else if (TabName == this._Tabs[10]) {
+            }  else if (TabName == this._Tabs[10]) {
                 dataContainer = <LoginLog GetLoginLogByCust={this.GetLoginLogByCust.bind(this)} searchData={this.state.LoginLogData} LoginLog={this.state.LoginLog} onChangeValue={this.onChangeValue.bind(this)} />;
             } else if (TabName == this._Tabs[11]) {
                 dataContainer = <ResetPwd />;
@@ -2646,13 +2947,17 @@ import WithdrawalLimitLog from './WithdrawalLimitLog/index';
             } else if (TabName == this._Tabs[17]) {
                 dataContainer = <CryptoWalletLog GetCryptoWalletLog={this.GetCryptoWalletLog.bind(this)} searchData={this.state.CryptoWalletLogData}/>
             } else if (TabName == this._Tabs[18]) {
-                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
+                dataContainer = <EWalletLog GetEWalletLog={this.GetEWalletLog.bind(this)} searchData={this.state.EWalletLogData}/>
             } else if (TabName == this._Tabs[19]) {
-                dataContainer = <VipLevel />
+                dataContainer = <ReferralHistory GetReferralHistory={this.GetReferralHistory.bind(this)} searchData={this.state.ReferralHistoryData} ReferralHistory={this.state.ReferralHistory} onChangeValue={this.onChangeValue.bind(this)} />
             } else if (TabName == this._Tabs[20]) {
-                dataContainer = <PromotionReport />
+                dataContainer = <VipLevel />
             } else if (TabName == this._Tabs[21]) {
+                dataContainer = <PromotionReport />
+            } else if (TabName == this._Tabs[22]) {
                 dataContainer = <Tag onGetCustInfoDetail={this.onGetCustInfoDetail.bind(this)}/>
+            } else if (TabName == this._Tabs[23]) {
+                dataContainer = <TpAdjustmentInfo GetTpAdjustmentInfoByCust={this.GetTpAdjustmentInfoByCust.bind(this)} searchData={this.state.TpAdjustmentInfoData} TpAdjustmentInfo={this.state.TpAdjustmentInfo} onChangeValue={this.onChangeValue.bind(this)} />;
             }
 
             let authSubKeys = {

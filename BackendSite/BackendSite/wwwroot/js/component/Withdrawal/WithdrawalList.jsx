@@ -8,7 +8,7 @@ import DateTimePicker from 'react-datetime';
         Pending: 1,
         ToKyc: 8,
         OnHold: 2,
-        Verify: 3,
+        Verified: 3,
         Process: 4,
         Cancelled: 5,
         Approved: 6,
@@ -16,28 +16,28 @@ import DateTimePicker from 'react-datetime';
     };
 
     const WithdrawalStatusOp = {
-        1: <span className="status status-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
-        2: <span className="status status-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
-        3: <span className="status status-verify">{i18n["lbl_WithdrawalStatus3"]}</span>,
-        4: <span className="status status-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
-        5: <span className="status status-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
-        6: <span className="status status-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
-        7: <span className="status status-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
-        8: <span className="status status-hold">{i18n["lbl_WithdrawalStatus8"]}</span>,
+        1: <span className="status status-withdrawal-pending">{i18n["lbl_WithdrawalStatus1"]}</span>,
+        2: <span className="status status-withdrawal-hold">{i18n["lbl_WithdrawalStatus2"]}</span>,
+        3: <span className="status status-withdrawal-verified">{i18n["lbl_WithdrawalStatus3"]}</span>,
+        4: <span className="status status-withdrawal-process">{i18n["lbl_WithdrawalStatus4"]}</span>,
+        5: <span className="status status-withdrawal-cancelled">{i18n["lbl_WithdrawalStatus5"]}</span>,
+        6: <span className="status status-withdrawal-approved">{i18n["lbl_WithdrawalStatus6"]}</span>,
+        7: <span className="status status-withdrawal-rejected">{i18n["lbl_WithdrawalStatus7"]}</span>,
+        8: <span className="status status-withdrawal-kyc">{i18n["lbl_WithdrawalStatus8"]}</span>,
     }
 
     const TypeSelectOp = {
         0: "Undefine",
         1: "Online Payment",
         2: "Local Bank",
-        4: "Crypto Pay",
+        4: "Crypto Pay"
     };
 
     const StatusSelectOp = {
         1: "Pending",
         8: "To KYC",
         2: "On Hold",
-        3: "Verify",
+        3: "Verified",
         4: "Process",
         5: "Cancelled",
         6: "Approved",
@@ -62,6 +62,11 @@ import DateTimePicker from 'react-datetime';
         10: 10,
         25: 25,
         50: 50
+    }
+    const WithdrawalMethod = {
+        0:"All",
+        1:"E-Wallet",
+        2:"Bank Card"
     }
 
     class WithdrawalList extends React.Component {
@@ -92,25 +97,28 @@ import DateTimePicker from 'react-datetime';
                         <th scope="row">
                             {(subFuncKeys.indexOf("f_wd_execute") > -1) ? <a href="#" role="button" onClick={this.onCheckDetail.bind(this, row.transId)}>{row.transId}</a> : row.transId}
                         </th>
-                        {/* <td>{row.calCode}</td> */}
+                        <td>{row.operator}</td>
+                        <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                         <td>{i18n["lbl_WithdrawalType" + row.withdrawalType]}</td>
+                        <td>{row.calCode}</td>
+                        <td className={row.deviceScore > 74 ? "low-risk" : "high-risk"}>{row.deviceScore != null ? (row.deviceScore > 74 ? "Low Risk(" + row.deviceScore + ")"  : "High Risk(" + row.deviceScore + ")")  : "" }</td>
                         <td>{row.isKyc === 1 ? "YES" : "NO"}</td>
                         <td>{row.isRisk === 1 ? "YES" : "NO"}</td>
                         <td><a href={"/CustManage/CustInfo?UserName=" + row.userName + "&custId=" + row.custId + "&TransId=" + row.transId} target="_blank">{row.userName}</a></td>
+                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td>{row.withdrawalType === 4 ? row.channelName : "" }</td>
                         <td>{JSON.parse(row.withdrawalInfo).ExchangeAmount}</td>
                         <td>{i18n["lbl_Currency" + row.currencyId]}</td>
                         <td className="text-right">{number_format(row.amount)}</td>
                         {(row.bankName == null&& row.accountType != null)?
+                            row.accountType == "ewallet" ?<td>{row.eWalletName}</td>:
                             <td>{row.cryptoCurrency || row.accountType}</td>:<td>{row.bankName}</td>}
                         {/* <td>{row.accountNo}</td>
                         <td>{row.accountName}</td> */}
                         <td>{moment(row.createTime).format('l LTS')}</td>
                         <td>{row.updateTime ? moment(row.updateTime).format('l LTS') : null}</td>
                         <td>{row.status ==5 || row.status==6 || row.status==7 ? moment(row.flowEndTime).format('l LTS') : null}</td>
-                        {row.vipLevel === 0 ? <td>{row.vipLevelName}</td> : <td bgcolor={vipbg}>{row.vipLevelName}</td>}
                         <td className="text-right">{row.withdrawlCnt}</td>
-                        <td>{WithdrawalStatusOp[row.status]}{row.status == 8 && row.hasPhotoId ? <span>(Uploaded PhothId)</span> : null} </td>
                     </tr>
                 )
             }
@@ -137,10 +145,15 @@ import DateTimePicker from 'react-datetime';
                             <tr>
                                 <th scope="col">Trxn.ID</th>
                                 {/* <th scope="col">Calvin Code</th> */}
+                                <th scope="col">Operator</th>
+                                <th scope="col">{i18n.lbl_Status}</th>
                                 <th scope="col">{i18n.lbl_WithdrawalType}</th>
+                                <th scope="col">CalCode</th>
+                                <th scope="col">Device Score</th>
                                 <th scope="col">Kyc</th>
                                 <th scope="col">Risk</th>
                                 <th scope="col">{i18n.lbl_UserName}</th>
+                                <th scope="col">VIP Level</th>
                                 <th scope="col">NetWork</th>
                                 <th scope="col">Crypto Amount</th>
                                 <th scope="col">Currency</th>
@@ -151,9 +164,7 @@ import DateTimePicker from 'react-datetime';
                                 <th scope="col">{i18n.lbl_CreateTime + " (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Update Time (" + moment().format('Z') + ")"}</th>
                                 <th scope="col">{"Flow End Time (" + moment().format('Z') + ")"}</th>
-                                <th scope="col">VIP Level</th>
                                 <th scope="col" className="text-right">Withdrawl Count</th>
-                                <th scope="col">{i18n.lbl_Status}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,6 +254,7 @@ import DateTimePicker from 'react-datetime';
                                 ? result.data.network
                                 : `${result.data.cryptoCurrency}-${result.data.network}`;
                             await this.onGetPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetEWalletPayList(result.data.currencyId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
                             await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, channelName);
                         }
@@ -303,7 +315,7 @@ import DateTimePicker from 'react-datetime';
                     confirmstring += " On Hold(Risk Check) ?";
                     break;
                 case 3:
-                    confirmstring += " Verify ?";
+                    confirmstring += " Verified ?";
                     break;
                 case 4:
                     confirmstring += " Process ?";
@@ -363,13 +375,16 @@ import DateTimePicker from 'react-datetime';
             let ChannelId = 0;
             if (parseInt(event.target.value) == 1 && this.state.PayList.length > 0) {
                 SelId = this.state.PayList[0].payId;
-            } else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
+            }else if (parseInt(event.target.value) == 1 && this.state.EWalletPayList.length > 0){
+                console.log(this.state.EWalletPayList[0].payId);
+                SelId = this.state.EWalletPayList[0].payId;
+            }else if (parseInt(event.target.value) == 2 && this.state.BankInfoOffList.length > 0) {
                 SelId = this.state.BankInfoOffList[0].bankId;
             } else if (parseInt(event.target.value) == 4 && this.state.CryptoPayList.length > 0) {
             //   console.log(this.state.CryptoPayList);
                 SelId = this.state.CryptoPayList[0].payId;
                 ChannelId = this.state.CryptoPayList[0].channelId;
-            }
+            } 
             this.setState({ selectType: parseInt(event.target.value), SelId: SelId, ChannelId: ChannelId });
         }
 
@@ -399,6 +414,22 @@ import DateTimePicker from 'react-datetime';
                     let result = response.data;
                     if (result.errorCode == 0) {
                         this.setState({ ...Comment,PayList: result.data });
+                    } else {
+                        alert(result.message);
+                    }
+                }.bind(this)).catch(function (error) {
+                    //Loading.UnLoading();
+                    alert(error);
+                }.bind(this));
+        }
+
+        async onGetEWalletPayList(currencyId) {
+            await axios.post('/api/Withdrawal/GetEWalletPayList', { CurrencyId: currencyId })
+                .then(function (response) {
+                    let result = response.data;
+                   console.log(response.data);
+                    if (result.errorCode == 0) {
+                        this.setState({ ...Comment, EWalletPayList: result.data });
                     } else {
                         alert(result.message);
                     }
@@ -490,23 +521,23 @@ import DateTimePicker from 'react-datetime';
             let PayFrom = [];
             if (data != null) {
                 // if (data.status == 1 || data.status == 2 || data.status == 3 || data.status == 4 || data.status == 8)
-                    btnGroup.push(<button key={0} type="button" className="btn btn-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
+                    btnGroup.push(<button key={0} type="button" className="btn btn-withdrawal-draft" onClick={this.onConfirm.bind(this, 0)}>Draft</button>);
                 if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={2} type="button" className="btn btn-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
+                    btnGroup.push(<button key={2} type="button" className="btn btn-withdrawal-hold" onClick={this.onConfirm.bind(this, 2)}>On Hold(Risk Check)</button>);
                 if ((data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 4 && data.sameOperator) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={3} type="button" className="btn btn-verify" onClick={this.onConfirm.bind(this, 3)}>Verify</button>);
+                    btnGroup.push(<button key={3} type="button" className="btn btn-withdrawal-verified" onClick={this.onConfirm.bind(this, 3)}>Verified</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
-                    btnGroup.push(<button key={4} type="button" className="btn btn-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
+                    btnGroup.push(<button key={4} type="button" className="btn btn-withdrawal-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
                 if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
-                    btnGroup.push(<button key={6} type="button" className="btn btn-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
+                    btnGroup.push(<button key={6} type="button" className="btn btn-withdrawal-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={7} type="button" className="btn btn-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+                    btnGroup.push(<button key={7} type="button" className="btn btn-withdrawal-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
                 if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
-                    btnGroup.push(<button key={1} type="button" className="btn btn-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
-                if ((data.status == 1  && subFuncKeys.indexOf("f_wd_risk") > -1))
-                    btnGroup.push(<button key={8} type="button" className="btn btn-tokyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
+                    btnGroup.push(<button key={1} type="button" className="btn btn-withdrawal-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
+                if (((data.status == 1 || data.status == 2) && subFuncKeys.indexOf("f_wd_risk") > -1))
+                    btnGroup.push(<button key={8} type="button" className="btn btn-withdrawal-kyc" onClick={this.onConfirm.bind(this, 8)}>ToKyc</button>);
 
                 selectType = i18n["lbl_WithdrawalType" + data.withdrawalType];
 
@@ -517,7 +548,16 @@ import DateTimePicker from 'react-datetime';
                     {
                         if (this.state.CryptoPayList.length > 0)
                             selectOp.push(<option key={4} value="4">Crypto Pay</option>);
-                    }else
+                    }
+                    else if(this.state.Data.accountType === 'ewallet')
+                    {
+                        if (this.state.BankInfoOffList.length > 0)
+                            selectOp.push(<option key={2} value="2">Local Bank</option>);
+
+                        if (data.eWalletName != null)
+                            selectOp.push(<option key={1} value="1">Online Payment</option>);
+                    }
+                    else
                     {
                         if (this.state.PayList.length > 0)
                             selectOp.push(<option key={1} value="1">Online Payment</option>);
@@ -530,7 +570,12 @@ import DateTimePicker from 'react-datetime';
 
                     selectPay = null;
                     if (this.state.selectType == 1) {
-                        selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        if (data.eWalletName != null){
+                            selectPay = this.state.EWalletPayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        }
+                        else{
+                            selectPay = this.state.PayList.map(row => <option key={row.payId} value={row.payId}>{row.payName}</option>);
+                        }
                         /*if(this.state.PayList.length>0) {
                             this.state.SelId=this.state.PayList[0];
                         }*/
@@ -545,7 +590,6 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
                     }
-
                     if (selectPay != null) {
                         selectPay = <tr>
                             <th scope="row">select Pay</th>
@@ -652,20 +696,28 @@ import DateTimePicker from 'react-datetime';
                                 <td>{data.bankName}</td>
                             </tr>
                             : null}
+                            {data.eWalletName != null ?
+                            <tr>
+                                <th scope="row">Name of E-Wallet</th>
+                                <td>{data.eWalletName}</td>
+                            </tr>
+                            : null}
                             {data.accountType != null ?
                             <tr>
                                 <th scope="row">Account Type</th>
                                 <td>{data.cryptoCurrency || data.accountType}</td>
                             </tr>
                             : null}
-                            {data.accountType != null ?
+                            {data.accountType != null && data.accountType == "crypto"?
                             <tr>
                                 <th scope="row">Network</th>
                                 <td>{data.network}</td>
                             </tr>
                             : null}
                             <tr>
-                                <th scope="row">Account No</th>
+                                {data.eWalletName != null ?
+                                    <th scope="row">E-Wallet Account</th>
+                                : <th scope="row">Account No</th>}
                                 <td>
                                     {data.accountNo}
                                     <button type="button" className="btn btn-copy js-copy" data-clipboard-text={data.accountNo}>Copy</button>
@@ -744,7 +796,7 @@ import DateTimePicker from 'react-datetime';
             this.selectdate_end = React.createRef();
             this.ExportForm = React.createRef();
             this.state = { SiteList: [], selectSite: [], selectType: [], selectCurrency: [], selectStatus: [], SelectUser: "", SelectWithdrawalID: "", ShowDetial: false, timeInterval: this._timeInterval, IsRefresh: false, MutiSelRefresh: false ,levelStatus: [],amountType:0,
-            amount: "",pageSize:25};
+            amount: "",pageSize:25, withdrawalMethod:0};
             this.searchFilter = {};
         }
 
@@ -766,7 +818,8 @@ import DateTimePicker from 'react-datetime';
             }
             //Loading.OnLoading();
             let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, PageNumber: pageNumber, SelectSite: this.searchFilter.selectSite, 
-                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize};
+                        AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount,PageSize:this.searchFilter.pageSize, 
+                        WithdrawalMethod: parseInt(this.searchFilter.withdrawalMethod)};
 
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
@@ -813,7 +866,8 @@ import DateTimePicker from 'react-datetime';
         }
 
         onExport() {
-            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType), Amount:this.searchFilter.amount };
+            let data = { StartDate: this.searchFilter.StartDate, EndDate: this.searchFilter.EndDate, SelectSite: this.searchFilter.selectSite, AmountType: parseInt(this.searchFilter.amountType)
+                , Amount:this.searchFilter.amount, WithdrawalMethod: this.searchFilter.withdrawalMethod };
             if (this.searchFilter.SelectWithdrawalID != "") {
                 data.WithdrawalId = this.searchFilter.SelectWithdrawalID;
             }
@@ -1164,6 +1218,11 @@ import DateTimePicker from 'react-datetime';
             }.bind(this));
             PageSizeList = <select onChange={this.onChange.bind(this)} name="pageSize" value={this.state.pageSize}>{PageSizeList}</select>
 
+            let WithdrawalMethodList = Object.keys(WithdrawalMethod).map(function (obj) {
+                return <option key={`status-list-${obj}`} value={obj}>{WithdrawalMethod[obj]}</option>;
+            }.bind(this));
+            WithdrawalMethodList = <select onChange={this.onChange.bind(this)} name="withdrawalMethod" value={this.state.withdrawalMethod}>{WithdrawalMethodList}</select>
+
             let searchData = this.state.searchData;
             let StartDate = this.state.StartDate;
             let EndDate = this.state.EndDate;
@@ -1228,6 +1287,12 @@ import DateTimePicker from 'react-datetime';
                                     <span className="label">Withdrawal ID</span>
                                     <div className="field">
                                         <input type="text" name="SelectWithdrawalID" value={this.state.SelectWithdrawalID} onChange={this.onChange.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <span className="label">Withdrawal Method</span>
+                                    <div className="field">
+                                        {WithdrawalMethodList}
                                     </div>
                                 </div>
                                 <div className="input-item">

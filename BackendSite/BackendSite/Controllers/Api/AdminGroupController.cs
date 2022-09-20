@@ -1,14 +1,12 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using BackendSite.Attributes;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Admin/GroupAuthoritySetting" })]
     [Route("api/[controller]/[action]")]
     [ApiController]

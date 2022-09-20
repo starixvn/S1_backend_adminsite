@@ -1,11 +1,7 @@
-﻿using System;
-using BackendSite.Service.Model.TpMaintain;
+﻿using BackendSite.Service.Model.TpMaintain;
 using Dapper;
-using System.Collections.Generic;
-using System.Linq;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 using TpCategory = BackendSite.Service.Model.TpMaintain.TpCategory;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 using System.Data;
@@ -25,7 +21,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
         {
-            return _reportDbClient.Query<CommonTpInfo>("Common_TpList_Get");
+            return _reportDbClient.Query<CommonTpInfo>("Common_TpList_Get").Where(i => i.Id > 0);
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()

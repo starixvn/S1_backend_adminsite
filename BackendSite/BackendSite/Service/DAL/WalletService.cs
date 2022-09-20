@@ -1,14 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using Dapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -31,7 +26,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { CustId = custId, SiteId = siteId, UserName = userName, Amount = Amount, Type = type, Memo = Memo, RefTransId = RefTransId });
             p.Add("Is1stDepoist", dbType: DbType.Boolean, direction: ParameterDirection.Output);
             p.Add("AfterAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            _mainDbClient.Execute("Wallet_Set", p, conn, trans);
+            _mainDbClient.Execute("Wallet_Set_V2", p, conn, trans);
             is1stDepoist = p.Get<byte?>("Is1stDepoist") ?? 0;
             afterAmount = p.Get<decimal?>("AfterAmount") ?? 0;
             return afterAmount >= 0 ? 1 : 0;
@@ -41,6 +36,12 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.ExecuteScalar<decimal>("Balance_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
+        public Task<decimal> GetBalanceAsync(int custId)
+        {
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            return conn.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+        }
+        
         public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("PayDummy_Set",
@@ -341,7 +342,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
         {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }));
+            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }),60);
             return result;
         }
     }

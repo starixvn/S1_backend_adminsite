@@ -4,13 +4,10 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BackendSite.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("api/[controller]/[action]")]
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -48,7 +45,7 @@ namespace BackendSite.Controllers.Api
                     CurrencyId = currencyId,
                     PeriodDays = referral == null ? string.Empty : referral.PeriodDays.ToString(),
                     BonusAmount = referral == null ? string.Empty : referral.BonusAmount.ToString(),
-                    VaildBet = referral == null ? string.Empty : referral.VaildBet.ToString(),
+                    ValidBet = referral == null ? string.Empty : referral.ValidBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
                     Status = referral?.Status ?? false
