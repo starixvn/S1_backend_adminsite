@@ -62,6 +62,8 @@ namespace BackendSite.Service.Model
     public class BonusReportResponseWrapper : BonusReportBase
     {
         public IEnumerable<BonusReportResponse> Data { get; set; }
+
+        public List<TotalAmount> TotalAmountSummary { get; set; }
     }
 
 
@@ -140,6 +142,8 @@ namespace BackendSite.Service.Model
     public class BonusReportDtoWrapper : BonusReportBase
     {
         public IEnumerable<BonusReportDto> Data { get; set; }
+
+        public List<TotalAmount> TotalAmountSummary { get; set; }
     }
 
     #endregion

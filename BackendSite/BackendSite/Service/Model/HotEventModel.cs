@@ -112,6 +112,12 @@ namespace BackendSite.Service.Model
         [JsonProperty("status")]
         public HotEventStatus Status { get; set; }
 
+        /// <summary>
+        /// 0 表示全查
+        /// </summary>
+        [JsonProperty("sportLeaguesTitleId")]
+        public int SportLeaguesTitleId { get; set; }
+
         [JsonProperty("pageNumber")]
         public int PageNumber { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Model.enums;
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusPayoutController;
 
 namespace BackendSite.Service.BLL
@@ -44,9 +45,31 @@ namespace BackendSite.Service.BLL
                 return result;
             }
 
-            result.BonusAmount = tierAmount.Bonus;
-            result.LockAmount = tierAmount.RequiredAmount;
-            result.RolloverAmount = tierAmount.RequiredAmount;
+            decimal bonusAmount;
+            decimal lockAmount;
+            decimal rolloverAmount;
+            if (tierRedepositBonus.BonusType == BonusType.Amount)
+            {
+                bonusAmount = tierAmount.Bonus;
+                lockAmount = tierAmount.RequiredAmount;
+            }
+            else
+            {
+                bonusAmount = Math.Ceiling(tierAmount.Bonus * checkResult.ActualDeposit / 100);
+                lockAmount = bonusAmount * 100 / tierAmount.Bonus;
+                if (tierAmount.MaxBonus != 0 && bonusAmount > tierAmount.MaxBonus)
+                {
+                    bonusAmount = tierAmount.MaxBonus;
+                    lockAmount = tierAmount.MaxBonus * 100 / tierAmount.Bonus;
+                }
+            }
+            rolloverAmount = (lockAmount + bonusAmount) * (tierRedepositBonus.FullFillType == FullFillType.RollOver ? tierAmount.RollOver : tierAmount.WinOver);
+
+            result.BonusAmount = bonusAmount;
+            result.LockAmount = lockAmount;
+            result.RolloverAmount = rolloverAmount;
+            result.RollOver = tierAmount.RollOver;
+            result.WinOver = tierAmount.WinOver;
             result.IsSuccess = true;
             return result;
         }

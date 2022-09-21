@@ -72,7 +72,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > Click[Site Name] [Deposit Type]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
         public ApiResult<IEnumerable<DepositLimitInfo>> GetList(GetListRequest request)
         {
@@ -93,7 +92,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > [Submit] > Add
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
         public ApiResult Create(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
@@ -135,7 +133,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > Click[Site Name] [Deposit Type] > [Edit] > [Save]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
         public ApiResult Update(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
@@ -164,7 +161,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type] > [Delete]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DepositLimitModel> req)
         {

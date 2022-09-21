@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
-            var data = await _memberDashboardBll.GetCustomerBasicInfo(request.CustId);
+            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -100,7 +100,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-
+        
+        /// <summary>
+        /// Member/GetCustPhotoId 取得客戶證件照列表
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
         {
@@ -117,8 +127,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Upload
+        /// Member/UploadCustPhotoId 上傳用戶證件照
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
@@ -140,8 +155,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Ask Re-Upload
+        /// Member/DeleteCustPhotoId 刪除用戶證件照
         /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
@@ -184,6 +204,460 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        /// Member/EditFullName 修改用戶真實姓名
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 41 })]
+        [HttpPost]
+        public async Task<ApiResult> EditFullName(SetFullNameRequest request)
+        {
+            var result = await _memberDashboardBll.EditFullNameAsync(request.CustId, request.FullName);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/EditEmail 修改用戶Email
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 42 })]
+        [HttpPost]
+        public async Task<ApiResult> EditEmail(SetEmailRequest request)
+        {
+            var result = await _memberDashboardBll.EditEmailAsync(request.CustId, request.Email);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/EditPhoneNo 修改用戶電話
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 43 })]
+        [HttpPost]
+        public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
+        {
+            var result = await _memberDashboardBll.EditPhoneNoAsync(request.CustId, request.PhoneNo);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/EditBirthday 修改用戶生日
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 45 })]
+        [HttpPost]
+        public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
+        {
+            var result = await _memberDashboardBll.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/EditAddress 修改會員地址
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 46 })]
+        [HttpPost]
+        public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
+        {
+            var result = await _memberDashboardBll.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchKyc 修改會員Kyc狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 20 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchKycAsync(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchRisk 切換會員Risk狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 25 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchRiskAsync(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchEmailVerified 切換會員Email驗證狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 33 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchEmailVerifiedAsync(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchPhoneVerified 切換會員電話驗證狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 29 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
+        {
+            var result = await _memberDashboardBll.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/ResetPassword 重置會員密碼
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 16 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
+        {
+            var newPassword = await _memberDashboardBll.ResetPasswordAsync(request.CustId);
+
+            if (!string.IsNullOrEmpty(newPassword))
+            {
+                return new ApiResult<string>
+                {
+                    Data = newPassword,
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Reset Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/LockAccount 鎖/解鎖會員帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 21 })]
+        [HttpPost]
+        public async Task<ApiResult> Lock(LockMemberRequest request)
+        {
+            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/Close 關閉會員帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 26 })]
+        [HttpPost]
+        public async Task<ApiResult> Close(CloseMemberRequest request)
+        {
+            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/SwitchRebatePayout 起停用派發Rebate
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 35 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
+        {
+            if (await _memberDashboardBll.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/ResetBankInfo 重置BankInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 22 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetBankInfoAsync(ResetBankInfoRequest request)
+        {
+            if (await _memberDashboardBll.ResetBankInfoAsync(request.CustId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/ResetCryptoInfo 重置CryptoInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 22 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetCryptoInfoAsync(ResetCryptoInfoRequest request)
+        {
+            if (await _memberDashboardBll.ResetCryptoInfoAsync(request.CustId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/ResetEWallet 重置E-Wallet
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 50 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetEWalletAsync(ResetEwalletRequest request)
+        {
+            if (await _memberDashboardBll.ResetEWalletAsync(request.CustId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/PayoutVerificationReward 派發客戶驗證獎勵金
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 54 })]
+        [HttpPost]
+        public async Task<ApiResult> PayoutVerificationReward(PayoutVerificationRewardRequest request)
+        {
+            var apiResult = await _memberDashboardBll.SetVerificationRewardAsync(request.CustId, request.OTPType);
+            return apiResult;
+        }
+
         /// <summary>
         /// Member/GetDeviceList 取得會員使用過的裝置
         /// </summary>
@@ -194,10 +668,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<MemberLoginDevice>>> GetDeviceList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetDeviceListByCustId(request.CustId);
+            var data = await _memberDashboardBll.GetDeviceListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<MemberLoginDevice>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -216,10 +691,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetIpListByCustId(request.CustId);
+            var data = await _memberDashboardBll.GetIpListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -285,7 +761,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.PageNumber = pageNumber;
                 apiResult.TotalPages = queryResult.TotalPages;
                 apiResult.RowCount = queryResult.RowCount;
-                apiResult.CurrencyAmount = queryResult.CurrencyAmount;
+                apiResult.CurrencyAmountRecord = queryResult.CurrencyAmount;
 
             }
             catch (Exception ex)
