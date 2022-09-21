@@ -35,7 +35,7 @@ namespace BackendSite.Extensions
             var type = typeof(T);
             return Enum.GetValues(type)
                 .Cast<T>()
-                .Where(x => except != null && !except.Contains(x))
+                .Where(x => except == null || !except.Contains(x))
                 .Select(x => new SelectListItem
                 {
                     Value = Convert.ToInt32(x),

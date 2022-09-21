@@ -1,8 +1,8 @@
 # localhost
-# @url=http://localhost:9158
+@url=http://localhost:9158
 
 # AdminSite DEV
-@url=http://admin.n88dev.com
+# @url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -20,6 +20,11 @@ POST {{url}}/apiV2/BankTransfer/GetTransferTypeList HTTP/1.1
 Content-Type: application/json
 
 ###
+# 取得 TransactionType 列表
+POST {{url}}/apiV2/BankTransfer/GetTransactionTypeList HTTP/1.1
+Content-Type: application/json
+
+###
 # 取得渠道列表
 POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
 Content-Type: application/json
@@ -34,7 +39,7 @@ POST {{url}}/apiV2/BaseData/GetReasonList HTTP/1.1
 Content-Type: application/json
 
 {
-    "FuncKey": "BankFinancial/TransferManage"
+    "FuncKey": "BankFinancial/TransferAccountManage"
 }
 
 ###
@@ -125,10 +130,14 @@ Content-Type: application/json
 ###
 # 新增/更新轉帳資料
 # 請用 postman
+# TransactionType: Plus(1) To 欄位必填
+# TransactionType: Minus(2) From 欄位必填
+# TransactionType: FromTo(3) From & To 欄位都必填
 POST {{url}}/apiV2/BankTransfer/Set HTTP/1.1
 Content-Type: multipart/form-data;
 
 TransferId:
+TransactionType:3
 TransferType:3
 TransDate:2022-08-30T00:00:00+08:00
 SiteId:1

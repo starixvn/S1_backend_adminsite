@@ -140,7 +140,7 @@ public class BankTransferController : ControllerBase
         {
             TransferId = request.TransferId,
             TransDate = request.TransDate,
-            TransactionType = TransactionTypeEnum.PlusAndMinus,
+            TransactionType = request.TransactionType,
             TransferType = request.TransferType,
             FromSiteId = (int) request.SiteId,
             FromSiteName = request.SiteId.GetDescription(),
@@ -218,6 +218,16 @@ public class BankTransferController : ControllerBase
         {
             ErrorCode = (int) ErrorCodeEnum.Success,
             Data = EnumExtension.EnumToSelectListItem(except)
+        };
+    }
+    
+    [HttpPost]
+    public ApiResult<IEnumerable<SelectListItem>> GetTransactionTypeList()
+    {
+        return new ApiResult<IEnumerable<SelectListItem>>
+        {
+            ErrorCode = (int) ErrorCodeEnum.Success,
+            Data = EnumExtension.EnumToSelectListItem<TransactionTypeEnum>()
         };
     }
 
