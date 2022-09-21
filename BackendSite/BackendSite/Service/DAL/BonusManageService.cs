@@ -566,34 +566,37 @@ namespace BackendSite.Service.DAL
                 {
                     if (specific.CashBackSetting.CashBackTpInfos != null)
                     {
-                        var promotionCashBacks = new List<PromotionCashBack>();
                         foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                         {
-                            promotionCashBacks.Add(new PromotionCashBack
+                            cashBackList.Add(new PromotionCashBackSetting
                             {
+                                CurrencyId = specific.CurrencyId,
                                 TpId = tpInfo.TpId,
-                                GameType = tpInfo.TpId,
+                                CategoryId = tpInfo.CategoryId,
+                                Level = (int)PromotionCashBackSettingLevelEnum.All,
                                 Percentage = specific.CashBackSetting.Percentage,
                                 LossAmount = specific.CashBackSetting.LossAmount,
-                                Status = 1
+                                Status = (int)PromotionCashBackSettingStatusEnum.Enable
                             });
                         }
-                        specific.CashBackList = promotionCashBacks;
                     }
-
-                    foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
+                    else
                     {
-                        var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;
-                        cashBackList.Add(new PromotionCashBackSetting
+                        //V1 版本，V2 上線後可移除
+                        foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
                         {
-                            CurrencyId = specific.CurrencyId,
-                            CategoryId = tempCategoryId,
-                            Level = 0,//0代表包含所有 VIP 等級
-                            Percentage = cashBack.Percentage,
-                            LossAmount = cashBack.LossAmount,
-                            Status = cashBack.Status,
-                            TpId = promotion.TpId == 0 ? cashBack.GameType : promotion.TpId
-                        });
+                            var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;
+                            cashBackList.Add(new PromotionCashBackSetting
+                            {
+                                CurrencyId = specific.CurrencyId,
+                                CategoryId = tempCategoryId,
+                                Level = (int)PromotionCashBackSettingLevelEnum.All,
+                                Percentage = cashBack.Percentage,
+                                LossAmount = cashBack.LossAmount,
+                                Status = cashBack.Status,
+                                TpId = promotion.TpId == 0 ? cashBack.GameType : promotion.TpId
+                            });
+                        }
                     }
                 }
 
