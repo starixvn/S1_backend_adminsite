@@ -75,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Edit [Status]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost("Set")]
         public async Task<ApiResult> Set(SetRegLiveStatusRequest req)
         {
@@ -104,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 12 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost("CallingRecord")]
         public async Task<ApiResult> CallingRecord(TeleCsdUpdateReq req)
         {
@@ -159,7 +159,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query)  > Note[Edit] > [Add]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost("Note/Add")]
         public async Task<ApiResult> AddNote(AddRegLiveStatusNoteRequest req)
         {
@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Registration Management > [Submit](Query) > Note[Edit] > Note List > [Delete]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 4 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 23, 3 })]
         [HttpPost("Note/Delete")]
         public async Task<ApiResult> DeleteNote(DeleteRegLiveStatusNoteRequest req)
         {
