@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
     public class BankFinancialTransferAccountDetailModel
     {
+        private DateTimeOffset _initTime { set; get; }
         /// <summary>
         /// 讀寫 識別值ID
         /// </summary>
@@ -95,6 +94,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 初始金額
         /// </summary>
         public decimal InitialAmount { get; set; }
+        public DateTimeOffset InitialTime
+        {
+            get => _initTime;
+            set => _initTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
 
         /// <summary>
         /// 讀寫 超過餘額警示

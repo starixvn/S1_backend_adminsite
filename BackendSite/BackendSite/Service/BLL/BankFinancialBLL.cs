@@ -134,14 +134,15 @@ namespace BackendSite.Service.BLL
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
-                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? null : input.AccountCode,
-                AccountNo = input.AccountNo,
+                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
+                AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
-                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? null : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? null : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? null : input.BankLoginPassword,
+                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
                 InitialAmount = input.InitialAmount,
+                InitialTime = input.InitialTime,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                 Reason = input.Reason == 0 ? null : input.Reason,
                 Remark = input.Remark,
@@ -170,6 +171,7 @@ namespace BackendSite.Service.BLL
                     oldData.BankLoginAccount,
                     oldData.BankLoginPassword,
                     InitialAmount = oldData.InitialAmount,
+                    InitialTime = oldData.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
                     Remark = oldData.Remark,
                     Status = oldData.Status.ToString()
@@ -186,6 +188,7 @@ namespace BackendSite.Service.BLL
                     input.BankLoginAccount,
                     input.BankLoginPassword,
                     InitialAmount = input.InitialAmount,
+                    InitialTime = input.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
                     Remark = input.Remark,
                     Status = input.Status.ToString()
@@ -194,13 +197,19 @@ namespace BackendSite.Service.BLL
 
             if (isCreate)
             {
+                if (input.Channel == TransferChannelEnum.LocalBank
+                    && _bankFinancialService.CheckTransferAccountExists(input.SiteId, transferAccountModel.AccountNo))
+                {
+                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
+                }
+                
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (false, count, "Insert Transfer Account Fail.");
+                        return (false, count, "Insert Transfer Account Fail. Duplicate AccountNo.");
                     };
 
                     if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
@@ -598,7 +607,7 @@ namespace BackendSite.Service.BLL
                 return (false, count, message);
             }
 
-            if (bankFinancialTransferInfoDetail.TransferType != TransferTypeEnum.Other)
+            if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus)
             {
                 if (!CheckParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
                 {

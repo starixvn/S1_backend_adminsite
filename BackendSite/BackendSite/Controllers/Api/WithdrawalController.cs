@@ -251,7 +251,8 @@ namespace BackendSite.Controllers.Api
                 else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
+                    var bankInfoOff = bankDetailBLL
+                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
                         .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
 
                     if (bankInfoOff != null)
@@ -394,15 +395,20 @@ namespace BackendSite.Controllers.Api
 
         //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalReq.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
-                .OrderBy(x => x.BSort);
-            apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var data = bankDetailBLL
+                .GetOfflineBankAccount(withdrawalReq.SiteId, withdrawalReq.CurrencyId)
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.SettingStatus == BankCardManagementStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.LocalBank);
+            
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = data,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
         }
 
         public class Pay
