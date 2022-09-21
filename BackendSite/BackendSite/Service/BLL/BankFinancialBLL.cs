@@ -115,7 +115,7 @@ namespace BackendSite.Service.BLL
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
                 AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
-                AccountNo = input.AccountNo,
+                AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
@@ -177,7 +177,8 @@ namespace BackendSite.Service.BLL
 
             if (isCreate)
             {
-                if (_bankFinancialService.CheckTransferAccountExists(transferAccountModel.AccountNo))
+                if (input.Channel == TransferChannelEnum.LocalBank
+                    && _bankFinancialService.CheckTransferAccountExists(input.SiteId, transferAccountModel.AccountNo))
                 {
                     return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
                 }
