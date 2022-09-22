@@ -276,7 +276,7 @@ namespace BackendSite.Controllers.Api
                 RedeemHours = promotion.RedeemHours,
                 PeriodType = promotion.PeriodType,
                 PeriodDay = promotion.PeriodDay,
-                SpecialCode = promotion.SpecialCode,
+                SpecialCode = promotion.IsSpecial ? promotion.SpecialCode : null,
                 IsSpecial = promotion.IsSpecial,
                 OnlyRegistered = promotion.OnlyRegistered,
                 PromotionDeviceType = promotion.PromotionDeviceType,
@@ -296,7 +296,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if (isAdd && _bonusManageBLL.CheckPromotionExists(promotion.BonusCode, promotion.SpecialCode))
+                if (isAdd && _bonusManageBLL.CheckPromotionExists(req.BonusCode, req.SpecialCode))
                 {
                     apiResult.ErrorCode = 999;
                     apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
@@ -347,6 +347,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
+                duplicateRequest.NewSpecialCode = duplicateRequest.IsSpecial ? duplicateRequest.NewSpecialCode : null;
                 if (_bonusManageBLL.CheckPromotionExists(duplicateRequest.NewBonusCode ,duplicateRequest.NewSpecialCode))
                 {
                     apiResult.ErrorCode = 99;

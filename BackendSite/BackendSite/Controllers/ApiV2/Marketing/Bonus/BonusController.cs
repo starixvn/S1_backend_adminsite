@@ -255,6 +255,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
+                request.PromotionInfo.SpecialCode = request.PromotionInfo.IsSpecial ? request.PromotionInfo.SpecialCode : null;
                 if (request.IsAdd && _bonusManageBll.CheckPromotionExists(request.PromotionInfo.BonusCode,
                         request.PromotionInfo.SpecialCode))
                 {
@@ -301,7 +302,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
-                if (request.IsSpecial && _bonusManageBll.CheckPromotionExists(request.NewBonusCode, request.NewSpecialCode))
+                request.NewSpecialCode = request.IsSpecial ? request.NewSpecialCode : null;
+                if (_bonusManageBll.CheckPromotionExists(request.NewBonusCode, request.NewSpecialCode))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
                     apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
