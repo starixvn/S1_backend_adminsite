@@ -20,6 +20,11 @@ POST {{url}}/apiV2/BankTransfer/GetTransferTypeList HTTP/1.1
 Content-Type: application/json
 
 ###
+# 取得 TransactionType 列表
+POST {{url}}/apiV2/BankTransfer/GetTransactionTypeList HTTP/1.1
+Content-Type: application/json
+
+###
 # 取得渠道列表
 POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
 Content-Type: application/json
@@ -34,7 +39,7 @@ POST {{url}}/apiV2/BaseData/GetReasonList HTTP/1.1
 Content-Type: application/json
 
 {
-    "FuncKey": "BankFinancial/TransferManage"
+    "FuncKey": "BankFinancial/TransferAccountManage"
 }
 
 ###
@@ -50,7 +55,7 @@ Content-Type: application/json
 # 取得轉帳帳戶列表
 # 列表下拉選單顯示全部(Value=>accountNo, Name=>displayName)
 # 編輯只顯示status === 2的項目
-POST {{url}}/apiV2/BankTransferAccount/GetTransferAccountList HTTP/1.1
+POST {{url}}/apiV2/BaseData/GetTransferAccountList HTTP/1.1
 Content-Type: application/json
 
 {
@@ -119,16 +124,20 @@ POST {{url}}/apiV2/BankTransfer/GetByTransferId HTTP/1.1
 Content-Type: application/json
 
 {
-    "transferId": "T202202150002"
+    "transferId": "T202208300001"
 }
 
 ###
 # 新增/更新轉帳資料
 # 請用 postman
+# TransactionType: Plus(1) To 欄位必填
+# TransactionType: Minus(2) From 欄位必填
+# TransactionType: FromTo(3) From & To 欄位都必填
 POST {{url}}/apiV2/BankTransfer/Set HTTP/1.1
 Content-Type: multipart/form-data;
 
 TransferId:
+TransactionType:3
 TransferType:3
 TransDate:2022-08-30T00:00:00+08:00
 SiteId:1
@@ -160,5 +169,5 @@ POST {{url}}/apiV2/BankTransfer/Delete HTTP/1.1
 Content-Type: application/json
 
 {
-    "transferId": "T202208290002"
+    "transferId": "T202208290001"
 }

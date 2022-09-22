@@ -213,12 +213,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
-        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5 //No Use
+        LoadCard = 5, //No Use
+        QRPay = 6 ,
+        BankAutoChannel = 7
     }
 
     public enum DepositStatusEnum
@@ -476,7 +477,6 @@ namespace BackendSite.Service.Model.enums
         FstDeposit = 1,
         ReDeposit = 2,
         FreeBet = 3,
-        WalletBonus = 5,
         Rebate = 6,
         Cashback = 7,
         SpecialBonus = 8,
@@ -527,8 +527,14 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionCashBackSettingStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Enable = 1,
+        Disable = 2
+    }
+    
+    public enum PromotionCashBackSettingLevelEnum
+    {
+        [Description("0代表包含所有 VIP 等級")]
+        All = 0
     }
 
     public enum ReferralCustStatusEnum
@@ -641,11 +647,11 @@ namespace BackendSite.Service.Model.enums
         SetEWalletWithdrawalLimitInfoStatus = 38,
         DepositRewardPointSetting = 39,
         TurnoverRewardPointSetting = 40,
-        TurnoverRewardPointGameTypeSetting = 46,
-        InactivePointExpirySetting = 47,
         RedemptionLimitSetting = 43,
         GiftManagement = 44,
         SetCustInfoEnableRebate = 45,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
         SetAdminUserStatus = 41,
         SetAdminUserPassword = 42,
         VerificationRewardSetting = 49,
@@ -725,7 +731,10 @@ namespace BackendSite.Service.Model.enums
         cs = 2,
         th = 3,
         id = 4,
-        vn = 5
+        vn = 5,
+        hi = 6,
+        my = 7,
+        bd = 8
     }
 
     public enum PromotionDisplayConditionType
@@ -767,7 +776,11 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 第三方支付
         /// </summary>
-        PSP = 3
+        PSP = 3,
+        
+        Finance = 4,
+        
+        MC = 5
     }
 
     /// <summary>
@@ -799,23 +812,22 @@ namespace BackendSite.Service.Model.enums
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
-    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
-        [Description("只有加項")] OnlyPlus = 1,
+        [Description("Plus")] OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
-        [Description("只有減項")] OnlyMinus = 2,
+        [Description("Minus")] OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
-        [Description("一加一減")] PlusAndMinus = 3
+        [Description("FromTo")] PlusAndMinus = 3
     }
 
     /// <summary>
@@ -824,50 +836,42 @@ namespace BackendSite.Service.Model.enums
     public enum TransferTypeEnum
     {
         Undefined = 0,
-        [Description("DEPOSIT")]
-        Deposit = 1,
-        [Description("WITHDRAWAL")]
-        Withdrawal = 2,
+        [Description("PSP")]
+        Psp = 2,
         [Description("LOCAL BANK")]
         LocalBank = 3,
-        [Description("OPENING BAL")]
-        OpeningBal = 4,
-        [Description("CLOSING BAL")]
-        ClosingBal = 5,
-        [Description("PSP")]
-        Psp = 6,
         [Description("BOUNC BACK")]
-        BounceBack = 7,
+        BounceBack = 4,
         [Description("MARKETING")]
-        Marketing = 8,
+        Marketing = 5,
         [Description("BONUS")]
-        Bonus = 9,
+        Bonus = 6,
         [Description("INTEREST")]
-        Interest = 10,
+        Interest = 7,
         [Description("TOP UP PHONE")]
-        ToUpPhone = 11,
+        ToUpPhone = 8,
         [Description("FEES")]
-        Fees = 12,
+        Fees = 9,
         [Description("UNCLAIM")]
-        Unclaimed = 13,
+        Unclaimed = 10,
         [Description("OVERCREDIT")]
-        OverCredit = 14,
+        OverCredit = 11,
         [Description("OVERPAID")]
-        OverPaid = 15,
+        OverPaid = 12,
         [Description("FRAUD")]
-        Fraud = 16,
+        Fraud = 13,
         [Description("FREEZE")]
-        Freeze = 17,
+        Freeze = 14,
         [Description("CURRENCY CONVERSION")]
-        CurrencyConversion = 18,
+        CurrencyConversion = 15,
         [Description("HEAD OFFICE")]
-        HeadOffice = 19,
+        HeadOffice = 16,
         [Description("FINANCE")]
-        Finance = 20,
+        Finance = 17,
+        [Description("ADVANCED")]
+        Advanced = 18,
         [Description("TEST")]
-        Test = 21,
-        [Description("OTHER")]
-        Other = 99
+        Test = 19
     }
 
     /// <summary>
@@ -1074,11 +1078,12 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerActionModeEnum
     {
-        GoToGame = 1,
-        GoToBonus = 2,
-        OpenWindow = 3,
-        RedirectPage = 4,
-        NoAction = 5
+        NoAction = 1,
+        GoToGame = 2,
+        GoToBonus = 3,
+        OpenWindow = 4,
+        RedirectPage = 5,
+        RedirectPagesOfThisSite = 6
     }
 
     public enum ShowStatusEnum
@@ -1094,6 +1099,16 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum UrlRouterEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        Referral = 3,
+        LeaderBoard = 4,
+        AngPow = 5,
+        Lottery = 6
+    }
+    
     #endregion
 
     #region AppLinkTable

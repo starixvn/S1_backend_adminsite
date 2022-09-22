@@ -742,29 +742,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// CustomerManage/GetRebateInfoByCustId 取得客戶返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
-        [HttpPost]
-        public ApiResult GetRebateInfoByCustId(CustIdRequest request)
-        {
-            var data = _paymentBll.GetRebateInfoByCust(request.CustId);
-            return new ApiResult<IEnumerable<RebateInfo>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
         /// CustomerManage/SetCustStatusSwitch 設定客戶狀態開關(客戶驗證、風險、電話驗證、Email驗證)
         /// </summary>
         /// <remarks>

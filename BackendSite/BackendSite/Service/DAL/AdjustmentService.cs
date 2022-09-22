@@ -313,6 +313,8 @@ namespace BackendSite.Service.DAL
         public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
         {
             Adjustment_transId = null;
+            int? depositId = adjustmentAndWithdrawalLimit.DepositId == 0 ? null : adjustmentAndWithdrawalLimit.DepositId;
+
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -327,11 +329,12 @@ namespace BackendSite.Service.DAL
                 adjustmentAndWithdrawalLimit.Amount,
                 Prefix = $"A{common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
-                adjustmentAndWithdrawalLimit.Category
+                adjustmentAndWithdrawalLimit.Category,
+                _DepositId = depositId
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
+            var result = conn.Execute("Admin_Adjustment_Ins_V3", adjustmentP, trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {

@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalController : ControllerBase
@@ -177,7 +177,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
@@ -225,7 +224,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
@@ -310,7 +308,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
@@ -358,7 +355,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
         {
@@ -379,7 +375,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
@@ -601,7 +596,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <param name="transId"></param>
         /// <param name="number"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpGet]
         public ActionResult GetPicture(string transId, int number)
         {
@@ -621,7 +615,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
@@ -681,7 +674,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {

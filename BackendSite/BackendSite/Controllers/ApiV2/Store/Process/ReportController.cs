@@ -63,9 +63,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         #region TurnoverPoint
 
         [HttpPost]
-        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
-            var result = _storeReportBLL.GetTurnoverPointReportAsync(req);
+            var result = await _storeReportBLL.GetTurnoverPointReportAsync(req);
 
             return result;
         }

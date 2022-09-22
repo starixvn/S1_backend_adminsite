@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -104,7 +103,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferAccountManage" })]
         [HttpPost]
         public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoByIdRequest req)
         {
@@ -151,6 +149,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 AccountCode = req.AccountCode,
                 DisplayName = req.DisplayName,
                 InitialAmount = req.InitialAmount,
+                InitialTime = req.InitialTime,
                 MaxBalanceAlertAmount = req.MaxBalanceAlertAmount,
                 PayId = req.PayId,
                 SysId = req.SysId,
@@ -167,6 +166,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
+        [HttpPost]
         public ApiResult GetTransferAccountReason()
         {
             var result = _bankFinancialBll.GetReason("BankFinancial/TransferAccountManage");
@@ -178,6 +178,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
+        [HttpPost]
         public ApiResult GetPayList()
         {
             var apiResult = new ApiResult<IEnumerable<PayList>>();
@@ -198,6 +199,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return apiResult;
         }
         
+        [HttpPost]
         public ApiResult GetAgentList(GetAgentListRequest req)
         {
             var result = _bankFinancialBll.GetTransferAccountAgentList(req.SiteId);
@@ -209,18 +211,6 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             };
         }
         
-        [HttpPost]
-        public ApiResult GetTransferAccountList(GetAccountListRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
-            {
-                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
         #endregion
     }
 }

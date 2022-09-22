@@ -65,6 +65,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public decimal LockAmount { get; set; }          
             public decimal BonusAmount { get; set; }
             public decimal RolloverAmount { get; set; }
+            public int RollOver { get; set; }
+            public int WinOver { get; set; }
         }
         #endregion
 

@@ -52,7 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             /// Bonus狀態：
             /// 0=All
             /// 1=Active
-            /// 1=Inactive
+            /// 2=Inactive
             /// </summary>
             public int Status { get; set; }
             public DateTimeOffset StartDate

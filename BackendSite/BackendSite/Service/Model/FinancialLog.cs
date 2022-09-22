@@ -34,40 +34,7 @@ namespace BackendSite.Service.Model
         public string RefTransId { get; set; }
         public string Memo { get; set; }
     }
-    public class RebateLog
-    {
-        private DateTimeOffset _createTime { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string GameName { get; set; }
-        public string RebateTypeName { get; set; }
-        public decimal RedeemAmount { get; set; }
-        public string BonusCode { get; set; }
-        public DateTimeOffset CreateTime 
-        {
-            get => _createTime;
-            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
 
-    }
-    public class RebateInfo
-    {
-        private DateTimeOffset _claimTime { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string BonusCode { get; set; }
-        public string Description { get; set; }
-        public string RebateTypeName { get; set; }
-        public DateTimeOffset ClaimTime
-        {
-            get => _claimTime;
-            set => _claimTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-
-    }
     public class PromotionCategory
     {
         public int id { get; set; }
@@ -157,6 +124,15 @@ namespace BackendSite.Service.Model
         public decimal TurnOver_ExcludeValidTO { get; set; }
         public decimal ValidBet_Valid { get; set; }
     }
+
+    public class VipRebateReportOverviewResult
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int TotalRecord { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
+
     public class VipRebateInfo
     {
         public int SiteId { get; set; }
@@ -175,10 +151,19 @@ namespace BackendSite.Service.Model
     public class VipRebateInfoData
     {
         public List<VipRebateInfo> VipRebateInfoList { get; set; }
+        public List<string> CurrencyAmount { get; set; }
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
-        public List<string> CurrencyAmount { get; set; }
+    }
+
+    public class VipRebateReportResult
+    {
+        public List<VipRebateInfo> VipRebateInfoList { get; set; }
+        public IEnumerable<VipRebateReportOverviewResult> CurrencyAmount { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
     public class VipTPCategory
     {
@@ -192,6 +177,7 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _updateTime { get; set; }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public decimal AdjustmentMax { get; set; }
         public DateTimeOffset UpdateTime 
         {
@@ -283,7 +269,8 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
         public string TierAmount { get; set; }
-        public int BonusType { get; set; }
+        public BonusType BonusType { get; set; }
+        public FullFillType FullFillType { get; set; }
 
         public IEnumerable<TierAmount> TierAmountList
         {

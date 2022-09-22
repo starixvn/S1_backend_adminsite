@@ -28,14 +28,16 @@
     }
     public class LatestHighlightVideoData
     {
-        public int SiteId { get; set; }
+        private DateTimeOffset _lastUpdateTime { get; set; }
+        public DateTimeOffset LastUpdateTime
+        {
+            get => _lastUpdateTime;
+            set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string LangId { get; set; }
-        public string Date { get; set; }
         public string Title { get; set; }
         public string Link { get; set; }
-        public string Time { get; set; }
         public string Operator { get; set; }
-        public string SiteName { get; set; }
         public int VideoId { get; set; }
     }
 

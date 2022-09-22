@@ -52,7 +52,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult GetList(GetListRequest request)
         {
@@ -77,7 +76,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult Create(ApiRequestWithLog<CreateCryptoWithdrawalLimitInfo> request)
         {
@@ -100,7 +98,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult Update(ApiRequestWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> request)
         {
@@ -123,7 +120,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DeleteCryptoWithdrawalLimitInfo> request)
         {

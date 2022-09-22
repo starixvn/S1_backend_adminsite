@@ -245,6 +245,7 @@ namespace BackendSite.Service.Model.BankFinancial
     {
         private DateTimeOffset _transDate;
         public string TransferId { get; set; }
+        public TransactionTypeEnum TransactionType { get; set; }
         public TransferTypeEnum TransferType { get; set; }
         public DateTimeOffset TransDate
         {
