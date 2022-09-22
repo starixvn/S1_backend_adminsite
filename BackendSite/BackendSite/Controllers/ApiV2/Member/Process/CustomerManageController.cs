@@ -3086,9 +3086,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > IP Log
-        public ApiListResult<CustLoginLog> GetIPLog(CustIdRequest request)
+        public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
         {
-            var IPLog = _custInfoBll.GetIPLog(request.CustId);
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,
