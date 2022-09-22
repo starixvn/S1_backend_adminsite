@@ -1068,9 +1068,10 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BlockEWalletAcc>("Admin_CustEWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
         }
-        public IEnumerable<CustLoginLog> GetIPLog(int custId)
+        public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
+            DateTime endDate)
         {
-            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { _CustId = custId }));
+            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { _CustId = custId, _StartDate = startDate, _EndDate = endDate }));
         }
         public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
         {

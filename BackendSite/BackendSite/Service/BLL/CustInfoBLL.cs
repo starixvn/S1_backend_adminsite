@@ -946,9 +946,10 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetEWalletList(custId);
         }
 
-        public IEnumerable<CustLoginLog> GetIPLog(int custId)
+        public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
+            DateTime endDate)
         {
-            var result =  _custInfoService.GetIPLog(custId);
+            var result =  _custInfoService.GetIPLog(custId, startDate, endDate);
             if (result != null)
             {
                 result.ToList().ForEach(x =>
