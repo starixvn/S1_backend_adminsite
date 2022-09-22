@@ -137,18 +137,7 @@ namespace BackendSite.Service.BLL
         
         /*public IEnumerable<BankInfoOff> GetAllBankInfoOff()
         {
-            var sBankInfoOffListKey = $"BankInfoOffList_All";
-            var bankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
-
-            if (bankInfoOffList == null)
-            {
-                bankInfoOffList = localBankService.GetAllBankAccountOff();
-                if (bankInfoOffList != null)
-                {
-                    cache.Set(sBankInfoOffListKey, bankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-                }
-            }
-
+            var bankInfoOffList = localBankService.GetAllBankAccountOff();
             return bankInfoOffList;
         }
 
@@ -170,52 +159,20 @@ namespace BackendSite.Service.BLL
         }*/
         public IEnumerable<BankInfoPay> GetBankInfoPay()
         {
-            var sBankInfoPayListKey = "BankInfoPayForPayout";
-            var BankInfoPayList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
-            if (BankInfoPayList == null)
-            {
-                BankInfoPayList = localBankService.GetBankInfoPayList();
-                if (BankInfoPayList != null)
-                {
-                    cache.Set(sBankInfoPayListKey, BankInfoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
-            }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoPayList;
+            var bankInfoPayList = localBankService.GetBankInfoPayList();
+            return bankInfoPayList;
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
         {
-            var sEWalletPayList = "EWalletPayList";
-            var eWalletPayList = cache.Get<IEnumerable<EWalletPay>>(sEWalletPayList);
-            if (eWalletPayList == null)
-            {
-                eWalletPayList = localBankService.GetEWalletPayList();
-                if (eWalletPayList != null)
-                {
-                    cache.Set(sEWalletPayList, eWalletPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
-            }
-            
+            var eWalletPayList = localBankService.GetEWalletPayList();
             return eWalletPayList;
         }
         
         public IEnumerable<BankInfoPay> GetCryptoPay()
         {
-            var sCryptoPayListKey = "CryptoPayForPayout";
-            var CryptoPayList = cache.Get<IEnumerable<BankInfoPay>>(sCryptoPayListKey);
-            if (CryptoPayList == null)
-            {
-                CryptoPayList = localBankService.GetCryptoPayList();
-                if (CryptoPayList != null)
-                {
-                    cache.Set(sCryptoPayListKey, CryptoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
-            }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return CryptoPayList;
+            var cryptoPayList = localBankService.GetCryptoPayList();
+            return cryptoPayList;
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
