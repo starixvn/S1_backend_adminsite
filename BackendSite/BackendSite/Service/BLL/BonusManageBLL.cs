@@ -248,9 +248,11 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetLeaderboardExtraPoint(activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
 
-        public bool CheckSpecialCodeDuplicate(string specialCode)
+        public bool CheckPromotionExists(string bonusCode, string specialCode)
         {
-            return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
+            bonusCode = (bonusCode ?? string.Empty).Trim();
+            specialCode = (specialCode ?? string.Empty).Trim();
+            return _bonusManageService.CheckPromotionExists(bonusCode, specialCode).ToList().Count > 0;
         }
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
