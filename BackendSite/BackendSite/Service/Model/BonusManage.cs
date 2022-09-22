@@ -438,11 +438,6 @@ namespace BackendSite.Service.Model
         [Description("TpId 傳入參數為0回傳 key 為 TpId，TpId 傳入參數大於0回傳 key 代表 Tp CategoryId")]
         public int Key { get; set; }
     }
-    public class CheckSpecialCodeDuplicate
-    {
-        public string BonusCode { get; set; }
-        public int SiteId { get; set; }
-    }
 
     public class TierAmount
     {

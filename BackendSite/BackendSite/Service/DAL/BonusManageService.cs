@@ -676,12 +676,13 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
-        public IEnumerable<CheckSpecialCodeDuplicate> CheckSpecialCodeDuplicate(string specialCode)
+        public IEnumerable<int> CheckPromotionExists(string bonusCode, string specialCode)
         {
             var p = new DynamicParameters();
+            p.Add("_BonusCode", bonusCode);
             p.Add("_SpecialCode", specialCode);
 
-            return _reportDbClient.Query<CheckSpecialCodeDuplicate>("Admin_PromotionSpecialCode_Get", p);
+            return _reportDbClient.Query<int>("Admin_PromotionExists_Get", p);
         }
         #endregion
 
