@@ -1253,4 +1253,5 @@ namespace BackendSite.Service.Model.enums
         HighRisk = 1
     }
     
+
 }
