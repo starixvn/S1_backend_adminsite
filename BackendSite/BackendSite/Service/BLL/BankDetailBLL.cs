@@ -88,18 +88,6 @@ namespace BackendSite.Service.BLL
             return bankDetailService.DelBankCard(input);
         }
 
-        public bool AddBankInfo(BankDetail bankDetail)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return bankDetailService.AddBankDetail(serverInfo.SiteId, bankDetail);
-        }
-
-        public bool EditBankInfo(BankDetail bankDetail)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return bankDetailService.EditBankDetail(serverInfo.SiteId, bankDetail);
-        }
-
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
             var sBankInfoSysListKey = $"SysBankList";

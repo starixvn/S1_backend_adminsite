@@ -501,7 +501,6 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult();
             var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit();
-            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
                 var authData = _authorizeBLL.GetAuthData();
@@ -663,7 +662,6 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBLL.GetAuthData();
-            string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
                 if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

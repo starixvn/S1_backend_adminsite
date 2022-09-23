@@ -85,8 +85,7 @@ namespace BackendSite.Service.DAL
                 var p = new DynamicParameters();
                 p.Add("@SiteId", bonusImportPara.SiteId);
                 p.Add("@UserName", bonusImportPara.UserName);
-                var customer = conn.Query<Customer>("Admin_CustInfoByUserName_Get", p, trans,
-                    commandType: CommandType.StoredProcedure).ToList();
+                var customer = _reportDbClient.Query<Customer>("Admin_CustInfoByUserName_Get", p).ToList();
 
                 //檢核是否有該筆UserName
                 if (customer.Count == 0)
@@ -99,8 +98,7 @@ namespace BackendSite.Service.DAL
                 {
                     var custBonusPara = new DynamicParameters();
                     custBonusPara.Add("@CustId", customer.FirstOrDefault().CustId);
-                    var bonusInfo = conn.Query<CustBonus>("Admin_CustBonus_Get", custBonusPara, trans,
-                        commandType: CommandType.StoredProcedure).ToList();
+                    var bonusInfo = _reportDbClient.Query<CustBonus>("Admin_CustBonus_Get", custBonusPara).ToList();
 
 
                     //查詢該名User是否有未完成的Bonus活動
@@ -126,8 +124,7 @@ namespace BackendSite.Service.DAL
                         para.Add("@Memo", bonusImportPara.Memo);
                         para.Add("@Prefix", "BD");
                         para.Add("@TransId", dbType: DbType.String, direction: ParameterDirection.Output);
-                        conn.Execute("Member_BonusInfo_Ins", para, transaction: trans,
-                            commandType: CommandType.StoredProcedure);
+                        _mainDbClient.Execute("Member_BonusInfo_Ins", para, conn, trans);
 
                         var transId = para.Get<string>("TransId");
                         int.TryParse(transId.Replace("BD", ""), out var bonusId);
@@ -147,8 +144,7 @@ namespace BackendSite.Service.DAL
                         para2.Add("@TYPE", 5);
                         para2.Add("@Memo", null);
                         para2.Add("@RefTransId", transId);
-                        conn.Execute("Common_Bonus_Ins", para2, transaction: trans,
-                            commandType: CommandType.StoredProcedure);
+                        _mainDbClient.Execute("Common_Bonus_Ins", para2, conn, trans);
                     }
                 }
 
@@ -314,19 +310,18 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public PromotionInfo GetPromotionFlow(string bonusCode, int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var promotion = GetPromotion(bonusCode, siteId, conn);
+            var promotion = GetPromotion(bonusCode, siteId);
 
             if (promotion != null)
             {
-                promotion.PromotionDisplayCondition = GetPromotionDisplayCondition(bonusCode, siteId, conn);
-                promotion.Specific = GetPromotionSpecific(bonusCode, siteId, conn);
+                promotion.PromotionDisplayCondition = GetPromotionDisplayCondition(bonusCode, siteId);
+                promotion.Specific = GetPromotionSpecific(bonusCode, siteId);
 
                 if (promotion.Specific != null)
                 {
                     if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
                     {
-                        var cashBackList = GetPromotionCashBack(bonusCode, siteId, conn);
+                        var cashBackList = GetPromotionCashBack(bonusCode, siteId);
                         var tempCashBackList = cashBackList
                             .GroupBy(x => new
                                 { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
@@ -381,22 +376,13 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public PromotionInfo GetPromotion(string bonusCode, int siteId,
-            MySqlConnection connection = null,
-            MySqlTransaction transaction = null)
+        public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
             var p = new DynamicParameters();
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            if (connection == null)
-            {
-                return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V3", p);
-            }
-            else
-            {
-                return connection.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V3", p, transaction, commandType: CommandType.StoredProcedure);
-            }
+            return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V3", p);
         }
 
         /// <summary>
@@ -407,23 +393,14 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public IEnumerable<PromotionSpecific> GetPromotionSpecific(string bonusCode, int siteId,
-            MySqlConnection connection = null,
-            MySqlTransaction transaction = null)
+        public IEnumerable<PromotionSpecific> GetPromotionSpecific(string bonusCode, int siteId)
         {
             var p = new DynamicParameters();
 
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            if (connection == null)
-            {
-                return _reportDbClient.Query<PromotionSpecific>("Admin_PromotionSpecificV3_Get", p);
-            }
-            else
-            {
-                return connection.Query<PromotionSpecific>("Admin_PromotionSpecificV3_Get", p, transaction, commandType: CommandType.StoredProcedure);
-            }
+            return _reportDbClient.Query<PromotionSpecific>("Admin_PromotionSpecificV3_Get", p);
         }
 
         /// <summary>
@@ -434,23 +411,14 @@ namespace BackendSite.Service.DAL
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        public IEnumerable<PromotionDisplayConditionModel> GetPromotionDisplayCondition(string bonusCode, int siteId,
-            MySqlConnection connection = null,
-            MySqlTransaction transaction = null)
+        public IEnumerable<PromotionDisplayConditionModel> GetPromotionDisplayCondition(string bonusCode, int siteId)
         {
             var p = new DynamicParameters();
 
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            if (connection == null)
-            {
-                return _reportDbClient.Query<PromotionDisplayConditionModel>("Admin_PromotionDisplayCondition_Get", p);
-            }
-            else
-            {
-                return connection.Query<PromotionDisplayConditionModel>("Admin_PromotionDisplayCondition_Get", p, transaction, commandType: CommandType.StoredProcedure);
-            }
+            return _reportDbClient.Query<PromotionDisplayConditionModel>("Admin_PromotionDisplayCondition_Get", p);
         }
 
         /// <summary>
@@ -752,7 +720,7 @@ namespace BackendSite.Service.DAL
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionV4_Set", p, transaction, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionV4_Set", p, connection, transaction);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
@@ -779,8 +747,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecific_Set_V5", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V5", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -808,8 +775,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecific_Del", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Del", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -837,8 +803,7 @@ namespace BackendSite.Service.DAL
             p.Add("_ConditionList", JsonConvert.SerializeObject(conditionData));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionDisplayCondition_Set", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Set", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -867,8 +832,7 @@ namespace BackendSite.Service.DAL
             p.Add("_ConditionList", JsonConvert.SerializeObject(conditionData));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionDisplayCondition_Del", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Del", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -894,7 +858,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewSpecialCode", newSpecialCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            connection.Execute("Admin_PromotionDuplicate_Set_V3", p, transaction, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionDuplicate_Set_V3", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
             return affectCount == 1;
@@ -921,8 +885,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionSpecificDuplicate_Set_V2", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionSpecificDuplicate_Set_V2", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -950,8 +913,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionDisplayConditionDuplicate_Set", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionDisplayConditionDuplicate_Set", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -982,7 +944,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", detailInfo);
             propsLog.Add("Operator", Operator);
-            return connection.Execute("Admin_AdjustmentInfoLog_Set", propsLog, transaction, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, connection, transaction);
         }
         #endregion
 
@@ -996,7 +958,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return connection.Execute("Admin_PromotionCashBack_Del", p, transaction, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_PromotionCashBack_Del", p, connection, transaction) > 0;
         }
 
         private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbackList,
@@ -1010,27 +972,17 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", Operator);
             p.Add("_CashBackList", JsonConvert.SerializeObject(cashbackList));
 
-            return connection.Execute("Admin_PromotionCashBack_Set", p, transaction, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_PromotionCashBack_Set", p, connection, transaction) > 0;
         }
 
-        public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId,
-            MySqlConnection connection = null,
-            MySqlTransaction transaction = null)
+        public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId)
         {
             var p = new DynamicParameters();
 
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            if (connection == null)
-            {
-
-                return _reportDbClient.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p);
-            }
-            else
-            {
-                return connection.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p, transaction, commandType: CommandType.StoredProcedure);
-            }
+            return _reportDbClient.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p);
         }
 
         private bool DuplicatePromotionCashBack(string bonusCode, int siteId, string newBonusCode,
@@ -1045,8 +997,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", Operator);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            connection.Execute("Admin_PromotionCashBackDuplicate_Set", p, transaction: transaction,
-                commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PromotionCashBackDuplicate_Set", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 

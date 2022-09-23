@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,26 +19,26 @@ namespace BackendSite.Service.BLL
             var appLinkTable =  appLinkTableService.GetAppLinkTable(siteId).ToList();
             var siteList = serverInfoService.GetSiteList().ToList();
 
-            if (appLinkTable.Find(x=> x.AppType == 1) == null){
+            if (appLinkTable.Find(x=> x.AppType == (int)AppLinkAppType.Andriod) == null){
                 appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
                     SiteName = siteList.Find(x=>x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
-                    AppType = 1,
-                    ProtocolType = 1
+                    AppType = (int)AppLinkAppType.Andriod,
+                    ProtocolType = (int)AppLinkProtocolType.HTTP
                 });
             }
 
-            if (appLinkTable.Find(x => x.AppType == 2) == null)
+            if (appLinkTable.Find(x => x.AppType == (int)AppLinkAppType.IOS) == null)
             {
                 appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
                     SiteName = siteList.Find(x => x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
-                    AppType = 2,
-                    ProtocolType = 1
+                    AppType = (int)AppLinkAppType.IOS,
+                    ProtocolType = (int)AppLinkProtocolType.HTTP
                 });
             }
 
