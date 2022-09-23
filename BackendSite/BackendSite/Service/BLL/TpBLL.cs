@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
                 tpWalletList = _thirdPartyService.GetTpWallet(custId);
                 var tasks = tpWalletList.Select(async x =>
                 {
-                    if(x.WalletType == (int)TpListWalletTypeEnum.FundTransfer) 
+                    if (x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
                     {
                         var tpInfo = new TpInfo
                         {
@@ -65,10 +65,10 @@ namespace BackendSite.Service.BLL
                             CustId = custId,
                         };
                         var apiResult = await GetBalanceAsync(tpInfo);
-                        if(apiResult.Data != null)
+                        if (apiResult.Data != null)
                         {
                             x.Balance = apiResult.Data.balance;
-                        }                    
+                        }
                     }
                 });
                 await Task.WhenAll(tasks);
@@ -150,7 +150,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
-        
+
         public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
@@ -180,7 +180,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetAdjustmentTpLog(siteId, tpId, custId, pageSize, ref pageNumber, ref totalPages, ref rowCount);
         }
-        
+
         public IEnumerable<TpAdjustmentLog> GetCustAdjustmentTpLog(GetCustTpAdjustmentLogParams input,
             int pageSize,
             int pageNumber,
@@ -229,7 +229,7 @@ namespace BackendSite.Service.BLL
         {
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
-        
+
         public async Task<IEnumerable<TpWallet>> GetTransferWalletAsync(int custId)
         {
             var sKey = $"TpWallet_{custId}";
@@ -283,10 +283,17 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
         {
             return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
         }
+
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int tpCategoryId)
+        {
+            var result =  await _thirdPartyService.GetTpGameTypeCurrency();
+            return result.Where(x => x.SiteId == siteId && x.TpCategoryId == tpCategoryId);
+        }
+
     }
 }

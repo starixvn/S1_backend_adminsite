@@ -152,6 +152,16 @@ namespace BackendSite.Service.Model
         public string CategoryName { get; set; }
     }
 
+    public class TpGameTypeCurrency
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int TpCategoryId { get; set; }
+        public string TpCategoryName { get; set; }
+        public int TpGameType { get; set; }
+        public string TpGameTypeName { get; set; }
+    }
+
     public class PromoCategory
     {
         public int Id { get; set; }
