@@ -9,7 +9,7 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<BonusReportDtoWrapper> GetBonusReportAsync(BonusReportRequest request);
+        Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request);
 
 
         /// <summary>
@@ -17,6 +17,6 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequest request);
+        Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request);
     }
 }
