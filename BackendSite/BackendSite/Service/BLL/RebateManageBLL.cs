@@ -136,7 +136,17 @@ namespace BackendSite.Service.BLL
                 PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null)
             };
             var rList = await _tpBLL.GetTpGameTypeCurremcyListAsync(siteId, currencyId);
-            result.CategoryDataList = rList.Select(x => new RebateCategoryList() { CategoryId = x.TpCategoryId, CategoryName = x.TpCategoryName, CategoryLevelList = GetRebateDataByCategory(siteId, x.TpCategoryId, currencyId) }).Distinct();
+            var categoryList = rList.Select(x => new { x.TpCategoryId, x.TpCategoryName }).Distinct();
+            var categoryDataList = new List<RebateCategoryList>();
+            foreach (var item in categoryList)
+                categoryDataList.Add(new RebateCategoryList()
+                {
+                    CategoryId = item.TpCategoryId,
+                    CategoryName = item.TpCategoryName,
+                    CategoryLevelList = GetRebateDataByCategory(siteId, item.TpCategoryId, currencyId)
+                }
+                );
+            result.CategoryDataList = categoryDataList;
             return result;
         }
         public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)
