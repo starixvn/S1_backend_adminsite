@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            var cacheTime = TimeSpan.FromMinutes(5);
+            var cacheTime = TimeSpan.FromMinutes(1);
 
             if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
