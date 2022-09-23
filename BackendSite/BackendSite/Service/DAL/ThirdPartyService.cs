@@ -185,5 +185,10 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameType_Get");
         }
+
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurrency()
+        {
+            return await _reportDbClient.QueryAsync<TpGameTypeCurrency>("Admin_TpGameTypeCurrency_Get");
+        }
     }
 }
