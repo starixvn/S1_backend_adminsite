@@ -82,19 +82,7 @@ namespace BackendSite.Service.BLL
         public bool SetPromotion(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
-            var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
-
-            //Display Condition Logic Process
-            if (vipLevelCondition.IsForVipLevel)
-            {
-                promotionDisplayConditionList.Add(new PromotionDisplayConditionModel()
-                {
-                    ConditionType = PromotionDisplayConditionType.VipLevel,
-                    Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
-                });
-            }
-
-            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList, Operator);
+            return _bonusManageService.SetPromotionFlow(isAdd, promotion, vipLevelCondition, Operator);
         }
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string Operator, string newSpecialCode, bool isSpecial)
