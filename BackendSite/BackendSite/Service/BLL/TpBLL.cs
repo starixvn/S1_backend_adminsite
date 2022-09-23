@@ -289,10 +289,10 @@ namespace BackendSite.Service.BLL
             return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
         }
 
-        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int tpCategoryId)
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
         {
             var result = await _thirdPartyService.GetTpGameTypeCurrency();
-            return result.Where(x => x.SiteId == siteId && x.TpCategoryId == tpCategoryId);
+            return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
     }
 }
