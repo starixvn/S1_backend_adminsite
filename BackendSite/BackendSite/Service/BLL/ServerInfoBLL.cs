@@ -16,9 +16,10 @@ namespace BackendSite.Service.BLL
         private readonly AuthorizeBLL authorizeBLL;
         private readonly PermissionBLL permissionBLL;
         private readonly NewAuthorizeBLL newAuthorizeBLL;
+        private readonly RebateManageBLL rebateManageBLL;
         private readonly NewAdminUserService newAdminUserService;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService,RebateManageBLL rebateManageBLL)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
@@ -28,6 +29,7 @@ namespace BackendSite.Service.BLL
             this.permissionBLL = permissionBLL;
             this.newAuthorizeBLL = newAuthorizeBLL;
             this.newAdminUserService = newAdminUserService;
+            this.rebateManageBLL = rebateManageBLL;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -251,5 +253,8 @@ namespace BackendSite.Service.BLL
         {
             return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
+
+        public IEnumerable<int> GetVipCurrencyList(int SiteId) => rebateManageBLL.GetRebatePeriodList(SiteId).Select(x=>x.CurrencyId).Distinct();
+
     }
 }
