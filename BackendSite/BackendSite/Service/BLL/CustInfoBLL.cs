@@ -307,14 +307,15 @@ namespace BackendSite.Service.BLL
                         WinlostAmount = tpBetRecord.WinlostAmount,
                         SettlementType = tpBetRecord.SettlementType,
                     })
+                .GroupBy(i => i.GameType)
                 .Select(i => new CustTurnoverRes
                 {
-                    UserName = i.UserName,
-                    GameType = i.GameType,
-                    GameName = i.GameName,
-                    StakeSettled = i.SettlementType == (int)SettlementType.SettledForValid ? i.Stake : 0,
-                    StakeNotRollover = i.SettlementType == (int)SettlementType.SettledForValidNotRollover ? i.Stake : 0,
-                    WinlostAmount = i.WinlostAmount
+                    UserName = i.First().UserName,
+                    GameType = i.Key,
+                    GameName = i.First().GameName,
+                    StakeSettled = i.Where( i=> i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
+                    StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
+                    WinlostAmount = i.Sum(i => i.WinlostAmount)
                 })
                 .ToList();
 
