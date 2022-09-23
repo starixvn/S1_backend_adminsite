@@ -26,7 +26,7 @@ namespace BackendSite.Service.BLL
                 slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
             });
 
-            rep.SlotGameDataList = slotGames;
+            rep.SlotGameDataList = SortSlotGamesList(slotGames);
             return rep;
         }
 
@@ -57,13 +57,14 @@ namespace BackendSite.Service.BLL
                 });
             }
 
-            rep.SlotGameCategoryList = slotGames;
+            rep.SlotGameCategoryList = SortSlotGamesList(slotGames);
             return rep;
         }
         public int SetSlotGameCategory(SetSlotGameCategoryReq req, string Operator)
         {
             return slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, (int)req.CategoryId, req.Status, Operator);
         }
+
         private SlotGameData GetSlotGameCurrencyStatus(string name, string status, DateTimeOffset updateTime, int tpId, string gameId, int id, string Operator, ServerInfo userSiteData)
         {
             string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
@@ -89,7 +90,7 @@ namespace BackendSite.Service.BLL
                 
             });
 
-            return (new SlotGameData
+            return new SlotGameData
             {
                 UpdateTime = updateTime,
                 TpId = tpId,
@@ -99,7 +100,12 @@ namespace BackendSite.Service.BLL
                 EName = eName,
                 CName = cName,
                 CurrencyStatusList = currencyStatusList
-            });
+            };
+        }
+
+        private List<SlotGameData> SortSlotGamesList(List<SlotGameData> list)
+        {
+            return  list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open)).ToList();
         }
     }
 }
