@@ -115,12 +115,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 49, 1 })]
         [HttpPost]
-        public async Task<ApiResult<RebateCurrencyData>> GetRebateInfo(GetRebateInfoRequest request)
+        public ApiResult<RebateCurrencyData> GetRebateInfo(GetRebateInfoRequest request)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _rebateManageBll.GeRebateInfoAsync(request.SiteId, request.CurrencyId)
+                Data = _rebateManageBll.GeRebateInfo(request.SiteId, request.CurrencyId)
             };
 
             return apiResult;
