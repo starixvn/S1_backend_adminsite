@@ -327,7 +327,6 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameter = new DynamicParameters();
 
             parameter.Add("_CustId", custId);
@@ -346,8 +345,13 @@ namespace BackendSite.Service.DAL
         }
         public bool SetCustNotes(int noteId, string note, int type, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustNotes_Set_V2", new { NoteId = noteId, Note = note, Type = type, Operator = Operator }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+
+            parameter.Add("NoteId", noteId);
+            parameter.Add("Note", note);
+            parameter.Add("Type", type);
+            parameter.Add("Operator", Operator);
+            return _mainDbClient.Execute("Admin_CustNotes_Set_V2", parameter) > 0;
         }
         public IEnumerable<LoginLog> GetLoginLogByCust(int custId, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int startIndex, out int totalPages, out int rowCount)
         {
@@ -359,36 +363,44 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<LoginLog>("Admin_LoginLogByCust_Get_V3", p, commandType: CommandType.StoredProcedure);
+
+            var depositList = _reportDbClient.Query<LoginLog>("Admin_LoginLogByCust_Get_V3", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
         public bool SetResetPwd(int custId, string md5NewPassword)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_ResetPwd_Set", new { CustId = custId, Md5NewPassword = md5NewPassword }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            parameter.Add("Md5NewPassword", md5NewPassword);
+            return _mainDbClient.Execute("Admin_ResetPwd_Set", parameter) > 0;
         }
         public bool ResetProfile(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_ResetProfile_Set_V2", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            return _mainDbClient.Execute("Admin_ResetProfile_Set_V2", parameter) > 0;
         }
         public bool ResetCustBankInfo(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_ResetCustBankInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            return _mainDbClient.Execute("Admin_ResetCustBankInfo_Set", parameter) > 0;
         }
         public bool ResetCustUSDTInfo(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_ResetCustUSDTInfo_Set", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            return _mainDbClient.Execute("Admin_ResetCustUSDTInfo_Set", parameter) > 0;
         }
         public bool SetCustStatus(int custId, int status, int taskId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustStatus_Set_V2", new { CustId = custId, Status = status, TaskId = taskId }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            parameter.Add("Status", status);
+            parameter.Add("TaskId", taskId);
+            return _mainDbClient.Execute("Admin_CustStatus_Set_V2", parameter) > 0;
         }
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
             int startIndex,
@@ -396,7 +408,6 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameter = new DynamicParameters();
 
             parameter.Add("_CustId", custId);
@@ -404,7 +415,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_StartIndex", startIndex);
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = conn.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V3", parameter, commandType: CommandType.StoredProcedure);
+            var data = _reportDbClient.Query<CustBankInfoLog>("Admin_BankInfoLogList_Get_V3", parameter);
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
@@ -417,7 +428,6 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameter = new DynamicParameters();
 
             parameter.Add("_CustId", custId);
@@ -425,7 +435,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_StartIndex", startIndex);
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = conn.Query<CustCryptoWalletLog>("Admin_CryptoWalletLogList_Get_V2", parameter, commandType: CommandType.StoredProcedure);
+            var data = _reportDbClient.Query<CustCryptoWalletLog>("Admin_CryptoWalletLogList_Get_V2", parameter);
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
@@ -435,7 +445,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustBonus>("Admin_CustBonus_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+
+            parameter.Add("CustId", custId);
+            return _reportDbClient.Query<CustBonus>("Admin_CustBonus_Get", parameter);
         }
 
         public class MutiSelect
@@ -560,7 +573,6 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public int DeleteOnUserData(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -568,7 +580,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_OnUser_Del";
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         /// <summary>
@@ -578,7 +590,6 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public int DeleteLineProfile(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -586,7 +597,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_CustLineProfile_Del";
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         public CustLineProfileModel GetCustLineProfile(int custId, string lineUserId)
