@@ -624,8 +624,8 @@ namespace BackendSite.Service.DAL
             props.Add("Description", input.After.Description);
             props.Add("Operator", input.Operator);
 
-            var success = conn
-                .Execute("Admin_Tag_Set", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_Tag_Set", props, conn, trans) > 0;
 
             if (success)
             {
@@ -640,7 +640,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -686,8 +686,8 @@ namespace BackendSite.Service.DAL
             props.Add("Id", input.After.Id);
             props.Add("Operator", input.Operator);
 
-            var success = conn
-                .Execute("Admin_TagStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_TagStatus_Set", props, conn, trans) > 0;
 
             if (success)
             {
@@ -701,7 +701,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -739,13 +739,15 @@ namespace BackendSite.Service.DAL
 
         public bool SetEnableDisablePromotion(int custId, int enablePromotion)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustInofoEnablePromotion_Set", new { CustId = custId, EnablePromotion = enablePromotion }, commandType: CommandType.StoredProcedure) > 0;
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("EnablePromotion", enablePromotion);
+            return _mainDbClient.Execute("Admin_CustInofoEnablePromotion_Set", props) > 0;
         }
 
         public async Task<bool> SetEnableRebateAsync(int custId, int status, MySqlConnection conn, MySqlTransaction trans)
         {
-            return await conn.ExecuteAsync("Admin_CustInfoEnableRebate_Set", new DynamicParameters(new { _CustId = custId, _EnableRebate = status }), trans, commandType: CommandType.StoredProcedure) > 0;
+            return await _mainDbClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", new DynamicParameters(new { _CustId = custId, _EnableRebate = status })) > 0;
         }
 
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
@@ -796,8 +798,8 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", input.SiteId);
             props.Add("Operator", input.Operator);
 
-            var success = conn
-                .Execute("Admin_RegLiveStatus_Set", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_RegLiveStatus_Set", props, conn, trans) > 0;
 
             if (success)
             {
@@ -811,7 +813,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -841,8 +843,8 @@ namespace BackendSite.Service.DAL
             props.Add("Note", string.IsNullOrWhiteSpace(input.After.Note) ? "" : input.After.Note);
             props.Add("Operator", input.Operator);
 
-            var success = conn
-                .Execute("Admin_CustRegLiveStatusNotes_Ins", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_CustRegLiveStatusNotes_Ins", props, conn, trans) > 0;
 
             if (success)
             {
@@ -856,7 +858,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -880,8 +882,8 @@ namespace BackendSite.Service.DAL
             props.Add("CustId", input.Before.CustId);
             props.Add("Id", input.Before.Id);
 
-            var success = conn
-                .Execute("Admin_CustRegLiveStatusNotes_Del", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_CustRegLiveStatusNotes_Del", props, conn, trans) > 0;
 
             if (success)
             {
@@ -895,7 +897,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", null, DbType.String);
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -921,8 +923,8 @@ namespace BackendSite.Service.DAL
             props.Add("Note", input.After.Note);
             props.Add("Operator", input.Operator);
 
-            var success = conn
-                .Execute("Admin_CustRegLiveStatusNotes_Set", props, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_CustRegLiveStatusNotes_Set", props, conn, trans) > 0;
 
             if (success)
             {
@@ -936,7 +938,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
@@ -982,13 +984,15 @@ namespace BackendSite.Service.DAL
 
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CustomerSwitchStatus>("Admin_CustSwitchStatus_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            return _reportDbClient.QueryFirst<CustomerSwitchStatus>("Admin_CustSwitchStatus_Get", props);
         }
         public CustProfileReq GetCustProfile(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CustProfileReq>("Admin_CustProfile_Get_V2", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            return _reportDbClient.QueryFirst<CustProfileReq>("Admin_CustProfile_Get_V2", props);
         }
 
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
@@ -1046,7 +1050,6 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameter = new DynamicParameters();
 
             parameter.Add("_CustId", custId);
@@ -1054,7 +1057,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_StartIndex", startIndex);
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = conn.Query<CustEWalletLog>("Admin_EWalletLogList_Get", parameter, commandType: CommandType.StoredProcedure);
+            var data = _reportDbClient.Query<CustEWalletLog>("Admin_EWalletLogList_Get", parameter);
 
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
@@ -1076,7 +1079,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            return await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam) > 0;
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
