@@ -19,13 +19,13 @@ namespace BackendSite.Service.BLL
             var appLinkTable =  appLinkTableService.GetAppLinkTable(siteId).ToList();
             var siteList = serverInfoService.GetSiteList().ToList();
 
-            if (appLinkTable.Find(x=> x.AppType == (int)AppLinkAppType.Andriod) == null){
+            if (appLinkTable.Find(x=> x.AppType == (int)AppLinkAppType.Android) == null){
                 appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
                     SiteName = siteList.Find(x=>x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
-                    AppType = (int)AppLinkAppType.Andriod,
+                    AppType = (int)AppLinkAppType.Android,
                     ProtocolType = (int)AppLinkProtocolType.HTTP
                 });
             }
