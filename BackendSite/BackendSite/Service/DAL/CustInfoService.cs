@@ -76,7 +76,7 @@ namespace BackendSite.Service.DAL
             {
                 if (selectStatus.ToList().Count == 0)
                 {
-                    var tempList = new List<int>() { 1, 2, 3 };
+                    var tempList = new List<int>() { (int)CustomerStatusEnum.Closed, (int)CustomerStatusEnum.Running, (int)CustomerStatusEnum.Suspend, (int)CustomerStatusEnum.Lock };
                     jsonSelectStatus = JsonConvert.SerializeObject(tempList);
                 }
                 else
@@ -180,8 +180,8 @@ namespace BackendSite.Service.DAL
             {
                 if (selectStatus.ToList().Count == 0)
                 {
-                    var templist = new List<int>() { 1, 2, 3 };
-                    SelectStatus = JsonConvert.SerializeObject(templist);
+                    var tempList = new List<int>() { (int)CustomerStatusEnum.Closed, (int)CustomerStatusEnum.Running, (int)CustomerStatusEnum.Suspend, (int)CustomerStatusEnum.Lock };
+                    SelectStatus = JsonConvert.SerializeObject(tempList);
                 }
                 else
                 {
@@ -228,14 +228,8 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var custInfoDetailList = conn.Query<T>("Admin_CustInfoSearchForExport_Get_V9", p, commandType: CommandType.StoredProcedure);
+            var custInfoDetailList = _reportDbClient.Query<T>("Admin_CustInfoSearchForExport_Get_V9", p);
             return custInfoDetailList;
-        }
-
-        public int GetVipLevel(int custId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.ExecuteScalar<int>("VipLevel_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
@@ -264,44 +258,54 @@ namespace BackendSite.Service.DAL
                 }), 600) > 0;
         }
 
-
-        public LastDepositAndWithdrawalTime GetCustDepositAndWithdrawalTime(int custId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var result = conn.QueryFirstOrDefault<LastDepositAndWithdrawalTime>("Admin_CustInfoOther", new { CustId = custId }, commandType: CommandType.StoredProcedure);
-            return result;
-        }
-
         public int SetCustStatusSwitch(int custId, int Op)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustStatusSwitch_Set", new { CustId = custId, Op }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            parameter.Add("Op", Op);
+            var result = _mainDbClient.Execute("Admin_CustStatusSwitch_Set", parameter);
             return result;
         }
 
         public int SetCustInfo(int custId, int? Level, string FullName, int? Birthday_Y, int? Birthday_M, int? Birthday_D, string PhoneNumber, string EMail, Dictionary<string, string> address, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustInfo_Set_V2", new { CustId = custId, Level, FullName, Birthday_Y, Birthday_M, Birthday_D, PhoneNumber, EMail, Address = JsonConvert.SerializeObject(address), Operator }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            parameter.Add("Level", Level);
+            parameter.Add("FullName", FullName);
+            parameter.Add("Birthday_Y", Birthday_Y);
+            parameter.Add("Birthday_M", Birthday_M);
+            parameter.Add("Birthday_D", Birthday_D);
+            parameter.Add("PhoneNumber", PhoneNumber);
+            parameter.Add("EMail", EMail);
+            parameter.Add("Address", JsonConvert.SerializeObject(address));
+            parameter.Add("Operator", Operator);
+            var result = _mainDbClient.Execute("Admin_CustInfo_Set_V2", parameter);
             return result;
         }
 
         public CustPhotoId GetCustPhotoId(int CustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<CustPhotoId>("Admin_CustPhotoId_Get", new { CustId = CustId }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", CustId);
+            return _reportDbClient.QueryFirst<CustPhotoId>("Admin_CustPhotoId_Get", parameter);
         }
 
         public int SetCustPhotoId(int custId, int siteId, string picFileName, byte[] photoIdPic)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustPhotoId_Ins", new { CustId = custId, SiteId = siteId, PicFileName = picFileName, PhotoIdPic = photoIdPic }, commandType: CommandType.StoredProcedure);
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            parameter.Add("SiteId", siteId);
+            parameter.Add("PicFileName", picFileName);
+            parameter.Add("PhotoIdPic", photoIdPic);
+            return _mainDbClient.Execute("Admin_CustPhotoId_Ins", parameter);
         }
 
         public bool DelCustPhotoId(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_CustPhotoId_Del", new { CustId = custId }, commandType: CommandType.StoredProcedure) > 0;
+            var parameter = new DynamicParameters();
+            parameter.Add("CustId", custId);
+            return _mainDbClient.Execute("Admin_CustPhotoId_Del", parameter) > 0;
         }
 
         public bool AddCustNote(int custId, string Note, string Operator, MySqlConnection conn = null, MySqlTransaction trans = null)
@@ -313,7 +317,7 @@ namespace BackendSite.Service.DAL
             }
             else
             {
-                return conn.Execute("Admin_CustNotes_Ins", new DynamicParameters(new { CustId = custId, Note = Note, Operator = Operator }), trans, commandType: CommandType.StoredProcedure) > 0;
+                return _mainDbClient.Execute("Admin_CustNotes_Ins", new DynamicParameters(new { CustId = custId, Note = Note, Operator = Operator }), conn, trans) > 0;
             }
         }
 
