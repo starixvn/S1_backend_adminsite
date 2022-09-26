@@ -639,6 +639,7 @@ namespace BackendSite.Service.Model.enums
         SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
         VerificationRewardSetting = 49,
+        SetFinanceAccount = 50,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
@@ -963,17 +964,31 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-
-    #region BankDetailOff
-
-    public enum PurposeEnum
+    
+    public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
         Withdrawal = 2,
-        DepositAndWithdrawal = 3
+        Transfer = 3
     }
 
-    public enum BankDetailOffStatusEnum
+    #region BankDetailOff
+
+    public enum BankDetailOffPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        [Description("Deposit & Withdrawal")]
+        DepositAndWithdrawal = 3
+    }
+    
+    public enum BankCardManagementPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum BankCardManagementStatusEnum
     {
         Initial = 0,     //Front-End Hidden
         Open = 1,        //Front-End green
@@ -1218,8 +1233,8 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-
-    public enum ShieldRiskTagged
+    
+     public enum ShieldRiskTagged
     {
         IsBot = 1,
         IsIncognito = 2,
