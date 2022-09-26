@@ -46,6 +46,14 @@ public class CustomerDto
     public string AddressLineSecond { get; set; }
 }
 
+public class CustomerTag
+{
+    public int Id { get; set; }
+    public string TagName { get; set; }
+    public string Description { get; set; }
+    public string TagColour { get; set; }
+}
+
 public class CustomerBasicInfo
 {
     public int CustId { get; set; }
@@ -77,7 +85,7 @@ public class CustomerBasicInfo
     public bool IsRisk { get; set; }
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
-    public List<int> TagList { get; set; }
+    public IEnumerable<CustomerTag> TagList { get; set; }
 }
 
 public class GetCustInfoWithBalanceRequest

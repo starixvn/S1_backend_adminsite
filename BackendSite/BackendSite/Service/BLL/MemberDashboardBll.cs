@@ -64,7 +64,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             IsRisk = customer.IsRisk,
             IsKyc = customer.IsKyc,
             IsTest = customer.IsTest,
-            TagList = string.IsNullOrEmpty(customer.TagList) ? null : JsonConvert.DeserializeObject<List<int>>(customer.TagList)
+            TagList = await _customerService.GetCustomerTagsAsync(customer.TagList)
         };
         return customerBasicInfo;
     }

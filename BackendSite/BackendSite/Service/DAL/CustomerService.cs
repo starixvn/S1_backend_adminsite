@@ -24,6 +24,13 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get", p);
     }
 
+    public async Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList)
+    {
+        var p = new DynamicParameters();
+        p.Add("_TagList", tagList);
+        return await _sqlClienct.QueryAsync<CustomerTag>("Admin_CustTag_Get", p);
+    }
+
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
