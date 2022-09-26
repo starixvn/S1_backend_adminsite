@@ -278,6 +278,7 @@ namespace BackendSite.Controllers.Api
                 startDate,
                 endDate, 
                 request.RefTransId,
+                null,
                 10, 
                 request.PageNumber, 
                 out var pageInfo);
