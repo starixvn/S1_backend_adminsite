@@ -67,7 +67,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            var list = data.OrderByDescending(i => i.Id).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
