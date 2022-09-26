@@ -39,7 +39,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var datas = _reportDbClient.Query<DomainTable>("Admin_DomainTablebySite_Get_V2", p);
+            var datas = _reportDbClient.Query<DomainTable>("Admin_DomainTablebySite_Get_V3", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;

@@ -60,8 +60,8 @@ namespace BackendSite.Controllers.Api
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
             _rebateManageBLL = rebateManageBLL;
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             this.courierAdapter = courierAdapter;
+            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
@@ -181,6 +181,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -275,7 +276,7 @@ namespace BackendSite.Controllers.Api
                 RedeemHours = promotion.RedeemHours,
                 PeriodType = promotion.PeriodType,
                 PeriodDay = promotion.PeriodDay,
-                SpecialCode = promotion.SpecialCode,
+                SpecialCode = promotion.IsSpecial ? promotion.SpecialCode : null,
                 IsSpecial = promotion.IsSpecial,
                 OnlyRegistered = promotion.OnlyRegistered,
                 PromotionDeviceType = promotion.PromotionDeviceType,
@@ -295,20 +296,17 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
-                if (isAdd && promotion.IsSpecial)
+                if (isAdd && _bonusManageBLL.CheckPromotionExists(req.BonusCode, req.SpecialCode))
                 {
-                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion.SpecialCode))
-                    {
-                        apiResult.ErrorCode = 999;
-                        apiResult.Message = "Duplicate Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = 999;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
 
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -349,15 +347,14 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if (duplicateRequest.IsSpecial)
+                duplicateRequest.NewSpecialCode = duplicateRequest.IsSpecial ? duplicateRequest.NewSpecialCode : null;
+                if (_bonusManageBLL.CheckPromotionExists(duplicateRequest.NewBonusCode ,duplicateRequest.NewSpecialCode))
                 {
-                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
-                    {
-                        apiResult.ErrorCode = 99;
-                        apiResult.Message = "Duplicate datas about Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = 99;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
+                
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(
                     duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
@@ -385,6 +382,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
