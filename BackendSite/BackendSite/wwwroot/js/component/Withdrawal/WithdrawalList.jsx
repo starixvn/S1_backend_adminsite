@@ -528,7 +528,7 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={3} type="button" className="btn btn-withdrawal-verified" onClick={this.onConfirm.bind(this, 3)}>Verified</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
                     btnGroup.push(<button key={4} type="button" className="btn btn-withdrawal-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
-                if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
+                if (data.status == 4 && data.withdrawalType == 2 && data.sameOperator)
                     btnGroup.push(<button key={6} type="button" className="btn btn-withdrawal-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
                 if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
