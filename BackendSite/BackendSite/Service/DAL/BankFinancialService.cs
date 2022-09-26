@@ -180,7 +180,6 @@ namespace BackendSite.Service.DAL
         {
             var count = 0;
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -264,7 +263,6 @@ namespace BackendSite.Service.DAL
 
         public int InsertTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -300,7 +298,6 @@ namespace BackendSite.Service.DAL
 
         public int UpdateTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -334,7 +331,6 @@ namespace BackendSite.Service.DAL
 
         public int InsertTransferInfoLog(ActionEnum action, BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -369,7 +365,6 @@ namespace BackendSite.Service.DAL
 
         public int DeleteTransferInfo(string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -470,7 +465,6 @@ namespace BackendSite.Service.DAL
 
         public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -485,7 +479,6 @@ namespace BackendSite.Service.DAL
 
         public int DeleteTransferInfoReceipt(string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -501,7 +494,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -518,7 +510,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -535,7 +526,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
