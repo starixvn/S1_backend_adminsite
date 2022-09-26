@@ -42,15 +42,20 @@ namespace BackendSite.Service.BLL
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
-            var key = $"FinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}:{refTransId}";
-            var cacheTime = TimeSpan.FromMinutes(15);
+            var key = $"GetFinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}";
+            if (!string.IsNullOrWhiteSpace(refTransId))
+            {
+                key += $":{refTransId}";
+            }
 
-            if (_cacheHelper.KeyExists(key))
+            var cacheTime = TimeSpan.FromMinutes(1);
+
+            if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
                 //Redis Pagination
-                var total = (int)_cacheHelper.GetListLength(key);
+                var total = (int)_cacheHelper.GetListLength(key, RedisDataBase.Shared);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
-                return _cacheHelper.GetListByRange<FinancialLog>(key, startIndex, endIndex);
+                return _cacheHelper.GetListByRange<FinancialLog>(key, startIndex, endIndex, RedisDataBase.Shared);
             }
 
             //Search range table
@@ -61,13 +66,13 @@ namespace BackendSite.Service.BLL
                 EndDate = endDate,
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
-            var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Admin_FinancialLogList_Get_V4", parameters);
+            var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
             var list = data.OrderByDescending(i => i.Id).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
             {
-                _cacheHelper.InsertList(key, cacheTime, list);
+                _cacheHelper.InsertList(key, cacheTime, list, RedisDataBase.Shared);
             });
 
             var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);

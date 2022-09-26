@@ -91,7 +91,7 @@ namespace BackendSite.Service.BLL
         {
             return _cacheHelper.TryGetOrCreate(
                 key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
-                timeSpan: TimeSpan.FromMinutes(15),
+                timeSpan: TimeSpan.FromMinutes(1),
                 factory: () =>
                 {
                     var data = _partitionService.GetTpBetRecord(StartTime, EndTime, "Admin_TpBetRecord_Get", new
