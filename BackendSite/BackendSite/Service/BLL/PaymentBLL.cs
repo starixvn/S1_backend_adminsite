@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -38,7 +39,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId,
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int? financialType,
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
@@ -46,6 +47,11 @@ namespace BackendSite.Service.BLL
             if (!string.IsNullOrWhiteSpace(refTransId))
             {
                 key += $":{refTransId}";
+            }
+
+            if (financialType != null)
+            {
+                key += $":{financialType}";
             }
 
             var cacheTime = TimeSpan.FromMinutes(1);
@@ -67,7 +73,12 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            var list = data.OrderByDescending(i => i.Id).ToList();
+            if (financialType != null)
+            {
+                data = FilterFinancialType(financialType.Value ,data).ToList();
+            }
+
+            var list = data.OrderByDescending(i => i.CreateTime).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
@@ -396,6 +407,37 @@ namespace BackendSite.Service.BLL
                 TierAmountList = checkData.TierAmountList,
                 BonusType = (int)checkData.BonusType,
                 PromotionType =checkData.PromotionType,            
+            };
+        }
+
+        private IEnumerable<FinancialLog> FilterFinancialType(int financialType, IEnumerable<FinancialLog> financials)
+        {
+            return (FinancialType)financialType switch
+            {
+                FinancialType.Deposit => financials.Where(i => i.Type == (int)FinancialType.Deposit || i.Type.IsBetween(101, 1000) || i.Memo.Contains("Deposit", StringComparison.OrdinalIgnoreCase)),
+                FinancialType.PaymentAdjustment => financials.Where(i => (i.Type.IsBetween(2, 3) || i.Type.IsBetween(7, 8)) && i.Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase)),
+                FinancialType.BonusReward => financials.Where(i => i.Type == (int)FinancialType.BonusReward),
+                FinancialType.LockedAmount => financials.Where(i => i.Type == (int)FinancialType.LockedAmount),
+                FinancialType.CancelledBonus => financials.Where(i => i.Type == (int)FinancialType.CancelledBonus && !i.Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase)),
+                FinancialType.CashReward => financials.Where(i => i.Type == (int)FinancialType.CashReward && !i.Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase)),
+                FinancialType.Commision => financials.Where(i => i.Type == (int)FinancialType.Commision),
+                FinancialType.BonusTransferIn => financials.Where(i => i.Type == (int)FinancialType.BonusTransferIn),
+                FinancialType.Rebate => financials.Where(i => i.Type == (int)FinancialType.Rebate),
+                FinancialType.CashBack => financials.Where(i => i.Type == (int)FinancialType.CashBack),
+                FinancialType.ReferFriendsRewards => financials.Where(i => i.Type == (int)FinancialType.ReferFriendsRewards),
+                FinancialType.VIPUpgradeReward => financials.Where(i => i.Type == (int)FinancialType.VIPUpgradeReward),
+                FinancialType.AffTransferToPlayer => financials.Where(i => i.Type == (int)FinancialType.AffTransferToPlayer),
+                FinancialType.RunningBonus => financials.Where(i => i.Type == (int)FinancialType.RunningBonus),
+                FinancialType.VerificationReward => financials.Where(i => i.Type == (int)FinancialType.VerificationReward),
+                FinancialType.Withdrawl => financials.Where(i => i.Type.IsBetween(1001, 2000)),
+                FinancialType.TpTransfer => financials.Where(i => i.Type.IsBetween(2001, 3000)),
+                FinancialType.TpWager => financials.Where(i => i.Type.IsBetween(11000, 12000)),
+                FinancialType.TpRefunds => financials.Where(i => i.Type.IsBetween(12001, 13000)),
+                FinancialType.TpPayout => financials.Where(i => i.Type.IsBetween(13001, 14000)),
+                FinancialType.TpPrize => financials.Where(i => i.Type.IsBetween(14001, 15000)),
+                FinancialType.TpUndo => financials.Where(i => i.Type.IsBetween(15001, 16000)),
+                FinancialType.TpTip => financials.Where(i => i.Type.IsBetween(16001, 17000)),
+                _ => financials,
             };
         }
     }
