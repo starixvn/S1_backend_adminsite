@@ -11,7 +11,7 @@ namespace BackendSite.Service.Model
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-
+        public int Type { get; set; }
         public string TypeName { get; set; }
         public DirectionEnum Direction { get; set; }
         public decimal ChangeAmount { get; set; }

@@ -488,6 +488,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public string RefTransId { get; set; }
+            public int? FinancialType { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -1722,6 +1723,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 startDate,
                 endDate,
                 request.RefTransId,
+                request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
                 out var pageInfo);
