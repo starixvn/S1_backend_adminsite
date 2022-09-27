@@ -640,7 +640,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", conn, trans) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
 
                 if (logSuccess)
                 {
