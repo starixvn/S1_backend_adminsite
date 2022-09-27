@@ -1039,6 +1039,47 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApproved" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualApproval(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualApproval(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualApproval Fail. {ex.Message}"
+                };
+            }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualReject" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualReject(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualReject(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualReject Fail. {ex.Message}"
+                };
+            }
+        }
         #region Private Methods
 
         /// <summary>

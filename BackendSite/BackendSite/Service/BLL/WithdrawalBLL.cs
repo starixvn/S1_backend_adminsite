@@ -27,6 +27,9 @@ namespace BackendSite.Service.BLL
         private readonly Common _common;
         private readonly WalletService _walletService;
         private readonly ILogger<WithdrawalBLL> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly string payApiUrl;
+        private readonly CourierAdapter _courierAdapter;
 
         private readonly Dictionary<int, bool> _isConvert = new Dictionary<int, bool>()
         {
@@ -54,6 +57,9 @@ namespace BackendSite.Service.BLL
             _walletService = provider.GetRequiredService<WalletService>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _configuration = provider.GetRequiredService<IConfiguration>();
+            payApiUrl = _configuration.GetValue<string>("PayService");
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
         }
 
         #endregion
@@ -1155,6 +1161,19 @@ namespace BackendSite.Service.BLL
             return _withdrawalLimitService.GetEWalletWithdrawalLimitInfo(siteId);
         }
 
+        public async Task<ApiResult<WithdrawalManualResponse>> WithdrawalManualApproval(WithdrawalManualRequest withdrawalManualRequest)
+        {
+            var url = $"{payApiUrl}WithdrawalManualApprove";
+            var response = await _courierAdapter.MyPostAsync<WithdrawalManualResponse, WithdrawalManualRequest>(url, withdrawalManualRequest);
+            return response;
+        }
+
+        public async Task<ApiResult<WithdrawalManualResponse>> WithdrawalManualReject(WithdrawalManualRequest withdrawalManualRequest)
+        {
+            var url = $"{payApiUrl}WithdrawalManualReject";
+            var response = await _courierAdapter.MyPostAsync<WithdrawalManualResponse, WithdrawalManualRequest>(url, withdrawalManualRequest);
+            return response;
+        }
         #endregion
 
         #region Private Methods
