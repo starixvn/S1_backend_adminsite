@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,7 +8,7 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BannerController : ControllerBase
@@ -39,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             private DateTimeOffset? _endTime;
             private DateTimeOffset? _sportBattleDateTime;
 
-            public bool isAdd { get; set; }
+            public bool IsAdd { get; set; }
             public int SiteId { get; set; }
             public string BannerName { get; set; }
             public BannerTypeEnum BannerType { get; set; }
@@ -68,7 +67,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int? TpId { get; set; }
             public string GameId { get; set; }
             public string UrlRouter { get; set; }
-
             public DateTimeOffset? SportBattleDateTime
             {
                 get => _sportBattleDateTime;
@@ -83,8 +81,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
             public IEnumerable<BannerDetails> Specific { get; set; }
             public int Sort { get; set; }
-            public string SiteName { get; set; }
-
         }
 
         public class GetBannerRequest
@@ -96,9 +92,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
 
@@ -108,12 +104,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public string BannerName { get; set; }
             public BannerStatusEnum Status { get; set; }
         }
+        
         public class GetHotEventListReq : ApiRequestPageModel
         {
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
-        public class GetHotEventreq
+        
+        public class GetHotEventReq
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
@@ -132,7 +130,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Edit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult<BannerInfo> GetBanner(GetBannerRequest request)
         {
@@ -169,7 +166,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiListResult<BannerInfoList> GetList(GetListRequest request)
         {
@@ -178,12 +174,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             {
                 var bannerTypeList = request.BannerTypes.Select(x => (int)x);
                 var statusList = request.Statuses.Select(x => (int)x);
-                var currencyIds = request.CurrencyIds.Select(x => x);
 
-                var data = _bannerManageBll.GetBannerList(request.SiteIds,
+                var data = _bannerManageBll.GetBannerList(
+                    new List<int>{request.SiteId},
                     bannerTypeList,
                     statusList,
-                    currencyIds,
+                    new List<int>{request.CurrencyId},
                     request.PageNumber,
                     request.PageSize,
                     out var totalPages, out var rowCount);
@@ -212,7 +208,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management  > [Edit] > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult SetBanner(SetRequest request)
         {
@@ -226,26 +221,25 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     BannerType = (int)request.BannerType,
                     ActionMode = (int)request.ActionMode,
                     ShowStatus = (int)request.ShowStatus,
-                    UnixStartTime = request.StartTime?.ToUnixTimeSeconds(),
-                    UnixEndTime = request.EndTime?.ToUnixTimeSeconds(),
+                    StartTime = request.StartTime,
+                    EndTime = request.EndTime,
                     BonusCode = request.BonusCode,
                     MatchId = request.MatchId,
                     TpId = request.TpId,
                     GameId = request.GameId,
                     UrlRouter = request.UrlRouter,
-                    UnixSportBattleDateTime = request.SportBattleDateTime?.ToUnixTimeSeconds(),
+                    SportBattleDateTime = request.SportBattleDateTime,
                     SportCategoryId = request.SportCategoryId,
                     SportLeaguesId = request.SportLeaguesId,
                     SportTeamsId = request.SportTeamsId,
                     Specific = request.Specific,
-                    Sort = request.Sort,
-                    SiteName = request.SiteName
+                    Sort = request.Sort
                 };
 
                 var user = _authorizeBll.GetAuthData().UserName;
                 var errorCode = _bannerManageBll.SetBanner(data, user);
 
-                if (request.isAdd)
+                if (request.IsAdd)
                 {
                     apiResult.ErrorCode = errorCode == 1 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
                 }
@@ -283,7 +277,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  Banner Management > Select [Available Sites] > [Status] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         [HttpPost]
         public ApiResult UpdateStatus(UpdateStatusRequest request)
         {
@@ -303,6 +296,33 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
 
+        /// <summary>
+        /// Banner/UpdateStatus 更新橫幅狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing >  Banner Management > Delete
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult DeleteBanner(GetBannerRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                apiResult.ErrorCode = _bannerManageBll.DeleteBanner(request.SiteId, request.BannerName, request.CurrencyId);
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
+        
         /// <summary>
         /// Banner/GetHotEventList
         /// </summary>
@@ -348,7 +368,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        public ApiResult<BannerInfo> GetHotEvent(GetHotEventreq req)
+        public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
         {
             var apiResult = new ApiResult<BannerInfo>();
             try

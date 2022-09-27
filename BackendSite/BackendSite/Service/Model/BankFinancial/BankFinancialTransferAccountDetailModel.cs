@@ -1,9 +1,11 @@
 ﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
     public class BankFinancialTransferAccountDetailModel
     {
+        private DateTimeOffset _initTime { set; get; }
         /// <summary>
         /// 讀寫 識別值ID
         /// </summary>
@@ -45,6 +47,9 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public string Purpose { get; set; }
 
+        public IEnumerable<TransferAccountPurposeEnum> Purposes =>
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{Purpose??string.Empty}]");
+
         /// <summary>
         /// 讀寫 付款方式
         /// </summary>
@@ -74,6 +79,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
+        
+        /// <summary>
+        /// 目前只 for INR IFSC. 使用
+        /// </summary>
+        public string AccountCode { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
@@ -84,6 +94,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 初始金額
         /// </summary>
         public decimal InitialAmount { get; set; }
+        public DateTimeOffset InitialTime
+        {
+            get => _initTime;
+            set => _initTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
 
         /// <summary>
         /// 讀寫 超過餘額警示
@@ -134,5 +149,48 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName { get; set; }
+
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
+    }
+    
+    public class BankFinancialTransferAccountExportModel
+    {
+        public int Id { get; set; }
+        public string SiteName { get; set; }
+        public string Currency { get; set; }
+        public string BankCode { get; set; }
+        public string Purpose { get; set; }
+        public string Channel { get; set; }
+        public string Agent { get; set; }
+        public string PayName { get; set; }
+        public string AccountNo { get; set; }
+        public string AccountName { get; set; }
+        public string DisplayName { get; set; }
+        public decimal InitialAmount { get; set; }
+        public decimal MaxBalanceAlertAmount { get; set; }
+        public string Remark { get; set; }
+        public string Status { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+        public string Creator { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public string Updator { get; set; }
+    }
+    
+    public class BankFinancialTransferAccount
+    {
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public int SysId { get; set; }
+        public string BankCode { get; set; }
+        public TransferChannelEnum Channel { get; set; }
+        public string Agent { get; set; }
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public string AccountNo { get; set; }
+        public string AccountName { get; set; }
+        public string DisplayName { get; set; }
+        public TransferAccountStatusEnum Status { get; set; }
     }
 }

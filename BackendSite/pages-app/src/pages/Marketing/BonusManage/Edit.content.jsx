@@ -470,10 +470,6 @@ export default ({ dispatch, state, action, IsAdd, processing }) => {
 									this,
 									state.currentTab
 								)}
-								EditTpGameCategoryValue={action.EditTpGameCategoryValue.bind(
-									this,
-									state.currentTab
-								)}
 								EditCashbackGameCategoryValue={action.EditCashbackGameCategoryValue.bind(
 									this,
 									state.currentTab
@@ -534,35 +530,6 @@ const SubPanel = props => {
 		}
 	);
 
-	let tpGameArr = props.state.tpGameCategory.map(
-		item => {
-			let switchKey = `tpgame-switch-${item.value}`;
-			let Data = props.state.specific[props.currencyId].tpGames;
-			let Locked = Boolean(Data[item.value]?.status);
-			let value = Data[item.value]?.percentage;
-			return (
-				<div key={`tpgame-${item.value}`} className="list__item" style={Locked ? { alignItems: "center", padding: "0.5rem", background: "#dcffee" } : { alignItems: "center", padding: "0.5rem" }}>
-					<label className="">
-						<span className="text">{item.displayText}</span>
-					</label>
-					<div className="switch__container">
-						<input id={switchKey} className="switch switch--flat" type="checkbox" checked={Locked} onChange={props.EditTpGameCategoryValue.bind(this, item.displayText, item.value, !Locked, "status")} />
-						<label htmlFor={switchKey}></label>
-					</div>
-					<InputBox
-						ClassName="input-item"
-						HideTitle={true}
-						value={value}
-						Disabled={!Locked}
-						OnChange={props.EditTpGameCategoryValue.bind(this, item.displayText, item.value)}
-						dataColumn="percentage"
-						type={'Number'}
-						iptSubClass='ratio'
-					/>
-				</div>
-			);
-		}
-	);
 	let cashbackGameArr = props.state.cashbackGameCategory.map(
 		item => {
 			let switchKey = `tpgame-switch-${item.value}`;
@@ -690,14 +657,12 @@ const SubPanel = props => {
 							</div>
 							<div className="row-flex ">
 								<div className="input-item">
-									{props.state.promotionType == 6 ? <label className="label">Tp Games</label> : <label className="label">CashBack Games</label>}
+								{props.state.promotionType == 7 ? <label className="label">CashBack Games</label> : null}
 								</div>
 							</div>
-							{props.state.promotionType == 6 ?<div className="row-flex ">
-								{tpGameArr}
-							</div>:<div className="row-flex ">
+							{props.state.promotionType == 7 ? <div className="row-flex ">
 								{cashbackGameArr}
-							</div>}
+							</div> : null}
 							
 						</>
 					) :
