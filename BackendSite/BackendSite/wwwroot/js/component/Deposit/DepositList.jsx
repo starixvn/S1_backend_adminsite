@@ -337,7 +337,7 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
-        /* Fatty pay 手動 Approval  */
+        /*  手動 Approval  */
         depositManualApproval() {
             let confirmString = "Are you sure deposit Manual Approval ?";
             if (confirm(confirmString)) {
