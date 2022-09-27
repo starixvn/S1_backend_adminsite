@@ -585,16 +585,32 @@ namespace BackendSite.Service.DAL
                 {
                     if (specific.CashBackSetting.CashBackTpInfos != null)
                     {
-                        
                         foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                         {
+                            var tpCategoryId = 0;
+                            if (promotion.WalletType == (int)PromotionWalletTypeEnum.Transfer || tpInfo.TpId == (int)TpEnum.SBSW)
+                            {
+                                tpCategoryId = tpInfo.CategoryId;
+                            }
+                            else
+                            {
+                                tpCategoryId = tpInfo.CategoryId switch
+                                {
+                                    (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
+                                    (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
+                                    (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
+                                    (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                                    _ => 0
+                                };
+                            }
+
                             vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
                             {
                                 cashBackList.Add(new PromotionCashBackSetting
                                 {
                                     CurrencyId = specific.CurrencyId,
                                     TpId = tpInfo.TpId,
-                                    CategoryId = tpInfo.CategoryId,
+                                    CategoryId = tpCategoryId,
                                     Level = vipLevel,
                                     Percentage = specific.CashBackSetting.Percentage,
                                     LossAmount = specific.CashBackSetting.LossAmount,

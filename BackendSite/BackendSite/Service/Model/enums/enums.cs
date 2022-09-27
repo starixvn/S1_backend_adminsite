@@ -474,7 +474,21 @@ namespace BackendSite.Service.Model.enums
         SpecialBonus = 8,
         RetentionFreeBet = 9
     }
-    
+
+    public enum PromotionCategoryEnum
+    {
+        SlotsGame = 1,
+        LiveCasino = 2,
+        Fish = 3,
+        SabaSports = 4,
+        Lottery = 5,
+        Sports = 6,
+        PTSlotsGame = 7,
+        PTLiveCasino = 8,
+        SBSW = 9,
+        Mega888SlotRNGAndFishing = 10
+    }
+
     public enum FullFillTypeEnum
     {
         RollOver = 1,
@@ -509,8 +523,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionWalletTypeEnum
     {
-        Transfer = 0,
-        Seamless = 1
+        Seamless = 1,
+        Transfer = 2
     }
 
     #endregion
@@ -916,7 +930,8 @@ namespace BackendSite.Service.Model.enums
     {
         Saba = 1,
         Mega = 22,
-        PT = 27
+        PT = 27,
+        SBSW = 41
     }
 
     public enum BalanceAdjustmentType
