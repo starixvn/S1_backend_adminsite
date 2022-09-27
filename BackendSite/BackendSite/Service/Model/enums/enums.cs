@@ -893,7 +893,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -1278,4 +1278,5 @@ namespace BackendSite.Service.Model.enums
         HighRisk = 1
     }
     
+
 }

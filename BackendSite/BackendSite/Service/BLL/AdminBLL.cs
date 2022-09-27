@@ -257,9 +257,6 @@ namespace BackendSite.Service.BLL
                             }
                         }                               
                     }
-                    else
-                        continue;
-
                 }
 
                 if (heirIdList.Contains(moduleData.Id))
