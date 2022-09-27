@@ -67,23 +67,6 @@ namespace BackendSite.Service.BLL
 
             return customer;
         }
-        public int GetVipLevelWithCache(int custId)
-        {
-            var key = $"VipLevelCache_{custId}";
-            var vipLevelCache = _cache.Get<int?>(key) ?? -1;
-            if (vipLevelCache != -1)
-            {
-                return vipLevelCache;
-            }
-
-            vipLevelCache = _custInfoService.GetVipLevel(custId);
-            if (vipLevelCache != 0)
-            {
-                _cache.Set(key, vipLevelCache, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-            }
-
-            return vipLevelCache;
-        }
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
