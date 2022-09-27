@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -19,6 +20,129 @@ namespace BackendSite.Service.Model
         public decimal AfterAmount { get; set; }
         public string RefTransId { get; set; }
         public string Memo { get; set; }
+        public FinancialType FinancialType 
+        {
+            get
+            {
+                if (Type == (int)FinancialType.Deposit || Type.IsBetween(101, 1000))
+                {
+                    return FinancialType.Deposit;
+                }
+
+                if ((Type.IsBetween(2, 3) || Type.IsBetween(7, 8)) && Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase))
+                {
+                    return FinancialType.PaymentAdjustment;
+                }
+
+                if (Type == (int)FinancialType.BonusReward)
+                {
+                    return FinancialType.BonusReward;
+                }
+
+                if (Type == (int)FinancialType.LockedAmount)
+                {
+                    return FinancialType.LockedAmount;
+                }
+
+                if (Type == (int)FinancialType.CancelledBonus && !Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase) )
+                {
+                    return FinancialType.CancelledBonus;
+                }
+
+                if (Type == (int)FinancialType.CashReward && !Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase))
+                {
+                    return FinancialType.CashReward;
+                }
+
+                if (Type == (int)FinancialType.Commision)
+                {
+                    return FinancialType.Commision;
+                }
+
+                if (Type == (int)FinancialType.BonusTransferIn)
+                {
+                    return FinancialType.BonusTransferIn;
+                }
+
+                if (Type == (int)FinancialType.Rebate)
+                {
+                    return FinancialType.Rebate;
+                }
+
+                if (Type == (int)FinancialType.CashBack)
+                {
+                    return FinancialType.CashBack;
+                }
+
+                if (Type == (int)FinancialType.ReferFriendsRewards)
+                {
+                    return FinancialType.ReferFriendsRewards;
+                }
+
+                if (Type == (int)FinancialType.VIPUpgradeReward)
+                {
+                    return FinancialType.VIPUpgradeReward;
+                }
+
+                if (Type == (int)FinancialType.AffTransferToPlayer)
+                {
+                    return FinancialType.AffTransferToPlayer;
+                }
+
+                if (Type == (int)FinancialType.RunningBonus)
+                {
+                    return FinancialType.RunningBonus;
+                }
+
+                if (Type == (int)FinancialType.VerificationReward)
+                {
+                    return FinancialType.VerificationReward;
+                }
+
+                if (Type.IsBetween(1001, 2000))
+                {
+                    return FinancialType.Withdrawl;
+                }
+
+                if (Type.IsBetween(2001, 3000))
+                {
+                    return FinancialType.TpTransfer;
+                }
+
+                if (Type.IsBetween(11001, 12000))
+                {
+                    return FinancialType.TpWager;
+                }
+
+                if (Type.IsBetween(12001, 13000))
+                {
+                    return FinancialType.TpRefunds;
+                }
+
+                if (Type.IsBetween(13001, 14000))
+                {
+                    return FinancialType.TpPayout;
+                }
+
+                if (Type.IsBetween(14001, 15000))
+                {
+                    return FinancialType.TpPrize;
+                }
+
+                if (Type.IsBetween(15001, 16000))
+                {
+                    return FinancialType.TpUndo;
+                }
+
+                if (Type.IsBetween(16001, 17000))
+                {
+                    return FinancialType.TpTip;
+                }
+
+                return FinancialType.Unknow;
+            }
+        }
+
     }
     public class BonusLog
     {

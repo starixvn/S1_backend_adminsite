@@ -2,6 +2,7 @@
 {
     public enum FinancialType
     {
+        Unknow = 0,                 //
         Deposit = 1,                //1 and 101 ~ 1000
         PaymentAdjustment = 2,      //2,3,7,8
         BonusReward = 5,            //5	
@@ -19,11 +20,11 @@
         VerificationReward = 20,    //20
         Withdrawl = 1001,           //1001 ~ 2000
         TpTransfer = 2001,          //2001 + tpId
-        TpWager = 11000,            //11000 + tpId
-        TpRefunds = 12000,          //12000 + tpId
-        TpPayout = 13000,           //13000 + tpId
-        TpPrize = 14000,            //14000 + tpId
-        TpUndo = 15000,             //15000 + tpId
-        TpTip = 16000               //16000 + tpId
+        TpWager = 11001,            //11000 + tpId
+        TpRefunds = 12001,          //12000 + tpId
+        TpPayout = 13001,           //13000 + tpId
+        TpPrize = 14001,            //14000 + tpId
+        TpUndo = 15001,             //15000 + tpId
+        TpTip = 16001               //16000 + tpId
     }
 }
