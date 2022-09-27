@@ -67,10 +67,9 @@ namespace BackendSite.Service.DAL
         public bool ChangePwd(int siteId, int userId, ChangePwd changePwd, out string Md5Userpwd)
         {
             Md5Userpwd = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters(new { SiteId = siteId, UserId = userId, Md5OldPassword = changePwd.OldPwd, Md5NewPassword = changePwd.NewPwd });
             p.Add("Md5Userpwd", dbType: DbType.String, direction: ParameterDirection.Output);
-            var result = conn.Execute("AdminAccountChangeSelfPwd_Set", p, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("AdminAccountChangeSelfPwd_Set", p);
             Md5Userpwd = p.Get<string>("Md5Userpwd");
             return result > 0;
         }

@@ -137,14 +137,16 @@ namespace BackendSite.Service.DAL
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get", new { _BonusId = bonusId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("_BonusId", bonusId);
+            return _reportDbClient.QueryFirst<CancelBonus>("Admin_BonusCancel_Get", props);
         }
 
         public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("BonusId", bonusId);
+            return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
@@ -159,7 +161,7 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, trans, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
             custId = p.Get<int?>("_CustId") ?? 0;
@@ -199,7 +201,7 @@ namespace BackendSite.Service.DAL
                 if (cancelBonusAmount > 0 && result > 0)
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = conn.Execute("Service_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
+                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", cp, conn, trans);
                 }
             }
 
