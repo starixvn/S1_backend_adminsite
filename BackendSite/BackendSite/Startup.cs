@@ -83,6 +83,8 @@ namespace BackendSite
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
+            services.AddTransient<IHotEventService, HotEventService>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
