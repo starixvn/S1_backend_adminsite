@@ -870,7 +870,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -1267,5 +1267,11 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
 }
