@@ -252,6 +252,10 @@
           {
             "DisplayKey": "Risk",
             "FuncKey": "f_wd_risk"
+          },
+          {
+            "DisplayKey": "Manual Approved And Reject",
+            "FuncKey": "f_wd_manualApprovedReject"
           }
         ]
       },
