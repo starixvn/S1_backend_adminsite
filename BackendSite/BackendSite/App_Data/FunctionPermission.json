@@ -254,12 +254,8 @@
             "FuncKey": "f_wd_risk"
           },
           {
-            "DisplayKey": "Manual Reject",
-            "FuncKey": "f_wd_manualReject"
-          },
-          {
-            "DisplayKey": "Manual Approved",
-            "FuncKey": "f_wd_manualApproved"
+            "DisplayKey": "Manual Approved And Reject",
+            "FuncKey": "f_wd_manualApprovedReject"
           }
         ]
       },
