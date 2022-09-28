@@ -1039,7 +1039,7 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApproved" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
         [HttpPost]
         public async Task<ApiResult> WithdrawalManualApproval(WithdrawalManualRequest para)
         {
@@ -1060,7 +1060,7 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualReject" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
         [HttpPost]
         public async Task<ApiResult> WithdrawalManualReject(WithdrawalManualRequest para)
         {
