@@ -1252,6 +1252,9 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
-
+    public enum BlockEWalletStatus
+    { 
+        Lock = 1,
+        Unlock = 2
+    }
 }

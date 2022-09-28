@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
@@ -11,22 +12,24 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration configuration;
         private readonly CourierAdapter courierAdapter;
         private readonly string commonServiceUrl;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public FireBaseService(IConfiguration configuration, CourierAdapter courierAdapter)
+        public FireBaseService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            this.courierAdapter = courierAdapter;
+            configuration = provider.GetRequiredService<IConfiguration>();
+            courierAdapter = provider.GetRequiredService<CourierAdapter>();
             commonServiceUrl = configuration.GetValue<string>("CommonService");
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public IEnumerable<FireBaseMessageInfo> GetFireBaseMessageList(int fireBaseId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<FireBaseMessageInfo>("Admin_FirebaseData_Get", new { FirebaseId = fireBaseId });
         }
         public IEnumerable<FireBaseCustInfo> GetFireBaseCustList(int siteId, int custId )
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<FireBaseCustInfo>("Admin_FirebaseCustList_Get",new { SiteId = siteId, CustId = custId });
         }
         public async Task<ApiResult<IEnumerable<FireBaseReturn>>> SendFireBaseNotificationAsync(IEnumerable<FireBaseMessage> fireBaseMessage)
         {
@@ -41,8 +44,7 @@ namespace BackendSite.Service.DAL
         }
         public bool UpdateFireBaseSendStatus(int firebaseId, int status)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_FirebaseUpdateStatus_Set", new { FirebaseId = firebaseId, Status = status }, commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_FirebaseUpdateStatus_Set", new { FirebaseId = firebaseId, Status = status }) > 0;
         }
     }
 }
