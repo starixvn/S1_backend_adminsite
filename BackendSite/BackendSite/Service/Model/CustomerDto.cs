@@ -9,6 +9,7 @@ public class GetCustomerBasicInfoRequest
 public class CustomerDto
 {
     public int SiteId { get; set; }
+    public string SiteName { get; set; }
     public int CustId { get; set; }
     public int VipLevel { get; set; }
     public string UserName { get; set; }
@@ -58,6 +59,7 @@ public class CustomerBasicInfo
 {
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }
     public string AccountName { get; set; }
