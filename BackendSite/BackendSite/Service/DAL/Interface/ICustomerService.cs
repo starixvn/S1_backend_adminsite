@@ -23,4 +23,5 @@ public interface ICustomerService
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
+    Task<int> DeleteLineProfileAsync(int custId);
 }

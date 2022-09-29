@@ -135,6 +135,11 @@ public class DeleteCustPhotoIdRequest
     public int Id { get; set; }
 }
 
+public class LineUnbindRequest
+{
+    public int CustId { get; set; }
+}
+
 public class SetFullNameRequest
 {
     public int CustId { get; set; }

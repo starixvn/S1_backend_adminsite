@@ -224,4 +224,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetVerificationRequest>(rewardUrl, verificationReq);
         return apiResult;
     }
+
+    public async Task<int> LineUnbind(int custId)
+    {
+        return await _customerService.DeleteLineProfileAsync(custId);
+    }
 }

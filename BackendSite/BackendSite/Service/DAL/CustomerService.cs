@@ -162,4 +162,10 @@ public class CustomerService : ICustomerService
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
+    
+    public async Task<int> DeleteLineProfileAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
+    }
 }
