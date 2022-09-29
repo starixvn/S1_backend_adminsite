@@ -1,116 +1,62 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.BLL
 {
     public class SlotGamesManagementBLL
     {
-        private readonly SlotGamesManagementService slotGamesManagementService;
-        private readonly ServerInfoService serverInfoService;
+        private readonly SlotGamesManagementService _slotGamesManagementService;
+        private readonly ServerInfoService _serverInfoService;
+
         public SlotGamesManagementBLL(SlotGamesManagementService slotGamesManagementService, ServerInfoService serverInfoService)
         {
-            this.slotGamesManagementService = slotGamesManagementService;
-            this.serverInfoService = serverInfoService;
+            _slotGamesManagementService = slotGamesManagementService;
+            _serverInfoService = serverInfoService;
         }
-
-        public GetSlotGameListRep GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status,int pageNumber,int pageSize, out int totalPages, out int rowCount)
+        
+        public IEnumerable<SlotGameData> GetSlotGameList(GetSlotGameListReq request, out IPageInfo pageInfo)
         {
-            var rep = new GetSlotGameListRep();
-            var slotGames = new List<SlotGameData>();
-            var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, gameId, status, pageNumber, pageSize, out totalPages, out rowCount);
-            var userSiteData = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
-            result.ForEach(x =>
-            {
-                slotGames.Add(GetSlotGameCurrencyStatus(x.Name,x.Status,x.UpdateTime,x.TpId,x.GameId,x.Id,x.Operator, userSiteData));
-            });
+            pageInfo = new PageInfo();
+            var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == request.SiteId);
 
-            rep.SlotGameDataList = SortSlotGamesList(slotGames);
-            return rep;
+            var result = _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, request.Status);    
+            var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
+            var data = SortSlotGamesList(slotGames).ToList();
+
+            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            return data.GetRange(index, count); 
         }
 
         public int SetSlotGame(SetSlotGameReq req, string Operator)
         {
-            return slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId,req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId,req.Status, Operator);
         }
 
-        public GetSlotGameCategoryListRep GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category,int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)
         {
-            var rep = new GetSlotGameCategoryListRep();
-            var slotGames = new List<SlotGameData>();
-            var userSiteData = serverInfoService.GetSiteList().ToList().Find(x => x.SiteId == siteId);
-            if (category == (int)SlotGameCategoryEnum.AllAndSetStatus)
-            {
-                var result = slotGamesManagementService.GetSlotGameList(siteId, tpId, name, gameId, SlotGameFilterStatusEnum.All, pageNumber, pageSize, out totalPages, out rowCount);
-                result.ForEach(x =>
-                {
-                    slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator, userSiteData));
-                });
-            }
-            else
-            {
-                var result = slotGamesManagementService.GetSlotGameCategoryList(siteId, tpId, name, gameId, category, pageNumber, pageSize, out totalPages, out rowCount);
-                result.ForEach(x =>
-                {
-                    slotGames.Add(GetSlotGameCurrencyStatus(x.Name, x.Status, x.UpdateTime, x.TpId, x.GameId, x.Id, x.Operator, userSiteData));
-                });
-            }
+            pageInfo = new PageInfo();
+            var userSiteData = _serverInfoService.GetSiteList().ToList().Find(x => x.SiteId == request.SiteId);
 
-            rep.SlotGameCategoryList = SortSlotGamesList(slotGames);
-            return rep;
+            var result = request.Category == SlotGameCategoryEnum.AllAndSetStatus ?
+                _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, SlotGameFilterStatusEnum.All) :
+                _slotGamesManagementService.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.GameId, request.Category);
+            var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
+            var data = SortSlotGamesList(slotGames).ToList();
+            
+            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            return data.GetRange(index, count);
         }
+
         public int SetSlotGameCategory(SetSlotGameCategoryReq req, string Operator)
         {
-            return slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, (int)req.CategoryId, req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, (int)req.CategoryId, req.Status, Operator);
         }
 
-        private SlotGameData GetSlotGameCurrencyStatus(string name, string status, DateTimeOffset updateTime, int tpId, string gameId, int id, string Operator, ServerInfo userSiteData)
+        private IEnumerable<SlotGameData> SortSlotGamesList(IEnumerable<SlotGameData> list)
         {
-            string eName = JsonConvert.DeserializeObject<SlotGameName>(name).en;
-            string cName = JsonConvert.DeserializeObject<SlotGameName>(name).ch;
-            List<CurrencyStatus> currencyStatusList = new List<CurrencyStatus>();
-            List<SlotGameStatus> slotGameStatusList = new List<SlotGameStatus>();
-            if (!string.IsNullOrWhiteSpace(status))
-            {
-                slotGameStatusList = JsonConvert.DeserializeObject<SlotGameStatus[]>(status).ToList();
-            }
-
-            userSiteData.ICurrencyList.ToList().ForEach(x =>
-            {
-                var CurrencyData = slotGameStatusList.Find(y => y.CurrencyId == x);
-                if(CurrencyData != null)
-                {
-                    currencyStatusList.Add(new CurrencyStatus { CurrencyId = x, Status = CurrencyData.Status });
-                }
-                else
-                {
-                    currencyStatusList.Add(new CurrencyStatus { CurrencyId = x, Status = (int)SlotGameStatusEnum.Closed });
-                }
-                
-            });
-
-            return new SlotGameData
-            {
-                UpdateTime = updateTime,
-                TpId = tpId,
-                GameId = gameId,
-                Id = id,
-                Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
-                EName = eName,
-                CName = cName,
-                CurrencyStatusList = currencyStatusList
-            };
-        }
-
-        private List<SlotGameData> SortSlotGamesList(List<SlotGameData> list)
-        {
-            return  list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open)).ToList();
+            return  list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open));
         }
     }
 }
