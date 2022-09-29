@@ -673,5 +673,95 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
+
+        /// <summary>
+        /// 取得玩家第三方調帳Log
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 53 })]
+
+        public async Task<ApiListResult<TpAdjustmentLogV2>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequestV2 request)
+        {
+            var apiResult = new ApiListResult<TpAdjustmentLogV2>();
+
+            try
+            {
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var result = await _custInfoBll.GetCustAdjustmentTpLogV2(request, siteId);
+                apiResult.Data = result.Data;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.TotalPages = result.TotalPages;
+                apiResult.RowCount = result.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// 取得玩家主錢包調帳Log
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 52 })]
+        public async Task<ApiListResultCurrencyAmount<PaymentAdjustmentV2>> GetAdjustmentInfoByCustId(AdjustmentInfoByCustIdRequest request)
+        {
+            var pageNumber = request.PageNumber;
+            var apiResult = new ApiListResultCurrencyAmount<PaymentAdjustmentV2>();
+
+            try
+            {
+                var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+                var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(siteId,
+                    request.CustId,
+                    request.StartDate.DateTime,
+                    request.EndDate.DateTime,
+                    request.PageSize, request.PageNumber);
+
+                apiResult.Data = queryResult.Data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.PageNumber = pageNumber;
+                apiResult.TotalPages = queryResult.TotalPages;
+                apiResult.RowCount = queryResult.RowCount;
+                apiResult.CurrencyAmountRecord = queryResult.CurrencyAmount;
+
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        /// <summary>
+        /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustomerBalanceInfo>> GetCustomerBalanceInfo(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<CustomerBalanceInfo>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberDashboardBll.GetCustomerBalanceInfoAsync(request.CustId)
+            };
+        }
     }
 }

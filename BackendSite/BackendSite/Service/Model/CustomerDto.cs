@@ -265,3 +265,36 @@ public class CustomerLoginIp
     public string LoginIp { get; set; }
     public int UserCount { get; set; }
 }
+
+
+public class CustomerBalanceInfo
+{
+    public decimal Balance { get; set; }
+    public decimal WithdrawalLimit { get; set; }
+    public decimal TurnOver { get; set; }
+    public decimal DepositSum { get; set; }
+    public int DepositCnt { get; set; }
+    public decimal WithdrawlSum { get; set; }
+    public int WithdrawlCnt { get; set; }
+    public decimal EffectiveBetSum { get; set; }
+    public decimal BonusSum { get; set; }
+    public int BonusCnt { get; set; }
+    public decimal TotalAdjustment { get; set; }
+
+    public decimal RemainingTurnOver 
+    {
+        get 
+        {
+            var remainingTurnOver = WithdrawalLimit - TurnOver;
+            return remainingTurnOver > 0 ? remainingTurnOver : 0;
+        }     
+    }
+
+    public decimal EligibleWithdrawal
+    {
+        get
+        {
+            return Balance - RemainingTurnOver;
+        }
+    }
+}

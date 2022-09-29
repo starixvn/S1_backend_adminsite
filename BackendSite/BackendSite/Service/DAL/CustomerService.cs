@@ -156,4 +156,10 @@ public class CustomerService : ICustomerService
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
+
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+    }
 }
