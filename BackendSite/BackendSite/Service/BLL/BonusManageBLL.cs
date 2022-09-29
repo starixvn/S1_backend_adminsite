@@ -82,19 +82,7 @@ namespace BackendSite.Service.BLL
         public bool SetPromotion(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
-            var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
-
-            //Display Condition Logic Process
-            if (vipLevelCondition.IsForVipLevel)
-            {
-                promotionDisplayConditionList.Add(new PromotionDisplayConditionModel()
-                {
-                    ConditionType = PromotionDisplayConditionType.VipLevel,
-                    Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
-                });
-            }
-
-            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList, Operator);
+            return _bonusManageService.SetPromotionFlow(isAdd, promotion, vipLevelCondition, Operator);
         }
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string Operator, string newSpecialCode, bool isSpecial)
@@ -248,9 +236,11 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetLeaderboardExtraPoint(activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
 
-        public bool CheckSpecialCodeDuplicate(string specialCode)
+        public bool CheckPromotionExists(string bonusCode, string specialCode)
         {
-            return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
+            bonusCode = (bonusCode ?? string.Empty).Trim();
+            specialCode = (specialCode ?? string.Empty).Trim();
+            return _bonusManageService.CheckPromotionExists(bonusCode, specialCode).ToList().Count > 0;
         }
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)

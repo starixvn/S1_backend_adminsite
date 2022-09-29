@@ -462,6 +462,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public string RefTransId { get; set; }
+            public int? FinancialType { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -1682,7 +1683,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
@@ -1694,6 +1695,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 startDate,
                 endDate,
                 request.RefTransId,
+                request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
                 out var pageInfo);
@@ -1754,7 +1756,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
         {
@@ -1780,7 +1782,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordByDay(
             CustTpBetRecordListOneDayReq req)
@@ -1808,7 +1810,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordByCategoryId(
             CustTpBetRecordListbyCategoryIdReq req)
@@ -1837,7 +1839,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
             CustTpBetRecordDetailListbyGameTypeReq req)
@@ -3063,9 +3065,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > IP Log
-        public ApiListResult<CustLoginLog> GetIPLog(CustIdRequest request)
+        public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
         {
-            var IPLog = _custInfoBll.GetIPLog(request.CustId);
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,

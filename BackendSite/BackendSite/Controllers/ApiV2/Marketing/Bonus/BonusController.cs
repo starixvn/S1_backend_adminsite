@@ -255,15 +255,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
-                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
-                if (request.IsAdd && request.PromotionInfo.IsSpecial)
+                request.PromotionInfo.SpecialCode = request.PromotionInfo.IsSpecial ? request.PromotionInfo.SpecialCode : null;
+                if (request.IsAdd && _bonusManageBll.CheckPromotionExists(request.PromotionInfo.BonusCode,
+                        request.PromotionInfo.SpecialCode))
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.PromotionInfo.SpecialCode))
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
-                        apiResult.Message = "Duplicate Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
 
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
@@ -304,15 +302,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             try
             {
-                if (request.IsSpecial)
+                request.NewSpecialCode = request.IsSpecial ? request.NewSpecialCode : null;
+                if (_bonusManageBll.CheckPromotionExists(request.NewBonusCode, request.NewSpecialCode))
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.NewSpecialCode))
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
-                        apiResult.Message = "Duplicate datas about Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
+                
                 apiResult.ErrorCode = _bonusManageBll.DuplicatePromotion(
                     request.BonusCode,
                     request.SiteId,

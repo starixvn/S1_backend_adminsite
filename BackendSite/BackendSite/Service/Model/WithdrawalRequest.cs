@@ -436,4 +436,16 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }
+    public class WithdrawalManualRequest
+    {
+        public string TransId { set; get; }
+        public string ThirdId { get; set; }
+        public string Operator { get; set; }
+    }
+    public class WithdrawalManualResponse
+    {
+        public int ErrorCode { get; set; }
+
+        public string Message { get; set; }
+    }
 }

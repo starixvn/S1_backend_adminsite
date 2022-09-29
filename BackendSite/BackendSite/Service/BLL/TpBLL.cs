@@ -152,6 +152,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
+
         public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
@@ -181,7 +182,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetAdjustmentTpLog(siteId, tpId, custId, pageSize, ref pageNumber, ref totalPages, ref rowCount);
         }
-        
+
         public IEnumerable<TpAdjustmentLog> GetCustAdjustmentTpLog(GetCustTpAdjustmentLogParams input,
             int pageSize,
             int pageNumber,
@@ -230,7 +231,7 @@ namespace BackendSite.Service.BLL
         {
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
-        
+
         public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
         {
             var key = $"TpCategory_{siteId}";
@@ -255,10 +256,16 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
         {
             return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
+        }
+
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
+        {
+            var result = await _thirdPartyService.GetTpGameTypeCurrency();
+            return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
     }
 }

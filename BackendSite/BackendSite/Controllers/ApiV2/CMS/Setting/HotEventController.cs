@@ -153,7 +153,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                await _hotEventBll.CreateHotEventAsync(request, "admin"); //todo User.Identity.Name
+                await _hotEventBll.CreateHotEventAsync(request, User.Identity.Name);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -177,7 +177,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                await _hotEventBll.SetHotEventData(request, "admin"); //todo User.Identity.Name
+                await _hotEventBll.SetHotEventData(request, User.Identity.Name);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -201,7 +201,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                await _hotEventBll.SetHotEventDataAsync(request, "admin"); //todo User.Identity.Name
+                await _hotEventBll.SetHotEventDataAsync(request, User.Identity.Name);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

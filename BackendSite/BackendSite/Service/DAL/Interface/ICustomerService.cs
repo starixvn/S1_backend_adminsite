@@ -5,6 +5,7 @@ namespace BackendSite.Service.DAL.Interface;
 public interface ICustomerService
 {
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
+    Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
     Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);
@@ -21,4 +22,5 @@ public interface ICustomerService
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
+    Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
 }

@@ -17,23 +17,16 @@ namespace BackendSite.Service.DAL
             _reportDbClient = dbClient.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
 
-        public List<SlotGameList> GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status, int pageNumber, int pageSize,out int totalPages,out int rowCount)
+        public IEnumerable<SlotGame> GetSlotGameList(int siteId, int tpId, string name, string gameId, SlotGameFilterStatusEnum status)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
-            parameter.Add("TpId", tpId, DbType.Int32);
-            parameter.Add("Status", (int)status, DbType.Int32);
+            parameter.Add("TpId", tpId, DbType.Int32);        
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
             parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
-            parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
-            parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
-            parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("Status", (int)status, DbType.Int32);
 
-            var result = _reportDbClient.Query<SlotGameList>("Admin_SlotGame_Get", parameter).ToList();
-            totalPages = parameter.Get<int?>("TotalPages") ?? 0;
-            rowCount = parameter.Get<int?>("RowCount") ?? 0;
-            return result;
+            return _reportDbClient.Query<SlotGame>("Admin_SlotGame_Get", parameter).ToList();
         }
 
         public int SetSlotGame(int siteId, int currencyId,int slotGameId, SlotGameStatusEnum status, string Operator)
@@ -48,23 +41,16 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
 
-        public List<SlotGameCategoryList> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category, int pageNumber, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<SlotGame> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
             parameter.Add("TpId", tpId, DbType.Int32);
-            parameter.Add("CategoryId", (int)category, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
             parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
-            parameter.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), dbType: DbType.Int32);
-            parameter.Add("PageSize", Math.Abs(pageSize), DbType.Int32);
-            parameter.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            parameter.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("CategoryId", (int)category, DbType.Int32);
 
-            var result = _reportDbClient.Query<SlotGameCategoryList>("Admin_SlotGameCategory_Get", parameter).ToList();
-            totalPages = parameter.Get<int?>("TotalPages") ?? 0;
-            rowCount = parameter.Get<int?>("RowCount") ?? 0;
-            return result;
+            return _reportDbClient.Query<SlotGame>("Admin_SlotGameCategory_Get", parameter).ToList();
         }
         public int SetSlotGameCategory(int siteId, int currencyId, int slotGameId, int categoryId, SlotGameStatusEnum status,string Operator)
         {

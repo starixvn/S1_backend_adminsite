@@ -24,6 +24,13 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get", p);
     }
 
+    public async Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList)
+    {
+        var p = new DynamicParameters();
+        p.Add("_TagList", tagList);
+        return await _sqlClienct.QueryAsync<CustomerTag>("Admin_CustTag_Get", p);
+    }
+
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
@@ -148,5 +155,11 @@ public class CustomerService : ICustomerService
     {
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
+    }
+
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
     }
 }

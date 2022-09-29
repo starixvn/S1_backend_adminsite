@@ -9,6 +9,7 @@ public class GetCustomerBasicInfoRequest
 public class CustomerDto
 {
     public int SiteId { get; set; }
+    public string SiteName { get; set; }
     public int CustId { get; set; }
     public int VipLevel { get; set; }
     public string UserName { get; set; }
@@ -46,10 +47,19 @@ public class CustomerDto
     public string AddressLineSecond { get; set; }
 }
 
+public class CustomerTag
+{
+    public int Id { get; set; }
+    public string TagName { get; set; }
+    public string Description { get; set; }
+    public string TagColour { get; set; }
+}
+
 public class CustomerBasicInfo
 {
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }
     public string AccountName { get; set; }
@@ -77,7 +87,7 @@ public class CustomerBasicInfo
     public bool IsRisk { get; set; }
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
-    public List<int> TagList { get; set; }
+    public IEnumerable<CustomerTag> TagList { get; set; }
 }
 
 public class GetCustInfoWithBalanceRequest
@@ -256,4 +266,37 @@ public class CustomerLoginIp
 {
     public string LoginIp { get; set; }
     public int UserCount { get; set; }
+}
+
+
+public class CustomerBalanceInfo
+{
+    public decimal Balance { get; set; }
+    public decimal WithdrawalLimit { get; set; }
+    public decimal TurnOver { get; set; }
+    public decimal DepositSum { get; set; }
+    public int DepositCnt { get; set; }
+    public decimal WithdrawlSum { get; set; }
+    public int WithdrawlCnt { get; set; }
+    public decimal EffectiveBetSum { get; set; }
+    public decimal BonusSum { get; set; }
+    public int BonusCnt { get; set; }
+    public decimal TotalAdjustment { get; set; }
+
+    public decimal RemainingTurnOver 
+    {
+        get 
+        {
+            var remainingTurnOver = WithdrawalLimit - TurnOver;
+            return remainingTurnOver > 0 ? remainingTurnOver : 0;
+        }     
+    }
+
+    public decimal EligibleWithdrawal
+    {
+        get
+        {
+            return Balance - RemainingTurnOver;
+        }
+    }
 }

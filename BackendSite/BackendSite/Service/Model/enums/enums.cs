@@ -482,7 +482,21 @@ namespace BackendSite.Service.Model.enums
         SpecialBonus = 8,
         RetentionFreeBet = 9
     }
-    
+
+    public enum PromotionCategoryEnum
+    {
+        SlotsGame = 1,
+        LiveCasino = 2,
+        Fish = 3,
+        SabaSports = 4,
+        Lottery = 5,
+        Sports = 6,
+        PTSlotsGame = 7,
+        PTLiveCasino = 8,
+        SBSW = 9,
+        Mega888SlotRNGAndFishing = 10
+    }
+
     public enum FullFillTypeEnum
     {
         RollOver = 1,
@@ -517,8 +531,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionWalletTypeEnum
     {
-        Transfer = 0,
-        Seamless = 1
+        Seamless = 1,
+        Transfer = 2
     }
 
     #endregion
@@ -527,8 +541,14 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionCashBackSettingStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Enable = 1,
+        Disable = 2
+    }
+    
+    public enum PromotionCashBackSettingLevelEnum
+    {
+        [Description("0代表包含所有 VIP 等級")]
+        All = 0
     }
 
     public enum ReferralCustStatusEnum
@@ -641,11 +661,11 @@ namespace BackendSite.Service.Model.enums
         SetEWalletWithdrawalLimitInfoStatus = 38,
         DepositRewardPointSetting = 39,
         TurnoverRewardPointSetting = 40,
-        TurnoverRewardPointGameTypeSetting = 46,
-        InactivePointExpirySetting = 47,
         RedemptionLimitSetting = 43,
         GiftManagement = 44,
         SetCustInfoEnableRebate = 45,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
         SetAdminUserStatus = 41,
         SetAdminUserPassword = 42,
         VerificationRewardSetting = 49,
@@ -770,7 +790,11 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 第三方支付
         /// </summary>
-        PSP = 3
+        PSP = 3,
+        
+        Finance = 4,
+        
+        MC = 5
     }
 
     /// <summary>
@@ -802,23 +826,22 @@ namespace BackendSite.Service.Model.enums
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
-    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
-        [Description("只有加項")] OnlyPlus = 1,
+        [Description("Plus")] OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
-        [Description("只有減項")] OnlyMinus = 2,
+        [Description("Minus")] OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
-        [Description("一加一減")] PlusAndMinus = 3
+        [Description("FromTo")] PlusAndMinus = 3
     }
 
     /// <summary>
@@ -827,50 +850,42 @@ namespace BackendSite.Service.Model.enums
     public enum TransferTypeEnum
     {
         Undefined = 0,
-        [Description("DEPOSIT")]
-        Deposit = 1,
-        [Description("WITHDRAWAL")]
-        Withdrawal = 2,
+        [Description("PSP")]
+        Psp = 2,
         [Description("LOCAL BANK")]
         LocalBank = 3,
-        [Description("OPENING BAL")]
-        OpeningBal = 4,
-        [Description("CLOSING BAL")]
-        ClosingBal = 5,
-        [Description("PSP")]
-        Psp = 6,
         [Description("BOUNC BACK")]
-        BounceBack = 7,
+        BounceBack = 4,
         [Description("MARKETING")]
-        Marketing = 8,
+        Marketing = 5,
         [Description("BONUS")]
-        Bonus = 9,
+        Bonus = 6,
         [Description("INTEREST")]
-        Interest = 10,
+        Interest = 7,
         [Description("TOP UP PHONE")]
-        ToUpPhone = 11,
+        ToUpPhone = 8,
         [Description("FEES")]
-        Fees = 12,
+        Fees = 9,
         [Description("UNCLAIM")]
-        Unclaimed = 13,
+        Unclaimed = 10,
         [Description("OVERCREDIT")]
-        OverCredit = 14,
+        OverCredit = 11,
         [Description("OVERPAID")]
-        OverPaid = 15,
+        OverPaid = 12,
         [Description("FRAUD")]
-        Fraud = 16,
+        Fraud = 13,
         [Description("FREEZE")]
-        Freeze = 17,
+        Freeze = 14,
         [Description("CURRENCY CONVERSION")]
-        CurrencyConversion = 18,
+        CurrencyConversion = 15,
         [Description("HEAD OFFICE")]
-        HeadOffice = 19,
+        HeadOffice = 16,
         [Description("FINANCE")]
-        Finance = 20,
+        Finance = 17,
+        [Description("ADVANCED")]
+        Advanced = 18,
         [Description("TEST")]
-        Test = 21,
-        [Description("OTHER")]
-        Other = 99
+        Test = 19
     }
 
     /// <summary>
@@ -913,7 +928,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -942,7 +957,8 @@ namespace BackendSite.Service.Model.enums
     {
         Saba = 1,
         Mega = 22,
-        PT = 27
+        PT = 27,
+        SBSW = 41
     }
 
     public enum BalanceAdjustmentType
@@ -1351,4 +1367,13 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    public enum HotGameTopCategory
+    {
+        HotGame = 1,
+        NewGame = 2,
+        Progressive = 3,
+        Featured = 4,
+        TopCasino = 5
+    }
 }

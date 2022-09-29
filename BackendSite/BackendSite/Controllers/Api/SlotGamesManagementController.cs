@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,37 +13,28 @@ namespace BackendSite.Controllers.Api
     [ApiExplorerSettings(IgnoreApi = true)]
     public class SlotGamesManagementController : ControllerBase
     {
-        private readonly ServerInfoBLL serverInfoBLL;
-        private readonly SlotGamesManagementBLL slotGamesManagementBLL;
-        public SlotGamesManagementController(ServerInfoBLL serverInfoBLL, SlotGamesManagementBLL slotGamesManagementBLL)
+        private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
+
+        public SlotGamesManagementController(SlotGamesManagementBLL slotGamesManagementBLL)
         {
-            this.serverInfoBLL = serverInfoBLL;
-            this.slotGamesManagementBLL = slotGamesManagementBLL;
+            _slotGamesManagementBLL = slotGamesManagementBLL;
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
-        public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq req)
+        public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq request)
         {
-
-            var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameList(req.SiteId, req.TpId, req.Name, req.GameId, req.Status, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
-                apiResult.TotalPages = TotalPages;
-                apiResult.RowCount = RowCount;
-                apiResult.Data = result.SlotGameDataList;
-                apiResult.PageNumber = req.PageNumber;
-                apiResult.ErrorCode = 0;
+                var data = _slotGamesManagementBLL.GetSlotGameList(request, out var pageInfo);
+                return new ApiListResult<SlotGameData>(ErrorCodeEnum.Success, pageInfo, data);
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
-
-            return apiResult;
         }
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
         public ApiResult SetSlotGame(SetSlotGameReq req)
@@ -50,7 +42,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                var result = slotGamesManagementBLL.SetSlotGame(req, User.Identity.Name);
+                var result = _slotGamesManagementBLL.SetSlotGame(req, User.Identity.Name);
                 if(result > 0)
                 {
                     apiResult.ErrorCode = 0;
@@ -67,27 +59,22 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
-        public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq req)
+        public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request)
         {
-            var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = slotGamesManagementBLL.GetSlotGameCategoryList(req.SiteId, req.TpId, req.Name, req.GameId, req.Category, req.PageNumber, req.PageSize, out int TotalPages, out int RowCount);
-                apiResult.TotalPages = TotalPages;
-                apiResult.RowCount = RowCount;
-                apiResult.Data = result.SlotGameCategoryList;
-                apiResult.PageNumber = req.PageNumber;
-                apiResult.ErrorCode = 0;
+                var data = _slotGamesManagementBLL.GetSlotGameCategoryList(request, out var pageInfo);
+                return new ApiListResult<SlotGameData>(ErrorCodeEnum.Success, pageInfo, data);
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
-            return apiResult;
         }
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
         public ApiResult SetSlotGameCategory(SetSlotGameCategoryReq req)
@@ -95,7 +82,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                var result = slotGamesManagementBLL.SetSlotGameCategory(req, User.Identity.Name);
+                var result = _slotGamesManagementBLL.SetSlotGameCategory(req, User.Identity.Name);
                 if (result > 0)
                 {
                     apiResult.ErrorCode = 0;

@@ -772,5 +772,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+
+        /// <summary>
+        /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustomerBalanceInfo>> GetCustomerBalanceInfo(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<CustomerBalanceInfo>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberDashboardBll.GetCustomerBalanceInfoAsync(request.CustId)
+            };
+        }
     }
 }

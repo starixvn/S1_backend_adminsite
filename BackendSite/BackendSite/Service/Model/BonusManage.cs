@@ -277,6 +277,15 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
     }
 
+    public class TpGameTypeCurrency
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int TpCategoryId { get; set; }
+        public string TpCategoryName { get; set; }
+        public int TpGameType { get; set; }
+        public string TpGameTypeName { get; set; }
+    }
     public class PromotionRebate
     {
         public int GameType { get; set; }
@@ -439,11 +448,6 @@ namespace BackendSite.Service.Model
         [Description("TpId 傳入參數為0回傳 key 為 TpId，TpId 傳入參數大於0回傳 key 代表 Tp CategoryId")]
         public int Key { get; set; }
     }
-    public class CheckSpecialCodeDuplicate
-    {
-        public string BonusCode { get; set; }
-        public int SiteId { get; set; }
-    }
 
     public class PromotionType
     {
@@ -456,6 +460,8 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public decimal RequiredAmount { get; set; }
+        public int RollOver { get; set; }
+        public int WinOver { get; set; }
     }
 
 
