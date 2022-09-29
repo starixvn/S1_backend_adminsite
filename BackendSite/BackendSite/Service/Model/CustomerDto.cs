@@ -25,7 +25,6 @@ public class CustomerDto
     public string AffiliatesName { get; set; }
     public string AffiliatesCode { get; set; }
     public DateTimeOffset RegTime { get; set; }
-    public DateTimeOffset? LineBindingTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
     public DateTimeOffset? LastDepositTime { get; set; }
@@ -67,6 +66,7 @@ public class CustomerBasicInfo
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
     public bool IsLineBinding { get; set; }
+    public CustLineProfileModel CustLineProfile { get; set; }
     public int Status { get; set; }
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
@@ -74,7 +74,6 @@ public class CustomerBasicInfo
     public string AffiliatesName { get; set; }
     public string AffiliatesCode { get; set; }
     public DateTimeOffset RegisteredTime { get; set; }
-    public DateTimeOffset? LineBindingTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
     public DateTimeOffset? LastActiveTime { get; set; }
@@ -134,6 +133,11 @@ public class DeleteCustPhotoIdRequest
 {
     public int CustId { get; set; }
     public int Id { get; set; }
+}
+
+public class LineUnbindRequest
+{
+    public int CustId { get; set; }
 }
 
 public class SetFullNameRequest

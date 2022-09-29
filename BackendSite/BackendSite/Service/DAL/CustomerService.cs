@@ -38,6 +38,12 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryAsync<CustomerLoginIp>("Admin_CustLoginIp_Get", p);
     }
 
+    public async Task<CustLineProfileModel> GetCustLineProfileAsync(int custId, string lineUserId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
+        return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
+    }
+
     public async Task<int> EditFullNameAsync(int custId, string fullName)
     {
         var p = new DynamicParameters();
@@ -161,5 +167,11 @@ public class CustomerService : ICustomerService
     {
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+    }
+
+    public async Task<int> DeleteLineProfileAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
     }
 }

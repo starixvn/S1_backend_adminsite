@@ -24,4 +24,5 @@ public interface IMemberDashboardBLL
     Task<int> ResetEWalletAsync(int custId);
     Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<int> LineUnbind(int custId);
 }

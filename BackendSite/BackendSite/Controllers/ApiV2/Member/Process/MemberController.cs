@@ -180,6 +180,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
+        /// <summary>
+        /// CustomerManage/LineUnbind 解除用戶Line帳號綁定
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > CustInfo [Line Unbind]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 47 })]
+        public async Task<ApiResult> LineUnbind(LineUnbindRequest request)
+        {
+            var result = await _memberDashboardBll.LineUnbind(request.CustId);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Line Unbind Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
+        }
 
         /// <summary>
         /// 取得玩家在第三方遊戲帳號
