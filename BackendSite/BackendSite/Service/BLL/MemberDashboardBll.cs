@@ -218,4 +218,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetVerificationRequest>(rewardUrl, verificationReq);
         return apiResult;
     }
+
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        return await _customerService.GetCustomerBalanceInfoAsync(custId);
+    }
 }
