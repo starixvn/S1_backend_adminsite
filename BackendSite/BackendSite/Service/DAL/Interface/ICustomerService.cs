@@ -7,6 +7,7 @@ public interface ICustomerService
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
     Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId);
+    Task<CustLineProfileModel> GetCustLineProfileAsync(int custId, string lineUserId);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> SetPhoneNoAsync(int custId, string phoneNo);
@@ -23,4 +24,5 @@ public interface ICustomerService
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<int> DeleteLineProfileAsync(int custId);
 }
