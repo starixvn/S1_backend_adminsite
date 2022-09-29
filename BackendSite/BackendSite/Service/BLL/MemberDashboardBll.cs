@@ -37,6 +37,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
         var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
+        var custLineProfile = await _customerService.GetCustLineProfileAsync(custId, null);
         var customerBasicInfo = new CustomerBasicInfo()
         {
             CustId = customer.CustId,
@@ -48,7 +49,8 @@ public class MemberDashboardBll : IMemberDashboardBLL
             PhoneVerified = customer.PhoneVerified,
             EmailVerified = customer.EmailVerified,
             ActStatus = customer.ActStatus,
-            IsLineBinding = customer.LineBindingTime.HasValue,
+            IsLineBinding = custLineProfile != null,
+            CustLineProfile = custLineProfile,
             Status = customer.Status,
             DepositPointLevel = customer.PointLevel,
             Currency = customer.CurrencyName,
@@ -56,7 +58,6 @@ public class MemberDashboardBll : IMemberDashboardBLL
             AffiliatesName = customer.AffiliatesName,
             AffiliatesCode = customer.AffiliatesCode,
             RegisteredTime = customer.RegTime,
-            LineBindingTime = customer.LineBindingTime,
             FirstDepositTime = customer.FirstDepositTime,
             LastLoginTime = customer.LastLoginTime,
             LastActiveTime = customer.LastDepositTime,
