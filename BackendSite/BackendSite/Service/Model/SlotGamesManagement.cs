@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -21,7 +22,8 @@ namespace BackendSite.Service.Model
             PageSize = 100;
         }
     }
-    public class SlotGameList
+
+    public class SlotGame
     {
         private DateTimeOffset _updateTime { get; set; }
         public DateTimeOffset UpdateTime
@@ -35,17 +37,44 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
         public string Status { get; set; }
         public string Operator { get; set; }
+
+        public SlotGameData GetSlotGameData( ServerInfo userSiteData)
+        {
+            var slotGameStatusList = string.IsNullOrWhiteSpace(Status)
+                ? new List<SlotGameStatus>() : JsonConvert.DeserializeObject<SlotGameStatus[]>(Status).ToList();
+            
+            var currencyStatusList = new List<CurrencyStatus>();
+            foreach (var currencyId in userSiteData.ICurrencyList)
+            {
+                currencyStatusList.Add(new CurrencyStatus
+                {
+                    CurrencyId = currencyId,
+                    Status = slotGameStatusList.Find(y => y.CurrencyId == currencyId)?.Status ?? (int)SlotGameStatusEnum.Closed
+                });
+            }
+
+            var nameObj = JsonConvert.DeserializeObject<SlotGameName>(Name);
+            return new SlotGameData
+            {
+                UpdateTime = UpdateTime,
+                TpId = TpId,
+                GameId = GameId,
+                Id = Id,
+                Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
+                EName = nameObj.en,
+                CName = nameObj.ch,
+                CurrencyStatusList = currencyStatusList
+            };
+        }
     }
+
     public class SlotGameName
     {
         public string en { get; set; }
         public string ch { get; set; }
         public string cs { get; set; }
     }
-    public class GetSlotGameListRep 
-    {
-        public List<SlotGameData> SlotGameDataList { get; set; }
-    }
+
     public class SlotGameData
     {
         public DateTimeOffset UpdateTime { get; set; }
@@ -95,30 +124,14 @@ namespace BackendSite.Service.Model
             PageSize = 100;
         }
     }
-    public class GetSlotGameCategoryListRep
-    {
-        public List<SlotGameData> SlotGameCategoryList { get; set; }
-    }
-    public class SlotGameCategoryList
-    {
-        private DateTimeOffset _updateTime { get; set; }
-        public DateTimeOffset UpdateTime
-        {
-            get => _updateTime;
-            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-        public int TpId { get; set; }
-        public int Id { get; set; }
-        public string GameId { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
-        public string Operator { get; set; }
-    }
+
+
     public class SlotGameStatus
     {
         public int CurrencyId { get; set; }
         public int Status { get; set; }
     }
+
     public class SetSlotGameCategoryReq
     {
         public int CurrencyId { get; set; }

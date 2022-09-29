@@ -51,24 +51,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameList(GetSlotGameListReq request)
         {
-
-            var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameList(request.SiteId, request.TpId, request.Name,request.GameId, request.Status, request.PageNumber, request.PageSize,out int TotalPages, out int RowCount);
-                apiResult.TotalPages = TotalPages;
-                apiResult.RowCount = RowCount;
-                apiResult.Data = result.SlotGameDataList;
-                apiResult.PageNumber = request.PageNumber;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var data = _slotGamesManagementBLL.GetSlotGameList(request, out var pageInfo);
+                return new ApiListResult<SlotGameData>(ErrorCodeEnum.Success, pageInfo, data);
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
-
-            return apiResult;
         }
 
         /// <summary>
@@ -118,23 +109,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
         public ApiListResult<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request)
         {
-            var apiResult = new ApiListResult<SlotGameData>();
             try
             {
-                var result = _slotGamesManagementBLL.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.GameId, request.Category, request.PageNumber, request.PageSize, out int TotalPages, out int RowCount);
-                apiResult.TotalPages = TotalPages;
-                apiResult.RowCount = RowCount;
-                apiResult.Data = result.SlotGameCategoryList;
-                apiResult.PageNumber = request.PageNumber;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                var data = _slotGamesManagementBLL.GetSlotGameCategoryList(request, out var pageInfo);
+                return new ApiListResult<SlotGameData>(ErrorCodeEnum.Success, pageInfo, data);
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
+                return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
-            return apiResult;
         }
+
         /// <summary>
         /// CategoryManagement/SetSlotGameCategory 
         /// </summary>
@@ -168,6 +153,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
+
         #endregion
     }
 }
