@@ -5,6 +5,7 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -226,11 +227,15 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
         
-        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
         {
-            var parameters = new DynamicParameters(new { _SiteId = siteId });
+            var parameters = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
+            });
             return _reportDbClient
-                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V2", parameters);
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V3", parameters);
         }
 
         public int GetTransferDataCount(string accountNo)
