@@ -122,6 +122,12 @@ namespace BackendSite.Service.Model.BankFinancial
     {
         public int SiteId { get; set; }
     }
+    
+    public class GetFinancialAccountListRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
+    }
 
     public class GetTransferInfoListRequest : ApiRequestPageModel
     {

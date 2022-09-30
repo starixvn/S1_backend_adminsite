@@ -16,6 +16,9 @@ Content-Type: application/json
 
 ###
 # 取得報表
+# channel | number array | nullable | 撈全部請帶null
+# agents | string array | nullable | 撈全部請帶null
+# financialAccountId | number array | nullable | 撈全部請帶null
 POST {{url}}/apiV2/BankFinancialReport/Get HTTP/1.1
 Content-Type: application/json
 
@@ -42,4 +45,32 @@ Content-Type: application/json
     "channel": null,
     "agents": null,
     "financialAccountIds": null
+}
+
+###
+# 取得 Agent 列表
+POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferChannelEnum"
+}
+
+###
+# 取得帳戶列表
+POST {{url}}/apiV2/BaseData/GetFinancialAccountList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "purposes": null
 }

@@ -70,10 +70,17 @@ namespace BackendSite.Service.BLL
         
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
         {
-            return _bankFinancialService.GetTransferAccountList(siteId);
+            return _bankFinancialService.GetTransferAccountList(siteId, new []
+            {
+                TransferAccountPurposeEnum.Transfer
+            });
         }
-
-
+        
+        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
+        }
+        
         #endregion
 
         #region Transfer Account Management
