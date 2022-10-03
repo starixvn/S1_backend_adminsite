@@ -16,7 +16,7 @@ namespace BackendSite.Service.Model
         public decimal LockedAmount { get; set; }
         public decimal BonusAmount { get; set; }
 
-        public DateTimeOffset ExpiryTime 
+        public DateTimeOffset ExpiryTime
         {
             get => _expiryTime;
             set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -73,12 +73,12 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public decimal Bonus { get; set; }
         public decimal Rollover { get; set; }
-        public DateTimeOffset ExpiryTime 
+        public DateTimeOffset ExpiryTime
         {
             get => _expiryTime;
             set => _expiryTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int TpId { get; set; }
     }
-    
+
     public class CancelBonus
     {
         public int BonusId { set; get; }
@@ -104,9 +104,9 @@ namespace BackendSite.Service.Model
         public decimal LockedAmount { set; get; }
         public int TpId { set; get; }
         public int WalletType { set; get; }
-        
+
     }
-    
+
     public class TpBonusCancelTransfer
     {
         public int TpId { set; get; }
@@ -118,5 +118,11 @@ namespace BackendSite.Service.Model
         public decimal RemainingBonus { set; get; }
         public decimal RefundAmount { set; get; }
         public bool UpdateBonusTransferStatus { set; get; }
+    }
+
+    public class BonusCodeInfo
+    {
+        public int BonusId { set; get; }
+        public string BonusCode { get; set; }
     }
 }

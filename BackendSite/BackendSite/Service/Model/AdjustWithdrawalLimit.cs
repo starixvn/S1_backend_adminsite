@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+
+namespace BackendSite.Service.Model
 {
     public class AdjustWithdrawalLimit
     {
@@ -30,5 +32,18 @@
         public decimal Balance { get; set; }
         public decimal DifferenceAmount { get; set; }
         public decimal AvailableBalance { get; set; }
+    }
+    
+    public class SetAdjustWithdrawalLimitParams
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public WithdrawalLimitAdjustmentAdjustTypeEnum AdjustType { get; set; }
+        public decimal Amount { get; set; }
+        public WithdrawalLimitAdjustmentReasonEnum ReasonId { get; set; }
+        public string Memo { get; set; }
+        public string Operator { get; set; }
     }
 }

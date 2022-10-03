@@ -563,29 +563,6 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        /// <summary>
-        /// CustManage/GetRebateInfo 取得客戶返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
-        /// 
-        /// </remarks>
-        /// <param name="custBonusReq"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
-        [HttpPost]
-        public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
-        {
-            var data = _paymentBll.GetRebateInfoByCust(custBonusReq.CustId);
-            return new ApiResult<IEnumerable<RebateInfo>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
         #endregion
 
         #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
@@ -1644,7 +1621,7 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    startTime,
                                                    endTime);
 
@@ -1845,11 +1822,9 @@ namespace BackendSite.Controllers.Api
                     case PromotionTypeEnum.FstDeposit:
                     case PromotionTypeEnum.ReDeposit:
                     case PromotionTypeEnum.FreeBet:
-                    case PromotionTypeEnum.WalletBonus:
-                    case PromotionTypeEnum.Rebate:
                     case PromotionTypeEnum.Cashback:
-                    case PromotionTypeEnum.StaticPage:
-                    case PromotionTypeEnum.RetentionBonus:
+                    case PromotionTypeEnum.SpecialBonus:
+                    case PromotionTypeEnum.RetentionFreeBet:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;
@@ -2663,7 +2638,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
-        
+
         #region CSD > Customer Administration > CustInfo > E Wallet Log
 
         /// <summary>

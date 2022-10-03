@@ -1,12 +1,16 @@
-﻿using BackendSite.Extensions;
+﻿using System.Drawing;
+using System.Transactions;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Newtonsoft.Json;
-using System.Drawing;
-using System.Transactions;
+using BackendSite.Service.Model.ApiModel;
+using NPOI.XSSF.UserModel;
+using NuGet.Packaging;
 
 namespace BackendSite.Service.BLL
 {
@@ -17,21 +21,29 @@ namespace BackendSite.Service.BLL
         private readonly BankFinancialService _bankFinancialService;
         private readonly PaymentManageService _paymentManageService;
         private readonly ReportService _reportService;
-        private readonly SelLangBLL _selLangBLL;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly AWSS3Helper _awsS3Helper;
+        private readonly ICacheHelper _cacheHelper;
+        private readonly string _bucketName;
+        private readonly string _bucketUrl;
+        private readonly string _folder;
 
         #endregion
 
         #region Constructors
 
-        public BankFinancialBLL(BankFinancialService bankFinancialService,
-                                PaymentManageService paymentManageService,
-                                ReportService reportService,
-                                SelLangBLL selLangBLL)
+        public BankFinancialBLL(IServiceProvider provider)
         {
-            _bankFinancialService = bankFinancialService;
-            _paymentManageService = paymentManageService;
-            _reportService = reportService;
-            _selLangBLL = selLangBLL;
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
+            _paymentManageService = provider.GetRequiredService<PaymentManageService>();
+            _reportService = provider.GetRequiredService<ReportService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
+            _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
+            _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
+            _folder = configuration.GetValue<string>("AwsFinanceFolder");
         }
 
         #endregion
@@ -40,7 +52,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialReasonModel> GetReason(string funcKey)
         {
-            return _bankFinancialService.GetReason(funcKey);
+            var key = $"Reason:{funcKey}";
+            
+            return _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => _bankFinancialService.GetReason(funcKey));
         }
 
         public IEnumerable<PayList> GetPayList()
@@ -52,8 +67,20 @@ namespace BackendSite.Service.BLL
         {
             return _bankFinancialService.GetTransferAccountList();
         }
-
-
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId, new []
+            {
+                TransferAccountPurposeEnum.Transfer
+            });
+        }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
+        }
+        
         #endregion
 
         #region Transfer Account Management
@@ -62,71 +89,136 @@ namespace BackendSite.Service.BLL
         {
             return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
+        
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoParams input)
+        {
+            return _bankFinancialService.GetTransferAccountInfoListV2(input);
+        }
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForExport(bool isSetting, int siteId, int id)
         {
             return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
+        
+        public IEnumerable<string> GetTransferAccountAgentList(int siteId)
+        {
+            return _bankFinancialService.GetTransferAccountAgentList(siteId)
+                .Where(x => !string.IsNullOrEmpty(x));
+        }
 
-        public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
+        public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel input, string updater)
         {
             var count = 0;
             var updateTransferDataFlag = false;
             var affectTransferData = 0;
             var oldData = new BankFinancialTransferAccountDetailModel();
+            var isCreate = input.Id == 0;
 
-            if (!CheckParameterForSetTransferAccount(bankFinancialTransferAccount, out var message))
+            if (!CheckParameterForSetTransferAccount(input, out var message))
             {
                 return (false, count, message);
             }
 
-            if (bankFinancialTransferAccount.Id != 0)
+            if (!isCreate)
             {
-                oldData = GetTransferAccountInfoListForDisplay(true, bankFinancialTransferAccount.SiteId, bankFinancialTransferAccount.Id).FirstOrDefault();
+                oldData = GetTransferAccountInfoListForDisplay(true, input.SiteId, input.Id).FirstOrDefault();
 
                 affectTransferData = _bankFinancialService.GetTransferDataCount(oldData.AccountNo);
 
                 if (affectTransferData > 0)
                 {
 
-                    updateTransferDataFlag = CheckKeyValueForSetTransferAccount(bankFinancialTransferAccount, oldData);
+                    updateTransferDataFlag = CheckKeyValueForSetTransferAccount(input, oldData);
                 }
             }
 
             var transferAccountModel = new BankFinancialTransferAccountModel
             {
-                Id = bankFinancialTransferAccount.Id,
-                SiteId = bankFinancialTransferAccount.SiteId,
-                SiteName = bankFinancialTransferAccount.SiteName,
-                CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                SysId = bankFinancialTransferAccount.SysId,
-                Purpose = SortPurpose(bankFinancialTransferAccount.Purpose),
-                Channel = bankFinancialTransferAccount.Channel,
-                Agent = bankFinancialTransferAccount.Agent == "" ? null : bankFinancialTransferAccount.Agent,
-                PayId = bankFinancialTransferAccount.PayId == 0 ? null : bankFinancialTransferAccount.PayId,
-                AccountNo = bankFinancialTransferAccount.AccountNo,
-                AccountName = bankFinancialTransferAccount.AccountName,
-                DisplayName = bankFinancialTransferAccount.DisplayName,
-                InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                Reason = bankFinancialTransferAccount.Reason == 0 ? null : bankFinancialTransferAccount.Reason,
-                Remark = bankFinancialTransferAccount.Remark,
-                Status = bankFinancialTransferAccount.Status,
-                //CreateTime = bankFinancialTransferAccount.CreateTime,
-                Creator = bankFinancialTransferAccount.Creator,
-                //UpdateTime = bankFinancialTransferAccount.UpdateTime,
-                Updator = bankFinancialTransferAccount.Updator
+                Id = input.Id,
+                SiteId = input.SiteId,
+                SiteName = input.SiteName,
+                CurrencyId = input.CurrencyId,
+                SysId = input.SysId,
+                Purpose = SortPurpose(input.Purpose),
+                Channel = input.Channel,
+                Agent = input.Agent == "" ? null : input.Agent,
+                PayId = input.PayId == 0 ? null : input.PayId,
+                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
+                AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
+                AccountName = input.AccountName,
+                DisplayName = input.DisplayName,
+                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
+                InitialAmount = input.InitialAmount,
+                InitialTime = input.InitialTime,
+                MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
+                Reason = input.Reason == 0 ? null : input.Reason,
+                Remark = input.Remark,
+                Status = input.Status,
+                Creator = isCreate ? input.Updator : oldData.Creator,
+                Updator = input.Updator
             };
 
-            if (transferAccountModel.Id == 0)
+            var logParams = new CreateAdminAdjustmentInfoLogInput
             {
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                Operator = updater,
+                ActionType = isCreate ? ActionType.Create : ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetFinanceAccount,
+                BeforeDetailInfo = isCreate ? null : JsonConvert.SerializeObject(new
+                {
+                    Id = oldData.Id,
+                    Purpose = GetPurpose(oldData.Purpose),
+                    Channel = oldData.Channel.ToString(),
+                    Agent = oldData.Agent,
+                    AccountNo = oldData.AccountNo,
+                    AccountName = oldData.AccountName,
+                    DisplayName = oldData.DisplayName,
+                    oldData.BankLoginUrl,
+                    oldData.BankLoginAccount,
+                    oldData.BankLoginPassword,
+                    InitialAmount = oldData.InitialAmount,
+                    InitialTime = oldData.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
+                    MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
+                    Remark = oldData.Remark,
+                    Status = oldData.Status.ToString()
+                }),
+                AfterDetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Purpose = GetPurpose(input.Purpose),
+                    Channel = input.Channel.ToString(),
+                    Agent = input.Agent,
+                    AccountNo = input.AccountNo,
+                    AccountName = input.AccountName,
+                    DisplayName = input.DisplayName,
+                    input.BankLoginUrl,
+                    input.BankLoginAccount,
+                    input.BankLoginPassword,
+                    InitialAmount = input.InitialAmount,
+                    InitialTime = input.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
+                    MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
+                    Remark = input.Remark,
+                    Status = input.Status.ToString()
+                })
+            };
+
+            if (isCreate)
+            {
+                if (input.Channel == TransferChannelEnum.LocalBank
+                    && _bankFinancialService.CheckTransferAccountExists(input.SiteId, transferAccountModel.AccountNo))
+                {
+                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
+                }
+                
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
                     {
                         scope.Dispose();
 
-                        return (false, count, "Insert Transfer Account Fail.");
+                        return (false, count, "Insert Transfer Account Fail. Duplicate AccountNo.");
                     };
 
                     if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
@@ -134,6 +226,13 @@ namespace BackendSite.Service.BLL
                         scope.Dispose();
 
                         return (false, count, "Insert Transfer Account Log Fail.");
+                    }
+
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    {
+                        scope.Dispose();
+
+                        return (false, count, "Insert Activity Log Fail.");
                     }
 
                     scope.Complete();
@@ -162,12 +261,19 @@ namespace BackendSite.Service.BLL
 
                     if (updateTransferDataFlag)
                     {
-                        if (_bankFinancialService.UpdateTransferInfo(bankFinancialTransferAccount, oldData) != affectTransferData)
+                        if (_bankFinancialService.UpdateTransferInfo(input, oldData) != affectTransferData)
                         {
                             scope.Dispose();
 
                             return (false, count, "Update Transfer Data Fail.");
                         }
+                    }
+                    
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    {
+                        scope.Dispose();
+
+                        return (false, count, "Insert Activity Log Fail.");
                     }
 
                     scope.Complete();
@@ -179,35 +285,15 @@ namespace BackendSite.Service.BLL
 
             return (true, count, message);
         }
-
+        
         #region Private Methods For GetTransferAccountInfoList
 
-        private string GetTransferId(TransferTypeEnum transferType)
+        private string GetTransferId()
         {
-            var prefix = string.Empty;
-            var nowDate = string.Empty;
-            var nowMaxNo = string.Empty;
-
-            switch (transferType)
-            {
-                case TransferTypeEnum.Deposit:
-                    prefix = "D";
-                    break;
-                case TransferTypeEnum.Withdrawal:
-                    prefix = "W";
-                    break;
-                case TransferTypeEnum.Transfer:
-                    prefix = "T";
-                    break;
-                case TransferTypeEnum.Other:
-                    prefix = "R";
-                    break;
-            }
-
-            (nowDate, nowMaxNo) = _bankFinancialService.NoAssign(prefix);
+            const string prefix = "T";
+            var (nowDate, nowMaxNo) = _bankFinancialService.NoAssign(prefix);
 
             return prefix + nowDate + nowMaxNo.PadLeft(4, '0');
-
         }
 
         #endregion
@@ -440,6 +526,25 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        private string GetPurpose(string purpose)
+        {
+            var result = string.Empty;
+
+            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
+
+            foreach (var i in purposeList)
+            {
+                switch (i)
+                {
+                    case 1: result += ",Deposit"; break;
+                    case 2: result += ",Withdrawal"; break;
+                    case 3: result += ",Transfer"; break;
+                }
+
+            }
+            return result.Substring(1);
+        }
 
         #endregion
 
@@ -470,7 +575,37 @@ namespace BackendSite.Service.BLL
                                                              transferId);
         }
 
-        public (bool Status, int Count, string Message) SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(
+            GetTransferInfoListParams input, int pageNumber, int pageSize, out IPageInfo pageInfo)
+        {
+            pageInfo = new PageInfo();
+            var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
+            var result =
+                _bankFinancialService.GetFinancialTransferInfoList(input, startIndex, pageSize, out _, out var rowCount);
+
+            pageInfo.SetPageInfo(rowCount, pageNumber, pageSize);
+            return result;
+        }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> ExportFinancialTransferInfoList(GetTransferInfoListParams input)
+        {
+            input.IsExport = true;
+            var result =
+                _bankFinancialService.GetFinancialTransferInfoList(input, 0, 0, out _, out _);
+
+            return result;
+        }
+        
+        public BankFinancialTransferInfoTransDetailModel GetFinancialTransferInfoById(string transferId)
+        {
+            var result =
+                _bankFinancialService.GetFinancialTransferInfoList(new GetTransferInfoListParams(transferId),
+                    0, 0, out _, out _);
+
+            return result.FirstOrDefault();
+        }
+
+        public async Task<(bool Status, int Count, string Message)> SetTransferInfo(BankFinancialTransferInfoTransDetailModel bankFinancialTransferInfoDetail, IFormFile transferReceipt)
         {
             var count = 0;
 
@@ -481,7 +616,7 @@ namespace BackendSite.Service.BLL
                 return (false, count, message);
             }
 
-            if (bankFinancialTransferInfoDetail.TransferType != TransferTypeEnum.Other)
+            if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus)
             {
                 if (!CheckParameterForSetTransferInfo(bankFinancialTransferInfoDetail, out message))
                 {
@@ -506,11 +641,11 @@ namespace BackendSite.Service.BLL
 
             if (bankFinancialTransferInfoDetail.TransferId == null)
             {
-                using (var scope = new TransactionScope())
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    var TransferId = GetTransferId(bankFinancialTransferInfoDetail.TransferType);
-                    transferInfoFromModel.TransferId = TransferId;
-                    transferInfoToModel.TransferId = TransferId;
+                    var transferId = GetTransferId();
+                    transferInfoFromModel.TransferId = transferId;
+                    transferInfoToModel.TransferId = transferId;
 
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
@@ -550,7 +685,7 @@ namespace BackendSite.Service.BLL
 
                     if (transferReceipt != null)
                     {
-                        if (InsertTransferReceipt(transferReceipt, TransferId) != 1)
+                        if (!await InsertTransferReceipt(transferReceipt, transferId))
                         {
                             scope.Dispose();
 
@@ -566,8 +701,9 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                using (var scope = new TransactionScope())
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
+                    var before = GetFinancialTransferInfoById(bankFinancialTransferInfoDetail.TransferId);
                     if (bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.PlusAndMinus ||
                        bankFinancialTransferInfoDetail.TransactionType == TransactionTypeEnum.OnlyMinus)
                     {
@@ -608,12 +744,97 @@ namespace BackendSite.Service.BLL
 
                     if (transferReceipt != null)
                     {
-                        if (InsertTransferReceipt(transferReceipt, bankFinancialTransferInfoDetail.TransferId) > 2)
+                        if (!await InsertTransferReceipt(transferReceipt, bankFinancialTransferInfoDetail.TransferId))
                         {
                             scope.Dispose();
 
                             return (false, count, "Update Transfer Receipt Fail.");
                         }
+                    }
+                    
+                    var after = GetFinancialTransferInfoById(bankFinancialTransferInfoDetail.TransferId);
+
+                    #region logParams
+
+                    var logParams = new CreateAdminAdjustmentInfoLogInput
+                    {
+                        SiteId = bankFinancialTransferInfoDetail.FromSiteId,
+                        CurrencyId = bankFinancialTransferInfoDetail.FromCurrencyId,
+                        Operator = bankFinancialTransferInfoDetail.UpdatorName,
+                        ActionType = ActionType.Update,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.TransferInfoManagement,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            before.TransferId,
+                            TransactionType = before.TransactionType.ToString(),
+                            TransferType = before.TransferType.ToString(),
+                            before.TransDate,
+                            FromSite = before.FromSiteName,
+                            FromCurrency = before.FromIsoCode,
+                            FromChannel = before.FromChannel.ToString(),
+                            before.FromAgent,
+                            before.FromPayName,
+                            before.FromUserName,
+                            before.FromIsoCode,
+                            before.FromBankCode,
+                            before.FromAccountNo,
+                            before.FromAccountDisplayName,
+                            before.FromAmount,
+                            before.FromFee,
+                            ToSite = before.ToSiteName,
+                            ToCurrency = before.ToIsoCode,
+                            ToChannel = before.ToChannel.ToString(),
+                            before.ToAgent,
+                            before.ToPayName,
+                            before.ToUserName,
+                            before.ToIsoCode,
+                            before.ToBankCode,
+                            before.ToAccountNo,
+                            before.ToAccountDisplayName,
+                            before.ToAmount,
+                            before.ToFee,
+                            before.Remark
+                        }),
+                        AfterDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            TransactionType = after.TransactionType.ToString(),
+                            TransferType = after.TransferType.ToString(),
+                            after.TransDate,
+                            FromSite = after.FromSiteName,
+                            FromCurrency = after.FromIsoCode,
+                            FromChannel = after.FromChannel.ToString(),
+                            after.FromAgent,
+                            after.FromPayName,
+                            after.FromUserName,
+                            after.FromIsoCode,
+                            after.FromBankCode,
+                            after.FromAccountNo,
+                            after.FromAccountDisplayName,
+                            after.FromAmount,
+                            after.FromFee,
+                            ToSite = after.ToSiteName,
+                            ToCurrency = after.ToIsoCode,
+                            ToChannel = after.ToChannel.ToString(),
+                            after.ToAgent,
+                            after.ToPayName,
+                            after.ToUserName,
+                            after.ToIsoCode,
+                            after.ToBankCode,
+                            after.ToAccountNo,
+                            after.ToAccountDisplayName,
+                            after.ToAmount,
+                            after.ToFee,
+                            after.Remark
+                        })
+                    };
+
+                    #endregion
+                    
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    {
+                        scope.Dispose();
+
+                        return (false, count, "Insert Transfer Info, Create Admin Adjustment Info Log Fail.");
                     }
 
                     scope.Complete();
@@ -626,7 +847,7 @@ namespace BackendSite.Service.BLL
             return (true, count, message);
         }
 
-        public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId)
+        public (bool Status, int Count, string Message) DeleteTransferInfo(string transferId, string @operator = "")
         {
             var count = 0;
             string message;
@@ -634,27 +855,10 @@ namespace BackendSite.Service.BLL
             if (transferId != null)
             {
                 //Step1:Get Data
-                var getData = _bankFinancialService.GetTransferInfoList(true,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             null,
-                                                             transferId);
-
+                var data = GetFinancialTransferInfoById(transferId);
                 var transferInfoReceiptModel = _bankFinancialService.GetTransferInfoReceipt(transferId);
 
-                BankFinancialTransferInfoTransDetailModel data;
-
-
-                if (getData.Count() == 1)
-                {
-                    data = getData.FirstOrDefault();
-                }
-                else
+                if (data == null)
                 {
                     return (false, count, "Delete Transfer Info Data Fail.Data is not exist.");
                 }
@@ -706,6 +910,58 @@ namespace BackendSite.Service.BLL
 
                             return (false, count, "Delete Transfer Info Receipt Fail.");
                         }
+
+                        _ = _awsS3Helper.DeleteFileAsync(_bucketName, transferInfoReceiptModel.PicFileName);
+                    }
+
+                    var logParams = new CreateAdminAdjustmentInfoLogInput
+                    {
+                        SiteId = data.FromSiteId,
+                        CurrencyId = data.FromCurrencyId,
+                        Operator = @operator,
+                        ActionType = ActionType.Delete,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.TransferInfoManagement,
+                        BeforeDetailInfo = JsonConvert.SerializeObject(new
+                        {
+                            data.TransferId,
+                            TransactionType = data.TransactionType.ToString(),
+                            TransferType = data.TransferType.ToString(),
+                            data.TransDate,
+                            FromSite = data.FromSiteName,
+                            FromCurrency = data.FromIsoCode,
+                            FromChannel = data.FromChannel.ToString(),
+                            data.FromAgent,
+                            data.FromPayName,
+                            data.FromUserName,
+                            data.FromIsoCode,
+                            data.FromBankCode,
+                            data.FromAccountNo,
+                            data.FromAccountDisplayName,
+                            data.FromAmount,
+                            data.FromFee,
+                            ToSite = data.ToSiteName,
+                            ToCurrency = data.ToIsoCode,
+                            ToChannel = data.ToChannel.ToString(),
+                            data.ToAgent,
+                            data.ToPayName,
+                            data.ToUserName,
+                            data.ToIsoCode,
+                            data.ToBankCode,
+                            data.ToAccountNo,
+                            data.ToAccountDisplayName,
+                            data.ToAmount,
+                            data.ToFee,
+                            data.Reason,
+                            data.Remark
+                        }),
+                        AfterDetailInfo = null
+                    };
+                    
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    {
+                        scope.Dispose();
+
+                        return (false, count, "Delete Transfer Info, Create Admin Adjustment Info Log Fail.");
                     }
 
                     scope.Complete();
@@ -1288,14 +1544,30 @@ namespace BackendSite.Service.BLL
 
         public BankFinancialTransferInfoReceiptModel GetTransferIngoReceipt(string transferId)
         {
-            return _bankFinancialService.GetTransferInfoReceipt(transferId);
+            var result = _bankFinancialService.GetTransferInfoReceipt(transferId);
+            
+            if (result != null)
+            {
+                result.PicFileName = _bucketUrl + result.PicFileName;
+            }
+            
+            return result;
         }
 
-        private int InsertTransferReceipt(IFormFile transferReceipt, string transferId)
+        private async Task<bool> InsertTransferReceipt(IFormFile transferReceipt, string transferId)
         {
-            var processedReceipt = ProcessImage(transferReceipt);
+            var ext = Path.GetExtension(transferReceipt.FileName);
+            var path = $"/transfer/receipt/{transferId}{ext}";
+            var key = _folder + path;
+            var success = await _awsS3Helper.UploadFileAsync(transferReceipt, _bucketName, key);
+            var result = success ? path : string.Empty;
 
-            return _bankFinancialService.SetTransferInfoReceipt(transferId, processedReceipt.FileName, processedReceipt.FileBytes);
+            if (success)
+            {
+                return _bankFinancialService.SetTransferInfoReceipt(transferId, key) > 0;
+            }
+
+            return false;
         }
 
         public ProcessedImage ProcessImage(IFormFile image)
@@ -1580,7 +1852,278 @@ namespace BackendSite.Service.BLL
 
             return Data;
         }
+        
+        public async Task<IEnumerable<BankFinancialReportCurrencySummary>> GetBankFinancialReportSummaryAsync(
+            GetFinancialReportParams input)
+        {
+            var report = await GetBankFinancialReportWithCacheAsync(input);
+            
+            if (!report.Data.Any())
+            {
+                return Array.Empty<BankFinancialReportCurrencySummary>();
+            }
 
+            var accountSummary = GetBankFinancialReportAccountSummaryAsync(report);
+            var agentSummary = GetBankFinancialReportAgentSummaryAsync(accountSummary);
+            var channelSummary = GetBankFinancialReportChannelSummaryAsync(agentSummary);
+            var result = GetBankFinancialReportCurrencySummaryAsync(channelSummary);
+            
+            return result;
+        }
+        
+        private IEnumerable<BankFinancialReportAccountSummary> GetBankFinancialReportAccountSummaryAsync(
+            BankFinancialReportResult report)
+        {
+            var result = report.Data
+                .GroupBy(x => new {x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId})
+                .Select(g =>
+                {
+                    var transferTypes = GetTransferTypeToDisplay();
+                    var details = transferTypes.ToDictionary(x => x.ToString(), x =>
+                    {
+                        var sum = g
+                            .Where(y => y.TransferType == x)
+                            .Sum(y => y.Summary);
+                        
+                        return new TransferTypeSummary
+                        {
+                            Summary = sum
+                        };
+                    });
+
+                    var accountInfo = report.AccountInfoList.FirstOrDefault(x => x.FinancialId == g.Key.FinancialId);
+                    var openBalance = accountInfo?.OpenBalance;
+                    var netBalance = g.Sum(x => x.Summary);
+                    
+                    return new BankFinancialReportAccountSummary
+                    {
+                        CurrencyId = g.Key.CurrencyId,
+                        Channel = g.Key.Channel,
+                        Agent = g.Key.Agent,
+                        AccountNo = g.Key.AccountNo,
+                        DisplayName = accountInfo?.DisplayName,
+                        Details = details,
+                        Fees = g.Sum(x => x.FeeSummary),
+                        OpenBalance = openBalance,
+                        NetBalance = netBalance,
+                        ClosingBalance = openBalance - netBalance
+                    };
+                });
+            
+            return result;
+        }
+        
+        private IEnumerable<BankFinancialReportAgentSummary> GetBankFinancialReportAgentSummaryAsync(
+            IEnumerable<BankFinancialReportAccountSummary> accountSummary)
+        {
+            var result = accountSummary
+                .GroupBy(x => new {x.Agent, x.Channel, x.CurrencyId})
+                .Select(g =>
+                {
+                    var transferTypes = GetTransferTypeToDisplay();
+                    var details =
+                        transferTypes.ToDictionary(x => x.ToString(), x =>
+                        {
+                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            
+                            return new TransferTypeSummary
+                            {
+                                Summary = sum
+                            };
+                        });
+                    
+                    return new BankFinancialReportAgentSummary
+                    {
+                        CurrencyId = g.Key.CurrencyId,
+                        Channel = g.Key.Channel,
+                        Agent = g.Key.Agent,
+                        Details = details,
+                        Fees = g.Sum(x => x.Fees),
+                        OpenBalance = g.Sum(x => x.OpenBalance),
+                        NetBalance = g.Sum(x => x.NetBalance),
+                        ClosingBalance = g.Sum(x => x.ClosingBalance),
+                        AccountDetails = g
+                    };
+                });
+            
+            return result;
+        }
+        
+        private IEnumerable<BankFinancialReportChannelSummary> GetBankFinancialReportChannelSummaryAsync(
+            IEnumerable<BankFinancialReportAgentSummary> agentSummary)
+        {
+            var result = agentSummary
+                .GroupBy(x => new {x.Channel, x.CurrencyId})
+                .Select(g =>
+                {
+                    var transferTypes = GetTransferTypeToDisplay();
+                    var details =
+                        transferTypes.ToDictionary(x => x.ToString(), x =>
+                        {
+                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            
+                            return new TransferTypeSummary
+                            {
+                                Summary = sum
+                            };
+                        });
+                    
+                    return new BankFinancialReportChannelSummary
+                    {
+                        CurrencyId = g.Key.CurrencyId,
+                        Channel = g.Key.Channel.ToString(),
+                        Details = details,
+                        Fees = g.Sum(x => x.Fees),
+                        OpenBalance = g.Sum(x => x.OpenBalance),
+                        NetBalance = g.Sum(x => x.NetBalance),
+                        ClosingBalance = g.Sum(x => x.ClosingBalance),
+                        AgentDetails = g
+                    };
+                });
+            
+            return result;
+        }
+        
+        private IEnumerable<BankFinancialReportCurrencySummary> GetBankFinancialReportCurrencySummaryAsync(
+            IEnumerable<BankFinancialReportChannelSummary> channelSummary)
+        {
+            var gData = channelSummary
+                .GroupBy(x => x.CurrencyId);
+            var result = gData
+                .Select(g =>
+                {
+                    var transferTypes = GetTransferTypeToDisplay();
+                    var details =
+                        transferTypes.ToDictionary(x => x.ToString(), x =>
+                        {
+                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            
+                            return new TransferTypeSummary
+                            {
+                                Summary = sum
+                            };
+                        });
+                    
+                    var d = g.First();
+                    return new BankFinancialReportCurrencySummary
+                    {
+                        CurrencyId = g.Key,
+                        Currency = g.Key.ToString(),
+                        Details = details,
+                        Fees = g.Sum(x => x.Fees),
+                        OpenBalance = g.Sum(x => x.OpenBalance),
+                        NetBalance = g.Sum(x => x.NetBalance),
+                        ClosingBalance = g.Sum(x => x.ClosingBalance),
+                        ChannelDetails = g
+                    };
+                });
+            
+            return result;
+        }
+
+        public async Task<byte[]> ExportBankFinancialReportAsync(GetFinancialReportParams input)
+        {
+            var report = await GetBankFinancialReportWithCacheAsync(input);
+            
+            if (!report.Data.Any())
+            {
+                return Array.Empty<byte>();
+            }
+            
+            var transferTypes = GetTransferTypeToDisplay();
+            var data = report.Data
+                .OrderBy(x => x.CurrencyId)
+                .ThenBy(x => x.Channel)
+                .ThenBy(x => x.Agent)
+                .GroupBy(x => new {x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId})
+                .Select(g =>
+                {
+                    var details = transferTypes.ToDictionary(x => x.ToString(), x =>
+                    {
+                        var sum = g
+                            .Where(y => y.TransferType == x)
+                            .Sum(y => y.Summary);
+                        
+                        return sum.ToString();
+                    });
+
+                    var accountInfo = report.AccountInfoList.FirstOrDefault(x => x.FinancialId == g.Key.FinancialId);
+                    var openBalance = accountInfo?.OpenBalance;
+                    var netBalance = g.Sum(x => x.Summary);
+                    
+                    var item = new Dictionary<string, string>
+                    {
+                        {"Currency", g.Key.CurrencyId.ToString()},
+                        {"Channel", g.Key.Channel.ToString()},
+                        {"Agent", g.Key.Agent},
+                        {"Account Name", accountInfo?.DisplayName ?? g.Key.AccountNo}
+                    };
+                    
+                    item.AddRange(details);
+                    item.AddRange(new Dictionary<string, string>
+                    {
+                        {"Open Balance", openBalance.ToString()},
+                        {"Net Balance", netBalance.ToString()},
+                        {"Closing Balance", (openBalance - netBalance).ToString()}
+                    });
+
+                    return item;
+                });
+            
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("BankFinancialReport");
+            sheet.WriteDictionaryListToSheet(data, true);
+            
+            await using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+            
+            return result;
+        }
+
+        private async Task<BankFinancialReportResult> GetBankFinancialReportWithCacheAsync(
+            GetFinancialReportParams input)
+        {
+            var key = $"FinancialReport:{input.SiteId}:{input.CurrencyIds}:{input.Channel}:{input.Agents}" +
+                      $":{input.FinancialAccountIds}:{input.StartTime:yyyyMMddHHmmss}:{input.EndTime:yyyyMMddHHmmss}:{input.TimeZone}";
+            
+            return await _cacheHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
+                () => GetBankFinancialReportAsync(input));
+        }
+        
+        private async Task<BankFinancialReportResult> GetBankFinancialReportAsync(GetFinancialReportParams input)
+        {
+            var deposit = await _bankFinancialService.GetFinancialReportDepositAsync(input);
+            var withdrawal = await _bankFinancialService.GetFinancialReportWithdrawalAsync(input);
+            var transfer = await _bankFinancialService.GetFinancialReportTransferAsync(input);
+            var data = deposit.Union(withdrawal).Union(transfer);
+            var ids = data.Select(x => x.FinancialId).Distinct();
+            
+            var openBalanceList = await _bankFinancialService.GetFinancialAccountOpenBalanceAsync(
+                new GetFinancialAccountOpenBalanceParams
+                {
+                    SiteId = input.SiteId,
+                    FinancialIds = JsonConvert.SerializeObject(ids),
+                    StartTime = input.StartTime
+                });
+
+            return new BankFinancialReportResult
+            {
+                Data = data,
+                AccountInfoList = openBalanceList
+            };
+        }
+        
+        private static IEnumerable<TransferTypeEnum> GetTransferTypeToDisplay()
+        {
+            var except = new[]
+            {
+                TransferTypeEnum.Undefined
+            };
+
+            return EnumExtension.EnumToIEnumerable(except);
+        }
+        
         #endregion
     }
 }
