@@ -2087,7 +2087,7 @@ namespace BackendSite.Service.BLL
             var key = $"FinancialReport:{input.SiteId}:{input.CurrencyIds}:{input.Channel}:{input.Agents}" +
                       $":{input.FinancialAccountIds}:{input.StartTime:yyyyMMddHHmmss}:{input.EndTime:yyyyMMddHHmmss}:{input.TimeZone}";
             
-            return await _cacheHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(10),
+            return await _cacheHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
                 () => GetBankFinancialReportAsync(input));
         }
         
