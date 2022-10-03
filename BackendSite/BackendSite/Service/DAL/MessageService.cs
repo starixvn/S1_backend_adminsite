@@ -30,14 +30,12 @@ namespace BackendSite.Service.DAL
 
         public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.Execute("Msg_Ins", new DynamicParameters(new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = siteId, Sender = sender, Title = title, Content = content, MainId = 0 }));
         }
 
         public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang, int SenderCustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 });
         }
 
         public IEnumerable<Announcement> GetAnnouncements(string selectSite,
@@ -127,8 +125,6 @@ namespace BackendSite.Service.DAL
             ref int TotalPages, ref int RowCount)
         {
             IEnumerable<PersonalMsg> result = null;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
             var SpName = "Admin_PersonalMessage_Get_V3";
             var props = new DynamicParameters();
             props.Add("_CustId", custId, dbType: DbType.Int32);
@@ -137,7 +133,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = conn.Query<PersonalMsg>(SpName, props, commandType: CommandType.StoredProcedure);
+            result = _reportDbClient.Query<PersonalMsg>(SpName, props);
             TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             RowCount = props.Get<int?>("_RowCount") ?? 0;
 
@@ -146,14 +142,12 @@ namespace BackendSite.Service.DAL
 
         public CustLang GetCustLang(int CustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
         }
 
         public void DeletePersonalMsg(int id ,bool isBatch)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_PersonalMsg_Del_V2", new { id , isBatch}, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_PersonalMsg_Del_V2", new { id , isBatch});
         }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
@@ -193,8 +187,7 @@ namespace BackendSite.Service.DAL
 
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator });
         }
         public bool NewBatchMessage(int siteId, string author, string personalMsg, bool isPopup, ref int batchId)
         {

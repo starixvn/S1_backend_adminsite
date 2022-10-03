@@ -21,32 +21,27 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankInfoOff> GetAllBankAccountOff()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoOff>("Admin_BankAccountOff_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoOff>("Admin_BankAccountOff_Get");
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOff(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId });
         }
 
         public IEnumerable<BankInfoPay> GetBankInfoPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get");
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<EWalletPay>("Common_EWalletPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
         }
 
         public IEnumerable<BankInfoPay> GetCryptoPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_CryptoPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoPay>("Common_CryptoPayForPayout_Get");
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)
