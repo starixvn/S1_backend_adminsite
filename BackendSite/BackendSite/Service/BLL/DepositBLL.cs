@@ -37,7 +37,9 @@ namespace BackendSite.Service.BLL
             custInfoService = provider.GetRequiredService<CustInfoService>();
             _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
+          	_depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
+
+  			payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
         }
