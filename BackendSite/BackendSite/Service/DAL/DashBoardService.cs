@@ -46,6 +46,20 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<DashBoardMemBerDataByMonth>("Admin_DashBoardMember_Get", props);
         }
         
+        public DashBoardFinancialDetailData GetDashBoardFinancialData(int siteId,
+            int currencyId,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_SiteId", siteId);
+
+            return _reportDbClient.QueryFirst<DashBoardFinancialDetailData>("Admin_DashBoardFinancial_Get", props);
+        }
+        
         public IEnumerable<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId,
             IEnumerable<int> currencyIds,
             DateTime startDate,

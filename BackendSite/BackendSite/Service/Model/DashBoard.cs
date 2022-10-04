@@ -87,6 +87,40 @@
     }
 
     #endregion
+
+    #region Dashboard_Financial
+
+    public class DashBoardFinancialData
+    {
+        public List<DashBoardFinancialDataByCurrency> FinancialDataByCurrency { get; set; }
+    }
     
+    public class DashBoardFinancialDataByCurrency
+    {
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public List<DashBoardFinancialDataByMonth> PerMonthData { get; set; }
+        public DashBoardFinancialDetailData TodayData { get; set; }
+        public DashBoardFinancialDetailData YesterdayData { get; set; }
+        public DashBoardFinancialDetailData MonthToDateData { get; set; }
+        public DashBoardFinancialDetailData SamePeriodLastMonthData { get; set; }
+    }
+
+    public class DashBoardFinancialDataByMonth 
+    {
+        public int Month { get; set; }
+        public DashBoardFinancialDetailData OriginalCurrencyData  { get; set; }
+        public DashBoardFinancialDetailData BaseCurrencyData   { get; set; }
+    }
     
+    public class DashBoardFinancialDetailData
+    {
+        public int DepositCount { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal WithdrawalAmount { get; set; }
+        public decimal BonusClaimAmount { get; set; }
+        public decimal NetCashAmount { get; set; }
+    }
+    
+    #endregion
 }

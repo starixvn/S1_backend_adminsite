@@ -10,10 +10,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly DashBoardService _dashBoardService;
         private readonly ICacheHelper _redisHelper;
+        private readonly ReportBLL _reportBll;
+        
         public DashBoardBLL(IServiceProvider provider)
         {
             _dashBoardService = provider.GetRequiredService<DashBoardService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _reportBll = provider.GetRequiredService<ReportBLL>();
         }
 
         #region DashBoardV1
@@ -123,7 +126,7 @@ namespace BackendSite.Service.BLL
             var yesterdayStartTime = todayStartTime.AddDays(-1);
             var yesterdayEndTime = yesterdayStartTime.AddDays(1).AddMilliseconds(-1);
             var yesterdayData = _dashBoardService.GetDashBoardMemberData(siteId, currencyId, yesterdayStartTime, yesterdayEndTime);
-            result.TodayData = new DashBoardMemBerDetailData
+            result.YesterdayData = new DashBoardMemBerDetailData
             {
                 NewMember = yesterdayData.NewMember,
                 UniqueLogin = yesterdayData.UniqueLogin
@@ -132,7 +135,7 @@ namespace BackendSite.Service.BLL
             //MonthToDateData
             var monthToDateStartTime = new DateTime(localTime.Year, localTime.Month, 1);
             var monthToDateData = _dashBoardService.GetDashBoardMemberData(siteId, currencyId, monthToDateStartTime, localTime);
-            result.TodayData = new DashBoardMemBerDetailData
+            result.MonthToDateData = new DashBoardMemBerDetailData
             {
                 NewMember = monthToDateData.NewMember,
                 UniqueLogin = monthToDateData.UniqueLogin
@@ -142,7 +145,7 @@ namespace BackendSite.Service.BLL
             var lastMonthStartTime = monthToDateStartTime.AddMonths(-1);
             var lastMonthEndTime = localTime.AddMonths(-1);
             var samePeriodLastMonthData = _dashBoardService.GetDashBoardMemberData(siteId, currencyId, lastMonthStartTime, lastMonthEndTime);
-            result.TodayData = new DashBoardMemBerDetailData
+            result.SamePeriodLastMonthData = new DashBoardMemBerDetailData
             {
                 NewMember = samePeriodLastMonthData.NewMember,
                 UniqueLogin = samePeriodLastMonthData.UniqueLogin
@@ -193,5 +196,156 @@ namespace BackendSite.Service.BLL
 
         #endregion
         
+        #region DashBoardFinancial
+
+        public DashBoardFinancialData GetDashBoardFinancialData(int siteId, IEnumerable<int> currencyIds ,int baseCurrencyId ,int timeZone)
+        {
+            var result = new DashBoardFinancialData
+            {
+                FinancialDataByCurrency = new List<DashBoardFinancialDataByCurrency>()
+            };
+            
+            var data = _reportBll.GetCurrency();
+            decimal baseRate = 0;
+            if (baseCurrencyId != 0)
+            {
+                 baseRate = data.FirstOrDefault(x => x.CurrencyId == baseCurrencyId).ActualRate;
+            }
+            
+            foreach (var currencyId in currencyIds)
+            {
+                var originRate = data.FirstOrDefault(x => x.CurrencyId == currencyId).ActualRate;
+                var key = $"DashBoardFinancial:{siteId}:{currencyId}:{baseCurrencyId}:{timeZone}";
+                var currencyData = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+                    () => GetDashBoardFinancialDataByCurrency(siteId, currencyId, originRate, baseRate, timeZone));
+                currencyData.CurrencyId = currencyId;
+                currencyData.Currency = Enum.GetName(typeof(CurrencyEnum),currencyId);
+                result.FinancialDataByCurrency.Add(currencyData);
+            }
+            return result;
+        }
+
+        private DashBoardFinancialDataByCurrency GetDashBoardFinancialDataByCurrency(
+            int siteId, int currencyId, decimal originRate , decimal baseRate ,int timeZone)
+        {
+            var result = new DashBoardFinancialDataByCurrency
+            {
+                PerMonthData = new List<DashBoardFinancialDataByMonth>(),
+                TodayData = new DashBoardFinancialDetailData(),
+                YesterdayData = new DashBoardFinancialDetailData(),
+                MonthToDateData = new DashBoardFinancialDetailData(),
+                SamePeriodLastMonthData = new DashBoardFinancialDetailData()
+            };
+            
+            //PerMonthData
+            for (var month = 1; month <= DateTime.UtcNow.Month; month++)
+            {
+                var monthData = new DashBoardFinancialDataByMonth();
+                var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
+                var endTime = startTime.AddMonths(1).AddMilliseconds(-1).AddHours(timeZone);
+                
+                monthData.Month = month;
+                monthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, startTime, endTime);
+               
+                if (baseRate != 0 && originRate != baseRate)
+                {
+                    monthData.BaseCurrencyData = new DashBoardFinancialDetailData()
+                    {
+                        DepositCount = monthData.OriginalCurrencyData.DepositCount,
+                        DepositAmount = ChangeRate(monthData.OriginalCurrencyData.DepositAmount ,originRate ,baseRate), 
+                        WithdrawalAmount = ChangeRate(monthData.OriginalCurrencyData.WithdrawalAmount ,originRate ,baseRate), 
+                        BonusClaimAmount = ChangeRate(monthData.OriginalCurrencyData.BonusClaimAmount ,originRate ,baseRate), 
+                        NetCashAmount = ChangeRate(monthData.OriginalCurrencyData.NetCashAmount ,originRate ,baseRate) 
+                    };
+                }
+                else
+                {
+                    monthData.BaseCurrencyData = monthData.OriginalCurrencyData;
+                }
+                result.PerMonthData.Add(monthData);
+            }
+            
+            //TodayData
+            var localTime = DateTime.UtcNow.AddHours(timeZone);
+            var todayStartTime = localTime.Date;
+            var todayEndTime = todayStartTime.AddDays(1).AddMilliseconds(-1);
+            var todayData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, todayStartTime, todayEndTime);
+            result.TodayData = new DashBoardFinancialDetailData
+            {
+                DepositCount = todayData.DepositCount,
+                DepositAmount = todayData.DepositAmount,
+                WithdrawalAmount = todayData.WithdrawalAmount,
+                BonusClaimAmount = todayData.BonusClaimAmount,
+                NetCashAmount = todayData.NetCashAmount
+            };
+            
+            //YesterdayData
+            var yesterdayStartTime = todayStartTime.AddDays(-1);
+            var yesterdayEndTime = yesterdayStartTime.AddDays(1).AddMilliseconds(-1);
+            var yesterdayData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, yesterdayStartTime, yesterdayEndTime);
+            result.YesterdayData = new DashBoardFinancialDetailData
+            {
+                DepositCount = yesterdayData.DepositCount,
+                DepositAmount = yesterdayData.DepositAmount,
+                WithdrawalAmount = yesterdayData.WithdrawalAmount,
+                BonusClaimAmount = yesterdayData.BonusClaimAmount,
+                NetCashAmount = yesterdayData.NetCashAmount
+            };
+            
+            //MonthToDateData
+            var monthToDateStartTime = new DateTime(localTime.Year, localTime.Month, 1);
+            var monthToDateData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, monthToDateStartTime, localTime);
+            result.MonthToDateData = new DashBoardFinancialDetailData
+            {
+                DepositCount = monthToDateData.DepositCount,
+                DepositAmount = monthToDateData.DepositAmount,
+                WithdrawalAmount = monthToDateData.WithdrawalAmount,
+                BonusClaimAmount = monthToDateData.BonusClaimAmount,
+                NetCashAmount = monthToDateData.NetCashAmount
+            };
+            
+            //LastMonthData
+            var lastMonthStartTime = monthToDateStartTime.AddMonths(-1);
+            var lastMonthEndTime = localTime.AddMonths(-1);
+            var samePeriodLastMonthData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, lastMonthStartTime, lastMonthEndTime);
+            result.SamePeriodLastMonthData = new DashBoardFinancialDetailData
+            {
+                DepositCount = samePeriodLastMonthData.DepositCount,
+                DepositAmount = samePeriodLastMonthData.DepositAmount,
+                WithdrawalAmount = samePeriodLastMonthData.WithdrawalAmount,
+                BonusClaimAmount = samePeriodLastMonthData.BonusClaimAmount,
+                NetCashAmount = samePeriodLastMonthData.NetCashAmount
+            };
+            
+            //轉換幣值匯率
+            if (baseRate != 0 && originRate != baseRate)
+            {
+                result.TodayData.DepositAmount = ChangeRate(result.TodayData.DepositAmount, originRate, baseRate);
+                result.TodayData.WithdrawalAmount = ChangeRate(result.TodayData.WithdrawalAmount, originRate, baseRate);
+                result.TodayData.BonusClaimAmount = ChangeRate(result.TodayData.BonusClaimAmount, originRate, baseRate);
+                result.TodayData.NetCashAmount = ChangeRate(result.TodayData.NetCashAmount, originRate, baseRate);
+                
+                result.YesterdayData.DepositAmount = ChangeRate(result.YesterdayData.DepositAmount, originRate, baseRate);
+                result.YesterdayData.WithdrawalAmount = ChangeRate(result.YesterdayData.WithdrawalAmount, originRate, baseRate);
+                result.YesterdayData.BonusClaimAmount = ChangeRate(result.YesterdayData.BonusClaimAmount, originRate, baseRate);
+                result.YesterdayData.NetCashAmount = ChangeRate(result.YesterdayData.NetCashAmount, originRate, baseRate);
+                
+                result.MonthToDateData.DepositAmount = ChangeRate(result.MonthToDateData.DepositAmount, originRate, baseRate);
+                result.MonthToDateData.WithdrawalAmount = ChangeRate(result.MonthToDateData.WithdrawalAmount, originRate, baseRate);
+                result.MonthToDateData.BonusClaimAmount = ChangeRate(result.MonthToDateData.BonusClaimAmount, originRate, baseRate);
+                result.MonthToDateData.NetCashAmount = ChangeRate(result.MonthToDateData.NetCashAmount, originRate, baseRate);
+                
+                result.SamePeriodLastMonthData.DepositAmount = ChangeRate(result.SamePeriodLastMonthData.DepositAmount, originRate, baseRate);
+                result.SamePeriodLastMonthData.WithdrawalAmount = ChangeRate(result.SamePeriodLastMonthData.WithdrawalAmount, originRate, baseRate);
+                result.SamePeriodLastMonthData.BonusClaimAmount = ChangeRate(result.SamePeriodLastMonthData.BonusClaimAmount, originRate, baseRate);
+                result.SamePeriodLastMonthData.NetCashAmount = ChangeRate(result.SamePeriodLastMonthData.NetCashAmount, originRate, baseRate);
+            }
+            
+            return result;
+        }
+        #endregion
+
+        private decimal ChangeRate(decimal originalAmount, decimal originalRate, decimal baseRate)
+            => originalAmount * originalRate / baseRate;
     }
 }

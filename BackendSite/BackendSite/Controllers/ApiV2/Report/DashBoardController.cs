@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Cryptography;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -46,6 +48,15 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
+            [Range(-12, 14)]
+            public int TimeZone { get; set; }
+        }
+        
+        public class GetFinancialDataRequest
+        {
+            public int SiteId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
             [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
@@ -112,6 +123,34 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         #endregion
         
+        #region DashBoardFinancial
+
+        /// <summary>
+        /// DashBoard/GetData 取得首頁儀錶板資訊資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [HttpPost]
+        public ApiResult<DashBoardFinancialData> GetFinancialData(GetFinancialDataRequest request)
+        {
+            if (request.TimeZone is > 14 or < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            var result = _dashBoardBll.GetDashBoardFinancialData(request.SiteId, request.CurrencyIds,request.BaseCurrencyId , request.TimeZone);
+            
+            return new ApiResult<DashBoardFinancialData>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+        }
         
+        #endregion
     }
 }
