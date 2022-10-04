@@ -62,14 +62,14 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (UnixDisplaytTo != null)
+                if (UnixDisplayTo != null)
                 {
-                    return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplaytTo.Value);
+                    return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayTo.Value);
                 }
                 return null;
             }
         }
-        public long? UnixDisplaytTo { get; set; }
+        public long? UnixDisplayTo { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }
         public int ExpiryDays { get; set; }
