@@ -67,5 +67,45 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_TodayExtra_Get_V2", props, 60);
         }
+
+        public IEnumerable<DashBoardGamePerMonthDao> GetDashBoardGameData(string siteIdStr,
+                                                              string currencyIdStr,
+                                                              DateTime startDate,
+                                                              DateTime endDate,
+                                                              string tpIdStr,
+                                                              string categoryStr,
+                                                              string gameTypeStr)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIdStr);
+            props.Add("_CurrencyIds", currencyIdStr);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TpIds", tpIdStr);
+            props.Add("_CategoryIds", categoryStr);
+            props.Add("_GameTypeIds", gameTypeStr);
+
+            return _reportDbClient.Query<DashBoardGamePerMonthDao>("Admin_DashBoard_Game_Get", props);
+        }
+
+        public IEnumerable<DashBoardGamePerMonthDao> GetDashBoardGameUniqueMemberData(string siteIdStr,
+                                                      string currencyIdStr,
+                                                      DateTime startDate,
+                                                      DateTime endDate,
+                                                      string tpIdStr,
+                                                      string categoryStr,
+                                                      string gameTypeStr)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIdStr);
+            props.Add("_CurrencyIds", currencyIdStr);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TpIds", tpIdStr);
+            props.Add("_CategoryIds", categoryStr);
+            props.Add("_GameTypeIds", gameTypeStr);
+
+            return _reportDbClient.Query<DashBoardGamePerMonthDao>("Admin_DashBoard_Game_UniqueMember_Get", props);
+        }
     }
 }
