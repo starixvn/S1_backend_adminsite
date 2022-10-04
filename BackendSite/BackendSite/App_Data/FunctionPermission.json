@@ -571,11 +571,6 @@
       "Enable": false
     },
     {
-      "DisplayKey": "Hot Event Management",
-      "FuncKey": "CMS/HotEventManagement",
-      "Enable": false
-    },
-    {
       "DisplayKey": "Hot Games Management",
       "FuncKey": "CMS/HotGamesManagement",
       "Enable": false

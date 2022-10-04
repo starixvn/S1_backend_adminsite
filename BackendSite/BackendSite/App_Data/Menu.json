@@ -732,16 +732,6 @@
         "Childs": null
       },
       {
-        "Key": "HotEventManagement",
-        "Title": "Hot Event Management",
-        "FuncKey": "CMS/HotEventManagement",
-        "Controller": "Marketing",
-        "Action": "HotEventManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "HotGamesManagement",
         "Title": "Hot Games Management",
         "FuncKey": "CMS/HotGamesManagement",
