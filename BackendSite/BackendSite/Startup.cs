@@ -75,6 +75,7 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
@@ -166,10 +167,6 @@ namespace BackendSite
                 #endregion
 
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseEndpoints(endpoints =>

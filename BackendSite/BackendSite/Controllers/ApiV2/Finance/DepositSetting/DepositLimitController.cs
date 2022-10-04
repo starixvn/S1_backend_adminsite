@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositLimitController : ControllerBase
@@ -32,11 +32,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest 
         {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<DepositTypeEnum> DepositTypes { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -70,28 +69,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type]
+        /// Func Path：Finance > Deposit Limit Management > Click[Site Name] [Deposit Type]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiListResult<DepositLimitInfo> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<DepositLimitInfo>> GetList(GetListRequest request)
         {
-            var apiResult = new ApiListResult<DepositLimitInfo>();
-            var depositTypeList = request.DepositTypes.Select(x => (int)x);
-
-            var depositLimitInfos = _depositBll.GetDepositLimitInfos(request.SiteIds,
-                depositTypeList,
-                request.CurrencyIds,
-                request.PageNumber,
-                request.PageSize,
-                out int totalPages,
-                out int rowCount);
+            var apiResult = new ApiResult<IEnumerable<DepositLimitInfo>>();
+            var depositLimitInfos = _depositBll.GetDepositLimitInfos(request.SiteId, request.CurrencyId);
             apiResult.Data = depositLimitInfos;
-            apiResult.PageNumber = request.PageNumber;
-            apiResult.TotalPages = totalPages;
-            apiResult.RowCount = rowCount;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            
             return apiResult;
         }
 
@@ -104,13 +92,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > [Submit] > Add
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Create(ApiRequestWithLog<DepositLimitModel> req)
+        public ApiResult Create(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
-            var result =
-                _depositBll.AddDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
+            
+            foreach (var input in req.After)
+            {
+                var currentUpperPoint = _depositBll.GetDepositLimitInfo(req.SiteId, (int)input.DepositType, req.CurrencyId, (int)input.VipLevel);
+                if (currentUpperPoint != null)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = _selLangBll.GetMsg("msg_DuplicateData");
+                    return apiResult;
+                }
+            }
+           
+            var result =
+                _depositBll.AddDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
+           
             if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -130,15 +130,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type] > [Edit] > [Save]
+        /// Func Path：Finance > Deposit Limit Management > Click[Site Name] [Deposit Type] > [Edit] > [Save]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
-        public ApiResult Update(ApiRequestWithLog<DepositLimitModel> req)
+        public ApiResult Update(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
             var result =
-                _depositBll.EditDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
+                _depositBll.EditDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {
@@ -162,12 +161,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         /// Func Path：Finance > Deposit Limit Management > Clikc[Site Name] [Deposit Type] > [Delete]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositLimitManage" })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DepositLimitModel> req)
         {
             var result =
-                _depositBll.DeleteDepositLimit(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
+                _depositBll.DeleteDepositLimitV2(new ParamsWithLog<DepositLimitModel>(req, User.Identity.Name));
             var apiResult = new ApiResult();
             if (result)
             {

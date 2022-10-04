@@ -1015,6 +1015,15 @@ namespace BackendSite.Service.DAL
 
             return WithdrawalLimitLogData;
         }
+        
+        public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, string userNames)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_UserNames", userNames);
+            
+            return _reportDbClient.QueryAsync<CustomerInfo>("Admin_CustInfo_GetList", props);
+        }
 
         public IEnumerable<CustEWalletLog> GetCustEWalletLogList(int custId,
             int startIndex,

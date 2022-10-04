@@ -4,6 +4,7 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL;
@@ -13,12 +14,14 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly ICustomerService _customerService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
+    private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
     private readonly CourierAdapter _courierAdapter;
     private readonly string _bonusApiUrl;
+    private const string VIPLOGOPATH = "/desktop/img/vip/";
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
@@ -26,6 +29,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _codeGenerator = codeGenerator;
         _tools = tools;
         _courierAdapter = courierAdapter;
+        _siteConfig = siteConfig;
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
@@ -33,17 +37,20 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
         var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
+        var custLineProfile = await _customerService.GetCustLineProfileAsync(custId, null);
         var customerBasicInfo = new CustomerBasicInfo()
         {
             CustId = customer.CustId,
             VipLevel = customer.VipLevel,
+            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}{VIPLOGOPATH}vip{customer.VipLevel}.png",
             IsOnline = isOnline,
             UserName = customer.UserName,
             AccountName = customer.AccountName,
             PhoneVerified = customer.PhoneVerified,
             EmailVerified = customer.EmailVerified,
             ActStatus = customer.ActStatus,
-            IsLineBinding = customer.LineBindingTime.HasValue,
+            IsLineBinding = custLineProfile != null,
+            CustLineProfile = custLineProfile,
             Status = customer.Status,
             DepositPointLevel = customer.PointLevel,
             Currency = customer.CurrencyName,
@@ -51,7 +58,6 @@ public class MemberDashboardBll : IMemberDashboardBLL
             AffiliatesName = customer.AffiliatesName,
             AffiliatesCode = customer.AffiliatesCode,
             RegisteredTime = customer.RegTime,
-            LineBindingTime = customer.LineBindingTime,
             FirstDepositTime = customer.FirstDepositTime,
             LastLoginTime = customer.LastLoginTime,
             LastActiveTime = customer.LastDepositTime,
@@ -64,7 +70,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             IsRisk = customer.IsRisk,
             IsKyc = customer.IsKyc,
             IsTest = customer.IsTest,
-            TagList = await _customerService.GetCustomerTagsAsync(customer.TagList)
+            TagList = customer.TagList == null ? new List<CustomerTag>() : await _customerService.GetCustomerTagsAsync(customer.TagList)
         };
         return customerBasicInfo;
     }
@@ -219,6 +225,10 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return apiResult;
     }
 
+    public async Task<int> LineUnbind(int custId)
+    {
+        return await _customerService.DeleteLineProfileAsync(custId);
+    }
     public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
     {
         return await _customerService.GetCustomerBalanceInfoAsync(custId);

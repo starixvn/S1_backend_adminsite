@@ -624,6 +624,12 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
         EditEWalletWithdrawalLimitInfo = 37,
         SetEWalletWithdrawalLimitInfoStatus = 38,
         SetBlockEWallet = 55,
@@ -863,7 +869,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -1201,6 +1207,13 @@ namespace BackendSite.Service.Model.enums
         INR = 61,
         BDT = 74
     }
+
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
@@ -1241,4 +1254,5 @@ namespace BackendSite.Service.Model.enums
         HighRisk = 1
     }
     
+
 }
