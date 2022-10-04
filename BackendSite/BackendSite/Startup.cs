@@ -11,6 +11,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite
 {
@@ -123,6 +124,9 @@ namespace BackendSite
 
             services.AddOpenApiDocument();//Swagger Setting
 
+            services.AddOptionListByDB<TpGameTypeOption>("Admin_TpGameType_Get");
+            services.AddOptionListByDB<TpListOption>("Common_TpList_Get");
+            services.AddOptionListByDB<CurrencyOption>("Common_Currency_Get");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
