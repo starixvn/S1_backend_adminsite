@@ -280,7 +280,7 @@ public class CustomerBalanceInfo
     public decimal BonusSum { get; set; }
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
-
+    public decimal PaymentFee { get; set; }
     public decimal RemainingTurnOver 
     {
         get 
@@ -289,7 +289,6 @@ public class CustomerBalanceInfo
             return remainingTurnOver > 0 ? remainingTurnOver : 0;
         }     
     }
-
     public decimal EligibleWithdrawal
     {
         get
