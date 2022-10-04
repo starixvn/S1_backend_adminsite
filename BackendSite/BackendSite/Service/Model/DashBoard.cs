@@ -1,5 +1,8 @@
 ﻿namespace BackendSite.Service.Model
 {
+    
+    #region DashboardV1
+
     public class DashBoard
     {
     }
@@ -27,6 +30,10 @@
         public decimal NetRevenue { get; set; }
         public decimal NetCash { get; set; }
     }
+
+    #endregion
+
+    #region Dashboard_Game
 
     public class DashBoardGamePerMonthDao
     {
@@ -87,4 +94,98 @@
         public decimal Payout { get; set; }
         public decimal GGR { get; set; }
     }
+
+    #endregion
+
+    #region Dashboard_MemBer
+
+    public class DashBoardMemBerData
+    {
+        public List<DashBoardMemBerDataByCurrency> MemBerDataByCurrency { get; set; }
+        public List<RegistrationPlatformDataByMonth> RegistrationPlatform { get; set; }
+    }
+    
+    public class DashBoardMemBerDataByCurrency
+    {
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public List<DashBoardMemBerDataByMonth> PerMonthData { get; set; }
+        public DashBoardMemBerDetailData TodayData { get; set; }
+        public DashBoardMemBerDetailData YesterdayData { get; set; }
+        public DashBoardMemBerDetailData MonthToDateData { get; set; }
+        public DashBoardMemBerDetailData SamePeriodLastMonthData { get; set; }
+    }
+    
+    public class DashBoardMemBerDataByMonth : DashBoardMemBerDetailData
+    {
+        public int Month { get; set; }
+        public int ActiveMember { get; set; }
+    }
+    
+    public class DashBoardMemBerDetailData
+    {
+        public int NewMember { get; set; }
+        public int UniqueLogin { get; set; }
+        
+    }
+
+    public class RegistrationPlatformDataByMonth
+    {
+        public int Month { get; set; }
+        public IEnumerable<RegistrationPlatformDetailData> Platform { get; set; }
+      
+    }
+    
+    public class RegistrationPlatformDetailData
+    {
+        public int DeviceType { get; set; }
+        public int Count { get; set; }
+    }
+    
+    public class NewMemberList
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
+        public int DeviceType { get; set; }
+        public DateTime RegTime { get; set; }
+    }
+
+    #endregion
+
+    #region Dashboard_Financial
+
+    public class DashBoardFinancialData
+    {
+        public List<DashBoardFinancialDataByCurrency> FinancialDataByCurrency { get; set; }
+    }
+    
+    public class DashBoardFinancialDataByCurrency
+    {
+        public string Currency { get; set; }
+        public int CurrencyId { get; set; }
+        public List<DashBoardFinancialDataByMonth> PerMonthData { get; set; }
+        public DashBoardFinancialDetailData TodayData { get; set; }
+        public DashBoardFinancialDetailData YesterdayData { get; set; }
+        public DashBoardFinancialDetailData MonthToDateData { get; set; }
+        public DashBoardFinancialDetailData SamePeriodLastMonthData { get; set; }
+    }
+
+    public class DashBoardFinancialDataByMonth 
+    {
+        public int Month { get; set; }
+        public DashBoardFinancialDetailData OriginalCurrencyData  { get; set; }
+        public DashBoardFinancialDetailData BaseCurrencyData   { get; set; }
+    }
+    
+    public class DashBoardFinancialDetailData
+    {
+        public int DepositCount { get; set; }
+        public decimal DepositAmount { get; set; }
+        public decimal WithdrawalAmount { get; set; }
+        public decimal BonusClaimAmount { get; set; }
+        public decimal NetCashAmount { get; set; }
+    }
+    
+    #endregion
+
 }

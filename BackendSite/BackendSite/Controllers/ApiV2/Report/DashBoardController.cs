@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Cryptography;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,25 +36,48 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region API Model
 
-        public class GetDataRequest
+        public class GetMemBerDataRequest
         {
             public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
             public int BaseCurrencyId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
 
             [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
-        public class GetGameRequest : GetDataRequest
+
+        public class GetGameRequest
         {
+            public IEnumerable<int> SiteId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
             public IEnumerable<int> TpId { get; set; }
             public IEnumerable<int> TpCategory { get; set; }
-            public IEnumerable<int> TpGameType{ get; set; }
-            public IEnumerable<int> BetStatus { get; set; } //待確認
+            public IEnumerable<int> TpGameType { get; set; }
+            public int TimeZone { get; set; }
+        }
+
+        public class GetNewMemBerListRequest : ApiRequestPageModel
+        {
+            public int SiteId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            [Range(-12, 14)]
+            public int TimeZone { get; set; }
+        }
+
+        public class GetFinancialDataRequest
+        {
+            public int SiteId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
+            [Range(-12, 14)]
+            public int TimeZone { get; set; }
         }
 
         #endregion
+
+        #region DashBoardMember
 
         /// <summary>
         /// DashBoard/GetData 取得首頁儀錶板資訊資料
@@ -65,17 +91,74 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
-        public ApiResult<DashBoardData> GetData(GetDataRequest request)
+        public ApiResult<DashBoardMemBerData> GetMemBerData(GetMemBerDataRequest request)
         {
-            var canSearchSite = new List<int>();
-
-            if (request.TimeZone > 14 || request.TimeZone < -12)
+            if (request.TimeZone is > 14 or < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
 
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x => canSearchSite.Add(x.SiteId));
-            var result = _dashBoardBll.GetDashBoardData(request.SiteId, request.CurrencyId, request.BaseCurrencyId, canSearchSite, request.TimeZone);
+            var result = _dashBoardBll.GetDashBoardMemberData(request.SiteId, request.CurrencyIds, request.TimeZone);
 
-            return new ApiResult<DashBoardData>
+            return new ApiResult<DashBoardMemBerData>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+        }
+
+        [HttpPost]
+        public ApiListResult<NewMemberList> GetNewMemBerList(GetNewMemBerListRequest request)
+        {
+            if (request.TimeZone is > 14 or < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
+            var startTime = localTime.Date;
+            var endTime = startTime.AddDays(1).AddMilliseconds(-1);
+
+            var result = _dashBoardBll.GetNewMemberList(
+                request.SiteId,
+                request.CurrencyIds,
+                startTime,
+                endTime,
+                request.PageSize,
+                request.PageNumber,
+                out var totalPages,
+                out var rowCount);
+
+            return new ApiListResult<NewMemberList>
+            {
+                Data = result,
+                TotalPages = totalPages,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        #endregion
+
+        #region DashBoardFinancial
+
+        /// <summary>
+        /// DashBoard/GetData 取得首頁儀錶板資訊資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [HttpPost]
+        public ApiResult<DashBoardFinancialData> GetFinancialData(GetFinancialDataRequest request)
+        {
+            if (request.TimeZone is > 14 or < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            var result = _dashBoardBll.GetDashBoardFinancialData(request.SiteId, request.CurrencyIds, request.BaseCurrencyId, request.TimeZone);
+
+            return new ApiResult<DashBoardFinancialData>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -94,7 +177,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
-        public ApiResult<DashBoardData> GetGameData(GetDataRequest request)
+        public ApiResult<DashBoardData> GetGameData(GetGameRequest request)
         {
             var canSearchSite = new List<int>();
 
@@ -109,5 +192,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success,
             };
         }
+        
+        #endregion
     }
 }

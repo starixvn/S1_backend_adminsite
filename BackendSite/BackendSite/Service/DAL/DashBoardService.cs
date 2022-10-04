@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model;
+﻿using System.Data;
+using BackendSite.Service.Model;
 using Dapper;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
@@ -30,6 +31,75 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardData>("Admin_DashBoard_Get_V2", props);
         }
+        
+        public DashBoardMemBerDataByMonth GetDashBoardMemberData(int siteId,
+            int currencyId,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_SiteId", siteId);
+
+            return _reportDbClient.QueryFirst<DashBoardMemBerDataByMonth>("Admin_DashBoardMember_Get", props);
+        }
+        
+        public DashBoardFinancialDetailData GetDashBoardFinancialData(int siteId,
+            int currencyId,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_SiteId", siteId);
+
+            return _reportDbClient.QueryFirst<DashBoardFinancialDetailData>("Admin_DashBoardFinancial_Get", props);
+        }
+        
+        public IEnumerable<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            
+            return _reportDbClient.Query<RegistrationPlatformDetailData>("Admin_DashBoardMemberPlatform_Get", props);
+        }
+        
+        public IEnumerable<NewMemberList> GetDashBoardNewMemberList(
+            int siteId,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", siteId);
+            parameter.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
+            parameter.Add("_StartDate", startDate);
+            parameter.Add("_EndDate", endDate);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = _reportDbClient.Query<NewMemberList>("Admin_DashBoardNewMemberList_Get", parameter);
+            
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+            
+            return data;
+        }
 
         public DashBoardDetailData GetDashBoardTodayData(int siteId,
             int currencyId,
@@ -48,6 +118,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_Today_Get_V2", props);
         }
+        
         public DashBoardDetailData GetDashBoardTodayExtraData(int siteId,
             int currencyId,
             int baseCurrencyId,
