@@ -252,6 +252,10 @@
           {
             "DisplayKey": "Risk",
             "FuncKey": "f_wd_risk"
+          },
+          {
+            "DisplayKey": "Manual Approved And Reject",
+            "FuncKey": "f_wd_manualApprovedReject"
           }
         ]
       },
@@ -564,11 +568,6 @@
     {
       "DisplayKey": "Banner Management",
       "FuncKey": "CMS/BannerManage",
-      "Enable": false
-    },
-    {
-      "DisplayKey": "Hot Event Management",
-      "FuncKey": "CMS/HotEventManagement",
       "Enable": false
     },
     {

@@ -14,13 +14,6 @@ namespace BackendSite.Service.BLL
 
     }
 
-    public class File
-    {
-        public byte[] FileContents { get; set; }
-        public string ContentType { get; set; }
-        public string FileName { get; set; }
-    }
-
     public class ExcelBLL
     {
         private readonly List<string> _excelContentType = new List<string>()
