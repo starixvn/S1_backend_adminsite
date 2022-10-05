@@ -4,12 +4,6 @@ using BackendSite.Extensions;
 using BackendSite;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
-    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5);
-});
-
 builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
 
 var excludesMessage = builder.Configuration.GetSection("ExcludesMessage").Get<string[]>();
