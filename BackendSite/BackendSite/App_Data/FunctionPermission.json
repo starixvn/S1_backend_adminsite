@@ -571,11 +571,6 @@
       "Enable": false
     },
     {
-      "DisplayKey": "Hot Event Management",
-      "FuncKey": "CMS/HotEventManagement",
-      "Enable": false
-    },
-    {
       "DisplayKey": "Hot Games Management",
       "FuncKey": "CMS/HotGamesManagement",
       "Enable": false
@@ -642,6 +637,30 @@
         "Enable": false
       }
     ]
-  }
+  },
+  {
+      "DisplayKey": "Slot Games Management",
+      "FuncKey": "CMS/SlotGamesManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_sgm_edit"
+          }
+        ]
+    },
+    {
+      "DisplayKey": "Category Management",
+      "FuncKey": "CMS/CategoryManagement",
+      "Enable": false,
+      "InputBoxType": "checkbox",
+        "SubFuncKeys": [
+          {
+            "DisplayKey": "Edit",
+            "FuncKey": "cms_cm_edit"
+          }
+        ]
+    }
   
 ]
