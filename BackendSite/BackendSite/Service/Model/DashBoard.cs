@@ -1,6 +1,6 @@
 ﻿namespace BackendSite.Service.Model
 {
-    
+
     #region DashboardV1
 
     public class DashBoard
@@ -48,6 +48,22 @@
 
     }
 
+    public class DashBoardGameUniqueMemberPerMonthDao
+    {
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+    }
+
+    public class DashboardGameForCaculateDao
+    {
+        public int CurrencyId { get; set; }
+        public int CategoryId { get; set; }
+        public decimal ValidBetSum { get; set; }
+        public decimal RevenueSum { get; set; }
+        public decimal WinLossSum { get; set; }
+        public int CountSum { get; set; }
+    }
+
     public class DashBoardGameDto
     {
         /// <summary>
@@ -59,7 +75,25 @@
         /// </summary>
         public List<DashBoardGamePerMonthDto> LineChartPerMonthSummary { get; set; }
 
-        public Dictionary<string, decimal> LineChartSummary { get; set; }
+        public List<CurrencySummaryDto> LineChartSummary { get; set; }
+    }
+
+    public class DashBoardGameCurrencySummaryDto : DashBoardCurrencySimpleSummaryDto
+    {
+        public DashBoardCurrencySummaryDto CurrencySummary { get; set; } = new DashBoardCurrencySummaryDto();
+    }
+
+    public class DashBoardCurrencySummaryDto
+    {
+        public DashBoardCurrencySimpleSummaryDto OriginalCurrency { get; set; } = new DashBoardCurrencySimpleSummaryDto();
+        public DashBoardCurrencySimpleSummaryDto BaseCurrency { get; set; } = new DashBoardCurrencySimpleSummaryDto();
+    }
+
+    public class DashBoardCurrencySimpleSummaryDto
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public decimal Summary { get; set; }
     }
 
     public class DashBoardGameSimpleSummaryDto
@@ -73,13 +107,13 @@
     {
         public int Year { get; set; }
         public int Month { get; set; }
-        public int CurrencyId { get; set; }
-        public string CurrencyName { get; set; }
-        public CurrencyPerMonthDto CurrencyDetail { get; set; }
+        public CurrencySummaryDto CurrencyDetail { get; set; }
     }
 
-    public class CurrencyPerMonthDto
+    public class CurrencySummaryDto
     {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public int UniqueMember { get; set; }
         public int BetCount { get; set; }
         public decimal Margin { get; set; }
@@ -89,6 +123,8 @@
 
     public class DashboardGamePerMonthCurrencyDto
     {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
         public decimal BetAmount { get; set; }
         public decimal AverageBetAmount { get; set; }
         public decimal Payout { get; set; }
@@ -104,7 +140,7 @@
         public List<DashBoardMemBerDataByCurrency> MemBerDataByCurrency { get; set; }
         public List<RegistrationPlatformDataByMonth> RegistrationPlatform { get; set; }
     }
-    
+
     public class DashBoardMemBerDataByCurrency
     {
         public string Currency { get; set; }
@@ -115,33 +151,33 @@
         public DashBoardMemBerDetailData MonthToDateData { get; set; }
         public DashBoardMemBerDetailData SamePeriodLastMonthData { get; set; }
     }
-    
+
     public class DashBoardMemBerDataByMonth : DashBoardMemBerDetailData
     {
         public int Month { get; set; }
         public int ActiveMember { get; set; }
     }
-    
+
     public class DashBoardMemBerDetailData
     {
         public int NewMember { get; set; }
         public int UniqueLogin { get; set; }
-        
+
     }
 
     public class RegistrationPlatformDataByMonth
     {
         public int Month { get; set; }
         public IEnumerable<RegistrationPlatformDetailData> Platform { get; set; }
-      
+
     }
-    
+
     public class RegistrationPlatformDetailData
     {
         public int DeviceType { get; set; }
         public int Count { get; set; }
     }
-    
+
     public class NewMemberList
     {
         public string Currency { get; set; }
@@ -158,7 +194,7 @@
     {
         public List<DashBoardFinancialDataByCurrency> FinancialDataByCurrency { get; set; }
     }
-    
+
     public class DashBoardFinancialDataByCurrency
     {
         public string Currency { get; set; }
@@ -170,13 +206,13 @@
         public DashBoardFinancialDetailData SamePeriodLastMonthData { get; set; }
     }
 
-    public class DashBoardFinancialDataByMonth 
+    public class DashBoardFinancialDataByMonth
     {
         public int Month { get; set; }
-        public DashBoardFinancialDetailData OriginalCurrencyData  { get; set; }
-        public DashBoardFinancialDetailData BaseCurrencyData   { get; set; }
+        public DashBoardFinancialDetailData OriginalCurrencyData { get; set; }
+        public DashBoardFinancialDetailData BaseCurrencyData { get; set; }
     }
-    
+
     public class DashBoardFinancialDetailData
     {
         public int DepositCount { get; set; }
@@ -185,7 +221,7 @@
         public decimal BonusClaimAmount { get; set; }
         public decimal NetCashAmount { get; set; }
     }
-    
+
     #endregion
 
 }

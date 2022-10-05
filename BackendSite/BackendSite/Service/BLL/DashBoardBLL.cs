@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using System.Reflection;
 
 namespace BackendSite.Service.BLL
 {
@@ -64,35 +65,35 @@ namespace BackendSite.Service.BLL
 
         #region DashBoardMember
 
-        public DashBoardMemBerData GetDashBoardMemberData(int siteId, IEnumerable<int> currencyIds ,int timeZone)
+        public DashBoardMemBerData GetDashBoardMemberData(int siteId, IEnumerable<int> currencyIds, int timeZone)
         {
             var result = new DashBoardMemBerData
             {
                 MemBerDataByCurrency = new List<DashBoardMemBerDataByCurrency>(),
                 RegistrationPlatform = new List<RegistrationPlatformDataByMonth>()
             };
-            
+
             // // MemBerDataByCurrency
             foreach (var currencyId in currencyIds)
             {
                 var key = $"DashBoardMember:{siteId}:{currencyId}:{timeZone}";
                 var currencyData = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
-                    () => GetDashBoardMemberDataByCurrency(siteId, currencyId , timeZone));
+                    () => GetDashBoardMemberDataByCurrency(siteId, currencyId, timeZone));
                 currencyData.CurrencyId = currencyId;
-                currencyData.Currency = Enum.GetName(typeof(CurrencyEnum),currencyId);
+                currencyData.Currency = Enum.GetName(typeof(CurrencyEnum), currencyId);
                 result.MemBerDataByCurrency.Add(currencyData);
             }
-            
+
             // RegistrationPlatform
             var key2 = $"DashBoardMember:{siteId}:{JsonConvert.SerializeObject(currencyIds)}";
-            result.RegistrationPlatform = _redisHelper.TryGetOrCreate(key2, TimeSpan.FromMinutes(15), 
+            result.RegistrationPlatform = _redisHelper.TryGetOrCreate(key2, TimeSpan.FromMinutes(15),
                 () => GetDashBoardMemberPlatformData(siteId, currencyIds, timeZone));
-            
-            
-             return result;
+
+
+            return result;
         }
 
-        private DashBoardMemBerDataByCurrency GetDashBoardMemberDataByCurrency(int siteId, int currencyId ,int timeZone)
+        private DashBoardMemBerDataByCurrency GetDashBoardMemberDataByCurrency(int siteId, int currencyId, int timeZone)
         {
             var result = new DashBoardMemBerDataByCurrency
             {
@@ -102,7 +103,7 @@ namespace BackendSite.Service.BLL
                 MonthToDateData = new DashBoardMemBerDetailData(),
                 SamePeriodLastMonthData = new DashBoardMemBerDetailData()
             };
-            
+
             //PerMonthData
             for (var month = 1; month <= DateTime.UtcNow.Month; month++)
             {
@@ -112,7 +113,7 @@ namespace BackendSite.Service.BLL
                 dataByMonth.Month = month;
                 result.PerMonthData.Add(dataByMonth);
             }
-            
+
             //TodayData
             var localTime = DateTime.UtcNow.AddHours(timeZone);
             var todayStartTime = localTime.Date;
@@ -123,7 +124,7 @@ namespace BackendSite.Service.BLL
                 NewMember = todayData.NewMember,
                 UniqueLogin = todayData.UniqueLogin
             };
-            
+
             //YesterdayData
             var yesterdayStartTime = todayStartTime.AddDays(-1);
             var yesterdayEndTime = yesterdayStartTime.AddDays(1).AddMilliseconds(-1);
@@ -133,7 +134,7 @@ namespace BackendSite.Service.BLL
                 NewMember = yesterdayData.NewMember,
                 UniqueLogin = yesterdayData.UniqueLogin
             };
-            
+
             //MonthToDateData
             var monthToDateStartTime = new DateTime(localTime.Year, localTime.Month, 1);
             var monthToDateData = _dashBoardService.GetDashBoardMemberData(siteId, currencyId, monthToDateStartTime, localTime);
@@ -142,7 +143,7 @@ namespace BackendSite.Service.BLL
                 NewMember = monthToDateData.NewMember,
                 UniqueLogin = monthToDateData.UniqueLogin
             };
-            
+
             //LastMonthData
             var lastMonthStartTime = monthToDateStartTime.AddMonths(-1);
             var lastMonthEndTime = localTime.AddMonths(-1);
@@ -152,14 +153,14 @@ namespace BackendSite.Service.BLL
                 NewMember = samePeriodLastMonthData.NewMember,
                 UniqueLogin = samePeriodLastMonthData.UniqueLogin
             };
-            
+
             return result;
         }
-        
-        private List<RegistrationPlatformDataByMonth> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds ,int timeZone)
+
+        private List<RegistrationPlatformDataByMonth> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds, int timeZone)
         {
             var result = new List<RegistrationPlatformDataByMonth>();
-            for (var month = 1 ; month <= DateTime.UtcNow.Month; month++)
+            for (var month = 1; month <= DateTime.UtcNow.Month; month++)
             {
                 var data = new RegistrationPlatformDataByMonth();
                 var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
@@ -168,13 +169,13 @@ namespace BackendSite.Service.BLL
                 data.Month = month;
                 result.Add(data);
             }
-            
+
             return result;
         }
 
         public IEnumerable<NewMemberList> GetNewMemberList(
-            int siteId, 
-            IEnumerable<int> currencyIds, 
+            int siteId,
+            IEnumerable<int> currencyIds,
             DateTime startTime,
             DateTime endTime,
             int pageSize,
@@ -183,37 +184,37 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             var result = _dashBoardService.GetDashBoardNewMemberList(
-                siteId, 
-                currencyIds, 
-                startTime, 
+                siteId,
+                currencyIds,
+                startTime,
                 endTime,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
-            
+
             return result;
         }
-        
+
 
         #endregion
-        
+
         #region DashBoardFinancial
 
-        public DashBoardFinancialData GetDashBoardFinancialData(int siteId, IEnumerable<int> currencyIds ,int baseCurrencyId ,int timeZone)
+        public DashBoardFinancialData GetDashBoardFinancialData(int siteId, IEnumerable<int> currencyIds, int baseCurrencyId, int timeZone)
         {
             var result = new DashBoardFinancialData
             {
                 FinancialDataByCurrency = new List<DashBoardFinancialDataByCurrency>()
             };
-            
+
             var data = _reportBll.GetCurrency();
             decimal baseRate = 0;
             if (baseCurrencyId != 0)
             {
-                 baseRate = data.FirstOrDefault(x => x.CurrencyId == baseCurrencyId).ActualRate;
+                baseRate = data.FirstOrDefault(x => x.CurrencyId == baseCurrencyId).ActualRate;
             }
-            
+
             foreach (var currencyId in currencyIds)
             {
                 var originRate = data.FirstOrDefault(x => x.CurrencyId == currencyId).ActualRate;
@@ -221,14 +222,14 @@ namespace BackendSite.Service.BLL
                 var currencyData = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
                     () => GetDashBoardFinancialDataByCurrency(siteId, currencyId, originRate, baseRate, timeZone));
                 currencyData.CurrencyId = currencyId;
-                currencyData.Currency = Enum.GetName(typeof(CurrencyEnum),currencyId);
+                currencyData.Currency = Enum.GetName(typeof(CurrencyEnum), currencyId);
                 result.FinancialDataByCurrency.Add(currencyData);
             }
             return result;
         }
 
         private DashBoardFinancialDataByCurrency GetDashBoardFinancialDataByCurrency(
-            int siteId, int currencyId, decimal originRate , decimal baseRate ,int timeZone)
+            int siteId, int currencyId, decimal originRate, decimal baseRate, int timeZone)
         {
             var result = new DashBoardFinancialDataByCurrency
             {
@@ -238,26 +239,26 @@ namespace BackendSite.Service.BLL
                 MonthToDateData = new DashBoardFinancialDetailData(),
                 SamePeriodLastMonthData = new DashBoardFinancialDetailData()
             };
-            
+
             //PerMonthData
             for (var month = 1; month <= DateTime.UtcNow.Month; month++)
             {
                 var monthData = new DashBoardFinancialDataByMonth();
                 var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
                 var endTime = startTime.AddMonths(1).AddMilliseconds(-1).AddHours(timeZone);
-                
+
                 monthData.Month = month;
                 monthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, startTime, endTime);
-               
+
                 if (baseRate != 0 && originRate != baseRate)
                 {
                     monthData.BaseCurrencyData = new DashBoardFinancialDetailData()
                     {
                         DepositCount = monthData.OriginalCurrencyData.DepositCount,
-                        DepositAmount = ChangeRate(monthData.OriginalCurrencyData.DepositAmount ,originRate ,baseRate), 
-                        WithdrawalAmount = ChangeRate(monthData.OriginalCurrencyData.WithdrawalAmount ,originRate ,baseRate), 
-                        BonusClaimAmount = ChangeRate(monthData.OriginalCurrencyData.BonusClaimAmount ,originRate ,baseRate), 
-                        NetCashAmount = ChangeRate(monthData.OriginalCurrencyData.NetCashAmount ,originRate ,baseRate) 
+                        DepositAmount = ChangeRate(monthData.OriginalCurrencyData.DepositAmount, originRate, baseRate),
+                        WithdrawalAmount = ChangeRate(monthData.OriginalCurrencyData.WithdrawalAmount, originRate, baseRate),
+                        BonusClaimAmount = ChangeRate(monthData.OriginalCurrencyData.BonusClaimAmount, originRate, baseRate),
+                        NetCashAmount = ChangeRate(monthData.OriginalCurrencyData.NetCashAmount, originRate, baseRate)
                     };
                 }
                 else
@@ -266,7 +267,7 @@ namespace BackendSite.Service.BLL
                 }
                 result.PerMonthData.Add(monthData);
             }
-            
+
             //TodayData
             var localTime = DateTime.UtcNow.AddHours(timeZone);
             var todayStartTime = localTime.Date;
@@ -280,7 +281,7 @@ namespace BackendSite.Service.BLL
                 BonusClaimAmount = todayData.BonusClaimAmount,
                 NetCashAmount = todayData.NetCashAmount
             };
-            
+
             //YesterdayData
             var yesterdayStartTime = todayStartTime.AddDays(-1);
             var yesterdayEndTime = yesterdayStartTime.AddDays(1).AddMilliseconds(-1);
@@ -293,7 +294,7 @@ namespace BackendSite.Service.BLL
                 BonusClaimAmount = yesterdayData.BonusClaimAmount,
                 NetCashAmount = yesterdayData.NetCashAmount
             };
-            
+
             //MonthToDateData
             var monthToDateStartTime = new DateTime(localTime.Year, localTime.Month, 1);
             var monthToDateData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, monthToDateStartTime, localTime);
@@ -305,7 +306,7 @@ namespace BackendSite.Service.BLL
                 BonusClaimAmount = monthToDateData.BonusClaimAmount,
                 NetCashAmount = monthToDateData.NetCashAmount
             };
-            
+
             //LastMonthData
             var lastMonthStartTime = monthToDateStartTime.AddMonths(-1);
             var lastMonthEndTime = localTime.AddMonths(-1);
@@ -318,7 +319,7 @@ namespace BackendSite.Service.BLL
                 BonusClaimAmount = samePeriodLastMonthData.BonusClaimAmount,
                 NetCashAmount = samePeriodLastMonthData.NetCashAmount
             };
-            
+
             //轉換幣值匯率
             if (baseRate != 0 && originRate != baseRate)
             {
@@ -326,23 +327,23 @@ namespace BackendSite.Service.BLL
                 result.TodayData.WithdrawalAmount = ChangeRate(result.TodayData.WithdrawalAmount, originRate, baseRate);
                 result.TodayData.BonusClaimAmount = ChangeRate(result.TodayData.BonusClaimAmount, originRate, baseRate);
                 result.TodayData.NetCashAmount = ChangeRate(result.TodayData.NetCashAmount, originRate, baseRate);
-                
+
                 result.YesterdayData.DepositAmount = ChangeRate(result.YesterdayData.DepositAmount, originRate, baseRate);
                 result.YesterdayData.WithdrawalAmount = ChangeRate(result.YesterdayData.WithdrawalAmount, originRate, baseRate);
                 result.YesterdayData.BonusClaimAmount = ChangeRate(result.YesterdayData.BonusClaimAmount, originRate, baseRate);
                 result.YesterdayData.NetCashAmount = ChangeRate(result.YesterdayData.NetCashAmount, originRate, baseRate);
-                
+
                 result.MonthToDateData.DepositAmount = ChangeRate(result.MonthToDateData.DepositAmount, originRate, baseRate);
                 result.MonthToDateData.WithdrawalAmount = ChangeRate(result.MonthToDateData.WithdrawalAmount, originRate, baseRate);
                 result.MonthToDateData.BonusClaimAmount = ChangeRate(result.MonthToDateData.BonusClaimAmount, originRate, baseRate);
                 result.MonthToDateData.NetCashAmount = ChangeRate(result.MonthToDateData.NetCashAmount, originRate, baseRate);
-                
+
                 result.SamePeriodLastMonthData.DepositAmount = ChangeRate(result.SamePeriodLastMonthData.DepositAmount, originRate, baseRate);
                 result.SamePeriodLastMonthData.WithdrawalAmount = ChangeRate(result.SamePeriodLastMonthData.WithdrawalAmount, originRate, baseRate);
                 result.SamePeriodLastMonthData.BonusClaimAmount = ChangeRate(result.SamePeriodLastMonthData.BonusClaimAmount, originRate, baseRate);
                 result.SamePeriodLastMonthData.NetCashAmount = ChangeRate(result.SamePeriodLastMonthData.NetCashAmount, originRate, baseRate);
             }
-            
+
             return result;
         }
         #endregion
@@ -360,6 +361,9 @@ namespace BackendSite.Service.BLL
             var result = new DashBoardGameDto();
             var pieChartSummary = new Dictionary<string, List<DashBoardGameSimpleSummaryDto>>();
             var lineChartPerMonthSummary = new List<DashBoardGamePerMonthDto>();
+            var lineChartSummary = new List<CurrencySummaryDto>();
+            var caculateData = new List<DashboardGameForCaculateDao>();
+            var caculateMemberData = Enumerable.Empty<DashBoardGameUniqueMemberPerMonthDao>();
 
             //Step1:決定日期區間  
 
@@ -369,11 +373,9 @@ namespace BackendSite.Service.BLL
             for (int i = 1; i <= dateTimeNowInTimeZone.Month; i++)
             {
                 var dateRange = CaculateDateRange(dateTimeNowInTimeZone.Year, i, timeZone);
-                var sourceData = GetGameSourceDataPerMonth(dateTimeNowInTimeZone.Year, i,
-                    siteIds, currencyIds, baseCurrencyId,
+                var sourceData = GetGameSourceDataPerMonth(siteIds, currencyIds,
                     dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes);
-                var sourceMemberData = GetDashBoardGameUniqueMemberDataPerMonth(dateTimeNowInTimeZone.Year, i,
-                  siteIds, currencyIds, baseCurrencyId,
+                var sourceMemberData = GetDashBoardGameUniqueMemberDataPerMonth(siteIds, currencyIds,
                   dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes);
 
                 var gameData = GetGameDataPerMonth(dateTimeNowInTimeZone.Year, i,
@@ -381,13 +383,40 @@ namespace BackendSite.Service.BLL
 
                 CombinePieChartSummary(sourceData, ref pieChartSummary);
                 lineChartPerMonthSummary.AddRange(gameData);
+
+                CombineCaculateData(currencyIds, sourceData, ref caculateData);
+                CombineSourceMemberData(sourceMemberData, ref caculateMemberData);
             }
+            CombineLineChartSummary(currencyIds, baseCurrencyId, caculateMemberData, caculateData, ref lineChartSummary);
 
             result.PieChartSummary = pieChartSummary;
             result.LineChartPerMonthSummary = lineChartPerMonthSummary;
+            result.LineChartSummary = lineChartSummary;
 
             //Step3:組合資料
             return result;
+        }
+
+        private void CombineCaculateData(IEnumerable<int> currencyIds,
+            IEnumerable<DashBoardGamePerMonthDao> sourceData,
+            ref List<DashboardGameForCaculateDao> caculateData)
+        {
+            var existCategoryList = sourceData.Select(x => x.CategoryId).Distinct().OrderBy(x => x);
+            foreach (var currencyId in currencyIds)
+            {
+                foreach (var category in existCategoryList)
+                {
+                    caculateData.Add(new DashboardGameForCaculateDao()
+                    {
+                        CurrencyId = currencyId,
+                        CategoryId = category,
+                        ValidBetSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.ValidBetSum),
+                        RevenueSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.RevenueSum),
+                        WinLossSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.WinLossSum),
+                        CountSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.CountSum)
+                    });
+                }
+            }
         }
 
         private (DateTimeOffset StartDate, DateTimeOffset EndDate) CaculateDateRange(int year, int month, int timeZone)
@@ -398,10 +427,8 @@ namespace BackendSite.Service.BLL
                     EndDate: new DateTimeOffset(lastDayOfMonth, new TimeSpan(timeZone, 0, 0)));
         }
 
-        private IEnumerable<DashBoardGamePerMonthDao> GetGameSourceDataPerMonth(int year, int month,
-                                           IEnumerable<int> siteIds,
+        private IEnumerable<DashBoardGamePerMonthDao> GetGameSourceDataPerMonth(IEnumerable<int> siteIds,
                                            IEnumerable<int> currencyIds,
-                                           int baseCurrencyId,
                                            DateTimeOffset startTime,
                                            DateTimeOffset endTime,
                                            IEnumerable<int> tpIds,
@@ -416,10 +443,8 @@ namespace BackendSite.Service.BLL
            JsonConvert.SerializeObject(categoryIds),
            JsonConvert.SerializeObject(gameTypes));
 
-        private IEnumerable<DashBoardGamePerMonthDao> GetDashBoardGameUniqueMemberDataPerMonth(int year, int month,
-                                       IEnumerable<int> siteIds,
+        private IEnumerable<DashBoardGameUniqueMemberPerMonthDao> GetDashBoardGameUniqueMemberDataPerMonth(IEnumerable<int> siteIds,
                                        IEnumerable<int> currencyIds,
-                                       int baseCurrencyId,
                                        DateTimeOffset startTime,
                                        DateTimeOffset endTime,
                                        IEnumerable<int> tpIds,
@@ -437,9 +462,15 @@ namespace BackendSite.Service.BLL
             ref Dictionary<string, List<DashBoardGameSimpleSummaryDto>> pieChartSummary)
         {
             var result = new Dictionary<string, List<DashBoardGameSimpleSummaryDto>>();
+            var pieChartData = Enumerable.Empty<int>();
 
             var tpProviderMappingResult = MappingTpProvieder(sourceData);
-            var pieChartData = pieChartSummary[tpProviderMappingResult.Key].Select(x => x.Id);
+
+            if (!pieChartSummary.ContainsKey(tpProviderMappingResult.Key))
+                pieChartSummary.Add(key: tpProviderMappingResult.Key, value: new List<DashBoardGameSimpleSummaryDto>());
+
+            pieChartData = pieChartSummary[tpProviderMappingResult.Key].Select(x => x.Id);
+
             foreach (var item in tpProviderMappingResult.Value)
             {
                 if (pieChartData.Contains(item.Id))
@@ -448,7 +479,14 @@ namespace BackendSite.Service.BLL
                 else
                     pieChartSummary[tpProviderMappingResult.Key].Add(tpProviderMappingResult.Value.FirstOrDefault(x => x.Id == item.Id));
             }
+
             var tpCategoryMappingResult = MappingTpCategory(sourceData).Result;
+
+            if (!pieChartSummary.ContainsKey(tpCategoryMappingResult.Key))
+                pieChartSummary.Add(key: tpCategoryMappingResult.Key, value: new List<DashBoardGameSimpleSummaryDto>());
+
+            pieChartData = pieChartSummary[tpCategoryMappingResult.Key].Select(x => x.Id);
+
             foreach (var item in tpCategoryMappingResult.Value)
             {
                 if (pieChartData.Contains(item.Id))
@@ -456,6 +494,68 @@ namespace BackendSite.Service.BLL
                         += tpCategoryMappingResult.Value.FirstOrDefault(x => x.Id == item.Id).Count;
                 else
                     pieChartSummary[tpCategoryMappingResult.Key].Add(tpCategoryMappingResult.Value.FirstOrDefault(x => x.Id == item.Id));
+            }
+        }
+
+        private void CombineSourceMemberData(IEnumerable<DashBoardGameUniqueMemberPerMonthDao> memberSourceData,
+            ref IEnumerable<DashBoardGameUniqueMemberPerMonthDao> source)
+        {
+            source = source.Select(x=>x).Concat(memberSourceData.Select(x => x)).Distinct();
+        }
+
+        private void CombineLineChartSummary(IEnumerable<int> currencyIds,
+            int baseCurrencyId,
+            IEnumerable<DashBoardGameUniqueMemberPerMonthDao> sourceMemberData,
+            List<DashboardGameForCaculateDao> sourceData,
+            ref List<CurrencySummaryDto> lineChartSummary)
+        {
+            var result = new List<DashBoardCurrencySimpleSummaryDto>();
+            var currencyList = _reportBll.GetCurrency();
+
+            foreach (var currencyId in currencyIds)
+            {
+                var currencyInfo = currencyList.FirstOrDefault(x => x.CurrencyId == currencyId);
+                var currencyData = sourceData.Where(x => x.CurrencyId == currencyId);
+                var memberData = sourceMemberData.Where(x => x.CurrencyId == currencyId);
+                var data = new CurrencySummaryDto()
+                {
+                    CurrencyId = currencyId,
+                    CurrencyName = currencyInfo.IsoCode,
+                    BetCount = currencyData.Sum(x => x.CountSum),
+                    UniqueMember = memberData.Select(x=>x.CustId).Distinct().Count(),
+                    OriginalCurrencyData = new DashboardGamePerMonthCurrencyDto()
+                    {
+                        CurrencyId = currencyId,
+                        CurrencyName = currencyInfo.IsoCode,
+                        BetAmount = currencyData.Sum(x => x.ValidBetSum),
+                        AverageBetAmount = currencyData.Sum(x => x.CountSum) == 0 ? 0
+                        : currencyData.Sum(x => x.ValidBetSum) / currencyData.Sum(x => x.CountSum),
+                        Payout = currencyData.Sum(x => x.WinLossSum) + currencyData.Sum(x => x.ValidBetSum),
+                        GGR = currencyData.Where(x => x.CategoryId == 8).Sum(x => x.RevenueSum)
+                        + currencyData.Where(x => x.CategoryId != 8).Sum(x => x.WinLossSum) * -1
+                    },
+                    BaseCurrencyData = new DashboardGamePerMonthCurrencyDto()
+
+                };
+                data.Margin = data.OriginalCurrencyData.BetAmount == 0 ? 0
+                        : data.OriginalCurrencyData.GGR / data.OriginalCurrencyData.BetAmount;
+
+                if (baseCurrencyId != 0)
+                {
+                    var currencyBaseInfo = currencyList.FirstOrDefault(x => x.CurrencyId == baseCurrencyId);
+
+                    data.BaseCurrencyData.CurrencyId = baseCurrencyId;
+                    data.BaseCurrencyData.CurrencyName = currencyBaseInfo.IsoCode;
+                    data.BaseCurrencyData.BetAmount = ChangeRate(data.OriginalCurrencyData.BetAmount, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
+                    data.BaseCurrencyData.AverageBetAmount = ChangeRate(data.OriginalCurrencyData.AverageBetAmount, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
+                    data.BaseCurrencyData.Payout = ChangeRate(data.OriginalCurrencyData.Payout, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
+                    data.BaseCurrencyData.GGR = ChangeRate(data.OriginalCurrencyData.GGR, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
+                }
+                else
+                {
+                    data.BaseCurrencyData = data.OriginalCurrencyData;
+                }
+                lineChartSummary.Add(data);
             }
         }
 
@@ -473,7 +573,7 @@ namespace BackendSite.Service.BLL
                     Count = sourceData.Where(x => x.TpId == tpId).Sum(x => x.CountSum)
                 });
 
-            return (Key: "Game Provider", Value: result);
+            return (Key: "GameProvider", Value: result);
         }
 
         private async Task<(string Key, List<DashBoardGameSimpleSummaryDto> Value)> MappingTpCategory(IEnumerable<DashBoardGamePerMonthDao> sourceData)
@@ -487,14 +587,14 @@ namespace BackendSite.Service.BLL
                 {
                     Id = categoryId,
                     Name = categoryList.FirstOrDefault(x => x.CategoryId == categoryId).CategoryName,
-                    Count = sourceData.Where(x => x.TpId == categoryId).Sum(x => x.CountSum)
+                    Count = sourceData.Where(x => x.CategoryId == categoryId).Sum(x => x.CountSum)
                 });
 
-            return (Key: "Game Category", Value: result);
+            return (Key: "GameCategory", Value: result);
         }
 
         private List<DashBoardGamePerMonthDto> GetGameDataPerMonth(int year, int month, IEnumerable<int> currencyIds,
-            int baseCurrencyId, IEnumerable<DashBoardGamePerMonthDao> sourceData, IEnumerable<DashBoardGamePerMonthDao> memberSourceData)
+            int baseCurrencyId, IEnumerable<DashBoardGamePerMonthDao> sourceData, IEnumerable<DashBoardGameUniqueMemberPerMonthDao> memberSourceData)
         {
             var result = new List<DashBoardGamePerMonthDto>();
             var currencyItem = new DashboardGamePerMonthCurrencyDto();
@@ -509,16 +609,20 @@ namespace BackendSite.Service.BLL
                 {
                     Year = year,
                     Month = month,
-                    CurrencyId = currencyId,
-                    CurrencyName = currencyInfo.IsoCode,
-                    CurrencyDetail = new CurrencyPerMonthDto()
+                    CurrencyDetail = new CurrencySummaryDto()
                     {
+                        CurrencyId = currencyId,
+                        CurrencyName = currencyInfo.IsoCode,
                         BetCount = currencyData.Sum(x => x.CountSum),
-                        UniqueMember = memberSourceData.Count(),
+                        UniqueMember = currencyMemberData.Count(),
                         OriginalCurrencyData = new DashboardGamePerMonthCurrencyDto()
                         {
+                            CurrencyId = currencyId,
+                            CurrencyName = currencyInfo.IsoCode,
                             BetAmount = currencyData.Sum(x => x.ValidBetSum),
-                            AverageBetAmount = currencyData.Sum(x => x.ValidBetSum) / currencyData.Sum(x => x.CountSum),
+                            AverageBetAmount = currencyData.Sum(x => x.CountSum) == 0
+                            ? 0
+                            : currencyData.Sum(x => x.ValidBetSum) / currencyData.Sum(x => x.CountSum),
                             Payout = currencyData.Sum(x => x.WinLossSum) + currencyData.Sum(x => x.ValidBetSum),
                             GGR = currencyData.Where(x => x.CategoryId == 8).Sum(x => x.RevenueSum)
                             + (currencyData.Where(x => x.CategoryId != 8).Sum(x => x.WinLossSum) * -1)
@@ -526,6 +630,7 @@ namespace BackendSite.Service.BLL
                     }
                 };
                 currencyDetail.CurrencyDetail.Margin =
+                    currencyDetail.CurrencyDetail.OriginalCurrencyData.BetAmount == 0 ? 0 :
                     currencyDetail.CurrencyDetail.OriginalCurrencyData.GGR / currencyDetail.CurrencyDetail.OriginalCurrencyData.BetAmount;
 
                 if (baseCurrencyId != 0)
@@ -534,6 +639,8 @@ namespace BackendSite.Service.BLL
 
                     currencyDetail.CurrencyDetail.BaseCurrencyData = new DashboardGamePerMonthCurrencyDto()
                     {
+                        CurrencyId = baseCurrencyId,
+                        CurrencyName = currencyBaseInfo.IsoCode,
                         BetAmount = ChangeRate(currencyDetail.CurrencyDetail.OriginalCurrencyData.BetAmount, currencyInfo.ActualRate, currencyBaseInfo.ActualRate),
                         AverageBetAmount = ChangeRate(currencyDetail.CurrencyDetail.OriginalCurrencyData.AverageBetAmount, currencyInfo.ActualRate, currencyBaseInfo.ActualRate),
                         Payout = ChangeRate(currencyDetail.CurrencyDetail.OriginalCurrencyData.Payout, currencyInfo.ActualRate, currencyBaseInfo.ActualRate),
@@ -550,7 +657,6 @@ namespace BackendSite.Service.BLL
 
         private decimal ChangeRate(decimal originalAmount, decimal originalRate, decimal baseRate)
         => originalAmount * originalRate / baseRate;
-
 
         #endregion
     }

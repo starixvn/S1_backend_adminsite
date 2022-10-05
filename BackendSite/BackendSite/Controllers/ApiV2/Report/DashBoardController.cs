@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    //[Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DashBoardController : ControllerBase
@@ -49,12 +49,13 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         public class GetGameRequest
         {
-            public IEnumerable<int> SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
-            public IEnumerable<int> TpId { get; set; }
-            public IEnumerable<int> TpCategory { get; set; }
-            public IEnumerable<int> TpGameType { get; set; }
+            public IEnumerable<int> TpIds { get; set; }
+            public IEnumerable<int> Categories { get; set; }
+            public IEnumerable<int> GameTypes { get; set; }
+            [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
 
@@ -175,20 +176,26 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
-        public ApiResult<DashBoardData> GetGameData(GetGameRequest request)
+        public ApiResult<DashBoardGameDto> GetGameData(GetGameRequest request)
         {
             var canSearchSite = new List<int>();
 
             if (request.TimeZone > 14 || request.TimeZone < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
 
-            //var result = _dashBoardBll.GetGameData(request.SiteId, request.CurrencyId, request.BaseCurrencyId, canSearchSite, request.TimeZone);
+            var result = _dashBoardBll.GetGameData(request.SiteIds,
+                request.CurrencyIds, 
+                request.BaseCurrencyId,
+                request.TpIds,
+                request.Categories,
+                request.GameTypes,
+                request.TimeZone);
 
-            return new ApiResult<DashBoardData>
+            return new ApiResult<DashBoardGameDto>
             {
-                Data = null,
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
             };
         }

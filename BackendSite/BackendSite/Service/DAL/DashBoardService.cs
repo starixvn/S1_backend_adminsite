@@ -154,12 +154,12 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_TpIds", tpIdStr);
             props.Add("_CategoryIds", categoryStr);
-            props.Add("_GameTypeIds", gameTypeStr);
+            props.Add("_GameTypes", gameTypeStr);
 
             return _reportDbClient.Query<DashBoardGamePerMonthDao>("Admin_DashBoard_Game_Get", props);
         }
 
-        public IEnumerable<DashBoardGamePerMonthDao> GetDashBoardGameUniqueMemberData(string siteIdStr,
+        public IEnumerable<DashBoardGameUniqueMemberPerMonthDao> GetDashBoardGameUniqueMemberData(string siteIdStr,
                                                       string currencyIdStr,
                                                       DateTime startDate,
                                                       DateTime endDate,
@@ -174,9 +174,9 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_TpIds", tpIdStr);
             props.Add("_CategoryIds", categoryStr);
-            props.Add("_GameTypeIds", gameTypeStr);
+            props.Add("_GameTypes", gameTypeStr);
 
-            return _reportDbClient.Query<DashBoardGamePerMonthDao>("Admin_DashBoard_Game_UniqueMember_Get", props);
+            return _reportDbClient.Query<DashBoardGameUniqueMemberPerMonthDao>("Admin_DashBoard_Game_UniqueMember_Get", props);
         }
     }
 }
