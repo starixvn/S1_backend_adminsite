@@ -18,13 +18,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly AuthorizeBLL _authorizeBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, AuthorizeBLL authorizeBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _authorizeBll = authorizeBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -68,7 +70,35 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
-        
+
+        /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiListResult<MemberList>> GetList(GetTempMemberListRequest request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var result = await _memberDashboardBll.GetList(authData.SiteId, request);
+            return new ApiListResult<MemberList>()
+            {
+                Data = result.Data,
+                TotalPages = result.TotalPages,
+                PageNumber = result.PageNumber,
+                RowCount = result.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
         /// <summary>
         /// Member/GetCustomerBasicInfo 取得客戶基本資料
         /// </summary>

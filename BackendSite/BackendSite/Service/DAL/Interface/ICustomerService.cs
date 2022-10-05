@@ -4,6 +4,7 @@ namespace BackendSite.Service.DAL.Interface;
 
 public interface ICustomerService
 {
+    Task<GetMemberListData> GetList(int siteId, GetTempMemberListRequest request);
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
     Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId);

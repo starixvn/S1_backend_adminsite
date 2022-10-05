@@ -33,6 +33,23 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
+    public async Task<GetMemberListResponse> GetList(int siteId, GetTempMemberListRequest request)
+    {
+        var memberList = await _customerService.GetList(siteId, request);
+        var response = new GetMemberListResponse()
+        {
+            Data = memberList.Data.Select(a => new MemberList()
+            {
+                UserName = a.UserName,
+                TpUserName = a.TpUserName
+            }),
+            PageNumber = memberList.PageNumber,
+            TotalPages = memberList.TotalPages,
+            RowCount = memberList.RowCount
+        };
+        return response;
+    }
+
     public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId)
     {
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);

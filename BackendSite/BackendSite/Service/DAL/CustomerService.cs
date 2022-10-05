@@ -17,6 +17,21 @@ public class CustomerService : ICustomerService
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
+    public async Task<GetMemberListData> GetList(int siteId, GetTempMemberListRequest request)
+    {
+        var p = new DynamicParameters();
+        var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V14", p);
+        var searchData = new GetMemberListData()
+        {
+            Data = result,
+            PageNumber = p.Get<int?>("_PageNumber") ?? 0,
+            TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+            RowCount = p.Get<int?>("_RowCount") ?? 0
+        };
+
+        return searchData;
+    }
+
     public async Task<CustomerDto> GetCustomerBasicInfoAsync(int custId)
     {
         var p = new DynamicParameters();
