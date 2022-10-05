@@ -1259,4 +1259,29 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         All = 2,
     }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
 }
