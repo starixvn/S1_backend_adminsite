@@ -196,7 +196,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-
         #endregion
 
         #region DashBoardFinancial
@@ -346,6 +345,82 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public IEnumerable<TopDepositorsList> GetTopDepositorsList(
+            int siteId, 
+            IEnumerable<int> currencyIds, 
+            DateTime startTime,
+            DateTime endTime,
+            DashboardOrderByPropertyEnum orderBy,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var result = _dashBoardService.GetTopDepositorsList(
+                siteId, 
+                currencyIds, 
+                startTime, 
+                endTime,
+                orderBy,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
+            
+            return result;
+        }
+        
+        public IEnumerable<TopWithdrawalList> GetTopWithdrawalList(
+            int siteId, 
+            IEnumerable<int> currencyIds, 
+            DateTime startTime,
+            DateTime endTime,
+            DashboardOrderByPropertyEnum orderBy,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var result = _dashBoardService.GetTopWithdrawalList(
+                siteId, 
+                currencyIds, 
+                startTime, 
+                endTime,
+                orderBy,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
+            
+            return result;
+        }
+        
+        public IEnumerable<TopBonusClaimedList> GetTopBonusClaimedList(
+            int siteId, 
+            IEnumerable<int> currencyIds, 
+            DateTime startTime,
+            DateTime endTime,
+            DashboardOrderByPropertyEnum orderBy,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var result = _dashBoardService.GetTopBonusClaimedList(
+                siteId, 
+                currencyIds, 
+                startTime, 
+                endTime,
+                orderBy,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages,
+                out rowCount);
+            
+            return result;
+        }
+        
         #endregion
 
         #region DashboardGame

@@ -101,6 +101,93 @@ namespace BackendSite.Service.DAL
             return data;
         }
 
+        public IEnumerable<TopDepositorsList> GetTopDepositorsList(
+            int siteId,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            DashboardOrderByPropertyEnum orderBy,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", siteId);
+            parameter.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
+            parameter.Add("_StartDate", startDate);
+            parameter.Add("_EndDate", endDate);
+            parameter.Add("_OrderBy", (int)orderBy);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = _reportDbClient.Query<TopDepositorsList>("Admin_DashBoardTopDepositorsList_Get", parameter);
+            
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+            
+            return data;
+        }
+        
+        public IEnumerable<TopWithdrawalList> GetTopWithdrawalList(
+            int siteId,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            DashboardOrderByPropertyEnum orderBy,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", siteId);
+            parameter.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
+            parameter.Add("_StartDate", startDate);
+            parameter.Add("_EndDate", endDate);
+            parameter.Add("_OrderBy", (int)orderBy);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = _reportDbClient.Query<TopWithdrawalList>("Admin_DashBoardTopWithdrawalList_Get", parameter);
+            
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+            
+            return data;
+        }
+        
+        public IEnumerable<TopBonusClaimedList> GetTopBonusClaimedList(
+            int siteId,
+            IEnumerable<int> currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            DashboardOrderByPropertyEnum orderBy,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", siteId);
+            parameter.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
+            parameter.Add("_StartDate", startDate);
+            parameter.Add("_EndDate", endDate);
+            parameter.Add("_OrderBy", (int)orderBy);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = _reportDbClient.Query<TopBonusClaimedList>("Admin_DashBoardTopBonusClaimedList_Get", parameter);
+            
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+            
+            return data;
+        }
+        
         public DashBoardDetailData GetDashBoardTodayData(int siteId,
             int currencyId,
             int baseCurrencyId,

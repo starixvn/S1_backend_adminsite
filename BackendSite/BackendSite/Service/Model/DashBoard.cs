@@ -221,6 +221,35 @@
         public decimal BonusClaimAmount { get; set; }
         public decimal NetCashAmount { get; set; }
     }
+    
+    public class TopDepositorsList
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public decimal Amount { get; set; }
+        public int Count { get; set; }
+    }
+    
+    public class TopWithdrawalList
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public decimal Amount { get; set; }
+        public int Count { get; set; }
+    }
+    
+    public class TopBonusClaimedList
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public decimal Amount { get; set; }
+    }
 
     #endregion
 
