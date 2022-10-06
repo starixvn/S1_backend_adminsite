@@ -996,6 +996,14 @@ namespace BackendSite.Service.Model.enums
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
     }
+    
+    public enum BankCardManagementSupportChannelEnum
+    {
+        [Description("Bank Transfer")]
+        LocalBank = 0,
+        [Description("Mobile E-Wallet")]
+        EWallet = 1
+    }
 
     #endregion
 

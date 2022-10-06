@@ -108,11 +108,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
         }
         
-        public bool CheckTransferAccountExists(string accountNo)
+        public bool CheckTransferAccountExists(int siteId, string accountNo)
         {
             var parameters = new DynamicParameters(
                 new
                 {
+                    _SiteId = siteId,
                     _AccountNo = accountNo,
                 });
             
@@ -142,6 +143,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
+                    _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -150,9 +152,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Ins_V3";
-
-            return _mainDbClient.Execute(SpName, parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V4", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -177,6 +177,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
+                    _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -184,7 +185,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V3";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V4";
 
             return _mainDbClient.Execute(SpName, parameters);
         }

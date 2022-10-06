@@ -149,6 +149,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 AccountCode = req.AccountCode,
                 DisplayName = req.DisplayName,
                 InitialAmount = req.InitialAmount,
+                InitialTime = req.InitialTime,
                 MaxBalanceAlertAmount = req.MaxBalanceAlertAmount,
                 PayId = req.PayId,
                 SysId = req.SysId,
