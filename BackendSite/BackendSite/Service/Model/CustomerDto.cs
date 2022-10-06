@@ -32,9 +32,29 @@ public class GetTempMemberListRequest : ApiRequestPageModel
 
 public class MemberListDto
 {
+    public string SiteName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string SabaId { get; set; }
+    public string AffiliateCode { get; set; }
+    public string TagList { get; set; }
+    public int UserLevel { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public bool IsTest { get; set; }
+    public string IP { get; set; }
+    public string LevelName { get; set; }
+    public DateTime RegTime { get; set; }
+    public DateTime? ReloadTime { get; set; }
+    public DateTime? LastTagUpdateTime { get; set; }
+    public DateTime? LastStatusUpdateTime { get; set; }
+    public decimal Balance { get; set; }
+    public decimal Bonus { get; set; }
+    public string DeviceScore { get; set; }
+    public string ShieldId { get; set; }
+    
 }
 public class GetMemberListData
 {
@@ -46,9 +66,28 @@ public class GetMemberListData
 
 public class MemberList
 {
+    public string SiteName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string SabaId { get; set; }
+    public string AffiliateCode { get; set; }
+    public List<int> TagList { get; set; }
+    public int UserLevel { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public bool IsTest { get; set; }
+    public string IP { get; set; }
+    public string LevelName { get; set; }
+    public DateTimeOffset RegTime { get; set; }
+    public DateTimeOffset? LastActiveTime { get; set; }
+    public DateTimeOffset? LastTagUpdateTime { get; set; }
+    public DateTimeOffset? LastStatusUpdateTime { get; set; }
+    public decimal Balance { get; set; }
+    public decimal Bonus { get; set; }
+    public string DeviceScore { get; set; }
+    public string ShieldId { get; set; }
 }
 
 public class GetMemberListResponse

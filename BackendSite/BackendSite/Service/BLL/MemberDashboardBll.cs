@@ -45,9 +45,27 @@ public class MemberDashboardBll : IMemberDashboardBLL
         {
             Data = memberList.Data.Select(a => new MemberList()
             {
+                SiteName = a.SiteName,
+                CurrencyId = a.CurrencyId,
+                IsoCode = a.IsoCode,
                 CustId = a.CustId,
                 UserName = a.UserName,
-                SabaId = a.SabaId
+                SabaId = a.SabaId,
+                AffiliateCode = a.AffiliateCode,
+                TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+                Agent = a.Agent,
+                Status = a.Status,
+                IsTest = a.IsTest,
+                IP = a.IP,
+                LevelName = a.LevelName,
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
+                LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
+                LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+                Balance = a.Balance,
+                Bonus = a.Bonus,
+                DeviceScore = a.DeviceScore,
+                ShieldId = a.ShieldId
             }),
             PageNumber = memberList.PageNumber,
             TotalPages = memberList.TotalPages,
@@ -264,5 +282,12 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<int> LineUnbind(int custId)
     {
         return await _customerService.DeleteLineProfileAsync(custId);
+    }
+    
+    private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
+    {
+        if (dateTime.HasValue)
+            return new DateTimeOffset(dateTime.Value, ts);
+        return null;
     }
 }
