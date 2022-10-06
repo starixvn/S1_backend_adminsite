@@ -154,7 +154,6 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyIds { get; set; }
         public PayListMethodEnum? Method { get; set; }
         public int? PayId { get; set; }
-        public int? ChannelId { get; set; }
         public PayChannelTypeEnum? Type { get; set; }
         public PayListStatusEnum? PayStatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }
@@ -168,7 +167,6 @@ namespace BackendSite.Service.Model
             CurrencyIds = req.CurrencyIds;
             Method = req.Method;
             PayId = req.PayId;
-            ChannelId = req.ChannelId;
             Type = req.Type;
             PayStatus = req.PayStatus;
             Status = req.Status;
@@ -178,7 +176,6 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyIds { get; set; }
         public PayListMethodEnum? Method { get; set; }
         public int? PayId { get; set; }
-        public int? ChannelId { get; set; }
         public PayChannelTypeEnum? Type { get; set; }
         public PayListStatusEnum? PayStatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }

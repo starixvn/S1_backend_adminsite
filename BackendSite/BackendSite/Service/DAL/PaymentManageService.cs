@@ -288,7 +288,6 @@ namespace BackendSite.Service.DAL
                 _Status = input.Status,
                 _PayStatus = input.PayStatus,
                 _Type = input.Type,
-                _ChannelId = input.ChannelId,
                 _PayId = input.PayId,
                 _PageSize = pageSize,
                 _StartIndex = startIndex
@@ -303,7 +302,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
         }
         
-        public IEnumerable<PaySetting> GetPaySetting(int siteId, int channelId)
+        public IEnumerable<PaySetting> GetPaySetting(int siteId, int? channelId = null)
         {
             var p = new DynamicParameters(new
             {

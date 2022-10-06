@@ -40,7 +40,6 @@ Content-Type: application/json
 # currencyIds | Number Array | 
 # method | Number | Nullable | 帶 null 可取全部
 # payId | Number | Nullable | 帶 null 可取全部
-# channelId | Number | Nullable | 帶 null 可取全部
 # type | Number | Nullable | 帶 null 可取全部
 # payStatus | Number | Nullable | 帶 null 可取全部
 # status | Number | Nullable | 帶 null 可取全部
@@ -52,7 +51,6 @@ Content-Type: application/json
     "currencyIds": [2, 4, 15, 51, 61],
     "method": 1,
     "payId": null,
-    "channelId": null,
     "type": null,
     "payStatus": null,
     "status": null,
@@ -140,4 +138,14 @@ Content-Type: application/json
 
 {
     "enumName": "PayListStatusEnum"
+}
+
+###
+# PointLevel 下拉選單
+POST {{url}}/apiV2/BaseData/GetPointLevelList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2
 }
