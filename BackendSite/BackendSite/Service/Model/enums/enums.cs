@@ -237,7 +237,13 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region PayList
-
+    
+    public enum PayListMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+    
     public enum PayListStatusEnum
     {
         Enable = 1,
@@ -259,10 +265,12 @@ namespace BackendSite.Service.Model.enums
     public enum PayChannelTypeEnum
     {
         OnlineBanking = 1,
-        MobilePay = 2,
-        LocalBanking = 3,
-        CryptoPay = 4,
-        LoadCard = 5
+        MobilePayment = 2,
+        LocalBank = 3,
+        CryptoPayment = 4,
+        LoadCardPayment = 5,
+        QrPayPayment = 6,
+        EWalletWithdrawal = 8
     }
 
     public enum PayChannelStatusEnum
@@ -278,7 +286,6 @@ namespace BackendSite.Service.Model.enums
     public enum AmountRuleEnum
     {
         Integer = 1,
-        Decimal = 2,
         Fixed = 3
     }
 
