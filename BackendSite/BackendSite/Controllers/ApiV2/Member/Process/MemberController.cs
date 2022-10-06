@@ -87,8 +87,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiListResult<MemberList>> GetList(GetTempMemberListRequest request)
         {
-            var authData = _authorizeBll.GetAuthData();
-            var result = await _memberDashboardBll.GetList(authData.SiteId, request);
+            var result = await _memberDashboardBll.GetList(request);
             return new ApiListResult<MemberList>()
             {
                 Data = result.Data,

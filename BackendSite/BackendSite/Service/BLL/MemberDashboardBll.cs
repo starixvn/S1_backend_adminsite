@@ -33,21 +33,40 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
-    public async Task<GetMemberListResponse> GetList(int siteId, GetTempMemberListRequest request)
+    public async Task<GetMemberListResponse> GetList(GetTempMemberListRequest request)
     {
-        var memberList = await _customerService.GetList(siteId, request);
+        var startTime = request.StartDate.ToUniversalTime().DateTime;
+        var endTime = request.EndDate.ToUniversalTime().DateTime;
+        var currencyList = string.Join(',', request.CurrencyId.ToArray());
+        var statusList = string.Join(',', request.Status.ToArray());
+        var transType = GetTransType(request.TransId);
+        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
         var response = new GetMemberListResponse()
         {
             Data = memberList.Data.Select(a => new MemberList()
             {
+                CustId = a.CustId,
                 UserName = a.UserName,
-                TpUserName = a.TpUserName
+                SabaId = a.SabaId
             }),
             PageNumber = memberList.PageNumber,
             TotalPages = memberList.TotalPages,
             RowCount = memberList.RowCount
         };
         return response;
+    }
+
+    private int GetTransType(string transId)
+    {
+        if (string.IsNullOrEmpty(transId)) 
+            return 0;
+        if (transId.StartsWith("W"))
+            return 1;
+        if (transId.StartsWith("D"))
+            return 2;
+        if (transId.StartsWith("T") || transId.StartsWith("AT") || transId.StartsWith("BT"))
+            return 3;
+        return 0;
     }
 
     public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId)

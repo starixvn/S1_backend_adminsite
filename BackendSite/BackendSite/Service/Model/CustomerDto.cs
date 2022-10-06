@@ -4,15 +4,16 @@ namespace BackendSite.Service.Model;
 
 public class GetTempMemberListRequest : ApiRequestPageModel
 {
+    public int SiteId { get; set; }
     public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset EndDate { get; set; }
     public int DateType { get; set; }
     public IEnumerable<int> CurrencyId { get; set; }
-    public int Status { get; set; }
-    public int Identity { get; set; }
+    public IEnumerable<int> Status { get; set; }
+    // public int Identity { get; set; }
     public string UserName { get; set; }
     public string TpUserName { get; set; }
-    public string AffiliateName { get; set; }
+    // public string AffiliateName { get; set; }
     public string LoginIp { get; set; }
     public string Email { get; set; }
     public string PhoneNo { get; set; }
@@ -20,18 +21,20 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public string BankAccountNumber { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
-    public IEnumerable<int> VipLevel { get; set; }
+    // public IEnumerable<int> VipLevel { get; set; }
     public string TransId { get; set; }
-    public int ShieldScore { get; set; }
-    public int IovationStatus { get; set; }
-    public int UserType { get; set; }
-    public bool ExportTransferWallet { get; set; } = false;
+    public int ShieldLevel { get; set; }
+    public int IovationLevel { get; set; }
+
+    public string DeviceId { get; set; }
+    // public int UserType { get; set; }
 }
 
 public class MemberListDto
 {
+    public int CustId { get; set; }
     public string UserName { get; set; }
-    public string TpUserName { get; set; }
+    public string SabaId { get; set; }
 }
 public class GetMemberListData
 {
@@ -43,8 +46,9 @@ public class GetMemberListData
 
 public class MemberList
 {
+    public int CustId { get; set; }
     public string UserName { get; set; }
-    public string TpUserName { get; set; }
+    public string SabaId { get; set; }
 }
 
 public class GetMemberListResponse
