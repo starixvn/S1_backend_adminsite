@@ -77,19 +77,17 @@ namespace BackendSite
             }
 
             //¤â°Êµù¥U
-            services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<LiveRegistrationDecorator>();
 
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<ICustomerService, CustomerService>();
-            services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IDeviceService, DeviceService>();
