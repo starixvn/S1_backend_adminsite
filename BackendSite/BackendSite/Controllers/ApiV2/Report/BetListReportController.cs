@@ -61,11 +61,17 @@ namespace BackendSite.Controllers.ApiV2.Report
         public IActionResult Export(GetBetListRequest request)
         {
             DateCheck(request);
+            var offset = request.StartTime.Offset;
 
             request.PageNumber = -1; //export all
-            var data = _betListBll.GetBetListReport(request, out var _);
+            var data = _betListBll.GetBetListReport(request, out var _);      
+            foreach (var item in data)
+            {
+                item.TransTime = item.TransTime.ToOffset(offset);
+                item.SettledTime = item.SettledTime.ToOffset(offset);
+            }
 
-            var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 

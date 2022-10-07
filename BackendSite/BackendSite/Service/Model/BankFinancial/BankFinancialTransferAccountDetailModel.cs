@@ -180,6 +180,7 @@ namespace BackendSite.Service.Model.BankFinancial
     
     public class BankFinancialTransferAccount
     {
+        public int FinancialId { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
         public int SysId { get; set; }

@@ -41,7 +41,7 @@ namespace BackendSite.Service.Model
         public SlotGameData GetSlotGameData( ServerInfo userSiteData)
         {
             var slotGameStatusList = string.IsNullOrWhiteSpace(Status)
-                ? new List<SlotGameStatus>() : JsonConvert.DeserializeObject<SlotGameStatus[]>(Status).ToList();
+                ? new List<SlotGameStatus>() : JsonConvert.DeserializeObject<List<SlotGameStatus>>(Status);
             
             var currencyStatusList = new List<CurrencyStatus>();
             foreach (var currencyId in userSiteData.ICurrencyList)
@@ -49,7 +49,7 @@ namespace BackendSite.Service.Model
                 currencyStatusList.Add(new CurrencyStatus
                 {
                     CurrencyId = currencyId,
-                    Status = slotGameStatusList.Find(y => y.CurrencyId == currencyId)?.Status ?? (int)SlotGameStatusEnum.Closed
+                    Status = slotGameStatusList.FirstOrDefault(y => y.CurrencyId == currencyId)?.Status ?? (int)SlotGameStatusEnum.Closed
                 });
             }
 
@@ -128,8 +128,8 @@ namespace BackendSite.Service.Model
 
     public class SlotGameStatus
     {
-        public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public int? CurrencyId { get; set; }
+        public int? Status { get; set; }
     }
 
     public class SetSlotGameCategoryReq
