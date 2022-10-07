@@ -142,6 +142,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             IsLineBinding = custLineProfile != null,
             CustLineProfile = custLineProfile,
             Status = customer.Status,
+            EnableRebate = customer.EnableRebate,
             DepositPointLevel = customer.PointLevel,
             Currency = customer.CurrencyName,
             Identity = customer.Identity,

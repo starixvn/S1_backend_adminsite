@@ -195,6 +195,7 @@ public class CustomerDto
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int PointLevel { get; set; }
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; }
@@ -245,6 +246,7 @@ public class CustomerBasicInfo
     public bool IsLineBinding { get; set; }
     public CustLineProfileModel CustLineProfile { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
     public int Identity { get; set; }
