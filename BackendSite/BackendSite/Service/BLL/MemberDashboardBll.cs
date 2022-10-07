@@ -33,6 +33,96 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
+    public async Task<GetMemberListResponse> GetList(GetTempMemberListRequest request)
+    {
+        var startTime = request.StartDate.ToUniversalTime().DateTime;
+        var endTime = request.EndDate.ToUniversalTime().DateTime;
+        var currencyList = string.Join(',', request.CurrencyId.ToArray());
+        var statusList = string.Join(',', request.Status.ToArray());
+        var transType = GetTransType(request.TransId);
+        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+        var response = new GetMemberListResponse()
+        {
+            Data = memberList.Data.Select(a => new MemberList()
+            {
+                SiteName = a.SiteName,
+                CurrencyId = a.CurrencyId,
+                IsoCode = a.IsoCode,
+                CustId = a.CustId,
+                UserName = a.UserName,
+                SabaId = a.SabaId,
+                AffiliateCode = a.AffiliateCode,
+                TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+                Agent = a.Agent,
+                Status = a.Status,
+                IsTest = a.IsTest,
+                IP = a.IP,
+                LevelName = a.LevelName,
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
+                LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
+                LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+                Balance = a.Balance,
+                Bonus = a.Bonus,
+                DeviceScore = a.DeviceScore,
+                ShieldId = a.ShieldId
+            }),
+            PageNumber = memberList.PageNumber,
+            TotalPages = memberList.TotalPages,
+            RowCount = memberList.RowCount
+        };
+        return response;
+    }
+
+    public async Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request)
+    {
+        var startTime = request.StartDate.ToUniversalTime().DateTime;
+        var endTime = request.EndDate.ToUniversalTime().DateTime;
+        var currencyList = string.Join(',', request.CurrencyId.ToArray());
+        var statusList = string.Join(',', request.Status.ToArray());
+        var transType = GetTransType(request.TransId);
+        var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime);
+
+        var exportData = memberList.Select(a => new MemberExportData()
+        {
+            SiteName = a.SiteName,
+            CurrencyId = a.CurrencyId,
+            IsoCode = a.IsoCode,
+            CustId = a.CustId,
+            UserName = a.UserName,
+            SabaId = a.SabaId,
+            AffiliateCode = a.AffiliateCode,
+            TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+            Agent = a.Agent,
+            Status = a.Status,
+            IsTest = a.IsTest,
+            IP = a.IP,
+            LevelName = a.LevelName,
+            RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+            LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
+            LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
+            LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+            Balance = a.Balance,
+            Bonus = a.Bonus,
+            DeviceScore = a.DeviceScore,
+            ShieldId = a.ShieldId
+        });
+        return exportData;
+    }
+
+    private int GetTransType(string transId)
+    {
+        if (string.IsNullOrEmpty(transId)) 
+            return 0;
+        if (transId.StartsWith("W"))
+            return 1;
+        if (transId.StartsWith("D"))
+            return 2;
+        if (transId.StartsWith("T") || transId.StartsWith("AT") || transId.StartsWith("BT"))
+            return 3;
+        return 0;
+    }
+
     public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId)
     {
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
@@ -233,5 +323,12 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<int> LineUnbind(int custId)
     {
         return await _customerService.DeleteLineProfileAsync(custId);
+    }
+    
+    private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
+    {
+        if (dateTime.HasValue)
+            return new DateTimeOffset(dateTime.Value, ts);
+        return null;
     }
 }
