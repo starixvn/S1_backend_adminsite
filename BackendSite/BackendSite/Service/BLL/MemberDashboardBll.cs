@@ -83,7 +83,30 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var transType = GetTransType(request.TransId);
         var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime);
 
-        var exportData = memberList.Select(a => new MemberExportData());
+        var exportData = memberList.Select(a => new MemberExportData()
+        {
+            SiteName = a.SiteName,
+            CurrencyId = a.CurrencyId,
+            IsoCode = a.IsoCode,
+            CustId = a.CustId,
+            UserName = a.UserName,
+            SabaId = a.SabaId,
+            AffiliateCode = a.AffiliateCode,
+            TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+            Agent = a.Agent,
+            Status = a.Status,
+            IsTest = a.IsTest,
+            IP = a.IP,
+            LevelName = a.LevelName,
+            RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+            LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
+            LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
+            LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+            Balance = a.Balance,
+            Bonus = a.Bonus,
+            DeviceScore = a.DeviceScore,
+            ShieldId = a.ShieldId
+        });
         return exportData;
     }
 
