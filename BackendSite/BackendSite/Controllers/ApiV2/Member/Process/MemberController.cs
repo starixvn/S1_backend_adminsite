@@ -20,11 +20,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
+        private readonly ExcelBLL _excelBll;
 
         public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll,
             ServerInfoBLL serverInfoBll,
             NewAuthorizeBLL newAuthorizeBll,
-            PaymentAdjustmentReportBLL paymentAdjustmentReportBll)
+            PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
+            ExcelBLL excelBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
@@ -32,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _serverInfoBll = serverInfoBll;
             _newAuthorizeBll = newAuthorizeBll;
             _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
-
+            _excelBll = excelBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -75,6 +77,54 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
+        }
+
+        /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiListResult<MemberList>> GetList(GetTempMemberListRequest request)
+        {
+            var result = await _memberDashboardBll.GetList(request);
+            return new ApiListResult<MemberList>()
+            {
+                Data = result.Data,
+                TotalPages = result.TotalPages,
+                PageNumber = result.PageNumber,
+                RowCount = result.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<IActionResult> Export(ExportMemberRequest request)
+        {
+            var exportData = await _memberDashboardBll.GetExportData(request);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
         /// <summary>
