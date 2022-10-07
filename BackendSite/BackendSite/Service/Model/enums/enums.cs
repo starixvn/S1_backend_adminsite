@@ -747,7 +747,11 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 第三方支付
         /// </summary>
-        PSP = 3
+        PSP = 3,
+        
+        Finance = 4,
+        
+        MC = 5
     }
 
     /// <summary>
