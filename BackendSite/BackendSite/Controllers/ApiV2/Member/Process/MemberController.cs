@@ -18,15 +18,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, AuthorizeBLL authorizeBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
-            _authorizeBll = authorizeBll;
+            _excelBll = excelBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -98,6 +98,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
         }
 
+        /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<IActionResult> Export(ExportMemberRequest request)
+        {
+            var exportData = await _memberDashboardBll.GetExportData(request);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            return _excelBll.ExcelFile(stream, "CustInfoList");
+        }
         /// <summary>
         /// Member/GetCustomerBasicInfo 取得客戶基本資料
         /// </summary>

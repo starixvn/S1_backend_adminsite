@@ -59,6 +59,36 @@ public class CustomerService : ICustomerService
         return searchData;
     }
 
+    public async Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, string userName, IEnumerable<int> tags,
+        string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber,
+        string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType,
+        DateTime startDate, DateTime endDate)
+    {
+        var p = new DynamicParameters();
+        p.Add("_SiteId", siteId);
+        p.Add("_CurrencyList", currencyList);
+        p.Add("_StatusList", statusList);
+        p.Add("_UserName", userName);
+        p.Add("_TagList", JsonConvert.SerializeObject(tags));
+        p.Add("_AccountName", accountName);
+        p.Add("_TpUserName", tpUserName);
+        p.Add("_LoginIp", loginIp);
+        p.Add("_Email", email);
+        p.Add("_PhoneNo", phoneNo);
+        p.Add("_BankAccountNumber", bankAccountNumber);
+        p.Add("_AffCode", affCode);
+        p.Add("_TransType", transType);
+        p.Add("_TransId", transId);
+        p.Add("_ShieldLevel", shieldLevel);
+        p.Add("_IovationLevel", iovationLevel);
+        p.Add("_DeviceId", deviceId);
+        p.Add("_DateType", dateType);
+        p.Add("_StartDate", startDate);
+        p.Add("_EndDate", endDate);
+        var result = await _sqlClienct.QueryAsync<MemberExportDataDto>("Admin_CustInfoSearchForExport_Get_V10", p);
+        return result;
+    }
+
     public async Task<CustomerDto> GetCustomerBasicInfoAsync(int custId)
     {
         var p = new DynamicParameters();

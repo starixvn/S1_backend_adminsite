@@ -5,6 +5,7 @@ namespace BackendSite.Service.BLL.Interface;
 public interface IMemberDashboardBLL
 {
     Task<GetMemberListResponse> GetList(GetTempMemberListRequest request);
+    Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request);
     Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);

@@ -74,6 +74,19 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return response;
     }
 
+    public async Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request)
+    {
+        var startTime = request.StartDate.ToUniversalTime().DateTime;
+        var endTime = request.EndDate.ToUniversalTime().DateTime;
+        var currencyList = string.Join(',', request.CurrencyId.ToArray());
+        var statusList = string.Join(',', request.Status.ToArray());
+        var transType = GetTransType(request.TransId);
+        var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime);
+
+        var exportData = memberList.Select(a => new MemberExportData());
+        return exportData;
+    }
+
     private int GetTransType(string transId)
     {
         if (string.IsNullOrEmpty(transId)) 
