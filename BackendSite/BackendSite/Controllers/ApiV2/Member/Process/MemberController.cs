@@ -16,17 +16,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     {
         private readonly IMemberDashboardBLL _memberDashboardBll;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
+        private readonly IVipLevelBLL _vipLevelBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
             _excelBll = excelBll;
+            _vipLevelBll = vipLevelBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -221,8 +223,135 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
+
         /// <summary>
-        /// CustomerManage/LineUnbind 解除用戶Line帳號綁定
+        /// Member/GetVipLevelSetting 取得VIP等級設定資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetVipLevelSetting(GetVipLevelSettingRequest custIdReq)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
+            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            {
+                Data = await _vipLevelBll.GetVipLevelSettingAsync(custInfo.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/GetVipLevelInfo 取得指定客戶VIP等級資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<MemberVipLevelInfo>> GetVipLevelInfo(GetVipLevelInfoRequest request)
+        {
+            var apiListResult = new ApiResult<MemberVipLevelInfo>
+            {
+                Data = await _vipLevelBll.GetVipLevelInfoAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/GetVipLevelLog 取得指定客戶VIP等級紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level Log
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<MemberVipLevelLog>>> GetVipLevelLog(GetVipLevelLogRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<MemberVipLevelLog>>
+            {
+                Data = await _vipLevelBll.GetVipLevelLogAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/SetVipLevel 設定指定客戶VIP等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Edit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevel(SetVipLevelRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result = await _vipLevelBll.SetVipLevelAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, request.VipLevel, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel fail");
+        }
+
+        /// <summary>
+        /// VipLevel/SetVipLevelManually 設定VIP等級為手動
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Manually]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevelManually(SetVipLevelManuallyRequest custIdReq)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
+            var result = await _vipLevelBll.SetVipLevelManuallyAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custIdReq.Manually, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Manually Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/LineUnbind 解除用戶Line帳號綁定
         /// </summary>
         /// <remarks>
         /// Http Method：POST

@@ -313,6 +313,32 @@ public class DeleteCustPhotoIdRequest
     public int CustId { get; set; }
     public int Id { get; set; }
 }
+public class GetVipLevelSettingRequest
+{
+    public int CustId { get; set; }
+}
+
+public class GetVipLevelInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class GetVipLevelLogRequest
+{
+    public int CustId { get; set; }
+}
+
+public class SetVipLevelRequest
+{
+    public int CustId { get; set; }
+    public int VipLevel { get; set; }
+}
+
+public class SetVipLevelManuallyRequest
+{
+    public int CustId { get; set; }
+    public int Manually { get; set; }
+}
 
 public class LineUnbindRequest
 {
