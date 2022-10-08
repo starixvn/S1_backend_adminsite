@@ -211,6 +211,13 @@ public class CustomerService : ICustomerService
         p.Add("TaskId", taskId);
         return await _mainSqlClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
     }
+
+    public async Task<int> DeleteOnUserAsync(int custId)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        return await _mainSqlClient.ExecuteAsync("Admin_OnUser_Del", p);
+    }
     
     public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
     {

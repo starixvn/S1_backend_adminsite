@@ -557,6 +557,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
+        /// Member/KickOut 強制讓客戶登出
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 30 })]
+        public async Task<ApiResult> KickOut(KickOutMemberRequest request)
+        {
+            if (await _memberDashboardBll.DeleteOnUserAsync(request.CustId) > 0)
+            {
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Kick Out Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
+        }
+        
+        /// <summary>
         /// Member/Close 關閉會員帳號
         /// </summary>
         /// <remarks>

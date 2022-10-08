@@ -392,6 +392,12 @@ public class LockMemberRequest
     public string Reason { get; set; }
 }
 
+public class KickOutMemberRequest
+{
+    public int CustId { get; set; }
+    public string Reason { get; set; }
+}
+
 public class CloseMemberRequest
 {
     public int CustId { get; set; }

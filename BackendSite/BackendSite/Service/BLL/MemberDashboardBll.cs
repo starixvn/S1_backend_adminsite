@@ -320,7 +320,12 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.DeleteLineProfileAsync(custId);
     }
-    
+
+    public async Task<int> DeleteOnUserAsync(int custId)
+    {
+        return await _customerService.DeleteOnUserAsync(custId);
+    }
+
     private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
     {
         if (dateTime.HasValue)
