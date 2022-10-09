@@ -340,6 +340,18 @@ public class SetVipLevelManuallyRequest
     public int Manually { get; set; }
 }
 
+public class AddTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
+}
+
+public class RemoveTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
+}
+
 public class LineUnbindRequest
 {
     public int CustId { get; set; }

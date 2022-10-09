@@ -9,6 +9,8 @@ public interface IMemberDashboardBLL
     Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
+    Task<int> AddCustTagAsync(int custId, int tagId);
+    Task<int> RemoveCustTagAsync(int custId, int tagId);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> EditPhoneNoAsync(int custId, string phoneNo);

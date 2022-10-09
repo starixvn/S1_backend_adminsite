@@ -219,6 +219,35 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return await _customerService.GetCustomerIpListByCustIdAsync(custId);
     }
 
+    public async Task<int> AddCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        var tagList = new List<int>();
+        if (!string.IsNullOrEmpty(tagListStr))
+        {
+            tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        }
+        tagList.Add(tagId);
+        return await _customerService.SetCustTag(custId, tagList);
+    }
+
+    public async Task<int> RemoveCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        if (string.IsNullOrEmpty(tagListStr))
+        {
+            return 0;
+        }
+        var tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        var idx = tagList.FindIndex(id => id == tagId);
+        if (idx == -1)
+        {
+            return 0;
+        }
+        tagList.RemoveAt(idx);
+        return await _customerService.SetCustTag(custId, tagList);
+    }
+
     public async Task<int> EditFullNameAsync(int custId, string fullName)
     {
         return await _customerService.EditFullNameAsync(custId, fullName);

@@ -80,6 +80,7 @@ namespace BackendSite
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
+            services.AddTransient<ITagBLL, TagBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ReferralManagementDecorator>();
@@ -88,6 +89,7 @@ namespace BackendSite
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();

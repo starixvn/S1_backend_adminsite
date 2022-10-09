@@ -103,6 +103,12 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryAsync<CustomerTag>("Admin_CustTag_Get", p);
     }
 
+    public async Task<string> GetCustomerTagsAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<string>("Admin_CustomerTagList_Get", p);
+    }
+    
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
@@ -114,6 +120,14 @@ public class CustomerService : ICustomerService
     {
         var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
         return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
+    }
+
+    public async Task<int> SetCustTag(int custid, List<int> tagList)
+    {
+        var p = new DynamicParameters();
+        p.Add("CustId", custid);
+        p.Add("TagList", JsonConvert.SerializeObject(tagList));
+        return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)

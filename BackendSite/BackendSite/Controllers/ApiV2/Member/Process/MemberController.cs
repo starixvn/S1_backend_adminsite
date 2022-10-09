@@ -323,7 +323,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// VipLevel/SetVipLevelManually 設定VIP等級為手動
+        /// Member/SetVipLevelManually 設定VIP等級為手動
         /// </summary>
         /// <remarks>
         /// 
@@ -348,6 +348,55 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 };
             }
             throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 設定客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Add]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> AddTag(AddTagRequest request)
+        {
+            if (await _memberDashboardBll.AddCustTagAsync(request.CustId, request.TagId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Add Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Add Tag Fail.");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 移除客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Remove]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+
+        [HttpPost]
+        public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
+        {
+            if (await _memberDashboardBll.RemoveCustTagAsync(request.CustId, request.TagId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Remove Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Remove Tag Fail.");
         }
 
         /// <summary>
