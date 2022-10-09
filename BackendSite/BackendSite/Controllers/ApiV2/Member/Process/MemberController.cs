@@ -927,5 +927,37 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
+        
+        /// <summary>
+        /// CustManage/GetLoginLogByCust 取得指定客戶登入紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
+        {
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
+            var loginLog = await _memberDashboardBll.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
+            var apiResult = new ApiListResult<MemberLoginLog>
+            {
+                Data = loginLog.LoginLog,
+                PageNumber = loginLog.PageNumber,
+                TotalPages = loginLog.TotalPages,
+                RowCount = loginLog.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
     }
 }

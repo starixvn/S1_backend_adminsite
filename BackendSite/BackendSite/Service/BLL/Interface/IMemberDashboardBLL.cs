@@ -29,4 +29,5 @@ public interface IMemberDashboardBLL
     Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType);
     Task<int> LineUnbind(int custId);
     Task<int> DeleteOnUserAsync(int custId);
+    Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
 }

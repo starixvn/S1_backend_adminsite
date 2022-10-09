@@ -355,6 +355,26 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return await _customerService.DeleteOnUserAsync(custId);
     }
 
+    public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
+    {
+        var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
+        var response = new GetLoginLogResponse()
+        {
+            LoginLog = data.LoginLog.Select(a => new MemberLoginLog()
+            {
+                Id = a.Id,
+                LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
+                LoginIp = a.LoginIp,
+                FromUrl = a.FromUrl,
+                UserAgent = a.UserAgent
+            }),
+            PageNumber = data.PageNumber,
+            TotalPages = data.TotalPages,
+            RowCount = data.RowCount
+        };
+        return response;
+    }
+
     private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
     {
         if (dateTime.HasValue)

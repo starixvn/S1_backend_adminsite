@@ -121,7 +121,28 @@ public class CustomerService : ICustomerService
         var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
         return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
     }
-
+    
+    public async Task<LoginLogPageData> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_StartDate", startDate);
+        p.Add("_EndDate", endDate);
+        p.Add("_PageSize", Math.Abs(pageSize));
+        p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+        p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        var loginLog = await _sqlClienct.QueryAsync<LoginLogDto>("Admin_LoginLogByCust_Get_V3", p);
+        var loginLogData = new LoginLogPageData
+        {
+            LoginLog = loginLog,
+            PageNumber = pageNumber,
+            TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+            RowCount = p.Get<int?>("_RowCount") ?? 0
+        };
+        return loginLogData;
+    }
+    
     public async Task<int> SetCustTag(int custid, List<int> tagList)
     {
         var p = new DynamicParameters();

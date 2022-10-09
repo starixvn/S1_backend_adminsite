@@ -494,3 +494,42 @@ public class CustomerLoginIp
     public string LoginIp { get; set; }
     public int UserCount { get; set; }
 }
+
+public class GetLoginLogRequest : ApiRequestPageModel
+{
+    public int CustId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+}
+
+public class GetLoginLogResponse
+{
+    public IEnumerable<MemberLoginLog> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
+public class MemberLoginLog
+{
+    public int Id { get; set; }
+    public DateTimeOffset LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+public class LoginLogDto
+{
+    public int Id { get; set; }
+    public DateTime LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+
+public class LoginLogPageData
+{
+    public IEnumerable<LoginLogDto> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
