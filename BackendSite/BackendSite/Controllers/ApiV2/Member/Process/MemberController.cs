@@ -225,30 +225,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Member/GetVipLevelSetting 取得VIP等級設定資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
-        /// 
-        /// </remarks>
-        /// <param name="custIdReq"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetVipLevelSetting(GetVipLevelSettingRequest custIdReq)
-        {
-            var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
-            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
-            {
-                Data = await _vipLevelBll.GetVipLevelSettingAsync(custInfo.SiteId),
-                ErrorCode = 0
-            };
-            return apiListResult;
-        }
-
-        /// <summary>
         /// Member/GetVipLevelInfo 取得指定客戶VIP等級資料
         /// </summary>
         /// <remarks>

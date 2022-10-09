@@ -315,7 +315,7 @@ public class DeleteCustPhotoIdRequest
 }
 public class GetVipLevelSettingRequest
 {
-    public int CustId { get; set; }
+    public int SiteId { get; set; }
 }
 
 public class GetVipLevelInfoRequest
