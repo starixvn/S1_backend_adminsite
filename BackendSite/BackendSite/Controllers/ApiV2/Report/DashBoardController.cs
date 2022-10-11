@@ -67,6 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
             [Range(-12, 14)]
             public int TimeZone { get; set; }
             public DashboardOrderByPropertyEnum OrderByProperty { get; set; }  = DashboardOrderByPropertyEnum.Amount ;
@@ -76,6 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
             [Range(-12, 14)]
             public int TimeZone { get; set; }
             public DashboardOrderByPropertyEnum OrderByProperty { get; set; } = DashboardOrderByPropertyEnum.Amount ;
@@ -85,6 +87,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
             [Range(-12, 14)]
             public int TimeZone { get; set; }
             public DashboardOrderByPropertyEnum OrderByProperty { get; set; } = DashboardOrderByPropertyEnum.Amount ;
@@ -219,9 +222,13 @@ namespace BackendSite.Controllers.ApiV2.Report
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
 
+            startTime = DateTime.Now.AddYears(-1);
+            endTime = DateTime.Now;
+            
             var result = _dashBoardBll.GetTopDepositorsList(
                 request.SiteId,
                 request.CurrencyIds,
+                request.BaseCurrencyId,
                 startTime,
                 endTime,
                 request.OrderByProperty,
@@ -260,9 +267,13 @@ namespace BackendSite.Controllers.ApiV2.Report
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
 
+            startTime = DateTime.Now.AddYears(-1);
+            endTime = DateTime.Now;
+            
             var result = _dashBoardBll.GetTopWithdrawalList(
                 request.SiteId,
                 request.CurrencyIds,
+                request.BaseCurrencyId,
                 startTime,
                 endTime,
                 request.OrderByProperty,
@@ -301,9 +312,13 @@ namespace BackendSite.Controllers.ApiV2.Report
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
 
+            startTime = DateTime.Now.AddYears(-1);
+            endTime = DateTime.Now;
+            
             var result = _dashBoardBll.GetTopBonusClaimedList(
                 request.SiteId,
                 request.CurrencyIds,
+                request.BaseCurrencyId,
                 startTime,
                 endTime,
                 request.OrderByProperty,

@@ -69,7 +69,7 @@ namespace BackendSite.Service.BLL
             var result = new DashBoardMemBerData
             {
                 MemBerDataByCurrency = new List<DashBoardMemBerDataByCurrency>(),
-                RegistrationPlatform = new List<RegistrationPlatformDataByMonth>()
+                RegistrationPlatform = new List<RegistrationPlatformDetailData>()
             };
             
             // // MemBerDataByCurrency
@@ -88,7 +88,6 @@ namespace BackendSite.Service.BLL
             result.RegistrationPlatform = _redisHelper.TryGetOrCreate(key2, TimeSpan.FromMinutes(15), 
                 () => GetDashBoardMemberPlatformData(siteId, currencyIds, timeZone));
             
-            
              return result;
         }
 
@@ -104,15 +103,10 @@ namespace BackendSite.Service.BLL
             };
             
             //PerMonthData
-            for (var month = 1; month <= DateTime.UtcNow.Month; month++)
-            {
-                var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
-                var endTime = startTime.AddMonths(1).AddMilliseconds(-1).AddHours(timeZone);
-                var dataByMonth = _dashBoardService.GetDashBoardMemberData(siteId, currencyId, startTime, endTime);
-                dataByMonth.Month = month;
-                result.PerMonthData.Add(dataByMonth);
-            }
-            
+            var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
+            var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
+            result.PerMonthData = _dashBoardService.GetDashBoardMemberDataByMonth(siteId, currencyId, startTime ,timeZoneString).ToList();
+
             //TodayData
             var localTime = DateTime.UtcNow.AddHours(timeZone);
             var todayStartTime = localTime.Date;
@@ -156,18 +150,11 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        private List<RegistrationPlatformDataByMonth> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds ,int timeZone)
+        private List<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds ,int timeZone)
         {
-            var result = new List<RegistrationPlatformDataByMonth>();
-            for (var month = 1 ; month <= DateTime.UtcNow.Month; month++)
-            {
-                var data = new RegistrationPlatformDataByMonth();
-                var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
-                var endTime = startTime.AddMonths(1).AddMilliseconds(-1).AddHours(timeZone);
-                data.Platform = _dashBoardService.GetDashBoardMemberPlatformData(siteId, currencyIds, startTime, endTime);
-                data.Month = month;
-                result.Add(data);
-            }
+            var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
+            var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
+            var result = _dashBoardService.GetDashBoardMemberPlatformData(siteId, currencyIds, startTime, timeZoneString).ToList();
             
             return result;
         }
@@ -231,7 +218,7 @@ namespace BackendSite.Service.BLL
         {
             var result = new DashBoardFinancialDataByCurrency
             {
-                PerMonthData = new List<DashBoardFinancialDataByMonth>(),
+                PerMonthData = new DashBoardFinancialDataByMonth(),
                 TodayData = new DashBoardFinancialDetailData(),
                 YesterdayData = new DashBoardFinancialDetailData(),
                 MonthToDateData = new DashBoardFinancialDetailData(),
@@ -239,31 +226,27 @@ namespace BackendSite.Service.BLL
             };
             
             //PerMonthData
-            for (var month = 1; month <= DateTime.UtcNow.Month; month++)
+            
+            var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
+            var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
+            result.PerMonthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialDataByMonth(siteId, currencyId, startTime ,timeZoneString);
+           
+            if (baseRate != 0 && originRate != baseRate)
             {
-                var monthData = new DashBoardFinancialDataByMonth();
-                var startTime = new DateTime(DateTime.UtcNow.Year, month, 1).AddHours(timeZone);
-                var endTime = startTime.AddMonths(1).AddMilliseconds(-1).AddHours(timeZone);
-                
-                monthData.Month = month;
-                monthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialData(siteId, currencyId, startTime, endTime);
-               
-                if (baseRate != 0 && originRate != baseRate)
+                var baseCurrencyData = result.PerMonthData.OriginalCurrencyData;
+
+                foreach (var data in baseCurrencyData)
                 {
-                    monthData.BaseCurrencyData = new DashBoardFinancialDetailData()
-                    {
-                        DepositCount = monthData.OriginalCurrencyData.DepositCount,
-                        DepositAmount = ChangeRate(monthData.OriginalCurrencyData.DepositAmount ,originRate ,baseRate), 
-                        WithdrawalAmount = ChangeRate(monthData.OriginalCurrencyData.WithdrawalAmount ,originRate ,baseRate), 
-                        BonusClaimAmount = ChangeRate(monthData.OriginalCurrencyData.BonusClaimAmount ,originRate ,baseRate), 
-                        NetCashAmount = ChangeRate(monthData.OriginalCurrencyData.NetCashAmount ,originRate ,baseRate) 
-                    };
+                    data.DepositAmount = ChangeRate(data.DepositAmount, originRate, baseRate);
+                    data.WithdrawalAmount = ChangeRate(data.WithdrawalAmount, originRate, baseRate);
+                    data.BonusClaimAmount = ChangeRate(data.BonusClaimAmount, originRate, baseRate);
+                    data.NetCashAmount = ChangeRate(data.NetCashAmount, originRate, baseRate);
                 }
-                else
-                {
-                    monthData.BaseCurrencyData = monthData.OriginalCurrencyData;
-                }
-                result.PerMonthData.Add(monthData);
+                result.PerMonthData.BaseCurrencyData = baseCurrencyData;
+            }
+            else
+            {
+                result.PerMonthData.BaseCurrencyData = result.PerMonthData.OriginalCurrencyData;
             }
             
             //TodayData
@@ -348,6 +331,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TopDepositorsList> GetTopDepositorsList(
             int siteId, 
             IEnumerable<int> currencyIds, 
+            int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
             DashboardOrderByPropertyEnum orderBy,
@@ -359,6 +343,7 @@ namespace BackendSite.Service.BLL
             var result = _dashBoardService.GetTopDepositorsList(
                 siteId, 
                 currencyIds, 
+                baseCurrencyId,
                 startTime, 
                 endTime,
                 orderBy,
@@ -373,6 +358,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TopWithdrawalList> GetTopWithdrawalList(
             int siteId, 
             IEnumerable<int> currencyIds, 
+            int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
             DashboardOrderByPropertyEnum orderBy,
@@ -384,6 +370,7 @@ namespace BackendSite.Service.BLL
             var result = _dashBoardService.GetTopWithdrawalList(
                 siteId, 
                 currencyIds, 
+                baseCurrencyId,
                 startTime, 
                 endTime,
                 orderBy,
@@ -398,6 +385,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TopBonusClaimedList> GetTopBonusClaimedList(
             int siteId, 
             IEnumerable<int> currencyIds, 
+            int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
             DashboardOrderByPropertyEnum orderBy,
@@ -409,6 +397,7 @@ namespace BackendSite.Service.BLL
             var result = _dashBoardService.GetTopBonusClaimedList(
                 siteId, 
                 currencyIds, 
+                baseCurrencyId,
                 startTime, 
                 endTime,
                 orderBy,

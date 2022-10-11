@@ -102,7 +102,7 @@
     public class DashBoardMemBerData
     {
         public List<DashBoardMemBerDataByCurrency> MemBerDataByCurrency { get; set; }
-        public List<RegistrationPlatformDataByMonth> RegistrationPlatform { get; set; }
+        public List<RegistrationPlatformDetailData> RegistrationPlatform { get; set; }
     }
     
     public class DashBoardMemBerDataByCurrency
@@ -128,18 +128,13 @@
         public int UniqueLogin { get; set; }
         
     }
-
-    public class RegistrationPlatformDataByMonth
-    {
-        public int Month { get; set; }
-        public IEnumerable<RegistrationPlatformDetailData> Platform { get; set; }
-      
-    }
     
     public class RegistrationPlatformDetailData
     {
-        public int DeviceType { get; set; }
-        public int Count { get; set; }
+        public int Month { get; set; }
+        public int WebCount { get; set; }
+        public int H5Count { get; set; }
+        public int AppCount { get; set; }
     }
     
     public class NewMemberList
@@ -163,7 +158,7 @@
     {
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
-        public List<DashBoardFinancialDataByMonth> PerMonthData { get; set; }
+        public DashBoardFinancialDataByMonth PerMonthData { get; set; }
         public DashBoardFinancialDetailData TodayData { get; set; }
         public DashBoardFinancialDetailData YesterdayData { get; set; }
         public DashBoardFinancialDetailData MonthToDateData { get; set; }
@@ -172,13 +167,13 @@
 
     public class DashBoardFinancialDataByMonth 
     {
-        public int Month { get; set; }
-        public DashBoardFinancialDetailData OriginalCurrencyData  { get; set; }
-        public DashBoardFinancialDetailData BaseCurrencyData   { get; set; }
+        public IEnumerable<DashBoardFinancialDetailData> OriginalCurrencyData  { get; set; }
+        public IEnumerable<DashBoardFinancialDetailData> BaseCurrencyData   { get; set; }
     }
     
     public class DashBoardFinancialDetailData
     {
+        public int Month { get; set; }
         public int DepositCount { get; set; }
         public decimal DepositAmount { get; set; }
         public decimal WithdrawalAmount { get; set; }
