@@ -217,6 +217,18 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
         }
+        
+        public async Task<IEnumerable<DeviceUser>> GetIoavationAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_IoavationAssociatedList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetShieldAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_ShieldAssociatedList_Get", p);
+        }
 
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
