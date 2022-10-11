@@ -142,6 +142,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             IsLineBinding = custLineProfile != null,
             CustLineProfile = custLineProfile,
             Status = customer.Status,
+            EnableRebate = customer.EnableRebate,
             DepositPointLevel = customer.PointLevel,
             Currency = customer.CurrencyName,
             Identity = customer.Identity,
@@ -216,6 +217,35 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
     {
         return await _customerService.GetCustomerIpListByCustIdAsync(custId);
+    }
+
+    public async Task<int> AddCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        var tagList = new List<int>();
+        if (!string.IsNullOrEmpty(tagListStr))
+        {
+            tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        }
+        tagList.Add(tagId);
+        return await _customerService.SetCustTag(custId, tagList);
+    }
+
+    public async Task<int> RemoveCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        if (string.IsNullOrEmpty(tagListStr))
+        {
+            return 0;
+        }
+        var tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        var idx = tagList.FindIndex(id => id == tagId);
+        if (idx == -1)
+        {
+            return 0;
+        }
+        tagList.RemoveAt(idx);
+        return await _customerService.SetCustTag(custId, tagList);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
@@ -324,7 +354,32 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.DeleteLineProfileAsync(custId);
     }
-    
+
+    public async Task<int> DeleteOnUserAsync(int custId)
+    {
+        return await _customerService.DeleteOnUserAsync(custId);
+    }
+
+    public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
+    {
+        var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
+        var response = new GetLoginLogResponse()
+        {
+            LoginLog = data.LoginLog.Select(a => new MemberLoginLog()
+            {
+                Id = a.Id,
+                LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
+                LoginIp = a.LoginIp,
+                FromUrl = a.FromUrl,
+                UserAgent = a.UserAgent
+            }),
+            PageNumber = data.PageNumber,
+            TotalPages = data.TotalPages,
+            RowCount = data.RowCount
+        };
+        return response;
+    }
+
     private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
     {
         if (dateTime.HasValue)
