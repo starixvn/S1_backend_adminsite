@@ -196,8 +196,10 @@ public class MemberDashboardBll : IMemberDashboardBLL
             return iovationList.Select(a => new MemberLoginDevice()
             {
                 DeviceId = a.DeviceId,
+                DeviceStatus = 1,
                 Risk = $"{a.Iovation}({a.Score})",
                 Frequency = a.Frequency,
+                DeviceType = a.DeviceType,
                 AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
             });
@@ -207,8 +209,10 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return shield.Select(a => new MemberLoginDevice()
         {
             DeviceId = a.DeviceId,
+            DeviceStatus = 1,
             Risk = a.DeviceScore < 75 ? $"High Risk({a.DeviceScore})" : $"Low Risk({a.DeviceScore})",
             Frequency = a.Frequency,
+            DeviceType = a.Platform,
             AssociateCount = a.AssociateCount,
             LastUpdateTime = a.LastUpdateTime
         });

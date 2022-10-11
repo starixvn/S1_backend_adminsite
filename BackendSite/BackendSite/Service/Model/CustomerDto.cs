@@ -483,9 +483,11 @@ public class GetIpListRequest
 public class MemberLoginDevice
 {
     public string DeviceId { get; set; }
+    public int DeviceStatus { get; set; }
     public string Risk { get; set; }
     public int Frequency { get; set; }
     public int AssociateCount { get; set; }
+    public string DeviceType { get; set; }
     public DateTimeOffset LastUpdateTime { get; set; }
 }
 
