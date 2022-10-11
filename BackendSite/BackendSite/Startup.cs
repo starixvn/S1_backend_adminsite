@@ -81,6 +81,8 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
+            services.AddTransient<IVipLevelBLL, VipLevelBLL>();
+            services.AddTransient<ITagBLL, TagBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
@@ -88,6 +90,8 @@ namespace BackendSite
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IVipLevelService, VipLevelService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IDeviceService, DeviceService>();

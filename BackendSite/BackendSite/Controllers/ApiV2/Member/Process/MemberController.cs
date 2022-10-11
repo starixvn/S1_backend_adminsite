@@ -16,17 +16,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     {
         private readonly IMemberDashboardBLL _memberDashboardBll;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
+        private readonly IVipLevelBLL _vipLevelBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll,
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, 
+            CustInfoBLL custInfoBll,
             ServerInfoBLL serverInfoBll,
             NewAuthorizeBLL newAuthorizeBll,
             PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
             ExcelBLL excelBll)
+
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
@@ -35,6 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _newAuthorizeBll = newAuthorizeBll;
             _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
             _excelBll = excelBll;
+            _vipLevelBll = vipLevelBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -230,8 +234,160 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
+
         /// <summary>
-        /// CustomerManage/LineUnbind 解除用戶Line帳號綁定
+        /// Member/GetVipLevelInfo 取得指定客戶VIP等級資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<MemberVipLevelInfo>> GetVipLevelInfo(GetVipLevelInfoRequest request)
+        {
+            var apiListResult = new ApiResult<MemberVipLevelInfo>
+            {
+                Data = await _vipLevelBll.GetVipLevelInfoAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/GetVipLevelLog 取得指定客戶VIP等級紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level Log
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<MemberVipLevelLog>>> GetVipLevelLog(GetVipLevelLogRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<MemberVipLevelLog>>
+            {
+                Data = await _vipLevelBll.GetVipLevelLogAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/SetVipLevel 設定指定客戶VIP等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Edit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevel(SetVipLevelRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result = await _vipLevelBll.SetVipLevelAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, request.VipLevel, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel fail");
+        }
+
+        /// <summary>
+        /// Member/SetVipLevelManually 設定VIP等級為手動
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Manually]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevelManually(SetVipLevelManuallyRequest custIdReq)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
+            var result = await _vipLevelBll.SetVipLevelManuallyAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custIdReq.Manually, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Manually Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 設定客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Add]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> AddTag(AddTagRequest request)
+        {
+            if (await _memberDashboardBll.AddCustTagAsync(request.CustId, request.TagId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Add Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Add Tag Fail.");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 移除客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Remove]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+
+        [HttpPost]
+        public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
+        {
+            if (await _memberDashboardBll.RemoveCustTagAsync(request.CustId, request.TagId) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Remove Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Remove Tag Fail.");
+        }
+
+        /// <summary>
+        /// Member/LineUnbind 解除用戶Line帳號綁定
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -588,6 +744,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         
         /// <summary>
+        /// Member/KickOut 強制讓客戶登出
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 30 })]
+        public async Task<ApiResult> KickOut(KickOutMemberRequest request)
+        {
+            if (await _memberDashboardBll.DeleteOnUserAsync(request.CustId) > 0)
+            {
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Kick Out Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
+        }
+        
+        /// <summary>
         /// Member/Close 關閉會員帳號
         /// </summary>
         /// <remarks>
@@ -865,10 +1045,42 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<CustomerBalanceInfo>> GetCustomerBalanceInfo(GetCustomerBasicInfoRequest request)
         {
             return new ApiResult<CustomerBalanceInfo>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Data = await _memberDashboardBll.GetCustomerBalanceInfoAsync(request.CustId)
+                };
+        }
+
+        /// <summary>
+        /// CustManage/GetLoginLogByCust 取得指定客戶登入紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
+        {
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
+            var loginLog = await _memberDashboardBll.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
+            var apiResult = new ApiListResult<MemberLoginLog>
             {
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _memberDashboardBll.GetCustomerBalanceInfoAsync(request.CustId)
+                Data = loginLog.LoginLog,
+                PageNumber = loginLog.PageNumber,
+                TotalPages = loginLog.TotalPages,
+                RowCount = loginLog.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
+
+            return apiResult;
         }
     }
 }

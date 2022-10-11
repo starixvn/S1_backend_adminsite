@@ -195,6 +195,7 @@ public class CustomerDto
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int PointLevel { get; set; }
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; }
@@ -245,6 +246,7 @@ public class CustomerBasicInfo
     public bool IsLineBinding { get; set; }
     public CustLineProfileModel CustLineProfile { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
     public int Identity { get; set; }
@@ -310,6 +312,44 @@ public class DeleteCustPhotoIdRequest
 {
     public int CustId { get; set; }
     public int Id { get; set; }
+}
+public class GetVipLevelSettingRequest
+{
+    public int SiteId { get; set; }
+}
+
+public class GetVipLevelInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class GetVipLevelLogRequest
+{
+    public int CustId { get; set; }
+}
+
+public class SetVipLevelRequest
+{
+    public int CustId { get; set; }
+    public int VipLevel { get; set; }
+}
+
+public class SetVipLevelManuallyRequest
+{
+    public int CustId { get; set; }
+    public int Manually { get; set; }
+}
+
+public class AddTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
+}
+
+public class RemoveTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
 }
 
 public class LineUnbindRequest
@@ -390,6 +430,12 @@ public class LockMemberRequest
     public string Reason { get; set; }
 }
 
+public class KickOutMemberRequest
+{
+    public int CustId { get; set; }
+    public string Reason { get; set; }
+}
+
 public class CloseMemberRequest
 {
     public int CustId { get; set; }
@@ -449,7 +495,6 @@ public class CustomerLoginIp
     public int UserCount { get; set; }
 }
 
-
 public class CustomerBalanceInfo
 {
     public decimal Balance { get; set; }
@@ -464,19 +509,57 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-    public decimal RemainingTurnOver 
-    {
-        get 
-        {
-            var remainingTurnOver = WithdrawalLimit - TurnOver;
-            return remainingTurnOver > 0 ? remainingTurnOver : 0;
-        }     
-    }
-    public decimal EligibleWithdrawal
+
+    public decimal RemainingTurnOver
     {
         get
         {
-            return Balance - RemainingTurnOver;
+            var remainingTurnOver = WithdrawalLimit - TurnOver;
+            return remainingTurnOver > 0 ? remainingTurnOver : 0;
         }
     }
+
+    public decimal EligibleWithdrawal
+    {
+        get { return Balance - RemainingTurnOver; }
+    }
+}
+
+public class GetLoginLogRequest : ApiRequestPageModel
+{
+    public int CustId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+}
+
+public class GetLoginLogResponse
+{
+    public IEnumerable<MemberLoginLog> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
+public class MemberLoginLog
+{
+    public int Id { get; set; }
+    public DateTimeOffset LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+public class LoginLogDto
+{
+    public int Id { get; set; }
+    public DateTime LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+
+public class LoginLogPageData
+{
+    public IEnumerable<LoginLogDto> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
 }
