@@ -366,6 +366,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
                 LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
                 LoginIp = a.LoginIp,
                 FromUrl = a.FromUrl,
+                Location = a.Location,
                 UserAgent = a.UserAgent
             }),
             PageNumber = data.PageNumber,
