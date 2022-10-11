@@ -22,11 +22,6 @@ namespace BackendSite.Service.BLL
         {
             return _vipLevelService.GetVipLevelSetting(siteId);
         }
-        
-        public Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
-        {
-            return _vipLevelService.GetVipLevelSettingAsync(siteId);
-        }
 
         public async Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
         {
