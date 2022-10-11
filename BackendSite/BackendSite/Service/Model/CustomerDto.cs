@@ -544,6 +544,7 @@ public class MemberLoginLog
     public int Id { get; set; }
     public DateTimeOffset LoginTime { get; set; }
     public string LoginIp { get; set; }
+    public string Location { get; set; }
     public string FromUrl { get; set; }
     public string UserAgent { get; set; }
 }
@@ -552,6 +553,7 @@ public class LoginLogDto
     public int Id { get; set; }
     public DateTime LoginTime { get; set; }
     public string LoginIp { get; set; }
+    public string Location { get; set; }
     public string FromUrl { get; set; }
     public string UserAgent { get; set; }
 }
