@@ -162,12 +162,6 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotEventManagement" })]
-        public IActionResult HotEventManagement()
-        {
-            return View();
-        }
-
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/HotGamesManagement" })]
         public IActionResult HotGamesManagement()
         {
@@ -179,5 +173,18 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
+        public IActionResult SlotGamesManagement()
+		{
+            return View();
+        }     
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        public IActionResult CategoryManagement()
+        {
+            return View();
+        }  
+
     }
 }

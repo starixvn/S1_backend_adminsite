@@ -399,7 +399,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(request.TpId);
+                var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(request.TpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
