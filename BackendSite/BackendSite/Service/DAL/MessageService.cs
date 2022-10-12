@@ -142,7 +142,7 @@ namespace BackendSite.Service.DAL
 
         public CustLang GetCustLang(int CustId)
         {
-            return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }, commandType: CommandType.StoredProcedure).FirstOrDefault();
+            return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }).FirstOrDefault();
         }
 
         public void DeletePersonalMsg(int id ,bool isBatch)
@@ -299,7 +299,7 @@ namespace BackendSite.Service.DAL
         public async Task<ApiResult> SendSMSMessageToPlayerAsync(int CustId)
         {
             var apiUrl = $"{_commonServiceUrl}OTPSMS/SendSMS";
-            ApiResult apiResult = await _courierAdapter.MyPostAsync<IEnumerable<FireBaseReturn>, dynamic>(apiUrl, new { CustId });
+            ApiResult apiResult = await _courierAdapter.MyPostAsync<ApiResult, dynamic>(apiUrl, new { CustId });
             return apiResult;
         }
 
