@@ -361,6 +361,40 @@ namespace BackendSite.Controllers.ApiV2.Report
             };
         }
 
+        /// <summary>
+        /// DashBoard/GetData 取得儀錶板遊戲資訊資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [HttpPost]
+        public ApiResult<Dictionary<string,List<DashBoardGameOverAllDto>>> GetGameOverAllData(GetGameRequest request)
+        {
+            var canSearchSite = new List<int>();
+
+            if (request.TimeZone > 14 || request.TimeZone < -12)
+                throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
+
+            var result = _dashBoardBll.GetGameOverallData(request.SiteIds,
+                request.CurrencyIds,
+                request.BaseCurrencyId,
+                request.TpIds,
+                request.Categories,
+                request.GameTypes,
+                request.TimeZone);
+
+            return new ApiResult<Dictionary<string, List<DashBoardGameOverAllDto>>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+        }
+
         #endregion
     }
 }

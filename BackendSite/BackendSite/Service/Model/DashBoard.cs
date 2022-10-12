@@ -125,10 +125,15 @@
     {
         public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
+        public decimal BetCount { get; set; }
         public decimal BetAmount { get; set; }
         public decimal AverageBetAmount { get; set; }
         public decimal Payout { get; set; }
         public decimal GGR { get; set; }
+        public decimal Margin { get; set; }
+        public decimal ActiveMember { get; set; }
+
+        public decimal ActiveMember { get; set; }
     }
 
     #endregion
