@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using System.Reflection;
+using Org.BouncyCastle.Asn1;
 
 namespace BackendSite.Service.BLL
 {
@@ -106,7 +107,7 @@ namespace BackendSite.Service.BLL
             //PerMonthData
             var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
             var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
-            result.PerMonthData = _dashBoardService.GetDashBoardMemberDataByMonth(siteId, currencyId, startTime ,timeZoneString).ToList();
+            result.PerMonthData = _dashBoardService.GetDashBoardMemberDataByMonth(siteId, currencyId, startTime, timeZoneString).ToList();
 
             //TodayData
             var localTime = DateTime.UtcNow.AddHours(timeZone);
@@ -151,7 +152,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        private List<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds ,int timeZone)
+        private List<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId, IEnumerable<int> currencyIds, int timeZone)
         {
             var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
             var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
@@ -227,11 +228,11 @@ namespace BackendSite.Service.BLL
             };
 
             //PerMonthData
-            
+
             var startTime = new DateTime(DateTime.UtcNow.Year, 1, 1);
             var timeZoneString = timeZone >= 0 ? $"+{timeZone}:00" : $"-{Math.Abs(timeZone)}:00";
-            result.PerMonthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialDataByMonth(siteId, currencyId, startTime ,timeZoneString);
-           
+            result.PerMonthData.OriginalCurrencyData = _dashBoardService.GetDashBoardFinancialDataByMonth(siteId, currencyId, startTime, timeZoneString);
+
             if (baseRate != 0 && originRate != baseRate)
             {
 
@@ -331,8 +332,8 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TopDepositorsList> GetTopDepositorsList(
-            int siteId, 
-            IEnumerable<int> currencyIds, 
+            int siteId,
+            IEnumerable<int> currencyIds,
             int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
@@ -343,10 +344,10 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             var result = _dashBoardService.GetTopDepositorsList(
-                siteId, 
-                currencyIds, 
+                siteId,
+                currencyIds,
                 baseCurrencyId,
-                startTime, 
+                startTime,
                 endTime,
                 orderBy,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
@@ -358,8 +359,8 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TopWithdrawalList> GetTopWithdrawalList(
-            int siteId, 
-            IEnumerable<int> currencyIds, 
+            int siteId,
+            IEnumerable<int> currencyIds,
             int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
@@ -370,8 +371,8 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             var result = _dashBoardService.GetTopWithdrawalList(
-                siteId, 
-                currencyIds, 
+                siteId,
+                currencyIds,
                 baseCurrencyId,
                 startTime,
                 endTime,
@@ -385,8 +386,8 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TopBonusClaimedList> GetTopBonusClaimedList(
-            int siteId, 
-            IEnumerable<int> currencyIds, 
+            int siteId,
+            IEnumerable<int> currencyIds,
             int baseCurrencyId,
             DateTime startTime,
             DateTime endTime,
@@ -397,10 +398,10 @@ namespace BackendSite.Service.BLL
             out int rowCount)
         {
             var result = _dashBoardService.GetTopBonusClaimedList(
-                siteId, 
-                currencyIds, 
+                siteId,
+                currencyIds,
                 baseCurrencyId,
-                startTime, 
+                startTime,
                 endTime,
                 orderBy,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
@@ -427,7 +428,7 @@ namespace BackendSite.Service.BLL
             var pieChartSummary = new Dictionary<string, List<DashBoardGameSimpleSummaryDto>>();
             var lineChartPerMonthSummary = new List<DashBoardGamePerMonthDto>();
             var lineChartSummary = new List<CurrencySummaryDto>();
-            var colectSource = Enumerable.Empty<DashboardGameForCaculateDao>();
+            var colectSource = new List<DashboardGameForCaculateDao>();
             var colectSourceMember = Enumerable.Empty<DashBoardGameUniqueMemberPerMonthDao>();
 
             //Step1:決定日期區間  
@@ -486,6 +487,8 @@ namespace BackendSite.Service.BLL
                   dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             var sourceMemberData = GetGameOverallMemberData(siteIds, currencyIds,
                   dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
+            var sourceWinData = GetOverAllLargestSingleWinInPeriod(siteIds, currencyIds,
+                  dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             //Step2:撈資料
             var currencyList = _reportBll.GetCurrency();
 
@@ -495,17 +498,20 @@ namespace BackendSite.Service.BLL
 
                 var todayData = CombineData(currencyInfo,
                     sourceData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")),
+                    sourceWinData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")));
                 result["Today"].Add(todayData);
 
                 var yesterdayData = CombineData(currencyInfo,
                     sourceData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")),
+                    sourceWinData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")));
                 result["Yesterday"].Add(yesterdayData);
 
                 var monthData = CombineData(currencyInfo,
                     sourceData.Where(x => x.CurrencyId == currencyId),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId),
+                    sourceWinData.Where(x => x.CurrencyId == currencyId));
                 result["MonthToDate"].Add(monthData);
             }
 
@@ -514,13 +520,16 @@ namespace BackendSite.Service.BLL
                   dateRangeLastMonth.StartDate, dateRangeLastMonth.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             var sourceLastMonthMemberData = GetGameOverallMemberData(siteIds, currencyIds,
                   dateRangeLastMonth.StartDate, dateRangeLastMonth.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
+            var sourceLastMonthWinData = GetOverAllLargestSingleWinInPeriod(siteIds, currencyIds,
+                 dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             foreach (var currencyId in currencyIds)
             {
                 var currencyInfo = currencyList.FirstOrDefault(x => x.CurrencyId == currencyId);
 
                 var todayData = CombineData(currencyInfo,
                     sourceLastMonthData.Where(x => x.CurrencyId == currencyId),
-                    sourceLastMonthMemberData.Where(x => x.CurrencyId == currencyId));
+                    sourceLastMonthMemberData.Where(x => x.CurrencyId == currencyId),
+                    sourceLastMonthWinData.Where(x => x.CurrencyId == currencyId));
                 result["SamePeriodLastMonth"].Add(todayData);
             }
 
@@ -530,7 +539,8 @@ namespace BackendSite.Service.BLL
 
         private DashBoardGameOverAllDto CombineData(CurrencyModel currencyInfo,
             IEnumerable<DashBoardGameOverAllDao> source,
-            IEnumerable<DashBoardGameOverAllMemberDao> sourceMember)
+            IEnumerable<DashBoardGameOverAllMemberDao> sourceMember,
+            IEnumerable<DashBoardGameOverAllLargestSingleWinDao> sourceWin)
         {
             var result = new DashBoardGameOverAllDto()
             {
@@ -542,7 +552,7 @@ namespace BackendSite.Service.BLL
                 GGR = source.Where(x => x.CategoryId == 8).Sum(x => x.RevenueSummary)
                         + source.Where(x => x.CategoryId != 8).Sum(x => x.WinLossSummary) * -1,
                 ActiveMember = sourceMember.Select(x => x.CustId).Distinct().Count(),
-                LargestSingleWin = 0
+                LargestSingleWin = sourceWin.Count() > 0 ? sourceWin.Select(x => x.Win).Max() : 0
             };
             result.AverangeBetAmount = result.BetCount == 0 ? 0 : result.BetAmount / result.BetCount;
             result.Margin = result.BetAmount == 0 ? 0 : result.GGR / result.BetAmount;
@@ -551,22 +561,22 @@ namespace BackendSite.Service.BLL
 
         private void CollectSourceForLineChartSum(IEnumerable<int> currencyIds,
             IEnumerable<DashBoardGamePerMonthDao> sourceData,
-            ref IEnumerable<DashboardGameForCaculateDao> caculateData)
+            ref List<DashboardGameForCaculateDao> caculateData)
         {
             var existCategoryList = sourceData.Select(x => x.CategoryId).Distinct().OrderBy(x => x);
             foreach (var currencyId in currencyIds)
             {
                 foreach (var category in existCategoryList)
                 {
-                    //caculateData.Add(new DashboardGameForCaculateDao()
-                    //{
-                    //    CurrencyId = currencyId,
-                    //    CategoryId = category,
-                    //    ValidBetSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.ValidBetSum),
-                    //    RevenueSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.RevenueSum),
-                    //    WinLossSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.WinLossSum),
-                    //    CountSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.CountSum)
-                    //});
+                    caculateData.Add(new DashboardGameForCaculateDao()
+                    {
+                        CurrencyId = currencyId,
+                        CategoryId = category,
+                        ValidBetSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.ValidBetSum),
+                        RevenueSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.RevenueSum),
+                        WinLossSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.WinLossSum),
+                        CountSum = sourceData.Where(x => x.CurrencyId == currencyId && x.CategoryId == category).Sum(x => x.CountSum)
+                    });
                 }
             }
         }
@@ -791,6 +801,40 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        private List<DashBoardGameOverAllLargestSingleWinDao> GetOverAllLargestSingleWinInPeriod(IEnumerable<int> siteIds,
+                           IEnumerable<int> currencyIds,
+                           DateTimeOffset startTime,
+                           DateTimeOffset endTime,
+                           IEnumerable<int> tpIds,
+                           IEnumerable<int> categoryIds,
+                           IEnumerable<int> gameTypes,
+                           string timeZone)
+        {
+            var result = new List<DashBoardGameOverAllLargestSingleWinDao>();
+            //This Month
+            if (startTime.Day > 10 && startTime.Month == DateTime.UtcNow.Month)
+                result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+                    tpIds, categoryIds, gameTypes, timeZone, startTime.ToString("yyyyMM")));
+            if (startTime.Day > 25 && startTime.Month == DateTime.UtcNow.Month)
+                result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(-1).ToString("yyyyMM")));
+            result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+        tpIds, categoryIds, gameTypes, timeZone, "0"));
+
+            //Last Month Same Period
+            if (startTime.Day > 10 && startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
+                result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+                    tpIds, categoryIds, gameTypes, timeZone, startTime.ToString("yyyyMM")));
+            if (startTime.Day > 25 && startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
+                result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(-1).ToString("yyyyMM")));
+            if (startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
+                result.AddRange(GetGameOverallLargestSingleWinData(siteIds, currencyIds, startTime, endTime,
+                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(1).ToString("yyyyMM")));
+
+            return result;
+        }
+
         #region Repo
 
         private IEnumerable<DashBoardGamePerMonthDao> GetGameSource(IEnumerable<int> siteIds,
@@ -857,6 +901,25 @@ namespace BackendSite.Service.BLL
         JsonConvert.SerializeObject(categoryIds),
         JsonConvert.SerializeObject(gameTypes),
         timeZone);
+
+        private IEnumerable<DashBoardGameOverAllLargestSingleWinDao> GetGameOverallLargestSingleWinData(IEnumerable<int> siteIds,
+                           IEnumerable<int> currencyIds,
+                           DateTimeOffset startTime,
+                           DateTimeOffset endTime,
+                           IEnumerable<int> tpIds,
+                           IEnumerable<int> categoryIds,
+                           IEnumerable<int> gameTypes,
+                           string timeZone,
+                           string yyyymm)
+                => _dashBoardService.GetDashBoardGameOverallLargestSingleWinData(JsonConvert.SerializeObject(siteIds),
+                    JsonConvert.SerializeObject(currencyIds),
+                    startTime.DateTime,
+                    endTime.DateTime,
+                    JsonConvert.SerializeObject(tpIds),
+                    JsonConvert.SerializeObject(categoryIds),
+                    JsonConvert.SerializeObject(gameTypes),
+                    timeZone,
+                    yyyymm);
 
         #endregion
 

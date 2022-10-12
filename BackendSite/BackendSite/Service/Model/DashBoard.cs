@@ -185,6 +185,14 @@
 
     }
 
+    public class DashBoardGameOverAllLargestSingleWinDao
+    {
+        public string Date { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal Win { get; set; }
+
+    }
+
     #endregion
 
     #region Dashboard_MemBer
@@ -265,8 +273,8 @@
     public class DashBoardFinancialDataByMonth
     {
         public int Month { get; set; }
-        public IEnumerable<DashBoardFinancialDetailData> OriginalCurrencyData  { get; set; }
-        public IEnumerable<DashBoardFinancialDetailData> BaseCurrencyData   { get; set; }
+        public IEnumerable<DashBoardFinancialDetailData> OriginalCurrencyData { get; set; }
+        public IEnumerable<DashBoardFinancialDetailData> BaseCurrencyData { get; set; }
 
     }
 
@@ -279,7 +287,7 @@
         public decimal BonusClaimAmount { get; set; }
         public decimal NetCashAmount { get; set; }
     }
-    
+
     public class TopDepositorsList
     {
         public int CustId { get; set; }
@@ -289,7 +297,7 @@
         public decimal Amount { get; set; }
         public int Count { get; set; }
     }
-    
+
     public class TopWithdrawalList
     {
         public int CustId { get; set; }
@@ -299,7 +307,7 @@
         public decimal Amount { get; set; }
         public int Count { get; set; }
     }
-    
+
     public class TopBonusClaimedList
     {
         public int CustId { get; set; }
