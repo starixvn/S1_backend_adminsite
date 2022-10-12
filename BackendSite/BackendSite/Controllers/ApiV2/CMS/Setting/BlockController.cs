@@ -14,12 +14,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly BlockBLL _blockBLL;
+        private readonly CustInfoBLL _custInfoBll;
         #endregion
 
         #region Constructors
         public BlockController(IServiceProvider provider)
         {
             _blockBLL = provider.GetRequiredService<BlockBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
         #endregion
 
@@ -242,7 +244,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public async Task<ApiResult<IEnumerable<DeviceUser>>> GetDeviceUserList(GetDeviceUserListRequest request)
         {
-            var deviceUserList = await _blockBLL.GetDeviceUserList(request.SiteId, request.DeviceId);
+            var customer = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            
+            var deviceUserList = await _blockBLL.GetDeviceUserList(customer.SiteId, request.DeviceId);
             return new ApiResult<IEnumerable<DeviceUser>>
             {
                 Data = deviceUserList,

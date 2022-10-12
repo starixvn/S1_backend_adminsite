@@ -113,7 +113,7 @@ namespace BackendSite.Service.Model
     }
     public class GetDeviceUserListRequest
     {
-        public int SiteId { get; set; }
+        public int CustId { get; set; }
         public string DeviceId { get; set; }
     }
     public class SetBlockIPRequest : BlockIPRequest
