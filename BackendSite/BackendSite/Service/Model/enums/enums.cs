@@ -1294,4 +1294,10 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+
+    public enum TransactionRelaySummaryTypeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
 }

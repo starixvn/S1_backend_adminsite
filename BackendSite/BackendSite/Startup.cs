@@ -85,6 +85,7 @@ namespace BackendSite
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IMpaWinLossService, MpaWinLossService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
