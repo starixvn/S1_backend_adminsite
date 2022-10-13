@@ -50,7 +50,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V2", new { _SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_GetV2", new { _SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
