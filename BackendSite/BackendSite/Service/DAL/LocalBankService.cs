@@ -47,10 +47,10 @@ namespace BackendSite.Service.DAL
             return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }*/
 
-        public IEnumerable<BankInfoPay> GetBankInfoPayList()
+        public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V2", new { _SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()

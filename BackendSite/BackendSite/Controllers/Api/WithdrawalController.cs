@@ -434,7 +434,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = bankDetailBLL.GetBankInfoPay();
+            var bankInfoPay = bankDetailBLL.GetBankInfoPay(withdrawalReq.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
                             select new Pay

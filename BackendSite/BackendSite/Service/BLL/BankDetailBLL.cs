@@ -145,9 +145,9 @@ namespace BackendSite.Service.BLL
             //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
             return BankInfoOffList;
         }*/
-        public IEnumerable<BankInfoPay> GetBankInfoPay()
+        public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
-            var bankInfoPayList = localBankService.GetBankInfoPayList();
+            var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
             return bankInfoPayList;
         }
         
