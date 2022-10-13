@@ -222,9 +222,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopDepositorsList(
                 request.SiteId,
@@ -267,9 +264,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopWithdrawalList(
                 request.SiteId,
@@ -312,9 +306,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopBonusClaimedList(
                 request.SiteId,
