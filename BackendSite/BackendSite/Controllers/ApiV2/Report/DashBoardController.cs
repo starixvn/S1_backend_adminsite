@@ -56,6 +56,21 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int TimeZone { get; set; }
         }
 
+        public class GetGameTopListRequest : ApiRequestPageModel
+        {
+            public DashboardGameTopDataTypeEnum Type { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public int BaseCurrencyId { get; set; }
+            public IEnumerable<int> TpIds { get; set; }
+            public IEnumerable<int> Categories { get; set; }
+            public IEnumerable<int> GameTypes { get; set; }
+            [Range(-12, 14)]
+            public int TimeZone { get; set; }
+            public string OrderByProperty { get; set; }
+            public bool IsDesc { get; set; }
+        }
+
         public class GetNewMemBerListRequest : ApiRequestPageModel
         {
             public int SiteId { get; set; }
@@ -356,12 +371,10 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         public ApiResult<DashBoardGameDto> GetGameData(GetGameRequest request)
         {
-            var canSearchSite = new List<int>();
-
             if (request.TimeZone > 14 || request.TimeZone < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
 
-            var result = _dashBoardBll.GetGameData(request.SiteIds,
+            var result = _dashBoardBll.GetGame(request.SiteIds,
                 request.CurrencyIds, 
                 request.BaseCurrencyId,
                 request.TpIds,
@@ -390,12 +403,10 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         public ApiResult<Dictionary<string,List<DashBoardGameOverAllDto>>> GetGameOverAllData(GetGameRequest request)
         {
-            var canSearchSite = new List<int>();
-
             if (request.TimeZone > 14 || request.TimeZone < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
 
-            var result = _dashBoardBll.GetGameOverallData(request.SiteIds,
+            var result = _dashBoardBll.GetGameOverall(request.SiteIds,
                 request.CurrencyIds,
                 request.BaseCurrencyId,
                 request.TpIds,
@@ -407,6 +418,47 @@ namespace BackendSite.Controllers.ApiV2.Report
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+        }
+
+        /// <summary>
+        /// DashBoard/GetData 取得儀錶板遊戲資訊資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Home > Dash Board > [Refresh]
+        /// </remarks>
+        /// <param name="request">參數</param>
+        /// <returns>結果</returns>
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [HttpPost]
+        public ApiListResult<DashBoardGameTopDto> GetGameTopTwentyData(GetGameTopListRequest request)
+        {
+
+            var result = _dashBoardBll.GetGameTopTwenty(
+                request.Type,
+                request.SiteIds,
+                request.CurrencyIds,
+                request.BaseCurrencyId,
+                request.TpIds,
+                request.Categories,
+                request.GameTypes,
+                request.OrderByProperty,
+                request.IsDesc,
+                request.TimeZone,
+                request.PageSize,
+                request.PageNumber,
+                out var totalPages,
+                out var rowCount);
+
+            return new ApiListResult<DashBoardGameTopDto>
+            {
+                Data = result,
+                TotalPages = totalPages,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 

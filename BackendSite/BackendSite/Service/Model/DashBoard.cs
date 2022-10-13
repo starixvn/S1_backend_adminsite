@@ -1,4 +1,8 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
+using System.Security.Policy;
+
+namespace BackendSite.Service.Model
 {
 
     #region DashboardV1
@@ -191,6 +195,27 @@
         public int CurrencyId { get; set; }
         public decimal Win { get; set; }
 
+    }
+
+    public class DashBoardGameTopDao
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int BetCount { get; set; }
+        public decimal BetAmount { get; set; }
+        public decimal BetAmountInRate { get; set; }
+        public decimal Payout { get; set; }
+        public decimal PayoutInRate { get; set; }
+        public decimal WinLossAmount { get; set; }
+        public decimal WinLossAmountInRate { get; set; }
+        public decimal Margin { get; set; }
+    }
+
+    public class DashBoardGameTopDto : DashBoardGameTopDao
+    {
+        public DashboardGameTopDataTypeEnum Type { get; set; }
     }
 
     #endregion

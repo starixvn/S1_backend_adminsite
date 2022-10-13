@@ -416,7 +416,7 @@ namespace BackendSite.Service.BLL
 
         #region DashboardGame
 
-        public DashBoardGameDto GetGameData(IEnumerable<int> siteIds,
+        public DashBoardGameDto GetGame(IEnumerable<int> siteIds,
                              IEnumerable<int> currencyIds,
                              int baseCurrencyId,
                              IEnumerable<int> tpIds,
@@ -463,7 +463,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Dictionary<string, List<DashBoardGameOverAllDto>> GetGameOverallData(IEnumerable<int> siteIds,
+        public Dictionary<string, List<DashBoardGameOverAllDto>> GetGameOverall(IEnumerable<int> siteIds,
                      IEnumerable<int> currencyIds,
                      int baseCurrencyId,
                      IEnumerable<int> tpIds,
@@ -536,6 +536,62 @@ namespace BackendSite.Service.BLL
             //Step3:組合資料
             return result;
         }
+
+        public IEnumerable<DashBoardGameTopDto> GetGameTopTwenty(
+            DashboardGameTopDataTypeEnum type,
+            IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
+            int baseCurrencyId,
+            IEnumerable<int> tpIds,
+            IEnumerable<int> categoryIds,
+            IEnumerable<int> gameTypes,
+            string orderByProperty,
+            bool isDesc,
+            int timeZone,
+            int pageSize,
+            int pageNumber,
+            out int totalPages,
+            out int rowCount)
+        {
+            var startTime = DateTime.UtcNow.AddHours(timeZone).Date.AddMonths(-1);
+            //var endTime = DateTime.UtcNow.AddHours(timeZone).Date.AddDays(1).AddMilliseconds(-1);
+            var endTime = DateTime.UtcNow.AddHours(timeZone).Date.AddDays(1).AddMilliseconds(-1);
+
+            var source = GetGameTopTwentyData(
+                type,
+                siteIds,
+                currencyIds,
+                baseCurrencyId,
+                startTime,
+                endTime,
+                tpIds,
+                categoryIds,
+                gameTypes,
+                orderByProperty,
+                isDesc,
+                pageNumber,
+                pageSize,
+                out totalPages,
+                out rowCount);
+
+            return source.Select(x => new DashBoardGameTopDto()
+            {
+                Type = type,
+                CustId = x.CustId,
+                UserName = x.UserName,
+                CurrencyId = x.CurrencyId,
+                CurrencyName = x.CurrencyName,
+                BetCount = x.BetCount,
+                BetAmount = x.BetAmount,
+                BetAmountInRate = x.BetAmountInRate,
+                Payout = x.Payout,
+                PayoutInRate = x.PayoutInRate,
+                WinLossAmount = x.WinLossAmount,
+                WinLossAmountInRate = x.WinLossAmountInRate,
+                Margin = x.Margin * 100
+            });
+        }
+
 
         private DashBoardGameOverAllDto CombineData(CurrencyModel currencyInfo,
             IEnumerable<DashBoardGameOverAllDao> source,
@@ -920,6 +976,38 @@ namespace BackendSite.Service.BLL
                     JsonConvert.SerializeObject(gameTypes),
                     timeZone,
                     yyyymm);
+
+        private IEnumerable<DashBoardGameTopDao> GetGameTopTwentyData(
+                   DashboardGameTopDataTypeEnum type,
+                   IEnumerable<int> siteIds,
+                   IEnumerable<int> currencyIds,
+                   int baseCurrencyId,
+                   DateTimeOffset startTime,
+                   DateTimeOffset endTime,
+                   IEnumerable<int> tpIds,
+                   IEnumerable<int> categoryIds,
+                   IEnumerable<int> gameTypes,
+                   string orderByProperty,
+                   bool isDesc,
+                   int pageNumber,
+                   int pageSize,
+                   out int totalPages,
+                   out int rowCount)
+        => _dashBoardService.GetGameTopTwenty(type,
+            JsonConvert.SerializeObject(siteIds),
+            JsonConvert.SerializeObject(currencyIds),
+            baseCurrencyId,
+            startTime.DateTime,
+            endTime.DateTime,
+            JsonConvert.SerializeObject(tpIds),
+            JsonConvert.SerializeObject(categoryIds),
+            JsonConvert.SerializeObject(gameTypes),
+            orderByProperty,
+            isDesc,
+           (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+            Math.Abs(pageSize),
+            out totalPages,
+            out rowCount);
 
         #endregion
 

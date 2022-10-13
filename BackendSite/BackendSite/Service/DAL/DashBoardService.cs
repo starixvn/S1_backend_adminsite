@@ -31,7 +31,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardData>("Admin_DashBoard_Get_V2", props);
         }
-        
+
         public DashBoardMemBerDataByMonth GetDashBoardMemberData(int siteId,
             int currencyId,
             DateTime startDate,
@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardMemBerDataByMonth>("Admin_DashBoardMember_Get", props);
         }
-        
+
         public IEnumerable<DashBoardMemBerDataByMonth> GetDashBoardMemberDataByMonth(int siteId,
             int currencyId,
             DateTime startDate,
@@ -59,7 +59,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<DashBoardMemBerDataByMonth>("Admin_DashBoardMemberGroupByMonth_Get", props);
         }
-        
+
         public DashBoardFinancialDetailData GetDashBoardFinancialData(int siteId,
             int currencyId,
             DateTime startDate,
@@ -73,7 +73,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardFinancialDetailData>("Admin_DashBoardFinancial_Get", props);
         }
-        
+
         public IEnumerable<DashBoardFinancialDetailData> GetDashBoardFinancialDataByMonth(int siteId,
             int currencyId,
             DateTime startDate,
@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<DashBoardFinancialDetailData>("Admin_DashBoardFinancialGroupByMonth_Get", props);
         }
-        
+
         public IEnumerable<RegistrationPlatformDetailData> GetDashBoardMemberPlatformData(int siteId,
             IEnumerable<int> currencyIds,
             DateTime startDate,
@@ -98,10 +98,10 @@ namespace BackendSite.Service.DAL
             props.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
             props.Add("_StartDate", startDate);
             props.Add("_TimeZone", timeZone);
-            
+
             return _reportDbClient.Query<RegistrationPlatformDetailData>("Admin_DashBoardMemberPlatform_Get", props);
         }
-        
+
         public IEnumerable<NewMemberList> GetDashBoardNewMemberList(
             int siteId,
             IEnumerable<int> currencyIds,
@@ -122,10 +122,10 @@ namespace BackendSite.Service.DAL
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var data = _reportDbClient.Query<NewMemberList>("Admin_DashBoardNewMemberList_Get", parameter);
-            
+
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
-            
+
             return data;
         }
 
@@ -153,13 +153,13 @@ namespace BackendSite.Service.DAL
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var data = _reportDbClient.Query<TopDepositorsList>("Admin_DashBoardTopDepositorsList_Get", parameter);
-            
+
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
-            
+
             return data;
         }
-        
+
         public IEnumerable<TopWithdrawalList> GetTopWithdrawalList(
             int siteId,
             IEnumerable<int> currencyIds,
@@ -184,13 +184,13 @@ namespace BackendSite.Service.DAL
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var data = _reportDbClient.Query<TopWithdrawalList>("Admin_DashBoardTopWithdrawalList_Get", parameter);
-            
+
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
-            
+
             return data;
         }
-        
+
         public IEnumerable<TopBonusClaimedList> GetTopBonusClaimedList(
             int siteId,
             IEnumerable<int> currencyIds,
@@ -215,13 +215,13 @@ namespace BackendSite.Service.DAL
             parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var data = _reportDbClient.Query<TopBonusClaimedList>("Admin_DashBoardTopBonusClaimedList_Get", parameter);
-            
+
             totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameter.Get<int?>("_RowCount") ?? 0;
-            
+
             return data;
         }
-        
+
         public DashBoardDetailData GetDashBoardTodayData(int siteId,
             int currencyId,
             int baseCurrencyId,
@@ -239,7 +239,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryFirst<DashBoardDetailData>("Admin_DashBoard_Today_Get_V2", props);
         }
-        
+
         public DashBoardDetailData GetDashBoardTodayExtraData(int siteId,
             int currencyId,
             int baseCurrencyId,
@@ -365,7 +365,48 @@ namespace BackendSite.Service.DAL
             props.Add("_TimeZone", timeZone);
             props.Add("_YYYYMM", yyyymm);
 
-            return _reportDbClient.Query<DashBoardGameOverAllLargestSingleWinDao>("Admin_DashBoard_Game_Overall_SingleWin_TpBetRecord_Get", props);
+            return _reportDbClient.Query<DashBoardGameOverAllLargestSingleWinDao>("Admin_DashBoard_Game_Overall_SingleWin_Get", props);
+        }
+
+        public IEnumerable<DashBoardGameTopDao> GetGameTopTwenty(
+            DashboardGameTopDataTypeEnum type,
+            string siteIdStr,
+            string currencyIdStr,
+            int baseCurrencyId,
+            DateTime startDate,
+            DateTime endDate,
+            string tpIdStr,
+            string categoryStr,
+            string gameTypeStr,
+            string orderByProperty,
+            bool isDesc,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteIds", siteIdStr);
+            parameter.Add("_CurrencyIds", currencyIdStr);
+            parameter.Add("_BaseCurrencyId", baseCurrencyId);
+            parameter.Add("_StartDate", startDate);
+            parameter.Add("_EndDate", endDate);
+            parameter.Add("_TpIds", tpIdStr);
+            parameter.Add("_CategoryIds", categoryStr);
+            parameter.Add("_GameTypes", gameTypeStr);
+            parameter.Add("_Type", type);
+            parameter.Add("_OrderField", orderByProperty);
+            parameter.Add("_OrderFieldIsDesc", isDesc);
+            parameter.Add("_PageSize", pageSize);
+            parameter.Add("_StartIndex", startIndex);
+            parameter.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameter.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = _reportDbClient.Query<DashBoardGameTopDao>("Admin_DashBoard_Game_Top_Get", parameter);
+
+            totalPages = parameter.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameter.Get<int?>("_RowCount") ?? 0;
+
+            return data;
         }
     }
 }
