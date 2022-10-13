@@ -40,7 +40,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var currencyList = string.Join(',', request.CurrencyId.ToArray());
         var statusList = string.Join(',', request.Status.ToArray());
         var transType = GetTransType(request.TransId);
-        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
         var response = new GetMemberListResponse()
         {
             Data = memberList.Data.Select(a => new MemberList()
@@ -142,6 +142,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
             IsLineBinding = custLineProfile != null,
             CustLineProfile = custLineProfile,
             Status = customer.Status,
+            EnableRebate = customer.EnableRebate,
             DepositPointLevel = customer.PointLevel,
             Currency = customer.CurrencyName,
             Identity = customer.Identity,
@@ -195,8 +196,10 @@ public class MemberDashboardBll : IMemberDashboardBLL
             return iovationList.Select(a => new MemberLoginDevice()
             {
                 DeviceId = a.DeviceId,
-                Risk = $"{a.Iovation}({a.Score})",
+                Risk = a.Iovation,
+                Score = a.Score,
                 Frequency = a.Frequency,
+                DeviceType = a.DeviceType,
                 AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
             });
@@ -206,8 +209,10 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return shield.Select(a => new MemberLoginDevice()
         {
             DeviceId = a.DeviceId,
-            Risk = a.DeviceScore < 75 ? $"High Risk({a.DeviceScore})" : $"Low Risk({a.DeviceScore})",
+            Risk = a.DeviceScore < 75 ? "High Risk" : "Low Risk",
+            Score = a.DeviceScore,
             Frequency = a.Frequency,
+            DeviceType = a.Platform,
             AssociateCount = a.AssociateCount,
             LastUpdateTime = a.LastUpdateTime
         });
@@ -216,6 +221,35 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
     {
         return await _customerService.GetCustomerIpListByCustIdAsync(custId);
+    }
+
+    public async Task<int> AddCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        var tagList = new List<int>();
+        if (!string.IsNullOrEmpty(tagListStr))
+        {
+            tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        }
+        tagList.Add(tagId);
+        return await _customerService.SetCustTag(custId, tagList);
+    }
+
+    public async Task<int> RemoveCustTagAsync(int custId, int tagId)
+    {
+        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        if (string.IsNullOrEmpty(tagListStr))
+        {
+            return 0;
+        }
+        var tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        var idx = tagList.FindIndex(id => id == tagId);
+        if (idx == -1)
+        {
+            return 0;
+        }
+        tagList.RemoveAt(idx);
+        return await _customerService.SetCustTag(custId, tagList);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
@@ -324,7 +358,33 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         return await _customerService.DeleteLineProfileAsync(custId);
     }
-    
+
+    public async Task<int> DeleteOnUserAsync(int custId)
+    {
+        return await _customerService.DeleteOnUserAsync(custId);
+    }
+
+    public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
+    {
+        var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
+        var response = new GetLoginLogResponse()
+        {
+            LoginLog = data.LoginLog.Select(a => new MemberLoginLog()
+            {
+                Id = a.Id,
+                LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
+                LoginIp = a.LoginIp,
+                FromUrl = a.FromUrl,
+                Location = a.Location,
+                UserAgent = a.UserAgent
+            }),
+            PageNumber = data.PageNumber,
+            TotalPages = data.TotalPages,
+            RowCount = data.RowCount
+        };
+        return response;
+    }
+
     private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
     {
         if (dateTime.HasValue)

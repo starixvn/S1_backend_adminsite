@@ -19,12 +19,13 @@ public class CustomerService : ICustomerService
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
-    public async Task<GetMemberListData> GetList(int siteId, string currencyList, string statusList, string userName, IEnumerable<int> tags, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
+    public async Task<GetMemberListData> GetList(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
         p.Add("_CurrencyList", currencyList);
         p.Add("_StatusList", statusList);
+        p.Add("_Identity", identity);
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
         p.Add("_AccountName", accountName);
@@ -103,6 +104,12 @@ public class CustomerService : ICustomerService
         return await _sqlClienct.QueryAsync<CustomerTag>("Admin_CustTag_Get", p);
     }
 
+    public async Task<string> GetCustomerTagsAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<string>("Admin_CustomerTagList_Get", p);
+    }
+    
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
@@ -114,6 +121,35 @@ public class CustomerService : ICustomerService
     {
         var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
         return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
+    }
+    
+    public async Task<LoginLogPageData> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_StartDate", startDate);
+        p.Add("_EndDate", endDate);
+        p.Add("_PageSize", Math.Abs(pageSize));
+        p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+        p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+        var loginLog = await _sqlClienct.QueryAsync<LoginLogDto>("Admin_LoginLogByCust_Get_V3", p);
+        var loginLogData = new LoginLogPageData
+        {
+            LoginLog = loginLog,
+            PageNumber = pageNumber,
+            TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+            RowCount = p.Get<int?>("_RowCount") ?? 0
+        };
+        return loginLogData;
+    }
+    
+    public async Task<int> SetCustTag(int custid, List<int> tagList)
+    {
+        var p = new DynamicParameters();
+        p.Add("CustId", custid);
+        p.Add("TagList", JsonConvert.SerializeObject(tagList));
+        return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
@@ -210,6 +246,13 @@ public class CustomerService : ICustomerService
         p.Add("Status", status);
         p.Add("TaskId", taskId);
         return await _mainSqlClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
+    }
+
+    public async Task<int> DeleteOnUserAsync(int custId)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        return await _mainSqlClient.ExecuteAsync("Admin_OnUser_Del", p);
     }
     
     public async Task<int> SwitchRebatePayoutAsync(int custId, int status)

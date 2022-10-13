@@ -684,6 +684,7 @@ namespace BackendSite.Service.Model.enums
         SetBlockEWallet = 55,
         ReleaseEWalletAccount = 56,
         WithdrawalSubmission = 57,
+        SetCurrencyUSDRate = 58,
         TransferInfoManagement = 60,
         WithdrawalLimitAdjustment = 73
     }
