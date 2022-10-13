@@ -10,10 +10,10 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int DateType { get; set; }
     public IEnumerable<int> CurrencyId { get; set; }
     public IEnumerable<int> Status { get; set; }
-    // public int Identity { get; set; }
+    public int Identity { get; set; }
     public string UserName { get; set; }
     public string TpUserName { get; set; }
-    // public string AffiliateName { get; set; }
+    public string AffiliateName { get; set; }
     public string LoginIp { get; set; }
     public string Email { get; set; }
     public string PhoneNo { get; set; }
@@ -21,12 +21,12 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public string BankAccountNumber { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
-    // public IEnumerable<int> VipLevel { get; set; }
+    public IEnumerable<int> VipLevel { get; set; }
     public string TransId { get; set; }
     public int ShieldLevel { get; set; }
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
-    // public int UserType { get; set; }
+    public int UserType { get; set; }
 }
 
 public class MemberListDto
