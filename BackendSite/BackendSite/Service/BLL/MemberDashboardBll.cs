@@ -39,8 +39,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var endTime = request.EndDate.ToUniversalTime().DateTime;
         var currencyList = string.Join(',', request.CurrencyId.ToArray());
         var statusList = string.Join(',', request.Status.ToArray());
+        var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
         var transType = GetTransType(request.TransId);
-        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity, request.UserName, request.Tags, vipList, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
         var response = new GetMemberListResponse()
         {
             Data = memberList.Data.Select(a => new MemberList()
