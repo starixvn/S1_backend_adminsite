@@ -9,6 +9,7 @@ namespace BackendSite.Service.Library
         Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan? timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<bool> StringSetAsync(string key, RedisValue value, TimeSpan? timeSpan = null, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool KeyExists(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<bool> KeyExistsAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<TItem> StringGetAsync<TItem>(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         List<TItem> GetCacheList<TItem>(IEnumerable<string> keys, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool SetCacheList<TItem>(Dictionary<string, TItem> dataList, TimeSpan? timeSpan, RedisDataBase redisDataBase = RedisDataBase.Admin);
@@ -17,5 +18,6 @@ namespace BackendSite.Service.Library
         long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
     }
 }

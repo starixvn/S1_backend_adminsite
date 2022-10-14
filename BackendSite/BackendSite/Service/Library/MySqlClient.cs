@@ -46,7 +46,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
+        public T QueryFirst<T>(string name, object parameters, int? timeOut = 30)
         {
             T result;
             var sw = Stopwatch.StartNew();

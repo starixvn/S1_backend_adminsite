@@ -23,6 +23,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly CustInfoBLL _custInfoBll;
         private readonly PaymentBLL _paymentBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
 
         #endregion
 
@@ -34,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _common = provider.GetRequiredService<Common>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
         }
 
@@ -65,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public TpAdjustmentOptionEnum Option { get; set; }
             public decimal Amount { get; set; }
             public string Memo { get; set; }
-            public AdjustmentCategoryEnum ReasonId { get; set; }
+            public int ReasonId { get; set; }
             public string TransId { get; set; }
         }
 
@@ -180,7 +182,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
             var user = User.Identity.Name;
-            var isDeposit = request.ReasonId == AdjustmentCategoryEnum.Deposit;
+            var isDeposit = request.ReasonId == 9; // 9: Deposit
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
@@ -189,7 +191,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 direction = (TpDirection)(int)request.Option,
                 Operator = user,
                 Remarks = request.Memo,
-                Category = (int)request.ReasonId
+                Category = request.ReasonId
             };
             
             if (isDeposit && !string.IsNullOrWhiteSpace(request.TransId))
@@ -202,6 +204,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
+                var reasonList = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+                var reason = reasonList.FirstOrDefault(x => x.ReasonId == request.ReasonId)?.Description;
                 var strDetail = string.Empty;
                 if (isDeposit)
                 {
@@ -213,7 +217,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         Option = request.Option.ToString(),
                         request.Amount,
                         request.Memo,
-                        Reason = request.ReasonId.ToString(),
+                        Reason = reason,
                         DepositTransId = request.TransId,
                         BeforeActualDeposit = log?.BeforeAmount,
                         AfterActualDeposit = log?.AfterAmount
@@ -228,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         Option = request.Option.ToString(),
                         request.Amount,
                         request.Memo,
-                        Reason = request.ReasonId.ToString()
+                        Reason = reason
                     });
                 }
 

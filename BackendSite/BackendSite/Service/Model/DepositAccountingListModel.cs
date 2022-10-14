@@ -10,6 +10,7 @@
     
     public class DepositAccountingModel
     {
+        public int SiteId{ get; set; }
         public string SiteName{ get; set; }
         public string TransId{ get; set; }
         public string UserName{ get; set; }
