@@ -26,6 +26,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly WinLostReportBLL _winLostReportBll;
+        private readonly ReportBLL _reportBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
@@ -43,6 +45,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
+            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+            _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 
@@ -112,6 +116,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
+        
+        public class GetTpGameTypeByCategoryAndTpIdReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
 
         public class GameCasinoByTpIdReq
         {
@@ -129,6 +139,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class SiteIdRequest
         {
             public int SiteId { get; set; }
+        }
+
+        public class TpCategoryByTpIdRequest
+        {
+            public int TpId { get; set; }
         }
 
         public class GetTpGameListReq
@@ -622,6 +637,31 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
         
         /// <summary>
+        /// 取得第三方遊戲分類清單ByTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
+        {
+            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x=>x.TpId == request.TpId);
+            var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
+            
+            var categoryList = await _reportBll.GetTpCategoryList();
+            
+            var query = categoryList.Join(categories, a => a.CategoryId, b => b,
+                (a, b) => new TpCategory {CategoryId = a.CategoryId, CategoryName = a.CategoryName});
+            
+            var apiResult = new ApiResult<IEnumerable<TpCategory>>
+            {
+                Data = query,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
         /// 取得第三方遊戲類型清單
         /// </summary>
         /// <param name="request"></param>
@@ -632,6 +672,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
                 Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲類型清單ByCategoryAndTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
+        {
+            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var result = data.Where(x => x.TpId == request.TpId);
+            
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
