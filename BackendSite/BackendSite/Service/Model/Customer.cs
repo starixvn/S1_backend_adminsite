@@ -316,6 +316,7 @@ namespace BackendSite.Service.Model
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
     }
     public class CustBonus
     {
@@ -645,5 +646,6 @@ namespace BackendSite.Service.Model
         public string AccountName { set; get; }
         public string EWalletName { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
     }
 }
