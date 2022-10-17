@@ -306,7 +306,7 @@ namespace BackendSite.Service.DAL
         public async Task<ApiResult> SendSMSMessageToPlayerAsync(int CustId)
         {
             var apiUrl = $"{_commonServiceUrl}OTPSMS/SendSMS";
-            ApiResult apiResult = await _courierAdapter.MyPostAsync<IEnumerable<FireBaseReturn>, dynamic>(apiUrl, new { CustId });
+            ApiResult apiResult = await _courierAdapter.MyPostAsync<ApiResult, dynamic>(apiUrl, new { CustId });
             return apiResult;
         }
 
