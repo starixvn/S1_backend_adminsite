@@ -240,28 +240,22 @@ namespace BackendSite.Controllers.Api
         /// Use：
         /// CSD > Customer Administration > CustInfo > Financial Log
         /// </remarks>
-        /// <param name="getFinancialLogReq"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public ApiListResult<FinancialLog> GetFinancialLog(GetFinancialLogReq getFinancialLogReq)
+        public ApiListResult<FinancialLog> GetFinancialLog(GetFinancialLogReq request)
         {
-            var pageNumber = getFinancialLogReq.PageNumber;
-            var startDate = getFinancialLogReq.StartDate == null ? (DateTime?) null
-                :  DateTimeExtensions.UnixToDateTime((long)getFinancialLogReq.StartDate).AddHours(-8);
-            var endDate = getFinancialLogReq.EndDate == null ? (DateTime?) null
-                :  DateTimeExtensions.UnixToDateTime((long)getFinancialLogReq.EndDate).AddHours(-8);
+            var startDate = request.StartDate?.FromUnixTimeSeconds().AddHours(-8) ?? DateTime.UtcNow.GetMonthBeginning();
+            var endDate = request.EndDate?.FromUnixTimeSeconds().AddHours(-8) ?? DateTime.UtcNow;         
+            var data = _paymentBLL.GetFinancialLog(
+                request.CustId, 
+                startDate,
+                endDate, 
+                request.RefTransId,
+                10, 
+                request.PageNumber, 
+                out var pageInfo);
             
-            var data = _paymentBLL.GetFinancialLog(getFinancialLogReq.CustId, startDate,
-                endDate, getFinancialLogReq.RefTransId, 10, ref pageNumber, out var totalPages,
-                out var rowCount);
-            
-            return new ApiListResult<FinancialLog>
-            {
-                Data = data,
-                TotalPages = totalPages,
-                PageNumber = pageNumber,
-                RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+            return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
 
         /// <summary>

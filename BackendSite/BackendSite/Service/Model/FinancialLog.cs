@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model
     public class FinancialLog
     {
         private DateTimeOffset _createTime { get; set; }
-        public int Id { get; set; }
+        public long Id { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
@@ -51,12 +51,14 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal TotalTO { get; set; }
+        public decimal TotalTO { get; set; }  
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
 
     }
     public class TpBetRecordListOneDay
@@ -68,6 +70,7 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int BonusId { get; set; }
     }
     public class TpBetRecordListOneDayRes
     {
@@ -80,6 +83,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
     }
     public class TpBetRecordbyCategoryId
     {
@@ -87,9 +92,10 @@ namespace BackendSite.Service.Model
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
         public decimal TurnOver { get; set; }
-        public decimal ValidBet { get; set; }
+        public decimal? ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int CategoryId { get; set; }
     }
     public class TpBetRecordbyCategoryIdRes
     {

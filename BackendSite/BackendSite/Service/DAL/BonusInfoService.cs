@@ -4,6 +4,7 @@ using Dapper;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -209,6 +210,11 @@ namespace BackendSite.Service.DAL
                 trans.Commit();
 
             return result;
+        }
+
+        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
+        {
+            return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
     }
 }
