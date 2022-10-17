@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    //[Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DashBoardController : ControllerBase
@@ -237,9 +237,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopDepositorsList(
                 request.SiteId,
@@ -282,9 +279,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopWithdrawalList(
                 request.SiteId,
@@ -327,9 +321,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var localTime = DateTime.UtcNow.AddHours(request.TimeZone);
             var startTime = localTime.Date;
             var endTime = startTime.AddDays(1).AddMilliseconds(-1);
-
-            startTime = DateTime.Now.AddYears(-1);
-            endTime = DateTime.Now;
             
             var result = _dashBoardBll.GetTopBonusClaimedList(
                 request.SiteId,
@@ -367,7 +358,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
         public ApiResult<DashBoardGameDto> GetGameData(GetGameRequest request)
         {
@@ -399,7 +390,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
         public ApiResult<Dictionary<string,List<DashBoardGameOverAllDto>>> GetGameOverAllData(GetGameRequest request)
         {
@@ -431,7 +422,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 1, 1 })]
         [HttpPost]
         public ApiListResult<DashBoardGameTopDto> GetGameTopTwentyData(GetGameTopListRequest request)
         {
