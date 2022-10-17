@@ -286,12 +286,6 @@ namespace BackendSite.Service.Model
         public int TpGameType { get; set; }
         public string TpGameTypeName { get; set; }
     }
-    public class PromotionRebate
-    {
-        public int GameType { get; set; }
-        public decimal Percentage { get; set; }
-        public int Status { get; set; }
-    }
 
     public class PromotionCashBack
     {
