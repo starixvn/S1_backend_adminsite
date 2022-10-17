@@ -27,6 +27,8 @@ public class GetCustTpAdjustmentLogParamsV2
     public int SiteId { get; set; }
     public int TpId { get; set; }
     public int CustId { get; set; }
+
+    public int Direction { get; set; }
     public int PageSize { get; set; }
     public int PageNumber { get; set; }
     public int StartIndex { get; set; }
@@ -71,6 +73,14 @@ public class GetCustTpAdjustmentLogRequestV2 : ApiRequestPageModel
     public int CustId { get; set; }
     public int TpId { get; set; }
     public int SiteId { get; set; }
+
+    /// <summary>
+    /// 0:All
+    /// 1: ToTp (三方錢包加錢)
+    /// 2:ToMain(三方錢包扣錢)
+    /// </summary>
+    public int Direction { get; set; }
+
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset EndTime { get; set; }
 }
