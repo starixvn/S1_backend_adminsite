@@ -1,9 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusPayoutController;
 
 namespace BackendSite.Service.DAL

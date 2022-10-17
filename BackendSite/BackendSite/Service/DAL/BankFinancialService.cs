@@ -2,7 +2,6 @@
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 

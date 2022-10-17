@@ -1,11 +1,7 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
-using Microsoft.VisualStudio.Web.CodeGeneration.CommandLine;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace BackendSite.Service.Model
 {
