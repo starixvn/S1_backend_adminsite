@@ -974,6 +974,7 @@ namespace BackendSite.Service.BLL
                 CustId = request.CustId,
                 TpId = request.TpId,
                 SiteId = siteId,
+                Direction = request.Direction,
                 StartTime = request.StartTime,
                 EndTime = request.EndTime,
                 PageNumber = request.PageNumber,

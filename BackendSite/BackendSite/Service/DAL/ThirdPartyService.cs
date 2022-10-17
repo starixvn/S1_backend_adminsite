@@ -121,6 +121,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", input.CustId, dbType: DbType.Int32);
             p.Add("_SiteId", input.SiteId, dbType: DbType.Int32);
             p.Add("_TpId", input.TpId, dbType: DbType.Int32);
+            p.Add("_Direction", input.Direction, dbType: DbType.Int16);
             p.Add("_StartTime", input.StartTime.UtcDateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", input.EndTime.UtcDateTime, dbType: DbType.DateTime);
             p.Add("_PageSize", input.PageSize, dbType: DbType.Int32);
