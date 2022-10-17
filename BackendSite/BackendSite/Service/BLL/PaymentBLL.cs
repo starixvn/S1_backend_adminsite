@@ -173,6 +173,7 @@ namespace BackendSite.Service.BLL
                       WinlostAmount = tpBetRecord.WinlostAmount,
                       SettlementType = tpBetRecord.SettlementType,
                       CategoryId = tpGameType.CategoryId,
+                      BonusId = tpBetRecord.BonusId,
                   })
                 .Where(i => i.CategoryId == categoryId)
                 .GroupBy(x => new
@@ -191,7 +192,9 @@ namespace BackendSite.Service.BLL
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.TurnOver),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
                     RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => y.ValidBet ?? y.TurnOver),
-                    WinLoss = x.Sum(y => y.WinlostAmount)
+                    WinLoss = x.Sum(y => y.WinlostAmount),
+                    TotalTOExcludeBonus = x.Where(y => y.BonusId == 0 && (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => y.ValidBet ?? y.TurnOver),
+                    WinLossExcludeBonus = x.Where(y => y.BonusId == 0).Sum(y => y.WinlostAmount),
                 })
                 .ToList();
             return result;
