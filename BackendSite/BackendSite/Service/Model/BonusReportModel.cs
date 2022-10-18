@@ -7,24 +7,14 @@ namespace BackendSite.Service.Model
 
     public class BonusReportRequestV2 : ApiRequestPageModel
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
         public PromotionTypeEnum PromotionType { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         public int BaseCurrencyId { get; set; }
         public int PromotionCategoryId { get; set; }
         public IEnumerable<int> Statuses { get; set; }
@@ -32,24 +22,15 @@ namespace BackendSite.Service.Model
 
     public class BonusReportExportRequestV2
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
         public PromotionTypeEnum PromotionType { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+
         public int BaseCurrencyId { get; set; }
         public int PromotionCategoryId { get; set; }
         public IEnumerable<int> Statuses { get; set; }
