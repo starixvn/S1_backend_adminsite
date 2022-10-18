@@ -48,8 +48,11 @@ namespace BackendSite.Service.DAL
             props.Add("_Id", para.Id);
             props.Add("_Description", para.Description);
             props.Add("_Updator", userId);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            return _mainDbClient.Execute("Admin_BankFinancialReason_Upd_V2", props);
+            _ = _mainDbClient.Execute("Admin_BankFinancialReason_Upd_V2", props);
+            
+            return props.Get<int>("_Result");
         }
         public int InsertReasonManagement(InsertReasonManagementPara para, int userId)
         {
@@ -59,8 +62,11 @@ namespace BackendSite.Service.DAL
             props.Add("_Description", para.Description);
             props.Add("_Updator", userId);
             props.Add("_Creator", userId);
-
-            return _mainDbClient.Execute("Admin_BankFinancialReason_Ins_V2", props);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            _ = _mainDbClient.Execute("Admin_BankFinancialReason_Ins_V2", props);
+            
+            return props.Get<int>("_Result");
         }
     }
 }
