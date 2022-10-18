@@ -68,7 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<IActionResult> Export(BonusReportExportRequestV2 request)
         {
             var exportData = await _bonusReportBll.GetBonusReportExportData(request);
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "BonusReport");
         }
 
