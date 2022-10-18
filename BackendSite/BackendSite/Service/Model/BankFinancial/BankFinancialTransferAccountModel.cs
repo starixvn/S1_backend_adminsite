@@ -69,6 +69,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string BankLoginUrl { get; set; }
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱

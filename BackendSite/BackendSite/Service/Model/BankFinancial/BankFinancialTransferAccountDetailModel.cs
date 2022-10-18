@@ -153,6 +153,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string BankLoginUrl { get; set; }
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
     }
     
     public class BankFinancialTransferAccountExportModel
@@ -171,6 +175,13 @@ namespace BackendSite.Service.Model.BankFinancial
         public decimal InitialAmount { get; set; }
         public decimal MaxBalanceAlertAmount { get; set; }
         public string Remark { get; set; }
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
         public string Status { get; set; }
         public DateTimeOffset CreateTime { get; set; }
         public string Creator { get; set; }
