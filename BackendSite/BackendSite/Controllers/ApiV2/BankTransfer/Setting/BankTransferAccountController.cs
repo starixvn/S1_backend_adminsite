@@ -88,6 +88,13 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     InitialAmount = x.InitialAmount,
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
                     Remark = x.Remark,
+                    BankLoginUrl = x.BankLoginUrl,
+                    BankLoginAccount = x.BankLoginAccount,
+                    BankLoginPassword = x.BankLoginPassword,
+                    TransferPin = x.TransferPin,
+                    LoginPin = x.LoginPin,
+                    MobilePin = x.MobilePin,
+                    CorporateID = x.CorporateID,
                     CreateTime = new DateTimeOffset(x.CreateTime.DateTime, TimeSpan.Zero),
                     Creator = x.CreatorName,
                     UpdateTime = new DateTimeOffset(x.UpdateTime.DateTime, TimeSpan.Zero),
@@ -156,7 +163,11 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 Updator = authData.UserId,
                 BankLoginUrl = req.BankLoginUrl,
                 BankLoginAccount = req.BankLoginAccount,
-                BankLoginPassword = req.BankLoginPassword
+                BankLoginPassword = req.BankLoginPassword,
+                TransferPin = req.TransferPin,
+                LoginPin = req.LoginPin,
+                MobilePin = req.MobilePin,
+                CorporateID = req.CorporateID
             }, authData.UserName);
 
             return new ApiResult
