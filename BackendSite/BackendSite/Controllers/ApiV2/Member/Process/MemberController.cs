@@ -33,11 +33,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             ServerInfoBLL serverInfoBll,
             NewAuthorizeBLL newAuthorizeBll,
             PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
+            BonusManageBLL bonusManageBll,
             ExcelBLL excelBll)
 
         {
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _courierAdapter = courierAdapter;
+            _bonusManageBll = bonusManageBll;
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
