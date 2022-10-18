@@ -1009,6 +1009,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var siteId = _newAuthorizeBll.GetAuthData().SiteId;
                 var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(siteId,
                     request.CustId,
+                    request.AdjustType,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     request.PageSize, request.PageNumber);

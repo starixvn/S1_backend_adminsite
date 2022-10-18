@@ -219,6 +219,7 @@ namespace BackendSite.Service.Model
         public decimal? ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int BonusId { get; set; }
         public int CategoryId { get; set; }
     }
     public class TpBetRecordbyCategoryIdRes
@@ -232,6 +233,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
     }
     public class TpBetRecordDetailbyGameType
     {

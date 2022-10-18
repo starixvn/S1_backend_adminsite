@@ -914,6 +914,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0, 
+        Fail = 1, 
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -1317,6 +1327,13 @@ namespace BackendSite.Service.Model.enums
         Amount = 1,
         Currency = 2,
         Count = 3
+    }
+
+    public enum DashboardGameTopDataTypeEnum
+    {
+        TopBetTwenty = 1,
+        TopWinTwenty = 2,
+        TopLoseTwenty = 3
     }
 
     public enum ShieldRiskTagged

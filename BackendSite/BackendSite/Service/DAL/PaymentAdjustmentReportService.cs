@@ -235,6 +235,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<PaymentAdjustmentWrapper> GetAdjustmentInfoByCustV2Async(int siteId,
             int custId,
+            int adjustType,
             DateTime? startDate,
             DateTime? endDate,
             int pageSize,
@@ -247,9 +248,10 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_AdjustType", adjustType, dbType: DbType.Int32);
             p.Add("_StartDate", startDate, dbType: DbType.DateTime);
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
-
+            
             #region GetCurrencyTotalAmount
 
             var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V4", p, commandType: CommandType.StoredProcedure)).ToList();

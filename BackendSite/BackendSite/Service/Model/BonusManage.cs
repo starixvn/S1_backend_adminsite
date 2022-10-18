@@ -1,11 +1,7 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
-using Microsoft.VisualStudio.Web.CodeGeneration.CommandLine;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace BackendSite.Service.Model
 {
@@ -285,12 +281,6 @@ namespace BackendSite.Service.Model
         public string TpCategoryName { get; set; }
         public int TpGameType { get; set; }
         public string TpGameTypeName { get; set; }
-    }
-    public class PromotionRebate
-    {
-        public int GameType { get; set; }
-        public decimal Percentage { get; set; }
-        public int Status { get; set; }
     }
 
     public class PromotionCashBack
