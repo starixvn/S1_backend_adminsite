@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -14,9 +15,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     {
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly string _bonusApiUrl;
+        private readonly CourierAdapter _courierAdapter;
 
-        public MemberController(CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
         {
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
+            _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
         }
@@ -42,6 +47,39 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<GetPromotionDetailResponse> GetPromotionDetail(GetPromotionDetailRequest request)
+        {
+                
+            var apiResult = new ApiResult<GetPromotionDetailResponse>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionDetail";
+                var req = new PromotionDetailRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = true,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    BonusCode = request.BonusCode
+                };
+
+                apiResult = _courierAdapter.MyPostAsync<GetPromotionDetailResponse, PromotionDetailRequest>(apiUrl, req).Result ??
+                            new ApiResult<GetPromotionDetailResponse>();
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
             return apiResult;
         }
 

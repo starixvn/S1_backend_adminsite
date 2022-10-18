@@ -110,6 +110,47 @@ namespace BackendSite.Service.Model
         public bool ExpiredCancel { get; set; }
         public string DepositInfo { get; set; }
     }
+    
+    public class GetPromotionDetailRequest
+    {
+        public string BonusCode { set; get; }
+        public int CustId { set; get; }
+    }
+    
+    public class GetPromotionDetailResponse
+    {
+        public CashBackDetails CashBackDetails { get; set; }
+    }
+    
+    public class CashBackDetails
+    {
+        public decimal TotalBonus { get; set; }
+        public decimal MaxBonus { get; set; }
+        public decimal TotalLossAmount { get; set; }
+        public decimal MinLossAmount { get; set; }
+        public decimal OriginalTotalBonus { get; set; }
+        public string Percentage { get; set; }
+        public IEnumerable<CashBackDetail> CashBackDetail { get; set; }
+    }
+
+    public class CashBackDetail
+    {
+        public string TpName { get; set; }
+        public decimal LossAmount { get; set; }
+        public decimal LossAmountWithBonus { get; set; }
+    }
+    
+    public class PromotionDetailRequest
+    {
+        public int SiteId { set; get; }
+        public int CustId { set; get; }
+        public int CurrencyId { set; get; }
+        public int DeviceType { set; get; }
+        public bool IsLogin { set; get; }
+        public string LangId { set; get; }
+        public string DefLang { set; get; }
+        public string BonusCode { set; get; }
+    }
 
     public class CancelBonusRequest
     {
