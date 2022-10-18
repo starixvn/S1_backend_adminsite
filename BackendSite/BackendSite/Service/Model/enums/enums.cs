@@ -1329,6 +1329,13 @@ namespace BackendSite.Service.Model.enums
         Count = 3
     }
 
+    public enum DashboardGameTopDataTypeEnum
+    {
+        TopBetTwenty = 1,
+        TopWinTwenty = 2,
+        TopLoseTwenty = 3
+    }
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
