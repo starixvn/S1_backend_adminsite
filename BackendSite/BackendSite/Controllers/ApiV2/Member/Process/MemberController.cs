@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -17,13 +18,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly BonusManageBLL _bonusManageBll;
 
-        public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, CustInfoBLL custInfoBll,
+            ServerInfoBLL serverInfoBll, BonusManageBLL bonusManageBll)
         {
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _bonusManageBll = bonusManageBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -47,6 +51,39 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<IEnumerable<GetPromotionCashbackResponse>> GetPromotionCashback(GetPromotionCashbackRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetPromotionCashbackResponse>>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var promotionList = _bonusManageBll.GetPromotionList(new List<int> { custInfo.SiteId },
+                    new List<int> { custInfo.CurrencyId },
+                    new List<int> { (int)PromotionTypeEnum.Cashback} ,
+                    (int)PromotionStatusEnum.Active,
+                    ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
+                    ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
+                    (int)PromotionDeviceTypeEnum.GetAll,
+                    null,
+                    false,
+                    1,
+                    25,
+                    out _,
+                    out _);
+
+                apiResult.Data = JsonConvert.DeserializeObject<IEnumerable<GetPromotionCashbackResponse>>(JsonConvert.SerializeObject(promotionList));
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
             return apiResult;
         }
         

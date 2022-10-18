@@ -110,6 +110,17 @@ namespace BackendSite.Service.Model
         public bool ExpiredCancel { get; set; }
         public string DepositInfo { get; set; }
     }
+
+    public class GetPromotionCashbackRequest
+    {
+        public int CustId { set; get; }
+    }
+    
+    public class GetPromotionCashbackResponse
+    {
+        public string BonusCode { set; get; }
+        public string Description { set; get; }
+    }
     
     public class GetPromotionDetailRequest
     {
