@@ -337,7 +337,6 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    _IsSetting = input.IsSetting,
                     _IsExport = input.IsExport,
                     _SiteId = input.SiteId,
                     _TransferTypes = input.StrTransferTypes,
@@ -352,7 +351,6 @@ namespace BackendSite.Service.DAL
                     _Reason = input.Reason,
                     _FromAgent = input.FromAgent,
                     _ToAgent = input.ToAgent,
-                    _TransferId = input.TransferId,
                     _StartIndex = startIndex,
                     _PageSize = pageSize
                 });
@@ -365,6 +363,19 @@ namespace BackendSite.Service.DAL
             
             totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameters.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoById(string transferId)
+        {
+            var parameters = new DynamicParameters(new
+                {
+                    _TransferId = transferId
+                });
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_GetById", parameters);
 
             return result;
         }

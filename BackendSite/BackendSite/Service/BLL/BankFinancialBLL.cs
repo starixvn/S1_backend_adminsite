@@ -590,8 +590,7 @@ namespace BackendSite.Service.BLL
         public BankFinancialTransferInfoTransDetailModel GetFinancialTransferInfoById(string transferId)
         {
             var result =
-                _bankFinancialService.GetFinancialTransferInfoList(new GetTransferInfoListParams(transferId),
-                    0, 0, out _, out _);
+                _bankFinancialService.GetFinancialTransferInfoById(transferId);
 
             return result.FirstOrDefault();
         }
