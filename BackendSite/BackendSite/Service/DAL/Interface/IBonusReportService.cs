@@ -18,5 +18,11 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="request"></param>
         /// <returns></returns>
         Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request);
+
+        /// <summary>
+        /// 取得PromotionCategory 下拉選單內容
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption();
     }
 }
