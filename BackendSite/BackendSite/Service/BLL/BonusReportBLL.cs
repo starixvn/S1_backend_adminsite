@@ -96,6 +96,12 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
+        {
+            return _bonusReportService.GetPromotionCategoryOption();
+        }
+
+
         private string CheckDepositInfoFormatter(string depositInfo)
         {
             if (string.IsNullOrEmpty(depositInfo) || depositInfo.Contains("[")) return depositInfo;

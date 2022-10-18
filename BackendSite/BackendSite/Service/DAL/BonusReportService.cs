@@ -85,6 +85,11 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V9", p);
         }
 
+        public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
+        {
+            return _reportDbClient.QueryAsync<PromotionCategoryOptionDto>("Admin_PromotionCategoryOption_Get");
+        }
+
         #region private method
 
         /// <summary>

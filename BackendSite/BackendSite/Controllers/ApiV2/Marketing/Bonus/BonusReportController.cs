@@ -71,5 +71,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var stream = _excelBll.Export(exportData);
             return _excelBll.ExcelFile(stream, "BonusReport");
         }
+
+        /// <summary>
+        /// 取得PromotionCategory 下拉選單內容
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<PromotionCategoryOptionDto>>> PromotionCategoryOption()
+        {
+            var apiResult = new ApiResult<IEnumerable<PromotionCategoryOptionDto>>
+            {
+                Data = await _bonusReportBll.GetPromotionCategoryOption(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
     }
 }
