@@ -68,6 +68,7 @@ namespace BackendSite.Service.BLL
             if (!queryResult.Any()) return new List<BonusReportExportExcelResponse>();
 
             var siteList = _serverInfoBll.GetSiteList();
+            var offset = request.StartDate.Offset;
             var result = queryResult.Select(r => new BonusReportExportExcelResponse
             {
                 CustId = r.CustId,
@@ -76,12 +77,12 @@ namespace BackendSite.Service.BLL
                 PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
                 SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
                 UserName = r.UserName,
-                CreateTime = r.CreateTime.ToString("yyyy-MM-dd hh:mm:ss"),
+                CreateTime = r.CreateTime.ToOffset(offset).ToString("yyyy-MM-dd HH:mm:ss"),
                 StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{r.Status}"),
                 Bonus = r.Bonus,
                 BonusAmount = r.BonusAmount,
                 BonusCode = r.BonusCode,
-                ExpiryTime = r.ExpiryTime.ToString("yyyy-MM-dd hh:mm:ss"),
+                ExpiryTime = r.ExpiryTime.ToOffset(offset).ToString("yyyy-MM-dd HH:mm:ss"),
                 LockedAmount = r.LockedAmount,
                 MaxBonus = r.MaxBonus,
                 RollOver = r.RollOver,
@@ -92,6 +93,8 @@ namespace BackendSite.Service.BLL
                 string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
                 DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
             });
+            
+
 
             return result;
         }
