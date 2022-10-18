@@ -251,8 +251,8 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
         public string TierAmount { get; set; }
-        public BonusType BonusType { get; set; }
-        public FullFillType FullFillType { get; set; }
+        public BonusTypeEnum BonusType { get; set; }
+        public FullFillTypeEnum FullFillType { get; set; }
 
         public IEnumerable<TierAmount> TierAmountList
         {
