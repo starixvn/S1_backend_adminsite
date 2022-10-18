@@ -95,6 +95,34 @@ namespace BackendSite.Service.Model
         public string DepositInfo { get; set; }
     }
 
+    public class BonusReportExportExcelResponse
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string TransId { get; set; }
+        public string PromotionName { get; set; }
+        public string BonusCode { get; set; }
+        public string UserName { get; set; }
+        public string CurrencyName { get; set; }
+        public decimal Bonus { get; set; }
+        public decimal MaxBonus { get; set; }
+        public int RollOver { get; set; }
+        public int WinOver { get; set; }
+        public decimal LockedAmount { get; set; }
+        public decimal BonusAmount { get; set; }
+        public string ExpiryTime { get; set; }
+        public string CreateTime { get; set; }
+        public string StatusName { get; set; }
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
+        public string Operator { get; set; }
+
+        /// <summary>
+        /// 存款資訊，內有存款單號，存款金額，會有多筆
+        /// </summary>
+        public string DepositInfo { get; set; }
+    }
+
     #endregion
 
     #region DTO
