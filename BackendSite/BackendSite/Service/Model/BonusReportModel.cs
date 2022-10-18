@@ -174,6 +174,13 @@ namespace BackendSite.Service.Model
         public List<TotalAmount> TotalAmountSummary { get; set; }
     }
 
+    public class PromotionCategoryOptionDto
+    {
+        public int PromotionCategoryId { get; set; }
+
+        public string PromotionCategoryName { get; set; }
+    }
+
     #endregion
 
     public class BonusReportBase
