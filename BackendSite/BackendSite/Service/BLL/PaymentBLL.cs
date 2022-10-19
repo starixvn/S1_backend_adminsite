@@ -58,6 +58,12 @@ namespace BackendSite.Service.BLL
 
             if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
+                //Export
+                if (pageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                }
+
                 //Redis Pagination
                 var total = (int)_cacheHelper.GetListLength(key, RedisDataBase.Shared);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
@@ -85,6 +91,12 @@ namespace BackendSite.Service.BLL
             {
                 _cacheHelper.InsertList(key, cacheTime, list, RedisDataBase.Shared);
             });
+
+            //Export
+            if (pageNumber == -1 || data.Count == 0)
+            {
+                return list;
+            }
 
             var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
             return list.GetRange(index, count);

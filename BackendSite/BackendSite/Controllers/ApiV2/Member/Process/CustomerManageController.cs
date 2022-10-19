@@ -459,8 +459,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnableRebateEnum Status { get; set; }
         }
 
-        public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
+        public class GetFinancialLogRequest : ApiRequestPageModel
         {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int? FinancialType { get; set; }
         }
@@ -1687,8 +1690,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
-            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
@@ -1702,6 +1705,46 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
+
+
+        /// <summary>
+        /// CustomerManage/GetFinancialLogByCustIdExport 匯出指定客戶金融紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Financial Log > [Search] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 2 })]
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        {
+            request.PageNumber = -1; //export all
+            var offset = request.StartDate.Offset;      
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
+
+            var data = _paymentBll.GetFinancialLog(
+                request.CustId,
+                startDate,
+                endDate,
+                request.RefTransId,
+                request.FinancialType,
+                request.PageSize,
+                request.PageNumber,
+                out var _);
+
+            foreach (var item in data)
+            {
+                item.CreateTime = item.CreateTime.ToOffset(offset);
+            }
+
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "FinancialLog");
+        }
+
 
         #endregion
 
