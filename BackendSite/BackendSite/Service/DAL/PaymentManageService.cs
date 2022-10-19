@@ -296,10 +296,12 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType:DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType:DbType.Int32, direction: ParameterDirection.Output);
             
-            totalPages = p.Get<int?>("_TotalPages") ?? 0;
-            rowCount = p.Get<int?>("_RowCount") ?? 0;
-                
-            return _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
+            var result = _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
+            
+            totalPages = p.Get<int>("_TotalPages");
+            rowCount = p.Get<int>("_RowCount");
+
+            return result;
         }
         
         public IEnumerable<PaySetting> GetPaySetting(int siteId, int? channelId = null)
@@ -319,15 +321,13 @@ namespace BackendSite.Service.DAL
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
-                .First(x => x.CurrencyId == input.CurrencyId
-                            && x.PayId == input.PayId);
+                .First(x => x.CurrencyId == input.CurrencyId);
 
             var jsonAmountShow = JsonConvert.SerializeObject(input.FixedAmountList);
             #region props
             var props = new DynamicParameters();
             props.Add("_SiteId", input.SiteId);
             props.Add("_CurrencyId", (int)input.CurrencyId);
-            props.Add("_PayId", input.PayId);
             props.Add("_ChannelId", input.ChannelId);
             props.Add("_MinAmount", input.MinAmount);
             props.Add("_MaxAmount", input.MaxAmount);
@@ -386,14 +386,12 @@ namespace BackendSite.Service.DAL
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
-                .First(x => x.CurrencyId == input.CurrencyId
-                            && x.PayId == input.PayId);
+                .First(x => x.CurrencyId == input.CurrencyId);
 
             #region props
             var props = new DynamicParameters();
             props.Add("_SiteId", input.SiteId);
             props.Add("_CurrencyId", (int)input.CurrencyId);
-            props.Add("_PayId", input.PayId);
             props.Add("_ChannelId", input.ChannelId);
             props.Add("_Status", (int)input.Status);
             #endregion
