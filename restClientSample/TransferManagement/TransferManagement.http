@@ -89,7 +89,11 @@ Content-Type: application/json
     "status": 1,
     "bankLoginUrl": "https://fake.bank.co",
     "bankLoginAccount": "test_test",
-    "bankLoginPassword": "!@#$ertDFG"
+    "bankLoginPassword": "!@#$ertDFG",
+    "transferPin": "888888",
+    "loginPin": "888888",
+    "mobilePin": "888888",
+    "corporateID": "test_c"
 }
 
 ###
