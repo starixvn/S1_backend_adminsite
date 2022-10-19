@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa
 {
@@ -111,7 +112,7 @@ namespace BackendSite.Service.Model.Mpa
         /// <summary>
         /// Deposit= 1, Withdrawal= 2
         /// </summary>
-        public TransactionRelaySummaryTypeEnum SummaryType { get; set; }
+        public MpaTransactionRelaySummaryTypeEnum SummaryType { get; set; }
 
         /// <summary>
         /// Deposit:(OnlineBanking = 1, MobilePayment = 2, LocalBank = 3, CryptoPayment = 4, LoadCardPayment = 5,QRPayPayment  = 6, BankAutoChannel = 7)
@@ -120,5 +121,20 @@ namespace BackendSite.Service.Model.Mpa
         public byte TransactionType { get; set; }
         public decimal Amount { get; set; }
         public int RowCount { get; set; }
+    }
+
+
+    public class MpaWinLossByDayCurrencySummaryDto : MpaWinLossByDateBaseResponse { }
+
+    public class MpaWinLossByDayCurrencyDetailDto : MpaWinLossByDateBaseResponse
+    {
+        [JsonIgnore]
+        //MYR、CNY...etc
+        public string Currency { get; set; }
+    }
+
+    public class MpaWinLossByDateDto : MpaWinLossByDateBaseResponse
+    {
+        public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 }

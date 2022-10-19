@@ -1295,9 +1295,19 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-    public enum TransactionRelaySummaryTypeEnum
+    public enum MpaTransactionRelaySummaryTypeEnum
     {
         Deposit = 1,
         Withdrawal = 2
+    }
+
+    public enum MpaWinLossGroupByTypeEnum
+    {
+        Date = 1,
+        Month = 2,
+        GameType = 3,
+        Currency = 4,
+        Player = 5,
+        TpCategory = 6
     }
 }

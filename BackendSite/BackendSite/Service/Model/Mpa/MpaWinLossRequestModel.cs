@@ -1,6 +1,8 @@
-﻿namespace BackendSite.Service.Model.Mpa
+﻿using BackendSite.Service.Model.ApiModel;
+
+namespace BackendSite.Service.Model.Mpa
 {
-    public class MpaWinLossBaseRequest
+    public class MpaWinLossBaseRequest : IOrderBy
     {
         /// <summary>
         /// 品牌 1:Nova、2:Goal123、3:Bwing
@@ -17,15 +19,11 @@
         /// </summary>
         public DateTime SettledEndTime { get; set; }
 
-        /// <summary>
-        /// 排序欄位，可為NULL或是空
-        /// </summary>
-        public string OrderByColumn { get; set; }
-
+        
         /// <summary>
         /// 所有供應商的所有類型遊戲
         /// </summary>
-        public IEnumerable<int> TpGameType { get; set; }
+        public IEnumerable<int> TpGameTypes { get; set; }
 
         /// <summary>
         /// 玩家名稱
@@ -37,6 +35,15 @@
         /// 所有幣別
         /// </summary>
         public IEnumerable<int> CurrencyIds { get; set; }
+
+        public bool OrderBy { get; set; }
+
+        /// <summary>
+        /// 排序欄位，可為NULL或是空
+        /// </summary>
+        public string OrderByProperty { get; set; }
+
+        public OrderByDirection OrderByDirection { get; set; }
     }
 
     public class MpaWinLossByDataRequest: MpaWinLossBaseRequest { }

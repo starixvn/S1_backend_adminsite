@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,11 +23,36 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossByDataRequest request)
         {
-            var result = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request);
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>
+            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
+            try
             {
-                Data = result
-            };
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Date);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }  
+
+            return apiResult;
+        }
+
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossByDataRequest request)
+        {
+            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
+            try
+            {
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Month);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
 
             return apiResult;
         }

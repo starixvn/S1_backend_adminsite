@@ -32,7 +32,7 @@ namespace BackendSite.Service.Model.Mpa
 
     public class MpaWinLossByDateBaseResponse : MpaWinLossBaseResponse
     {
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public string Date { get; set; }
 
         [JsonProperty(Order = 8)]
@@ -51,25 +51,9 @@ namespace BackendSite.Service.Model.Mpa
         public decimal TotalBonus { get; set; }
     }
 
-    public class MpaWinLossByDayCurrencySummary : MpaWinLossByDateBaseResponse { }
-
-    public class MpaWinLossByDayCurrencyDetail : MpaWinLossByDateBaseResponse
-    {
-        [Newtonsoft.Json.JsonIgnore]
-        /// <summary>
-        /// MYR、CNY...etc
-        /// </summary>
-        public string Currency { get; set; }
-    }
-
-    public class MpaWinLossByDateDto : MpaWinLossByDateBaseResponse
-    {
-        public IEnumerable<MpaWinLossByDayCurrencyDetail> CurrencyDetail { get; set; }
-    }
-
     public class MpaWinLossByDateResponse : MpaWinLossByDateBaseResponse
     {
-        public Dictionary<string,MpaWinLossByDayCurrencyDetail> CurrencyDetail { get; set; }
+        public Dictionary<string,MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
 }
