@@ -124,7 +124,6 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public CurrencyEnum CurrencyId { get; set; }
-        public int PayId { get; set; }
         public int ChannelId { get; set; }
 
         public decimal MinAmount { get; set; }
@@ -143,7 +142,6 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public CurrencyEnum CurrencyId { get; set; }
-        public int PayId { get; set; }
         public int ChannelId { get; set; }
         public PayChannelStatusEnum Status { get; set; }
     }
