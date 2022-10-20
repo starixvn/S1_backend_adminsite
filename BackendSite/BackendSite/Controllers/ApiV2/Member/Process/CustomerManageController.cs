@@ -14,7 +14,7 @@ using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    //[Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class CustomerManageController : ControllerBase
@@ -1754,7 +1754,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 32 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 32 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(GetVipRebateLogRequest request)
         {
