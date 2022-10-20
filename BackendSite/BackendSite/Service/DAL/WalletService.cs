@@ -289,7 +289,7 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, bool isPayout, int pageSize, int pageNumber)
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int status, int pageSize, int pageNumber)
         {
             var searchData = new VipRebateInfoData();
             var tempCurrencyTotalAmount = new List<string>();
@@ -299,9 +299,10 @@ namespace BackendSite.Service.DAL
             //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
             //else { props.Add("EndDate"); }
             props.Add("EndDate", endDate);
+            props.Add("Status", status);
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V3", props).ToList();
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V4", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.ForEach(x =>
@@ -313,7 +314,6 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            props.Add("IsPayout", isPayout);
             props.Add("PageSize", Math.Abs(pageSize));
             props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);

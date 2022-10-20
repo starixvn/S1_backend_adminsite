@@ -269,10 +269,13 @@ namespace BackendSite.Service.BLL
                 pageNumber, categoryId, baseCurrencyId, ref currencyAmount);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, bool isPayout, int pageSize,
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, IEnumerable<VipRebateStatusEnum> statuses, int pageSize,
             int pageNumber)
         {
-            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, isPayout, pageSize, pageNumber);
+            var spStatus = 2; //All
+            if (statuses.Count() == 1)
+                spStatus = (int)statuses.FirstOrDefault(); //reference:VipRebateStatusEnum
+            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spStatus, pageSize, pageNumber);
         }
 
         public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
