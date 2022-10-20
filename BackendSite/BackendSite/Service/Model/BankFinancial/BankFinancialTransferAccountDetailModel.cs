@@ -159,6 +159,78 @@ namespace BackendSite.Service.Model.BankFinancial
         public string CorporateID { get; set; }
     }
     
+    public class BankFinancialTransferAccountDisplayModel
+    {
+        public BankFinancialTransferAccountDisplayModel(BankFinancialTransferAccountDetailModel data)
+        {
+            Id = data.Id;
+            SiteId = data.SiteId;
+            SiteName = data.SiteName;
+            CurrencyId = data.CurrencyId;
+            IsoCode = data.IsoCode;
+            SysId = data.SysId;
+            BankCode = data.BankCode;
+            Purposes = data.Purposes;
+            Channel = data.Channel;
+            Agent = data.Agent;
+            PayId = data.PayId;
+            PayName = data.PayName;
+            AccountNo = data.AccountNo;
+            AccountName = data.AccountName;
+            DisplayName = data.DisplayName;
+            InitialAmount = data.InitialAmount;
+            InitialTime = data.InitialTime;
+            Status = data.Status;
+            CreateTime = data.CreateTime;
+            CreatorName = data.CreatorName;
+            UpdateTime = data.UpdateTime;
+            UpdatorName = data.UpdatorName;
+        }
+        
+        public int Id { get; set; }
+
+        public int SiteId { get; set; }
+
+        public string SiteName { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public string IsoCode { get; set; }
+
+        public int SysId { get; set; }
+
+        public string BankCode { get; set; }
+
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
+
+        public TransferChannelEnum Channel { get; set; }
+
+        public string Agent { get; set; }
+
+        public int PayId { get; set; }
+
+        public string PayName { get; set; }
+
+        public string AccountNo { get; set; }
+
+        public string AccountName { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public decimal InitialAmount { get; set; }
+        public DateTimeOffset InitialTime { get; set; }
+        
+        public TransferAccountStatusEnum Status { get; set; }
+
+        public DateTimeOffset CreateTime { get; set; }
+        
+        public string CreatorName { get; set; }
+
+        public DateTimeOffset UpdateTime { get; set; }
+        
+        public string UpdatorName { get; set; }
+    }
+    
     public class BankFinancialTransferAccountExportModel
     {
         public int Id { get; set; }
