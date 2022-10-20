@@ -467,6 +467,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string RefTransId { get; set; }
             public int? FinancialType { get; set; }
         }
+        public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
+        {
+            public bool IsPayout { get; set; }
+        }
+
+        public class GetVipRebateDetailRequest
+        {
+            public int CustId { get; set; }
+            public int TpCategoryId { get; set; }
+            public string RefId { get; set; }
+        }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
@@ -1760,9 +1771,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 32 })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(CustIdWithDateRangeNullAndPageRequest request)
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(GetVipRebateLogRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -1771,6 +1782,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CustId,
                 startDate,
                 endDate,
+                request.IsPayout,
                 request.PageSize,
                 request.PageNumber);
 
@@ -1781,6 +1793,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 PageNumber = searchResult.PageNumber,
                 RowCount = searchResult.RowCount,
                 CurrencyAmount = searchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustomerManage/GetVipRebateDetail 取得指定客戶VIP回扣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Vip Rebate Log > [Search] > [Detail]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 32 })]
+        [HttpPost]
+        public ApiResult<IEnumerable<VipRebateDetail>> GetVipRebateDetail(GetVipRebateDetailRequest request)
+        {
+            return new ApiResult<IEnumerable<VipRebateDetail>>
+            {
+                Data = _paymentBll.GetVipRebateDetail(request.CustId, request.TpCategoryId, request.RefId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

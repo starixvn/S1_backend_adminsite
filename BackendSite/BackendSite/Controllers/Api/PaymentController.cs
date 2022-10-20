@@ -978,6 +978,7 @@ namespace BackendSite.Controllers.Api
             var searchResult = _paymentBLL.GetVipRebateInfoListByCustId(para.CustId,
                 startDate,
                 endDate,
+                true,
                 10,
                 para.PageNumber);
 

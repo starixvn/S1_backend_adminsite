@@ -74,7 +74,7 @@ namespace BackendSite.Service.BLL
             var parameters = new
             {
                 CustId = custId,
-                StartDate  = startDate,
+                StartDate = startDate,
                 EndDate = endDate,
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
@@ -141,7 +141,7 @@ namespace BackendSite.Service.BLL
                       TurnOver = tpBetRecord.Stake,
                       ValidBet = tpBetRecord.ValidBet ?? 0,
                       WinlostAmount = tpBetRecord.WinlostAmount,
-                      SettlementType = tpBetRecord.SettlementType,   
+                      SettlementType = tpBetRecord.SettlementType,
                       BonusId = tpBetRecord.BonusId,
                   })
                 .GroupBy(x => new
@@ -257,10 +257,15 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize), ref currencyAmount);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize,
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, bool isPayout, int pageSize,
             int pageNumber)
         {
-            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
+            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, isPayout, pageSize, pageNumber);
+        }
+
+        public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
+        {
+            return walletService.GetVipRebateDetail(custId, tpCategoryId, refId);
         }
 
         public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
@@ -313,7 +318,7 @@ namespace BackendSite.Service.BLL
                 .Select(x => new TpBetRecordByDate
                 {
                     SettledDate = x.Key.SettledDate,
-                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),               
+                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
@@ -327,7 +332,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
         public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
-
         {
             var result = new BalanceAdjustBonusCodeRep();
             var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
