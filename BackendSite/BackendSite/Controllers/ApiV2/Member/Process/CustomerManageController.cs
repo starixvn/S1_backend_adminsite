@@ -1729,7 +1729,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, new[] { 2, 24 } })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 2 })]
         public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
         {
             request.PageNumber = -1; //export all
