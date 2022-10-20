@@ -469,7 +469,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
-            public bool IsPayout { get; set; }
+            public IEnumerable<VipRebateStatusEnum> Statuses { get; set; }
         }
 
         public class GetVipRebateDetailRequest
@@ -1782,7 +1782,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CustId,
                 startDate,
                 endDate,
-                request.IsPayout,
+                request.Statuses,
                 request.PageSize,
                 request.PageNumber);
 
