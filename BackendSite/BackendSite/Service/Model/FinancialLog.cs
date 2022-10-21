@@ -173,6 +173,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string VipLevelName { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public int CategoryId { get; set; }

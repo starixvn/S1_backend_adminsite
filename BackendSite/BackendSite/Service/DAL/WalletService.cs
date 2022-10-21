@@ -253,7 +253,7 @@ namespace BackendSite.Service.DAL
             DateTime endDate,
             string userName,
             string categoryIdStr,
-            int baseCurrencyId, int startIndex, int pageSize,
+            int baseCurrencyId, int payoutStatuses,int startIndex, int pageSize,
             ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
@@ -266,9 +266,10 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_CategoryIds", categoryIdStr);
             props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", payoutStatuses);
 
             #region GetCurrencyTotalAmount
-            
+
             searchData.CurrencyAmount = _reportDbClient.Query<VipRebateReportOverviewResult>("Admin_VipRebateTotalAmount_Get_V6", props);
 
             if (searchData.CurrencyAmount.Count() > 0)
@@ -350,7 +351,8 @@ namespace BackendSite.Service.DAL
             DateTime endDate, 
             string userName, 
             string categoryIdStr,
-            int baseCurrencyId)
+            int baseCurrencyId,
+            int spPayoutStatus)
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
@@ -361,6 +363,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_CategoryIds", categoryIdStr);
             props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", spPayoutStatus);
             var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V7", props).ToList();
 
             searchData.VipRebateInfoList = result;

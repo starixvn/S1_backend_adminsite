@@ -262,12 +262,15 @@ namespace BackendSite.Service.BLL
         }
 
         public VipRebateReportResult GetVipRebateInfoList(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
-            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId,
+            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses,
             int pageSize, int pageNumber,ref List<string> currencyAmount)
         {
+            var spPayoutStatus = 2; //All
+            if (payoutStatuses.Count() == 1)
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
             return walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(siteIds), JsonConvert.SerializeObject(currencyIds),
                 startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
-                baseCurrencyId,
+                baseCurrencyId, spPayoutStatus,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize), ref currencyAmount);
         }
@@ -275,10 +278,10 @@ namespace BackendSite.Service.BLL
         public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses, int pageSize,
             int pageNumber)
         {
-            var spStatus = 2; //All
+            var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
-                spStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spStatus, pageSize, pageNumber);
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
+            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spPayoutStatus, pageSize, pageNumber);
         }
 
         public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
@@ -287,11 +290,14 @@ namespace BackendSite.Service.BLL
         }
 
         public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
-            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId)
+            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses)
         {
+            var spPayoutStatus = 2; //All
+            if (payoutStatuses.Count() == 1)
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
             return walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(siteIds),
                 JsonConvert.SerializeObject(currencyIds), startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
-                baseCurrencyId);
+                baseCurrencyId, spPayoutStatus);
         }
 
         public IEnumerable<VipTPCategory> GetTPCategoryList()
