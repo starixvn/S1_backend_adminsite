@@ -27,6 +27,7 @@ namespace BackendSite.Service.BLL
         private readonly string _bucketName;
         private readonly string _bucketUrl;
         private readonly string _folder;
+        private readonly Cryptor _cryptor;
 
         #endregion
 
@@ -44,6 +45,7 @@ namespace BackendSite.Service.BLL
             _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
             _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
             _folder = configuration.GetValue<string>("AwsFinanceFolder");
+            _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
         #endregion
@@ -148,12 +150,12 @@ namespace BackendSite.Service.BLL
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
-                LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : input.LoginPin,
-                MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : input.MobilePin,
-                TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : input.TransferPin,
-                CorporateID = string.IsNullOrWhiteSpace(input.CorporateID) ? string.Empty : input.CorporateID,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
+                LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : _cryptor.Encrypt(input.LoginPin),
+                MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : _cryptor.Encrypt(input.MobilePin),
+                TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : _cryptor.Encrypt(input.TransferPin),
+                CorporateID = string.IsNullOrWhiteSpace(input.CorporateID) ? string.Empty : _cryptor.Encrypt(input.CorporateID),
                 InitialAmount = input.InitialAmount,
                 InitialTime = input.InitialTime,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
@@ -181,12 +183,12 @@ namespace BackendSite.Service.BLL
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
                     oldData.BankLoginUrl,
-                    oldData.BankLoginAccount,
-                    oldData.BankLoginPassword,
-                    oldData.TransferPin,
-                    oldData.MobilePin,
-                    oldData.LoginPin,
-                    oldData.CorporateID,
+                    BankLoginAccount = _cryptor.Decrypt(oldData.BankLoginAccount),
+                    BankLoginPassword = _cryptor.Decrypt(oldData.BankLoginPassword),
+                    TransferPin = _cryptor.Decrypt(oldData.TransferPin),
+                    MobilePin = _cryptor.Decrypt(oldData.MobilePin),
+                    LoginPin = _cryptor.Decrypt(oldData.LoginPin),
+                    CorporateID = _cryptor.Decrypt(oldData.CorporateID),
                     InitialAmount = oldData.InitialAmount,
                     InitialTime = oldData.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
