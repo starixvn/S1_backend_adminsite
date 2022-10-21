@@ -265,7 +265,6 @@ namespace BackendSite.Controllers.Api
                 out var pageInfo);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
-
         }
 
         /// <summary>
@@ -934,6 +933,7 @@ namespace BackendSite.Controllers.Api
 
                 var searchResult = _paymentBLL.GetVipRebateInfoList(para.SelectSite, currencyList, startTime,
                     endTime, string.IsNullOrWhiteSpace(para.User) ? null : para.User, categoryList, para.BaseCurrencyId,
+                    new List<VipRebatePayoutStatusEnum>() { VipRebatePayoutStatusEnum.Payouted },
                      para.PageSize, para.PageNumber, ref currencyAmount);
 
                 foreach (var data in searchResult.VipRebateInfoList)
@@ -1016,8 +1016,7 @@ namespace BackendSite.Controllers.Api
                 categoryList.Add(CategoryId);
 
             var searchResult = _paymentBLL.GetVipRebateInfoListExport(siteList, currencyList, startTime, endTime, string.IsNullOrWhiteSpace(User) ? null : User,
-                categoryList, BaseCurrencyId);
-
+                categoryList, BaseCurrencyId, new List<VipRebatePayoutStatusEnum>() { VipRebatePayoutStatusEnum.Payouted });
             foreach (var data in searchResult.VipRebateInfoList)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);

@@ -6,8 +6,9 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Member.Process.CustomerManageController;
 
-namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
+namespace BackendSite.Controllers.ApiV2.Report
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
@@ -51,6 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             public string UserName { get; set; }
             public IEnumerable<int> CategoryIds { get; set; }
+            public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
         }
 
@@ -72,6 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
             public string UserName { get; set; }
             public IEnumerable<int> CategoryIds { get; set; }
+            public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
         }
 
@@ -100,6 +103,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
                     request.CategoryIds, request.BaseCurrencyId,
+                    request.PayoutStatuses,
                     request.PageSize, request.PageNumber, ref currencyAmount);
 
                 foreach (var data in searchResult.VipRebateInfoList)
@@ -137,7 +141,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
-                    request.CategoryIds, request.BaseCurrencyId);
+                    request.CategoryIds, request.BaseCurrencyId,request.PayoutStatuses);
 
             foreach (var data in searchResult.VipRebateInfoList)
             {
@@ -148,5 +152,25 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return _excelBll.ExcelFile(stream, "VipRebateReport");
         }
 
+        /// <summary>
+        /// RebateReport/GetVipRebateDetail 取得指定客戶VIP回扣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing > Vip Rebate Report > [Submit] > [Detail]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 75, 1 })]
+        [HttpPost]
+        public ApiResult<IEnumerable<VipRebateDetail>> GetVipRebateDetail(GetVipRebateDetailRequest request)
+        {
+            return new ApiResult<IEnumerable<VipRebateDetail>>
+            {
+                Data = _paymentBll.GetVipRebateDetail(request.CustId, request.TpCategoryId, request.RefId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }
