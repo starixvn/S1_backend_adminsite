@@ -32,6 +32,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -53,7 +54,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
-            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -217,9 +218,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayList>> GetPayList()
+        public ApiResult<IEnumerable<PayListInfo>> GetPayList()
         {
-            var data = _paymentManageBll.GetPayList();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayList(authData.SiteId);
 
             if (!data.Any())
             {
@@ -227,7 +229,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayList>>
+                return new ApiResult<IEnumerable<PayListInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success

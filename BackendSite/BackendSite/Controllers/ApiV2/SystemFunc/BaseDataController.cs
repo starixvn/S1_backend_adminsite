@@ -26,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
@@ -44,6 +45,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -238,7 +240,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay();
+            var authData = _authorizeBll.GetAuthData();
+            var bankInfoPay = _bankDetailBll.GetBankInfoPay(authData.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
                             select new Pay
@@ -301,7 +304,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = _bankDetailBll.GetCryptoPay();
+            var authData = _authorizeBll.GetAuthData();
+            var cryptoPay = _bankDetailBll.GetCryptoPay(authData.SiteId);
             var _payInfo = (from x in cryptoPay
                             where x.CurrencyId == request.CurrencyId && x.ChannelName.Equals(request.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay

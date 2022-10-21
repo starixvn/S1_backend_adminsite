@@ -417,7 +417,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = bankDetailBLL.GetBankInfoPay();
+            var bankInfoPay = bankDetailBLL.GetBankInfoPay(withdrawalReq.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
                             select new Pay
@@ -458,7 +458,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = bankDetailBLL.GetCryptoPay();
+            var cryptoPay = bankDetailBLL.GetCryptoPay(withdrawalReq.SiteId);
             var _payInfo = (from x in cryptoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay
