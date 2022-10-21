@@ -66,7 +66,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
                 Balance = a.Balance,
                 Bonus = a.Bonus,
                 DeviceScore = a.DeviceScore,
-                ShieldId = a.ShieldId
+                DeviceId = a.ShieldId
             }),
             PageNumber = memberList.PageNumber,
             TotalPages = memberList.TotalPages,

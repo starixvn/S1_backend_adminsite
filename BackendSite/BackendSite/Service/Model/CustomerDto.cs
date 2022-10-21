@@ -73,7 +73,10 @@ public class MemberList
     public string SabaId { get; set; }
     public string AffiliateCode { get; set; }
     public List<int> TagList { get; set; }
-    public int UserLevel { get; set; }
+    public int PointLevel { get; set; }
+    public int UserType { get; set; }
+    public int Identity { get; set; }
+    public string  AffiliateName { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
@@ -86,7 +89,7 @@ public class MemberList
     public decimal Balance { get; set; }
     public decimal Bonus { get; set; }
     public string DeviceScore { get; set; }
-    public string ShieldId { get; set; }
+    public string DeviceId { get; set; }
 }
 
 public class GetMemberListResponse
