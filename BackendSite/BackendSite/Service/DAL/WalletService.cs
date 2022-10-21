@@ -163,7 +163,7 @@ namespace BackendSite.Service.DAL
             DateTime endDate,
             string userName,
             string categoryIdStr,
-            int baseCurrencyId, int startIndex, int pageSize,
+            int baseCurrencyId, int payoutStatuses,int startIndex, int pageSize,
             ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
@@ -176,6 +176,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_CategoryIds", categoryIdStr);
             props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", payoutStatuses);
 
             #region GetCurrencyTotalAmount
 
@@ -215,7 +216,7 @@ namespace BackendSite.Service.DAL
             //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
             //else { props.Add("EndDate"); }
             props.Add("EndDate", endDate);
-            props.Add("Status", status);
+            props.Add("PayoutStatus", status);
             #region GetCurrencyTotalAmount
 
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V4", props).ToList();
@@ -245,22 +246,23 @@ namespace BackendSite.Service.DAL
         }
 
         public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
-=> _reportDbClient.Query<VipRebateDetail>("Admin_VipRebateDetail_Get",
-    new DynamicParameters(
-        new
-        {
-            _CustId = custId,
-            _CategoryId = tpCategoryId,
-            _RefId = refId
-        }));
+       => _reportDbClient.Query<VipRebateDetail>("Admin_VipRebateDetail_Get",
+           new DynamicParameters(
+               new
+               {
+                   _CustId = custId,
+                   _CategoryId = tpCategoryId,
+                   _RefId = refId
+               }));
 
         public VipRebateInfoData GetVipRebateInfoListExport(string SiteStr,
             string currencyStr,
             DateTime startDate,
-            DateTime endDate,
-            string userName,
+            DateTime endDate, 
+            string userName, 
             string categoryIdStr,
-            int baseCurrencyId)
+            int baseCurrencyId,
+            int spPayoutStatus)
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
@@ -271,6 +273,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_CategoryIds", categoryIdStr);
             props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", spPayoutStatus);
             var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V7", props).ToList();
 
             searchData.VipRebateInfoList = result;

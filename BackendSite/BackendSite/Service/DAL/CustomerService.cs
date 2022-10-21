@@ -61,20 +61,22 @@ public class CustomerService : ICustomerService
         return searchData;
     }
 
-    public async Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, string userName, IEnumerable<int> tags,
-        string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber,
-        string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType,
-        DateTime startDate, DateTime endDate)
+    public async Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, 
+        int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, 
+        string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, 
+        int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
         p.Add("_CurrencyList", currencyList);
         p.Add("_StatusList", statusList);
+        p.Add("_Identity", identity);
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
         p.Add("_AccountName", accountName);
         p.Add("_TpUserName", tpUserName);
         p.Add("_LoginIp", loginIp);
+        p.Add("_VipList", vipList);
         p.Add("_Email", email);
         p.Add("_PhoneNo", phoneNo);
         p.Add("_BankAccountNumber", bankAccountNumber);
