@@ -306,7 +306,7 @@ namespace BackendSite.Service.DAL
             //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
             //else { props.Add("EndDate"); }
             props.Add("EndDate", endDate);
-            props.Add("Status", status);
+            props.Add("PayoutStatus", status);
             #region GetCurrencyTotalAmount
 
             var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V4", props).ToList();
