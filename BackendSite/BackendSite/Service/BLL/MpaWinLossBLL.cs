@@ -23,8 +23,6 @@ namespace BackendSite.Service.BLL
 
         #region Public BLL Method
 
-
-
         public async Task<Dictionary<string, MpaWinLossByDateResponse>> GetMapWinLossByDateResult(MpaWinLossByDataRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var responseResult = new Dictionary<string, MpaWinLossByDateResponse>();

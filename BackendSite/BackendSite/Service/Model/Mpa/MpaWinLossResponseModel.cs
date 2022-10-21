@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.Model.Mpa
 {
-    public class MpaWinLossBaseResponse
+    public class MpaWinLossByDateResponse 
     {
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
@@ -27,13 +27,6 @@ namespace BackendSite.Service.Model.Mpa
 
         [JsonProperty(Order = 7)]
         public decimal Margin { get; set; }
-    }
-
-
-    public class MpaWinLossByDateBaseResponse : MpaWinLossBaseResponse
-    {
-        [JsonIgnore]
-        public string Date { get; set; }
 
         [JsonProperty(Order = 8)]
         public int DepositCount { get; set; }
@@ -49,11 +42,12 @@ namespace BackendSite.Service.Model.Mpa
 
         [JsonProperty(Order = 12)]
         public decimal TotalBonus { get; set; }
-    }
 
-    public class MpaWinLossByDateResponse : MpaWinLossByDateBaseResponse
-    {
         public Dictionary<string,MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
+    //public class MpaWinLossByTpGameTypeDto : MpaWinLossBaseDto
+    //{
+    //    public string TpGameTypeName { get; set; }
+    //}
 }

@@ -123,18 +123,119 @@ namespace BackendSite.Service.Model.Mpa
         public int RowCount { get; set; }
     }
 
-
-    public class MpaWinLossByDayCurrencySummaryDto : MpaWinLossByDateBaseResponse { }
-
-    public class MpaWinLossByDayCurrencyDetailDto : MpaWinLossByDateBaseResponse
+    public class MpaWinLossByDayCurrencySummaryDto 
     {
+        [JsonIgnore]
+        public string Date { get; set; }
+
+        public decimal TurnOver { get; set; }
+
+        public decimal ValidTurnOver { get; set; }
+
+        public decimal GGR { get; set; }
+
+        public decimal PlayerWinLoss { get; set; }
+
+        public int BetCount { get; set; }
+
+        public decimal AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public decimal Margin { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public decimal TotalDepositAmount { get; set; }
+
+        public int WithDrawCount { get; set; }
+
+        public decimal TotalWithDrawAmount { get; set; }
+
+        public decimal TotalBonus { get; set; }
+
+    }
+
+    public class MpaWinLossByDayCurrencyDetailDto 
+    {
+        [JsonIgnore]
+        public string Date { get; set; }
+
         [JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
+
+        [JsonProperty(Order = 0)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal Margin { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public int DepositCount { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 11)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 12)]
+        public decimal TotalBonus { get; set; }
     }
 
-    public class MpaWinLossByDateDto : MpaWinLossByDateBaseResponse
+    public class MpaWinLossByDateDto
     {
+        [JsonIgnore]
+        public string Date { get; set; }
+
+        public decimal TurnOver { get; set; }
+
+        public decimal ValidTurnOver { get; set; }
+
+        public decimal GGR { get; set; }
+
+        public decimal PlayerWinLoss { get; set; }
+
+        public int BetCount { get; set; }
+
+        public decimal AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public decimal Margin { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public decimal TotalDepositAmount { get; set; }
+
+        public int WithDrawCount { get; set; }
+
+        public decimal TotalWithDrawAmount { get; set; }
+
+        public decimal TotalBonus { get; set; }
+
         public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 }
