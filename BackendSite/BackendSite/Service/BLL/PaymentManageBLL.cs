@@ -29,11 +29,6 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<PayList> GetPayList()
-        {
-            return _paymentManageService.GetPayList();
-        }
-
         public IEnumerable<PayChannel> GetPayChannel()
         {
             return _paymentManageService.GetPayChannelList();

@@ -113,13 +113,6 @@ namespace BackendSite.Service.Model
         public IEnumerable<decimal> FixedAmountList { get; set; }
     }
     
-    public class PayListInfo
-    {
-        public int PayId { get; set; }
-        public string PayName { get; set; }
-        public PayListStatusEnum Status { get; set; }
-    }
-    
     public class UpdatePaySettingParams
     {
         public int SiteId { get; set; }
@@ -136,6 +129,18 @@ namespace BackendSite.Service.Model
         public int PointLevel { get; set; }
 
         public int Sort { get; set; }
+    }
+    
+    public class PayListInfo
+    {
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public PayListStatusEnum PayStatus { get; set; }
+        public PayListStatusEnum SitePayStatus { get; set; }
+
+        public PayListStatusEnum Status => PayStatus == PayListStatusEnum.Enable
+            ? SitePayStatus
+            : PayStatus;
     }
 
     public class UpdatePaySettingStatusParams
@@ -199,5 +204,6 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; }
         public PayChannelStatusEnum Status { get; set; }
         public PayListStatusEnum PayStatus { get; set; }
+        public PayListStatusEnum SitePayStatus { get; set; }
     }
 }
