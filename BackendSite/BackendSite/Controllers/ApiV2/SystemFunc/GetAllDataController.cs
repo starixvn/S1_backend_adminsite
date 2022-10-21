@@ -245,9 +245,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayChannel>> GetPayChannel()
+        public ApiResult<IEnumerable<PayChannelInfo>> GetPayChannel()
         {
-            var data = _paymentManageBll.GetPayChannel();
+            
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayChannel(authData.SiteId);
 
             if (!data.Any())
             {
@@ -255,7 +257,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayChannel>>
+                return new ApiResult<IEnumerable<PayChannelInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -263,17 +265,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// <summary>
-        /// GetAllData/GetPayCurrency 取得第三方支付廠商幣別資料清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayCurrency>> GetPayCurrency()
+        public ApiResult<IEnumerable<PaySetting>> GetPaySetting()
         {
-            var data = _paymentManageBll.GetPayCurrency();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPaySetting(authData.SiteId);
 
             if (!data.Any())
             {
@@ -281,7 +277,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayCurrency>>
+                return new ApiResult<IEnumerable<PaySetting>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success

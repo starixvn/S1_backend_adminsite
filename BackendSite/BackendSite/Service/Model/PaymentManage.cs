@@ -206,4 +206,39 @@ namespace BackendSite.Service.Model
         public PayListStatusEnum PayStatus { get; set; }
         public PayListStatusEnum SitePayStatus { get; set; }
     }
+    
+    public class PayChannelInfo
+    {
+        public PayChannelInfo(PaySetting setting)
+        {
+            PayId = setting.PayId;
+            PayName = setting.PayName;
+            ChannelId = setting.ChannelId;
+            ChannelName = setting.ChannelName;
+            Type = setting.Type;
+            Mode = setting.Mode;
+            Sort = setting.Sort;
+        }
+        
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
+        public PayChannelTypeEnum Type { get; set; }
+        public int Mode { get; set; }
+        public int Sort { get; set; }
+    }
+    
+    public class PayChannelInfoComparer : IEqualityComparer<PayChannelInfo>
+    {
+        public bool Equals(PayChannelInfo t1, PayChannelInfo t2)
+        {
+            return (t1.ChannelId == t2.ChannelId);
+        }
+
+        public int GetHashCode(PayChannelInfo t)
+        {
+            return t.ToString().GetHashCode();
+        }
+    }
 }
