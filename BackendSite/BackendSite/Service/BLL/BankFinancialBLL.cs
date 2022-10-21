@@ -123,7 +123,7 @@ namespace BackendSite.Service.BLL
 
             if (!isCreate)
             {
-                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoListParams(input.Id))
+                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoParams(input.Id))
                     .FirstOrDefault();
             }
 
