@@ -73,6 +73,12 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
+    }
+
     #endregion
 
     #region Withdrawal Submission For Frontend Use
@@ -414,19 +420,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
     public enum AdjustmentCategoryEnum
     {
         [Description("None - (Default)")]
@@ -850,8 +856,8 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferStatusEnum
     {
-        Success = 0, 
-        Fail = 1, 
+        Success = 0,
+        Fail = 1,
         Pending = 2,
         PendingD = 3
     }
@@ -1174,7 +1180,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1205,7 +1211,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1287,7 +1293,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         Closed = 2,
     }
-    public enum SlotGameStatusEnum 
+    public enum SlotGameStatusEnum
     {
         Closed = 0,
         Open = 1

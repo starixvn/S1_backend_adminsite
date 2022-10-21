@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using NuGet.Protocol;
 
 namespace BackendSite.Service.Model
 {
@@ -44,7 +46,7 @@ namespace BackendSite.Service.Model
         public string RebateTypeName { get; set; }
         public decimal RedeemAmount { get; set; }
         public string BonusCode { get; set; }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -83,7 +85,7 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal TotalTO { get; set; }  
+        public decimal TotalTO { get; set; }
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
         public decimal TurnOver { get; set; }
@@ -179,7 +181,11 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { get; set; }
         public string RefId { get; set; }
         public int SettledDate { get; set; }
+        public decimal RCCalculatedAmount { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
     }
+
     public class VipRebateInfoData
     {
         public List<VipRebateInfo> VipRebateInfoList { get; set; }
@@ -197,6 +203,15 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class VipRebateDetail
+    {
+        public int GameType { get; set; }
+        public string TypeName { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal CalculatedAmount { get; set; }
+    }
+
     public class VipTPCategory
     {
         public int CategoryId { get; set; }
@@ -211,7 +226,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
         public decimal AdjustmentMax { get; set; }
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
