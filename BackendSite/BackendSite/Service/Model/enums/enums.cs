@@ -73,7 +73,7 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
-    public enum VipRebateStatusEnum
+    public enum VipRebatePayoutStatusEnum
     {
         NotPayout = 0,
         Payouted = 1
