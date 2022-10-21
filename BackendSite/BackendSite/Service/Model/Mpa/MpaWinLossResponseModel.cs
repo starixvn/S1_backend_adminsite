@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.Model.Mpa
 {
-    public class MpaWinLossByDateResponse 
+    public class MpaWinLossByDateResponse
     {
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
@@ -43,11 +43,38 @@ namespace BackendSite.Service.Model.Mpa
         [JsonProperty(Order = 12)]
         public decimal TotalBonus { get; set; }
 
-        public Dictionary<string,MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
+        public Dictionary<string, MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
-    //public class MpaWinLossByTpGameTypeDto : MpaWinLossBaseDto
-    //{
-    //    public string TpGameTypeName { get; set; }
-    //}
+    public class MpaWinLossByTpGameTypeResponse
+    {
+        [JsonIgnore]
+        public string TpGameTypeName { get; set; }
+
+        [JsonProperty(Order = 0)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal Margin { get; set; }
+
+        public Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> CurrencyDetail { get; set; }
+    }
 }

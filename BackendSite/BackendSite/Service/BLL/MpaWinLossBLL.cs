@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             var responseResult = new Dictionary<string, MpaWinLossByDateResponse>();
 
             // 注單資料
-            var tpBetRecordResult = await GetTpBetRecordResult(request, groupByType);
+            var tpBetRecordResult = await GetTpBetRecordByDateResult(request, groupByType);
 
             // 存提款 
             var transactionResult = await GetTransactionResult(request, groupByType);
@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
                 foreach (var dayItem in byDay)
                 {
                     // 組合 (注單 + 存提款)的幣別 Detail
-                    var dayCurrencyDetail = ComposeByDate_CurrencyDetail(dayItem);
+                    var dayCurrencyDetail = Compose_CurrencyDetail_ByDate(dayItem);
 
                     // 組合結果 + day Summary
                     ComposeByDate_ResultItem(responseResult, byDay, dayItem, dayCurrencyDetail);
@@ -76,17 +76,59 @@ namespace BackendSite.Service.BLL
             return responseResult;
         }
 
+        public async Task<Dictionary<string, MpaWinLossByTpGameTypeResponse>> GetMapWinLossByTpGameTypeResult(MpaWinLossByDataRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
+            var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
+
+            // 注單資料
+            var tpBetRecordResult = await GetTpBetRecordByTpGameTypeResult(request, groupByType);
+
+            var groupByResult = request.OrderBy
+                ? tpBetRecordResult
+                    .OrderBy(request)
+                    .GroupBy(x => x.TpGameTypeName)
+                : tpBetRecordResult
+                    .GroupBy(x => x.TpGameTypeName);
+
+            foreach (var byGameType in groupByResult)
+            {
+                foreach (var gameTypeItem in byGameType)
+                {
+                    //(注單) 的幣別 Detail
+                    var dayCurrencyDetail = Compose_CurrencyDetail_ByTpGameType(gameTypeItem);
+
+                    // 組合結果 + day Summary
+                    ComposeByTpGameType_ResultItem(responseResult, byGameType, gameTypeItem, dayCurrencyDetail);
+                }
+            }
+
+            // total
+            responseResult.Add("total", new MpaWinLossByTpGameTypeResponse()
+            {
+                TurnOver = responseResult.Sum(x => x.Value.TurnOver),
+                ValidTurnOver = responseResult.Sum(x => x.Value.ValidTurnOver),
+                GGR = responseResult.Sum(x => x.Value.GGR),
+                PlayerWinLoss = responseResult.Sum(x => x.Value.PlayerWinLoss),
+                BetCount = responseResult.Sum(x => x.Value.BetCount),
+                AvgBetAmount = responseResult.Sum(x => x.Value.AvgBetAmount),
+                UniquePlayers = responseResult.Sum(x => x.Value.UniquePlayers),
+                Margin = responseResult.Sum(x => x.Value.Margin)
+            });
+
+            return responseResult;
+        }
+
         #endregion
 
         #region TpBetRecodr
 
         /// <summary>
-        /// 取得注單結果
+        /// 取得 GroupBy 日期、月份注單結果
         /// </summary>
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<MpaWinLossByDateDto>> GetTpBetRecordResult(MpaWinLossByDataRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        private async Task<IEnumerable<MpaWinLossByDateDto>> GetTpBetRecordByDateResult(MpaWinLossByDataRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var tpBetRecordResult = new List<MpaWinLossByDateDto>();
 
@@ -104,8 +146,6 @@ namespace BackendSite.Service.BLL
 
             var currencyMap = await GetCurrencyIsoCodeMapper();
             var rateMap = await GetRateMapper();
-
-            var month = tpBetRecordRelayResult.GroupBy(r => r.Date);
 
             foreach (var byDateResult in tpBetRecordRelayResult.GroupBy(r => r.Date)) // by日期
             {
@@ -132,7 +172,57 @@ namespace BackendSite.Service.BLL
             return tpBetRecordResult;
         }
 
+        /// <summary>
+        /// 取得 GroupBy TpGameType 注單結果
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="groupByType"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<MpaWinLossByTpGameTypeDto>> GetTpBetRecordByTpGameTypeResult(MpaWinLossByDataRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
 
+            var tpBetRecordResult = new List<MpaWinLossByTpGameTypeDto>();
+
+            // 注單過濾
+            var tpBetRecordRelayResult = (await GetMapTpBetRecordByDate(request, groupByType))
+                .Where(r => request.TpGameTypes.Contains(r.GameType) &&
+                            request.CurrencyIds.Contains(r.CurrencyId));
+
+            // 過濾過濾
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                var custId = await GetCustIdByUserName(request.SiteId, request.UserName);
+                tpBetRecordRelayResult = tpBetRecordRelayResult.Where(r => r.CustId == custId);
+            }
+
+            var currencyMap = await GetCurrencyIsoCodeMapper();
+            var rateMap = await GetRateMapper();
+            var tpGameTypeMap = await GetTpGameTypeMapper();
+
+            var gtype = tpBetRecordRelayResult.GroupBy(r => r.GameType);
+
+            foreach (var byDateResult in tpBetRecordRelayResult.GroupBy(r => r.GameType)) // by GameType
+            {
+                var currencyDetail = GetTpBetRecordCurrencyDetail(byDateResult, currencyMap, rateMap);
+                var daySummary = GetTpBetRecordCurrencySummary(currencyDetail);
+
+                tpBetRecordResult.Add(new MpaWinLossByTpGameTypeDto()
+                {
+                    TpGameTypeName = tpGameTypeMap[byDateResult.Key],
+                    TurnOver = daySummary.TurnOver,
+                    ValidTurnOver = daySummary.ValidTurnOver,
+                    GGR = daySummary.GGR,
+                    PlayerWinLoss = daySummary.PlayerWinLoss,
+                    BetCount = daySummary.BetCount,
+                    AvgBetAmount = daySummary.AvgBetAmount,
+                    Margin = daySummary.Margin,
+                    UniquePlayers = daySummary.UniquePlayers,
+                    CurrencyDetail = currencyDetail
+                });
+            }
+
+            return tpBetRecordResult;
+        }
 
         /// <summary>
         /// 取得注單每日每個幣別的Detail
@@ -173,6 +263,40 @@ namespace BackendSite.Service.BLL
                 detail.Date = groupByType == MpaWinLossGroupByTypeEnum.Date
                     ? byDateResult.Key.ToString("yyyy-MM-dd")
                     : byDateResult.Key.ToString("yyyy-MM");
+                currencyDetail.Add(detail);
+            }
+
+            return currencyDetail;
+        }
+
+        private static List<MpaWinLossByDayCurrencyDetailDto> GetTpBetRecordCurrencyDetail(IGrouping<int, MpaTpBetRecordByDateDto> byDateResult,
+        Dictionary<int, string> currencyMap,
+        Dictionary<int, decimal> rateMap)
+        {
+            // todo 確認計算小數點公式
+            var currencyDetail = new List<MpaWinLossByDayCurrencyDetailDto>();
+
+            foreach (var byDateByCurrencyIds in byDateResult.GroupBy(x => x.CurrencyId)) // by 幣別，同個幣別一天會有多筆
+            {
+                var currencyKey = currencyMap[byDateByCurrencyIds.Key];
+                var rate = rateMap[byDateByCurrencyIds.Key];
+                var detail = new MpaWinLossByDayCurrencyDetailDto();
+                var uniquePlayerCount = byDateByCurrencyIds.DistinctBy(x => x.CustId).Count();
+
+                foreach (var byDateByCurrencyId in byDateByCurrencyIds)
+                {
+                    detail.TurnOver += (byDateByCurrencyId.StakeSummary / rate).ToDecimal2();
+                    detail.ValidTurnOver += (byDateByCurrencyId.ValidBetSummary / rate).ToDecimal2();
+                    detail.PlayerWinLoss += (byDateByCurrencyId.WinLossSummary / rate).ToDecimal2();
+                    detail.BetCount += byDateByCurrencyId.RowCount;
+                }
+
+                detail.GGR = (detail.PlayerWinLoss * -1).ToDecimal2();
+                detail.AvgBetAmount = detail.BetCount != 0 ? (detail.TurnOver / detail.BetCount).ToDecimal2() : 0.00m;
+                detail.Margin = detail.GGR != 0 ? (detail.GGR / detail.TurnOver).ToDecimal2() : 0.00m;
+                detail.UniquePlayers = uniquePlayerCount;
+                detail.Currency = currencyKey;
+                detail.GameType = byDateResult.Key;
                 currencyDetail.Add(detail);
             }
 
@@ -342,7 +466,44 @@ namespace BackendSite.Service.BLL
                 temp.TotalDepositAmount += dayItem.TotalDepositAmount;
                 temp.WithDrawCount += dayItem.WithDrawCount;
                 temp.TotalWithDrawAmount += dayItem.TotalWithDrawAmount;
-                ComposeByDate_ResultItem_ExistCurrencyDetail(dayCurrencyDetail, temp);
+
+                foreach (var currencyDetail in dayCurrencyDetail)
+                {
+                    if (temp.CurrencyDetail.ContainsKey(currencyDetail.Key))
+                    {
+                        var currencyItem = temp.CurrencyDetail[currencyDetail.Key];
+                        currencyItem.TurnOver += currencyDetail.Value.TurnOver;
+                        currencyItem.ValidTurnOver += currencyDetail.Value.ValidTurnOver;
+                        currencyItem.GGR += currencyDetail.Value.GGR;
+                        currencyItem.PlayerWinLoss += currencyDetail.Value.PlayerWinLoss;
+                        currencyItem.BetCount += currencyDetail.Value.BetCount;
+                        currencyItem.AvgBetAmount += currencyDetail.Value.AvgBetAmount;
+                        currencyItem.UniquePlayers += currencyDetail.Value.UniquePlayers;
+                        currencyItem.Margin += currencyDetail.Value.Margin;
+                        currencyItem.DepositCount += currencyDetail.Value.DepositCount;
+                        currencyItem.TotalDepositAmount += currencyDetail.Value.TotalDepositAmount;
+                        currencyItem.WithDrawCount += currencyDetail.Value.WithDrawCount;
+                        currencyItem.TotalWithDrawAmount += currencyDetail.Value.TotalWithDrawAmount;
+                    }
+                    else
+                    {
+                        temp.CurrencyDetail[currencyDetail.Key] = new MpaWinLossByDayCurrencyDetailDto()
+                        {
+                            TurnOver = currencyDetail.Value.TurnOver,
+                            ValidTurnOver = currencyDetail.Value.ValidTurnOver,
+                            GGR = currencyDetail.Value.GGR,
+                            PlayerWinLoss = currencyDetail.Value.PlayerWinLoss,
+                            BetCount = currencyDetail.Value.BetCount,
+                            AvgBetAmount = currencyDetail.Value.AvgBetAmount,
+                            UniquePlayers = currencyDetail.Value.UniquePlayers,
+                            Margin = currencyDetail.Value.Margin,
+                            DepositCount = currencyDetail.Value.DepositCount,
+                            TotalDepositAmount = currencyDetail.Value.TotalDepositAmount,
+                            WithDrawCount = currencyDetail.Value.WithDrawCount,
+                            TotalWithDrawAmount = currencyDetail.Value.TotalWithDrawAmount,
+                        };
+                    }
+                }
             }
             else
             {
@@ -365,49 +526,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        private static void ComposeByDate_ResultItem_ExistCurrencyDetail(Dictionary<string, MpaWinLossByDayCurrencyDetailDto> dayCurrencyDetail,
-            MpaWinLossByDateResponse temp)
-        {
-            foreach (var currencyDetail in dayCurrencyDetail)
-            {
-                if (temp.CurrencyDetail.ContainsKey(currencyDetail.Key))
-                {
-                    var currencyItem = temp.CurrencyDetail[currencyDetail.Key];
-                    currencyItem.TurnOver += currencyDetail.Value.TurnOver;
-                    currencyItem.ValidTurnOver += currencyDetail.Value.ValidTurnOver;
-                    currencyItem.GGR += currencyDetail.Value.GGR;
-                    currencyItem.PlayerWinLoss += currencyDetail.Value.PlayerWinLoss;
-                    currencyItem.BetCount += currencyDetail.Value.BetCount;
-                    currencyItem.AvgBetAmount += currencyDetail.Value.AvgBetAmount;
-                    currencyItem.UniquePlayers += currencyDetail.Value.UniquePlayers;
-                    currencyItem.Margin += currencyDetail.Value.Margin;
-                    currencyItem.DepositCount += currencyDetail.Value.DepositCount;
-                    currencyItem.TotalDepositAmount += currencyDetail.Value.TotalDepositAmount;
-                    currencyItem.WithDrawCount += currencyDetail.Value.WithDrawCount;
-                    currencyItem.TotalWithDrawAmount += currencyDetail.Value.TotalWithDrawAmount;
-                }
-                else
-                {
-                    temp.CurrencyDetail[currencyDetail.Key] = new MpaWinLossByDayCurrencyDetailDto()
-                    {
-                        TurnOver = currencyDetail.Value.TurnOver,
-                        ValidTurnOver = currencyDetail.Value.ValidTurnOver,
-                        GGR = currencyDetail.Value.GGR,
-                        PlayerWinLoss = currencyDetail.Value.PlayerWinLoss,
-                        BetCount = currencyDetail.Value.BetCount,
-                        AvgBetAmount = currencyDetail.Value.AvgBetAmount,
-                        UniquePlayers = currencyDetail.Value.UniquePlayers,
-                        Margin = currencyDetail.Value.Margin,
-                        DepositCount = currencyDetail.Value.DepositCount,
-                        TotalDepositAmount = currencyDetail.Value.TotalDepositAmount,
-                        WithDrawCount = currencyDetail.Value.WithDrawCount,
-                        TotalWithDrawAmount = currencyDetail.Value.TotalWithDrawAmount,
-                    };
-                }
-            }
-        }
-
-        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> ComposeByDate_CurrencyDetail(MpaWinLossByDateDto dayItem)
+        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> Compose_CurrencyDetail_ByDate(MpaWinLossByDateDto dayItem)
         {
             var dayCurrencyDetail = new Dictionary<string, MpaWinLossByDayCurrencyDetailDto>();
             foreach (var currencyDetailKeyPair in dayItem.CurrencyDetail)
@@ -451,6 +570,108 @@ namespace BackendSite.Service.BLL
             return dayCurrencyDetail;
         }
 
+
+        private static void ComposeByTpGameType_ResultItem(Dictionary<string, MpaWinLossByTpGameTypeResponse> responseResult,
+          IGrouping<string, MpaWinLossByTpGameTypeDto> byGameType,
+          MpaWinLossByTpGameTypeDto dayItem,
+          Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> dayCurrencyDetail)
+        {
+            if (responseResult.ContainsKey(byGameType.Key))
+            {
+                var temp = responseResult[byGameType.Key];
+                temp.TurnOver += dayItem.TurnOver;
+                temp.ValidTurnOver += dayItem.ValidTurnOver;
+                temp.GGR += dayItem.GGR;
+                temp.PlayerWinLoss += dayItem.PlayerWinLoss;
+                temp.BetCount += dayItem.BetCount;
+                temp.AvgBetAmount += dayItem.AvgBetAmount;
+                temp.UniquePlayers += dayItem.UniquePlayers;
+                temp.Margin += dayItem.Margin;
+
+
+                foreach (var currencyDetail in dayCurrencyDetail)
+                {
+                    if (temp.CurrencyDetail.ContainsKey(currencyDetail.Key))
+                    {
+                        var currencyItem = temp.CurrencyDetail[currencyDetail.Key];
+                        currencyItem.TurnOver += currencyDetail.Value.TurnOver;
+                        currencyItem.ValidTurnOver += currencyDetail.Value.ValidTurnOver;
+                        currencyItem.GGR += currencyDetail.Value.GGR;
+                        currencyItem.PlayerWinLoss += currencyDetail.Value.PlayerWinLoss;
+                        currencyItem.BetCount += currencyDetail.Value.BetCount;
+                        currencyItem.AvgBetAmount += currencyDetail.Value.AvgBetAmount;
+                        currencyItem.UniquePlayers += currencyDetail.Value.UniquePlayers;
+                        currencyItem.Margin += currencyDetail.Value.Margin;
+                    }
+                    else
+                    {
+                        temp.CurrencyDetail[currencyDetail.Key] = new MpaWinLossByTpGameTypeCurrencyDetailDto()
+                        {
+                            TurnOver = currencyDetail.Value.TurnOver,
+                            ValidTurnOver = currencyDetail.Value.ValidTurnOver,
+                            GGR = currencyDetail.Value.GGR,
+                            PlayerWinLoss = currencyDetail.Value.PlayerWinLoss,
+                            BetCount = currencyDetail.Value.BetCount,
+                            AvgBetAmount = currencyDetail.Value.AvgBetAmount,
+                            UniquePlayers = currencyDetail.Value.UniquePlayers,
+                            Margin = currencyDetail.Value.Margin,
+                        };
+                    }
+                }
+            }
+            else
+            {
+                responseResult[byGameType.Key] = new MpaWinLossByTpGameTypeResponse()
+                {
+                    TurnOver = dayItem.TurnOver,
+                    ValidTurnOver = dayItem.ValidTurnOver,
+                    GGR = dayItem.GGR,
+                    PlayerWinLoss = dayItem.PlayerWinLoss,
+                    BetCount = dayItem.BetCount,
+                    AvgBetAmount = dayItem.AvgBetAmount,
+                    UniquePlayers = dayItem.UniquePlayers,
+                    Margin = dayItem.Margin,
+                    CurrencyDetail = dayCurrencyDetail
+                };
+            }
+        }
+
+        private static Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> Compose_CurrencyDetail_ByTpGameType(MpaWinLossByTpGameTypeDto gameTypeItem)
+        {
+            var dayCurrencyDetail = new Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto>();
+            foreach (var currencyDetailKeyPair in gameTypeItem.CurrencyDetail)
+            {
+                if (dayCurrencyDetail.ContainsKey(currencyDetailKeyPair.Currency))
+                {
+                    var temp = dayCurrencyDetail[currencyDetailKeyPair.Currency];
+                    temp.TurnOver += currencyDetailKeyPair.TurnOver;
+                    temp.ValidTurnOver += currencyDetailKeyPair.ValidTurnOver;
+                    temp.GGR += currencyDetailKeyPair.GGR;
+                    temp.PlayerWinLoss += currencyDetailKeyPair.PlayerWinLoss;
+                    temp.BetCount += currencyDetailKeyPair.BetCount;
+                    temp.AvgBetAmount += currencyDetailKeyPair.AvgBetAmount;
+                    temp.UniquePlayers += currencyDetailKeyPair.UniquePlayers;
+                    temp.Margin += currencyDetailKeyPair.Margin;
+                }
+                else
+                {
+                    dayCurrencyDetail[currencyDetailKeyPair.Currency] = new MpaWinLossByTpGameTypeCurrencyDetailDto()
+                    {
+                        TurnOver = currencyDetailKeyPair.TurnOver,
+                        ValidTurnOver = currencyDetailKeyPair.ValidTurnOver,
+                        GGR = currencyDetailKeyPair.GGR,
+                        PlayerWinLoss = currencyDetailKeyPair.PlayerWinLoss,
+                        BetCount = currencyDetailKeyPair.BetCount,
+                        AvgBetAmount = currencyDetailKeyPair.AvgBetAmount,
+                        UniquePlayers = currencyDetailKeyPair.UniquePlayers,
+                        Margin = currencyDetailKeyPair.Margin,
+                    };
+                }
+            }
+
+            return dayCurrencyDetail;
+        }
+
         #endregion
 
         #region Common
@@ -487,6 +708,19 @@ namespace BackendSite.Service.BLL
                 TimeSpan.FromHours(12),
                 () => _mpaWinLossService.GetMpaUsdRate());
         }
+
+
+        public async Task<Dictionary<int, string>> GetTpGameTypeMapper()
+        {
+            const string redisKey = "MpaTpGameTypeMapper";
+            var data = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                TimeSpan.FromHours(12),
+                () => _mpaWinLossService.GetTpGameTypeOption());
+
+            return data.ToDictionary(x => x.Type, v => v.TypeName);
+        }
+
+
 
         /// <summary>
         /// 取得 TpBetRecordRelay by Date

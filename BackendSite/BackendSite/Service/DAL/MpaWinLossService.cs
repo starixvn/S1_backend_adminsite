@@ -49,5 +49,10 @@ namespace BackendSite.Service.DAL
             p.Add("_UserName", userName, dbType: DbType.String);
             return _reportDbClient.QueryFirstAsync<int>("Admin_CustIdByUserName_Get", p);
         }
+
+        public Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption()
+        {
+            return _reportDbClient.QueryAsync<TpGameTypeOptionDto>("Common_TpGameType_Get");
+        }
     }
 }

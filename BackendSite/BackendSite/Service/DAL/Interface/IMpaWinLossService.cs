@@ -41,5 +41,12 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="userName"></param>
         /// <returns></returns>
         Task<int> GetCustIdByUserName(int siteId, string userName);
+
+
+        /// <summary>
+        /// 取得所有 TpGameTypeID/TpGameTypeName
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption();
     }
 }
