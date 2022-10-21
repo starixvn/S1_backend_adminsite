@@ -54,6 +54,9 @@ public class MemberDashboardBll : IMemberDashboardBLL
                 SabaId = a.SabaId,
                 AffiliateCode = a.AffiliateCode,
                 TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+                Identity = 1,
+                UserType = 1,
+                PointLevel = 1,
                 Agent = a.Agent,
                 Status = a.Status,
                 IsTest = a.IsTest,
@@ -81,32 +84,42 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var endTime = request.EndDate.ToUniversalTime().DateTime;
         var currencyList = string.Join(',', request.CurrencyId.ToArray());
         var statusList = string.Join(',', request.Status.ToArray());
+        var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
         var transType = GetTransType(request.TransId);
-        var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList, request.UserName, request.Tags, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime);
+        var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList,
+            request.Identity, request.UserName, request.Tags, vipList, request.AccountName, request.TpUserName,
+            request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode,
+            transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType,
+            startTime, endTime);
 
         var exportData = memberList.Select(a => new MemberExportData()
         {
             SiteName = a.SiteName,
-            CurrencyId = a.CurrencyId,
-            IsoCode = a.IsoCode,
-            CustId = a.CustId,
             UserName = a.UserName,
-            SabaId = a.SabaId,
-            AffiliateCode = a.AffiliateCode,
-            TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
-            Agent = a.Agent,
-            Status = a.Status,
+            CustId = a.CustId,
+            Currency = a.IsoCode,
+            BirthDate = a.BirthDate,
+            BirthMonth = a.BirthMonth,
+            BirthYear = a.BirthYear,
             IsTest = a.IsTest,
-            IP = a.IP,
+            IsKyc = a.IsKyc,
+            IsRisk = a.IsRisk,
+            SeamlessWallet = a.SeamlessWallet,
+            BonusWallet = a.BonusWallet,
+            Email = a.Email,
+            RealName = a.RealName,
+            CountryCode = a.CountryCode,
+            AreaCode = a.AreaCode,
+            PhoneNo = a.PhoneNo,
             LevelName = a.LevelName,
+            Agent = a.Agent,
             RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-            LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
-            LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
-            LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
-            Balance = a.Balance,
-            Bonus = a.Bonus,
-            DeviceScore = a.DeviceScore,
-            ShieldId = a.ShieldId
+            Status = a.Status,
+            SabaId = a.SabaId,
+            SignupUrl = a.SignupUrl,
+            AffiliateId = a.AffiliateId,
+            AffiliateCode = a.AffiliateCode,
+            LastActivityIp = a.LastActivityIp
         });
         return exportData;
     }
