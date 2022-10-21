@@ -108,10 +108,10 @@ public class ExportMemberRequest
     public int DateType { get; set; }
     public IEnumerable<int> CurrencyId { get; set; }
     public IEnumerable<int> Status { get; set; }
-    // public int Identity { get; set; }
+    public int Identity { get; set; }
     public string UserName { get; set; }
     public string TpUserName { get; set; }
-    // public string AffiliateName { get; set; }
+    public string AffiliateName { get; set; }
     public string LoginIp { get; set; }
     public string Email { get; set; }
     public string PhoneNo { get; set; }
@@ -119,12 +119,12 @@ public class ExportMemberRequest
     public string BankAccountNumber { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
-    // public IEnumerable<int> VipLevel { get; set; }
+    public IEnumerable<int> VipLevel { get; set; }
     public string TransId { get; set; }
     public int ShieldLevel { get; set; }
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
-    // public int UserType { get; set; }
+    public int UserType { get; set; }
     public bool ExportTransferWallet { get; set; } = false;
 }
 
@@ -132,53 +132,61 @@ public class ExportMemberRequest
 public class MemberExportDataDto
 {
     public string SiteName { get; set; }
-    public int CurrencyId { get; set; }
     public string IsoCode { get; set; }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string SabaId { get; set; }
+    public string AffiliateId { get; set; }
     public string AffiliateCode { get; set; }
-    public string TagList { get; set; }
-    public int UserLevel { get; set; }
+    public string SignupUrl { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+    public string Email { get; set; }
+    public string RealName { get; set; }
+    public string CountryCode { get; set; }
+    public string AreaCode { get; set; }
+    public string PhoneNo { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
-    public string IP { get; set; }
+    public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
+    public string LastActivityIp { get; set; }
     public string LevelName { get; set; }
     public DateTime RegTime { get; set; }
-    public DateTime? ReloadTime { get; set; }
-    public DateTime? LastTagUpdateTime { get; set; }
-    public DateTime? LastStatusUpdateTime { get; set; }
-    public decimal Balance { get; set; }
-    public decimal Bonus { get; set; }
-    public string DeviceScore { get; set; }
-    public string ShieldId { get; set; }
+    public decimal SeamlessWallet { get; set; }
+    public decimal BonusWallet { get; set; }
 }
 
 public class MemberExportData
 {
     public string SiteName { get; set; }
-    public int CurrencyId { get; set; }
-    public string IsoCode { get; set; }
-    public int CustId { get; set; }
     public string UserName { get; set; }
-    public string SabaId { get; set; }
-    public string AffiliateCode { get; set; }
-    public List<int> TagList { get; set; }
-    public int UserLevel { get; set; }
+    public int CustId { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+    public bool IsTest { get; set; }
+    public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
+    public decimal SeamlessWallet { get; set; }
+    public decimal BonusWallet { get; set; }
+    public string Email { get; set; }
+    public string RealName { get; set; }
+    public string CountryCode { get; set; }
+    public string AreaCode { get; set; }
+    public string PhoneNo { get; set; }
+    public string Currency { get; set; }
+    public string LevelName { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
-    public bool IsTest { get; set; }
-    public string IP { get; set; }
-    public string LevelName { get; set; }
     public DateTimeOffset RegTime { get; set; }
-    public DateTimeOffset? LastActiveTime { get; set; }
-    public DateTimeOffset? LastTagUpdateTime { get; set; }
-    public DateTimeOffset? LastStatusUpdateTime { get; set; }
-    public decimal Balance { get; set; }
-    public decimal Bonus { get; set; }
-    public string DeviceScore { get; set; }
-    public string ShieldId { get; set; }
+    public string SabaId { get; set; }
+    public string SignupUrl { get; set; }
+    public string AffiliateId { get; set; }
+    public string AffiliateCode { get; set; }
+    public string LastActivityIp { get; set; }
 }
 
 public class GetCustomerBasicInfoRequest
