@@ -520,7 +520,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string SabaId { get; set; }
 
         }
-        
+
         public class GetCustInfoWithBalanceResult
         {
             public int SiteId { get; set; }
@@ -531,7 +531,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public CustomerStatusEnum Status { get; set; }
             public decimal Balance { get; set; }
         }
-        
+
         public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
@@ -1723,9 +1723,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var pageNumber = request.PageNumber;
-            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
-            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
+            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
@@ -1733,18 +1732,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 request.RefTransId,
                 request.PageSize,
-                ref pageNumber,
-                out var totalPages,
-                out var rowCount);
+                request.PageNumber,
+                out var pageInfo);
 
-            return new ApiListResult<FinancialLog>
-            {
-                Data = data,
-                TotalPages = totalPages,
-                PageNumber = pageNumber,
-                RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+            return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
 
         #endregion
@@ -2453,7 +2444,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    request.StartDate,
                                                    request.EndDate);
             return new ApiResult<dynamic>
@@ -2911,14 +2902,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result =
                 _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-            
+
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
             }
 
             var balance = _custInfoBll.GetBalance(custInfo.CustId);
-            var status = (CustomerStatusEnum) custInfo.Status;
+            var status = (CustomerStatusEnum)custInfo.Status;
             return status switch
             {
                 CustomerStatusEnum.Running
@@ -2934,16 +2925,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             Status = status,
                             Balance = balance
                         },
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     },
-                    
+
                 CustomerStatusEnum.Suspend
                     => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
-                    
+
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
-        
+
         /// <summary>
         /// CustomerManage/GetCustInfoWithTpBalance 取得客戶資料、主錢包餘額及三方錢包餘額
         /// </summary>
@@ -2959,7 +2950,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result =
                 _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
-            
+
             if (result != ErrorCodeEnum.Success)
             {
                 throw new AdminException(result);
@@ -2967,7 +2958,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var balance = await _custInfoBll.GetBalanceAsync(custInfo.CustId);
             var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(custInfo.CustId);
-            var status = (CustomerStatusEnum) custInfo.Status;
+            var status = (CustomerStatusEnum)custInfo.Status;
             return status switch
             {
                 CustomerStatusEnum.Running
@@ -2982,14 +2973,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             UserName = custInfo.UserName,
                             Status = status,
                             Balance = balance,
-                            TpWalletList = custTPWallet.Where(x=>x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
+                            TpWalletList = custTPWallet.Where(x => x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
                         },
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     },
-                    
+
                 CustomerStatusEnum.Suspend
                     => throw new AdminException(ErrorCodeEnum.CustStatusIsSuspend),
-                    
+
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }

@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
 
 namespace BackendSite.Service.DAL
@@ -14,7 +15,7 @@ namespace BackendSite.Service.DAL
         }
 
         public IEnumerable<CustTurnover> GetCustTurnover(int CustId,
-            string GameTypes,
+            IEnumerable<int> GameTypes,
             DateTimeOffset StartTime,
             DateTimeOffset EndTime)
         {
@@ -22,7 +23,7 @@ namespace BackendSite.Service.DAL
             return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustId_V4", new
             {
                 CustId = CustId,
-                GameList = GameTypes,
+                GameList = JsonConvert.SerializeObject(GameTypes),
                 StartDate = StartTime.DateTime,
                 EndDate = EndTime.DateTime
             }, commandType: CommandType.StoredProcedure);

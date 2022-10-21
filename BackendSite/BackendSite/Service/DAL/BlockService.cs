@@ -24,28 +24,39 @@ namespace BackendSite.Service.DAL
             _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate, int startIndex,
-            int pageSize, out int totalPages,out int rowCount)
+
+        public async Task<IEnumerable<BlockIP>> GetBlockIPList()
+        {
+            var p = new DynamicParameters();
+            p.Add("IP", null);
+            return await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+        }
+
+        public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
         {
             var p = new DynamicParameters(new
             {
                 IP = string.IsNullOrWhiteSpace(ip) ? null : ip,
                 StartDate = startDate,
                 EndDate = endDate,
-                StartIndex = startIndex,
+                StartIndex = Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1),
                 PageSize = pageSize,
             });
 
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result =  _reportDbClient.Query<BlockIP>("Admin_BlockIPList_Get", p);
+            var result = await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIPList_Get", p);
+            var blockIpPageData = new BlockIPPageData()
+            {
+                BlockIP = result,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = p.Get<int?>("TotalPages") ?? 0,
+                RowCount = p.Get<int?>("RowCount") ?? 0
+            };
 
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-
-            return result;
+            return blockIpPageData;
         }
 
         public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
@@ -159,17 +170,17 @@ namespace BackendSite.Service.DAL
             var jsonSelectStatus = string.Empty;
             if(blockStatus == 0)
             {
-                var tempList = new List<int>() { 1, 2};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else if(blockStatus == 1)
             {
-                var tempList = new List<int>() { 1};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else
             {
-                var tempList = new List<int>() { 2 };
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
 
@@ -195,10 +206,6 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
-        }
-        public IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
         }
 
         public IEnumerable<IPUser> GetIPUserList(string ip)
