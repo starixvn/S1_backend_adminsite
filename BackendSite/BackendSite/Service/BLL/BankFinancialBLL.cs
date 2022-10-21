@@ -7,6 +7,7 @@ using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Transactions;
+using BackendSite.Service.Library;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
@@ -19,6 +20,7 @@ namespace BackendSite.Service.BLL
         private readonly PaymentManageService _paymentManageService;
         private readonly ReportService _reportService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly Cryptor _cryptor;
 
         #endregion
 
@@ -30,6 +32,7 @@ namespace BackendSite.Service.BLL
             _paymentManageService = provider.GetRequiredService<PaymentManageService>();
             _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
         #endregion
@@ -92,15 +95,8 @@ namespace BackendSite.Service.BLL
 
             if (!isCreate)
             {
-                oldData = GetTransferAccountInfoListForDisplay(true, input.SiteId, input.Id).FirstOrDefault();
-
-                affectTransferData = _bankFinancialService.GetTransferDataCount(oldData.AccountNo);
-
-                if (affectTransferData > 0)
-                {
-
-                    updateTransferDataFlag = CheckKeyValueForSetTransferAccount(input, oldData);
-                }
+                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoListParams(input.Id))
+                    .FirstOrDefault();
             }
 
             var transferAccountModel = new BankFinancialTransferAccountModel
@@ -119,12 +115,12 @@ namespace BackendSite.Service.BLL
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
-                LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : input.LoginPin,
-                MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : input.MobilePin,
-                TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : input.TransferPin,
-                CorporateID = string.IsNullOrWhiteSpace(input.CorporateID) ? string.Empty : input.CorporateID,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
+                LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : _cryptor.Encrypt(input.LoginPin),
+                MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : _cryptor.Encrypt(input.MobilePin),
+                TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : _cryptor.Encrypt(input.TransferPin),
+                CorporateID = string.IsNullOrWhiteSpace(input.CorporateID) ? string.Empty : _cryptor.Encrypt(input.CorporateID),
                 InitialAmount = input.InitialAmount,
                 InitialTime = input.InitialTime,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
@@ -152,12 +148,12 @@ namespace BackendSite.Service.BLL
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
                     oldData.BankLoginUrl,
-                    oldData.BankLoginAccount,
-                    oldData.BankLoginPassword,
-                    oldData.TransferPin,
-                    oldData.MobilePin,
-                    oldData.LoginPin,
-                    oldData.CorporateID,
+                    BankLoginAccount = _cryptor.Decrypt(oldData.BankLoginAccount),
+                    BankLoginPassword = _cryptor.Decrypt(oldData.BankLoginPassword),
+                    TransferPin = _cryptor.Decrypt(oldData.TransferPin),
+                    MobilePin = _cryptor.Decrypt(oldData.MobilePin),
+                    LoginPin = _cryptor.Decrypt(oldData.LoginPin),
+                    CorporateID = _cryptor.Decrypt(oldData.CorporateID),
                     InitialAmount = oldData.InitialAmount,
                     InitialTime = oldData.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
