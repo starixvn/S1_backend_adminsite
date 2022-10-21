@@ -29,14 +29,12 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<PayChannel> GetPayChannel()
+        public IEnumerable<PayChannelInfo> GetPayChannel(int siteId)
         {
-            return _paymentManageService.GetPayChannelList();
-        }
+            var list =_paymentManageService.GetPaySetting(siteId);
 
-        public IEnumerable<PayCurrency> GetPayCurrency()
-        {
-            return _paymentManageService.GetPayCurrencyList();
+            return list.Select(x => new PayChannelInfo(x))
+                .Distinct(new PayChannelInfoComparer());
         }
 
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
