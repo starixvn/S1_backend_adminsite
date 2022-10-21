@@ -232,12 +232,6 @@ namespace BackendSite.Service.DAL
             return custInfoDetailList;
         }
 
-        public int GetVipLevel(int custId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.ExecuteScalar<int>("VipLevel_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
-        }
-
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
             var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));

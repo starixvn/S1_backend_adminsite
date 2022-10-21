@@ -3,7 +3,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
 
@@ -13,77 +13,51 @@ namespace BackendSite.Service.BLL
     {
         private readonly CustInfoService _custInfoService;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly IMemoryCache _cache;
         private readonly TpBLL _tpBll;
         private readonly WalletService _walletService;
         private readonly Tools _tools;
         private readonly CodeGenerator _codeGenerator;
         private readonly PromotionService _promotionService;
         private readonly RollOverService _rolloverService;
-        private readonly CustTurnoverService _custTurnoverService;
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly BetListBLL _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly ICacheHelper _redisHelper;
+
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _walletService = provider.GetRequiredService<WalletService>();
             _tools = provider.GetRequiredService<Tools>();
             _codeGenerator = provider.GetRequiredService<CodeGenerator>();
             _promotionService = provider.GetRequiredService<PromotionService>();
             _rolloverService = provider.GetRequiredService<RollOverService>();
-            _custTurnoverService = provider.GetRequiredService<CustTurnoverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
-            _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
         {
-            var key = $"CustInfo_{custId}";
-            var customer = _cache.Get<Customer>(key);
-            if (customer == null)
-            {
-                customer = _custInfoService.GetCustInfo(custId);
-                if (customer != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-                    _cache.Set(key, customer, cacheEntryOptions);
-                }
-            }
-
-            return customer;
+            return _redisHelper.TryGetOrCreate($"CustInfo:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetCustInfo(custId),
+                RedisDataBase.Shared);
         }
-        public int GetVipLevelWithCache(int custId)
-        {
-            var key = $"VipLevelCache_{custId}";
-            var vipLevelCache = _cache.Get<int?>(key) ?? -1;
-            if (vipLevelCache != -1)
-            {
-                return vipLevelCache;
-            }
 
-            vipLevelCache = _custInfoService.GetVipLevel(custId);
-            if (vipLevelCache != 0)
-            {
-                _cache.Set(key, vipLevelCache, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-            }
-
-            return vipLevelCache;
-        }
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
@@ -274,42 +248,40 @@ namespace BackendSite.Service.BLL
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
-            string GameTypes,
+            IEnumerable<int> GameTypes,
             DateTimeOffset StartTime,
             DateTimeOffset EndTime)
         {
-            var datas = _custTurnoverService.GetCustTurnover(CustId,
-                GameTypes,
-                StartTime,
-                EndTime);
-
-            var result = new List<CustTurnoverRes>();
-
-            foreach (var data in datas)
-            {
-                var item = result.FirstOrDefault(x => x.GameType == data.GameType);
-                if (item == null)
-                {
-                    result.Add(new CustTurnoverRes
+            var result = _betListBll
+                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .Where(i => GameTypes.Contains(i.GameType))
+                .Join(_tpGameTypeList,
+                    tpBetRecord => tpBetRecord.GameType,
+                    tpGameType => tpGameType.Type,
+                    (tpBetRecord, tpGameType) => new CustTurnover
                     {
-                        UserName = data.UserName,
-                        GameType = data.GameType,
-                        GameName = data.GameName,
-                        StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
-                        StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
-                        WinlostAmount = data.WinlostAmount
-                    });
-                }
-                else
+                        UserName = tpBetRecord.UserName,
+                        GameType = tpBetRecord.GameType,
+                        GameName = tpGameType.TypeName,
+                        Stake = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
+                        WinlostAmount = tpBetRecord.WinlostAmount,
+                        SettlementType = tpBetRecord.SettlementType,
+                    })
+                .GroupBy(i => i.GameType)
+                .Select(i => new CustTurnoverRes
                 {
-                    item.StakeSettled += data.SettlementType == 1 ? data.Stake : 0;
-                    item.StakeNotRollover += data.SettlementType == 3 ? data.Stake : 0;
-                    item.WinlostAmount += data.WinlostAmount;
-                }
-            }
+                    UserName = i.First().UserName,
+                    GameType = i.Key,
+                    GameName = i.First().GameName,
+                    StakeSettled = i.Where( i=> i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
+                    StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
+                    WinlostAmount = i.Sum(i => i.WinlostAmount)
+                })
+                .ToList();
 
             return result;
         }
+
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
             int pageSize,
             int pageNumber,

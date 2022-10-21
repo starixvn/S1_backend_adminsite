@@ -170,17 +170,17 @@ namespace BackendSite.Service.DAL
             var jsonSelectStatus = string.Empty;
             if(blockStatus == 0)
             {
-                var tempList = new List<int>() { 1, 2};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else if(blockStatus == 1)
             {
-                var tempList = new List<int>() { 1};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else
             {
-                var tempList = new List<int>() { 2 };
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
 
@@ -206,10 +206,6 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
-        }
-        public IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
         }
 
         public IEnumerable<IPUser> GetIPUserList(string ip)
