@@ -158,7 +158,7 @@ namespace BackendSite.Service.Model
         public PayListMethodEnum? Method { get; set; }
         public int? PayId { get; set; }
         public PayChannelTypeEnum? Type { get; set; }
-        public PayListStatusEnum? PayStatus { get; set; }
+        public PayListStatusEnum? Globalstatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }
     }
 
@@ -171,7 +171,7 @@ namespace BackendSite.Service.Model
             Method = req.Method;
             PayId = req.PayId;
             Type = req.Type;
-            PayStatus = req.PayStatus;
+            PayStatus = req.Globalstatus;
             Status = req.Status;
         }
 
@@ -203,8 +203,11 @@ namespace BackendSite.Service.Model
         public int PointLevel { get; set; }
         public int Sort { get; set; }
         public PayChannelStatusEnum Status { get; set; }
+        [JsonIgnore]
         public PayListStatusEnum PayStatus { get; set; }
+        [JsonIgnore]
         public PayListStatusEnum SitePayStatus { get; set; }
+        public PayListStatusEnum Globalstatus => SitePayStatus;
     }
     
     public class PayChannelInfo
