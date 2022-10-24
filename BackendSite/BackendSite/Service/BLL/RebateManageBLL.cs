@@ -30,10 +30,6 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetTPCategoryList();
         }
-        public IEnumerable<TpGameType> GetTpGameTypeListByCategory(int categoryId)
-        {
-            return _rebateManageService.GetTpGameTypeListByCategory(categoryId);
-        }
         public IEnumerable<RebatePayoutLimitData> GetRebatePayoutLimit(int siteId, int currencyId, int? categoryId)
         {
             return _rebateManageService.GetRebatePayoutLimit(siteId, currencyId, categoryId);
@@ -41,14 +37,6 @@ namespace BackendSite.Service.BLL
         public async Task<bool> SetRebatePayoutLimitAsync(int siteId, int currencyId, int categoryId, decimal maxPayout, decimal minPayout, string lastUpdateUser)
         {
             return await _rebateManageService.SetRebatePayoutLimitAsync(siteId, currencyId, categoryId, maxPayout, minPayout, lastUpdateUser);
-        }
-        public bool SetRebatePayoutLimitBatch(int siteId, int currencyId, string levelPayout, string lastUpdateUser)
-        {
-            return _rebateManageService.SetRebatePayoutLimitBatch(siteId, currencyId, levelPayout, lastUpdateUser);
-        }
-        public bool DelRebatePayoutLimit(int siteId, int currencyId, int categoryId, string lastUpdateUser)
-        {
-            return _rebateManageService.DelRebatePayoutLimit(siteId, currencyId, categoryId, lastUpdateUser);
         }
         public RebatePeriod GetRebatePeriod(int siteId)
         {
@@ -165,54 +153,9 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetRebateDataByGameType(siteId, gameType, currencyId);
         }
-        public RebateCategoryDetail GeRebateCategoryDetail(int siteId, int currencyId, int categoryId)
-        {
-            var reault = new RebateCategoryDetail
-            {
-                CategoryId = categoryId
-            };
-
-            var rList = new List<RebateGameTypeList>();
-            foreach (var x in GetTpGameTypeListByCategory(categoryId))
-            {
-                rList.Add(new RebateGameTypeList() { Type = x.Type, TypeName = x.TypeName, GameTypeLevelList = GetRebateDataByGameType(siteId, x.Type, currencyId) });
-            }
-            reault.GameTypeList = rList;
-            return reault;
-        }
         public async Task<bool> SetRebateCategoryAsync(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
             return await _rebateManageService.SetRebateCategoryAsync(siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
-        }
-        public bool SetRebateCategoryBatch(int siteId, int currencyId, int categoryId, string levelPercentage, string lastUpdateUser)
-        {
-            return _rebateManageService.SetRebateCategoryBatch(siteId, currencyId, categoryId, levelPercentage, lastUpdateUser);
-        }
-        public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level, string lastUpdateUser)
-        {
-            return _rebateManageService.DelRebateCategory(siteId, currencyId, categoryId, level, lastUpdateUser);
-        }
-        public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser)
-        {
-            await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            await using var trans = await conn.BeginTransactionAsync();
-            if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, gameType, level, percentage, lastUpdateUser, conn, trans))
-            {
-                trans.Rollback();
-                return false;
-            }
-
-            trans.Commit();
-            return true;
-        }
-        public bool SetRebateGameTypeBatch(int siteId, int currencyId, int gameType, string levelPercentage, string lastUpdateUser)
-        {
-            return _rebateManageService.SetRebateGameTypeBatch(siteId, currencyId, gameType, levelPercentage, lastUpdateUser);
-        }
-        public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level, string lastUpdateUser)
-        {
-            return _rebateManageService.DelRebateGameType(siteId, currencyId, gameType, level, lastUpdateUser);
         }
     }
 }

@@ -94,7 +94,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_SiteId", siteId);
             parameter.Add("_CurrencyId", currencyId);
 
-            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V2",
+            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V3",
                 parameter);
         }
 
@@ -110,8 +110,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)
         {
-            using var connection =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             connection.Open();
             using var transaction = connection.BeginTransaction();
             switch (action)

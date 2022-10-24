@@ -99,6 +99,21 @@ namespace BackendSite.Service.Library
                 return false;
             }
         }
+        
+        public async Task<bool> KeyExistsAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.KeyExistsAsync(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
 
         public async Task<TItem> StringGetAsync<TItem>(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
@@ -261,6 +276,21 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public async Task<bool> KeyDeleteAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.KeyDeleteAsync(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
+
         public long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
@@ -270,6 +300,23 @@ namespace BackendSite.Service.Library
                 var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
                 var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
                 return db.KeyDelete(keys);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{keyPattern} | {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
+                var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                return await db.KeyDeleteAsync(keys);
             }
             catch (Exception ex)
             {
