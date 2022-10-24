@@ -52,7 +52,7 @@ Content-Type: application/json
     "method": 1,
     "payId": null,
     "type": null,
-    "payStatus": null,
+    "globalStatus": null,
     "status": null,
     "pageNumber": 1,
     "pageSize": 10

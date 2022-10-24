@@ -157,9 +157,9 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<BankInfoPay> GetCryptoPay()
+        public IEnumerable<BankInfoPay> GetCryptoPay(int siteId)
         {
-            var cryptoPayList = localBankService.GetCryptoPayList();
+            var cryptoPayList = localBankService.GetCryptoPayList(siteId);
             return cryptoPayList;
         }
 

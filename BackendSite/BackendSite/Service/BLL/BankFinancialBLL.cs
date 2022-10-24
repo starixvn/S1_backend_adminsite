@@ -60,6 +60,7 @@ namespace BackendSite.Service.BLL
                 () => _bankFinancialService.GetReason(funcKey));
         }
 
+        [Obsolete("請改用GetPayList(int siteId)")]
         public IEnumerable<PayList> GetPayList()
         {
             return _paymentManageService.GetPayList();

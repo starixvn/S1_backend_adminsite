@@ -31,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly MarketingBLL _marketingBll;
 		private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
@@ -52,6 +53,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 			_winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -308,7 +310,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay(request.SiteId);
+            var authData = _authorizeBll.GetAuthData();
+            var bankInfoPay = _bankDetailBll.GetBankInfoPay(authData.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
                             select new Pay
@@ -371,7 +374,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = _bankDetailBll.GetCryptoPay();
+            var authData = _authorizeBll.GetAuthData();
+            var cryptoPay = _bankDetailBll.GetCryptoPay(authData.SiteId);
             var _payInfo = (from x in cryptoPay
                             where x.CurrencyId == request.CurrencyId && x.ChannelName.Equals(request.ChannelName, StringComparison.OrdinalIgnoreCase)
                             select new Pay
