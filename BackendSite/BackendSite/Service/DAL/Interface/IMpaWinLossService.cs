@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.Mpa;
+﻿using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Mpa;
 
 namespace BackendSite.Service.DAL.Interface
 {
@@ -9,24 +10,26 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="siteId"></param>
-        /// <param name="settledStarTime"></param>
-        /// <param name="settledEndTime"></param>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
         /// <param name="format"></param>
+        /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTpBetRecordByDate<TResult>(int siteId, DateTime settledStarTime,
-            DateTime settledEndTime, string format);
+        Task<IEnumerable<TResult>> GetMapTpBetRecordByDate<TResult>(int siteId, DateTime starTime,
+            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
         /// <summary>
         /// 取得 Deposit 與 WithDraw Relay By (日期(天) 或 月份)
         /// </summary>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="siteId"></param>
-        /// <param name="settledStarTime"></param>
-        /// <param name="settledEndTime"></param>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
         /// <param name="format"></param>
+        /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTransactionByDate<TResult>(int siteId, DateTime settledStarTime,
-            DateTime settledEndTime, string format);
+        Task<IEnumerable<TResult>> GetMapTransactionByDate<TResult>(int siteId, DateTime starTime,
+            DateTime endTime, string format);
 
         /// <summary>
         /// 取的幣別的 USD 匯率，目前先從 Currency 取的，未來可能替換成 匯率商 API
@@ -40,13 +43,17 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="siteId"></param>
         /// <param name="userName"></param>
         /// <returns></returns>
-        Task<int> GetCustIdByUserName(int siteId, string userName);
-
+        int GetCustIdByUserName(int siteId, string userName);
 
         /// <summary>
         /// 取得所有 TpGameTypeID/TpGameTypeName
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption();
+
+
+        IEnumerable<Commission9WDto> Get9WCommission(DateTime starTime,
+            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+
     }
 }

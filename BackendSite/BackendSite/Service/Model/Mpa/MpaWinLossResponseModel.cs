@@ -17,30 +17,39 @@ namespace BackendSite.Service.Model.Mpa
         public decimal PlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
-        public int BetCount { get; set; }
+        public decimal ProgressiveWin { get; set; }
 
         [JsonProperty(Order = 5)]
-        public decimal AvgBetAmount { get; set; }
+        public decimal ProgressiveBet { get; set; }
 
         [JsonProperty(Order = 6)]
-        public int UniquePlayers { get; set; }
+        public decimal Commission { get; set; }
 
         [JsonProperty(Order = 7)]
-        public decimal Margin { get; set; }
+        public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public int DepositCount { get; set; }
+        public decimal AvgBetAmount { get; set; }
 
         [JsonProperty(Order = 9)]
-        public decimal TotalDepositAmount { get; set; }
+        public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public int WithDrawCount { get; set; }
+        public decimal Margin { get; set; }
 
         [JsonProperty(Order = 11)]
-        public decimal TotalWithDrawAmount { get; set; }
+        public int DepositCount { get; set; }
 
         [JsonProperty(Order = 12)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 13)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 14)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 15)]
         public decimal TotalBonus { get; set; }
 
         public Dictionary<string, MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
@@ -64,15 +73,24 @@ namespace BackendSite.Service.Model.Mpa
         public decimal PlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
-        public int BetCount { get; set; }
+        public decimal ProgressiveWin { get; set; }
 
         [JsonProperty(Order = 5)]
-        public decimal AvgBetAmount { get; set; }
+        public decimal ProgressiveBet { get; set; }
 
         [JsonProperty(Order = 6)]
-        public int UniquePlayers { get; set; }
+        public decimal Commission { get; set; }
 
         [JsonProperty(Order = 7)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 10)]
         public decimal Margin { get; set; }
 
         public Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> CurrencyDetail { get; set; }

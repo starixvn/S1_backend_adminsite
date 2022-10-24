@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa;
@@ -21,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             this._MaMpaWinLossBll = MaMpaWinLossBll;
         }
 
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossByDataRequest request)
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
             try
@@ -39,7 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossByDataRequest request)
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
             try
@@ -58,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
 
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossByDataRequest request)
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>();
             try
