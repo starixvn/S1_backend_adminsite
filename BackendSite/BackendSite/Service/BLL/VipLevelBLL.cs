@@ -1,6 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
 
@@ -18,6 +20,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<VipLevelSetting> GetVipLevelSetting(int siteId)
         {
             return _vipLevelService.GetVipLevelSetting(siteId);
+        }
+        
+        public Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
+        {
+            return _vipLevelService.GetVipLevelSettingAsync(siteId);
         }
 
         public VipLevelInfo GetVipLevelInfo(int custId)
