@@ -97,7 +97,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult GetPayList(GetPayListRequest request)
         {
-            var result = _paymentManageBll.GetPayList(request.SiteId);
+            var result = _paymentManageBll.GetPayList(request.SiteId)
+                .Where(x => x.PayStatus == PayListStatusEnum.Enable);
 
             return new ApiResult<IEnumerable<PayListInfo>>
             {

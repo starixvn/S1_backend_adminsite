@@ -135,7 +135,16 @@ namespace BackendSite.Service.Model
     {
         public int PayId { get; set; }
         public string PayName { get; set; }
+        
+        /// <summary>
+        /// 全域金流狀態
+        /// </summary>
+        [JsonIgnore]
         public PayListStatusEnum PayStatus { get; set; }
+        /// <summary>
+        /// 品牌金流狀態
+        /// </summary>
+        [JsonIgnore]
         public PayListStatusEnum SitePayStatus { get; set; }
 
         public PayListStatusEnum Status => PayStatus == PayListStatusEnum.Enable
