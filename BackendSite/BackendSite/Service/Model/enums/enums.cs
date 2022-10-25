@@ -165,6 +165,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
+    }
 
     #endregion
 
