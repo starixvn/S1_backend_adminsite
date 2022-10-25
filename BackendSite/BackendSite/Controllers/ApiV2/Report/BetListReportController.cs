@@ -2,6 +2,7 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,12 +61,30 @@ namespace BackendSite.Controllers.ApiV2.Report
         public IActionResult Export(GetBetListRequest request)
         {
             DateCheck(request);
+            var offset = request.StartTime.Offset;
 
             request.PageNumber = -1; //export all
-            var data = _betListBll.GetBetListReport(request, out var _);
+            var data = _betListBll.GetBetListReport(request, out var _);      
+            foreach (var item in data)
+            {
+                item.TransTime = item.TransTime.ToOffset(offset);
+                item.SettledTime = item.SettledTime.ToOffset(offset);
+            }
 
-            var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 100, 1 })]
+        public ApiListResult<TpBetRecord> GetTpBetRecord(GetTpBetRecordRequest request)
+        {
+            var startTime = request.StartTime.ToUniversalTime().DateTime;
+            var endTime = request.EndTime.ToUniversalTime().DateTime;
+            var data = _betListBll.GetTpBetRecord(request.CustId , startTime, endTime);
+            IPageInfo pageInfo = new PageInfo();
+            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            return new ApiListResult<TpBetRecord>(ErrorCodeEnum.Success, pageInfo, data.GetRange(index, count)) ;
         }
 
         private void DateCheck(GetBetListRequest request)
