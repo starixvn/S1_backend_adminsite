@@ -602,6 +602,12 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
         EditEWalletWithdrawalLimitInfo = 37,
         SetEWalletWithdrawalLimitInfoStatus = 38,
         SetBlockEWallet = 55,
@@ -817,6 +823,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0, 
+        Fail = 1, 
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -841,7 +857,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -1178,6 +1194,13 @@ namespace BackendSite.Service.Model.enums
         INR = 61,
         BDT = 74
     }
+
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
@@ -1217,5 +1240,36 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
 }

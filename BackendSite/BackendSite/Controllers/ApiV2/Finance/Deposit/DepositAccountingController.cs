@@ -176,6 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public IActionResult ExportList(ExportListRequest request)
         {
+            var offset = request.StartDate.Offset;
             request.StartDate = new DateTimeOffset(request.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero);
             request.EndDate = new DateTimeOffset(request.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).AddDays(1).AddMilliseconds(-1);
 
@@ -186,7 +187,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.TransId,
                 request.UserName);
             
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.Export(data, offset: offset);
             return _excelBll.ExcelFile(stream, "DepositAccountList");
         }
     }

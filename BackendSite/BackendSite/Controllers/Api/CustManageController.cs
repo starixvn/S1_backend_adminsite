@@ -1644,7 +1644,7 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(request.EndTime);
 
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    startTime,
                                                    endTime);
 
@@ -1707,8 +1707,8 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<CustBankInfoLog>();
             apiListResult.ErrorCode = 0;
             var bankInfoPay = _custInfoBll.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
-                1000,
                 1,
+                1000,
                 out var totalPages,
                 out var rowCount);
             apiListResult.Data = bankInfoPay;

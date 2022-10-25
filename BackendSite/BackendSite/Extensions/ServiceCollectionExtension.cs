@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Library;
+﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Extensions
@@ -31,6 +32,15 @@ namespace BackendSite.Extensions
                 {
                     DataBase = DataBase.IP
                 });
+        }
+
+        public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        {
+            var provider = services.BuildServiceProvider();
+            var configService = provider.GetRequiredService<ConfigService>();
+            var option = configService.Query<T>(sql, parameters);
+            services.AddSingleton(typeof(IEnumerable<T>), p => option);
+            return services;
         }
     }
 }
