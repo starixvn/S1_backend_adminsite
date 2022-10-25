@@ -209,7 +209,7 @@ namespace BackendSite.Service.DAL
             return conn.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic }, commandType: CommandType.StoredProcedure);
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest, bool canReward = false)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -264,6 +264,19 @@ namespace BackendSite.Service.DAL
                             {
                                 var pay = (IPay)depositRequest.oDepositInfo;
                                 result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
+                            }
+                        }
+                        
+                        if (result > 0 && canReward)
+                        {
+                            var resultCode = InsertDepositRewardPointQueue(transId, conn, trans);
+                            if (resultCode != (int) ErrorCodeEnum.Success)
+                            {
+                                _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
+                            }
+                            else
+                            {
+                                result = 1;
                             }
                         }
                     }
@@ -376,6 +389,17 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
+        {
+            var props = new DynamicParameters();
+
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyId", currencyId);
+            var result = _reportDbClient.Query<DepositLimitInfo>("Admin_DepositLimitInfoReNew_Get", props);
+
+            return result;
+        }
 
         public bool AddDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
@@ -417,6 +441,44 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
+        public bool AddDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+
+            var param = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Infos = JsonConvert.SerializeObject(input.After) 
+            };
+            
+            var result = conn.Execute("Admin_DepositLimitInfoReNew_Ins", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            if (result)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", null, DbType.String);
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
+
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    tran.Commit();
+                    return true;
+                }
+            }
+            
+            tran.Rollback();
+            return false;
+        }
+        
         public bool EditDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -456,7 +518,44 @@ namespace BackendSite.Service.DAL
             tran.Rollback();
             return false;
         }
+        
+        public bool EditDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                _SiteId = input.SiteId,
+                _CurrencyId = input.CurrencyId,
+                _Infos = JsonConvert.SerializeObject(input.After) 
+            };
+            var result = conn.Execute("Admin_DepositLimitInfoReNew_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
+            
+            if (result)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+                logParam.Add("_Operator", input.Operator);
 
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    tran.Commit();
+                    return true;
+                }
+            }
+            
+            tran.Rollback();
+            return false;
+        }
+        
         public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
         {
             return _mainDbClient.QueryFirst<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = vipLevel }));
@@ -499,6 +598,43 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
+        public bool DeleteDepositLimitInfoV2(ParamsWithLog<DepositLimitModel> input)
+        {
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var tran = conn.BeginTransaction();
+            var param = new
+            {
+                input.SiteId,
+                input.CurrencyId,
+                input.Before.VipLevel
+            };
+            
+            var result = conn.Execute("Admin_DepositLimitInfoReNew_Del", param, commandType: CommandType.StoredProcedure) > 0;
+            if (result)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+                logParam.Add("_AfterDetailInfo", null, DbType.String);
+                logParam.Add("_Operator", input.Operator);
+
+                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+                if (logResult)
+                {
+                    tran.Commit();
+                    return true;
+                }
+            }
+            
+            tran.Rollback();
+            return false;
+        }
+        
         public IEnumerable<DepositTimeList> DepositTimeReportGet(string siteIds,
             string currencyIds,
             string statuses,
@@ -562,30 +698,15 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<PaymentGateWayOptions>("Admin_PaymentGateWayOptions_Get");
         }
 
-        public int InsertDepositRewardPointQueue(string transId)
+        public int InsertDepositRewardPointQueue(string transId, IDbConnection conn, IDbTransaction trans)
         {
             var para = new DynamicParameters();
             para.Add("_TransId", transId);
             para.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-
-            using var trans = conn.BeginTransaction();
             _ = conn.Execute("Service_DepositRewardPointQueue_Ins", para, transaction: trans,
                 commandType: CommandType.StoredProcedure);
             var resultCode = para.Get<int?>("_Result") ?? -9;
-                
-            if (resultCode == 0)
-            {
-                trans.Commit();
-            }
-            else
-            {
-                trans.Rollback();
-            }
-
-            conn.CloseAsync();
             
             return resultCode;
         }

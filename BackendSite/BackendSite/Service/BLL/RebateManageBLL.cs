@@ -11,6 +11,7 @@ namespace BackendSite.Service.BLL
         private readonly UserBetLimitBLL _userBetLimitBLL;
         private readonly VipLevelBLL _vipLevelBLL;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly TpBLL _tpBLL;
         private readonly MySqlClient _mainDbClient;
         private readonly ILogger<RebateManageBLL> _logger;
 
@@ -22,6 +23,7 @@ namespace BackendSite.Service.BLL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _userBetLimitBLL = provider.GetRequiredService<UserBetLimitBLL>();
             _vipLevelBLL = provider.GetRequiredService<VipLevelBLL>();
+            _tpBLL = provider.GetRequiredService<TpBLL>();
         }
 
         public IEnumerable<TPCategory> GetTPCategoryList()
@@ -40,6 +42,12 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetRebatePeriod(siteId).FirstOrDefault();
         }
+
+        public IEnumerable<RebatePeriod> GetRebatePeriodList(int siteId)
+        {
+            return _rebateManageService.GetRebatePeriod(siteId);
+        }
+
         public async Task<bool> SetRebatePeriodAsync(int siteId, int periodType, int? periodDay, int redeemHours, string lastUpdateUser)
         {
             var siteData = _serverInfoBll.GetSiteList().Where(x => x.SiteId == siteId).FirstOrDefault();
@@ -48,11 +56,11 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<RebateGameTypeDetail>> GetRebateGameTypeList(int siteId, int currencyId, int rebateCategoryId)
         {
             var result = new List<RebateGameTypeDetail>();
-            var tpGameType = await _userBetLimitBLL.GetTpGameTypeListbyCategoryAsync(rebateCategoryId);
+            var tpGameType = await _tpBLL.GetTpGameTypeCurremcyListAsync(siteId, currencyId);
             var vipLevelList = _vipLevelBLL.GetVipLevelSetting(siteId);
-            foreach (var item in tpGameType)
+            foreach (var item in tpGameType.Where(x => x.TpCategoryId == rebateCategoryId))
             {
-                var data = _rebateManageService.GetRebateDataByGameType(siteId, item.TypeId, currencyId);
+                var data = _rebateManageService.GetRebateDataByGameType(siteId, item.TpGameType, currencyId);
                 if (data.Any())
                 {
                     var existLevelData = data.Select(x => x.Level);
@@ -62,8 +70,8 @@ namespace BackendSite.Service.BLL
                         {
                             result.Add(new RebateGameTypeDetail()
                             {
-                                GameType = item.TypeId,
-                                GameTypeName = item.TypeName,
+                                GameType = item.TpGameType,
+                                GameTypeName = item.TpGameTypeName,
                                 Level = level.Level,
                                 Percentage = data.Where(x => x.Level == level.Level).Select(x => x.Percentage).FirstOrDefault()
                             });
@@ -72,8 +80,8 @@ namespace BackendSite.Service.BLL
                         {
                             result.Add(new RebateGameTypeDetail()
                             {
-                                GameType = item.TypeId,
-                                GameTypeName = item.TypeName,
+                                GameType = item.TpGameType,
+                                GameTypeName = item.TpGameTypeName,
                                 Level = level.Level,
                                 Percentage = null
                             });
@@ -84,8 +92,8 @@ namespace BackendSite.Service.BLL
                 {
                     result.AddRange(vipLevelList.Select(x => new RebateGameTypeDetail()
                     {
-                        GameType = item.TypeId,
-                        GameTypeName = item.TypeName,
+                        GameType = item.TpGameType,
+                        GameTypeName = item.TpGameTypeName,
                         Level = x.Level,
                         Percentage = null
                     }));
@@ -120,15 +128,25 @@ namespace BackendSite.Service.BLL
         {
             return _rebateManageService.GetRebateDataByCategory(siteId, categoryId, currencyId);
         }
-        public RebateCurrencyData GeRebateInfo(int siteId, int currencyId)
+        public async Task<RebateCurrencyData> GeRebateInfoAsync(int siteId, int currencyId)
         {
             var result = new RebateCurrencyData
             {
                 CurrencyId = currencyId,
                 PayoutLimitList = GetRebatePayoutLimit(siteId, currencyId, null)
             };
-            var rList = GetTPCategoryList().Select(x => new RebateCategoryList() { CategoryId = x.CategoryId, CategoryName = x.CategoryName, CategoryLevelList = GetRebateDataByCategory(siteId, x.CategoryId, currencyId) }).ToList();
-            result.CategoryDataList = rList;
+            var rList = await _tpBLL.GetTpGameTypeCurremcyListAsync(siteId, currencyId);
+            var categoryList = rList.Select(x => new { x.TpCategoryId, x.TpCategoryName }).Distinct();
+            var categoryDataList = new List<RebateCategoryList>();
+            foreach (var item in categoryList)
+                categoryDataList.Add(new RebateCategoryList()
+                {
+                    CategoryId = item.TpCategoryId,
+                    CategoryName = item.TpCategoryName,
+                    CategoryLevelList = GetRebateDataByCategory(siteId, item.TpCategoryId, currencyId)
+                }
+                );
+            result.CategoryDataList = categoryDataList;
             return result;
         }
         public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)

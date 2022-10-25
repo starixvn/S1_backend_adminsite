@@ -512,6 +512,40 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));               
         }
 
+        ManualApproval = ()=>{
+            let transId = this.props.transId;
+            axios.post('/api/Withdrawal/WithdrawalManualApproval', { TransId: transId })
+                .then(async function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                            this.onBack();
+                    } else {
+                        alert(result.message);
+                        this.onGetComment();
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));               
+        }
+
+        ManualReject = ()=>{
+            let transId = this.props.transId;
+            axios.post('/api/Withdrawal/WithdrawalManualReject', { TransId: transId })
+                .then(async function (response) {
+                    let result = response.data;
+                    if (result.errorCode == 0) {
+                        alert(result.message);
+                            this.onBack();
+                    } else {
+                        alert(result.message);
+                        this.onGetComment();
+                    }
+                }.bind(this)).catch(function (error) {
+                    alert(error);
+                }.bind(this));               
+        }
+
          render() {
             // console.log("CryptoPayList",this.state.CryptoPayList);
             let data = this.state.Data;
@@ -528,11 +562,15 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={3} type="button" className="btn btn-withdrawal-verified" onClick={this.onConfirm.bind(this, 3)}>Verified</button>);
                 if (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1)
                     btnGroup.push(<button key={4} type="button" className="btn btn-withdrawal-process" onClick={this.onConfirm.bind(this, 4)}>Process</button>);
-                if (data.status == 4 && data.withdrawalType != 1 && data.sameOperator)
+                if (data.status == 4 && data.withdrawalType == 2 && data.sameOperator)
                     btnGroup.push(<button key={6} type="button" className="btn btn-withdrawal-aprroved" onClick={this.onConfirm.bind(this, 6)}>Approved</button>);
+                if (data.status != 6 && (data.withdrawalType == 1 || data.withdrawalType == 4) && subFuncKeys.indexOf("f_wd_manualApprovedReject") > -1)
+                    btnGroup.push(<button type="button" className="btn btn-withdrawal-aprroved" onClick={this.ManualApproval.bind(this)}>Manual Approved</button>);
                 if ((data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1) || (data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 1 && subFuncKeys.indexOf("f_wd_risk") > -1) || (data.status == 2 && subFuncKeys.indexOf("f_wd_risk") > -1))
                     btnGroup.push(<button key={7} type="button" className="btn btn-withdrawal-rejected" onClick={this.onConfirm.bind(this, 7)}>Rejected</button>);
+                if ((data.status == 4 || data.status == 5 || data.status == 6) && data.withdrawalType != 2 && subFuncKeys.indexOf("f_wd_manualApprovedReject") > -1)
+                    btnGroup.push(<button type="button" className="btn btn-withdrawal-rejected" onClick={this.ManualReject.bind(this)}>Manual Rejected</button>);
                 if ((data.status == 8 && (subFuncKeys.indexOf("f_wd_risk") > -1 || subFuncKeys.indexOf("f_wd_payment") > -1)) 
                     || (data.status == 3 && subFuncKeys.indexOf("f_wd_payment") > -1))
                     btnGroup.push(<button key={1} type="button" className="btn btn-withdrawal-pending" onClick={this.onConfirm.bind(this, 1)}>Pending</button>);
