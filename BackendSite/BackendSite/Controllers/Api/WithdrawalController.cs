@@ -26,7 +26,6 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly ExcelBLL excelBLL;
-        private readonly static BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly string payApiUrl;
         private readonly CourierAdapter courierAdapter;
         private readonly string awsWithdrawalFolder;
@@ -75,6 +74,15 @@ namespace BackendSite.Controllers.Api
             public string Amount { get; set; }
             public int PageSize { get; set; }
             public WithdrawalMethodEnum WithdrawalMethod { get; set; }
+        }
+        
+        public class GetPayListRequest
+        {
+            public int CurrencyId { get; set; }
+            public int SysId { get; set; }
+            public int SiteId { get; set; }
+            public string ChannelName { get; set; }
+            public decimal Amount { get; set; }
         }
 
         [HttpPost]
@@ -384,50 +392,31 @@ namespace BackendSite.Controllers.Api
             public int? EWalletSysId { get; set; }
         }
 
-        public class WithdrawalReq3
-        {
-            public int CurrencyId { get; set; }
-            public int SysId { get; set; }
-            public int SiteId { get; set; }
-            public string ChannelName { get; set; }
-        }
 
         //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
+        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetPayListRequest req)
         {
             var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalReq.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
+            var bankInfoOff = bankDetailBLL.GetBankInfoOff(req.SiteId);
+            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == req.CurrencyId && (x.Purpose & 2) > 0)
                 .OrderBy(x => x.BSort);
             apiResult.Data = bankInfoOff;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
 
-        public class Pay
-        {
-            public int PayId { get; set; }
-            public string PayName { get; set; }
-            public int ChannelId { get; set; }
-        }
-
-        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
+        public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest req)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = bankDetailBLL.GetBankInfoPay(withdrawalReq.SiteId);
-            var _payInfo = (from x in bankInfoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName
-                            }).Distinct(bankInfoPayComparer);
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var result = bankDetailBLL
+                .GetBankInfoPayList(req.SiteId, req.CurrencyId, req.SysId, req.Amount);
+            
+            return new ApiResult<IEnumerable<Pay>>
+            {
+                Data = result,
+                ErrorCode = 0
+            };
         }
         
         public class WithdrawalEWalletReq
@@ -452,38 +441,18 @@ namespace BackendSite.Controllers.Api
             apiResult.ErrorCode = 0;
             return apiResult;
         }
-
-        //有新舊API，這支是新API，另一支新的API=api/BaseData/GetBankInfoOffList
+        
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(WithdrawalReq3 withdrawalReq)
+        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetPayListRequest req)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = bankDetailBLL.GetCryptoPay(withdrawalReq.SiteId);
-            var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId && x.ChannelName.Equals(withdrawalReq.ChannelName, StringComparison.OrdinalIgnoreCase)
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName,
-                                ChannelId = x.ChannelId
-                            }).Distinct(bankInfoPayComparer);
+            var result =
+                bankDetailBLL.GetCryptoPayList(req.SiteId, req.CurrencyId, req.ChannelName, req.Amount);
 
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
-
-        private class BankInfoPayComparer : IEqualityComparer<Pay>
-        {
-            public bool Equals(Pay t1, Pay t2)
+            return new ApiResult<IEnumerable<Pay>>
             {
-                return (t1.PayId == t2.PayId);
-            }
-
-            public int GetHashCode(Pay t)
-            {
-                return t.ToString().GetHashCode();
-            }
+                Data = result,
+                ErrorCode = 0
+            };
         }
 
         public class WithdrawalReq4 : ApiRequestPageModel

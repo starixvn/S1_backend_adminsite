@@ -27,7 +27,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly NewAuthorizeBLL _authorizeBll;
-        private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
 
         #endregion
 
@@ -75,9 +74,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int CurrencyId { get; set; }
             /// <summary>
-            /// 支付ID
+            /// 銀行ID
             /// </summary>
-            public int PayId { get; set; }
+            public int SysId { get; set; }
+            /// <summary>
+            /// 金額，取提款金流商列表以外非必填
+            /// </summary>
+            public decimal? Amount { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -90,24 +93,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 渠道名稱
             /// </summary>
             public string ChannelName { get; set; }
-        }
-
-        public class Pay
-        {
             /// <summary>
-            /// 付款渠道ID
+            /// 金額，取提款金流商列表以外非必填
             /// </summary>
-            public int PayId { get; set; }
-
-            /// <summary>
-            /// 付款名稱
-            /// </summary>
-            public string PayName { get; set; }
-
-            /// <summary>
-            /// 渠道ID
-            /// </summary>
-            public int ChannelId { get; set; }
+            public decimal? Amount { get; set; }
         }
 
         public class GetTpGameTypeListByCategoryReq
@@ -239,19 +228,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
             var authData = _authorizeBll.GetAuthData();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay(authData.SiteId);
-            var _payInfo = (from x in bankInfoPay
-                            where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName
-                            }).Distinct(bankInfoPayComparer);
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
+            var result = _bankDetailBll
+                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount);
+            
+            return new ApiResult<IEnumerable<Pay>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -303,21 +288,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
             var authData = _authorizeBll.GetAuthData();
-            var cryptoPay = _bankDetailBll.GetCryptoPay(authData.SiteId);
-            var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == request.CurrencyId && x.ChannelName.Equals(request.ChannelName, StringComparison.OrdinalIgnoreCase)
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName,
-                                ChannelId = x.ChannelId
-                            }).Distinct(bankInfoPayComparer);
+            var result =
+                _bankDetailBll.GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount);
 
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
+            return new ApiResult<IEnumerable<Pay>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -641,24 +620,5 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
-        
-        #region Private Methods
-
-        private class BankInfoPayComparer : IEqualityComparer<Pay>
-        {
-            public bool Equals(Pay t1, Pay t2)
-            {
-                return (t1.PayId == t2.PayId);
-            }
-
-            public int GetHashCode(Pay t)
-            {
-                return t.ToString().GetHashCode();
-            }
-        }
-
-        #endregion
-
     }
 }
