@@ -2,6 +2,7 @@
 {
     public enum OTPProvider
     {
+        ALL,
         SkyLine,
         NxCloud,
         YC

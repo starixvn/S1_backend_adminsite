@@ -27,22 +27,25 @@ namespace BackendSite.Service.BLL
         public IEnumerable<OTPLog> GetOTPLogList(GetOTPLogListRequest request, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
+            var (StartIndex, PageSize) = request.PageNumber.GetStartIndex(request.PageSize);
+            
             var p = new 
             {
                 SiteId = _newAuthorizeBLL.CheckBrand(),
                 SelectCurrency = JsonConvert.SerializeObject(request.CurrencyList),
-                OTPProvider = request.OTPProvider.ToString(),
+                OTPProvider = request.OTPProvider == OTPProvider.ALL ? string.Empty : request.OTPProvider.ToString(),
                 OTPStatus = (int)request.OTPStatus,
-                request.UserName,
-                request.PhoneNo,
+                UserName = string.IsNullOrWhiteSpace(request.UserName) ? string.Empty : request.UserName,
+                PhoneNo = string.IsNullOrWhiteSpace(request.PhoneNo) ? string.Empty : request.PhoneNo,
                 StartDate = request.StartDate.ToUniversalTime().DateTime,
                 EndDate = request.EndDate.ToUniversalTime().DateTime,
-                request.PageSize,
-                StartIndex = 1
+                PageSize,
+                StartIndex
             };
-            var props = new DynamicParameters(request);
+
+            var props = new DynamicParameters(p);
             props.Add("RowCount", DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<OTPLog>("Admin_OTPLog_Get", p);
+            var result = _reportDbClient.Query<OTPLog>("Admin_OTPLog_Get", props);
             var totalCount = props.Get<int?>("RowCount") ?? 0;
             
             pageInfo.SetPageInfo(totalCount, request.PageNumber, request.PageSize);
