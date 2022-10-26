@@ -139,7 +139,7 @@ namespace BackendSite.Service.Model
                     return FinancialType.TpTip;
                 }
 
-                return FinancialType.Unknow;
+                return FinancialType.Others;
             }
         }
 
