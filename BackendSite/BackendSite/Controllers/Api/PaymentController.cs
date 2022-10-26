@@ -259,9 +259,9 @@ namespace BackendSite.Controllers.Api
                 startDate,
                 endDate,
                 request.RefTransId,
-                null,
-                10,
-                request.PageNumber,
+                0,
+                10, 
+                request.PageNumber, 
                 out var pageInfo);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);

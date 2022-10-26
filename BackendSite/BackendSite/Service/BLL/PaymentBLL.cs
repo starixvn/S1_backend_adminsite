@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int? financialType,
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != null)
+            if (financialType != 0)
             {
                 key += $":{financialType}";
             }
@@ -79,9 +79,9 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            if (financialType != null)
+            if (financialType != 0)
             {
-                data = data.Where(i => i.FinancialType == (FinancialType)financialType.Value).ToList();
+                data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
             }
 
             var list = data.OrderByDescending(i => i.CreateTime).ToList();
