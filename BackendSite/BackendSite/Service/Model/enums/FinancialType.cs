@@ -2,6 +2,7 @@
 {
     public enum FinancialType
     {    
+        All = 0,
         Deposit = 1,                //1 and 101 ~ 1000
         PaymentAdjustment = 2,      //2,3,7,8
         BonusReward = 5,            //5	
