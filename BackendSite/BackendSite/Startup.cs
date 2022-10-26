@@ -43,6 +43,7 @@ namespace BackendSite
             services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
+            services.AddSingleton<Cryptor>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -76,15 +77,25 @@ namespace BackendSite
 
             }
 
+            //¤â°Êµù¥U
+
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
+            services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
+            services.AddTransient<IVipLevelBLL, VipLevelBLL>();
+            services.AddTransient<ITagBLL, TagBLL>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IVipLevelService, VipLevelService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IDeviceService, DeviceService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

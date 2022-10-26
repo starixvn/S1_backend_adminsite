@@ -6,12 +6,6 @@ namespace BackendSite.Service.Model
     {
         private DateTimeOffset _startTime { set; get; }
         private DateTimeOffset _endTime { set; get; }
-        private DateTimeOffset? _sportBattleDateTime { set; get; }
-        public int SiteId { get; set; }
-        public string BannerName { get; set; }
-        public int BannerType { get; set; }
-        public int ActionMode { get; set; }
-        public int ShowStatus { get; set; }
         public DateTimeOffset? StartTime 
         {
             get => _startTime;
@@ -30,13 +24,18 @@ namespace BackendSite.Service.Model
                     _endTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
-        public long? UnixStartTime { get; set; }
-        public long? UnixEndTime { get; set; }
+        public int SiteId { get; set; }
+        public string BannerName { get; set; }
+        public string Currency { get; set; }
+        public int BannerType { get; set; }
+        public int ActionMode { get; set; }
+        public int ShowStatus { get; set; }
         public string BonusCode { get; set; }
         public int? MatchId { get; set; }
         public int? TpId { get; set; }
         public string GameId { get; set; }
         public string UrlRouter { get; set; }
+        private DateTimeOffset? _sportBattleDateTime { set; get; }
         public DateTimeOffset? SportBattleDateTime 
         {
             get => _sportBattleDateTime;
@@ -46,14 +45,11 @@ namespace BackendSite.Service.Model
                     _sportBattleDateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
-        public long? UnixSportBattleDateTime { get; set; }
         public int? SportCategoryId { get; set; }
         public int? SportLeaguesId { get; set; }
         public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
-        public string SiteName { get; set; }
-
     }
     public class BannerSportTeamsDetails
     {

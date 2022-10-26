@@ -125,6 +125,10 @@
             "FuncKey": "ca_setCustTag"
           },
           {
+            "DisplayKey": "Disable Rebate Payout",
+            "FuncKey": "ca_rebatePayout"
+          },
+          {
             "DisplayKey": "Line Unbind",
             "FuncKey": "ca_lineUnbind"
           }
@@ -422,16 +426,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Rebate Info",
-        "FuncKey": "Marketing/RebateInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Rebate Report",
-        "FuncKey": "Marketing/RebateLogReport",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
         "Enable": false
@@ -500,18 +494,6 @@
           {
             "DisplayKey": "Delete Note",
             "FuncKey": "rm_delete_note"
-          }
-        ]
-      },
-      {
-        "DisplayKey": "Vip Rebate Mangetment",
-        "FuncKey": "Marketing/VipRebateMangetment",
-        "Enable": false,
-        "InputBoxType": "checkbox",
-        "SubFuncKeys": [
-          {
-            "DisplayKey": "Edit",
-            "FuncKey": "f_vrm_edit"
           }
         ]
       },
@@ -661,5 +643,6 @@
         "Enable": false
       }
     ]
-  }  
+  }
+
 ]

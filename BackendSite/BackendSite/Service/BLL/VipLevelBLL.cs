@@ -1,12 +1,15 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using System.Linq;
+using System.Threading.Tasks;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class VipLevelBLL
+    public class VipLevelBLL : IVipLevelBLL
     {
         private readonly VipLevelService _vipLevelService;
 
@@ -20,9 +23,28 @@ namespace BackendSite.Service.BLL
             return _vipLevelService.GetVipLevelSetting(siteId);
         }
 
+        public async Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
+        {
+            return await _vipLevelService.GetVipLevelSettingAsync(siteId);
+        }
+
         public VipLevelInfo GetVipLevelInfo(int custId)
         {
             return _vipLevelService.GetVipLevelInfo(custId);
+        }
+        
+        public async Task<MemberVipLevelInfo> GetVipLevelInfoAsync(int custId)
+        {
+            var data = await _vipLevelService.GetVipLevelInfoAsync(custId);
+            if (data == null) return null;
+            
+            return new MemberVipLevelInfo()
+            {
+                Manually = data.Manually,
+                VipLevel = data.VipLevel,
+                QualifiedTime = data.QualifiedTime
+            };;
+
         }
 
         public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int pageNumber, int pageSize, out int totalPages, out int rowCount)
@@ -34,10 +56,29 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
 
+        public async Task<IEnumerable<MemberVipLevelLog>> GetVipLevelLogAsync(int custId)
+        {
+            var data = await _vipLevelService.GetVipLevelLogAsync(custId);
+            var vipLevelLog = data.Select(a => new MemberVipLevelLog()
+            {
+                OldLevel = a.OldLevel,
+                NewLevel = a.NewLevel,
+                Memo = a.Memo,
+                UpdateTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero),
+                Updaters = a.Updaters
+            });
+            return vipLevelLog;
+        }
+
         public int SetVipLevel(int siteId, int custId, string userName, int vipLevel, string updator)
         {
             return _vipLevelService.SetVipLevel(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel",
                 updator);
+        }
+        
+        public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string updator)
+        {
+            return await _vipLevelService.SetVipLevelAsync(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel", updator);
         }
 
         public int SetVipLevelManually(int siteId, int custId, string userName, int manually, string updator)
@@ -46,6 +87,10 @@ namespace BackendSite.Service.BLL
                 $"{updator} Update Manually", updator);
         }
 
+        public async Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string updator)
+        {
+            return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
+        }
         // public VipUpgradeReviewData GetVipUpgradeReview(string yearMonth, int siteId, int pageNumber, int pageSize,
         //     int status, string userName)
         // {

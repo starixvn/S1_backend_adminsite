@@ -536,26 +536,6 @@
         "Childs": null
       },
       {
-        "Key": "RebateInfoReport",
-        "Title": "Rebate Info",
-        "FuncKey": "Marketing/RebateInfoReport",
-        "Controller": "Marketing",
-        "Action": "RebateInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "RebateLogReport",
-        "Title": "Rebate Report",
-        "FuncKey": "Marketing/RebateLogReport",
-        "Controller": "Marketing",
-        "Action": "RebateLogReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "VipRebateInfoReport",
         "Title": "Vip Rebate Report",
         "FuncKey": "Marketing/VipRebateInfoReport",
@@ -621,16 +601,6 @@
         "FuncKey": "Marketing/VipLevelReview",
         "Controller": "Marketing",
         "Action": "VipLevelReview",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "VipRebateMangetment",
-        "Title": "Vip Rebate Mangetment",
-        "FuncKey": "Marketing/VipRebateMangetment",
-        "Controller": "Marketing",
-        "Action": "VipRebateMangetment",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -802,26 +772,6 @@
         "Childs": null
       },
       {
-        "Key": "DeepLinkManagement",
-        "Title": "Deep Link Management",
-        "FuncKey": "CMS/DeepLinkManagement",
-        "Controller": "Marketing",
-        "Action": "DeepLinkManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "SiteMaintenance",
-        "Title": "Site Maintenance",
-        "FuncKey": "CMS/SiteMaintain",
-        "Controller": "Marketing",
-        "Action": "SiteMaintain",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-        {
         "Key": "SlotGamesManagement",
         "Title": "Slot Games Management",
         "FuncKey": "CMS/SlotGamesManagement",
@@ -837,6 +787,26 @@
         "FuncKey": "CMS/CategoryManagement",
         "Controller": "Marketing",
         "Action": "CategoryManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "DeepLinkManagement",
+        "Title": "Deep Link Management",
+        "FuncKey": "CMS/DeepLinkManagement",
+        "Controller": "Marketing",
+        "Action": "DeepLinkManagement",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      },
+      {
+        "Key": "SiteMaintenance",
+        "Title": "Site Maintenance",
+        "FuncKey": "CMS/SiteMaintain",
+        "Controller": "Marketing",
+        "Action": "SiteMaintain",
         "Icon": "",
         "Roles": null,
         "Childs": null
