@@ -491,7 +491,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
-            public int? FinancialType { get; set; }
+            public int FinancialType { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
