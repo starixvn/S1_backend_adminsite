@@ -271,6 +271,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         or (int)PromotionTypeEnum.SpecialBonus or (int)PromotionTypeEnum.RetentionFreeBet:
                     {
                         if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
                         {
                             return apiResult;
@@ -280,6 +281,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     }
                     case (int)PromotionTypeEnum.ReDeposit:
                         if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
                                     CheckRollover(tierAmount.RollOver, tierAmount.WinOver, apiResult))))
                         {
