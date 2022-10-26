@@ -25,6 +25,6 @@
         TpPrize = 14001,            //14000 + tpId
         TpUndo = 15001,             //15000 + tpId
         TpTip = 16001,              //16000 + tpId
-        Others = 9999,                 //
+        Others = 99999,                 //
     }
 }
