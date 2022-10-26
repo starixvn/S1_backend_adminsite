@@ -217,6 +217,7 @@ namespace BackendSite.Service.Model
         [JsonIgnore]
         public PayListStatusEnum SitePayStatus { get; set; }
         public PayListStatusEnum Globalstatus => SitePayStatus;
+        public PayChannelMethodEnum Method { get; set; }
     }
     
     public class PayChannelInfo
