@@ -124,9 +124,9 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        public IEnumerable<BankInfoPay> GetBankInfoPay()
+        public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
-            var bankInfoPayList = localBankService.GetBankInfoPayList();
+            var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
             return bankInfoPayList;
         }
         
