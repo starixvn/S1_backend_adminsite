@@ -181,7 +181,9 @@ namespace BackendSite.Service.BLL
             }
 
             custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-
+            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
