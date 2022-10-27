@@ -652,4 +652,12 @@ namespace BackendSite.Service.Model
         public string EWalletName { set; get; }
         public DateTimeOffset CreateTime { set; get; }
     }
+
+    public class CustDashBoardTodayModel
+    {
+        public decimal TodayDeposit { get; set; }
+        public decimal TodayWithdrawal { get; set; }
+        public decimal TodayWinLoss { get; set; }
+        public decimal TodayBetting { get; set; }
+    }
 }
