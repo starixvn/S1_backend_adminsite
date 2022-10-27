@@ -18,13 +18,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
+                NewAuthorizeBLL newAuthorizeBll,
+                PaymentAdjustmentReportBLL paymentAdjustmentReportBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _newAuthorizeBll = newAuthorizeBll;
+            _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -68,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
-        
+
         /// <summary>
         /// Member/GetCustomerBasicInfo 取得客戶基本資料
         /// </summary>
@@ -708,7 +714,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 53 })]
-
         public async Task<ApiListResult<TpAdjustmentLogV2>> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogRequestV2 request)
         {
             var apiResult = new ApiListResult<TpAdjustmentLogV2>();
@@ -749,6 +754,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var siteId = _newAuthorizeBll.GetAuthData().SiteId;
                 var queryResult = await _paymentAdjustmentReportBll.GetAdjustmentInfoByCustV2(siteId,
                     request.CustId,
+                    request.AdjustType,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     request.PageSize, request.PageNumber);
