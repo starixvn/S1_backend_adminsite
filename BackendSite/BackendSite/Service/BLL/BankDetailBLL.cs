@@ -76,9 +76,9 @@ namespace BackendSite.Service.BLL
             var bankInfoOffList = localBankService.GetBankAccountOff(siteId);
             return bankInfoOffList;
         }
-        public IEnumerable<BankInfoPay> GetBankInfoPay()
+        public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
-            var bankInfoPayList = localBankService.GetBankInfoPayList();
+            var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
             return bankInfoPayList;
         }
         
