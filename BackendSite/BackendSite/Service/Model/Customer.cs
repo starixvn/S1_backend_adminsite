@@ -21,7 +21,13 @@ namespace BackendSite.Service.Model
         public DateTime RegTime { get; set; }
         public int Status { get; set; }
         public bool PhoneVerified { get; set; }
+        public bool IsResetPwd { get; set; }
+        public string PhoneNo { get; set; }
+        public string AreaCode { get; set; }
         public string AccountName { get; set; }
+        public string Aff { get; set; }
+        public string AffCode { get; set; }
+        public string Token { get; set; }
     }
     public class CustInfoDetail
     {
@@ -557,6 +563,16 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
     }
+    
+    public class CustomerInfo
+    {
+        public string UserName { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public int Status { get; set; }
+    }
+    
     public class CustomerSwitchStatus
     {
         public int IsKyc { get; set; }

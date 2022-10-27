@@ -1,9 +1,9 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Caching.Memory;
 using static BackendSite.Controllers.Api.TpController;
-using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.BLL
 {
@@ -148,6 +148,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetSiteTpList(siteId);
         }
+
         public async Task<ApiResult<AdjustWalletResult>> AdminAdjustmentTransferAsync(AdminTpTransfer inAdminTpTransfer)
         {
             var amount = inAdminTpTransfer.Amount;
@@ -177,7 +178,7 @@ namespace BackendSite.Service.BLL
         {
             return _thirdPartyService.GetAdjustmentTpLog(siteId, tpId, custId, pageSize, ref pageNumber, ref totalPages, ref rowCount);
         }
-        
+
         public IEnumerable<TpAdjustmentLog> GetCustAdjustmentTpLog(GetCustTpAdjustmentLogParams input,
             int pageSize,
             int pageNumber,
@@ -225,6 +226,42 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoList(int custId)
         {
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
+        }
+
+        public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
+        {
+            var key = $"TpCategory_{siteId}";
+
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => GetSiteTpCategoryListAsync(siteId));
+        }
+        
+        private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
+        {
+            var tpList = await _thirdPartyService.GetSiteTpListAllAsync(siteId);
+            var tpGameTypeList = await _thirdPartyService.GetTpGameType();
+            var result = tpGameTypeList
+                .Where(x => tpList.Any(y => y.TpId == x.TpId))
+                .Select(x => new TpCategory
+                {
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.CategoryName
+                })
+                .Distinct(new TpCategoryComparer())
+                .OrderBy(x => x.CategoryId);
+
+            return result;
+        }
+
+        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        {
+            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
+        }
+
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
+        {
+            var result = await _thirdPartyService.GetTpGameTypeCurrency();
+            return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
     }
 }

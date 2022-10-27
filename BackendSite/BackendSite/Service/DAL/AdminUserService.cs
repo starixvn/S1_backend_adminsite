@@ -21,20 +21,20 @@ namespace BackendSite.Service.DAL
         }
         public AdminUser GetAdminUserByUserName(string userName)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<AdminUser>("LoginAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("UserName", userName);
+            return _reportDbClient.QueryFirst<AdminUser>("LoginAdminUser_Get", para);
         }
 
         public IEnumerable<AdminUser> GetUserList(int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var para = new DynamicParameters();
             para.Add("_StartIndex", startIndex);
             para.Add("_PageSize", pageSize);
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<AdminUser>("Admin_User_GetAll_V2", para, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<AdminUser>("Admin_User_GetAll_V2", para);
 
             totalPages = para.Get<int?>("_TotalPages") ?? 0;
             rowCount = para.Get<int?>("_RowCount") ?? 0;
@@ -52,25 +52,24 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
+            var para = new DynamicParameters();
+            para.Add("UserId", UserId);
             var SpName = "Admin_AuthorSite_Del";
-            conn.Execute(SpName, new { UserId }, tran, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute(SpName, para, conn, tran);
 
             if (SiteIds != null && SiteIds.Any())
             {
                 SpName = "Admin_AuthorSite_Ins";
                 foreach (var id in SiteIds)
                 {
-                    conn.Execute(SpName, new { UserId, SiteId = id }, tran, commandType: CommandType.StoredProcedure);
+                    var para2 = new DynamicParameters();
+                    para2.Add("UserId", UserId);
+                    para2.Add("SiteId", id);
+                    _mainDbClient.Execute(SpName, para2, conn, tran);
                 }
             }
 
             tran.Commit();
-        }
-
-        public AssignGroups GetAssignGroup(int UserId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirst<AssignGroups>("Admin_AuthorGroup_Get", new { UserId }, commandType: CommandType.StoredProcedure);
         }
 
         public void AssignGroup(int UserId, int? GroupSEQ)
@@ -78,15 +77,18 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var tran = conn.BeginTransaction();
+            var para = new DynamicParameters();
+            para.Add("UserId", UserId);
             if (GroupSEQ == null)
             {
                 var SpName = "Admin_AuthorGroup_Del";
-                conn.Execute(SpName, new { UserId }, tran, commandType: CommandType.StoredProcedure);
+                _mainDbClient.Execute(SpName, para, conn, tran);
             }
             else
             {
+                para.Add("GroupSEQ", GroupSEQ);
                 var SpName = "Admin_AuthorGroup_Set";
-                conn.Execute(SpName, new { UserId, GroupSEQ }, tran, commandType: CommandType.StoredProcedure);
+                _mainDbClient.Execute(SpName, para, conn, tran);
             }
 
             tran.Commit();
@@ -94,14 +96,18 @@ namespace BackendSite.Service.DAL
 
         public void SetUserPassword(int UserId, string MD5Pwd)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_User_SetPwd", new { UserId, UserPwd = MD5Pwd }, commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("UserId", UserId);
+            para.Add("UserPwd", MD5Pwd);
+            _mainDbClient.Execute("Admin_User_SetPwd", para);
         }
 
         public void SetUserStatus(int UserId, int Status)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Admin_User_SetStatus", new { UserId, UserStatus = Status }, commandType: CommandType.StoredProcedure);
+            var para = new DynamicParameters();
+            para.Add("UserId", UserId);
+            para.Add("UserStatus", Status);
+            _mainDbClient.Execute("Admin_User_SetStatus", para);
         }
 
         public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, IEnumerable<int> SiteList, int? GroupSEQ)
@@ -117,7 +123,7 @@ namespace BackendSite.Service.DAL
             UserInfo.Add("@IsSuper", 0);
             UserInfo.Add("@Status", 1);
 
-            conn.Execute("Admin_User_Ins", UserInfo, tran, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_User_Ins", UserInfo, conn, tran);
 
             var UserId = UserInfo.Get<int?>("@UserId");
 
@@ -125,19 +131,25 @@ namespace BackendSite.Service.DAL
             {
                 if (GroupSEQ != null)
                 {
+                    var para = new DynamicParameters();
+                    para.Add("UserId", UserId);
+                    para.Add("GroupSEQ", GroupSEQ);
                     var SpName = "Admin_AuthorGroup_Set";
-                    conn.Execute(SpName, new { UserId, GroupSEQ }, tran, commandType: CommandType.StoredProcedure);
+                    _mainDbClient.Execute(SpName, para, conn, tran);
                 }
 
                 if (SiteList != null)
                 {
                     foreach (var SiteId in SiteList)
                     {
-                        conn.Execute("Admin_AuthorSite_Ins", new { UserId, SiteId }, tran, commandType: CommandType.StoredProcedure);
+                        var para2 = new DynamicParameters();
+                        para2.Add("UserId", UserId);
+                        para2.Add("SiteId", SiteId);
+                        _mainDbClient.Execute("Admin_AuthorSite_Ins", para2, conn, tran);
                     }
                 }
 
-                userList = conn.Query<AdminUser>("Admin_User_GetAll", transaction: tran, commandType: CommandType.StoredProcedure);
+                userList = _reportDbClient.Query<AdminUser>("Admin_User_GetAll");
             }
 
             tran.Commit();
