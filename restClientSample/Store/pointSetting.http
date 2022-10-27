@@ -1,0 +1,186 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得TpCategory
+POST {{url}}/apiV2/BaseData/GetTpCategoryList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得TpGameType
+POST {{url}}/apiV2/BaseData/GetTpGameTypeList HTTP/1.1
+Content-Type: application/json
+
+{
+    "categoryId": 3
+}
+
+###
+# 取得VipLevel
+POST {{url}}/apiV2/BaseData/GetVipLevelSettingBySiteId HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 取得非活躍點數過期設定
+POST {{url}}/apiV2/PointSetting/GetInactivePointExpirySetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 非活躍點數過期設定
+POST {{url}}/apiV2/PointSetting/SetInactivePointExpirySetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "status": 1,
+    "days": 2
+}
+
+###
+# 取得流水點數設定列表
+POST {{url}}/apiV2/PointSetting/GetTurnoverPointSettingList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2
+}
+
+###
+# 取得流水點數設定
+POST {{url}}/apiV2/PointSetting/GetTurnoverPointSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "vipLevel": 1
+}
+
+###
+# 流水點數設定
+POST {{url}}/apiV2/PointSetting/SetTurnoverPointSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 4,
+    "infos": [
+        {
+            "tpCategoryId": 1,
+            "vipLevel": 1,
+            "turnover": 100,
+            "pointRate": 1,
+            "promotionStatus": 1,
+            "promotionPointRate": 2,
+            "promotionStartTime": "2022-07-01T00:00:00+08:00",
+            "promotionEndTime": "2022-07-20T00:00:00+08:00"
+        },
+        {
+            "tpCategoryId": 2,
+            "vipLevel": 1,
+            "turnover": 100,
+            "pointRate": 1,
+            "promotionStatus": 1,
+            "promotionPointRate": 3,
+            "promotionStartTime": "2022-07-01T00:00:00+08:00",
+            "promotionEndTime": "2022-07-20T00:00:00+08:00"
+        },
+        {
+            "tpCategoryId": 3,
+            "vipLevel": 1,
+            "turnover": 100,
+            "pointRate": 1,
+            "promotionStatus": 0,
+            "promotionPointRate": 2,
+            "promotionStartTime": "2022-07-01T00:00:00+08:00",
+            "promotionEndTime": "2022-07-20T00:00:00+08:00"
+        }
+    ]
+}
+
+###
+# 取得流水點數狀態設定
+POST {{url}}/apiV2/PointSetting/GetTurnoverPointStatusSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "tpCategoryId": 1
+}
+
+###
+# 流水點數狀態設定
+POST {{url}}/apiV2/PointSetting/SetTurnoverPointStatusSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 4,
+    "tpCategoryId": 1,
+    "infos": [
+        {
+            "tpGameTypeId": 1,
+            "status": 1
+        },
+        {
+            "tpGameTypeId": 49,
+            "status": 1
+        },
+        {
+            "tpGameTypeId": 51,
+            "status": 1
+        }
+    ]
+}
+
+###
+# 取得存款點數設定
+POST {{url}}/apiV2/PointSetting/GetDepositPointSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}
+
+###
+# 存款點數設定
+POST {{url}}/apiV2/PointSetting/SetDepositPointSetting HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 51,
+    "depositAmount": 500000,
+    "pointRate": 1,
+    "promotionStatus": 0,
+    "promotionPointRate": 2,
+    "promotionStartTime": "2022-07-01T00:00:00+07:00",
+    "promotionEndTime": "2022-07-20T00:00:00+07:00"
+}

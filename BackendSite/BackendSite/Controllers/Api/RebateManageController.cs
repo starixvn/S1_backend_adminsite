@@ -130,12 +130,12 @@ namespace BackendSite.Controllers.Api
             public int CurrencyId { get; set; }
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
-        public ApiResult<RebateCurrencyData> GetRebateInfo(RebateInfoReq rebateInfoReq)
+        public async Task<ApiResult<RebateCurrencyData>> GetRebateInfo(RebateInfoReq rebateInfoReq)
         {
             var apiResult = new ApiResult<RebateCurrencyData>
             {
                 ErrorCode = 0,
-                Data = rebateManageBLL.GeRebateInfo(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId)
+                Data = await rebateManageBLL.GeRebateInfoAsync(rebateInfoReq.SiteId, rebateInfoReq.CurrencyId)
             };
             return apiResult;
         }

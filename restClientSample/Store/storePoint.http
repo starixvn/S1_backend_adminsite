@@ -1,0 +1,77 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得用戶列表(有點數才會有資料)
+POST {{url}}/apiV2/StorePoint/GetMemberList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyIds": [2, 4, 15],
+    "vipLevels": [1, 2, 3, 4, 5, 6],
+    "userName": "",
+    "tpUserName": "",
+    "startTime": "2022-06-01T00:00:00+08:00",
+    "endTime": "2022-07-30T00:00:00+08:00",
+    "pageNumber": 1,
+    "pageSize": 10,
+}
+
+###
+# 取得用戶點數紀錄
+POST {{url}}/apiV2/StorePoint/GetMemberRewardPointLog HTTP/1.1
+Content-Type: application/json
+
+{
+    "custId": 643973,
+    "startTime": "2022-06-01T00:00:00+08:00",
+    "endTime": "2022-07-30T00:00:00+08:00",
+    "pageNumber": 1,
+    "pageSize": 10,
+}
+
+###
+# 取得category列表
+POST {{url}}/apiV2/StorePoint/GetManualRewardPointCategoryType HTTP/1.1
+Content-Type: application/json
+
+###
+# 手動發放點數
+POST {{url}}/apiV2/StorePoint/ManualRewardPoint HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "userName": "anisetestmyr01",
+    "point": -20,
+    "categoryId": 0,
+    "memo": "test456"
+}
+
+###
+# 取得批次發放點數樣本Excel => 請用 Postman 打才能下載檔案
+POST {{url}}/apiV2/StorePoint/GetSampleExcelFile HTTP/1.1
+Content-Type: application/json
+
+
+###
+# 批次發放點數 => 請用 Postman 打才能上傳檔案
+POST {{url}}/apiV2/StorePoint/BatchManualRewardPoint HTTP/1.1
+Content-Type: multipart/form-data;
+
+SiteId: 1
+File:
