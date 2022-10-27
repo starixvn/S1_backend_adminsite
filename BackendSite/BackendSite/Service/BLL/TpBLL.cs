@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
         {
             var key = $"TransferTpWallet_{custId}";
             
-            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
+            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(10),
                 () => GetTransferTpWalletAsync(custId));
         }
         
