@@ -845,6 +845,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0, 
+        Fail = 1, 
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -1253,6 +1263,36 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
 
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
 }
