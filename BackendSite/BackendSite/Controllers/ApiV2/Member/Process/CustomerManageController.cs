@@ -1714,9 +1714,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var pageNumber = request.PageNumber;
-            var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
-            var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
+            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
+            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
@@ -1724,18 +1723,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 request.RefTransId,
                 request.PageSize,
-                ref pageNumber,
-                out var totalPages,
-                out var rowCount);
+                request.PageNumber,
+                out var pageInfo);
 
-            return new ApiListResult<FinancialLog>
-            {
-                Data = data,
-                TotalPages = totalPages,
-                PageNumber = pageNumber,
-                RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+            return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
 
         #endregion
@@ -2445,7 +2436,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   JsonConvert.SerializeObject(request.GameTypes),
+                                                   request.GameTypes,
                                                    request.StartDate,
                                                    request.EndDate);
             return new ApiResult<dynamic>
@@ -2507,7 +2498,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 24 })]
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogByCustId(CustIdWithPageRequest request)
         {

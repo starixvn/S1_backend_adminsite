@@ -76,6 +76,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 支付ID
             /// </summary>
             public int PayId { get; set; }
+            
+            public int SiteId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -238,7 +240,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay();
+            var bankInfoPay = _bankDetailBll.GetBankInfoPay(request.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
                             select new Pay
@@ -399,7 +401,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(request.TpId);
+                var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(request.TpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }

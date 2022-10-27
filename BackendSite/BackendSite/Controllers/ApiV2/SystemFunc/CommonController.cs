@@ -17,6 +17,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdminBLL _adminBll;
         private readonly ServerInfoBLL _serverInfoBLL;
+        private readonly RebateManageBLL _rebateManageBLL;
         private readonly List<int> _RewardCurrencyList = new List<int> { 2, 4, 15 };  //商城目前只開放給MYR、THB、IDR使用
         #endregion
 
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adminBll = provider.GetService<AdminBLL>();
             _serverInfoBLL = provider.GetService<ServerInfoBLL>();
+            _rebateManageBLL = provider.GetService<RebateManageBLL>();
         }
         #endregion
 
@@ -46,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<object>();
             var normalCurrencyList = Enumerable.Empty<int>();
+            var vipCurrencyList = Enumerable.Empty<int>();
             try
             {
                 if (User.Identity.IsAuthenticated)
@@ -68,6 +71,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                         if (brandData != null)
                             normalCurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
                     }
+                    vipCurrencyList = _rebateManageBLL.GetRebatePeriodList(brand).Select(x => x.CurrencyId).Distinct();
                 }
                 else
                 {
@@ -76,7 +80,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 apiResult.Data = new
                 {
                     SiteCurrencyList = normalCurrencyList,
-                    RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList)
+                    RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList),
+                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList)
                 };
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
