@@ -204,7 +204,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR { get; set; }
+        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -222,13 +222,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public decimal AvgBetAmount { get; set; }
+        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
 
         [JsonProperty(Order = 9)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin { get; set; }
+        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
     }
 
     public class MpaWinLossByDayCurrencyDetailDto
@@ -297,6 +297,13 @@ namespace BackendSite.Service.Model.Mpa
         [JsonIgnore]
         public string Date { get; set; }
 
+        [JsonIgnore]
+        //MYR、CNY...etc
+        public string Currency { get; set; }
+
+        [JsonIgnore]
+        public int GameType { get; set; }
+
         public decimal TurnOver { get; set; }
 
         public decimal ValidTurnOver { get; set; }
@@ -332,7 +339,7 @@ namespace BackendSite.Service.Model.Mpa
         public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
-    public class TpBetRecordByDateResultDto
+    public class TpBetRecordRelayResultWrapper
     {
         public List<MpaWinLossByDateDto> TpBetRecordResult { get; set; }
 
@@ -344,6 +351,10 @@ namespace BackendSite.Service.Model.Mpa
     {
         [JsonIgnore]
         public string TpGameTypeName { get; set; }
+
+        [JsonIgnore]
+        //MYR、CNY...etc
+        public string Currency { get; set; }
 
         public decimal TurnOver { get; set; }
 
@@ -370,9 +381,9 @@ namespace BackendSite.Service.Model.Mpa
         public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
-    public class TpBetRecordByTpGameTypeDto
+    public class TpBetRecordByTpGameTypeWrapper
     {
-        public List<MpaWinLossByTpGameTypeDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByTpGameTypeDto> TpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }
