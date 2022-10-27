@@ -264,6 +264,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     return apiResult;
                 }
 
+                foreach (var specific in request.PromotionInfo.Specific)
+                {
+                    if (specific.TierAmountList.Count() > 10)
+                    {
+                        return new ApiResult((int)ErrorCodeEnum.UpdateFailed, "tier Amount more then 10.");
+                    }
+                }
+
+
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
                     request.PromotionInfo,
                     request.DisplayConditionAboutVipLevel,
