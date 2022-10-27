@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public int OTPType { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
