@@ -299,7 +299,8 @@ public class CustomerBalanceInfo
     {
         get
         {
-            return Balance - RemainingTurnOver;
+            var eligibleWithdrawal = Balance - RemainingTurnOver;
+            return eligibleWithdrawal < 0 ? 0 : eligibleWithdrawal;
         }
     }
 }
