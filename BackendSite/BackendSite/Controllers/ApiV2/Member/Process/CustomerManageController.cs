@@ -288,46 +288,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public bool ExportTransferWallet { get; set; } = false;
         }
 
-        public class ExportCustInfoListRequest
-        {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? BirDate { get; set; }
-            public int? BirMonth { get; set; }
-            public int? BirYear { get; set; }
-            public string UserName { get; set; }
-            public string AccountName { get; set; }
-            public string LoginIp { get; set; }
-            public string TransId { get; set; }
-            public string TpUserName { get; set; }
-            public string Email { get; set; }
-            public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
-            public string BankAccountNumber { get; set; }
-            public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
-        }
-
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
@@ -485,9 +445,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnableRebateEnum Status { get; set; }
         }
 
-        public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
+        public class GetFinancialLogRequest : ApiRequestPageModel
         {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
+            public int FinancialType { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -535,6 +499,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
+        }
+        
+        public class GetCustTPWalletResult
+        {
+            public decimal TotalTpWalletBalance { get; set; }
+            public IEnumerable<TpWallet> TpWalletList { get; set; }
+        }
+        
+        public class GetTodayDashboardRequest
+        {
+            public int CustId { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -1710,24 +1686,65 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
-            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
                 startDate,
                 endDate,
                 request.RefTransId,
+                request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
                 out var pageInfo);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
+
+
+        /// <summary>
+        /// CustomerManage/GetFinancialLogByCustIdExport 匯出指定客戶金融紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Financial Log > [Search] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        {
+            request.PageNumber = -1; //export all
+            var offset = request.StartDate.Offset;      
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
+
+            var data = _paymentBll.GetFinancialLog(
+                request.CustId,
+                startDate,
+                endDate,
+                request.RefTransId,
+                request.FinancialType,
+                request.PageSize,
+                request.PageNumber,
+                out var _);
+
+            foreach (var item in data)
+            {
+                item.CreateTime = item.CreateTime.ToOffset(offset);
+            }
+
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "FinancialLog");
+        }
+
 
         #endregion
 
@@ -1782,7 +1799,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
         {
@@ -1808,7 +1825,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordByDay(
             CustTpBetRecordListOneDayReq req)
@@ -1836,7 +1853,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordByCategoryId(
             CustTpBetRecordListbyCategoryIdReq req)
@@ -1865,7 +1882,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
             CustTpBetRecordDetailListbyGameTypeReq req)
@@ -2976,6 +2993,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
+        
+        [HttpPost]
+        public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result =
+                await _custInfoBll.GetCustDashBoardTodayAsync(request.CustId, custInfo.CurrencyId);
+
+            return new ApiResult<CustDashBoardTodayModel>
+            {
+                ErrorCode = (int) ErrorCodeEnum.Success,
+                Data = result
+            };
+        }
 
         #endregion
 
@@ -3017,16 +3048,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpWallet>>> GetCustTPWalletAsync(CustIdRequest request)
+        public async Task<ApiResult<GetCustTPWalletResult>> GetCustTPWalletAsync(CustIdRequest request)
         {
+            var wallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
 
-            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
-
-            return new ApiResult<IEnumerable<TpWallet>>
+            return new ApiResult<GetCustTPWalletResult>
             {
-                Data = custTPWallet,
+                Data = new GetCustTPWalletResult
+                {
+                    TotalTpWalletBalance = wallet.Sum(x => x.Balance),
+                    TpWalletList = wallet
+                },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

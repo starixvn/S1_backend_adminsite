@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -38,7 +39,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId,
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
@@ -48,10 +49,21 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
+            if (financialType != 0)
+            {
+                key += $":{financialType}";
+            }
+
             var cacheTime = TimeSpan.FromMinutes(1);
 
             if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
+                //Export
+                if (pageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                }
+
                 //Redis Pagination
                 var total = (int)_cacheHelper.GetListLength(key, RedisDataBase.Shared);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
@@ -67,6 +79,11 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+            if (financialType != 0)
+            {
+                data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
+            }
+
             var list = data.OrderByDescending(i => i.CreateTime).ToList();
 
             // Add Cache by List      
@@ -74,6 +91,12 @@ namespace BackendSite.Service.BLL
             {
                 _cacheHelper.InsertList(key, cacheTime, list, RedisDataBase.Shared);
             });
+
+            //Export
+            if (pageNumber == -1 || data.Count == 0)
+            {
+                return list;
+            }
 
             var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
             return list.GetRange(index, count);
@@ -203,6 +226,7 @@ namespace BackendSite.Service.BLL
                       WinlostAmount = tpBetRecord.WinlostAmount,
                       SettlementType = tpBetRecord.SettlementType,
                       CategoryId = tpGameType.CategoryId,
+                      BonusId = tpBetRecord.BonusId,
                   })
                 .Where(i => i.CategoryId == categoryId)
                 .GroupBy(x => new
@@ -221,7 +245,9 @@ namespace BackendSite.Service.BLL
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.TurnOver),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
                     RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => y.ValidBet ?? y.TurnOver),
-                    WinLoss = x.Sum(y => y.WinlostAmount)
+                    WinLoss = x.Sum(y => y.WinlostAmount),
+                    TotalTOExcludeBonus = x.Where(y => y.BonusId == 0 && (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => y.ValidBet ?? y.TurnOver),
+                    WinLossExcludeBonus = x.Where(y => y.BonusId == 0).Sum(y => y.WinlostAmount),
                 })
                 .ToList();
             return result;

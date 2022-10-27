@@ -79,13 +79,18 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
+            services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
-
+            services.AddTransient<IDeviceService, DeviceService>();
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
