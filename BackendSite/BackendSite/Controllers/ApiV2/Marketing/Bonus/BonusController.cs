@@ -287,7 +287,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         {
                             return apiResult;
                         }
-
+                        
+                        if (request.PromotionInfo.Specific.Any(specific => specific.TierAmountList.Count() > 10))
+                        {
+                            apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                            apiResult.Message = "Tier Amount can only be set up to 10.";
+                            return apiResult;
+                        }
                         break;
                 }
 
