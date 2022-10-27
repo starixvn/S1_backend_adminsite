@@ -264,6 +264,33 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     return apiResult;
                 }
 
+                switch (request.PromotionInfo.PromotionType)
+                {
+                    case (int)PromotionTypeEnum.FstDeposit
+                        or (int)PromotionTypeEnum.FreeBet or (int)PromotionTypeEnum.Cashback
+                        or (int)PromotionTypeEnum.SpecialBonus or (int)PromotionTypeEnum.RetentionFreeBet:
+                    {
+                        if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
+                                CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
+                        {
+                            return apiResult;
+                        }
+
+                        break;
+                    }
+                    case (int)PromotionTypeEnum.ReDeposit:
+                        if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
+                                specific.TierAmountList.Any(tierAmount =>
+                                    CheckRollover(tierAmount.RollOver, tierAmount.WinOver, apiResult))))
+                        {
+                            return apiResult;
+                        }
+
+                        break;
+                }
+
                 foreach (var specific in request.PromotionInfo.Specific)
                 {
                     if (specific.TierAmountList.Count() > 10)
@@ -276,7 +303,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
                     request.PromotionInfo,
                     request.DisplayConditionAboutVipLevel,
-                    User.Identity.Name) ? 0 : 1;
+                    User.Identity?.Name) ? 0 : 1;
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
@@ -292,6 +319,23 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
 
             return apiResult;
+        }
+
+        private bool CheckRollover(int rollOver, int winOver, ApiResult apiResult)
+        {
+            switch (rollOver)
+            {
+                case <= 0 when winOver <= 0:
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DateOutOfRange;
+                    apiResult.Message = "RollOver or WinOver must have at least one greater than 0.";
+                    return true;
+                case > 0 when winOver > 0:
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DateOutOfRange;
+                    apiResult.Message = "RollOver or WinOver can only have one greater than 0.";
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
