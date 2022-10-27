@@ -73,6 +73,12 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
+    }
+
     #endregion
 
     #region Withdrawal Submission For Frontend Use
@@ -373,11 +379,32 @@ namespace BackendSite.Service.Model.enums
 
     #region AdjustWithdrawalLimitInfo
 
-    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    public enum WithdrawalLimitAdjustmentAdjustTypeEnum
     {
         Debit = 1,
-        Credit = 2,
-        //Bonus = 3  NoUse
+        Credit = 2
+    }
+    
+    public enum WithdrawalLimitAdjustmentReasonEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     public enum AdjustWithdrawalLimitInfoStatusEnum
@@ -414,19 +441,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
     public enum AdjustmentCategoryEnum
     {
         [Description("None - (Default)")]
@@ -643,7 +670,8 @@ namespace BackendSite.Service.Model.enums
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
-        WithdrawalSubmission = 57
+        WithdrawalSubmission = 57,
+        WithdrawalLimitAdjustment = 73
     }
 
     #region BankFinancialTransferInfoLog
@@ -850,8 +878,8 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferStatusEnum
     {
-        Success = 0, 
-        Fail = 1, 
+        Success = 0,
+        Fail = 1,
         Pending = 2,
         PendingD = 3
     }
@@ -1175,7 +1203,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1206,7 +1234,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1288,7 +1316,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         Closed = 2,
     }
-    public enum SlotGameStatusEnum 
+    public enum SlotGameStatusEnum
     {
         Closed = 0,
         Open = 1
