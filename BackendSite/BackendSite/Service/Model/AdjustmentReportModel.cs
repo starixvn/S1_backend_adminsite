@@ -13,8 +13,14 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
         public string TransId { get; set; }
+
+        /// <summary>
+        /// DepositInfo 的 TransId
+        /// </summary>
+        public string DepositId { get; set; }
 
         public DateTimeOffset StartDate
         {
@@ -37,8 +43,14 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
         public string TransId { get; set; }
+
+        /// <summary>
+        /// DepositInfo 的 TransId
+        /// </summary>
+        public string DepositId { get; set; }
 
         public DateTimeOffset StartDate
         {
