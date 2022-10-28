@@ -475,7 +475,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_SetV2", props, conn, trans);
+            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V2", props, conn, trans);
             if (setResult > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
