@@ -35,14 +35,22 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return _verifiedTime != null ? new DateTimeOffset(_verifiedTime.Value, TimeSpan.Zero) :  null;
+                if (_verifiedTime == null)
+                {
+                    return null;
+                }
+                if (_verifiedTime != null && _verifiedTime.Value.Year == 1970)
+                {
+                    return null;
+                }
+                return  new DateTimeOffset(_verifiedTime.Value, TimeSpan.Zero);
             }
             set
             {
                 if (value.HasValue)
                 {
                     _verifiedTime = value.Value.DateTime;
-                }                 
+                }
             }
         }
         private DateTime? _verifiedTime { get; set; }
