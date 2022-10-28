@@ -5,7 +5,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 {
     public static class MpaWinLossExtension
     {
-        public static IEnumerable<MpaTpBetRecordByDateDto> Filter(this IEnumerable<MpaTpBetRecordByDateDto> data, MpaWinLossRequest request, Func<int, string, int> getCustIdMethod)
+        public static IEnumerable<MpaTpBetRecordDto> Filter(this IEnumerable<MpaTpBetRecordDto> data, MpaWinLossRequest request, Func<int, string, int> getCustIdMethod)
         {
 
             // 過濾 GameType、CurrencyId
@@ -22,7 +22,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return data;
         }
 
-        public static IEnumerable<MpaTpBetRecordByDateDto> SetGgRByOneGamingPoker(this IEnumerable<MpaTpBetRecordByDateDto> data)
+        public static IEnumerable<MpaTpBetRecordDto> SetGgRByOneGamingPoker(this IEnumerable<MpaTpBetRecordDto> data)
         {
             foreach (var item in data)
             {
@@ -37,7 +37,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return data;
         }
 
-        public static IEnumerable<MpaTpBetRecordByDateDto> SetGgRByV8Poker(this IEnumerable<MpaTpBetRecordByDateDto> data)
+        public static IEnumerable<MpaTpBetRecordDto> SetGgRByV8Poker(this IEnumerable<MpaTpBetRecordDto> data)
         {
             foreach (var item in data)
             {
@@ -52,7 +52,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return data;
         }
 
-        public static IEnumerable<MpaTpBetRecordByDateDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordByDateDto> data,
+        public static IEnumerable<MpaTpBetRecordDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordDto> data,
             MpaWinLossRequest request,
             string format,
             Func<DateTime, DateTime, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission)

@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             this._MaMpaWinLossBll = MaMpaWinLossBll;
         }
 
+        [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
@@ -39,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
@@ -57,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
-
+        [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>();
@@ -76,51 +78,23 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        [HttpPost]
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>();
+            try
+            {
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByTpCategoryResult(request, MpaWinLossGroupByTypeEnum.TpCategory);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
 
-
-
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
-        //public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
-        //{
-        //    var apiResult = new ApiResult<WorldCupPredictionSettingResponse>();
-        //    try
-        //    {
-        //        var responseData = _worldCupPredictionBll.GetCupPredictionSettingResponse("en"); //後台不用多語系，統一用英文，有需要可以更改
-        //        apiResult.Data = responseData;
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //        apiResult.Message = ex.Message;
-        //    }
-
-        //    return apiResult;
-        //}
-
-        //[HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 1 })]
-        //public ApiListResult<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request)
-        //{
-        //    var apiResult = new ApiListResult<GetWorldCupMemberReportResponse>();
-        //    try
-        //    {
-        //        apiResult.Data = _worldCupPredictionBll.GetMemberReport(request,
-        //            out var totalPages,
-        //            out var rowCount); ;
-        //        apiResult.TotalPages = totalPages;
-        //        apiResult.PageNumber = request.PageNumber;
-        //        apiResult.RowCount = rowCount;
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //        apiResult.Message = ex.Message;
-        //    }
-        //    return apiResult;
-        //}
-
+            return apiResult;
+        }
     }
 }

@@ -57,9 +57,6 @@ namespace BackendSite.Service.Model.Mpa
 
     public class MpaWinLossByTpGameTypeResponse
     {
-        [JsonIgnore]
-        public string TpGameTypeName { get; set; }
-
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
 
@@ -94,5 +91,43 @@ namespace BackendSite.Service.Model.Mpa
         public decimal Margin { get; set; }
 
         public Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> CurrencyDetail { get; set; }
+    }
+
+    public class MpaWinLossByTpCategoryResponse
+    {
+        [JsonProperty(Order = 0)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public decimal Margin { get; set; }
+
+        public Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 }
