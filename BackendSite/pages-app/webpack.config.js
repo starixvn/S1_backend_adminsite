@@ -113,10 +113,6 @@ module.exports = {
     // "CSD/TpFailRecordReport.min": [
     //     "./src/pages/CSD/TpFailRecordReport/index.js"
     // ],
-    // "Marketing/BonusImport.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/Marketing/BonusImport/index.js"
-    // ],
     // "Marketing/ReferralReport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/ReferralReport/index.js"

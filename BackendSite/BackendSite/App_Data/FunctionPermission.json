@@ -417,11 +417,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
         "Enable": false
