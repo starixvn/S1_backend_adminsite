@@ -314,6 +314,7 @@ namespace BackendSite.Service.Model
         public string IFSCCode { set; get; }
         public DateTimeOffset CreateTime { set; get; }
         public int Status { get; set; }
+        public string Operator { get; set; }
     }
     public class CustCryptoWalletLog
     {
@@ -651,6 +652,8 @@ namespace BackendSite.Service.Model
         public string AccountName { set; get; }
         public string EWalletName { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
+        public string Operator { get; set; }
     }
 
     public class CustLoginLog 
