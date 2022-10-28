@@ -1,18 +1,9 @@
-﻿using Amazon.Runtime.Internal.Transform;
-using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa;
-using System.Linq;
 using BackendSite.Extensions;
-using BackendSite.Service.Model;
 using BackendSite.Service.Library;
-using BackendSite.Service.Model.ApiModel;
-using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.BLL.Mpa.Extension;
-using System.Security.Policy;
-using NPOI.SS.Formula.Functions;
-using NuGet.Configuration;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -77,7 +68,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             var responseResult = new Dictionary<string, MpaWinLossByDateResponse>();
             var keys = combineResult.Select(x => x.Date).Distinct();
-            var rateMap = await GetRateMapper2();
+            var rateMap = await GetCurrencyNameRateMapper();
 
             foreach (var key in keys)
             {
@@ -121,8 +112,8 @@ namespace BackendSite.Service.BLL.Mpa
                         ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                    ? GetOriginalCurrencyDetail(combineResult, key)
-                    : GetCurrencyDetail(dateSummary)
+                    ? GetOriginalCurrencyDetailByDate(combineResult, key)
+                    : GetCurrencyDetailByDate(dateSummary)
                 };
 
                 responseResult.Add(key, result);
@@ -157,7 +148,7 @@ namespace BackendSite.Service.BLL.Mpa
             return responseResult;
         }
 
-        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetail(List<MpaWinLossByDateDto> dateSummary)
+        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
         {
             return dateSummary.ToDictionary(k => k.Currency, v => new MpaWinLossByDayCurrencyDetailDto
             {
@@ -176,7 +167,7 @@ namespace BackendSite.Service.BLL.Mpa
             });
         }
 
-        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetOriginalCurrencyDetail(IEnumerable<MpaWinLossByDateDto> combineResult, string key)
+        private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetOriginalCurrencyDetailByDate(IEnumerable<MpaWinLossByDateDto> combineResult, string key)
         {
             return combineResult.Where(x => x.Date == key)
                 .ToDictionary(k => k.Currency, v => new MpaWinLossByDayCurrencyDetailDto
@@ -208,7 +199,7 @@ namespace BackendSite.Service.BLL.Mpa
                 ? tpBetRecordResult.OrderBy(request)
                 : tpBetRecordResult;
 
-            var rateMap = await GetRateMapper2();
+            var rateMap = await GetCurrencyNameRateMapper();
             var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();
 
             foreach (var key in keys)
@@ -355,7 +346,7 @@ namespace BackendSite.Service.BLL.Mpa
                 AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
                 Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
                 UniquePlayers = r.DistinctBy(x => x.CustId).Count()
-            }).ToList();
+            });
 
             var tpBetRecordRelayResultWrapper = new TpBetRecordRelayResultWrapper()
             {
@@ -468,30 +459,30 @@ namespace BackendSite.Service.BLL.Mpa
             return transactionResult;
         }
 
-
-
-
         #endregion
 
-
-
         #region Common
+        
         /// <summary>
-        /// 取得幣別匯率
+        /// 取得幣別對應
         /// </summary>
         /// <returns></returns>
-        private async Task<Dictionary<int, decimal>> GetRateMapper()
-        {
-            var usdRateResult = await GetMpaUSdRate();
-            return usdRateResult
-                .ToDictionary(k => k.CurrencyId, v => v.USDRate);
-        }
-
-        private async Task<Dictionary<string, decimal>> GetRateMapper2()
+        private async Task<Dictionary<string, decimal>> GetCurrencyNameRateMapper()
         {
             var usdRateResult = await GetMpaUSdRate();
             return usdRateResult
                 .ToDictionary(k => k.IsoCode, v => v.USDRate);
+        }
+
+        /// <summary>
+        /// 取得幣別對應
+        /// </summary>
+        /// <returns></returns>
+        private async Task<Dictionary<int, decimal>> GetCurrencyIdRateMapper()
+        {
+            var usdRateResult = await GetMpaUSdRate();
+            return usdRateResult
+                .ToDictionary(k => k.CurrencyId, v => v.USDRate);
         }
 
         /// <summary>
@@ -518,6 +509,10 @@ namespace BackendSite.Service.BLL.Mpa
         }
 
 
+        /// <summary>
+        /// 取得每個TpGameType + Name
+        /// </summary>
+        /// <returns></returns>
         public async Task<Dictionary<int, string>> GetTpGameTypeMapper()
         {
             const string redisKey = "MpaTpGameTypeMapper";
@@ -529,6 +524,15 @@ namespace BackendSite.Service.BLL.Mpa
         }
 
 
+        public async Task<Dictionary<int, string>> GetTpCategoryMapper()
+        {
+            const string redisKey = "MpaTpCategoryMapper";
+            var data = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                TimeSpan.FromHours(12),
+                () => _mpaWinLossService.GetTpCategory());
+
+            return data.ToDictionary(x => x.CategoryId, v => v.CategoryName);
+        }
 
         /// <summary>
         /// 取得 TpBetRecordRelay by Date
@@ -544,7 +548,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             return _redisHelper.TryGetOrCreateAsync(redisKey,
                 TimeSpan.FromMinutes(15),
-                () => _mpaWinLossService.GetMapTpBetRecordByDate<MpaTpBetRecordByDateDto>(request.SiteId, request.StarTime, request.EndTime, format, request.DateType));
+                () => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordByDateDto>(request.SiteId, request.StarTime, request.EndTime, format, request.DateType));
         }
 
         /// <summary>
@@ -561,7 +565,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             return _redisHelper.TryGetOrCreateAsync(redisKey,
                 TimeSpan.FromMinutes(15),
-                () => _mpaWinLossService.GetMapTransactionByDate<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format));
+                () => _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format));
         }
 
         private int GetCustIdByUserName(int siteId, string userName)
@@ -578,6 +582,8 @@ namespace BackendSite.Service.BLL.Mpa
             var format = groupByType switch
             {
                 MpaWinLossGroupByTypeEnum.Date => "%Y-%m-%d",
+                MpaWinLossGroupByTypeEnum.GameType => "%Y-%m-%d",
+                MpaWinLossGroupByTypeEnum.TpCategory => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Month => "%Y-%m",
                 _ => string.Empty
             };

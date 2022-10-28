@@ -143,7 +143,12 @@ namespace BackendSite.Service.Model.Mpa
         public decimal Commission { get; set; }
     }
 
+    public class TpCategoryDto
+    {
+        public int CategoryId { get; set; }
 
+        public string CategoryName { get; set; }
+    }
 
 
     public class MpaWinLossByDayCurrencySummaryDto
@@ -341,7 +346,7 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordRelayResultWrapper
     {
-        public List<MpaWinLossByDateDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByDateDto> TpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }

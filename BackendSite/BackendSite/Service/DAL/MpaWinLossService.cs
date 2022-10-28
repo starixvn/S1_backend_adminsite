@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTpBetRecordByDate<TResult>(int siteId, DateTime starTime, DateTime endTime, string format,
+        public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTime starTime, DateTime endTime, string format,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTransactionByDate<TResult>(int siteId, DateTime starTime, DateTime endTime, string format)
+        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTime starTime, DateTime endTime, string format)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
@@ -66,6 +66,11 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int16);
             return _reportDbClient.Query<Commission9WDto>("Admin_9WCommission_Get", p);
+        }
+
+        public  Task<IEnumerable<TpCategoryDto>> GetTpCategory()
+        {
+            return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
     }
 }

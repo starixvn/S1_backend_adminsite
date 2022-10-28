@@ -63,7 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>();
             try
             {
-                var responseData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeResult(request, MpaWinLossGroupByTypeEnum.Date);
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeResult(request, MpaWinLossGroupByTypeEnum.GameType);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }

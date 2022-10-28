@@ -15,7 +15,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTpBetRecordByDate<TResult>(int siteId, DateTime starTime,
+        Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTime starTime,
             DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTransactionByDate<TResult>(int siteId, DateTime starTime,
+        Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTime starTime,
             DateTime endTime, string format);
 
         /// <summary>
@@ -52,8 +52,22 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption();
 
 
+        /// <summary>
+        /// 取得 9 W 傭金
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="format"></param>
+        /// <param name="mpaDateType"></param>
+        /// <returns></returns>
         IEnumerable<Commission9WDto> Get9WCommission(DateTime starTime,
             DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+
+        /// <summary>
+        /// 取得 TpCategoryId + TpCategoryName
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<TpCategoryDto>> GetTpCategory();
 
     }
 }
