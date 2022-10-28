@@ -271,6 +271,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         or (int)PromotionTypeEnum.SpecialBonus or (int)PromotionTypeEnum.RetentionFreeBet:
                     {
                         if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
                         {
                             return apiResult;
@@ -280,12 +281,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     }
                     case (int)PromotionTypeEnum.ReDeposit:
                         if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
                                     CheckRollover(tierAmount.RollOver, tierAmount.WinOver, apiResult))))
                         {
                             return apiResult;
                         }
-
+                        
+                        if (request.PromotionInfo.Specific.Any(specific => specific.TierAmountList.Count() > 10))
+                        {
+                            apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                            apiResult.Message = "Tier Amount can only be set up to 10.";
+                            return apiResult;
+                        }
                         break;
                 }
 

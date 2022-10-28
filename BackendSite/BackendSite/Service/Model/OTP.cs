@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public int OTPType { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
@@ -29,8 +30,48 @@ namespace BackendSite.Service.Model
         public int OTPStatus { get; set; }
         public string OTPResponse { get; set; }
         public int Verified { get; set; }
-        public DateTime? VerifiedTime { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime UpdateTime { get; set; }
+
+        public DateTimeOffset? VerifiedTime
+        {
+            get
+            {
+                return _verifiedTime != null ? new DateTimeOffset(_verifiedTime.Value, TimeSpan.Zero) :  null;
+            }
+            set
+            {
+                if (value.HasValue)
+                {
+                    _verifiedTime = value.Value.DateTime;
+                }                 
+            }
+        }
+        private DateTime? _verifiedTime { get; set; }
+
+        public DateTimeOffset CreateTime
+        {
+            get
+            {
+                return new DateTimeOffset(_createTime, TimeSpan.Zero);
+            }
+            set
+            {
+                _createTime = value.DateTime;
+            }
+        }
+        private DateTime _createTime { get; set; }
+
+        public DateTimeOffset UpdateTime
+        {
+            get
+            {
+                return new DateTimeOffset(_updateTime, TimeSpan.Zero);
+            }
+            set
+            {
+                _updateTime = value.DateTime;
+            }
+        }
+        private DateTime _updateTime { get; set; }
+
     }
 }
