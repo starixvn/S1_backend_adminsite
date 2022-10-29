@@ -46,6 +46,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(siteId,
                     request.CurrencyIds,
                     request.UserName,
+                    request.SabaId,
+                    request.DepositId,
                     adjustTypeList,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,

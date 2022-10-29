@@ -84,6 +84,8 @@ namespace BackendSite.Service.DAL
          bool getFromLogAdminAdjustWallet,
          string AdjustTypesForLAAW,
          string userName,
+         string sabaId,
+         string depositId,
          DateTime startDate,
          DateTime endDate,
          string transId,
@@ -104,6 +106,8 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+            props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
+            props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
 
             #region GetCurrencyTotalAmount
 
