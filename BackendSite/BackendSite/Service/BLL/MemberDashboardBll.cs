@@ -21,7 +21,6 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly string _bonusApiUrl;
     private readonly PermissionBLL _permissionBll;
     private readonly AdminBLL _adminBll;
-    private const string VipLogoPath = "/desktop/img/vip/";
 
     public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll)
     {
@@ -158,7 +157,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
         {
             CustId = customer.CustId,
             VipLevel = customer.VipLevel,
-            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}{VipLogoPath}vip{customer.VipLevel}.png",
+            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
             IsOnline = isOnline,
             UserName = customer.UserName,
             AccountName = customer.AccountName,
