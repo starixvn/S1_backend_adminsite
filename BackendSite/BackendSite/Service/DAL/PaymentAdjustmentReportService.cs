@@ -84,8 +84,10 @@ namespace BackendSite.Service.DAL
          bool getFromLogAdminAdjustWallet,
          string AdjustTypesForLAAW,
          string userName,
-         DateTime startDate,
-         DateTime endDate,
+         string sabaId,
+         string depositId,
+         DateTimeOffset startDate,
+         DateTimeOffset endDate,
          string transId,
          int startIndex,
          int pageSize)
@@ -101,9 +103,11 @@ namespace BackendSite.Service.DAL
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
             props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
+            props.Add("_StartDate", startDate.ToUniversalTime().DateTime);
+            props.Add("_EndDate", endDate.ToUniversalTime().DateTime);
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+            props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
+            props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
 
             #region GetCurrencyTotalAmount
 
@@ -170,8 +174,10 @@ namespace BackendSite.Service.DAL
             bool getFromLogAdminAdjustWallet,
             string AdjustTypesForLAAW,
             string userName,
-            DateTime startDate,
-            DateTime endDate,
+            string sabaId,
+            string depositId,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
             string transId)
         {
             var props = new DynamicParameters();
@@ -182,9 +188,11 @@ namespace BackendSite.Service.DAL
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
             props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
+            props.Add("_StartDate", startDate.ToUniversalTime().DateTime);
+            props.Add("_EndDate", endDate.ToUniversalTime().DateTime);
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
+            props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
+            props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
 
             var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V6", props);
             return result;

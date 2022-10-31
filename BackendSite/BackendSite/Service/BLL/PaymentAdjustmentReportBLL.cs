@@ -110,9 +110,11 @@ namespace BackendSite.Service.BLL
         public async Task<PaymentAdjustmentReportResponseWrapper> GetPaymentAdjustmentReportV2Async(int siteId,
         IEnumerable<int> currencyIds,
         string userName,
+        string sabaId,
+        string depositId,
         IEnumerable<int> adjustTypes,
-        DateTime startDate,
-        DateTime endDate,
+        DateTimeOffset startDate,
+        DateTimeOffset endDate,
         string transId,
         int pageNumber,
         int pageSize)
@@ -142,6 +144,8 @@ namespace BackendSite.Service.BLL
                     getFromLogAdminAdjustWallet,
                     JsonConvert.SerializeObject(adjustTypesForLaaw),
                     userName,
+                    sabaId,
+                    depositId,
                     startDate,
                     endDate,
                     transId,
@@ -149,17 +153,18 @@ namespace BackendSite.Service.BLL
                     Math.Abs(pageSize));
 
             var siteList = serverInfoBLL.GetSiteList().ToList();
+            var offset = startDate.Offset;
             queryResult.Data = new List<PaymentAdjustmentReportResponse>();
-       
+
             foreach (var row in queryResult.QueryResult)
             {
-                queryResult.Data.Add(ComposePaymentAdjustmentReportResponse(row, siteList));
+                queryResult.Data.Add(ComposePaymentAdjustmentReportResponse(row, siteList, offset));
             }
 
             return queryResult;
         }
 
-      
+
 
         public List<PaymentAdjustmentFrontEnd> GetPaymentAdjustmentExportReport(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
@@ -231,12 +236,14 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async  Task<List<PaymentAdjustmentReportResponse>> GetPaymentAdjustmentExportReportV2(int siteId,
+        public async Task<List<PaymentAdjustmentReportResponse>> GetPaymentAdjustmentExportReportV2(int siteId,
           IEnumerable<int> currencyIds,
           string userName,
+          string sabaId,
+          string depositId,
           IEnumerable<int> adjustTypes,
-          DateTime startDate,
-          DateTime endDate,
+          DateTimeOffset startDate,
+          DateTimeOffset endDate,
           string transId)
         {
             #region AdjustType
@@ -254,22 +261,26 @@ namespace BackendSite.Service.BLL
 
             // DB 取資料
             var queryResult = (await paymentAdjustmentService.GetPaymentAdjustmentExportReportV2(
-                    JsonConvert.SerializeObject(new List<int>{ siteId }),
+                    JsonConvert.SerializeObject(new List<int> { siteId }),
                     JsonConvert.SerializeObject(currencyIds),
                     getFromAdjustmentInfo,
                     JsonConvert.SerializeObject(AdjustTypesForAI),
                     getFromLogAdminAdjustWallet,
                     JsonConvert.SerializeObject(AdjustTypesForLAAW),
                     userName,
+                    sabaId,
+                    depositId,
                     startDate,
                     endDate,
                     transId)).ToList();
 
-        
+
             var result = new List<PaymentAdjustmentReportResponse>();
             if (!queryResult.Any()) return result;
 
             var siteList = serverInfoBLL.GetSiteList();
+            var offset = startDate.Offset;
+
             result.AddRange(queryResult.Select(row => new PaymentAdjustmentReportResponse
             {
                 TransId = row.TransId,
@@ -281,8 +292,10 @@ namespace BackendSite.Service.BLL
                 UserName = row.UserName,
                 SabaID = row.SabaID,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
-                StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                CreateTime = new DateTimeOffset(row.CreateTime, offset),
+                StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
+                    ? GetThirdAdjustmentStatusName(row.Status)
+                    : GetMailAdjustmentStatusName(row.Status),
                 Memo = row.Memo,
                 Operator = row.Operator,
                 WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
@@ -390,7 +403,7 @@ namespace BackendSite.Service.BLL
         }
 
 
-        private PaymentAdjustmentReportResponse ComposePaymentAdjustmentReportResponse(PaymentAdjustmentV2 row, IEnumerable<ServerInfo> siteList)
+        private PaymentAdjustmentReportResponse ComposePaymentAdjustmentReportResponse(PaymentAdjustmentV2 row, IEnumerable<ServerInfo> siteList, TimeSpan offset)
         {
             return new PaymentAdjustmentReportResponse
             {
@@ -405,14 +418,49 @@ namespace BackendSite.Service.BLL
                 SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                 UserName = row.UserName,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
-                StatusName = row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus ? selLangBLL.GetResourceValue($"lbl_AdjustmentStatus2") : selLangBLL.GetResourceValue($"lbl_AdjustmentStatus{row.Status}"),
+                CreateTime = new DateTimeOffset(row.CreateTime, offset),
+                StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
+                    ? GetThirdAdjustmentStatusName(row.Status)
+                    : GetMailAdjustmentStatusName(row.Status),
                 Memo = row.Memo,
                 SabaID = row.SabaID,
                 Operator = row.Operator,
                 WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
                 CategoryName = row.CategoryName,
                 DepositId = row.DepositId
+            };
+        }
+
+        /// <summary>
+        /// 第三方錢包調帳 log 狀態
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        private string GetThirdAdjustmentStatusName(int status)
+        {
+            return status switch
+            {
+                0 => "Success",
+                1 => "Fail",
+                2 => "Pending ",
+                _ => "NotFound Status"
+            };
+        }
+
+
+        /// <summary>
+        /// 主錢包調帳 log 狀態
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        private string GetMailAdjustmentStatusName(int status)
+        {
+            return status switch
+            {
+                1 => "Pending",
+                2 => "Success ",
+                3 => "Pending",
+                _ => "NotFound Status"
             };
         }
 
