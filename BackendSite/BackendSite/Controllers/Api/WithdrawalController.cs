@@ -423,7 +423,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = bankDetailBLL.GetBankInfoPay();
+            var bankInfoPay = bankDetailBLL.GetBankInfoPay(withdrawalReq.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
                             select new Pay
@@ -1028,6 +1028,47 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualApproval(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualApproval(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualApproval Fail. {ex.Message}"
+                };
+            }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualReject(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualReject(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualReject Fail. {ex.Message}"
+                };
+            }
+        }
         #region Private Methods
 
         /// <summary>

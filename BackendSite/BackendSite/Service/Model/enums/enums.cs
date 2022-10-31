@@ -373,11 +373,32 @@ namespace BackendSite.Service.Model.enums
 
     #region AdjustWithdrawalLimitInfo
 
-    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    public enum WithdrawalLimitAdjustmentAdjustTypeEnum
     {
         Debit = 1,
-        Credit = 2,
-        //Bonus = 3  NoUse
+        Credit = 2
+    }
+    
+    public enum WithdrawalLimitAdjustmentReasonEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     public enum AdjustWithdrawalLimitInfoStatusEnum
@@ -624,6 +645,12 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
         EditEWalletWithdrawalLimitInfo = 37,
         SetEWalletWithdrawalLimitInfoStatus = 38,
         SetBlockEWallet = 55,
@@ -638,7 +665,8 @@ namespace BackendSite.Service.Model.enums
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
-        WithdrawalSubmission = 57
+        WithdrawalSubmission = 57,
+        WithdrawalLimitAdjustment = 73
     }
 
     #region BankFinancialTransferInfoLog
@@ -844,6 +872,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0, 
+        Fail = 1, 
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -868,7 +906,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -1227,6 +1265,13 @@ namespace BackendSite.Service.Model.enums
         INR = 61,
         BDT = 74
     }
+
+    public enum ManualRewardPointCategoryEnum
+    {
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
+    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
@@ -1266,5 +1311,36 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum 
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
 }

@@ -181,45 +181,6 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
-
-        [HttpPost]
-        public ApiResult AddBank(BankDetail bankDetail)
-        {
-            var result = bankDetailBLL.AddBankInfo(bankDetail);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-
-
-
-        [HttpPost]
-        public ApiResult EditBank([FromBody] BankDetail bankDetail)
-        {
-            var result = bankDetailBLL.EditBankInfo(bankDetail);
-            var apiResult = new ApiResult();
-            if (result)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = 9;
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankList([FromBody] BankListPara bankDetail)
         {

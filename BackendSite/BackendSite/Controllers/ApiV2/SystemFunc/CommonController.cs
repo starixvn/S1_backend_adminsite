@@ -17,6 +17,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdminBLL _adminBll;
         private readonly ServerInfoBLL _serverInfoBLL;
+        private readonly RebateManageBLL _rebateManageBLL;
+        private readonly List<int> _RewardCurrencyList = new List<int> { 2, 4, 15 };  //商城目前只開放給MYR、THB、IDR使用
         #endregion
 
         #region Constructors
@@ -25,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adminBll = provider.GetService<AdminBLL>();
             _serverInfoBLL = provider.GetService<ServerInfoBLL>();
+            _rebateManageBLL = provider.GetService<RebateManageBLL>();
         }
         #endregion
 
@@ -41,9 +44,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiResult<IEnumerable<int>> AdminUserCurrencyList()
+        public ApiResult<object> AdminUserCurrencyList()
         {
-            var apiResult = new ApiResult<IEnumerable<int>>();
+            var apiResult = new ApiResult<object>();
+            var normalCurrencyList = Enumerable.Empty<int>();
+            var vipCurrencyList = Enumerable.Empty<int>();
             try
             {
                 if (User.Identity.IsAuthenticated)
@@ -55,27 +60,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     {
                         var siteList = _serverInfoBLL.GetSiteList().ToList();
                         var brandData = siteList.Find(x => x.SiteId == brand);
+                        normalCurrencyList = brandData.ICurrencyList;
                         if (brandData != null)
-                        {
-                            apiResult.Data = brandData.ICurrencyList;
-                            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                        }
+                            normalCurrencyList = brandData.ICurrencyList;
                     }
                     else
                     {
                         var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authInfo.UserId);
                         var brandData = siteList.Find(x => x.SiteId == brand);
-                        if(brandData != null)
-                        {
-                            apiResult.Data = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
-                            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                        }
-                    }        
+                        if (brandData != null)
+                            normalCurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
+                    }
+                    vipCurrencyList = _rebateManageBLL.GetRebatePeriodList(brand).Select(x => x.CurrencyId).Distinct();
                 }
                 else
                 {
                     throw new AdminException(ErrorCodeEnum.Fail);
                 }
+                apiResult.Data = new
+                {
+                    SiteCurrencyList = normalCurrencyList,
+                    RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList),
+                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList)
+                };
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
