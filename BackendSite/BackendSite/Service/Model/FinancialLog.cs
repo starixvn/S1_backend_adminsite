@@ -101,7 +101,7 @@ namespace BackendSite.Service.Model
 
                 if (Type.IsBetween(1001, 2000))
                 {
-                    return FinancialType.Withdrawl;
+                    return FinancialType.Withdrawal;
                 }
 
                 if (Type.IsBetween(2001, 3000))
