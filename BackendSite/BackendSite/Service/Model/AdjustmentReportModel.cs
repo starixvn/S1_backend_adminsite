@@ -13,22 +13,18 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
         public string TransId { get; set; }
 
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        /// <summary>
+        /// DepositInfo 的 TransId
+        /// </summary>
+        public string DepositId { get; set; }
 
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+     
+        public DateTimeOffset EndDate { get; set; }
     }
 
 
@@ -37,22 +33,18 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> CurrencyIds { get; set; }
         public string UserName { get; set; }
+        public string SabaId { get; set; }
         public IEnumerable<AdjustTypeEnum> AdjustTypes { get; set; }
         public string TransId { get; set; }
 
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        /// <summary>
+        /// DepositInfo 的 TransId
+        /// </summary>
+        public string DepositId { get; set; }
 
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+        
     }
 
     #region Response
@@ -96,6 +88,8 @@ namespace BackendSite.Service.Model
 
         public string DepositId { get; set; }
     }
+
+
 
     #endregion
 }

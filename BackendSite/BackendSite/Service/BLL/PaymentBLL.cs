@@ -20,6 +20,7 @@ namespace BackendSite.Service.BLL
         private readonly BonusInfoBLL _bonusInfoBLL;
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
+        private readonly Common _common;
 
         public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
         {
@@ -32,6 +33,7 @@ namespace BackendSite.Service.BLL
             _bonusInfoBLL = provider.GetRequiredService<BonusInfoBLL>();
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -86,6 +88,8 @@ namespace BackendSite.Service.BLL
 
             var list = data.OrderByDescending(i => i.CreateTime).ToList();
 
+            SetTpTransferMemo(list);
+
             // Add Cache by List      
             _ = Task.Run(() =>
             {
@@ -100,6 +104,20 @@ namespace BackendSite.Service.BLL
 
             var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
             return list.GetRange(index, count);
+        }
+
+        private void SetTpTransferMemo(IEnumerable<FinancialLog> list)
+        {
+            foreach (var financialLog in list)
+            {
+                if (financialLog.FinancialType == FinancialType.TpTransfer)
+                {
+                    var tpId = financialLog.Type - 2000;
+                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
+                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
+                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
+                }
+            }
         }
 
         public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,

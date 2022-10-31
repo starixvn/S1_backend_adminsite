@@ -329,47 +329,6 @@ namespace BackendSite.Service.Model
         public bool IsSpecial { get; set; }
     }
 
-    public class Filter
-    {
-        public string label { get; set; }
-        public int value { get; set; }
-    }
-
-    public class FilterPara
-    {
-        public Filter[] SiteidFilter { get; set; }
-        public Filter[] PromotionTypeFilter { get; set; }
-        public int Status { get; set; }
-        public int[] SiteArray { get; set; }
-        public long StartDate { get; set; }
-        public long EndDate { get; set; }
-        public int Device { get; set; }
-    }
-
-    public class BonusImportPara
-    {
-        public int SiteId { get; set; }
-        public string UserName { get; set; }
-        public decimal BonusAmount { get; set; }
-        public int RollOver { get; set; }
-        public int ExpiryDay { get; set; }
-        public string Memo { get; set; }
-        public int TpId { get; set; }
-        public int CategoryId { get; set; }
-    }
-
-    public class BonusImportResult
-    {
-        public int SiteId { get; set; }
-        public string UserName { get; set; }
-        public decimal BonusAmount { get; set; }
-        public int RollOver { get; set; }
-        public int ExpiryDay { get; set; }
-        public string Memo { get; set; }
-        public int Status { get; set; }
-        public string ErrorMessage { get; set; }
-    }
-
     public class ScratchCard
     {
         public string SpecialCode { get; set; }
@@ -410,11 +369,7 @@ namespace BackendSite.Service.Model
         public string LastUpdateUser { get; set; }
 
     }
-    public class TpGames
-    {
-        public string GameName { get; set; }
-        public int CategoryId { get; set; }
-    }
+
     public class PromotionCashBackSetting
     {
         public int CurrencyId { get; set; }

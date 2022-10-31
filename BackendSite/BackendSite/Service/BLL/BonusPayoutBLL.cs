@@ -32,7 +32,7 @@ namespace BackendSite.Service.BLL
             
             //check deposit
             var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request, tierRedepositBonus.PromotionType);
-            if (!checkResult.IsSuccess)
+            if (checkResult == null || !checkResult.IsSuccess)
             {
                 return result;
             }

@@ -132,20 +132,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
         {
-            var sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
-            var BankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
-            if (BankInfoOffList == null)
-            {
-                BankInfoOffList = localBankService.GetBankAccountOff(siteId);
-                if (BankInfoOffList != null)
-                {
-                    cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-                }
-            }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoOffList;
+            var bankInfoOffList = localBankService.GetBankAccountOff(siteId);
+            return bankInfoOffList;
         }*/
+        
         public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount)
         {
             var result = localBankService.GetBankInfoPayList(siteId)
