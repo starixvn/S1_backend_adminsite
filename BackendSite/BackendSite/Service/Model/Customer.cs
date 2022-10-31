@@ -367,6 +367,7 @@ namespace BackendSite.Service.Model
         public string IFSCCode { set; get; }
         public DateTimeOffset CreateTime { set; get; }
         public int Status { get; set; }
+        public string Operator { get; set; }
     }
     
     public class CustCryptoWalletLog
@@ -722,6 +723,63 @@ namespace BackendSite.Service.Model
         public string AccountName { set; get; }
         public string EWalletName { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
+        public string Operator { get; set; }
+    }
+
+    public class CustLoginLog 
+    {
+        private DateTimeOffset _loginTime { get; set; }
+        public string LoginIp { set; get; }
+        public string UpdateOperator { set; get; }
+        public string Memo { set; get; }
+        public bool IsBlock { get; set; }
+        public string Location { set; get; }
+        public int Count { get; set; }
+        public DateTimeOffset LoginTime
+        {
+            get => _loginTime;
+            set => _loginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
+    public class DashboardWinLossGroup
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal RelayStake { set; get; }
+        public decimal TpBetRecordStake { set; get; }
+    }
+    public class DashboardWinLossGroupData
+    {
+        public decimal Winnings { set; get; }
+        public decimal Losses { set; get; }
+        public decimal ValidBet { set; get; }
+        public decimal OutstandingAmount { set; get; }
+        public decimal WinLoss { set; get; }
+    }
+
+    public class WinLoseSummary
+    {
+        public decimal WinlostAmount { set; get; }
+        public int CategoryId { set; get; }
+        public string Name { get; set; }
+    }
+    public class WinLoseSummaryDetail
+    {
+        public decimal WinlostAmount { set; get; }
+        public decimal Stake { set; get; }
+        public int GameType { set; get; }
+        public string GameName { get; set; }
+        public int SettlementType { set; get; }
+    }
+    public class WinLoseSummaryDetailResult
+    {
+        public decimal WinlostAmount { set; get; }
+        public decimal StakeSettled { set; get; }
+        public decimal StakeNotRollover { set; get; }
+        public int GameType { set; get; }
+        public string GameName { get; set; }
     }
 
     public class CustDashBoardTodayModel

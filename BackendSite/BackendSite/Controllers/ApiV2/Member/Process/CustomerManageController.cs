@@ -524,6 +524,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CurrencyId { get; set; }
         }
 
+        public class GetGameTypeListRequset
+        {
+            public IEnumerable<int> TPCategoryList { get; set; }
+        }
+
+        public class GetWinLoseSummaryDetailRequset : CustIdWithDateRangeRequest
+        {
+            public IEnumerable<int> GameTypes { get; set; }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -2481,7 +2490,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         [HttpPost]
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
@@ -3093,6 +3101,109 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     TotalTpWalletBalance = wallet.Sum(x => x.Balance),
                     TpWalletList = wallet
                 },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Bank list
+        public ApiListResult<BlockBankAcc> GetBankList(CustIdRequest request)
+        {
+            var BankList = _custInfoBll.GetBankList(request.CustId);
+            return new ApiListResult<BlockBankAcc>
+            {
+                Data = BankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet List
+        public ApiListResult<BlockEWalletAcc> GetEWalletList(CustIdRequest request)
+        {
+            var EWalletList = _custInfoBll.GetEWalletList(request.CustId);
+            return new ApiListResult<BlockEWalletAcc>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet Log
+        public ApiListResult<CustEWalletLog> GetEWalletLog(CustIdWithDateRangeAndPageRequest request)
+        {
+            var EWalletList = _custInfoBll.GetCustEWalletLogList(request.CustId,
+                request.PageSize,
+                request.PageNumber,
+                out var totalPages,
+                out var rowCount);
+            return new ApiListResult<CustEWalletLog>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount,
+                TotalPages = totalPages
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > IP Log
+        public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
+        {
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
+            return new ApiListResult<CustLoginLog>
+            {
+                Data = IPLog,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Turnover
+        public ApiListResult<GameType> GetGameTypeList(GetGameTypeListRequset request)
+        {
+            var GameTypeList = _custInfoBll.GetGameTypeList(request.TPCategoryList);
+            return new ApiListResult<GameType>
+            {
+                Data = GameTypeList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > DashboardWinLossGroup
+        public ApiResult<DashboardWinLossGroupData> GetDashboardWinLossGroup(CustIdRequest request)
+        {
+            var dashboardWinLossGroup = _custInfoBll.GetDashboardWinLossGroup(request.CustId);
+            return new ApiResult<DashboardWinLossGroupData>
+            {
+                Data = dashboardWinLossGroup,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary
+        public ApiListResult<WinLoseSummary> GetWinLoseSummary(CustIdRequest request)
+        {
+            var winLoseSummary = _custInfoBll.GetWinLoseSummary(request.CustId);
+            return new ApiListResult<WinLoseSummary>
+            {
+                Data = winLoseSummary,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary > Detail
+        public ApiListResult<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(GetWinLoseSummaryDetailRequset request)
+        {
+            var winLoseSummaryDetail = _custInfoBll.GetWinLoseSummaryDetail(request.CustId, JsonConvert.SerializeObject(request.GameTypes));
+            return new ApiListResult<WinLoseSummaryDetailResult>
+            {
+                Data = winLoseSummaryDetail,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
