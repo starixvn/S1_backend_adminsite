@@ -32,8 +32,7 @@ POST {{url}}/apiV2/WithdrawalLimitAdjustment/GetReasonList HTTP/1.1
 Content-Type: application/json
 
 ###
-# 取得客戶資料及錢包資訊
-# userName / sabaId 任選一
+# 設定提款限額
 POST {{url}}/apiV2/WithdrawalLimitAdjustment/Submit HTTP/1.1
 Content-Type: application/json
 
