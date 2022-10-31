@@ -19,9 +19,11 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly Tools _tools;
     private readonly CourierAdapter _courierAdapter;
     private readonly string _bonusApiUrl;
-    private const string VIPLOGOPATH = "/desktop/img/vip/";
+    private readonly PermissionBLL _permissionBll;
+    private readonly AdminBLL _adminBll;
+    private const string VipLogoPath = "/desktop/img/vip/";
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
@@ -30,6 +32,8 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _tools = tools;
         _courierAdapter = courierAdapter;
         _siteConfig = siteConfig;
+        _permissionBll = permissionBll;
+        _adminBll = adminBll;
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
@@ -137,16 +141,24 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return 0;
     }
 
-    public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId)
+    public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(AuthData authData, int custId)
     {
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
         var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
         var custLineProfile = await _customerService.GetCustLineProfileAsync(custId, null);
+        
+        var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+        var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+        if (custLineProfile != null && !hasPermission)
+        {
+            custLineProfile.userId = _tools.MaskLineId(custLineProfile.userId);
+        }
+
         var customerBasicInfo = new CustomerBasicInfo()
         {
             CustId = customer.CustId,
             VipLevel = customer.VipLevel,
-            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}{VIPLOGOPATH}vip{customer.VipLevel}.png",
+            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}{VipLogoPath}vip{customer.VipLevel}.png",
             IsOnline = isOnline,
             UserName = customer.UserName,
             AccountName = customer.AccountName,
@@ -169,8 +181,8 @@ public class MemberDashboardBll : IMemberDashboardBLL
             BirthDay = customer.BirthDay,
             BirthMonth = customer.BirthMonth,
             BirthYear = customer.BirthYear,
-            Email = customer.Email,
-            MobileNumber = $"({customer.AreaCode}) {customer.PhoneNo}",
+            Email = hasPermission ? customer.Email : _tools.MaskEmail(customer.Email),
+            MobileNumber = hasPermission ? $"({customer.AreaCode}) {customer.PhoneNo}" : $"({customer.AreaCode}) {_tools.MaskPhone(customer.PhoneNo)}",
             Address = CreateAddress(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity, customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
             IsRisk = customer.IsRisk,
             IsKyc = customer.IsKyc,

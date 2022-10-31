@@ -6,7 +6,7 @@ public interface IMemberDashboardBLL
 {
     Task<GetMemberListResponse> GetList(GetTempMemberListRequest request);
     Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request);
-    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId);
+    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(AuthData authData, int custId);
     Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
     Task<int> AddCustTagAsync(int custId, int tagId);

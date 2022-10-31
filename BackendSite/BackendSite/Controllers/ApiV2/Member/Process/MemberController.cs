@@ -17,17 +17,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly IMemberDashboardBLL _memberDashboardBll;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly IVipLevelBLL _vipLevelBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll, NewAuthorizeBLL newAuthorizeBll)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
             _excelBll = excelBll;
+            _newAuthorizeBll = newAuthorizeBll;
             _vipLevelBll = vipLevelBll;
         }
 
@@ -83,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > [Submit]
         /// 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
@@ -110,9 +112,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD >  Customer Administration > [Submit]
         /// 
         /// </remarks>
-        /// <param name="req"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
         [HttpPost]
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
@@ -134,7 +136,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
-            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(request.CustId);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(authData, request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -154,6 +157,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
         {
@@ -179,6 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 5 })]
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
         {
@@ -207,6 +212,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 4 })]
         [HttpPost]
         public async Task<ApiResult> DeleteCustPhotoId(DeleteCustPhotoIdRequest request)
         {
@@ -236,6 +242,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<MemberVipLevelInfo>> GetVipLevelInfo(GetVipLevelInfoRequest request)
         {
@@ -259,6 +266,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<MemberVipLevelLog>>> GetVipLevelLog(GetVipLevelLogRequest request)
         {
@@ -282,6 +290,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 44 })]
         [HttpPost]
         public async Task<ApiResult> SetVipLevel(SetVipLevelRequest request)
         {
@@ -310,6 +319,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="custIdReq"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
         [HttpPost]
         public async Task<ApiResult> SetVipLevelManually(SetVipLevelManuallyRequest custIdReq)
         {
@@ -336,6 +346,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 5 })]
         [HttpPost]
         public async Task<ApiResult> AddTag(AddTagRequest request)
         {
@@ -360,7 +371,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 4 })]
         [HttpPost]
         public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
         {
@@ -386,8 +397,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 47 })]
+        [HttpPost]
         public async Task<ApiResult> LineUnbind(LineUnbindRequest request)
         {
             var result = await _memberDashboardBll.LineUnbind(request.CustId);
@@ -717,8 +728,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 30 })]
+        [HttpPost]
         public async Task<ApiResult> KickOut(KickOutMemberRequest request)
         {
             if (await _memberDashboardBll.DeleteOnUserAsync(request.CustId) > 0)
@@ -796,7 +807,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 22 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 62 })]
         [HttpPost]
         public async Task<ApiResult> ResetBankInfoAsync(ResetBankInfoRequest request)
         {
@@ -940,8 +951,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
