@@ -18,7 +18,7 @@
         AffTransferToPlayer = 15,   //15
         RunningBonus = 16,          //16
         VerificationReward = 20,    //20
-        Withdrawl = 1001,           //1001 ~ 2000
+        Withdrawal = 1001,           //1001 ~ 2000
         TpTransfer = 2001,          //2001 + tpId
         TpWager = 11001,            //11000 + tpId
         TpRefunds = 12001,          //12000 + tpId
