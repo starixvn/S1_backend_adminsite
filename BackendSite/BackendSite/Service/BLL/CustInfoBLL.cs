@@ -287,8 +287,8 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
-            int pageSize,
             int pageNumber,
+            int pageSize,
             out int totalPages,
             out int rowCount)
         {
