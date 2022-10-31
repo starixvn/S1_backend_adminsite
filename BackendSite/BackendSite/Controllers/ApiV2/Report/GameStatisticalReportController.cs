@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -80,13 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 new GetListInputModel() { SiteId = request.SiteId, StartDate = request.StartDate.DateTime, EndDate = request.EndDate.DateTime });
 
             if (!data.Any())
-            {
-                return new ApiResult<IEnumerable<GameStatisticalByCurrencyDto>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.NoData
-                };
-            }
+                throw new AdminException(ErrorCodeEnum.NoData);
 
             return new ApiResult<IEnumerable<GameStatisticalByCurrencyDto>>
             {
