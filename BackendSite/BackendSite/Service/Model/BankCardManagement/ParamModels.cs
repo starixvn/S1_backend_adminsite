@@ -19,7 +19,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             AccountNo = req.AccountNo;
             Agent = req.Agent;
             SupportChannels = req.SupportChannels.Select(x => (int) x);
-            var (startIndex, absPageSize) = req.PageSize.GetStartIndex(req.PageNumber);
+            var (startIndex, absPageSize) = req.PageNumber.GetStartIndex(req.PageSize);
             PageSize = absPageSize;
             StartIndex = startIndex;
         }
