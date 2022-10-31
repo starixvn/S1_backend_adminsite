@@ -86,8 +86,8 @@ namespace BackendSite.Service.DAL
          string userName,
          string sabaId,
          string depositId,
-         DateTime startDate,
-         DateTime endDate,
+         DateTimeOffset startDate,
+         DateTimeOffset endDate,
          string transId,
          int startIndex,
          int pageSize)
@@ -103,8 +103,8 @@ namespace BackendSite.Service.DAL
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
             props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
+            props.Add("_StartDate", startDate.ToUniversalTime().DateTime);
+            props.Add("_EndDate", endDate.ToUniversalTime().DateTime);
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
             props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
@@ -176,8 +176,8 @@ namespace BackendSite.Service.DAL
             string userName,
             string sabaId,
             string depositId,
-            DateTime startDate,
-            DateTime endDate,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
             string transId)
         {
             var props = new DynamicParameters();
@@ -188,8 +188,8 @@ namespace BackendSite.Service.DAL
             props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
             props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
             props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
+            props.Add("_StartDate", startDate.ToUniversalTime().DateTime);
+            props.Add("_EndDate", endDate.ToUniversalTime().DateTime);
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
             props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);

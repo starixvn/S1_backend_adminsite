@@ -113,8 +113,8 @@ namespace BackendSite.Service.BLL
         string sabaId,
         string depositId,
         IEnumerable<int> adjustTypes,
-        DateTime startDate,
-        DateTime endDate,
+        DateTimeOffset startDate,
+        DateTimeOffset endDate,
         string transId,
         int pageNumber,
         int pageSize)
@@ -153,11 +153,12 @@ namespace BackendSite.Service.BLL
                     Math.Abs(pageSize));
 
             var siteList = serverInfoBLL.GetSiteList().ToList();
+            var offset = startDate.Offset;
             queryResult.Data = new List<PaymentAdjustmentReportResponse>();
 
             foreach (var row in queryResult.QueryResult)
             {
-                queryResult.Data.Add(ComposePaymentAdjustmentReportResponse(row, siteList));
+                queryResult.Data.Add(ComposePaymentAdjustmentReportResponse(row, siteList, offset));
             }
 
             return queryResult;
@@ -241,8 +242,8 @@ namespace BackendSite.Service.BLL
           string sabaId,
           string depositId,
           IEnumerable<int> adjustTypes,
-          DateTime startDate,
-          DateTime endDate,
+          DateTimeOffset startDate,
+          DateTimeOffset endDate,
           string transId)
         {
             #region AdjustType
@@ -278,6 +279,8 @@ namespace BackendSite.Service.BLL
             if (!queryResult.Any()) return result;
 
             var siteList = serverInfoBLL.GetSiteList();
+            var offset = startDate.Offset;
+
             result.AddRange(queryResult.Select(row => new PaymentAdjustmentReportResponse
             {
                 TransId = row.TransId,
@@ -289,7 +292,7 @@ namespace BackendSite.Service.BLL
                 UserName = row.UserName,
                 SabaID = row.SabaID,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
+                CreateTime = new DateTimeOffset(row.CreateTime, offset),
                 StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
                     ? GetThirdAdjustmentStatusName(row.Status)
                     : GetMailAdjustmentStatusName(row.Status),
@@ -400,7 +403,7 @@ namespace BackendSite.Service.BLL
         }
 
 
-        private PaymentAdjustmentReportResponse ComposePaymentAdjustmentReportResponse(PaymentAdjustmentV2 row, IEnumerable<ServerInfo> siteList)
+        private PaymentAdjustmentReportResponse ComposePaymentAdjustmentReportResponse(PaymentAdjustmentV2 row, IEnumerable<ServerInfo> siteList, TimeSpan offset)
         {
             return new PaymentAdjustmentReportResponse
             {
@@ -415,7 +418,7 @@ namespace BackendSite.Service.BLL
                 SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                 UserName = row.UserName,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, TimeSpan.Zero),
+                CreateTime = new DateTimeOffset(row.CreateTime, offset),
                 StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
                     ? GetThirdAdjustmentStatusName(row.Status)
                     : GetMailAdjustmentStatusName(row.Status),

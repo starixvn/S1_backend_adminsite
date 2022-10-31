@@ -49,8 +49,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     request.SabaId,
                     request.DepositId,
                     adjustTypeList,
-                    request.StartDate.DateTime,
-                    request.EndDate.DateTime,
+                    request.StartDate,
+                    request.EndDate,
                     request.TransId,
                     request.PageNumber,
                     request.PageSize);
@@ -90,11 +90,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 request.SabaId,
                 request.DepositId,
                 adjustTypeList,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
+                request.StartDate,
+                request.EndDate,
                 request.TransId);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 
