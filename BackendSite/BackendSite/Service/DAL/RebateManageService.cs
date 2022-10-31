@@ -61,10 +61,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<TPCategory>("Admin_TPCategory_Get");
         }
-        public IEnumerable<TpGameType> GetTpGameTypeListByCategory(int categoryId)
-        {
-            return _reportDbClient.Query<TpGameType>("Admin_TpGameTypebyCategory_Get", new DynamicParameters(new { CategoryId = categoryId }));
-        }
+
         public IEnumerable<RebatePeriod> GetRebatePeriod(int siteId)
         {
             var p = new DynamicParameters(new { _SiteId = siteId });
@@ -173,34 +170,6 @@ namespace BackendSite.Service.DAL
                 return false;
             }
         }
-        public bool SetRebatePayoutLimitBatch(int siteId, int currencyId, string levelPayout, string lastUpdateUser)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var parameters = new { SiteId = siteId, CurrencyId = currencyId, LevelPayout = levelPayout, LastUpdateUser = lastUpdateUser };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "SetRebatePayoutLimitBatch",
-                ActionType = 1,
-                DetailInfo = JsonConvert.SerializeObject(parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebatePayoutLimitBatch_Set", new DynamicParameters(parameters)) > 0;
-        }
-        public bool DelRebatePayoutLimit(int siteId, int currencyId, int categoryId, string lastUpdateUser)
-        {
-            var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "DelRebatePayoutLimit",
-                ActionType = 2,
-                DetailInfo = JsonConvert.SerializeObject(parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebatePayoutLimit_Del", new DynamicParameters(parameters)) > 0;
-        }
-
         public async Task<bool> SetRebateCategoryAsync(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
             var result = true;
@@ -239,36 +208,6 @@ namespace BackendSite.Service.DAL
             }
         }
 
-        public bool SetRebateCategoryBatch(int siteId, int CurrencyId, int categoryId, string levelPercentage, string lastUpdateUser)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var Parameters = new { siteId, CurrencyId, categoryId, levelPercentage, lastUpdateUser };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "SetRebateCategoryBatch",
-                ActionType = 1,
-                DetailInfo = JsonConvert.SerializeObject(Parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateCategoryBatch_Set", Parameters, commandType: CommandType.StoredProcedure) > 0;
-        }
-
-        public bool DelRebateCategory(int siteId, int currencyId, int categoryId, int level, string lastUpdateUser)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var Parameters = new { siteId, currencyId, categoryId, level };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "DelRebateCategory",
-                ActionType = 2,
-                DetailInfo = JsonConvert.SerializeObject(Parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateCategory_Del", Parameters, commandType: CommandType.StoredProcedure) > 0;
-        }
-
         public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser, MySqlConnection conn, MySqlTransaction trans)
         {
             var result = true;
@@ -293,37 +232,5 @@ namespace BackendSite.Service.DAL
             else
                 return false;
         }
-
-        public bool SetRebateGameTypeBatch(int siteId, int currencyId, int gameType, string levelPercentage, string lastUpdateUser)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var Parameters = new { siteId, currencyId, gameType, levelPercentage, lastUpdateUser };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "SetRebateGameTypeBatch",
-                ActionType = 1,
-                DetailInfo = JsonConvert.SerializeObject(Parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateGameTypeBatch_Set", Parameters, commandType: CommandType.StoredProcedure) > 0;
-        }
-
-        public bool DelRebateGameType(int siteId, int currencyId, int gameType, int level, string lastUpdateUser)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var Parameters = new { siteId, currencyId, gameType, level };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "DelRebateGameType",
-                ActionType = 2,
-                DetailInfo = JsonConvert.SerializeObject(Parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return conn.Execute("Admin_RebateGameType_Del", Parameters, commandType: CommandType.StoredProcedure) > 0;
-        }
-
-
     }
 }
