@@ -1655,7 +1655,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
         public ApiResult GetBonusLogByCustId(GetBonusLogRequest request)
         {

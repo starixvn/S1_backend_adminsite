@@ -149,6 +149,7 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
         public int BonusId { get; set; }
+        public string BonusCode { get; set; }
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
         public DirectionEnum Direction { get; set; }
