@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System.Transactions;
 
@@ -14,65 +13,51 @@ namespace BackendSite.Service.BLL
     {
         private readonly CustInfoService _custInfoService;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly IMemoryCache _cache;
         private readonly TpBLL _tpBll;
         private readonly WalletService _walletService;
         private readonly Tools _tools;
         private readonly CodeGenerator _codeGenerator;
         private readonly PromotionService _promotionService;
         private readonly RollOverService _rolloverService;
-        private readonly CustTurnoverService _custTurnoverService;
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly ICacheHelper _redisHelper;
 
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _walletService = provider.GetRequiredService<WalletService>();
             _tools = provider.GetRequiredService<Tools>();
             _codeGenerator = provider.GetRequiredService<CodeGenerator>();
             _promotionService = provider.GetRequiredService<PromotionService>();
             _rolloverService = provider.GetRequiredService<RollOverService>();
-            _custTurnoverService = provider.GetRequiredService<CustTurnoverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
-            _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
         {
-            var key = $"CustInfo_{custId}";
-            var customer = _cache.Get<Customer>(key);
-            if (customer == null)
-            {
-                customer = _custInfoService.GetCustInfo(custId);
-                if (customer != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-                    _cache.Set(key, customer, cacheEntryOptions);
-                }
-            }
-
-            return customer;
+            return _redisHelper.TryGetOrCreate($"CustInfo:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetCustInfo(custId),
+                RedisDataBase.Shared);
         }
+
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
@@ -298,8 +283,8 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
-            int pageSize,
             int pageNumber,
+            int pageSize,
             out int totalPages,
             out int rowCount)
         {

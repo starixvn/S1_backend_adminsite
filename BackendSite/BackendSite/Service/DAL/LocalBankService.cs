@@ -18,20 +18,38 @@ namespace BackendSite.Service.DAL
              _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
             _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
+        
+        /// <summary>
+        /// API V2 使用，取代 GetAllBankAccountOff、GetBankAccountOff
+        /// </summary>
+        public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
+        {
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _CurrencyId = currencyId
+            });
+            
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
 
-        public IEnumerable<BankInfoOff> GetAllBankAccountOff()
+            return a;
+        }
+
+        /*public IEnumerable<BankInfoOff> GetAllBankAccountOff()
         {
             return _reportDbClient.Query<BankInfoOff>("Admin_BankAccountOff_Get");
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOff(int siteId)
         {
-            return _reportDbClient.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId });
-        }
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+        }*/
 
-        public IEnumerable<BankInfoPay> GetBankInfoPayList()
+        public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
-            return _reportDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get");
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V2", new { _SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
