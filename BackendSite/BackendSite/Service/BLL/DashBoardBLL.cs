@@ -530,8 +530,6 @@ namespace BackendSite.Service.BLL
                   dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             var sourceMemberData = GetGameOverallMember(siteIds, currencyIds,
                   dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
-            var sourceWinData = GetOverAllLargestSingleWin(siteIds, currencyIds,
-                  dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             //Step2:撈資料
             var currencyList = _reportBll.GetCurrency();
 
@@ -542,22 +540,19 @@ namespace BackendSite.Service.BLL
                 var todayData = CombineOverallSource(currencyInfo,
                     baseCurrencyId, currencyList,
                     sourceData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")),
-                    sourceWinData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.ToString("yyyy-MM-dd")));
                 result["Today"].Add(todayData);
 
                 var yesterdayData = CombineOverallSource(currencyInfo,
                     baseCurrencyId, currencyList,
                     sourceData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")),
-                    sourceWinData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId && x.Date == dateTimeNowInTimeZone.AddDays(-1).ToString("yyyy-MM-dd")));
                 result["Yesterday"].Add(yesterdayData);
 
                 var monthData = CombineOverallSource(currencyInfo,
                     baseCurrencyId, currencyList,
                     sourceData.Where(x => x.CurrencyId == currencyId),
-                    sourceMemberData.Where(x => x.CurrencyId == currencyId),
-                    sourceWinData.Where(x => x.CurrencyId == currencyId));
+                    sourceMemberData.Where(x => x.CurrencyId == currencyId));
                 result["MonthToDate"].Add(monthData);
             }
 
@@ -566,8 +561,6 @@ namespace BackendSite.Service.BLL
                   dateRangeLastMonth.StartDate, dateRangeLastMonth.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             var sourceLastMonthMemberData = GetGameOverallMember(siteIds, currencyIds,
                   dateRangeLastMonth.StartDate, dateRangeLastMonth.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
-            var sourceLastMonthWinData = GetOverAllLargestSingleWin(siteIds, currencyIds,
-                 dateRange.StartDate, dateRange.EndDate, tpIds, categoryIds, gameTypes, timeZoneStr);
             foreach (var currencyId in currencyIds)
             {
                 var currencyInfo = currencyList.FirstOrDefault(x => x.CurrencyId == currencyId);
@@ -575,8 +568,7 @@ namespace BackendSite.Service.BLL
                 var todayData = CombineOverallSource(currencyInfo,
                     baseCurrencyId, currencyList,
                     sourceLastMonthData.Where(x => x.CurrencyId == currencyId),
-                    sourceLastMonthMemberData.Where(x => x.CurrencyId == currencyId),
-                    sourceLastMonthWinData.Where(x => x.CurrencyId == currencyId));
+                    sourceLastMonthMemberData.Where(x => x.CurrencyId == currencyId));
                 result["SamePeriodLastMonth"].Add(todayData);
             }
 
@@ -882,8 +874,7 @@ namespace BackendSite.Service.BLL
             int baseCurrencyId,
             IEnumerable<CurrencyModel> currencyList,
             IEnumerable<DashBoardGameOverAllDao> source,
-            IEnumerable<DashBoardGameOverAllMemberDao> sourceMember,
-            IEnumerable<DashBoardGameOverAllLargestSingleWinDao> sourceWin)
+            IEnumerable<DashBoardGameOverAllMemberDao> sourceMember)
         {
             var result = new DashBoardGameOverAllDto()
             {
@@ -899,7 +890,7 @@ namespace BackendSite.Service.BLL
                     Payout = source.Sum(x => x.WinLossSummary) + source.Sum(x => x.ValidBetSummary),
                     GGR = source.Where(x => x.CategoryId == 8).Sum(x => x.RevenueSummary)
                         + source.Where(x => x.CategoryId != 8).Sum(x => x.WinLossSummary) * -1,
-                    LargestSingleWin = sourceWin.Count() > 0 ? sourceWin.Select(x => x.Win).Max() : 0
+                    LargestSingleWin = source.Count() == 0 ? 0 : source.Select(x => x.MaxWinlostAmount).Max()
                 },
                 BaseCurrencyDetail = new DashboardGameOverAllCurrencyDto()
             };
@@ -921,40 +912,6 @@ namespace BackendSite.Service.BLL
                 result.BaseCurrencyDetail.GGR = ChangeRate(result.OriginalCurrencyDetail.GGR, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
                 result.BaseCurrencyDetail.LargestSingleWin = ChangeRate(result.OriginalCurrencyDetail.GGR, currencyInfo.ActualRate, currencyBaseInfo.ActualRate);
             }
-
-            return result;
-        }
-
-        private List<DashBoardGameOverAllLargestSingleWinDao> GetOverAllLargestSingleWin(IEnumerable<int> siteIds,
-                           IEnumerable<int> currencyIds,
-                           DateTimeOffset startTime,
-                           DateTimeOffset endTime,
-                           IEnumerable<int> tpIds,
-                           IEnumerable<int> categoryIds,
-                           IEnumerable<int> gameTypes,
-                           string timeZone)
-        {
-            var result = new List<DashBoardGameOverAllLargestSingleWinDao>();
-            //This Month
-            if (startTime.Day > 10 && startTime.Month == DateTime.UtcNow.Month)
-                result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-                    tpIds, categoryIds, gameTypes, timeZone, startTime.ToString("yyyyMM")));
-            if (startTime.Day > 25 && startTime.Month == DateTime.UtcNow.Month)
-                result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(-1).ToString("yyyyMM")));
-            result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-        tpIds, categoryIds, gameTypes, timeZone, "0"));
-
-            //Last Month Same Period
-            if (startTime.Day > 10 && startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
-                result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-                    tpIds, categoryIds, gameTypes, timeZone, startTime.ToString("yyyyMM")));
-            if (startTime.Day > 25 && startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
-                result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(-1).ToString("yyyyMM")));
-            if (startTime.Month == DateTime.UtcNow.AddMonths(-1).Month)
-                result.AddRange(GetGameOverallLargestSingleWin(siteIds, currencyIds, startTime, endTime,
-                    tpIds, categoryIds, gameTypes, timeZone, startTime.AddMonths(1).ToString("yyyyMM")));
 
             return result;
         }
@@ -1025,25 +982,6 @@ namespace BackendSite.Service.BLL
         JsonConvert.SerializeObject(categoryIds),
         JsonConvert.SerializeObject(gameTypes),
         timeZone);
-
-        private IEnumerable<DashBoardGameOverAllLargestSingleWinDao> GetGameOverallLargestSingleWin(IEnumerable<int> siteIds,
-                           IEnumerable<int> currencyIds,
-                           DateTimeOffset startTime,
-                           DateTimeOffset endTime,
-                           IEnumerable<int> tpIds,
-                           IEnumerable<int> categoryIds,
-                           IEnumerable<int> gameTypes,
-                           string timeZone,
-                           string yyyymm)
-                => _dashBoardService.GetDashBoardGameOverallLargestSingleWinData(JsonConvert.SerializeObject(siteIds),
-                    JsonConvert.SerializeObject(currencyIds),
-                    startTime.DateTime,
-                    endTime.DateTime,
-                    JsonConvert.SerializeObject(tpIds),
-                    JsonConvert.SerializeObject(categoryIds),
-                    JsonConvert.SerializeObject(gameTypes),
-                    timeZone,
-                    yyyymm);
 
         private IEnumerable<DashBoardGameTopDao> GetGameTopTwentyData(
                    DashboardGameTopDataTypeEnum type,

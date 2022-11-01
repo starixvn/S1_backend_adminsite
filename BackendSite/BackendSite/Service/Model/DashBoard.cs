@@ -181,6 +181,7 @@ namespace BackendSite.Service.Model
         public decimal WinLossSummary { get; set; }
         public decimal RevenueSummary { get; set; }
         public int CountSummary { get; set; }
+        public decimal MaxWinlostAmount { get; set; }
 
     }
 
@@ -189,14 +190,6 @@ namespace BackendSite.Service.Model
         public string Date { get; set; }
         public int CurrencyId { get; set; }
         public int CustId { get; set; }
-    }
-
-    public class DashBoardGameOverAllLargestSingleWinDao
-    {
-        public string Date { get; set; }
-        public int CurrencyId { get; set; }
-        public decimal Win { get; set; }
-
     }
 
     //====Top 20 For Winners / Losers / Bettors====
