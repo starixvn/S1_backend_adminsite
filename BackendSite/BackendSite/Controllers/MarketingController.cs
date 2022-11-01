@@ -52,12 +52,6 @@ namespace BackendSite.Controllers
             return View();
         }
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
-        public IActionResult BonusImport()
-        {
-            return View();
-        }
-
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralManagement" })]
         public IActionResult ReferralManagement()
         {

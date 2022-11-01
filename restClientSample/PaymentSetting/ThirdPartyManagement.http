@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+# @url=http://localhost:9158
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+@url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -52,7 +52,7 @@ Content-Type: application/json
     "method": 1,
     "payId": null,
     "type": null,
-    "payStatus": null,
+    "globalStatus": null,
     "status": null,
     "pageNumber": 1,
     "pageSize": 10
@@ -67,7 +67,6 @@ Content-Type: application/json
 {
     "siteId": 1,
     "currencyId": 4,
-    "payId": 1,
     "channelId": 1,
     "minAmount": 50,
     "maxAmount": 10000,
@@ -85,7 +84,6 @@ Content-Type: application/json
 {
     "siteId": 1,
     "currencyId": 4,
-    "payId": 1,
     "channelId": 1,
     "status": 2
 }

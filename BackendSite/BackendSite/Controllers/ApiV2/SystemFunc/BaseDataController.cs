@@ -29,7 +29,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly MarketingBLL _marketingBll;
-        private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
+		private readonly WinLostReportBLL _winLostReportBll;
+        private readonly ReportBLL _reportBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -47,7 +49,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _marketingBll = provider.GetRequiredService<MarketingBLL>();
+			_winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+            _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -77,9 +82,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int CurrencyId { get; set; }
             /// <summary>
-            /// 支付ID
+            /// 銀行ID
             /// </summary>
-            public int PayId { get; set; }
+            public int SysId { get; set; }
+            /// <summary>
+            /// 金額，取提款金流商列表以外非必填
+            /// </summary>
+            public decimal? Amount { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -92,24 +101,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 渠道名稱
             /// </summary>
             public string ChannelName { get; set; }
-        }
-
-        public class Pay
-        {
             /// <summary>
-            /// 付款渠道ID
+            /// 金額，取提款金流商列表以外非必填
             /// </summary>
-            public int PayId { get; set; }
-
-            /// <summary>
-            /// 付款名稱
-            /// </summary>
-            public string PayName { get; set; }
-
-            /// <summary>
-            /// 渠道ID
-            /// </summary>
-            public int ChannelId { get; set; }
+            public decimal? Amount { get; set; }
         }
 
         public class GetTpGameTypeListByCategoryReq
@@ -119,6 +114,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         
         public class GetTpListByCategoryReq
         {
+            public int CategoryId { get; set; }
+        }
+		
+		public class GetTpGameTypeByCategoryAndTpIdReq
+        {
+            public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
 
@@ -138,6 +139,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class SiteIdRequest
         {
             public int SiteId { get; set; }
+        }
+
+        public class TpCategoryByTpIdRequest
+        {
+            public int TpId { get; set; }
         }
 
         public class GetTpGameListReq
@@ -290,18 +296,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay();
-            var _payInfo = (from x in bankInfoPay
-                            where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName
-                            }).Distinct(bankInfoPayComparer);
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
+            var authData = _authorizeBll.GetAuthData();
+            var result = _bankDetailBll
+                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount);
+            
+            return new ApiResult<IEnumerable<Pay>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -353,20 +356,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var cryptoPay = _bankDetailBll.GetCryptoPay();
-            var _payInfo = (from x in cryptoPay
-                            where x.CurrencyId == request.CurrencyId && x.ChannelName.Equals(request.ChannelName, StringComparison.OrdinalIgnoreCase)
-                            select new Pay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName,
-                                ChannelId = x.ChannelId
-                            }).Distinct(bankInfoPayComparer);
+            var authData = _authorizeBll.GetAuthData();
+            var result =
+                _bankDetailBll.GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount);
 
-            apiResult.Data = _payInfo;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiResult;
+            return new ApiResult<IEnumerable<Pay>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -796,6 +794,31 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
         
         /// <summary>
+        /// 取得第三方遊戲分類清單ByTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
+        {
+            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x=>x.TpId == request.TpId);
+            var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
+            
+            var categoryList = await _reportBll.GetTpCategoryList();
+            
+            var query = categoryList.Join(categories, a => a.CategoryId, b => b,
+                (a, b) => new TpCategory {CategoryId = a.CategoryId, CategoryName = a.CategoryName});
+            
+            var apiResult = new ApiResult<IEnumerable<TpCategory>>
+            {
+                Data = query,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
         /// 取得第三方遊戲類型清單
         /// </summary>
         /// <param name="request"></param>
@@ -806,6 +829,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
                 Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲類型清單ByCategoryAndTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
+        {
+            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var result = data.Where(x => x.TpId == request.TpId);
+            
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -837,23 +880,5 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
-        #region Private Methods
-
-        private class BankInfoPayComparer : IEqualityComparer<Pay>
-        {
-            public bool Equals(Pay t1, Pay t2)
-            {
-                return (t1.PayId == t2.PayId);
-            }
-
-            public int GetHashCode(Pay t)
-            {
-                return t.ToString().GetHashCode();
-            }
-        }
-
-        #endregion
-
     }
 }

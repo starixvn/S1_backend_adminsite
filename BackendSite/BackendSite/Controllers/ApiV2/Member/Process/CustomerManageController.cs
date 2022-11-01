@@ -459,10 +459,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnableRebateEnum Status { get; set; }
         }
 
-        public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
+        public class GetFinancialLogRequest : ApiRequestPageModel
         {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
-            public int? FinancialType { get; set; }
+            public int FinancialType { get; set; }
+        }
+        public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
+        {
+            public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
+        }
+
+        public class GetVipRebateDetailRequest
+        {
+            public int CustId { get; set; }
+            public int TpCategoryId { get; set; }
+            public string RefId { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -1687,8 +1701,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
-            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
@@ -1702,6 +1716,46 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
+
+
+        /// <summary>
+        /// CustomerManage/GetFinancialLogByCustIdExport 匯出指定客戶金融紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Financial Log > [Search] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        {
+            request.PageNumber = -1; //export all
+            var offset = request.StartDate.Offset;      
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
+
+            var data = _paymentBll.GetFinancialLog(
+                request.CustId,
+                startDate,
+                endDate,
+                request.RefTransId,
+                request.FinancialType,
+                request.PageSize,
+                request.PageNumber,
+                out var _);
+
+            foreach (var item in data)
+            {
+                item.CreateTime = item.CreateTime.ToOffset(offset);
+            }
+
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "FinancialLog");
+        }
+
 
         #endregion
 
@@ -1717,9 +1771,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(CustIdWithDateRangeNullAndPageRequest request)
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(GetVipRebateLogRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -1728,6 +1782,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CustId,
                 startDate,
                 endDate,
+                request.PayoutStatuses,
                 request.PageSize,
                 request.PageNumber);
 
@@ -1738,6 +1793,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 PageNumber = searchResult.PageNumber,
                 RowCount = searchResult.RowCount,
                 CurrencyAmount = searchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustomerManage/GetVipRebateDetail 取得指定客戶VIP回扣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Vip Rebate Log > [Search] > [Detail]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        [HttpPost]
+        public ApiResult<IEnumerable<VipRebateDetail>> GetVipRebateDetail(GetVipRebateDetailRequest request)
+        {
+            return new ApiResult<IEnumerable<VipRebateDetail>>
+            {
+                Data = _paymentBll.GetVipRebateDetail(request.CustId, request.TpCategoryId, request.RefId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -2471,7 +2547,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 24 })]
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogByCustId(CustIdWithPageRequest request)
         {

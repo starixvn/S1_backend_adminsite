@@ -2,7 +2,6 @@
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using Newtonsoft.Json;
@@ -146,6 +145,10 @@ namespace BackendSite.Service.DAL
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
+                    _TransferPin = bankFinancialTransferAccount.TransferPin,
+                    _LoginPin = bankFinancialTransferAccount.LoginPin,
+                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
@@ -153,7 +156,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V4", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V5", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -179,6 +182,10 @@ namespace BackendSite.Service.DAL
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
+                    _TransferPin = bankFinancialTransferAccount.TransferPin,
+                    _LoginPin = bankFinancialTransferAccount.LoginPin,
+                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -186,7 +193,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V4";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V5";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -332,7 +339,6 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    _IsSetting = input.IsSetting,
                     _IsExport = input.IsExport,
                     _SiteId = input.SiteId,
                     _TransferTypes = input.StrTransferTypes,
@@ -347,7 +353,6 @@ namespace BackendSite.Service.DAL
                     _Reason = input.Reason,
                     _FromAgent = input.FromAgent,
                     _ToAgent = input.ToAgent,
-                    _TransferId = input.TransferId,
                     _StartIndex = startIndex,
                     _PageSize = pageSize
                 });
@@ -360,6 +365,19 @@ namespace BackendSite.Service.DAL
             
             totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameters.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoById(string transferId)
+        {
+            var parameters = new DynamicParameters(new
+                {
+                    _TransferId = transferId
+                });
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_GetById", parameters);
 
             return result;
         }

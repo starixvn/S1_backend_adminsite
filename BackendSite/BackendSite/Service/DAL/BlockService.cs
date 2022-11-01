@@ -217,6 +217,18 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
         }
+        
+        public async Task<IEnumerable<DeviceUser>> GetIoavationAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_IoavationAssociatedList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetShieldAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_ShieldAssociatedList_Get", p);
+        }
 
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
@@ -284,10 +296,11 @@ namespace BackendSite.Service.DAL
                             AccountNum = input.After.AccountNum,
                             IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
                             AccountName = x.AccountName,
-                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock,
+                            Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
                         if(result == 0)
                         {
                             trans.Rollback();
@@ -361,10 +374,11 @@ namespace BackendSite.Service.DAL
                         AccountNum = input.Before.AccountNum,
                         IFSCCode = string.IsNullOrWhiteSpace(input.Before.IFSCCode) ? "" : input.Before.IFSCCode,
                         AccountName = input.Before.CustId,
-                        Status = CustBankInfoLogStatus.Release
+                        Status = CustBankInfoLogStatus.Release,
+                        Operator = input.Operator
                     });
 
-                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
 
                     if(result <= 0)
                     {

@@ -46,9 +46,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(siteId,
                     request.CurrencyIds,
                     request.UserName,
+                    request.SabaId,
+                    request.DepositId,
                     adjustTypeList,
-                    request.StartDate.DateTime,
-                    request.EndDate.DateTime,
+                    request.StartDate,
+                    request.EndDate,
                     request.TransId,
                     request.PageNumber,
                     request.PageSize);
@@ -85,12 +87,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var exportData = await _paymentAdjustmentBll.GetPaymentAdjustmentExportReportV2(siteId,
                 request.CurrencyIds,
                 request.UserName,
+                request.SabaId,
+                request.DepositId,
                 adjustTypeList,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
+                request.StartDate,
+                request.EndDate,
                 request.TransId);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 

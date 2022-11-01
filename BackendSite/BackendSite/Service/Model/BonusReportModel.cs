@@ -7,24 +7,14 @@ namespace BackendSite.Service.Model
 
     public class BonusReportRequestV2 : ApiRequestPageModel
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
         public PromotionTypeEnum PromotionType { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
         public int BaseCurrencyId { get; set; }
         public int PromotionCategoryId { get; set; }
         public IEnumerable<int> Statuses { get; set; }
@@ -32,24 +22,15 @@ namespace BackendSite.Service.Model
 
     public class BonusReportExportRequestV2
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
         public PromotionTypeEnum PromotionType { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+
         public int BaseCurrencyId { get; set; }
         public int PromotionCategoryId { get; set; }
         public IEnumerable<int> Statuses { get; set; }
@@ -84,6 +65,34 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public DateTimeOffset ExpiryTime { get; set; }
         public DateTimeOffset CreateTime { get; set; }
+        public string StatusName { get; set; }
+        public decimal CancelBonusAmount { get; set; }
+        public bool ExpiredCancel { get; set; }
+        public string Operator { get; set; }
+
+        /// <summary>
+        /// 存款資訊，內有存款單號，存款金額，會有多筆
+        /// </summary>
+        public string DepositInfo { get; set; }
+    }
+
+    public class BonusReportExportExcelResponse
+    {
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+        public string TransId { get; set; }
+        public string PromotionName { get; set; }
+        public string BonusCode { get; set; }
+        public string UserName { get; set; }
+        public string CurrencyName { get; set; }
+        public decimal Bonus { get; set; }
+        public decimal MaxBonus { get; set; }
+        public int RollOver { get; set; }
+        public int WinOver { get; set; }
+        public decimal LockedAmount { get; set; }
+        public decimal BonusAmount { get; set; }
+        public string ExpiryTime { get; set; }
+        public string CreateTime { get; set; }
         public string StatusName { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public bool ExpiredCancel { get; set; }
@@ -144,6 +153,13 @@ namespace BackendSite.Service.Model
         public IEnumerable<BonusReportDto> Data { get; set; }
 
         public List<TotalAmount> TotalAmountSummary { get; set; }
+    }
+
+    public class PromotionCategoryOptionDto
+    {
+        public int PromotionCategoryId { get; set; }
+
+        public string PromotionCategoryName { get; set; }
     }
 
     #endregion

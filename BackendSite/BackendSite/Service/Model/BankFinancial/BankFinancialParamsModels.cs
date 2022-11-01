@@ -45,11 +45,6 @@ namespace BackendSite.Service.Model.BankFinancial
     
     public class GetTransferInfoListParams
     {
-        public GetTransferInfoListParams(string id)
-        {
-            IsSetting = true;
-            TransferId = id;
-        }
         public GetTransferInfoListParams(GetTransferInfoListRequest req)
         {
             SiteId = req.SiteId;
@@ -85,7 +80,6 @@ namespace BackendSite.Service.Model.BankFinancial
             Reason = req.Reason;
         }
         
-        public bool IsSetting { get; set; }
         public bool IsExport { get; set; }
         public int SiteId { get; set; }
         public DateTimeOffset StartTime { get; set; }

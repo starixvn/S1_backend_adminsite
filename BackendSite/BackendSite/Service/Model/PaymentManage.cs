@@ -113,18 +113,10 @@ namespace BackendSite.Service.Model
         public IEnumerable<decimal> FixedAmountList { get; set; }
     }
     
-    public class PayListInfo
-    {
-        public int PayId { get; set; }
-        public string PayName { get; set; }
-        public PayListStatusEnum Status { get; set; }
-    }
-    
     public class UpdatePaySettingParams
     {
         public int SiteId { get; set; }
         public CurrencyEnum CurrencyId { get; set; }
-        public int PayId { get; set; }
         public int ChannelId { get; set; }
 
         public decimal MinAmount { get; set; }
@@ -138,12 +130,32 @@ namespace BackendSite.Service.Model
 
         public int Sort { get; set; }
     }
+    
+    public class PayListInfo
+    {
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        
+        /// <summary>
+        /// 全域金流狀態
+        /// </summary>
+        [JsonIgnore]
+        public PayListStatusEnum PayStatus { get; set; }
+        /// <summary>
+        /// 品牌金流狀態
+        /// </summary>
+        [JsonIgnore]
+        public PayListStatusEnum SitePayStatus { get; set; }
+
+        public PayListStatusEnum Status => PayStatus == PayListStatusEnum.Enable
+            ? SitePayStatus
+            : PayStatus;
+    }
 
     public class UpdatePaySettingStatusParams
     {
         public int SiteId { get; set; }
         public CurrencyEnum CurrencyId { get; set; }
-        public int PayId { get; set; }
         public int ChannelId { get; set; }
         public PayChannelStatusEnum Status { get; set; }
     }
@@ -155,7 +167,7 @@ namespace BackendSite.Service.Model
         public PayListMethodEnum? Method { get; set; }
         public int? PayId { get; set; }
         public PayChannelTypeEnum? Type { get; set; }
-        public PayListStatusEnum? PayStatus { get; set; }
+        public PayListStatusEnum? Globalstatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }
     }
 
@@ -168,7 +180,7 @@ namespace BackendSite.Service.Model
             Method = req.Method;
             PayId = req.PayId;
             Type = req.Type;
-            PayStatus = req.PayStatus;
+            PayStatus = req.Globalstatus;
             Status = req.Status;
         }
 
@@ -200,6 +212,46 @@ namespace BackendSite.Service.Model
         public int PointLevel { get; set; }
         public int Sort { get; set; }
         public PayChannelStatusEnum Status { get; set; }
+        [JsonIgnore]
         public PayListStatusEnum PayStatus { get; set; }
+        [JsonIgnore]
+        public PayListStatusEnum SitePayStatus { get; set; }
+        public PayListStatusEnum Globalstatus => SitePayStatus;
+        public PayChannelMethodEnum Method { get; set; }
+    }
+    
+    public class PayChannelInfo
+    {
+        public PayChannelInfo(PaySetting setting)
+        {
+            PayId = setting.PayId;
+            PayName = setting.PayName;
+            ChannelId = setting.ChannelId;
+            ChannelName = setting.ChannelName;
+            Type = setting.Type;
+            Mode = setting.Mode;
+            Sort = setting.Sort;
+        }
+        
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
+        public PayChannelTypeEnum Type { get; set; }
+        public int Mode { get; set; }
+        public int Sort { get; set; }
+    }
+    
+    public class PayChannelInfoComparer : IEqualityComparer<PayChannelInfo>
+    {
+        public bool Equals(PayChannelInfo t1, PayChannelInfo t2)
+        {
+            return (t1.ChannelId == t2.ChannelId);
+        }
+
+        public int GetHashCode(PayChannelInfo t)
+        {
+            return t.ToString().GetHashCode();
+        }
     }
 }

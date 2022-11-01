@@ -318,8 +318,7 @@ namespace BackendSite.Service.DAL
         public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
         {
             Adjustment_transId = null;
-            int? depositId = adjustmentAndWithdrawalLimit.DepositId == 0 ? null : adjustmentAndWithdrawalLimit.DepositId;
-
+            
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -335,11 +334,10 @@ namespace BackendSite.Service.DAL
                 Prefix = $"A{common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
                 adjustmentAndWithdrawalLimit.Category,
-                _DepositId = depositId
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Execute("Admin_Adjustment_Ins_V3", adjustmentP, conn, trans);
+            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
@@ -528,14 +526,14 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var logParam = new DynamicParameters();
-            props.Add("_SiteId", input.SiteId);
-            props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
-            props.Add("_ActionType", (int)ActionType.Update);
-            props.Add("_RefTransId", string.Empty);
-            props.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-            props.Add("_Operator", input.Operator);
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_Operator", input.Operator);
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, tran) > 0;
 
             if (!logResult)

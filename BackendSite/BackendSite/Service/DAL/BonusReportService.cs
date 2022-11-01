@@ -28,8 +28,8 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", request.CurrencyId);
             p.Add("_UserName", request.UserName);
             p.Add("_PromotionType", (int)request.PromotionType);
-            p.Add("_StartDate", request.StartDate.DateTime);
-            p.Add("_EndDate", request.EndDate.DateTime);
+            p.Add("_StartDate", request.StartDate.ToUniversalTime().DateTime);
+            p.Add("_EndDate", request.EndDate.ToUniversalTime().DateTime);
             p.Add("_BaseCurrencyId", request.BaseCurrencyId);
             p.Add("_CategoryType", request.PromotionCategoryId);
             p.Add("_Statuses", statuses);
@@ -76,13 +76,18 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", request.CurrencyId);
             p.Add("_UserName", request.UserName);
             p.Add("_PromotionType", (int)request.PromotionType);
-            p.Add("_StartDate", request.StartDate.DateTime);
-            p.Add("_EndDate", request.EndDate.DateTime);
+            p.Add("_StartDate", request.StartDate.ToUniversalTime().DateTime);
+            p.Add("_EndDate", request.EndDate.ToUniversalTime().DateTime);
             p.Add("_BaseCurrencyId", request.BaseCurrencyId);
             p.Add("_CategoryType", request.PromotionCategoryId);
             p.Add("_Statuses", statuses);
 
             return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V9", p);
+        }
+
+        public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
+        {
+            return _reportDbClient.QueryAsync<PromotionCategoryOptionDto>("Admin_PromotionCategoryOption_Get");
         }
 
         #region private method

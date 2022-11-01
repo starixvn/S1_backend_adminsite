@@ -144,11 +144,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
-        {
-            return await _bonusManageService.BonusImportAsync(bonusImportPara);
-        }
-
         private static Random random = new Random();
 
         public static string RandomString(int length, int type)

@@ -67,11 +67,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult Set(SetReasonManagementPara request)
         {
             var authData = _authorizeBll.GetAuthData();
-            var success = _reasonManagementBll.SetReasonManagement(request, authData.UserId) > 0;
+            var (success, msg) = _reasonManagementBll.SetReasonManagement(request, authData.UserId);
 
             return new ApiResult
             {
-                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                Message = msg
             };
         }
 
@@ -89,11 +90,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult Insert(InsertReasonManagementPara request)
         {
             var authData = _authorizeBll.GetAuthData();
-            var success = _reasonManagementBll.InsertReasonManagement(request, authData.UserId) > 0;
+            var (success, msg) = _reasonManagementBll.InsertReasonManagement(request, authData.UserId);
             
             return new ApiResult
             {
-                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                Message = msg
             };
         }
     }

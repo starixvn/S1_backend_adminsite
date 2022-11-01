@@ -43,6 +43,7 @@ namespace BackendSite
             services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
+            services.AddSingleton<Cryptor>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -76,10 +77,10 @@ namespace BackendSite
 
             }
 
-            //¤â°Êµù¥U
-
+          
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
@@ -95,7 +96,6 @@ namespace BackendSite
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IDeviceService, DeviceService>();
-
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

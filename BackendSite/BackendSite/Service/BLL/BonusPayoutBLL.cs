@@ -32,7 +32,7 @@ namespace BackendSite.Service.BLL
             
             //check deposit
             var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request, tierRedepositBonus.PromotionType);
-            if (!checkResult.IsSuccess)
+            if (checkResult == null || !checkResult.IsSuccess)
             {
                 return result;
             }
@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
             decimal bonusAmount;
             decimal lockAmount;
             decimal rolloverAmount;
-            if (tierRedepositBonus.BonusType == BonusType.Amount)
+            if (tierRedepositBonus.BonusType == BonusTypeEnum.Amount)
             {
                 bonusAmount = tierAmount.Bonus;
                 lockAmount = tierAmount.RequiredAmount;
@@ -63,7 +63,7 @@ namespace BackendSite.Service.BLL
                     lockAmount = tierAmount.MaxBonus * 100 / tierAmount.Bonus;
                 }
             }
-            rolloverAmount = (lockAmount + bonusAmount) * (tierRedepositBonus.FullFillType == FullFillType.RollOver ? tierAmount.RollOver : tierAmount.WinOver);
+            rolloverAmount = (lockAmount + bonusAmount) * (tierRedepositBonus.FullFillType == FullFillTypeEnum.RollOver ? tierAmount.RollOver : tierAmount.WinOver);
 
             result.BonusAmount = bonusAmount;
             result.LockAmount = lockAmount;

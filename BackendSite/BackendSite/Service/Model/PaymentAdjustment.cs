@@ -58,6 +58,15 @@ namespace BackendSite.Service.Model
 
         private DateTimeOffset _endDate;
         public int CustId { get; set; }
+
+        /// <summary>
+        /// Debit = 1,
+        /// Credit = 2,
+        /// IncreaseBonus = 3,
+        /// ReduceBonus = 4,
+        /// </summary>
+        public int AdjustType { get; set; } // 不用Enum，因為 Enum 有包含到三方錢包的 Type
+
         public DateTimeOffset StartDate
         {
             get => _startDate;

@@ -102,7 +102,7 @@ namespace BackendSite.Service.Model
 
                 if (Type.IsBetween(1001, 2000))
                 {
-                    return FinancialType.Withdrawl;
+                    return FinancialType.Withdrawal;
                 }
 
                 if (Type.IsBetween(2001, 3000))
@@ -140,7 +140,7 @@ namespace BackendSite.Service.Model
                     return FinancialType.TpTip;
                 }
 
-                return FinancialType.Unknow;
+                return FinancialType.Others;
             }
         }
 
@@ -175,7 +175,7 @@ namespace BackendSite.Service.Model
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }
-        public decimal TotalTO { get; set; }  
+        public decimal TotalTO { get; set; }
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
         public decimal TurnOver { get; set; }
@@ -219,6 +219,7 @@ namespace BackendSite.Service.Model
         public decimal? ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public int BonusId { get; set; }
         public int CategoryId { get; set; }
     }
     public class TpBetRecordbyCategoryIdRes
@@ -232,6 +233,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal RunningTickets { get; set; }
         public decimal WinLoss { get; set; }
+        public decimal TotalTOExcludeBonus { get; set; }
+        public decimal WinLossExcludeBonus { get; set; }
     }
     public class TpBetRecordDetailbyGameType
     {
@@ -263,6 +266,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public string VipLevelName { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public int CategoryId { get; set; }
@@ -271,7 +275,11 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { get; set; }
         public string RefId { get; set; }
         public int SettledDate { get; set; }
+        public decimal RCCalculatedAmount { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
     }
+
     public class VipRebateInfoData
     {
         public List<VipRebateInfo> VipRebateInfoList { get; set; }
@@ -289,6 +297,15 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    public class VipRebateDetail
+    {
+        public int GameType { get; set; }
+        public string TypeName { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal CalculatedAmount { get; set; }
+    }
+
     public class VipTPCategory
     {
         public int CategoryId { get; set; }
@@ -303,7 +320,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
         public decimal AdjustmentMax { get; set; }
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
@@ -393,8 +410,8 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public int CurrencyId { get; set; }
         public string TierAmount { get; set; }
-        public BonusType BonusType { get; set; }
-        public FullFillType FullFillType { get; set; }
+        public BonusTypeEnum BonusType { get; set; }
+        public FullFillTypeEnum FullFillType { get; set; }
 
         public IEnumerable<TierAmount> TierAmountList
         {

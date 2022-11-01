@@ -1,4 +1,4 @@
-namespace BackendSite.Extensions
+﻿namespace BackendSite.Extensions
 {
     public static class PagerExtension
     {
@@ -8,6 +8,6 @@ namespace BackendSite.Extensions
             var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
 
             return (startIndex, absPageSize);
-        }   
+        }
     }
 }

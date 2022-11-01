@@ -3,7 +3,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
@@ -98,7 +97,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult GetPayList(GetPayListRequest request)
         {
-            var result = _paymentManageBll.GetPayList(request.SiteId);
+            var result = _paymentManageBll.GetPayList(request.SiteId)
+                .Where(x => x.PayStatus == PayListStatusEnum.Enable);
 
             return new ApiResult<IEnumerable<PayListInfo>>
             {

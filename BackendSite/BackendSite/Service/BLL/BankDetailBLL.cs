@@ -19,6 +19,7 @@ namespace BackendSite.Service.BLL
         private readonly VipLevelService _vipLevelService;
         private readonly IMemoryCache cache;
         private readonly ICacheHelper _redisHelper;
+        private static readonly PayComparer PayComparer = new();
 
         public BankDetailBLL(IServiceProvider provider)
         {
@@ -131,24 +132,25 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
         {
-            var sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
-            var BankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
-            if (BankInfoOffList == null)
-            {
-                BankInfoOffList = localBankService.GetBankAccountOff(siteId);
-                if (BankInfoOffList != null)
-                {
-                    cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-                }
-            }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoOffList;
+            var bankInfoOffList = localBankService.GetBankAccountOff(siteId);
+            return bankInfoOffList;
         }*/
-        public IEnumerable<BankInfoPay> GetBankInfoPay()
+        
+        public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount)
         {
-            var bankInfoPayList = localBankService.GetBankInfoPayList();
-            return bankInfoPayList;
+            var result = localBankService.GetBankInfoPayList(siteId)
+                .Where(x => x.SysId == sysId
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
+                .Select(x => new Pay
+                {
+                    PayId = x.PayId,
+                    PayName = x.PayName,
+                    ChannelId = x.ChannelId
+                })
+                .Distinct(PayComparer);
+            
+            return result;
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
@@ -157,10 +159,21 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<BankInfoPay> GetCryptoPay()
+        public IEnumerable<Pay> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount)
         {
-            var cryptoPayList = localBankService.GetCryptoPayList();
-            return cryptoPayList;
+            var result = localBankService.GetCryptoPayList(siteId)
+                .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
+                .Select(x => new Pay
+                {
+                    PayId = x.PayId,
+                    PayName = x.PayName,
+                    ChannelId = x.ChannelId
+                })
+                .Distinct(PayComparer);
+            
+            return result;
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)

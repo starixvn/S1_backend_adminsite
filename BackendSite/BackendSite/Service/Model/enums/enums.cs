@@ -73,6 +73,12 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
+    }
+
     #endregion
 
     #region Withdrawal Submission For Frontend Use
@@ -158,6 +164,12 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
+    }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
     }
 
     #endregion
@@ -278,6 +290,11 @@ namespace BackendSite.Service.Model.enums
     {
         Enable = 1,
         Disable = 2
+    }
+    public enum PayChannelMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
     }
 
     #endregion
@@ -451,19 +468,41 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
+    public enum AdjustmentCategoryEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
+    }
+
     #endregion
 
     #region AdminUser
@@ -512,8 +551,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum PromotionPeriodTypeEnum
@@ -525,6 +564,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionDeviceTypeEnum
     {
+        [Description("不區分 DeviceType")]
+        GetAll = 0,
         All = 1,
         Web = 2,
         App = 3
@@ -581,8 +622,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionSpecificStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum BonusTypeEnum
@@ -684,6 +725,7 @@ namespace BackendSite.Service.Model.enums
         SetBlockEWallet = 55,
         ReleaseEWalletAccount = 56,
         WithdrawalSubmission = 57,
+        SetCurrencyUSDRate = 58,
         TransferInfoManagement = 60,
         WithdrawalLimitAdjustment = 73
     }
@@ -913,6 +955,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0,
+        Fail = 1,
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -1293,7 +1345,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1316,6 +1368,13 @@ namespace BackendSite.Service.Model.enums
         Amount = 1,
         Currency = 2,
         Count = 3
+    }
+
+    public enum DashboardGameTopDataTypeEnum
+    {
+        TopBetTwenty = 1,
+        TopWinTwenty = 2,
+        TopLoseTwenty = 3
     }
 
     public enum ShieldRiskTagged
@@ -1377,7 +1436,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         Closed = 2,
     }
-    public enum SlotGameStatusEnum 
+    public enum SlotGameStatusEnum
     {
         Closed = 0,
         Open = 1
