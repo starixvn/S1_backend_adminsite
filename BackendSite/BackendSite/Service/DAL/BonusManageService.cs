@@ -239,12 +239,16 @@ namespace BackendSite.Service.DAL
                             specific.CashBackList = tempCashBackList.Where(x => x.CurrencyId == specific.CurrencyId);
                         
                             var cashBack = specific.CashBackList.FirstOrDefault();
-                            specific.CashBackSetting = new CashBackSetting
+                            if (cashBack != null)
                             {
-                                CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo{ TpId = i.TpId, CategoryId = i.GameType }),
-                                Percentage = cashBack.Percentage,
-                                LossAmount = cashBack.LossAmount
-                            };
+                                specific.CashBackSetting = new CashBackSetting
+                                {
+                                    CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo
+                                        { TpId = i.TpId, CategoryId = i.GameType }),
+                                    Percentage = cashBack.Percentage,
+                                    LossAmount = cashBack.LossAmount
+                                };
+                            }
                         }
                     }
 
