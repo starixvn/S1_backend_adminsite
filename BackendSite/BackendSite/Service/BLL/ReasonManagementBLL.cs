@@ -1,35 +1,49 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
     public class ReasonManagementBLL
     {
-        private readonly ReasonManagementService reasonManagementService;
+        private readonly ReasonManagementService _reasonManagementService;
 
         public ReasonManagementBLL(ReasonManagementService reasonManagementService)
         {
-            this.reasonManagementService = reasonManagementService;
+            this._reasonManagementService = reasonManagementService;
         }
         public IEnumerable<ReasonManagementFuncKey> GetFuncKey()
         {
-            return reasonManagementService.GetFuncKey();
+            return _reasonManagementService.GetFuncKey();
         }
 
         public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
         {
-            return reasonManagementService.GetReasonManagementData(para);
+            return _reasonManagementService.GetReasonManagementData(para);
         }
 
-        public int SetReasonManagement(SetReasonManagementPara para,int userId)
+        public (bool Success, string Message) SetReasonManagement(SetReasonManagementPara para,int userId)
         {
-            var now = DateTime.UtcNow;
-            return reasonManagementService.SetReasonManagement(para, userId, now);
+            var result = _reasonManagementService.SetReasonManagement(para, userId);
+
+            return result switch
+            {
+                (int) ErrorCodeEnum.Success => (true, string.Empty),
+                -1 => (false, "Duplicate description of FuncKey."),
+                -3 => (false, $"Id {para.Id} not exists."),
+                _ => (false, "Set reason failed.")
+            };
         }
-        public int InsertReasonManagement(InsertReasonManagementPara para, int userId)
+        public (bool Success, string Message) InsertReasonManagement(InsertReasonManagementPara para, int userId)
         {
-            var now = DateTime.UtcNow;
-            return reasonManagementService.InsertReasonManagement(para, userId, now);
+            var result =  _reasonManagementService.InsertReasonManagement(para, userId);
+            
+            return result switch
+            {
+                (int) ErrorCodeEnum.Success => (true, string.Empty),
+                -1 => (false, "Duplicate description of FuncKey."),
+                _ => (false, "Set reason failed.")
+            };
         }
     }
 }
