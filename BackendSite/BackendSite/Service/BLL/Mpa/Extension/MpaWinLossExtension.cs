@@ -5,7 +5,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 {
     public static class MpaWinLossExtension
     {
-        public static IEnumerable<MpaTpBetRecordDto> Filter(this IEnumerable<MpaTpBetRecordDto> data, MpaWinLossRequest request, Func<int, string, int> getCustIdMethod)
+        public static IEnumerable<MpaTpBetRecordDto> Filter(this IEnumerable<MpaTpBetRecordDto> data, MpaWinLossRequest request)
         {
 
             // 過濾 GameType、CurrencyId
@@ -15,8 +15,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             // 過濾 UserName
             if (string.IsNullOrEmpty(request.UserName)) return data;
             {
-                var custId = getCustIdMethod(request.SiteId, request.UserName);
-                data = data.Where(r => r.CustId == custId);
+                data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName );
             }
 
             return data;

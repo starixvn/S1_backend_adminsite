@@ -96,5 +96,25 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
+
+
+        [HttpPost]
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>> GetWinLossByPlayer(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>();
+            try
+            {
+                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.TpCategory);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
     }
 }
