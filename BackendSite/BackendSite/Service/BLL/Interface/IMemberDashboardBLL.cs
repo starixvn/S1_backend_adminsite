@@ -6,10 +6,11 @@ public interface IMemberDashboardBLL
 {
     Task<GetMemberListResponse> GetList(GetTempMemberListRequest request);
     Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request);
-    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(int custId);
+    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(AuthData authData, int custId);
     Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
-    Task<int> AddCustTagAsync(int custId, int tagId);
+    Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
+    Task<int> AddCustTagAsync(int custId, int tagId, string @operator);
     Task<int> RemoveCustTagAsync(int custId, int tagId);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);
@@ -30,5 +31,4 @@ public interface IMemberDashboardBLL
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
     Task<int> LineUnbind(int custId);
     Task<int> DeleteOnUserAsync(int custId);
-    Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
 }
