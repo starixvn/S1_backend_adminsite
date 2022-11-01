@@ -727,6 +727,7 @@ namespace BackendSite.Service.Model.enums
         WithdrawalSubmission = 57,
         SetCurrencyUSDRate = 58,
         TransferInfoManagement = 60,
+        SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73
     }
 
