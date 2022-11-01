@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -15,14 +16,18 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
     private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
+    private readonly PermissionBLL _permissionBll;
+    private readonly AdminBLL _adminBll;
+    
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
     private readonly CourierAdapter _courierAdapter;
     private readonly string _bonusApiUrl;
-    private readonly PermissionBLL _permissionBll;
-    private readonly AdminBLL _adminBll;
+    private readonly IAdminLogService _adminLogService;
+    private readonly ILogger<MemberDashboardBll> _logger;
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll)
+
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberDashboardBll> logger)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
@@ -33,6 +38,8 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _siteConfig = siteConfig;
         _permissionBll = permissionBll;
         _adminBll = adminBll;
+        _adminLogService = adminLogService;
+        _logger = logger;
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
 
@@ -248,7 +255,28 @@ public class MemberDashboardBll : IMemberDashboardBLL
         return await _customerService.GetCustomerIpListByCustIdAsync(custId);
     }
 
-    public async Task<int> AddCustTagAsync(int custId, int tagId)
+    public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
+    {
+        var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
+        var response = new GetLoginLogResponse()
+        {
+            LoginLog = data.LoginLog.Select(a => new MemberLoginLog()
+            {
+                Id = a.Id,
+                LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
+                LoginIp = a.LoginIp,
+                FromUrl = a.FromUrl,
+                Location = a.Location,
+                UserAgent = a.UserAgent
+            }),
+            PageNumber = data.PageNumber,
+            TotalPages = data.TotalPages,
+            RowCount = data.RowCount
+        };
+        return response;
+    }
+
+    public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
     {
         var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
         var tagList = new List<int>();
@@ -256,8 +284,49 @@ public class MemberDashboardBll : IMemberDashboardBLL
         {
             tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
         }
+        var beforeTag = await _customerService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        
         tagList.Add(tagId);
-        return await _customerService.SetCustTag(custId, tagList);
+        var result = await _customerService.SetCustTag(custId, tagList);
+        if (result <= 0) return result;
+        
+        var tempTag = await _customerService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        var afterTag = tempTag.ToList();
+        var newTag = afterTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
+        var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
+        var beforeTagName = beforeTag.Select(a => a.TagName);
+        var afterTagName = afterTag.Select(a => a.TagName);
+        var logParam = new AdminLog()
+        {
+            Operator = @operator,
+            SiteId = customer.SiteId,
+            CurrencyId = customer.CurrencyId,
+            BeforeDetailInfo = JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                Tag = JsonConvert.SerializeObject(beforeTagName)
+            }),
+            AfterDetailInfo = JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                Tag = JsonConvert.SerializeObject(afterTagName)
+            }),
+            ActionType = ActionType.Create,
+            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+            CustId = custId,
+            Menu = "CustManage/CustInfoList",
+            Note = $"Add Tag {newTag}",
+            DetailInfo = JsonConvert.SerializeObject(new
+            {
+                Action = $"Add Tag {newTag}",
+                MenuName = "Member Setting",
+            })
+        };
+        if (await _adminLogService.Insert(logParam) > 0)
+        {
+            _logger.LogError("InsertAdminLog failed. params: " + JsonConvert.SerializeObject(logParam));
+        }
+        return result;
     }
 
     public async Task<int> RemoveCustTagAsync(int custId, int tagId)
@@ -382,27 +451,6 @@ public class MemberDashboardBll : IMemberDashboardBLL
     public async Task<int> DeleteOnUserAsync(int custId)
     {
         return await _customerService.DeleteOnUserAsync(custId);
-    }
-
-    public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
-    {
-        var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
-        var response = new GetLoginLogResponse()
-        {
-            LoginLog = data.LoginLog.Select(a => new MemberLoginLog()
-            {
-                Id = a.Id,
-                LoginTime = new DateTimeOffset(a.LoginTime, TimeSpan.Zero),
-                LoginIp = a.LoginIp,
-                FromUrl = a.FromUrl,
-                Location = a.Location,
-                UserAgent = a.UserAgent
-            }),
-            PageNumber = data.PageNumber,
-            TotalPages = data.TotalPages,
-            RowCount = data.RowCount
-        };
-        return response;
     }
 
     private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)

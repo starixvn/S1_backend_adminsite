@@ -95,6 +95,7 @@ namespace BackendSite
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IAdminLogService, AdminLogService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

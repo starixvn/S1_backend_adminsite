@@ -350,7 +350,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> AddTag(AddTagRequest request)
         {
-            if (await _memberDashboardBll.AddCustTagAsync(request.CustId, request.TagId) > 0)
+            if (await _memberDashboardBll.AddCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
