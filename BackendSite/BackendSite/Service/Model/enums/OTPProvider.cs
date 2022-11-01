@@ -5,6 +5,7 @@
         ALL,
         SkyLine,
         NxCloud,
-        YC
+        YC,
+        AWS
     }
 }
