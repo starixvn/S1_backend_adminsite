@@ -1103,7 +1103,7 @@ import DateTimePicker from 'react-datetime';
                 onSelectAll: function () {
                     state.selectCalCode.length = 0;
                     state.CalCodeList.forEach(function (obj) {
-                        state.selectCalCode.push(obj.id);
+                        state.selectCalCode.push(obj.bankId);
                     });
                 },
                 onDeselectAll: function () {
@@ -1280,7 +1280,7 @@ import DateTimePicker from 'react-datetime';
             bankCodeList = <select id="selectBankCode" name="selectBankCode[]" multiple="multiple">{bankCodeList}</select>
 
             let calCodeList = this.state.CalCodeList.map(function (item) {
-                return <option key={`bank-list-${item.id}`} value={item.id}>{item.calCodeName}</option>;
+                return <option key={`bank-list-${item.bankId}`} value={item.bankId}>{item.calCodeName}</option>;
             }.bind(this));
             calCodeList = <select id="selectCalCode" name="selectCalCode[]" multiple="multiple">{calCodeList}</select>
 

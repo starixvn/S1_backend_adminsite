@@ -103,11 +103,7 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
-        public IActionResult VipRebateMangetment()
-        {
-            return View();
-        }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateInfoReport" })]
         public IActionResult VipRebateInfoReport()
         {
