@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -16,17 +17,14 @@ namespace BackendSite.Service.BLL
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
         }
 
-        public async Task<BonusReportResponseWrapper> GetBonusReportAsync(BonusReportRequest request)
+        public async Task<BonusReportResponseWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
         {
-            if (!request.SiteIds.Any())
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
-
-            var queryResult = await _bonusReportService.GetBonusReportAsync(request);
+            var queryResult = await _bonusReportService.GetBonusReportV2Async(request);
 
             if (queryResult == null || !queryResult.Data.Any())
                 return new BonusReportResponseWrapper()
                 {
-                    TempCurrencyTotalAmount = new List<string>()
+                    Data = new List<BonusReportResponse>() // 前端希望給預設空陣列[]，不要 null
                 };
 
             var siteList = _serverInfoBll.GetSiteList();
@@ -53,26 +51,25 @@ namespace BackendSite.Service.BLL
                     CancelBonusAmount = r.CancelBonusAmount,
                     ExpiredCancel = r.ExpiredCancel,
                     Operator = string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
-                    DepositInfo = r.DepositInfo
+                    DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages,
-                TempCurrencyTotalAmount = queryResult.TempCurrencyTotalAmount
+                TotalAmountSummary = queryResult.TotalAmountSummary
             };
 
             return result;
         }
 
-        public async Task<IEnumerable<BonusReportResponse>> GetBonusReportExportData(BonusReportExportRequest request)
+        public async Task<IEnumerable<BonusReportExportExcelResponse>> GetBonusReportExportData(BonusReportExportRequestV2 request)
         {
-            if (!request.SiteIds.Any())
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
 
             var queryResult = (await _bonusReportService.GetBonusReportExportData(request)).ToList();
-            if (!queryResult.Any()) return new List<BonusReportResponse>();
+            if (!queryResult.Any()) return new List<BonusReportExportExcelResponse>();
 
             var siteList = _serverInfoBll.GetSiteList();
-            var result = queryResult.Select(r => new BonusReportResponse
+            var offset = request.StartDate.Offset;
+            var result = queryResult.Select(r => new BonusReportExportExcelResponse
             {
                 CustId = r.CustId,
                 TransId = r.TransId,
@@ -80,12 +77,12 @@ namespace BackendSite.Service.BLL
                 PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
                 SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
                 UserName = r.UserName,
-                CreateTime = r.CreateTime,
+                CreateTime = r.CreateTime.ToOffset(offset).ToString("yyyy-MM-dd HH:mm:ss"),
                 StatusName = _selLangBll.GetResourceValue($"lbl_BonusStatus{r.Status}"),
                 Bonus = r.Bonus,
                 BonusAmount = r.BonusAmount,
                 BonusCode = r.BonusCode,
-                ExpiryTime = r.ExpiryTime,
+                ExpiryTime = r.ExpiryTime.ToOffset(offset).ToString("yyyy-MM-dd HH:mm:ss"),
                 LockedAmount = r.LockedAmount,
                 MaxBonus = r.MaxBonus,
                 RollOver = r.RollOver,
@@ -94,10 +91,24 @@ namespace BackendSite.Service.BLL
                 ExpiredCancel = r.ExpiredCancel,
                 Operator =
                 string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
-                DepositInfo = r.DepositInfo
+                DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
             });
+            
+
 
             return result;
+        }
+
+        public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
+        {
+            return _bonusReportService.GetPromotionCategoryOption();
+        }
+
+
+        private string CheckDepositInfoFormatter(string depositInfo)
+        {
+            if (string.IsNullOrEmpty(depositInfo) || depositInfo.Contains("[")) return depositInfo;
+            return $"[{depositInfo}]";
         }
     }
 }

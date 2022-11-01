@@ -181,6 +181,7 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankList([FromBody] BankListPara bankDetail)
         {
@@ -193,19 +194,11 @@ namespace BackendSite.Controllers.Api
                 var bankInfoOff = bankDetailBLL
                     .GetOfflineBankAccount(bankDetail.SiteId, custInfosDetail.CurrencyId)
                     .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit)
-                                && x.AccountStatus == TransferAccountStatusEnum.Open
-                                && x.SettingStatus == BankCardManagementStatusEnum.Open);
+                                && x.AccountStatus == TransferAccountStatusEnum.Open)
+                    .OrderBy(x => x.SettingStatus);
 
-                if (bankInfoOff != null)
-                {
-                    apiResult.Data = bankInfoOff;
-                    apiResult.ErrorCode = 0;
-                }
-                else
-                {
-                    apiResult.ErrorCode = 21;
-                    apiResult.Message = "BankAccount not found.";
-                }
+                apiResult.Data = bankInfoOff;
+                apiResult.ErrorCode = 0;
             }
             else
             {

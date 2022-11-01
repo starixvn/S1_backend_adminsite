@@ -124,18 +124,6 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        /*public IEnumerable<BankInfoOff> GetAllBankInfoOff()
-        {
-            var bankInfoOffList = localBankService.GetAllBankAccountOff();
-            return bankInfoOffList;
-        }
-
-        public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
-        {
-            var bankInfoOffList = localBankService.GetBankAccountOff(siteId);
-            return bankInfoOffList;
-        }*/
-        
         public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
             var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
