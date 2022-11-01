@@ -153,10 +153,6 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    "Marketing/VipRebateMangetment.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
-    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
