@@ -107,7 +107,8 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V3", p);
+            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V4", p);
+
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
