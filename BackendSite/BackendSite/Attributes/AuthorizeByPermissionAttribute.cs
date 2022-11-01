@@ -1,5 +1,4 @@
 ﻿using BackendSite.Service.BLL;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,15 +14,13 @@ namespace BackendSite.Attributes
         public int PermissionId { get; set; }
         private readonly NewAuthorizeBLL newAuthorizeBLL;
         private readonly PermissionBLL permissionBLL;
-        private readonly AdminUserService adminUserService;
         private readonly AdminBLL adminBll;
 
-        public AuthorizeByPermissionAttribute(NewAuthorizeBLL newAuthorizeBLL, PermissionBLL permissionBLL, AdminBLL adminBll, AdminUserService adminUserService, int MenuId,int PermissionId)
+        public AuthorizeByPermissionAttribute(NewAuthorizeBLL newAuthorizeBLL, PermissionBLL permissionBLL, AdminBLL adminBll, int MenuId, int PermissionId)
         {
             this.newAuthorizeBLL = newAuthorizeBLL;
             this.permissionBLL = permissionBLL;
             this.adminBll = adminBll;
-            this.adminUserService = adminUserService;
             this.MenuId = MenuId;
             this.PermissionId = PermissionId;
         }
@@ -34,7 +31,7 @@ namespace BackendSite.Attributes
                 var brand = newAuthorizeBLL.CheckBrand();
                 if (brand != 0)
                 {
-                    if (filterContext.HttpContext.User.Identity.IsAuthenticated)
+                    if (filterContext.HttpContext.User.Identity?.IsAuthenticated == true)
                     {
                         var authInfo = newAuthorizeBLL.GetAuthData();
 

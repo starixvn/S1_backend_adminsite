@@ -27,12 +27,13 @@ namespace BackendSite.Service.DAL
             var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
             return vipLevelSetting;
         }
+
         public async Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
         {
             return await _reportDbClient.QueryAsync<VipLevelSetting>("Admin_VipLevel_Get",
                 new DynamicParameters(new { SiteId = siteId }));
         }
-        
+
         public VipLevelInfo GetVipLevelInfo(int CustId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

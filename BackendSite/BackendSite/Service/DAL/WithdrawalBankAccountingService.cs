@@ -94,7 +94,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_SiteId", siteId);
             parameter.Add("_CurrencyId", currencyId);
 
-            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V2",
+            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V3",
                 parameter);
         }
 
