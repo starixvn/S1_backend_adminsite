@@ -12,11 +12,11 @@ namespace BackendSite.Service.Model
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
-        public PromotionTypeEnum PromotionType { get; set; }
+        public IEnumerable<PromotionTypeEnum> PromotionTypes { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public int BaseCurrencyId { get; set; }
-        public int PromotionCategoryId { get; set; }
+        public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
     }
 
@@ -27,12 +27,12 @@ namespace BackendSite.Service.Model
         public string TransId { get; set; }
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
-        public PromotionTypeEnum PromotionType { get; set; }
+        public IEnumerable<PromotionTypeEnum> PromotionTypes { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
 
         public int BaseCurrencyId { get; set; }
-        public int PromotionCategoryId { get; set; }
+        public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
     }
 
