@@ -377,7 +377,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
         {
-            if (await _memberCommand.RemoveCustTagAsync(request.CustId, request.TagId) > 0)
+            if (await _memberCommand.RemoveCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {

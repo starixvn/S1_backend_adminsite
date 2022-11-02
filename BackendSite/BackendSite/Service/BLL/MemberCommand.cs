@@ -13,46 +13,28 @@ namespace BackendSite.Service.BLL;
 public class MemberCommand : IMemberCommand
 {
     private readonly IMemberService _memberService;
-    private readonly IDeviceService _deviceService;
-    private readonly ICacheHelper _cacheHelper;
-    private readonly Dictionary<string, SiteConfig> _siteConfig;
-    private readonly PermissionBLL _permissionBll;
-    private readonly AdminBLL _adminBll;
-    private readonly MarketingService _marketingService;
-    private readonly IAffiliateApiService _affiliateApi;
-
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
+    private readonly CustInfoBLL _custInfoBll; 
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
 
-
-    public MemberCommand(IMemberService memberService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberCommand> logger, MarketingService marketingService, IAffiliateApiService affiliateApi, IBonusApiService bonusApi, IOptions<Dictionary<string, SiteConfig>> siteConfig)
+    public MemberCommand(IMemberService memberService, CodeGenerator codeGenerator, Tools tools, IAdminLogService adminLogService, ILogger<MemberCommand> logger, IBonusApiService bonusApi, CustInfoBLL custInfoBll)
     {
         _memberService = memberService;
-        _cacheHelper = cacheHelper;
-        _deviceService = deviceService;
         _codeGenerator = codeGenerator;
         _tools = tools;
-        _permissionBll = permissionBll;
-        _adminBll = adminBll;
         _adminLogService = adminLogService;
         _logger = logger;
-        _marketingService = marketingService;
-        _affiliateApi = affiliateApi;
         _bonusApi = bonusApi;
-        _siteConfig = siteConfig.Value;
+        _custInfoBll = custInfoBll;
     }
     
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
     {
         var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
-        var tagList = new List<int>();
-        if (!string.IsNullOrEmpty(tagListStr))
-        {
-            tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
-        }
+        var tagList = !string.IsNullOrEmpty(tagListStr) ? JsonConvert.DeserializeObject<List<int>>(tagListStr) : new List<int>();
         var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         
         tagList.Add(tagId);
@@ -62,7 +44,7 @@ public class MemberCommand : IMemberCommand
         var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var afterTag = tempTag.ToList();
         var newTag = afterTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
-        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
         var logParam = new AdminLog()
@@ -84,10 +66,10 @@ public class MemberCommand : IMemberCommand
             MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
             CustId = custId,
             Menu = "CustManage/CustInfoList",
-            Note = $"Add Tag {newTag}",
+            Note = $"Add Tag \"{newTag}\"",
             DetailInfo = JsonConvert.SerializeObject(new
             {
-                Action = $"Add Tag {newTag}",
+                Action = $"Add Tag \"{newTag}\"",
                 MenuName = "Member Setting",
             })
         };
@@ -98,21 +80,60 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
-    public async Task<int> RemoveCustTagAsync(int custId, int tagId)
+    public async Task<int> RemoveCustTagAsync(int custId, int tagId, string @operator)
     {
         var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
-        if (string.IsNullOrEmpty(tagListStr))
-        {
-            return 0;
-        }
+        if (string.IsNullOrEmpty(tagListStr)) return 0;
         var tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
+        
+        var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        var beforeTag = tempTag.ToList();
         var idx = tagList.FindIndex(id => id == tagId);
         if (idx == -1)
         {
             return 0;
         }
         tagList.RemoveAt(idx);
-        return await _memberService.SetCustTag(custId, tagList);
+        var result = await _memberService.SetCustTag(custId, tagList);
+        if (result <= 0) return result;
+        
+        var afterTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        var newTag = beforeTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        var beforeTagName = beforeTag.Select(a => a.TagName);
+        var afterTagName = afterTag.Select(a => a.TagName);
+        var logParam = new AdminLog()
+        {
+            Operator = @operator,
+            SiteId = customer.SiteId,
+            CurrencyId = customer.CurrencyId,
+            BeforeDetailInfo = JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                Tag = JsonConvert.SerializeObject(beforeTagName)
+            }),
+            AfterDetailInfo = JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                Tag = JsonConvert.SerializeObject(afterTagName)
+            }),
+            ActionType = ActionType.Delete,
+            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+            CustId = custId,
+            Menu = "CustManage/CustInfoList",
+            Note = $"Remove Tag \"{newTag}\"",
+            DetailInfo = JsonConvert.SerializeObject(new
+            {
+                Action = $"Remove Tag \"{newTag}\"",
+                MenuName = "Member Setting",
+            })
+        };
+        if (await _adminLogService.Insert(logParam) > 0)
+        {
+            _logger.LogError("InsertAdminLog failed. params: " + JsonConvert.SerializeObject(logParam));
+        }
+
+        return result;
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
