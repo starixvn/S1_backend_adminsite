@@ -405,7 +405,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
 
             return _excelBll.ExcelFile(stream, "ScratchCardList");
         }
