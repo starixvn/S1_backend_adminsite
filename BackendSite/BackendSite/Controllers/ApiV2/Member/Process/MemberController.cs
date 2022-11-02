@@ -15,6 +15,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     public class MemberController : ControllerBase
     {
         private readonly IMemberDashboardBLL _memberDashboardBll;
+        private readonly IMemberQuery _memberQuery;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly IVipLevelBLL _vipLevelBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
@@ -22,7 +23,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll, NewAuthorizeBLL newAuthorizeBll)
+        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll, NewAuthorizeBLL newAuthorizeBll, IMemberQuery memberQuery)
         {
             _memberDashboardBll = memberDashboardBll;
             _custPhotoIdBll = custPhotoIdBll;
@@ -30,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _serverInfoBll = serverInfoBll;
             _excelBll = excelBll;
             _newAuthorizeBll = newAuthorizeBll;
+            _memberQuery = memberQuery;
             _vipLevelBll = vipLevelBll;
         }
 
@@ -91,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiListResult<MemberList>> GetList(GetTempMemberListRequest request)
         {
-            var result = await _memberDashboardBll.GetList(request);
+            var result = await _memberQuery.GetListAsync(request);
             return new ApiListResult<MemberList>()
             {
                 Data = result.Data,
@@ -118,7 +120,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
-            var exportData = await _memberDashboardBll.GetExportData(request);
+            var exportData = await _memberQuery.GetExportDataAsync(request);
             var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
@@ -137,7 +139,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
             var authData = _newAuthorizeBll.GetAuthData();
-            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(authData, request.CustId);
+            var data = await _memberQuery.GetCustomerBasicInfoAsync(authData, request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -907,7 +909,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<MemberLoginDevice>>> GetDeviceList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetDeviceListByCustIdAsync(request.CustId);
+            var data = await _memberQuery.GetDeviceListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<MemberLoginDevice>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -930,7 +932,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetIpListByCustIdAsync(request.CustId);
+            var data = await _memberQuery.GetIpListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -958,7 +960,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             
-            var loginLog = await _memberDashboardBll.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
+            var loginLog = await _memberQuery.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
             var apiResult = new ApiListResult<MemberLoginLog>
             {
                 Data = loginLog.LoginLog,

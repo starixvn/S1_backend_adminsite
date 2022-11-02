@@ -78,6 +78,7 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<IMemberQuery, MemberQuery>();
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<IMemberDashboardBLL, MemberDashboardBll>();

@@ -4,12 +4,6 @@ namespace BackendSite.Service.BLL.Interface;
 
 public interface IMemberDashboardBLL
 {
-    Task<GetMemberListResponse> GetList(GetTempMemberListRequest request);
-    Task<IEnumerable<MemberExportData>> GetExportData(ExportMemberRequest request);
-    Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(AuthData authData, int custId);
-    Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId);
-    Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
-    Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
     Task<int> AddCustTagAsync(int custId, int tagId, string @operator);
     Task<int> RemoveCustTagAsync(int custId, int tagId);
     Task<int> EditFullNameAsync(int custId, string fullName);
