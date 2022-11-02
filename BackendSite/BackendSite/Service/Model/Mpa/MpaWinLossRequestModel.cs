@@ -81,7 +81,7 @@ namespace BackendSite.Service.Model.Mpa
 
         public string GetWinLossByPlayerRedisKey()
         {
-            var key = $"SiteId:{SiteId}:{StarTime:yyyy-MM-dd HH:mm:ss}:{EndTime:yyyy-MM-dd HH:mm:ss}";
+            var key = $"SiteId:{SiteId}:{StarTime:yyyy-MM-dd HH:mm:ss}:{EndTime:yyyy-MM-dd HH:mm:ss}:OriginalCurrency:{DisplayGroupBreakdownInOriginalCurrency}:UserName:{UserName}";
             return key;
         }
 
