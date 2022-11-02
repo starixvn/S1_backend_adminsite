@@ -14,7 +14,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class MemberController : ControllerBase
     {
-        private readonly IMemberDashboardBLL _memberDashboardBll;
+        private readonly IMemberCommand _memberCommand;
         private readonly IMemberQuery _memberQuery;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
         private readonly IVipLevelBLL _vipLevelBll;
@@ -23,9 +23,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll, NewAuthorizeBLL newAuthorizeBll, IMemberQuery memberQuery)
+        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll, ExcelBLL excelBll, NewAuthorizeBLL newAuthorizeBll, IMemberQuery memberQuery)
         {
-            _memberDashboardBll = memberDashboardBll;
+            _memberCommand = memberCommand;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
@@ -352,7 +352,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> AddTag(AddTagRequest request)
         {
-            if (await _memberDashboardBll.AddCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
+            if (await _memberCommand.AddCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -377,7 +377,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
         {
-            if (await _memberDashboardBll.RemoveCustTagAsync(request.CustId, request.TagId) > 0)
+            if (await _memberCommand.RemoveCustTagAsync(request.CustId, request.TagId) > 0)
             {
                 return new ApiResult
                 {
@@ -403,7 +403,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> LineUnbind(LineUnbindRequest request)
         {
-            var result = await _memberDashboardBll.LineUnbind(request.CustId);
+            var result = await _memberCommand.LineUnbind(request.CustId);
             if (result > 0)
             {
                 return new ApiResult
@@ -430,7 +430,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberDashboardBll.EditFullNameAsync(request.CustId, request.FullName);
+            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName);
 
             if (result > 0)
             {
@@ -458,7 +458,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberDashboardBll.EditEmailAsync(request.CustId, request.Email);
+            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email);
 
             if (result > 0)
             {
@@ -486,7 +486,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberDashboardBll.EditPhoneNoAsync(request.CustId, request.PhoneNo);
+            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo);
 
             if (result > 0)
             {
@@ -514,7 +514,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
-            var result = await _memberDashboardBll.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
+            var result = await _memberCommand.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
 
             if (result > 0)
             {
@@ -542,7 +542,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
-            var result = await _memberDashboardBll.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+            var result = await _memberCommand.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
 
             if (result > 0)
             {
@@ -570,7 +570,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchKycAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchKycAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -598,7 +598,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchRiskAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchRiskAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -626,7 +626,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchEmailVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchEmailVerifiedAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -654,7 +654,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
 
             if (result > 0)
             {
@@ -682,7 +682,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
         {
-            var newPassword = await _memberDashboardBll.ResetPasswordAsync(request.CustId);
+            var newPassword = await _memberCommand.ResetPasswordAsync(request.CustId);
 
             if (!string.IsNullOrEmpty(newPassword))
             {
@@ -711,7 +711,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
             {
                 return new ApiResult
                 {
@@ -734,7 +734,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> KickOut(KickOutMemberRequest request)
         {
-            if (await _memberDashboardBll.DeleteOnUserAsync(request.CustId) > 0)
+            if (await _memberCommand.DeleteOnUserAsync(request.CustId) > 0)
             {
 
                 return new ApiResult
@@ -761,7 +761,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Close(CloseMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
             {
                 return new ApiResult
                 {
@@ -787,7 +787,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
         {
-            if (await _memberDashboardBll.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
+            if (await _memberCommand.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
             {
                 return new ApiResult
                 {
@@ -813,7 +813,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetBankInfoAsync(ResetBankInfoRequest request)
         {
-            if (await _memberDashboardBll.ResetBankInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetBankInfoAsync(request.CustId) > 0)
             {
                 return new ApiResult
                 {
@@ -839,7 +839,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetCryptoInfoAsync(ResetCryptoInfoRequest request)
         {
-            if (await _memberDashboardBll.ResetCryptoInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetCryptoInfoAsync(request.CustId) > 0)
             {
                 return new ApiResult
                 {
@@ -865,7 +865,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetEWalletAsync(ResetEwalletRequest request)
         {
-            if (await _memberDashboardBll.ResetEWalletAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetEWalletAsync(request.CustId) > 0)
             {
                 return new ApiResult
                 {
@@ -891,7 +891,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> PayoutVerificationReward(PayoutVerificationRewardRequest request)
         {
-            var apiResult = await _memberDashboardBll.SetVerificationRewardAsync(request.CustId, request.OTPType);
+            var apiResult = await _memberCommand.SetVerificationRewardAsync(request.CustId, request.OTPType);
             return apiResult;
         }
 

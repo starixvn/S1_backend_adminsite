@@ -10,9 +10,9 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL;
 
-public class MemberDashboardBll : IMemberDashboardBLL
+public class MemberCommand : IMemberCommand
 {
-    private readonly ICustomerService _customerService;
+    private readonly IMemberService _memberService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
     private readonly Dictionary<string, SiteConfig> _siteConfig;
@@ -25,12 +25,12 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly Tools _tools;
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
-    private readonly ILogger<MemberDashboardBll> _logger;
+    private readonly ILogger<MemberCommand> _logger;
 
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberDashboardBll> logger, MarketingService marketingService, IAffiliateApiService affiliateApi, IBonusApiService bonusApi, IOptions<Dictionary<string, SiteConfig>> siteConfig)
+    public MemberCommand(IMemberService memberService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberCommand> logger, MarketingService marketingService, IAffiliateApiService affiliateApi, IBonusApiService bonusApi, IOptions<Dictionary<string, SiteConfig>> siteConfig)
     {
-        _customerService = customerService;
+        _memberService = memberService;
         _cacheHelper = cacheHelper;
         _deviceService = deviceService;
         _codeGenerator = codeGenerator;
@@ -47,22 +47,22 @@ public class MemberDashboardBll : IMemberDashboardBLL
     
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
     {
-        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
         var tagList = new List<int>();
         if (!string.IsNullOrEmpty(tagListStr))
         {
             tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
         }
-        var beforeTag = await _customerService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         
         tagList.Add(tagId);
-        var result = await _customerService.SetCustTag(custId, tagList);
+        var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
         
-        var tempTag = await _customerService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
+        var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var afterTag = tempTag.ToList();
         var newTag = afterTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
-        var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
         var logParam = new AdminLog()
@@ -100,7 +100,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
 
     public async Task<int> RemoveCustTagAsync(int custId, int tagId)
     {
-        var tagListStr = await _customerService.GetCustomerTagsAsync(custId);
+        var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
         if (string.IsNullOrEmpty(tagListStr))
         {
             return 0;
@@ -112,22 +112,22 @@ public class MemberDashboardBll : IMemberDashboardBLL
             return 0;
         }
         tagList.RemoveAt(idx);
-        return await _customerService.SetCustTag(custId, tagList);
+        return await _memberService.SetCustTag(custId, tagList);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
     {
-        return await _customerService.EditFullNameAsync(custId, fullName);
+        return await _memberService.EditFullNameAsync(custId, fullName);
     }
 
     public async Task<int> EditEmailAsync(int custId, string email)
     {
-        return await _customerService.EditEmailAsync(custId, email);
+        return await _memberService.EditEmailAsync(custId, email);
     }
 
     public async Task<int> EditPhoneNoAsync(int custId, string phoneNo)
     {
-        return await _customerService.SetPhoneNoAsync(custId, phoneNo);
+        return await _memberService.SetPhoneNoAsync(custId, phoneNo);
     }
 
     public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date)
@@ -136,32 +136,32 @@ public class MemberDashboardBll : IMemberDashboardBLL
         if (!isValid)
             return 0;
         
-        return await _customerService.EditBirthdayAsync(custId, year, month, date);
+        return await _memberService.EditBirthdayAsync(custId, year, month, date);
     }
 
     public async Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2)
     {
-        return await _customerService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
+        return await _memberService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
     }
 
     public async Task<int> SwitchKycAsync(int custId, int status)
     {
-        return await _customerService.SwitchKycAsync(custId, status);
+        return await _memberService.SwitchKycAsync(custId, status);
     }
 
     public async Task<int> SwitchRiskAsync(int custId, int status)
     {
-        return await _customerService.SwitchRiskAsync(custId, status);
+        return await _memberService.SwitchRiskAsync(custId, status);
     }
 
     public async Task<int> SwitchPhoneVerifiedAsync(int custId, int status)
     {
-        return await _customerService.SwitchPhoneVerifiedAsync(custId, status);
+        return await _memberService.SwitchPhoneVerifiedAsync(custId, status);
     }
 
     public async Task<int> SwitchEmailVerifiedAsync(int custId, int status)
     {
-        return await _customerService.SwitchEmailVerifiedAsync(custId, status);
+        return await _memberService.SwitchEmailVerifiedAsync(custId, status);
     }
 
     public async Task<string> ResetPasswordAsync(int custId)
@@ -171,32 +171,32 @@ public class MemberDashboardBll : IMemberDashboardBLL
         _codeGenerator.RepeatCharacters = true;
         var newPassword = _codeGenerator.Generate();
         var md5NewPassword = _tools.MD5Encrypt(newPassword);
-        return await _customerService.ResetPasswordAsync(custId, md5NewPassword) > 0 ? newPassword : "";
+        return await _memberService.ResetPasswordAsync(custId, md5NewPassword) > 0 ? newPassword : "";
     }
 
     public async Task<int> SetCustStatusAsync(int custId, int status, string reason)
     {
-        return await _customerService.SetCustStatusAsync(custId, status, (int)CustTaskType.LastStatusUpdateTime);
+        return await _memberService.SetCustStatusAsync(custId, status, (int)CustTaskType.LastStatusUpdateTime);
     }
 
     public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
     {
-        return await _customerService.SwitchRebatePayoutAsync(custId, status);
+        return await _memberService.SwitchRebatePayoutAsync(custId, status);
     }
 
     public async Task<int> ResetBankInfoAsync(int custId)
     {
-        return await _customerService.ResetBankInfoAsync(custId);
+        return await _memberService.ResetBankInfoAsync(custId);
     }
 
     public async Task<int> ResetCryptoInfoAsync(int custId)
     {
-        return await _customerService.ResetCryptoInfoAsync(custId);
+        return await _memberService.ResetCryptoInfoAsync(custId);
     }
 
     public async Task<int> ResetEWalletAsync(int custId)
     {
-        return await _customerService.ResetEWalletAsync(custId);
+        return await _memberService.ResetEWalletAsync(custId);
     }
 
     public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)
@@ -206,11 +206,11 @@ public class MemberDashboardBll : IMemberDashboardBLL
 
     public async Task<int> LineUnbind(int custId)
     {
-        return await _customerService.DeleteLineProfileAsync(custId);
+        return await _memberService.DeleteLineProfileAsync(custId);
     }
 
     public async Task<int> DeleteOnUserAsync(int custId)
     {
-        return await _customerService.DeleteOnUserAsync(custId);
+        return await _memberService.DeleteOnUserAsync(custId);
     }
 }

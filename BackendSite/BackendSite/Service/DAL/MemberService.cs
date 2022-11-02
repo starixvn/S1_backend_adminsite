@@ -8,12 +8,12 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL;
 
-public class CustomerService : ICustomerService
+public class MemberService : IMemberService
 {
     private readonly MySqlClient _sqlClienct;
     private readonly MySqlClient _mainSqlClient;
 
-    public CustomerService(IEnumerable<MySqlClient> sqlCliencts)
+    public MemberService(IEnumerable<MySqlClient> sqlCliencts)
     {
         _sqlClienct = sqlCliencts.FirstOrDefault(a=>a.DataBase == DataBase.Report);
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
@@ -11,7 +12,7 @@ namespace BackendSite.Service.BLL
 {
     public class MemberQuery : IMemberQuery
     {
-        private readonly ICustomerService _customerService;
+        private readonly IMemberService _memberService;
         private readonly IDeviceService _deviceService;
         private readonly ICacheHelper _cacheHelper;
         private readonly Dictionary<string, SiteConfig> _siteConfig;
@@ -21,9 +22,9 @@ namespace BackendSite.Service.BLL
         private readonly IAffiliateApiService _affiliateApi;
         private readonly Tools _tools;
 
-        public MemberQuery(ICustomerService customerService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, MarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, MarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools)
         {
-            _customerService = customerService;
+            _memberService = memberService;
             _deviceService = deviceService;
             _cacheHelper = cacheHelper;
             _permissionBll = permissionBll;
@@ -52,7 +53,7 @@ namespace BackendSite.Service.BLL
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
 
-            var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity,
+            var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
@@ -114,7 +115,7 @@ namespace BackendSite.Service.BLL
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
 
-            var memberList = await _customerService.GetExportData(request.SiteId, currencyList, statusList,
+            var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
                 request.IovationLevel,
@@ -170,9 +171,9 @@ namespace BackendSite.Service.BLL
 
         public async Task<CustomerBasicInfo> GetCustomerBasicInfoAsync(AuthData authData, int custId)
         {
-            var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
+            var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
             var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
-            var custLineProfile = await _customerService.GetCustLineProfileAsync(custId, null);
+            var custLineProfile = await _memberService.GetCustLineProfileAsync(custId, null);
 
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
             var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
@@ -225,7 +226,7 @@ namespace BackendSite.Service.BLL
                 IsTest = customer.IsTest,
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
-                    : await _customerService.GetCustomerTagsAsync(customer.TagList)
+                    : await _memberService.GetCustomerTagsAsync(customer.TagList)
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -263,7 +264,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId)
         {
-            var custInfo = await _customerService.GetCustomerBasicInfoAsync(custId);
+            var custInfo = await _memberService.GetCustomerBasicInfoAsync(custId);
 
             if (custInfo.SiteId == (int)SiteEnum.NOVA88)
             {
@@ -295,12 +296,12 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
         {
-            return await _customerService.GetCustomerIpListByCustIdAsync(custId);
+            return await _memberService.GetCustomerIpListByCustIdAsync(custId);
         }
 
         public async Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
         {
-            var data = await _customerService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
+            var data = await _memberService.GetLoginLogAsync(custId, startTime, endTime, pageSize, pageNumber);
             var response = new GetLoginLogResponse()
             {
                 LoginLog = data.LoginLog.Select(a => new MemberLoginLog()

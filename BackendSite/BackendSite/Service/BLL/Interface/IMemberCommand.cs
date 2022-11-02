@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.BLL.Interface;
 
-public interface IMemberDashboardBLL
+public interface IMemberCommand
 {
     Task<int> AddCustTagAsync(int custId, int tagId, string @operator);
     Task<int> RemoveCustTagAsync(int custId, int tagId);
