@@ -47,6 +47,8 @@ public class MemberListDto
     public string IP { get; set; }
     public int DepositCnt { get; set; }
     public int WithdrawCnt { get; set; }
+    public int Identity { get; set; }
+    public int UserType { get; set; }
     public string LevelName { get; set; }
     public DateTime RegTime { get; set; }
     public DateTime? ReloadTime { get; set; }

@@ -49,11 +49,21 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         var startTime = request.StartDate.ToUniversalTime().DateTime;
         var endTime = request.EndDate.ToUniversalTime().DateTime;
+        var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
         var currencyList = string.Join(',', request.CurrencyId.ToArray());
         var statusList = string.Join(',', request.Status.ToArray());
         var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
+        var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
+        var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
+        var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
+        var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
+        var phoneNo = string.IsNullOrEmpty(request.PhoneNo) ? null : request.PhoneNo;
+        var bankAccountNumber = string.IsNullOrEmpty(request.BankAccountNumber) ? null : request.BankAccountNumber;
+        var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
+        var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
         var transType = GetTransType(request.TransId);
-        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity, request.UserName, request.Tags, vipList, request.AccountName, request.TpUserName, request.LoginIp, request.Email, request.PhoneNo, request.BankAccountNumber, request.AffiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, request.DeviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+        
+        var memberList = await _customerService.GetList(request.SiteId, currencyList, statusList, request.Identity, userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
         var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
         
         var response = new GetMemberListResponse()
@@ -68,8 +78,8 @@ public class MemberDashboardBll : IMemberDashboardBLL
                 SabaId = a.SabaId,
                 AffiliateCode = a.AffiliateCode,
                 TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
-                Identity = 1,
-                UserType = 1,
+                Identity = a.Identity,
+                UserType = a.UserType,
                 PointLevel = CalculatePointLevel(pointLevelInfo, a.CurrencyId, a.DepositCnt, a.WithdrawCnt, a.IsKyc),
                 Agent = a.Agent,
                 Status = a.Status,
@@ -142,10 +152,13 @@ public class MemberDashboardBll : IMemberDashboardBLL
     {
         if (string.IsNullOrEmpty(transId)) 
             return 0;
+        // 提款
         if (transId.StartsWith("W"))
             return 1;
+        // 存款
         if (transId.StartsWith("D"))
             return 2;
+        // 轉帳
         if (transId.StartsWith("T") || transId.StartsWith("AT") || transId.StartsWith("BT"))
             return 3;
         return 0;
