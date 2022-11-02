@@ -62,7 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<IActionResult> Export(ExportRegLiveStatusRequest request)
         {
             var exportData = await _registrationBll.GetExportRegLiveStatus(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "Registration");
         }
 

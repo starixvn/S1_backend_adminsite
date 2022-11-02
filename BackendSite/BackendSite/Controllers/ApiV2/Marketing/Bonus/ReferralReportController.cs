@@ -152,7 +152,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 startTime,
                 endTime);
 
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "ReferralReport");
         }
     }
