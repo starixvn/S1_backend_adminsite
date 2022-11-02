@@ -6,6 +6,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
+using System.Linq;
 
 namespace BackendSite.Service.BLL
 {
@@ -28,7 +29,8 @@ namespace BackendSite.Service.BLL
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
-
+        private readonly WinLostReportService _winLostReportService;
+        private readonly RebateManageService _rebateManageService;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -49,6 +51,8 @@ namespace BackendSite.Service.BLL
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _winLostReportService = provider.GetRequiredService<WinLostReportService>();
+            _rebateManageService = provider.GetRequiredService<RebateManageService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -180,7 +184,9 @@ namespace BackendSite.Service.BLL
             }
 
             custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-
+            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
@@ -198,7 +204,7 @@ namespace BackendSite.Service.BLL
         {
             return _walletService.GetBalance(custId);
         }
-        
+
         public Task<decimal> GetBalanceAsync(int custId)
         {
             return _walletService.GetBalanceAsync(custId);
@@ -855,7 +861,7 @@ namespace BackendSite.Service.BLL
         public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
         {
             var result = custInfoDetailForExport;
-            var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
+            var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
             if (sabaWallet != null)
@@ -871,7 +877,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
         {
-            return await _tpBll.GetTpWalletAsync(custId);
+            return await _tpBll.GetTransferTpWalletWithCacheAsync(custId);
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
@@ -935,6 +941,139 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount); ;
+        }
+
+
+        public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request,int siteId)
+        {
+            var dbParams = new GetCustTpAdjustmentLogParamsV2()
+            {
+                CustId = request.CustId,
+                TpId = request.TpId,
+                SiteId = siteId,
+                Direction = request.Direction,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
+            };
+            var queryResult = await _thirdPartyService.GetCustTpAdjustmentLogV2(dbParams);
+            
+            foreach (var data in queryResult.Data)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
+            return queryResult;
+        }
+
+        public IEnumerable<BlockBankAcc> GetBankList(int custId)
+        {
+            return _custInfoService.GetBankList(custId);
+        }
+
+        public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
+        {
+            return _custInfoService.GetEWalletList(custId);
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
+        }
+
+        public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
+            DateTime endDate)
+        {
+            var result =  _custInfoService.GetIPLog(custId, startDate, endDate);
+            if (result != null)
+            {
+                result.ToList().ForEach(x =>
+                {
+                    x.IsBlock = !string.IsNullOrWhiteSpace(x.UpdateOperator);
+                });
+            }
+            return result;
+        }
+        
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+        }
+
+        public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
+        {
+           var AllGameType =  _winLostReportService.GetAllGameType().ToList();
+           return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
+        }
+
+        public DashboardWinLossGroupData GetDashboardWinLossGroup(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var tempDashboardWinLossGroup = _custInfoService.GetDashboardWinLossGroup(custId, Convert.ToDateTime(Date));
+
+            return new DashboardWinLossGroupData()
+            {
+                Winnings = tempDashboardWinLossGroup.Winnings,
+                Losses = tempDashboardWinLossGroup.Losses,
+                WinLoss = tempDashboardWinLossGroup.Winnings + tempDashboardWinLossGroup.Losses,
+                OutstandingAmount = tempDashboardWinLossGroup.OutstandingAmount,
+                ValidBet = tempDashboardWinLossGroup.TpBetRecordStake + tempDashboardWinLossGroup.RelayStake
+            };
+        }
+
+        public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummary = _custInfoService.GetWinLoseSummary(custId, Convert.ToDateTime(Date)).ToList();
+            List<WinLoseSummary> result = winLoseSummary.GroupBy(x => x.CategoryId).Select(y => new WinLoseSummary
+            {
+                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                Name = y.First().Name,
+                CategoryId = y.Key
+            }).ToList();
+            var tPCategoryList = _rebateManageService.GetTPCategoryList().ToList();
+
+            tPCategoryList.ForEach(x =>
+            {
+                if (!result.Any(y => y.CategoryId == x.CategoryId))
+                {
+                    result.Add(new WinLoseSummary()
+                    {
+                        WinlostAmount = 0,
+                        Name = x.CategoryName,
+                        CategoryId = x.CategoryId
+                    });
+                }
+            });
+
+            return result.OrderBy(x=> x.CategoryId);
+        }
+        public IEnumerable<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(int custId, string GameTypes)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummaryDetail = _custInfoService.GetWinLoseSummaryDetail(custId, Convert.ToDateTime(Date), GameTypes).ToList();
+            List<WinLoseSummaryDetailResult> result = winLoseSummaryDetail.GroupBy(x => x.GameType).Select(y => new WinLoseSummaryDetailResult
+            {
+                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                GameName = y.First().GameName,
+                GameType = y.Key,
+                StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
+                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0)
+            }).ToList();
+
+            return result;
         }
     }
 }
