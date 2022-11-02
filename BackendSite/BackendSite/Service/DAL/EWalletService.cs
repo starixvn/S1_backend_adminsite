@@ -134,10 +134,11 @@ namespace BackendSite.Service.DAL
                             SysId = input.After.SysId,
                             AccountNum = input.After.AccountNum,
                             AccountName = x.AccountName,
-                            Status = input.After.Status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock,
+                            Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -208,9 +209,10 @@ namespace BackendSite.Service.DAL
                         SysId = input.Before.SysId,
                         AccountNum = input.Before.AccountNum,
                         AccountName = x.AccountName,
-                        Status = (int)EWalletinfoLogStatusEnum.Release
+                        Status = (int)EWalletinfoLogStatusEnum.Release,
+                        Operator = input.Operator
                     });
-                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
                     if (result == 0)
                     {
                         trans.Rollback();

@@ -176,16 +176,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             try
             {
-                if (!_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_reason")
-                    && !_permissionBll.CheckPermission("Finance/AdjustmentReport", "rm_edit_memo"))
-                {
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.PermissionDenied,
-                        Message = "Permission denied."
-                    };
-                }
-
                 var success =
                     _paymentAdjustmentBll.SetAdjustment(new ParamsWithLog<SetAdjustment>(request, User.Identity.Name));
 
