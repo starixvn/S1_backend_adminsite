@@ -15,34 +15,34 @@ public class MemberDashboardBll : IMemberDashboardBLL
     private readonly ICustomerService _customerService;
     private readonly IDeviceService _deviceService;
     private readonly ICacheHelper _cacheHelper;
-    private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
+    private readonly Dictionary<string, SiteConfig> _siteConfig;
     private readonly PermissionBLL _permissionBll;
     private readonly AdminBLL _adminBll;
     private readonly MarketingService _marketingService;
+    private readonly IAffiliateApiService _affiliateApi;
 
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
-    private readonly CourierAdapter _courierAdapter;
-    private readonly string _bonusApiUrl;
     private readonly IAdminLogService _adminLogService;
+    private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberDashboardBll> _logger;
 
 
-    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, CourierAdapter courierAdapter, IConfiguration configuration, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberDashboardBll> logger, MarketingService marketingService)
+    public MemberDashboardBll(ICustomerService customerService, ICacheHelper cacheHelper, IDeviceService deviceService, CodeGenerator codeGenerator, Tools tools, PermissionBLL permissionBll, AdminBLL adminBll, IAdminLogService adminLogService, ILogger<MemberDashboardBll> logger, MarketingService marketingService, IAffiliateApiService affiliateApi, IBonusApiService bonusApi, IOptions<Dictionary<string, SiteConfig>> siteConfig)
     {
         _customerService = customerService;
         _cacheHelper = cacheHelper;
         _deviceService = deviceService;
         _codeGenerator = codeGenerator;
         _tools = tools;
-        _courierAdapter = courierAdapter;
-        _siteConfig = siteConfig;
         _permissionBll = permissionBll;
         _adminBll = adminBll;
         _adminLogService = adminLogService;
         _logger = logger;
         _marketingService = marketingService;
-        _bonusApiUrl = configuration.GetValue<string>("BonusService");
+        _affiliateApi = affiliateApi;
+        _bonusApi = bonusApi;
+        _siteConfig = siteConfig.Value;
     }
 
     public async Task<GetMemberListResponse> GetList(GetTempMemberListRequest request)
@@ -181,19 +181,26 @@ public class MemberDashboardBll : IMemberDashboardBLL
         var customer = await _customerService.GetCustomerBasicInfoAsync(custId);
         var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
         var custLineProfile = await _customerService.GetCustLineProfileAsync(custId, null);
-        
+
         var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
         var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
-        if (custLineProfile != null && !hasPermission)
+        var email = customer.Email;
+        var phoneNo = customer.PhoneNo;
+        if (!hasPermission)
         {
-            custLineProfile.userId = _tools.MaskLineId(custLineProfile.userId);
+            if (custLineProfile != null)
+            {
+                custLineProfile.userId = _tools.MaskLineId(custLineProfile.userId);
+            }
+            email = _tools.MaskEmail(customer.Email);
+            phoneNo = _tools.MaskPhone(customer.PhoneNo);
         }
 
         var customerBasicInfo = new CustomerBasicInfo()
         {
             CustId = customer.CustId,
             VipLevel = customer.VipLevel,
-            VipLogo = $"{_siteConfig.Value[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
+            VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
             IsOnline = isOnline,
             UserName = customer.UserName,
             AccountName = customer.AccountName,
@@ -216,14 +223,22 @@ public class MemberDashboardBll : IMemberDashboardBLL
             BirthDay = customer.BirthDay,
             BirthMonth = customer.BirthMonth,
             BirthYear = customer.BirthYear,
-            Email = hasPermission ? customer.Email : _tools.MaskEmail(customer.Email),
-            MobileNumber = hasPermission ? $"({customer.AreaCode}) {customer.PhoneNo}" : $"({customer.AreaCode}) {_tools.MaskPhone(customer.PhoneNo)}",
+            Email = email,
+            MobileNumber = $"({customer.AreaCode}) {phoneNo}",
             Address = CreateAddress(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity, customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
             IsRisk = customer.IsRisk,
             IsKyc = customer.IsKyc,
             IsTest = customer.IsTest,
             TagList = customer.TagList == null ? new List<CustomerTag>() : await _customerService.GetCustomerTagsAsync(customer.TagList)
         };
+        if (!string.IsNullOrEmpty(customer.AffPlayerName))
+        {
+            var affInfo = await _affiliateApi.QueryAffInfo(customer.AffPlayerName, customer.CurrencyName, customer.SiteId);
+            if (affInfo != null)
+            {
+                customerBasicInfo.AffInfo = affInfo;
+            }
+        }
         return customerBasicInfo;
     }
 
@@ -461,15 +476,7 @@ public class MemberDashboardBll : IMemberDashboardBLL
 
     public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)
     {
-        var rewardUrl = $"{_bonusApiUrl}SetVerificationReward";
-        var verificationReq = new SetVerificationRequest()
-        {
-            CustId = custId,
-            OTPType = otpType
-        };
-
-        var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetVerificationRequest>(rewardUrl, verificationReq);
-        return apiResult;
+        return await _bonusApi.SetVerificationRewardAsync(custId, otpType);
     }
 
     public async Task<int> LineUnbind(int custId)

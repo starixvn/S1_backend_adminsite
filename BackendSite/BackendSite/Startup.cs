@@ -44,6 +44,7 @@ namespace BackendSite
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
+            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -97,6 +98,8 @@ namespace BackendSite
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IAdminLogService, AdminLogService>();
+            services.AddTransient<IAffiliateApiService, AffiliateApiService>();
+            services.AddTransient<IBonusApiService, BonusApiService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

@@ -218,6 +218,7 @@ public class CustomerDto
     public int Identity { get; set; }
     public string AffiliatesName { get; set; }
     public string AffiliatesCode { get; set; }
+    public string AffPlayerName { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -282,6 +283,23 @@ public class CustomerBasicInfo
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
+    public AffInfo AffInfo { get; set; }
+}
+
+public class AffInfo
+{
+    public string AffiliateName { get; set; }
+    public string RevenueName { get; set; }
+    public int TotalPlayers { get; set; }
+    public decimal RevenueShare { get; set; }
+    public decimal TotalEarning { get; set; }
+}
+
+public class AffToken
+{
+    public string access_token { get; set; }
+    public string token_type { get; set; }
+    public int expires_in { get; set; }
 }
 
 public class GetCustPhotoIdRequest
