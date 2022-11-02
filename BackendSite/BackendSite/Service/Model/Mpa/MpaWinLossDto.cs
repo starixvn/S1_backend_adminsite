@@ -398,13 +398,13 @@ namespace BackendSite.Service.Model.Mpa
     public class MpaWinLossByPlayerDto
     {
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public string UserName { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         public string TpUserName { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
 

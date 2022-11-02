@@ -67,6 +67,24 @@ namespace BackendSite.Service.Model.Mpa
         /// CreatedDate = 2
         /// </summary>
         public MpaDateType DateType { get; set; }
+
+        /// <summary>
+        /// 第 x 分頁
+        /// </summary>
+        public int PageNumber { get; set; }
+
+
+        /// <summary>
+        /// 一頁顯示幾筆
+        /// </summary>
+        public int PageSize { get; set; }
+
+        public string GetWinLossByPlayerRedisKey()
+        {
+            var key = $"SiteId:{SiteId}:{StarTime:yyyy-MM-dd HH:mm:ss}:{EndTime:yyyy-MM-dd HH:mm:ss}";
+            return key;
+        }
+
     }
 
 }
