@@ -492,7 +492,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
-            public int PromoCategoryId { get; set; }
+            public IEnumerable<int> PromoCategoryIds { get; set; }
             public string RefTransId { get; set; }
         }
 
@@ -1677,7 +1677,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
 
             var data = _paymentBll.GetBonusLog(request.CustId,
-                request.PromoCategoryId,
+                request.PromoCategoryIds,
                 startDate,
                 endDate,
                 request.RefTransId,

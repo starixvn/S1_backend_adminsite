@@ -88,12 +88,12 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
             var p = new DynamicParameters(
                 new { CustId = custId, 
-                    PromoCategoryId = promoCategoryId,
+                    PromoCategoryIds = promoCategoryIds,
                     StartDate = startDate, 
                     EndDate = endDate,
                     RefTransId = refTransId,
