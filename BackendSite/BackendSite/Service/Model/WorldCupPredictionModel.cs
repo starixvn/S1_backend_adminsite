@@ -209,7 +209,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public string TicketType { get; set; }
         public string TeamName { get; set; }
-        public DateTime? SelectTime { get; set; }
+        public DateTimeOffset? SelectTime { get; set; }
     }
     
     public class WorldCupPredictiveStatisticsDto
