@@ -64,8 +64,8 @@ namespace BackendSite.Service.DAL
             
             foreach (var data in siteLangDatas)
             {
-                conn.Execute("Admin_LatestHighlightVideo_Int",
-                    new { SiteId = siteId, Date = date, Operator = user, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
+                _mainDbClient.Execute("Admin_LatestHighlightVideo_Int", tran,
+                    new { SiteId = siteId, Date = date, Operator = user, Title = data.Title, Link = data.Link, LangId = data.LangId });
             }
             tran.Commit();
             

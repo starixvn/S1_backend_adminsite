@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 data.TaggedIssueName = Enum.GetName(typeof(TaggedIssue), data.TaggedIssue);
             }
             
-            var stream = _excelBll.Export(datas);
+            var stream = _excelBll.ExportV2(datas);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ShieldTaggingReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

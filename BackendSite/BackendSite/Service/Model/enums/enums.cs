@@ -1453,4 +1453,9 @@ namespace BackendSite.Service.Model.enums
         Featured = 4,
         TopCasino = 5
     }
+    public enum BlockEWalletStatus
+    { 
+        Lock = 1,
+        Unlock = 2
+    }
 }
