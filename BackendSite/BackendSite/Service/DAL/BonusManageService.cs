@@ -639,7 +639,7 @@ namespace BackendSite.Service.DAL
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionV4_Set", p, connection, transaction);
+            _mainDbClient.Execute("Admin_Promotion_Set_V5", p, connection, transaction);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
@@ -666,7 +666,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V5", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", p, connection, transaction);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
