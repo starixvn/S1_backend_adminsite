@@ -101,19 +101,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         public class CustIdWithDateRangeRequest : CustIdRequest
         {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         /// <summary>
@@ -482,10 +471,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CategoryId { get; set; }
         }
 
-        public class CustTpBetRecordDetailListbyGameTypeReq : CustIdWithDateRangeAndPageRequest
+        public class CustTpBetRecordDetailListbyGameTypeReq : ApiRequestPageModel
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         public class GetCustInfoWithBalanceRequest
@@ -1849,8 +1841,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Data = _paymentBll.GetCustTpBetRecordList(
                     request.CustId,
-                    request.StartDate.DateTime,
-                    request.EndDate.DateTime),
+                    request.StartDate.ToUniversalTime().DateTime,
+                    request.EndDate.ToUniversalTime().DateTime,
+                    request.StartDate.Offset),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -1878,8 +1871,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = _paymentBll.GetCustTpBetRecordListOneDay(
                     req.CustId,
                     req.SelDate.Date,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1907,8 +1900,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.CustId,
                     req.SelDate.Date,
                     req.CategoryId,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1926,8 +1919,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
-        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
-            CustTpBetRecordDetailListbyGameTypeReq req)
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(CustTpBetRecordDetailListbyGameTypeReq req)
         {
             var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
             var pageSize = req.PageSize;
@@ -1938,8 +1930,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.CustId,
                 req.SelDate.Date,
                 req.GameTypeId,
-                req.StartDate.DateTime,
-                req.EndDate.DateTime,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime,
                 pageSize,
                 ref pageNumber,
                 ref totalPages,

@@ -180,11 +180,6 @@ namespace BackendSite.Service.BLL
                 out transId);
         }
 
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
-        {
-            return walletService.GetCustTpBetRecordListOneWeek(custId);
-        }
-
         public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
@@ -378,11 +373,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate,TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
-                .GroupBy(x => new { SettledDate = x.SettledTime.AddHours(8).Date })
+                .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
                     SettledDate = x.Key.SettledDate,
