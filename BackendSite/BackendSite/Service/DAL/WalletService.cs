@@ -194,43 +194,6 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient.Query<PromotionCategory>("Common_PromotionCategory_Get");
             return result;
         }
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecord_byCustIDOneWeek_Get", new DynamicParameters(new { CustId = custId }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDay_Get_V5", new DynamicParameters(new
-            {
-                CustId = custId, 
-                SelDate = selDate,
-                StartDate = startDate, 
-                EndDate = endDate
-            }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate, int categoryId, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryId_Get_V5", new DynamicParameters(new  { CustId = custId, SelDate = selDate, CategoryId = categoryId, StartDate = startDate, EndDate = endDate }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, DateTime selDate, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
-        {
-            var props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
-            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            props.Add("@PageSize", Math.Abs(pageSize));
-
-            var result = _reportDbClient.Query<TpBetRecordDetailbyGameType>("Admin_TpBetRecord_byGameTypeList_Get_V5", props);
-            pageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            totalPages = props.Get<int?>("@TotalPages") ?? 0;
-            rowCount = props.Get<int?>("@RowCount") ?? 0;
-
-            return result;
-        }
 
         public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate, DateTime endDate, string user, int pageSize, int pageNumber,int categoryId, int baseCurrencyId,ref List<string> currencyAmount)
         {
@@ -339,11 +302,6 @@ namespace BackendSite.Service.DAL
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {
             return _mainDbClient.Query<VipTPCategory>("Admin_TPCategory_Get");
-        }
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }),60);
-            return result;
         }
     }
 }

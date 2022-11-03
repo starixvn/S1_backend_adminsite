@@ -446,36 +446,14 @@ namespace BackendSite.Controllers.Api
                 $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// Use：
-        /// CSD > Customer Administration > CustInfo > Statement
-        /// </remarks>
-        /// <param name="custTpBetRecordListOneWeekReq"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
-            CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>
-            {
-                ErrorCode = 0,
-                Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId)
-            };
-            return apiResult;
-        }
-
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
+            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, new TimeSpan(8, 0, 0));
 
-            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime);
-            
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
                 Data = result,
