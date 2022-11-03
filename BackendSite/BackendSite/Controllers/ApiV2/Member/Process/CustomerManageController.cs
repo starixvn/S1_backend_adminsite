@@ -1914,14 +1914,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var pageNumber = req.PageNumber;
             var result = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
                 req.StartDate.ToUniversalTime().DateTime,
                 req.EndDate.ToUniversalTime().DateTime,
                 pageSize,
                 ref pageNumber,
                 ref totalPages,
-                ref rowCount);
+                ref rowCount,
+                req.StartDate.Offset);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiResult.Data = result;
