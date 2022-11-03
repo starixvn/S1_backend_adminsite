@@ -277,8 +277,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
-        public DateTime TransTime { get; set; }
-        public DateTime SettledTime { get; set; }
+        public DateTimeOffset TransTime { get; set; }
+        public DateTimeOffset SettledTime { get; set; }
         public int SettlementType { get; set; }
         public string SettlementTypeName { get; set; }
         public decimal TurnOver_ExcludeValidTO { get; set; }
