@@ -38,10 +38,10 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+            var siteList = JsonConvert.SerializeObject(siteIds);
 
             return _bonusManageService.GetPromotionList(
-                        JsonConvert.SerializeObject(siteIds),
+                        siteList,
                         currencyIds: currencyIds != null ? JsonConvert.SerializeObject(currencyIds) : "[]",
                         JsonConvert.SerializeObject(promotionTypes),
                         status,
@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
                         endDate,
                         device,
                         bonusCode,
-                        JsonConvert.SerializeObject(siteList),
+                        siteList,
                         isSpecial,
                         (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                         Math.Abs(pageSize),
