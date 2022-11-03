@@ -413,8 +413,8 @@ namespace BackendSite.Controllers.Api
                 .GetOfflineBankAccount(req.SiteId, req.CurrencyId)
                 .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.SettingStatus == BankCardManagementStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank);
+                            && x.Channel == TransferChannelEnum.LocalBank)
+                .OrderBy(x => x.SettingStatus);
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
@@ -927,7 +927,7 @@ namespace BackendSite.Controllers.Api
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

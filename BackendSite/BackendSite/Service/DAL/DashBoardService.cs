@@ -344,30 +344,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<DashBoardGameOverAllMemberDao>("Admin_DashBoard_Game_Overall_Member_Get", props);
         }
 
-        public IEnumerable<DashBoardGameOverAllLargestSingleWinDao> GetDashBoardGameOverallLargestSingleWinData(string siteIdStr,
-                              string currencyIdStr,
-                              DateTime startDate,
-                              DateTime endDate,
-                              string tpIdStr,
-                              string categoryStr,
-                              string gameTypeStr,
-                              string timeZone,
-                              string yyyymm)
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteIds", siteIdStr);
-            props.Add("_CurrencyIds", currencyIdStr);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
-            props.Add("_TpIds", tpIdStr);
-            props.Add("_CategoryIds", categoryStr);
-            props.Add("_GameTypes", gameTypeStr);
-            props.Add("_TimeZone", timeZone);
-            props.Add("_YYYYMM", yyyymm);
-
-            return _reportDbClient.Query<DashBoardGameOverAllLargestSingleWinDao>("Admin_DashBoard_Game_Overall_SingleWin_Get", props);
-        }
-
         public IEnumerable<DashBoardGameTopDao> GetGameTopTwenty(
             DashboardGameTopDataTypeEnum type,
             string siteIdStr,

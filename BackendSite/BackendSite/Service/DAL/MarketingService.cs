@@ -25,6 +25,11 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<PointLevelInfo>("PointLevelInfo_Get", new DynamicParameters(new { SiteId = siteId, CurrencyId = currencyId }));
         }
 
+        public async Task<IEnumerable<PointLevelInfo>> GetPointLevelInfos(int siteId)
+        {
+            return await _reportDbClient.QueryAsync<PointLevelInfo>("Admin_PointLevelInfo_Get", new DynamicParameters(new { _SiteId = siteId }));
+        }
+
         public bool AddPointLevelInfo(PointLevelInfo pointLevelInfo)
         {
             var param = new

@@ -43,7 +43,12 @@ public class MemberListDto
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
+    public bool IsKyc { get; set; }
     public string IP { get; set; }
+    public int DepositCnt { get; set; }
+    public int WithdrawCnt { get; set; }
+    public int Identity { get; set; }
+    public int UserType { get; set; }
     public string LevelName { get; set; }
     public DateTime RegTime { get; set; }
     public DateTime? ReloadTime { get; set; }
@@ -277,29 +282,6 @@ public class CustomerBasicInfo
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
-}
-
-public class GetCustInfoWithBalanceRequest
-{
-    public int SiteId { get; set; }
-    public string UserName { get; set; }
-    public string SabaId { get; set; }
-}
-
-public class GetCustInfoWithBalanceResult
-{
-    public int SiteId { get; set; }
-    public string SiteName { get; set; }
-    public int CustId { get; set; }
-    public string UserName { get; set; }
-    public int CurrencyId { get; set; }
-    public CustomerStatusEnum Status { get; set; }
-    public decimal Balance { get; set; }
-}
-        
-public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
-{
-    public IEnumerable<TpWallet> TpWalletList { get; set; }
 }
 
 public class GetCustPhotoIdRequest

@@ -103,19 +103,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         public class CustIdWithDateRangeRequest : CustIdRequest
         {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         /// <summary>
@@ -481,7 +470,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
-            public int PromoCategoryId { get; set; }
+            public IEnumerable<int> PromoCategoryIds { get; set; }
             public string RefTransId { get; set; }
         }
 
@@ -496,10 +485,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CategoryId { get; set; }
         }
 
-        public class CustTpBetRecordDetailListbyGameTypeReq : CustIdWithDateRangeAndPageRequest
+        public class CustTpBetRecordDetailListbyGameTypeReq : ApiRequestPageModel
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         public class GetCustInfoWithBalanceRequest
@@ -1655,7 +1647,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
         public ApiResult GetBonusLogByCustId(GetBonusLogRequest request)
         {
@@ -1664,7 +1656,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
 
             var data = _paymentBll.GetBonusLog(request.CustId,
-                request.PromoCategoryId,
+                request.PromoCategoryIds,
                 startDate,
                 endDate,
                 request.RefTransId,
@@ -1840,8 +1832,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Data = _paymentBll.GetCustTpBetRecordList(
                     request.CustId,
-                    request.StartDate.DateTime,
-                    request.EndDate.DateTime),
+                    request.StartDate.ToUniversalTime().DateTime,
+                    request.EndDate.ToUniversalTime().DateTime,
+                    request.StartDate.Offset),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -1869,8 +1862,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = _paymentBll.GetCustTpBetRecordListOneDay(
                     req.CustId,
                     req.SelDate.Date,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1898,8 +1891,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.CustId,
                     req.SelDate.Date,
                     req.CategoryId,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1917,8 +1910,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
-        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
-            CustTpBetRecordDetailListbyGameTypeReq req)
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(CustTpBetRecordDetailListbyGameTypeReq req)
         {
             var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
             var pageSize = req.PageSize;
@@ -1927,14 +1919,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var pageNumber = req.PageNumber;
             var result = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
-                req.StartDate.DateTime,
-                req.EndDate.DateTime,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime,
                 pageSize,
                 ref pageNumber,
                 ref totalPages,
-                ref rowCount);
+                ref rowCount,
+                req.StartDate.Offset);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiResult.Data = result;

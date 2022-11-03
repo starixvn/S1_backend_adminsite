@@ -285,7 +285,7 @@ namespace BackendSite.Controllers.Api
                 : DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
 
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                getBonusLogReq.PromoCategoryId,
+                new List<int>() { getBonusLogReq.PromoCategoryId },
                 startDate,
                 endDate,
                 getBonusLogReq.RefTransId,
@@ -329,34 +329,13 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// Use：
-        /// CSD > Customer Administration > CustInfo > Statement
-        /// </remarks>
-        /// <param name="custTpBetRecordListOneWeekReq"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
-            CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>
-            {
-                ErrorCode = 0,
-                Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId)
-            };
-            return apiResult;
-        }
-
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
-
-            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime);
+            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, new TimeSpan(8, 0, 0));
 
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -471,14 +450,14 @@ namespace BackendSite.Controllers.Api
 
             var result = _paymentBLL.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
                 startTime,
                 endTime,
                 PageSize,
                 ref PageNumber,
                 ref TotalPages,
-                ref RowCount);
+                ref RowCount,
+                new TimeSpan(8,0,0));
 
             foreach (var data in result)
             {
@@ -1021,8 +1000,8 @@ namespace BackendSite.Controllers.Api
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-
-            var stream = _excelBLL.Export(searchResult.VipRebateInfoList);
+            
+            var stream = _excelBLL.ExportV2(searchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

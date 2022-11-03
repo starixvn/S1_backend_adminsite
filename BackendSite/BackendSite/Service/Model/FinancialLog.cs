@@ -149,6 +149,7 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
         public int BonusId { get; set; }
+        public string BonusCode { get; set; }
         public DateTime CreateTime { get; set; }
         public string TypeName { get; set; }
         public DirectionEnum Direction { get; set; }
@@ -244,8 +245,8 @@ namespace BackendSite.Service.Model
         public decimal TurnOver { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
-        public DateTime TransTime { get; set; }
-        public DateTime SettledTime { get; set; }
+        public DateTimeOffset TransTime { get; set; }
+        public DateTimeOffset SettledTime { get; set; }
         public int SettlementType { get; set; }
         public string SettlementTypeName { get; set; }
         public decimal TurnOver_ExcludeValidTO { get; set; }
