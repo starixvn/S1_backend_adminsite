@@ -567,15 +567,15 @@ namespace BackendSite.Controllers.Api
             
             var result =_paymentBLL.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
                 startTime,
                 endTime,
                 PageSize,
                 ref PageNumber,
                 ref TotalPages,
-                ref RowCount);
-            
+                ref RowCount,
+                new TimeSpan(8,0,0));
+
             foreach (var data in result)
             {
                 data.SettledTime = data.SettledTime.AddHours(8);
