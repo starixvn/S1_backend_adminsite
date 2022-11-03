@@ -437,7 +437,7 @@ public class ResetMemberPasswordRequest
 public class LockMemberRequest
 {
     public int CustId { get; set; }
-    public int Status { get; set; }
+    public CustomerStatusEnum Status { get; set; }
     public string Reason { get; set; }
 }
 
@@ -477,13 +477,7 @@ public class ResetEwalletRequest
 public class PayoutVerificationRewardRequest
 {
     public int CustId { get; set; }
-    public int OTPType { get; set; }
-}
-
-public class SetVerificationRequest
-{
-    public int CustId { get; set; }
-    public int OTPType { get; set; }
+    public OTPTypeEnum OTPType { get; set; }
 }
 
 public class GetIpListRequest

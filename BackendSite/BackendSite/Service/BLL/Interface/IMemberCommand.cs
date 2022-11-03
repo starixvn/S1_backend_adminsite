@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL.Interface;
 
@@ -15,13 +16,13 @@ public interface IMemberCommand
     Task<int> SwitchRiskAsync(int custId, int status, string @operator);
     Task<int> SwitchPhoneVerifiedAsync(int custId, int status, string @operator);
     Task<int> SwitchEmailVerifiedAsync(int custId, int status, string @operator);
-    Task<string> ResetPasswordAsync(int custId);
-    Task<int> SetCustStatusAsync(int custId, int status, string reason);
-    Task<int> SwitchRebatePayoutAsync(int custId, int status);
-    Task<int> ResetBankInfoAsync(int custId);
-    Task<int> ResetCryptoInfoAsync(int custId);
-    Task<int> ResetEWalletAsync(int custId);
-    Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType);
+    Task<string> ResetPasswordAsync(int custId, string @operator);
+    Task<int> SetCustStatusAsync(int custId, CustomerStatusEnum status, string reason, string @operator);
+    Task<int> SwitchRebatePayoutAsync(int custId, int status, string @operator);
+    Task<int> ResetBankInfoAsync(int custId, string @operator);
+    Task<int> ResetCryptoInfoAsync(int custId, string @operator);
+    Task<int> ResetEWalletAsync(int custId, string @operator);
+    Task<ApiResult> SetVerificationRewardAsync(int custId, OTPTypeEnum otpType, string @operator);
     Task<int> LineUnbind(int custId, string @operator);
-    Task<int> DeleteOnUserAsync(int custId);
+    Task<int> DeleteOnUserAsync(int custId, string @operator);
 }

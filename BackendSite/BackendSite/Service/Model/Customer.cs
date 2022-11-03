@@ -609,6 +609,12 @@ namespace BackendSite.Service.Model
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }
+    public class EWalletDetail
+    {
+        [LogIgnore]
+        public int SysId { set; get; }
+        public string AccountNo { set; get; }
+    }
     public class WithdrawalLimitLog
     {
         private DateTimeOffset _createTime { get; set; }

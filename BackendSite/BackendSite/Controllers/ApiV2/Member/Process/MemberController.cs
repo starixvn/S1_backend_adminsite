@@ -678,7 +678,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
         {
-            var newPassword = await _memberCommand.ResetPasswordAsync(request.CustId);
+            var newPassword = await _memberCommand.ResetPasswordAsync(request.CustId, User.Identity.Name);
 
             if (!string.IsNullOrEmpty(newPassword))
             {
@@ -707,7 +707,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -730,7 +730,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> KickOut(KickOutMemberRequest request)
         {
-            if (await _memberCommand.DeleteOnUserAsync(request.CustId) > 0)
+            if (await _memberCommand.DeleteOnUserAsync(request.CustId, User.Identity.Name) > 0)
             {
 
                 return new ApiResult
@@ -757,7 +757,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Close(CloseMemberRequest request)
         {
-            if (await _memberCommand.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, CustomerStatusEnum.Closed, request.Reason, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -783,7 +783,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
         {
-            if (await _memberCommand.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
+            if (await _memberCommand.SwitchRebatePayoutAsync(request.CustId, (int)request.Status, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -809,7 +809,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetBankInfoAsync(ResetBankInfoRequest request)
         {
-            if (await _memberCommand.ResetBankInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetBankInfoAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -835,7 +835,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetCryptoInfoAsync(ResetCryptoInfoRequest request)
         {
-            if (await _memberCommand.ResetCryptoInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetCryptoInfoAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -861,7 +861,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetEWalletAsync(ResetEwalletRequest request)
         {
-            if (await _memberCommand.ResetEWalletAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetEWalletAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -887,7 +887,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> PayoutVerificationReward(PayoutVerificationRewardRequest request)
         {
-            var apiResult = await _memberCommand.SetVerificationRewardAsync(request.CustId, request.OTPType);
+            var apiResult = await _memberCommand.SetVerificationRewardAsync(request.CustId, request.OTPType, User.Identity.Name);
             return apiResult;
         }
 
