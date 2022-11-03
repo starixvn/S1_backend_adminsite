@@ -1,5 +1,198 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 namespace BackendSite.Service.Model;
+
+public class GetTempMemberListRequest : ApiRequestPageModel
+{
+    public int SiteId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+    public int DateType { get; set; }
+    public IEnumerable<int> CurrencyId { get; set; }
+    public IEnumerable<int> Status { get; set; }
+    public int Identity { get; set; }
+    public string UserName { get; set; }
+    public string TpUserName { get; set; }
+    public string AffiliateName { get; set; }
+    public string LoginIp { get; set; }
+    public string Email { get; set; }
+    public string PhoneNo { get; set; }
+    public string AccountName { get; set; }
+    public string BankAccountNumber { get; set; }
+    public string AffiliateCode { get; set; }
+    public IEnumerable<int> Tags { get; set; }
+    public IEnumerable<int> VipLevel { get; set; }
+    public string TransId { get; set; }
+    public int ShieldLevel { get; set; }
+    public int IovationLevel { get; set; }
+    public string DeviceId { get; set; }
+    public int UserType { get; set; }
+}
+
+public class MemberListDto
+{
+    public string SiteName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string SabaId { get; set; }
+    public string AffiliateCode { get; set; }
+    public string TagList { get; set; }
+    public int UserLevel { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public bool IsTest { get; set; }
+    public bool IsKyc { get; set; }
+    public string IP { get; set; }
+    public int DepositCnt { get; set; }
+    public int WithdrawCnt { get; set; }
+    public int Identity { get; set; }
+    public int UserType { get; set; }
+    public string LevelName { get; set; }
+    public DateTime RegTime { get; set; }
+    public DateTime? ReloadTime { get; set; }
+    public DateTime? LastTagUpdateTime { get; set; }
+    public DateTime? LastStatusUpdateTime { get; set; }
+    public decimal Balance { get; set; }
+    public decimal Bonus { get; set; }
+    public string DeviceScore { get; set; }
+    public string ShieldId { get; set; }
+}
+
+public class GetMemberListData
+{
+    public IEnumerable<MemberListDto> Data { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
+
+public class MemberList
+{
+    public string SiteName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string SabaId { get; set; }
+    public string AffiliateCode { get; set; }
+    public List<int> TagList { get; set; }
+    public int PointLevel { get; set; }
+    public int UserType { get; set; }
+    public int Identity { get; set; }
+    public string  AffiliateName { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public bool IsTest { get; set; }
+    public string IP { get; set; }
+    public string LevelName { get; set; }
+    public DateTimeOffset RegTime { get; set; }
+    public DateTimeOffset? LastActiveTime { get; set; }
+    public DateTimeOffset? LastTagUpdateTime { get; set; }
+    public DateTimeOffset? LastStatusUpdateTime { get; set; }
+    public decimal Balance { get; set; }
+    public decimal Bonus { get; set; }
+    public string DeviceScore { get; set; }
+    public string DeviceId { get; set; }
+}
+
+public class GetMemberListResponse
+{
+    public IEnumerable<MemberList> Data { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
+
+public class ExportMemberRequest
+{
+    public int SiteId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+    public int DateType { get; set; }
+    public IEnumerable<int> CurrencyId { get; set; }
+    public IEnumerable<int> Status { get; set; }
+    public int Identity { get; set; }
+    public string UserName { get; set; }
+    public string TpUserName { get; set; }
+    public string AffiliateName { get; set; }
+    public string LoginIp { get; set; }
+    public string Email { get; set; }
+    public string PhoneNo { get; set; }
+    public string AccountName { get; set; }
+    public string BankAccountNumber { get; set; }
+    public string AffiliateCode { get; set; }
+    public IEnumerable<int> Tags { get; set; }
+    public IEnumerable<int> VipLevel { get; set; }
+    public string TransId { get; set; }
+    public int ShieldLevel { get; set; }
+    public int IovationLevel { get; set; }
+    public string DeviceId { get; set; }
+    public int UserType { get; set; }
+    public bool ExportTransferWallet { get; set; } = false;
+}
+
+
+public class MemberExportDataDto
+{
+    public string SiteName { get; set; }
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string SabaId { get; set; }
+    public string AffiliateId { get; set; }
+    public string AffiliateCode { get; set; }
+    public string SignupUrl { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+    public string Email { get; set; }
+    public string RealName { get; set; }
+    public string CountryCode { get; set; }
+    public string AreaCode { get; set; }
+    public string PhoneNo { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public bool IsTest { get; set; }
+    public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
+    public string LastActivityIp { get; set; }
+    public string LevelName { get; set; }
+    public DateTime RegTime { get; set; }
+    public decimal SeamlessWallet { get; set; }
+    public decimal BonusWallet { get; set; }
+}
+
+public class MemberExportData
+{
+    public string SiteName { get; set; }
+    public string UserName { get; set; }
+    public int CustId { get; set; }
+    public int BirthDate { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthYear { get; set; }
+    public bool IsTest { get; set; }
+    public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
+    public decimal SeamlessWallet { get; set; }
+    public decimal BonusWallet { get; set; }
+    public string Email { get; set; }
+    public string RealName { get; set; }
+    public string CountryCode { get; set; }
+    public string AreaCode { get; set; }
+    public string PhoneNo { get; set; }
+    public string Currency { get; set; }
+    public string LevelName { get; set; }
+    public string Agent { get; set; }
+    public int Status { get; set; }
+    public DateTimeOffset RegTime { get; set; }
+    public string SabaId { get; set; }
+    public string SignupUrl { get; set; }
+    public string AffiliateId { get; set; }
+    public string AffiliateCode { get; set; }
+    public string LastActivityIp { get; set; }
+}
 
 public class GetCustomerBasicInfoRequest
 {
@@ -18,12 +211,14 @@ public class CustomerDto
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int PointLevel { get; set; }
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; }
     public int Identity { get; set; }
     public string AffiliatesName { get; set; }
     public string AffiliatesCode { get; set; }
+    public string AffPlayerName { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -68,6 +263,7 @@ public class CustomerBasicInfo
     public bool IsLineBinding { get; set; }
     public CustLineProfileModel CustLineProfile { get; set; }
     public int Status { get; set; }
+    public int EnableRebate { get; set; }
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
     public int Identity { get; set; }
@@ -87,29 +283,23 @@ public class CustomerBasicInfo
     public bool IsKyc { get; set; }
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
+    public AffInfo AffInfo { get; set; }
 }
 
-public class GetCustInfoWithBalanceRequest
+public class AffInfo
 {
-    public int SiteId { get; set; }
-    public string UserName { get; set; }
-    public string SabaId { get; set; }
+    public string AffiliateName { get; set; }
+    public string RevenueName { get; set; }
+    public int TotalPlayers { get; set; }
+    public decimal RevenueShare { get; set; }
+    public decimal TotalEarning { get; set; }
 }
 
-public class GetCustInfoWithBalanceResult
+public class AffToken
 {
-    public int SiteId { get; set; }
-    public string SiteName { get; set; }
-    public int CustId { get; set; }
-    public string UserName { get; set; }
-    public int CurrencyId { get; set; }
-    public CustomerStatusEnum Status { get; set; }
-    public decimal Balance { get; set; }
-}
-        
-public class GetCustInfoWithTpBalanceResult : GetCustInfoWithBalanceResult
-{
-    public IEnumerable<TpWallet> TpWalletList { get; set; }
+    public string access_token { get; set; }
+    public string token_type { get; set; }
+    public int expires_in { get; set; }
 }
 
 public class GetCustPhotoIdRequest
@@ -133,6 +323,44 @@ public class DeleteCustPhotoIdRequest
 {
     public int CustId { get; set; }
     public int Id { get; set; }
+}
+public class GetVipLevelSettingRequest
+{
+    public int SiteId { get; set; }
+}
+
+public class GetVipLevelInfoRequest
+{
+    public int CustId { get; set; }
+}
+
+public class GetVipLevelLogRequest
+{
+    public int CustId { get; set; }
+}
+
+public class SetVipLevelRequest
+{
+    public int CustId { get; set; }
+    public int VipLevel { get; set; }
+}
+
+public class SetVipLevelManuallyRequest
+{
+    public int CustId { get; set; }
+    public int Manually { get; set; }
+}
+
+public class AddTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
+}
+
+public class RemoveTagRequest
+{
+    public int CustId { get; set; }
+    public int TagId { get; set; }
 }
 
 public class LineUnbindRequest
@@ -209,7 +437,13 @@ public class ResetMemberPasswordRequest
 public class LockMemberRequest
 {
     public int CustId { get; set; }
-    public int Status { get; set; }
+    public CustomerStatusEnum Status { get; set; }
+    public string Reason { get; set; }
+}
+
+public class KickOutMemberRequest
+{
+    public int CustId { get; set; }
     public string Reason { get; set; }
 }
 
@@ -243,13 +477,7 @@ public class ResetEwalletRequest
 public class PayoutVerificationRewardRequest
 {
     public int CustId { get; set; }
-    public int OTPType { get; set; }
-}
-
-public class SetVerificationRequest
-{
-    public int CustId { get; set; }
-    public int OTPType { get; set; }
+    public OTPTypeEnum OTPType { get; set; }
 }
 
 public class GetIpListRequest
@@ -261,8 +489,10 @@ public class MemberLoginDevice
 {
     public string DeviceId { get; set; }
     public string Risk { get; set; }
+    public int Score { get; set; }
     public int Frequency { get; set; }
     public int AssociateCount { get; set; }
+    public string DeviceType { get; set; }
     public DateTimeOffset LastUpdateTime { get; set; }
 }
 
@@ -271,7 +501,6 @@ public class CustomerLoginIp
     public string LoginIp { get; set; }
     public int UserCount { get; set; }
 }
-
 
 public class CustomerBalanceInfo
 {
@@ -287,14 +516,16 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-    public decimal RemainingTurnOver 
+
+    public decimal RemainingTurnOver
     {
-        get 
+        get
         {
             var remainingTurnOver = WithdrawalLimit - TurnOver;
             return remainingTurnOver > 0 ? remainingTurnOver : 0;
-        }     
+        }
     }
+
     public decimal EligibleWithdrawal
     {
         get
@@ -303,4 +534,45 @@ public class CustomerBalanceInfo
             return eligibleWithdrawal < 0 ? 0 : eligibleWithdrawal;
         }
     }
+}
+
+public class GetLoginLogRequest : ApiRequestPageModel
+{
+    public int CustId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+}
+
+public class GetLoginLogResponse
+{
+    public IEnumerable<MemberLoginLog> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
+}
+public class MemberLoginLog
+{
+    public int Id { get; set; }
+    public DateTimeOffset LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string Location { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+public class LoginLogDto
+{
+    public int Id { get; set; }
+    public DateTime LoginTime { get; set; }
+    public string LoginIp { get; set; }
+    public string Location { get; set; }
+    public string FromUrl { get; set; }
+    public string UserAgent { get; set; }
+}
+
+public class LoginLogPageData
+{
+    public IEnumerable<LoginLogDto> LoginLog { get; set; }
+    public int PageNumber { get; set; }
+    public int TotalPages { get; set; }
+    public int RowCount { get; set; }
 }

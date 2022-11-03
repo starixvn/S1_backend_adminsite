@@ -69,6 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             {
                 item.TransTime = item.TransTime.ToOffset(offset);
                 item.SettledTime = item.SettledTime.ToOffset(offset);
+                item.SetBetListTimeOffset(offset);
             }
 
             var stream = _excelBll.ExportV2(data);

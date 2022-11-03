@@ -672,6 +672,7 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
+        SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73
     }
 
@@ -1229,6 +1230,13 @@ namespace BackendSite.Service.Model.enums
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
+    }
+
+    public enum AffSiteEnum
+    {
+        N88 = 1,
+        N8G = 2,
+        N8B = 3
     }
 
     public enum WithdrawalMethodEnum

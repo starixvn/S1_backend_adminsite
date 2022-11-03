@@ -11,6 +11,6 @@
         public int DepositCnt { get; set; }
 
         public int WithdrawalCnt { get; set; }
-        public int IsKyc { get; set; }
+        public bool IsKyc { get; set; }
     }
 }

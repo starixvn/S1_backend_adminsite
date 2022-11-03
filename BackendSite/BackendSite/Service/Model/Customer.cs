@@ -500,7 +500,6 @@ namespace BackendSite.Service.Model
         public string TagColour { get; set; }
         public int Status { get; set; }
         public string Description { get; set; }
-        // public DateTimeOffset CreateTime { get; set; }
         public string Creator { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
@@ -680,7 +679,14 @@ namespace BackendSite.Service.Model
         public string NickName { set; get; }
         public string USDTAddress { set; get; }
     }
-    
+
+    public class EWalletDetail
+    {
+        [LogIgnore]
+        public int SysId { set; get; }
+        public string AccountNo { set; get; }
+    }
+
     public class WithdrawalLimitLog
     {
         private DateTimeOffset _createTime { get; set; }
