@@ -618,7 +618,7 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.PayList[0];
                         }*/
                     } else if (this.state.selectType == 2) {
-                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
+                        selectPay = this.state.BankInfoOffList.filter(x => x.settingStatus === 1).map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
