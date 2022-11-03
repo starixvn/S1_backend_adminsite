@@ -1062,7 +1062,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
-        
+
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             var p = new DynamicParameters();
@@ -1097,6 +1097,11 @@ namespace BackendSite.Service.DAL
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
         {
             return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+        }
+
+        public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<EWalletDetail>("Admin_CustEWalletDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
     }
 }

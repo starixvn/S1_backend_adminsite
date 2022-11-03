@@ -14,23 +14,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class MemberController : ControllerBase
     {
-        private readonly IMemberDashboardBLL _memberDashboardBll;
+        private readonly IMemberCommand _memberCommand;
+        private readonly IMemberQuery _memberQuery;
         private readonly ICustPhotoIdBLL _custPhotoIdBll;
+        private readonly IVipLevelBLL _vipLevelBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
+        private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberDashboardBLL memberDashboardBll, ICustPhotoIdBLL custPhotoIdBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
+        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
                 NewAuthorizeBLL newAuthorizeBll,
-                PaymentAdjustmentReportBLL paymentAdjustmentReportBll)
+                PaymentAdjustmentReportBLL paymentAdjustmentReportBll, 
+                ExcelBLL excelBll, 
+                IMemberQuery memberQuery)
         {
-            _memberDashboardBll = memberDashboardBll;
+            _memberCommand = memberCommand;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
             _newAuthorizeBll = newAuthorizeBll;
             _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
+            _excelBll = excelBll;
+            _newAuthorizeBll = newAuthorizeBll;
+            _memberQuery = memberQuery;
+            _vipLevelBll = vipLevelBll;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -76,6 +85,54 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiListResult<MemberList>> GetList(GetTempMemberListRequest request)
+        {
+            var result = await _memberQuery.GetListAsync(request);
+            return new ApiListResult<MemberList>()
+            {
+                Data = result.Data,
+                TotalPages = result.TotalPages,
+                PageNumber = result.PageNumber,
+                RowCount = result.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustManage/GetList 取得客戶資料清單
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > [Submit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [HttpPost]
+        public async Task<IActionResult> Export(ExportMemberRequest request)
+        {
+            var exportData = await _memberQuery.GetExportDataAsync(request);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            return _excelBll.ExcelFile(stream, "CustInfoList");
+        }
+
+        /// <summary>
         /// Member/GetCustomerBasicInfo 取得客戶基本資料
         /// </summary>
         /// <remarks>
@@ -89,7 +146,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<CustomerBasicInfo>> GetBasicInfo(GetCustomerBasicInfoRequest request)
         {
-            var data = await _memberDashboardBll.GetCustomerBasicInfoAsync(request.CustId);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var data = await _memberQuery.GetCustomerBasicInfoAsync(authData, request.CustId);
 
             var apiResult = new ApiResult<CustomerBasicInfo>()
             {
@@ -109,6 +167,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GetCustPhotoIdResponse>>> GetCustPhotoId(GetCustPhotoIdRequest request)
         {
@@ -134,6 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 5 })]
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
         {
@@ -162,6 +222,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 4 })]
         [HttpPost]
         public async Task<ApiResult> DeleteCustPhotoId(DeleteCustPhotoIdRequest request)
         {
@@ -178,8 +239,165 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Delete Fail.");
         }
+
         /// <summary>
-        /// CustomerManage/LineUnbind 解除用戶Line帳號綁定
+        /// Member/GetVipLevelInfo 取得指定客戶VIP等級資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<MemberVipLevelInfo>> GetVipLevelInfo(GetVipLevelInfoRequest request)
+        {
+            var apiListResult = new ApiResult<MemberVipLevelInfo>
+            {
+                Data = await _vipLevelBll.GetVipLevelInfoAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/GetVipLevelLog 取得指定客戶VIP等級紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level Log
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<MemberVipLevelLog>>> GetVipLevelLog(GetVipLevelLogRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<MemberVipLevelLog>>
+            {
+                Data = await _vipLevelBll.GetVipLevelLogAsync(request.CustId),
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
+        /// Member/SetVipLevel 設定指定客戶VIP等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Edit]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 44 })]
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevel(SetVipLevelRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result = await _vipLevelBll.SetVipLevelAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, request.VipLevel, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel fail");
+        }
+
+        /// <summary>
+        /// Member/SetVipLevelManually 設定VIP等級為手動
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Manually]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevelManually(SetVipLevelManuallyRequest custIdReq)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custIdReq.CustId);
+            var result = await _vipLevelBll.SetVipLevelManuallyAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custIdReq.Manually, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Manually Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 設定客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Add]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 5 })]
+        [HttpPost]
+        public async Task<ApiResult> AddTag(AddTagRequest request)
+        {
+            if (await _memberCommand.AddCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Add Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Add Tag Fail.");
+        }
+
+        /// <summary>
+        /// Member/SetCustTag 移除客戶標籤
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > [Remove]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 4 })]
+        [HttpPost]
+        public async Task<ApiResult> RemoveTag(RemoveTagRequest request)
+        {
+            if (await _memberCommand.RemoveCustTagAsync(request.CustId, request.TagId, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Remove Tag Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Remove Tag Fail.");
+        }
+
+        /// <summary>
+        /// Member/LineUnbind 解除用戶Line帳號綁定
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -189,12 +407,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 47 })]
+        [HttpPost]
         public async Task<ApiResult> LineUnbind(LineUnbindRequest request)
         {
-            var result = await _memberDashboardBll.LineUnbind(request.CustId);
-            if (result > 0)
+            if (await _memberCommand.LineUnbind(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -202,7 +419,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Line Unbind Success."
                 };
             }
-
             throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
         }
 
@@ -220,7 +436,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberDashboardBll.EditFullNameAsync(request.CustId, request.FullName);
+            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
 
             if (result > 0)
             {
@@ -248,7 +464,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberDashboardBll.EditEmailAsync(request.CustId, request.Email);
+            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email, User.Identity.Name);
 
             if (result > 0)
             {
@@ -276,7 +492,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberDashboardBll.EditPhoneNoAsync(request.CustId, request.PhoneNo);
+            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo, User.Identity.Name);
 
             if (result > 0)
             {
@@ -304,9 +520,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
-            var result = await _memberDashboardBll.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
-
-            if (result > 0)
+            if (await _memberCommand.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -332,7 +546,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
-            var result = await _memberDashboardBll.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+            var result = await _memberCommand.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2, User.Identity.Name);
 
             if (result > 0)
             {
@@ -360,7 +574,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchKycAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchKycAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -388,7 +602,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
         {
-            var result = await _memberDashboardBll.SwitchRiskAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchRiskAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -416,7 +630,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchEmailVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchEmailVerifiedAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -444,7 +658,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
         {
-            var result = await _memberDashboardBll.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchPhoneVerifiedAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -472,7 +686,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetPassword(ResetMemberPasswordRequest request)
         {
-            var newPassword = await _memberDashboardBll.ResetPasswordAsync(request.CustId);
+            var newPassword = await _memberCommand.ResetPasswordAsync(request.CustId, User.Identity.Name);
 
             if (!string.IsNullOrEmpty(newPassword))
             {
@@ -501,7 +715,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, request.Status, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -511,6 +725,30 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        /// <summary>
+        /// Member/KickOut 強制讓客戶登出
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 30 })]
+        [HttpPost]
+        public async Task<ApiResult> KickOut(KickOutMemberRequest request)
+        {
+            if (await _memberCommand.DeleteOnUserAsync(request.CustId, User.Identity.Name) > 0)
+            {
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Kick Out Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
         }
         
         /// <summary>
@@ -527,7 +765,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Close(CloseMemberRequest request)
         {
-            if (await _memberDashboardBll.SetCustStatusAsync(request.CustId, (int)CustomerStatusEnum.Closed, request.Reason) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, CustomerStatusEnum.Closed, request.Reason, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -553,7 +791,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
         {
-            if (await _memberDashboardBll.SwitchRebatePayoutAsync(request.CustId, (int)request.Status) > 0)
+            if (await _memberCommand.SwitchRebatePayoutAsync(request.CustId, (int)request.Status, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -575,11 +813,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 22 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 62 })]
         [HttpPost]
         public async Task<ApiResult> ResetBankInfoAsync(ResetBankInfoRequest request)
         {
-            if (await _memberDashboardBll.ResetBankInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetBankInfoAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -605,7 +843,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetCryptoInfoAsync(ResetCryptoInfoRequest request)
         {
-            if (await _memberDashboardBll.ResetCryptoInfoAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetCryptoInfoAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -631,7 +869,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetEWalletAsync(ResetEwalletRequest request)
         {
-            if (await _memberDashboardBll.ResetEWalletAsync(request.CustId) > 0)
+            if (await _memberCommand.ResetEWalletAsync(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -657,7 +895,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> PayoutVerificationReward(PayoutVerificationRewardRequest request)
         {
-            var apiResult = await _memberDashboardBll.SetVerificationRewardAsync(request.CustId, request.OTPType);
+            var apiResult = await _memberCommand.SetVerificationRewardAsync(request.CustId, request.OTPType, User.Identity.Name);
             return apiResult;
         }
 
@@ -675,7 +913,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<MemberLoginDevice>>> GetDeviceList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetDeviceListByCustIdAsync(request.CustId);
+            var data = await _memberQuery.GetDeviceListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<MemberLoginDevice>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -698,7 +936,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerLoginIp>>> GetIpList(GetIpListRequest request)
         {
-            var data = await _memberDashboardBll.GetIpListByCustIdAsync(request.CustId);
+            var data = await _memberQuery.GetIpListByCustIdAsync(request.CustId);
             var apiResult = new ApiResult<IEnumerable<CustomerLoginIp>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -816,8 +1054,34 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult<CustomerBalanceInfo>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _memberDashboardBll.GetCustomerBalanceInfoAsync(request.CustId)
+                Data = await _memberQuery.GetCustomerBalanceInfoAsync(request.CustId)
             };
+        }
+
+        /// <summary>
+        /// CustManage/GetLoginLogByCust 取得指定客戶登入紀錄
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
+        {
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            
+            var loginLog = await _memberQuery.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
+            var apiResult = new ApiListResult<MemberLoginLog>
+            {
+                Data = loginLog.LoginLog,
+                PageNumber = loginLog.PageNumber,
+                TotalPages = loginLog.TotalPages,
+                RowCount = loginLog.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
         }
     }
 }

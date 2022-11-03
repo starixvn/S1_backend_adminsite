@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -66,6 +67,13 @@ namespace BackendSite.Service.BLL
         public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
             return _blockService.ReleaseAccount(input);
+        }
+
+        public async Task<IEnumerable<DeviceUser>> GetDeviceUserList(int siteId, string deviceId)
+        {
+            if(siteId == (int)SiteEnum.NOVA88) 
+                return await _blockService.GetIoavationAssociatedList(deviceId);
+            return await _blockService.GetShieldAssociatedList(deviceId);
         }
     }
 }
