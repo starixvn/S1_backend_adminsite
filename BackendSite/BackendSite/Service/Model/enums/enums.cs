@@ -1310,6 +1310,13 @@ namespace BackendSite.Service.Model.enums
         BWING = 3
     }
 
+    public enum AffSiteEnum
+    {
+        N88 = 1,
+        N8G = 2,
+        N8B = 3
+    }
+
     public enum ManualRewardPointCategoryEnum
     {
         Default = 0,

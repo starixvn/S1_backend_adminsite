@@ -31,8 +31,8 @@ namespace BackendSite.Service.DAL
             props.Add("_Note", input.Note);
             props.Add("_DetailInfo", input.DetailInfo);
             props.Add("_Operator", input.Operator);
-            
-            return await _mainDbClient.ExecuteAsync("Admin_AdminLog_Ins", props);
+            var result = await _mainDbClient.ExecuteAsync("Admin_AdminLog_Ins", props);
+            return result;
         }
     }
 }
