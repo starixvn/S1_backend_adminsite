@@ -99,6 +99,7 @@ namespace BackendSite
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IAdminLogService, AdminLogService>();
+            services.AddTransient<IMarketingService, MarketingService>();
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
 

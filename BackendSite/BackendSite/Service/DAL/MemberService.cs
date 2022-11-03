@@ -146,7 +146,19 @@ public class MemberService : IMemberService
         };
         return loginLogData;
     }
-    
+
+    public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
+    {
+        return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
+            new { _CustId = custId, _AreaCode = areaCode, _PhoneNo = phoneNo, _SiteId = siteId }) != 0;
+    }
+
+    public async Task<bool> IsExistsEmail(int custId, string email, int siteId)
+    {
+        return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsEmail_Get",
+            new { _CustId = custId, _Email = email, _SiteId = siteId }) != 0;
+    }
+
     public async Task<int> SetCustTag(int custid, List<int> tagList)
     {
         var p = new DynamicParameters();

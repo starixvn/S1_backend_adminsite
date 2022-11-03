@@ -36,7 +36,7 @@ public class MemberCommand : IMemberCommand
         var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
         var tagList = !string.IsNullOrEmpty(tagListStr) ? JsonConvert.DeserializeObject<List<int>>(tagListStr) : new List<int>();
         var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
-        
+
         tagList.Add(tagId);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
@@ -47,36 +47,11 @@ public class MemberCommand : IMemberCommand
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
-        var logParam = new AdminLog()
-        {
-            Operator = @operator,
-            SiteId = customer.SiteId,
-            CurrencyId = customer.CurrencyId,
-            BeforeDetailInfo = JsonConvert.SerializeObject(new
-            {
-                customer.UserName,
-                Tag = JsonConvert.SerializeObject(beforeTagName)
-            }),
-            AfterDetailInfo = JsonConvert.SerializeObject(new
-            {
-                customer.UserName,
-                Tag = JsonConvert.SerializeObject(afterTagName)
-            }),
-            ActionType = ActionType.Create,
-            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
-            CustId = custId,
-            Menu = "CustManage/CustInfoList",
-            Note = $"Add Tag \"{newTag}\"",
-            DetailInfo = JsonConvert.SerializeObject(new
-            {
-                Action = $"Add Tag \"{newTag}\"",
-                MenuName = "Member Setting",
-            })
-        };
-        if (await _adminLogService.Insert(logParam) > 0)
-        {
-            _logger.LogError("InsertAdminLog failed. params: " + JsonConvert.SerializeObject(logParam));
-        }
+        
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(beforeTagName) }),
+            JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(afterTagName) }), ActionType.Create,
+            custId, $"Add Tag \"{newTag}\"");
         return result;
     }
 
@@ -89,10 +64,8 @@ public class MemberCommand : IMemberCommand
         var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var beforeTag = tempTag.ToList();
         var idx = tagList.FindIndex(id => id == tagId);
-        if (idx == -1)
-        {
-            return 0;
-        }
+        if (idx == -1) return 0;
+        
         tagList.RemoveAt(idx);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
@@ -102,62 +75,84 @@ public class MemberCommand : IMemberCommand
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
-        var logParam = new AdminLog()
-        {
-            Operator = @operator,
-            SiteId = customer.SiteId,
-            CurrencyId = customer.CurrencyId,
-            BeforeDetailInfo = JsonConvert.SerializeObject(new
-            {
-                customer.UserName,
-                Tag = JsonConvert.SerializeObject(beforeTagName)
-            }),
-            AfterDetailInfo = JsonConvert.SerializeObject(new
-            {
-                customer.UserName,
-                Tag = JsonConvert.SerializeObject(afterTagName)
-            }),
-            ActionType = ActionType.Delete,
-            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
-            CustId = custId,
-            Menu = "CustManage/CustInfoList",
-            Note = $"Remove Tag \"{newTag}\"",
-            DetailInfo = JsonConvert.SerializeObject(new
-            {
-                Action = $"Remove Tag \"{newTag}\"",
-                MenuName = "Member Setting",
-            })
-        };
-        if (await _adminLogService.Insert(logParam) > 0)
-        {
-            _logger.LogError("InsertAdminLog failed. params: " + JsonConvert.SerializeObject(logParam));
-        }
+        
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(beforeTagName) }),
+            JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(afterTagName) }), ActionType.Delete,
+            custId, $"Remove Tag \"{newTag}\"");
 
         return result;
     }
 
-    public async Task<int> EditFullNameAsync(int custId, string fullName)
+    public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
     {
-        return await _memberService.EditFullNameAsync(custId, fullName);
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        var beforeName = customer.AccountName;
+        
+        var result = await _memberService.EditFullNameAsync(custId, fullName);
+        if (result <= 0) return 0;
+        
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
+            JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), ActionType.Update,
+            custId, $"Edit FullName \"{fullName}\"");
+        return result;
     }
 
-    public async Task<int> EditEmailAsync(int custId, string email)
+    public async Task<int> EditEmailAsync(int custId, string email, string @operator)
     {
-        return await _memberService.EditEmailAsync(custId, email);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+
+        if (await _memberService.IsExistsEmail(custId, email, customer.SiteId)) 
+            return -1;
+
+        var beforeEmail = customer.Email;
+        var result = await _memberService.EditEmailAsync(custId, email);
+        if (result <= 0) 
+            return 0;
+
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, Email = beforeEmail }),
+            JsonConvert.SerializeObject(new { customer.UserName, Email = email }), ActionType.Update,
+            custId, $"Edit Email \"{email}\"");
+        
+        return result;
     }
 
-    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo)
+    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator)
     {
-        return await _memberService.SetPhoneNoAsync(custId, phoneNo);
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+
+        if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) return -1;
+
+        var beforePhone = customer.PhoneNo;
+        var result = await _memberService.SetPhoneNoAsync(custId, phoneNo);
+        if (result <= 0) return 0;
+        
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, PhoneNo = beforePhone }),
+            JsonConvert.SerializeObject(new { customer.UserName, PhoneNo = phoneNo }), ActionType.Update,
+            custId, $"Edit PhoneNo \"{phoneNo}\"");
+        
+        return result; 
     }
 
-    public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date)
+    public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator)
     {
-        var isValid = DateTime.TryParse($"{year}-{month}-{date}", out _);
+        var birth = $"{month}-{date}-{year}";
+        var isValid = DateTime.TryParse(birth, out _);
         if (!isValid)
             return 0;
+
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeBirth = $"{customer.BirthMonth}-{customer.BirthDay}-{customer.BirthYear}";
+        var result = await _memberService.EditBirthdayAsync(custId, year, month, date);
         
-        return await _memberService.EditBirthdayAsync(custId, year, month, date);
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, Birthday = beforeBirth }),
+            JsonConvert.SerializeObject(new { customer.UserName, Birthday = birth }), ActionType.Update,
+            custId, $"Edit Birthday \"{birth}\"");
+        return result;
     }
 
     public async Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2)
@@ -225,13 +220,53 @@ public class MemberCommand : IMemberCommand
         return await _bonusApi.SetVerificationRewardAsync(custId, otpType);
     }
 
-    public async Task<int> LineUnbind(int custId)
+    public async Task<int> LineUnbind(int custId, string @operator)
     {
-        return await _memberService.DeleteLineProfileAsync(custId);
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        
+        var result = await _memberService.DeleteLineProfileAsync(custId);
+        if (result <= 0) return 0;
+        
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, 
+            JsonConvert.SerializeObject(new { customer.UserName, LineStatus = "Binding" }),
+            JsonConvert.SerializeObject(new { customer.UserName, LineStatus = "Unbind" }), ActionType.Update, 
+            custId, "Line Unbind");
+        
+        return result;
     }
 
     public async Task<int> DeleteOnUserAsync(int custId)
     {
         return await _memberService.DeleteOnUserAsync(custId);
+    }
+
+    private async Task CreateAdminLog(string @operator, int siteId, int currencyId, string beforeLog, string afterLog, ActionType action, int custId, string message)
+    {
+        var adminLog = new AdminLog()
+        {
+            Operator = @operator,
+            SiteId = siteId,
+            CurrencyId = currencyId,
+            BeforeDetailInfo = beforeLog,
+            AfterDetailInfo = afterLog,
+            ActionType = action,
+            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+            CustId = custId,
+            Menu = "CustManage/CustInfoList",
+            Note = message,
+            DetailInfo = JsonConvert.SerializeObject(new
+            {
+                Action = message,
+                MenuName = "Member Setting",
+            })
+        };
+        try
+        {
+            await _adminLogService.Insert(adminLog);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
+        }
     }
 }

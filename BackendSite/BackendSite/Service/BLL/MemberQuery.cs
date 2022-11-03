@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -15,14 +14,14 @@ namespace BackendSite.Service.BLL
         private readonly IMemberService _memberService;
         private readonly IDeviceService _deviceService;
         private readonly ICacheHelper _cacheHelper;
+        private readonly IMarketingService _marketingService;
+        private readonly IAffiliateApiService _affiliateApi;
         private readonly Dictionary<string, SiteConfig> _siteConfig;
         private readonly PermissionBLL _permissionBll;
         private readonly AdminBLL _adminBll;
-        private readonly MarketingService _marketingService;
-        private readonly IAffiliateApiService _affiliateApi;
         private readonly Tools _tools;
 
-        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, MarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools)
         {
             _memberService = memberService;
             _deviceService = deviceService;

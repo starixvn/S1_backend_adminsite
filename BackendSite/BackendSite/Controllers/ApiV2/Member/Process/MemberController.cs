@@ -403,8 +403,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> LineUnbind(LineUnbindRequest request)
         {
-            var result = await _memberCommand.LineUnbind(request.CustId);
-            if (result > 0)
+            if (await _memberCommand.LineUnbind(request.CustId, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -412,7 +411,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Line Unbind Success."
                 };
             }
-
             throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
         }
 
@@ -430,7 +428,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName);
+            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
 
             if (result > 0)
             {
@@ -458,7 +456,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email);
+            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email, User.Identity.Name);
 
             if (result > 0)
             {
@@ -486,7 +484,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo);
+            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo, User.Identity.Name);
 
             if (result > 0)
             {
@@ -514,9 +512,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditBirthday(SetBirthdayRequest request)
         {
-            var result = await _memberCommand.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate);
-
-            if (result > 0)
+            if (await _memberCommand.EditBirthdayAsync(request.CustId, request.BirthYear, request.BirthMonth, request.BirthDate, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
