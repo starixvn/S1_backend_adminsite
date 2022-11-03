@@ -892,6 +892,11 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCustBankDetailAsync(custId);
         }
+        
+        public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustEWalletDetailAsync(custId);
+        }
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
         {
