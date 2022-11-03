@@ -218,7 +218,7 @@ namespace BackendSite.Service.BLL
                 BirthYear = customer.BirthYear,
                 Email = email,
                 MobileNumber = $"({customer.AreaCode}) {phoneNo}",
-                Address = CreateAddress(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity,
+                Address = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity,
                     customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
                 IsRisk = customer.IsRisk,
                 IsKyc = customer.IsKyc,
@@ -239,28 +239,6 @@ namespace BackendSite.Service.BLL
 
             return customerBasicInfo;
         }
-
-        private static string CreateAddress(string line2, string line1, string city, string postCode, string state,
-            string country)
-        {
-            var sb = new StringBuilder();
-
-            if (!string.IsNullOrEmpty(line2))
-                sb.Append($"{line2},");
-            if (!string.IsNullOrEmpty(line1))
-                sb.Append($"{line1},");
-            if (!string.IsNullOrEmpty(city))
-                sb.Append($"{city},");
-            if (!string.IsNullOrEmpty(postCode))
-                sb.Append($"{postCode},");
-            if (!string.IsNullOrEmpty(state))
-                sb.Append($"{state},");
-            if (!string.IsNullOrEmpty(country))
-                sb.Append($"{country}");
-
-            return sb.ToString();
-        }
-
         public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId)
         {
             var custInfo = await _memberService.GetCustomerBasicInfoAsync(custId);

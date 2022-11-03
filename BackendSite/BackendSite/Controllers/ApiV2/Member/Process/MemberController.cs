@@ -538,7 +538,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditAddress(SetMemberAddressRequest request)
         {
-            var result = await _memberCommand.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2);
+            var result = await _memberCommand.EditAddressAsync(request.CustId, request.Country, request.State, request.PostCode, request.City, request.Line1, request.Line2, User.Identity.Name);
 
             if (result > 0)
             {
@@ -566,7 +566,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchKyc(SetMemberKycStatusRequest request)
         {
-            var result = await _memberCommand.SwitchKycAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchKycAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -594,7 +594,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchRisk(SetMemberRiskStatusRequest request)
         {
-            var result = await _memberCommand.SwitchRiskAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchRiskAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -622,7 +622,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchEmailVerified(SwitchMemberEmailVerifiedRequest request)
         {
-            var result = await _memberCommand.SwitchEmailVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchEmailVerifiedAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {
@@ -650,7 +650,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> SwitchPhoneVerified(SwitchMemberPhoneVerifiedRequest request)
         {
-            var result = await _memberCommand.SwitchPhoneVerifiedAsync(request.CustId, request.Status);
+            var result = await _memberCommand.SwitchPhoneVerifiedAsync(request.CustId, request.Status, User.Identity.Name);
 
             if (result > 0)
             {

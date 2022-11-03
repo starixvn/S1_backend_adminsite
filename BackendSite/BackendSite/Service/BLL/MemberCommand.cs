@@ -147,7 +147,8 @@ public class MemberCommand : IMemberCommand
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var beforeBirth = $"{customer.BirthMonth}-{customer.BirthDay}-{customer.BirthYear}";
         var result = await _memberService.EditBirthdayAsync(custId, year, month, date);
-        
+        if (result <= 0) return 0;
+
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, Birthday = beforeBirth }),
             JsonConvert.SerializeObject(new { customer.UserName, Birthday = birth }), ActionType.Update,
@@ -155,29 +156,85 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
-    public async Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2)
+    public async Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2, string @operator)
     {
-        return await _memberService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeAddress = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity,
+            customer.AddressPostCode, customer.AddressState, customer.AddressCountry);
+
+        var result = await _memberService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
+        if (result <= 0) return 0;
+        
+        var address = AddressFormat.Format(line2, line1, city, postCode, state, country);
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, Address = beforeAddress }),
+            JsonConvert.SerializeObject(new { customer.UserName, Address = address }), ActionType.Update,
+            custId, $"Edit Address \"{address}\"");
+        return result; 
     }
 
-    public async Task<int> SwitchKycAsync(int custId, int status)
+    public async Task<int> SwitchKycAsync(int custId, int status, string @operator)
     {
-        return await _memberService.SwitchKycAsync(custId, status);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = customer.IsKyc;
+        
+        var result = await _memberService.SwitchKycAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = status != 0;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, IsKyc = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, IsKyc = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Edit IsKyc \"{afterStatus}\"");
+        return result; 
     }
 
-    public async Task<int> SwitchRiskAsync(int custId, int status)
+    public async Task<int> SwitchRiskAsync(int custId, int status, string @operator)
     {
-        return await _memberService.SwitchRiskAsync(custId, status);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = customer.IsRisk;
+
+        var result = await _memberService.SwitchRiskAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = status != 0;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, IsRisk = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, IsRisk = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Edit IsRisk \"{afterStatus}\"");
+        return result; 
     }
 
-    public async Task<int> SwitchPhoneVerifiedAsync(int custId, int status)
+    public async Task<int> SwitchPhoneVerifiedAsync(int custId, int status, string @operator)
     {
-        return await _memberService.SwitchPhoneVerifiedAsync(custId, status);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = customer.PhoneVerified;
+
+        var result = await _memberService.SwitchPhoneVerifiedAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = status != 0;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, PhoneVerified = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, PhoneVerified = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Edit PhoneVerified \"{afterStatus}\"");
+        return result; 
     }
 
-    public async Task<int> SwitchEmailVerifiedAsync(int custId, int status)
+    public async Task<int> SwitchEmailVerifiedAsync(int custId, int status, string @operator)
     {
-        return await _memberService.SwitchEmailVerifiedAsync(custId, status);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = customer.EmailVerified;
+
+        var result =  await _memberService.SwitchEmailVerifiedAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = status != 0;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, EmailVerified = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, EmailVerified = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Edit EmailVerified \"{afterStatus}\"");
+        return result; 
     }
 
     public async Task<string> ResetPasswordAsync(int custId)

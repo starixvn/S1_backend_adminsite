@@ -10,11 +10,11 @@ public interface IMemberCommand
     Task<int> EditEmailAsync(int custId, string email, string @operator);
     Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator);
-    Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2);
-    Task<int> SwitchKycAsync(int custId, int status);
-    Task<int> SwitchRiskAsync(int custId, int status);
-    Task<int> SwitchPhoneVerifiedAsync(int custId, int status);
-    Task<int> SwitchEmailVerifiedAsync(int custId, int status);
+    Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2, string @operator);
+    Task<int> SwitchKycAsync(int custId, int status, string @operator);
+    Task<int> SwitchRiskAsync(int custId, int status, string @operator);
+    Task<int> SwitchPhoneVerifiedAsync(int custId, int status, string @operator);
+    Task<int> SwitchEmailVerifiedAsync(int custId, int status, string @operator);
     Task<string> ResetPasswordAsync(int custId);
     Task<int> SetCustStatusAsync(int custId, int status, string reason);
     Task<int> SwitchRebatePayoutAsync(int custId, int status);
