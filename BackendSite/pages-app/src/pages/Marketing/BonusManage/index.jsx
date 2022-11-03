@@ -208,14 +208,6 @@ const App = () => {
 							? Number(info.bonus)
 							: Number(info.maxBonus);
 
-					let tpGame = promotion.promotionType == 6 ? promotion.tpGameCategory.map(t => {
-						return {
-							GameType: t.value,
-							Percentage: info.tpGames[t.value]?.percentage ? Number(info.tpGames[t.value].percentage) : 0,
-							Status: info.tpGames[t.value]?.status ? Number(info.tpGames[t.value].status) : 0
-						}
-					}) : null;
-
 					let cashbackGame = promotion.promotionType == 7 ? promotion.cashbackGameCategory.map(t => {
 						return {
 							GameType: t.value,
@@ -238,7 +230,6 @@ const App = () => {
 						RequiredAmount: Number(info.requiredAmount),
 						LockedType: info.lockedType,
 						BeenUsed: info.beenUsed,
-						RebateList: tpGame,
 						MinPayout: Number(info.minPayout),
 						VN_AffCodes: info.affid,
 						TotalUsageLimit: info.totalUsageLimit,
