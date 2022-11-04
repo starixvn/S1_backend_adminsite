@@ -22,6 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly CustInfoBLL _custInfoBll;
         private readonly TpBLL _tpBll;
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
         private readonly ILogger<BalanceAdjustmentController> _logger;
@@ -39,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<BalanceAdjustmentController>>();
@@ -712,24 +714,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
         {
-            var type = typeof(AdjustmentCategoryEnum);
-            var data = Enum.GetValues(type)
-                .Cast<AdjustmentCategoryEnum>()
-                .Select(x => new SelectListItem((int) x, x.GetDescription()));
+            var result =
+                _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+            var data =
+                result.Select(x => new SelectListItem(x.ReasonId, x.Description));
             var apiResult = 
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             
             return apiResult;
-            
-            // Select from DB
-            // var result =
-            //     _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
-            // var data =
-            //     result.Select(x => new SelectListItem(x.ReasonId, x.Description));
-            // var apiResult = 
-            //     new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
-            //
-            // return apiResult;
         }
 
         #endregion

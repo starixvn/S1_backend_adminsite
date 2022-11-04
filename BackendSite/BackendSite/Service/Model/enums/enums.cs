@@ -448,28 +448,6 @@ namespace BackendSite.Service.Model.enums
         ThirdParty = 2
     }
     
-    public enum AdjustmentCategoryEnum
-    {
-        [Description("None - (Default)")]
-        None = 1,
-        [Description("Retention Bonus")]
-        RetentionBonus = 2,
-        [Description("Manual Bonus(Special Bonus)")]
-        ManualBonus = 3,
-        [Description("Vip Upgrade Reward")]
-        VipUpgradeReward = 4,
-        [Description("Prize Drop")]
-        PrizeDrop = 5,
-        [Description("Tech Issue None Affected")]
-        TechIssueNoneAffected = 6,
-        Test = 7,
-        [Description("Vendor Mistake")]
-        VendorMistake = 8,
-        Deposit = 9,
-        Withdrawal = 10,
-        Other = 11
-    }
-
     #endregion
 
     #region AdminUser
@@ -660,6 +638,7 @@ namespace BackendSite.Service.Model.enums
         SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
         VerificationRewardSetting = 49,
+        SetFinanceAccount = 50,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
@@ -774,7 +753,11 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 第三方支付
         /// </summary>
-        PSP = 3
+        PSP = 3,
+        
+        Finance = 4,
+        
+        MC = 5
     }
 
     /// <summary>
@@ -995,23 +978,45 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-
-    #region BankDetailOff
-
-    public enum PurposeEnum
+    
+    public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
         Withdrawal = 2,
-        DepositAndWithdrawal = 3
+        Transfer = 3
     }
 
-    public enum BankDetailOffStatusEnum
+    #region BankDetailOff
+
+    public enum BankDetailOffPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        [Description("Deposit & Withdrawal")]
+        DepositAndWithdrawal = 3
+    }
+    
+    public enum BankCardManagementPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum BankCardManagementStatusEnum
     {
         Initial = 0,     //Front-End Hidden
         Open = 1,        //Front-End green
         Suspend = 2,
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
+    }
+    
+    public enum BankCardManagementSupportChannelEnum
+    {
+        [Description("Bank Transfer")]
+        LocalBank = 0,
+        [Description("Mobile E-Wallet")]
+        EWallet = 1
     }
 
     #endregion
