@@ -193,4 +193,43 @@ namespace BackendSite.Service.Model.Mpa
         public Dictionary<string, MpaWinLossByPlayerCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
+
+    public class MpaWinLossByPlayerDetailResponse
+    {
+        [JsonProperty(Order = 0)]
+        public string SabaId { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 11)]
+        public decimal Margin { get; set; }
+    }
 }

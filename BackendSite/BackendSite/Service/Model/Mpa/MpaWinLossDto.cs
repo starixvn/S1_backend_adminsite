@@ -345,6 +345,61 @@ namespace BackendSite.Service.Model.Mpa
         public decimal TotalBonus { get; set; }
     }
 
+    public class MpaWinLossByPlayerDetailCurrencyDetailDto
+    {
+
+        [JsonProperty(Order = 0)]
+        public string SabaId { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+
+        [JsonProperty(Order = 4)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+
+        [JsonProperty(Order = 10)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 11)]
+        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+
+        [JsonProperty(Order = 12)]
+        public int DepositCount { get; set; }
+
+        [JsonProperty(Order = 13)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 14)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 15)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 16)]
+        public decimal TotalBonus { get; set; }
+    }
+
 
 
     public class MpaWinLossByDateDto
@@ -391,16 +446,15 @@ namespace BackendSite.Service.Model.Mpa
 
     public class MpaWinLossByPlayerDto
     {
-
-        //[JsonIgnore]
         public string UserName { get; set; }
 
-        //[JsonIgnore]
         public string TpUserName { get; set; }
 
         //[JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
+
+        public string GameTypeName { get; set; }
 
         public decimal TurnOver { get; set; }
 
