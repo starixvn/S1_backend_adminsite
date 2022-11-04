@@ -30,7 +30,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     // For p2p products (OneGaming Poker), show commission: GGR = sum(revenue) 
                     item.WinLossSummary = item.RevenueSummary;
                 }
-
             }
 
             return data;
@@ -45,7 +44,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     /// For p2p products (V8 Poker), show commission: GGR = sum(revenue) 
                     item.WinLossSummary = item.RevenueSummary;
                 }
-
             }
 
             return data;
