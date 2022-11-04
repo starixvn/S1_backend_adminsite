@@ -10,18 +10,33 @@ namespace BackendSite.Service.DAL
     {
         private readonly AffConfig _affConfig;
         private readonly CourierAdapter _courierAdapter;
-        public AffiliateApiService(IOptions<AffConfig> affConfig, CourierAdapter courierAdapter)
+        private readonly ICacheHelper _cacheHelper;
+        private readonly ILogger<AffiliateApiService> _logger;
+        private const string TokenKey = "AffAuthToken";
+        public AffiliateApiService(IOptions<AffConfig> affConfig, CourierAdapter courierAdapter, ICacheHelper cacheHelper, ILogger<AffiliateApiService> logger)
         {
             _affConfig = affConfig.Value;
             _courierAdapter = courierAdapter;
+            _cacheHelper = cacheHelper;
+            _logger = logger;
         }
 
         public async Task<AffInfo> QueryAffInfo(string userName, string currency, int site)
         {
-            var token = await GetAuthToken();
-            if (token == null)
-                return null;
-            var affInfoUrl = $"{_affConfig.ApiUrl}/api/AffInfo?access_token={token.access_token}";
+            var token = await _cacheHelper.StringGetAsync(TokenKey);
+            if (string.IsNullOrEmpty(token))
+            {
+                var affToken = await GetAuthToken();
+                if (affToken == null)
+                {
+                    _logger.LogError("aff token is null");
+                    return null;
+                }
+                await _cacheHelper.StringSetAsync(TokenKey, affToken.access_token, TimeSpan.FromMinutes(25));
+                token = affToken.access_token;
+            }
+
+            var affInfoUrl = $"{_affConfig.ApiUrl}/api/AffInfo?access_token={token}";
             var now = DateTime.UtcNow;
             var siteName = (AffSiteEnum)site;
             var data = new
@@ -29,10 +44,18 @@ namespace BackendSite.Service.DAL
                 PlayerName = userName,
                 MonthDate = new DateTime(now.Year, now.Month, now.Day),
                 BaseCurrencyName = currency,
-                LicenseeCode = siteName
+                LicenseeCode = siteName.ToString()
             };
-            var apiResult = await _courierAdapter.PostAsync<AffInfo, object>(affInfoUrl, data);
-            return apiResult;
+            try
+            {
+                var apiResult = await _courierAdapter.PostAsync<AffInfo, object>(affInfoUrl, data);
+                return apiResult;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e,"aff AffInfo is failed");
+                return null;
+            }
         }
 
         private async Task<AffToken> GetAuthToken()
@@ -50,6 +73,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception e)
             {
+                _logger.LogError(e,"get auth token failed");
                 return null;
             }
         }

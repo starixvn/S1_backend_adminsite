@@ -11,6 +11,7 @@ namespace BackendSite.Service.Library
         bool KeyExists(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<bool> KeyExistsAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<TItem> StringGetAsync<TItem>(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<string> StringGetAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         List<TItem> GetCacheList<TItem>(IEnumerable<string> keys, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool SetCacheList<TItem>(Dictionary<string, TItem> dataList, TimeSpan? timeSpan, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool InsertList<TItem>(string key, TimeSpan? timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin);
