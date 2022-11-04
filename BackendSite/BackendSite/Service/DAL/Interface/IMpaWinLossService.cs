@@ -18,6 +18,21 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTime starTime,
             DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
+
+        /// <summary>
+        /// 取得 TpBetRecord Relay By (日期(天) 或 月份)
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="siteId"></param>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="format"></param>
+        /// <param name="mpaDateType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTime starTime,
+            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+
+
         /// <summary>
         /// 取得 Deposit 與 WithDraw Relay By (日期(天) 或 月份)
         /// </summary>

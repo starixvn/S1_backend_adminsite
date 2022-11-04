@@ -29,6 +29,23 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get", p);
         }
 
+        public Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTime starTime, DateTime endTime, string format,
+            MpaDateType mpaDateType = MpaDateType.SettledDate)
+        {
+            var closingBalanceTimeZone = siteId == 1 ? " 00:00:00" : " 23:00:00"; // +8時區 00:00:00  +7時區 23:00:00
+            var closingEndTime = siteId == 1 ? endTime : endTime.AddDays(-1); // +8時區今天 +7 時區-1天
+
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_Format", format, dbType: DbType.String);
+            p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
+            p.Add("_ClosingEndTime", closingEndTime, dbType: DbType.DateTime);
+            p.Add("_ClosingBalanceTimeZone", closingBalanceTimeZone, dbType: DbType.String);
+            return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByPlayer_Get", p);
+        }
+
         public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTime starTime, DateTime endTime, string format)
         {
             var p = new DynamicParameters();

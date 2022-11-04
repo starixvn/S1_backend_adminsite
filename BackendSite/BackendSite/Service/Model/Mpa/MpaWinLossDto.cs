@@ -31,6 +31,8 @@ namespace BackendSite.Service.Model.Mpa
         public decimal RevenueSummary { get; set; }
         public decimal ProgressiveWinSummary { get; set; }
         public decimal ProgressiveBetSummary { get; set; }
+
+        public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
     }
 
@@ -330,18 +332,21 @@ namespace BackendSite.Service.Model.Mpa
         public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
 
         [JsonProperty(Order = 13)]
-        public int DepositCount { get; set; }
+        public decimal ClosingBalance { get; set;}
 
         [JsonProperty(Order = 14)]
-        public decimal TotalDepositAmount { get; set; }
+        public int DepositCount { get; set; }
 
         [JsonProperty(Order = 15)]
-        public int WithDrawCount { get; set; }
+        public decimal TotalDepositAmount { get; set; }
 
         [JsonProperty(Order = 16)]
-        public decimal TotalWithDrawAmount { get; set; }
+        public int WithDrawCount { get; set; }
 
         [JsonProperty(Order = 17)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 18)]
         public decimal TotalBonus { get; set; }
     }
 
@@ -485,6 +490,8 @@ namespace BackendSite.Service.Model.Mpa
         public int WithDrawCount { get; set; }
 
         public decimal TotalWithDrawAmount { get; set; }
+
+        public decimal ClosingBalance { get; set; }
 
         public decimal TotalBonus { get; set; }
     }
