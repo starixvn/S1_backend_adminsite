@@ -529,7 +529,7 @@ namespace BackendSite.Service.Model.enums
         Transfer = 0,
         Seamless = 1
     }
-
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -1036,8 +1036,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
-
+    
     #region Banner
 
     public enum BannerTypeEnum
@@ -1136,6 +1135,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {

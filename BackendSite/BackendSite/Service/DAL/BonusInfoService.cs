@@ -216,5 +216,54 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
+        
+        public List<MpaBonusInfo> GetMpaBonusInfoList(
+            int siteId,
+            string currencyIds,
+            string bonusStatuses,
+            string bonusTypes,
+            string bonusCode,
+            DateTime startDate,
+            DateTime endDate,
+            string claimStatuses,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_Statuses", bonusStatuses);
+            props.Add("_BonusTypes", bonusTypes);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_ClaimStatuses", claimStatuses);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            
+            var result = _mainDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
+
+            return result.ToList();
+        }
+        
+        public List<MpaBonusDetail> GetMpaBonusDetailList(
+            int siteId,
+            string currencyIds,
+            string bonusCode,
+            DateTime startDate,
+            DateTime endDate,
+            string claimStatuses,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_ClaimStatuses", claimStatuses);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            
+            var result = _mainDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
+            return result.ToList();
+        }
     }
 }
