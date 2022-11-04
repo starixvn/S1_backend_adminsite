@@ -150,6 +150,18 @@ namespace BackendSite.Service.Model
         public decimal LossAmount { get; set; }
         public decimal LossAmountWithBonus { get; set; }
     }
+
+    public class CustPromotionRequest
+    {
+        public int SiteId { set; get; }
+        public int CustId { set; get; }
+        public int CurrencyId { set; get; }
+        public int DeviceType { set; get; }
+        public bool IsLogin { set; get; }
+        public string LangId { set; get; }
+        public string DefLang { set; get; }
+        public int PromotionType { set; get; } 
+    }
     
     public class PromotionDetailRequest
     {

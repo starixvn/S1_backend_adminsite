@@ -83,22 +83,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-                var promotionList = _bonusManageBll.GetPromotionList(new List<int> { custInfo.SiteId },
-                    new List<int> { custInfo.CurrencyId },
-                    new List<int> { (int)PromotionTypeEnum.Cashback} ,
-                    (int)PromotionStatusEnum.Active,
-                    ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
-                    ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds(),
-                    (int)PromotionDeviceTypeEnum.GetAll,
-                    null,
-                    false,
-                    1,
-                    25,
-                    out _,
-                    out _);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionListV3";
+                var req = new CustPromotionRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = false,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    PromotionType = (int)PromotionTypeEnum.Cashback
+                };
 
-                apiResult.Data = JsonConvert.DeserializeObject<IEnumerable<GetPromotionCashbackResponse>>(JsonConvert.SerializeObject(promotionList));
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult = _courierAdapter.MyPostAsync<IEnumerable<GetPromotionCashbackResponse>, CustPromotionRequest>(apiUrl, req).Result;
             }
             catch (Exception ex)
             {
