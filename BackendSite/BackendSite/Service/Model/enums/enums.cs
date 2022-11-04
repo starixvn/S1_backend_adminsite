@@ -582,7 +582,7 @@ namespace BackendSite.Service.Model.enums
         Seamless = 1,
         Transfer = 2
     }
-
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -1250,6 +1250,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
