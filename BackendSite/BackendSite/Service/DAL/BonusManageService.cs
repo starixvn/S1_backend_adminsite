@@ -40,11 +40,11 @@ namespace BackendSite.Service.DAL
             return errorCode;
         }
 
-        public IEnumerable<PromotionType> GetPromotionType(bool isPayout)
+        public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new DynamicParameters(new { isPayout }));
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new DynamicParameters(new { isPayout, isNew }));
         }
-        
+
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
@@ -476,7 +476,7 @@ namespace BackendSite.Service.DAL
                     CurrencyId = specific.CurrencyId,
                     RollOver = specific.RollOver,
                     WinOver = specific.WinOver,
-                    FullFillType = specific.WinOver > 0 ? 2 : 1 ,
+                    FullFillType = specific.WinOver > 0 ? 2 : 1,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
                     MaxBonus = specific.BonusType == 2 ? specific.Bonus : specific.MaxBonus,

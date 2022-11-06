@@ -524,7 +524,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
-                Data = _bonusManageBll.GetPromotionType(request.isPayout),
+                Data = _bonusManageBll.GetPromotionType(request.isPayout,request.isNew),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -532,6 +532,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetPromotionTypeRequest
         {
             public bool isPayout { get; set; } = false;
+
+            public bool isNew {get; set; } = false;
         }
 
         #endregion
