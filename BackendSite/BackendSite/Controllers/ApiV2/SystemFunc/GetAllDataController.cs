@@ -531,9 +531,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetPromotionTypeRequest
         {
+            /// <summary>
+            /// Bonus Payout使用
+            /// </summary>
             public bool isPayout { get; set; } = false;
 
-            public bool isNew {get; set; } = false;
+            /// <summary>
+            /// 新後台Bonus Manage使用，排除Rebate
+            /// </summary>
+            public bool isNew { get; set; } = true;
         }
 
         #endregion
