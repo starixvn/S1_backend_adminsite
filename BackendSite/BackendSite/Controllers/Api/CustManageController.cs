@@ -2070,7 +2070,7 @@ namespace BackendSite.Controllers.Api
                 if (data.ThirdTimeCall != string.Empty)
                     data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20, data.ThirdTimeCall.Length - 20)}";
             }
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -2556,7 +2556,7 @@ namespace BackendSite.Controllers.Api
                 {
                     data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                stream = _excelBll.Export(exportData);
+                stream = _excelBll.ExportV2(exportData);
             }
             else
             {
@@ -2565,7 +2565,7 @@ namespace BackendSite.Controllers.Api
                 {
                     data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                stream = _excelBll.Export(exportData);
+                stream = _excelBll.ExportV2(exportData);
             }
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

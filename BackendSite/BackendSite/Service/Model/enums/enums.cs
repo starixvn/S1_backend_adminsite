@@ -582,7 +582,7 @@ namespace BackendSite.Service.Model.enums
         Seamless = 1,
         Transfer = 2
     }
-
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -1250,6 +1250,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1308,6 +1309,13 @@ namespace BackendSite.Service.Model.enums
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3
+    }
+
+    public enum AffSiteEnum
+    {
+        N88 = 1,
+        N8G = 2,
+        N8B = 3
     }
 
     public enum ManualRewardPointCategoryEnum
@@ -1461,5 +1469,10 @@ namespace BackendSite.Service.Model.enums
         Progressive = 3,
         Featured = 4,
         TopCasino = 5
+    }
+    public enum BlockEWalletStatus
+    { 
+        Lock = 1,
+        Unlock = 2
     }
 }

@@ -139,7 +139,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 request.StartDate.DateTime,
                 request.EndDate.DateTime);
 
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
 
             return _excelBll.ExcelFile(stream, "TransferInfoReport");
         }

@@ -360,6 +360,7 @@ namespace BackendSite.Service.BLL
         public async Task<PromotionResponseWrapper> GetPromotionListByCustIdAndDateAsync(CustIdWithDateRangeAndPageRequest request)
         {
             var result = await _promotionService.GetPromotionListByCustIdAndDateAsync(request);
+
             if (result.PromotionList != null)
             {
                 foreach (var promotion in result.PromotionList)
@@ -377,9 +378,16 @@ namespace BackendSite.Service.BLL
                         promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0, TurnOver = 0 };
                     };
 
+                    promotion.DepositInfo = CheckDepositInfoFormatter(promotion.DepositInfo);
                 }
             }
             return result;
+        }
+
+        private string CheckDepositInfoFormatter(string depositInfo)
+        {
+            if (string.IsNullOrEmpty(depositInfo) || depositInfo.Contains("[")) return depositInfo;
+            return $"[{depositInfo}]";
         }
 
         #region
@@ -883,6 +891,11 @@ namespace BackendSite.Service.BLL
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
         {
             return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+        
+        public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustEWalletDetailAsync(custId);
         }
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
