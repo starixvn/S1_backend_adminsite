@@ -104,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>();
             try
             {
-                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.TpCategory);
+                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.Player);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -123,7 +123,27 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByPlayerDetailResponse>>();
             try
             {
-                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerDetailResult(request, MpaWinLossGroupByTypeEnum.TpCategory);
+                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerDetailResult(request, MpaWinLossGroupByTypeEnum.Player);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+
+        [HttpPost]
+        public async Task<ApiResult<Dictionary<string, MpaWinLossByCurrencyResponse>>> GetWinLossByCurrency(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByCurrencyResponse>>();
+            try
+            {
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByCurrencyResult(request, MpaWinLossGroupByTypeEnum.Currency);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
