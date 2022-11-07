@@ -12,30 +12,29 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusManage" })]
     public class BonusController : ControllerBase
     {
         #region Fields
 
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly ServerInfoBLL _serverInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+
         private readonly ExcelBLL _excelBll;
         private readonly ILogger<BonusManageController> _logger;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
+
         #endregion
 
         #region Constructors
 
         public BonusController(IServiceProvider provider)
         {
-            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();         
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -46,8 +45,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<int> PromotionTypes { get; set; }
+
+            /// <summary>
+            /// Bonus狀態：
+            /// 0=All
+            /// 1=Active
+            /// 2=Inactive
+            /// </summary>
             public int Status { get; set; }
             public DateTimeOffset StartDate
             {
@@ -59,6 +65,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            /// <summary>
+            /// Bonus支援裝置：
+            /// 0=Select All
+            /// 1=Web and App
+            /// 2=Web
+            /// 3=App
+            /// </summary>
             public int Device { get; set; }
             public string BonusCode { get; set; }
             public bool IsSpecial { get; set; }
@@ -133,13 +146,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
         public ApiListResult<PromotionInfo> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<PromotionInfo>();
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromotionList(request.SiteIds,
+                var siteId = _newAuthorizeBLL.CheckBrand();
+                apiResult.Data = _bonusManageBll.GetPromotionList(new List<int> { siteId },
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate.ToUnixTimeSeconds(),
@@ -178,6 +194,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
         public ApiResult<PromotionInfo> GetByBonusCode(GetByBonusCodeRequest request)
         {
             var apiResult = new ApiResult<PromotionInfo>();
@@ -196,40 +213,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
 
-        /// <summary>
-        /// BonusManagement/GetSiteListByLoginUser 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing  > Bonus Management > [Search] > [edit]
-        /// </remarks>
-        /// <param name="req"></param>
-        //[HttpPost]
-        //public ApiResult<IEnumerable<dynamic>> GetSiteListByLoginUser(GetSiteListByLoginUserReq req)
-        //{
-        //    var apiResult = new ApiResult<IEnumerable<dynamic>>();
-        //    try
-        //    {
-        //        apiResult.Data = _serverInfoBll.GetSiteListByLoginUser()?.Select(x =>
-        //            new { x.SiteName, x.SiteId, CurrencyList = x.ICurrencyList, LangList = x.ILangList });
-        //        if (req.SiteId != null && apiResult.Data != null && apiResult.Data.Any())
-        //        {
-        //            apiResult.Data = apiResult.Data.Where(s => s.SiteId == req.SiteId);
-        //        }
-
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //        apiResult.Message = "something went wrong.";
-        //        apiResult.RawMessage = ex.Message;
-        //    }
-
-        //    return apiResult;
-        //}
 
         /// <summary>
         /// BonusManagement/UpdateStatus 更新促銷獎勵狀態
@@ -241,6 +224,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
         public ApiResult UpdateStatus(UpdatePromotionStatusReq req)
         {
             var result = _bonusManageBll.SetPromotionStatus(req.BonusCode, req.SiteId, req.Status);
@@ -264,27 +248,59 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
         public ApiResult Set(SetRequest request)
         {
             var apiResult = new ApiResult();
 
             try
             {
-                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
-                if (request.IsAdd && request.PromotionInfo.IsSpecial)
+                request.PromotionInfo.SpecialCode = request.PromotionInfo.IsSpecial ? request.PromotionInfo.SpecialCode : null;
+                if (request.IsAdd && _bonusManageBll.CheckPromotionExists(request.PromotionInfo.BonusCode,
+                        request.PromotionInfo.SpecialCode))
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.PromotionInfo.SpecialCode))
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
+                }
+
+                switch (request.PromotionInfo.PromotionType)
+                {
+                    case (int)PromotionTypeEnum.FstDeposit
+                        or (int)PromotionTypeEnum.FreeBet or (int)PromotionTypeEnum.Cashback
+                        or (int)PromotionTypeEnum.SpecialBonus or (int)PromotionTypeEnum.RetentionFreeBet:
                     {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
-                        apiResult.Message = "Duplicate Special Code.";
-                        return apiResult;
+                        if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
+                                CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
+                        {
+                            return apiResult;
+                        }
+
+                        break;
                     }
+                    case (int)PromotionTypeEnum.ReDeposit:
+                        if (request.PromotionInfo.Specific.Any(specific =>
+                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
+                                specific.TierAmountList.Any(tierAmount =>
+                                    CheckRollover(tierAmount.RollOver, tierAmount.WinOver, apiResult))))
+                        {
+                            return apiResult;
+                        }
+                        
+                        if (request.PromotionInfo.Specific.Any(specific => specific.TierAmountList.Count() > 10))
+                        {
+                            apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                            apiResult.Message = "Tier Amount can only be set up to 10.";
+                            return apiResult;
+                        }
+                        break;
                 }
 
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
                     request.PromotionInfo,
                     request.DisplayConditionAboutVipLevel,
-                    User.Identity.Name) ? 0 : 1;
+                    User.Identity?.Name) ? 0 : 1;
 
                 apiResult.ErrorCode = errorCode;
                 apiResult.Message = errorCode == 1
@@ -302,6 +318,23 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
 
+        private bool CheckRollover(int rollOver, int winOver, ApiResult apiResult)
+        {
+            switch (rollOver)
+            {
+                case <= 0 when winOver <= 0:
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DateOutOfRange;
+                    apiResult.Message = "RollOver or WinOver must have at least one greater than 0.";
+                    return true;
+                case > 0 when winOver > 0:
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DateOutOfRange;
+                    apiResult.Message = "RollOver or WinOver can only have one greater than 0.";
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// BonusManagement/Duplicate 複製促銷獎勵
         /// </summary>
@@ -312,21 +345,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
         public ApiResult Duplicate(DuplicateRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<PromotionInfo>>();
 
             try
             {
-                if (request.IsSpecial)
+                request.NewSpecialCode = request.IsSpecial ? request.NewSpecialCode : null;
+                if (_bonusManageBll.CheckPromotionExists(request.NewBonusCode, request.NewSpecialCode))
                 {
-                    if (_bonusManageBll.CheckSpecialCodeDuplicate(request.NewSpecialCode))
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
-                        apiResult.Message = "Duplicate datas about Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.DuplicateData;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
+                
                 apiResult.ErrorCode = _bonusManageBll.DuplicatePromotion(
                     request.BonusCode,
                     request.SiteId,
@@ -361,6 +394,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
         public ApiListResult<ScratchCard> GetScratchCardList(GetScratchCardListRequest request)
         {
             var apiResult = new ApiListResult<ScratchCard>();
@@ -397,6 +431,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 2 })]
         public IActionResult ExportScratchCardList(ExportScratchCardListRequest request)
         {
             var exportData = _bonusManageBll.GetScratchCardListExport(request.SpecialCode, (int)request.Status);
@@ -420,11 +455,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
         public ApiResult GenScratchCardCode(GenScratchCardCodeRequest request)
         {
             var apiResult = new ApiResult<dynamic>();
 
-            apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(request.SpecialCode, request.Num, _authorizeBll.GetAuthData().UserName);
+            apiResult.ErrorCode = _bonusManageBll.GenScratchCardCode(request.SpecialCode, request.Num, _newAuthorizeBLL.GetAuthData().UserName);
 
             return apiResult;
         }
