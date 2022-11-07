@@ -1,10 +1,14 @@
-﻿using BackendSite.Extensions;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
+using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 
 namespace BackendSite.Service.BLL
@@ -972,6 +976,140 @@ namespace BackendSite.Service.BLL
         
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
+
+        public Dictionary<string, Dictionary<string, DepositPaymentReport>> GetDepositPaymentReport(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportDepositDetail(input);
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.DepositType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+            
+            var result = gData.ToDictionary(data => data.Key, data => data.GroupBy(x => x.CurrencyId)
+                    .ToDictionary(x => x.Key.ToString(), x =>
+                    {
+                        var count = x.Count();
+                        var totalDepositAmount = x.Sum(y => y.ActualDeposit);
+                        return new DepositPaymentReport
+                        {
+                            TotalDepositCount = count,
+                            AverageDepositAmount = decimal.Round(totalDepositAmount / count, 4),
+                            FirstDepositCount = x.Count(y => y.FirstDeposit),
+                            TotalDepositAmount = totalDepositAmount,
+                            AverageProcessingTime = 
+                                TimeSpan.FromMilliseconds(x.Average(y => y.FlowEndTime.UtcTicks - y.CreateTime.UtcTicks))
+                                    .ToString(@"hh\:mm\:ss")
+                        };
+                    }));
+            
+            return result;
+        }
         
+        public Dictionary<string, Dictionary<string, WithdrawalPaymentReport>> GetWithdrawalPaymentReport(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportWithdrawalDetail(input);
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.WithdrawalType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+            
+            var result = gData.ToDictionary(data => data.Key, data => data.GroupBy(x => x.CurrencyId)
+                .ToDictionary(x => x.Key.ToString(), x =>
+                {
+                    var count = x.Count();
+                    var totalDepositAmount = x.Sum(y => y.Amount);
+                    return new WithdrawalPaymentReport
+                    {
+                        TotalWithdrawalCount = count,
+                        AverageWithdrawalAmount = decimal.Round(totalDepositAmount / count, 2),
+                        TotalWithdrawalAmount = totalDepositAmount,
+                        AverageProcessingTime =
+                            TimeSpan.FromMilliseconds(x.Average(y => y.FlowEndTime.UtcTicks - y.CreateTime.UtcTicks))
+                                .ToString(@"hh\:mm\:ss")
+                    };
+                }));
+            
+            return result;
+        }
+
+        public byte[] ExportPaymentReport<T>(Dictionary<string, Dictionary<string, T>> data) where T : class
+        {
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Report");
+
+            sheet.CreateHeaders<T>(freeze: true, index: 1);
+            
+            var gCellStyle = workbook.CreateCellStyle();
+            gCellStyle.BorderBottom = BorderStyle.Medium;
+            gCellStyle.FillForegroundColor = IndexedColors.LightCornflowerBlue.Index;
+            gCellStyle.FillPattern = FillPattern.SolidForeground;
+            
+            var subCellStyle = workbook.CreateCellStyle();
+            subCellStyle.BorderBottom = BorderStyle.Thin;
+            subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
+            subCellStyle.FillPattern = FillPattern.SolidForeground;
+            
+            var props = typeof(T).GetProperties();
+            var index = 1;
+            foreach (var gData in data)
+            {
+                var groupCell = sheet.CreateRow(index).CreateCell(0);
+                groupCell.SetCellValue(gData.Key);
+                groupCell.CellStyle = gCellStyle;
+                
+                index++;
+
+                foreach (var (key, value) in gData.Value)
+                {
+                    var row = sheet.CreateRow(index);
+                    var subGroupCell = row.CreateCell(0);
+                    subGroupCell.SetCellValue(key);
+                    subGroupCell.CellStyle = subCellStyle;
+                    
+                    var i = 1;
+                    foreach (var prop in props)
+                    {
+                        var val = value.GetType().GetProperty(prop.Name)?.GetValue(value);
+                        row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
+                   
+                        i++;
+                    }
+                    index++;
+                }
+            }
+            
+            sheet.AutoSizeColumn(0);
+
+            using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+            
+            return result;
+        }
     }
 }

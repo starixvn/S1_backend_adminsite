@@ -218,7 +218,9 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5 //No Use
+        LoadCard = 5,
+        QRPay = 6,
+        BankAutoChannel = 7
     }
 
     public enum DepositStatusEnum
@@ -308,7 +310,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalTypeEnum
     {
-        Undefine = 0, //No Use
+        Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
@@ -1318,6 +1320,15 @@ namespace BackendSite.Service.Model.enums
     {
         Closed = 0,
         Open = 1
+    }
+    
+    public enum PaymentReportGroupByEnum
+    {
+        Date = 1,
+        Month = 2,
+        Gateway = 3,
+        Type = 4,
+        Currency = 5
     }
 
     #endregion

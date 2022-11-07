@@ -373,7 +373,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     break;
                 case (int)WithdrawalStatusEnum.Process:
                     {
-                        if (request.WithdrawalType == null || request.WithdrawalType == (int)WithdrawalTypeEnum.Undefine)
+                        if (request.WithdrawalType == null || request.WithdrawalType == (int)WithdrawalTypeEnum.Undefined)
                         {
                             apiResult.ErrorCode = 1101;
                             apiResult.Message = "Select 1 Type of Withdrawal Please.";

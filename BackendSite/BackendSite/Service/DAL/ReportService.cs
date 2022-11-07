@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -282,6 +283,40 @@ namespace BackendSite.Service.DAL
            
 
             return result;
+        }
+        
+        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _PayIds = input.PayIds,
+                    _Types = input.Types,
+                    _UserNames = input.UserNames,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get", parameters);
+        }
+        
+        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _PayIds = input.PayIds,
+                    _Types = input.Types,
+                    _UserNames = input.UserNames,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get", parameters);
         }
     }
 }
