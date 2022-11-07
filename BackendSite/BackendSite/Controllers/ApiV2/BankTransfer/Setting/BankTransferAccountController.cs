@@ -107,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     Updator = x.UpdatorName
                 });
             
-            var stream = _excelBll.Export(result);
+            var stream = _excelBll.ExportV2(result);
             return _excelBll.ExcelFile(stream, "TransferAccountInfoList");
         }
         

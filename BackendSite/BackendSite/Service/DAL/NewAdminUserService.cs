@@ -21,8 +21,9 @@ namespace BackendSite.Service.DAL
         }
         public NewAdminUser GetAdminUserByUserName(string userName)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<NewAdminUser>("LoginNewAdminUser_Get", new { UserName = userName }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("UserName", userName);
+            return _reportDbClient.QueryFirst<NewAdminUser>("LoginNewAdminUser_Get", props);
         }
 
         public int SetLoginTime(int userId)
@@ -48,10 +49,9 @@ namespace BackendSite.Service.DAL
         public bool ChangePwdV2(int userId, string oldPwd, string newPwd, out string Md5Userpwd)
         {
             Md5Userpwd = null;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var p = new DynamicParameters(new { UserId = userId, Md5OldPassword = oldPwd, Md5NewPassword = newPwd });
             p.Add("Md5Userpwd", dbType: DbType.String, direction: ParameterDirection.Output);
-            var result = conn.Execute("Admin_AccountChangeSelfPwd_Set", p, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_AccountChangeSelfPwd_Set", p);
             Md5Userpwd = p.Get<string>("Md5Userpwd");
             return result > 0;
         }

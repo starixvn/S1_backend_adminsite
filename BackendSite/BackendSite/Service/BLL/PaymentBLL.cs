@@ -138,11 +138,6 @@ namespace BackendSite.Service.BLL
                 out transId);
         }
 
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
-        {
-            return walletService.GetCustTpBetRecordListOneWeek(custId);
-        }
-
         public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
@@ -229,8 +224,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId,
-            DateTime selDate, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -247,8 +241,8 @@ namespace BackendSite.Service.BLL
                                   TurnOver = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
                                   ValidBet = tpBetRecord.ValidBet.Value,
                                   WinlostAmount = tpBetRecord.WinlostAmount,
-                                  TransTime = tpBetRecord.TransTime.DateTime,
-                                  SettledTime = tpBetRecord.SettledTime.DateTime,
+                                  TransTime = tpBetRecord.TransTime.ToOffset(offset),
+                                  SettledTime = tpBetRecord.SettledTime.ToOffset(offset),
                                   SettlementType = tpBetRecord.SettlementType,
                                   SettlementTypeName = Enum.GetName(typeof(SettlementType), tpBetRecord.SettlementType),
                                   TurnOver_ExcludeValidTO = tpBetRecord.SettlementType == (int)SettlementType.SettledForValidNotRollover ? tpBetRecord.ValidBet ?? tpBetRecord.Stake : 0,
@@ -336,11 +330,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
-                .GroupBy(x => new { SettledDate = x.SettledTime.AddHours(8).Date })
+                .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
                     SettledDate = x.Key.SettledDate,

@@ -130,6 +130,22 @@ namespace BackendSite.Service.Library
                 return default;
             }
         }
+        
+        public async Task<string> StringGetAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var json = await db.StringGetAsync(key);
+                return json.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
+        }
 
         public List<TItem> GetCacheList<TItem>(IEnumerable<string> keys, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {            

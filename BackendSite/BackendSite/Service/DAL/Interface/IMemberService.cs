@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.DAL.Interface;
 
-public interface ICustomerService
+public interface IMemberService
 {
     Task<GetMemberListData> GetList(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize);
     Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate);
@@ -12,6 +12,8 @@ public interface ICustomerService
     Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId);
     Task<CustLineProfileModel> GetCustLineProfileAsync(int custId, string lineUserId);
     Task<LoginLogPageData> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
+    Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo);
+    Task<bool> IsExistsEmail(int custId, string email, int siteId);
     Task<int> SetCustTag(int custid, List<int> tagList);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);

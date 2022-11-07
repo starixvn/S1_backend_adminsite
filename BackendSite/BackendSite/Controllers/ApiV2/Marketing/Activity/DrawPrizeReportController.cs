@@ -135,7 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
                 JsonConvert.SerializeObject(eventNameList),
                 timeSpan.Hours);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "DrawPrizeReport");
 
         }
