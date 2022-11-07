@@ -4,8 +4,8 @@ namespace BackendSite.Extensions
     {
         public static IEnumerable<string> SplitRemoveSpace(string str, char separator)
         {
-            return string.IsNullOrEmpty(str) 
-                ? new string[]{}
+            return string.IsNullOrWhiteSpace(str) 
+                ? Array.Empty<string>()
                 : str.Replace(" ", "").Split(separator);
         }
     }
