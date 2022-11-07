@@ -236,7 +236,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<List<PaymentAdjustmentReportResponse>> GetPaymentAdjustmentExportReportV2(int siteId,
+        public async Task<List<PaymentAdjustmentReportExport>> GetPaymentAdjustmentExportReportV2(int siteId,
           IEnumerable<int> currencyIds,
           string userName,
           string sabaId,
@@ -275,13 +275,13 @@ namespace BackendSite.Service.BLL
                     transId)).ToList();
 
 
-            var result = new List<PaymentAdjustmentReportResponse>();
+            var result = new List<PaymentAdjustmentReportExport>();
             if (!queryResult.Any()) return result;
 
             var siteList = serverInfoBLL.GetSiteList();
             var offset = startDate.Offset;
 
-            result.AddRange(queryResult.Select(row => new PaymentAdjustmentReportResponse
+            result.AddRange(queryResult.Select(row => new PaymentAdjustmentReportExport
             {
                 TransId = row.TransId,
                 CurrencyName = $"{selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}")}{(row.IsTest == 1 ? "(UUS)" : "")}",
@@ -292,7 +292,7 @@ namespace BackendSite.Service.BLL
                 UserName = row.UserName,
                 SabaID = row.SabaID,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, offset),
+                CreateTime = row.CreateTime.ToOffset(offset).ToString("yyyy-MM-dd HH:mm:ss"),
                 StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
                     ? GetThirdAdjustmentStatusName(row.Status)
                     : GetMailAdjustmentStatusName(row.Status),
@@ -418,7 +418,7 @@ namespace BackendSite.Service.BLL
                 SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName,
                 UserName = row.UserName,
                 Amount = row.Amount,
-                CreateTime = new DateTimeOffset(row.CreateTime, offset),
+                CreateTime = row.CreateTime,
                 StatusName = (row.AdjustType == (int)AdjustTypeEnum.ThirdAdd || row.AdjustType == (int)AdjustTypeEnum.ThirdMinus)
                     ? GetThirdAdjustmentStatusName(row.Status)
                     : GetMailAdjustmentStatusName(row.Status),
