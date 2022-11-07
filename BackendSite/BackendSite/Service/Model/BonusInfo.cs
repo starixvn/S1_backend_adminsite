@@ -128,6 +128,7 @@ namespace BackendSite.Service.Model
 
     public class MpaBonusInfo
     {
+        public DateTime? RecordDate { get; set; }
         public string BonusName { get; set; }
         public string BonusCode { get; set; }
         public int BonusType { get; set; }

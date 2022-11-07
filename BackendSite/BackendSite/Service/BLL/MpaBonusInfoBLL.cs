@@ -69,7 +69,8 @@ namespace BackendSite.Service.BLL
                 input.StartDate.DateTime,
                 input.EndDate.DateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
-                input.BaseCurrencyId);
+                input.BaseCurrencyId,
+                input.IsGroupByDate);
             
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.BonusCode).ToList();
