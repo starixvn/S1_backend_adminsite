@@ -42,7 +42,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new { isPayout, isNew });
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new DynamicParameters(new { isPayout, isNew }));
         }
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
