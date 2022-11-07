@@ -56,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> ClaimStatuses { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
+            public bool IsGroupByDate { get; set; }
             
             #region 分頁排序
 
