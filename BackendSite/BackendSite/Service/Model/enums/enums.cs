@@ -583,6 +583,12 @@ namespace BackendSite.Service.Model.enums
         Transfer = 2
     }
     
+    public enum BonusAtPageEnum
+    {
+        Promotion = 0,
+        Deposit = 1
+    }
+
     #endregion
 
     #region PromotionCashBackSetting
