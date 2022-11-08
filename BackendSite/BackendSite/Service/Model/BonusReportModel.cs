@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model
         public int BaseCurrencyId { get; set; }
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
+        public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
     }
 
     public class BonusReportExportRequestV2
@@ -34,6 +35,7 @@ namespace BackendSite.Service.Model
         public int BaseCurrencyId { get; set; }
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
+        public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
     }
 
     #endregion
@@ -74,6 +76,8 @@ namespace BackendSite.Service.Model
         /// 存款資訊，內有存款單號，存款金額，會有多筆
         /// </summary>
         public string DepositInfo { get; set; }
+        public string CategoryName { get; set; }
+        public string AtPage { get; set; }
     }
 
     public class BonusReportExportExcelResponse
@@ -102,6 +106,8 @@ namespace BackendSite.Service.Model
         /// 存款資訊，內有存款單號，存款金額，會有多筆
         /// </summary>
         public string DepositInfo { get; set; }
+        public string CategoryName { get; set; }
+        public string AtPage { get; set; }
     }
 
     #endregion
@@ -146,6 +152,9 @@ namespace BackendSite.Service.Model
         /// </summary>
         public string DepositInfo { get; set; }
 
+        public string CategoryName { get; set; }
+
+        public BonusAtPageEnum AtPage { get; set; }
     }
 
     public class BonusReportDtoWrapper : BonusReportBase
