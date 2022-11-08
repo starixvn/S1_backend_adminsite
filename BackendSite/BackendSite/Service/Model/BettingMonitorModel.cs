@@ -7,6 +7,7 @@ public class BettingMonitorModel
     public int CurrencyId { get; set; }
     public string Currency { get; set; }
     public int TpId { get; set; }
+    public string TpName { get; set; }
     public int CategoryId { get; set; }
     public string CategoryName { get; set; }
     public int GameType { get; set; }
