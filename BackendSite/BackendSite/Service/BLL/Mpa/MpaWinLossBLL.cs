@@ -1192,7 +1192,7 @@ namespace BackendSite.Service.BLL.Mpa
 
         #endregion
 
-        #region Transaction
+        #region Transaction (存/提)款
 
         /// <summary>
         /// 取得 (充值單/提款單) 結果 By 日期
@@ -1304,10 +1304,10 @@ namespace BackendSite.Service.BLL.Mpa
 
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var transactionResult = transactionRelayResult.GroupBy(x => new
-                {
-                    x.CurrencyId,
-                    x.SummaryType,
-                })
+            {
+                x.CurrencyId,
+                x.SummaryType,
+            })
                 .Select(r => new MpaWinLossByCurrencyDto
                 {
                     Currency = currencyNameMapper[r.Key.CurrencyId],
@@ -1328,6 +1328,42 @@ namespace BackendSite.Service.BLL.Mpa
             return transactionResult;
         }
 
+
+
+        #endregion
+
+        #region Bouns 
+
+
+        private async Task<IEnumerable<MpaWinLossByDateDto>> GetBonusByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
+
+            var bonusRelayResult = (await GetMapWinLossBonusByDate(request, groupByType))
+                .Where(r => request.CurrencyIds.Contains(r.CurrencyId));
+
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                bonusRelayResult = bonusRelayResult.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
+            }
+
+            var currencyNameMapper = await GetCurrencyIsoCodeMapper();
+
+            var bonusResult = bonusRelayResult.GroupBy(x => new
+            {
+                x.Date,
+                x.CurrencyId
+            }).Select(r => new MpaWinLossByDateDto
+            {
+                Date = groupByType == MpaWinLossGroupByTypeEnum.Date
+                            ? r.Key.Date.ToString("yyyy-MM-dd")
+                            : r.Key.Date.ToString("yyyy-MM"),
+                Currency = currencyNameMapper[r.Key.CurrencyId],
+                TotalBonus = r.Sum(x=>x.BonusAmountClaim)
+            }).ToList();
+
+
+            return bonusResult;
+        }
 
 
         #endregion
@@ -1463,6 +1499,20 @@ namespace BackendSite.Service.BLL.Mpa
                 return await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
             var data = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime,
                 request.EndTime, format);
+            var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            return data;
+        }
+
+        private async Task<IEnumerable<MpaWinLossBonusDto>> GetMapWinLossBonusByDate(MpaWinLossRequest request,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+            var redisKey =
+                $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+            if (_redisHelper.KeyExists(redisKey))
+                return await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
+
+            var data = await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format);
             var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             return data;
         }

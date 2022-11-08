@@ -89,5 +89,16 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
+
+        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTime starTime, DateTime endTime, string format)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_Format", format, dbType: DbType.String);
+
+            return _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get", p);
+        }
     }
 }

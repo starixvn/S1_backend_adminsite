@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa
 {
-
     /// <summary>
     /// WinLoss By 日期 or 月份
     /// </summary>
@@ -16,11 +15,8 @@ namespace BackendSite.Service.Model.Mpa
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public int CustId { get; set; }
-
         public string UserName { get; set; }
-
         public string TpUserName { get; set; }
-
         public byte SettlementType { get; set; }
         public int BonusId { get; set; }
         public byte PromotionType { get; set; }
@@ -31,22 +27,13 @@ namespace BackendSite.Service.Model.Mpa
         public decimal RevenueSummary { get; set; }
         public decimal ProgressiveWinSummary { get; set; }
         public decimal ProgressiveBetSummary { get; set; }
-
         public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
     }
 
-
-    public class MpaUSdRateDto
-    {
-        public int CurrencyId { get; set; }
-
-        public string IsoCode { get; set; }
-
-        public decimal USDRate { get; set; }
-    }
-
-
+    /// <summary>
+    /// 存提款資訊
+    /// </summary>
     public class TransactionRelayDto
     {
         public DateTime Date { get; set; }
@@ -72,6 +59,33 @@ namespace BackendSite.Service.Model.Mpa
         public int RowCount { get; set; }
     }
 
+    /// <summary>
+    /// Bonus 資訊
+    /// </summary>
+    public class MpaWinLossBonusDto
+    {
+        public DateTime Date { get; set; }
+
+        public int CustId { get; set; }
+
+        public string UserName { get; set; }
+
+        public string TpUserName { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public decimal BonusAmountClaim { get; set; }
+    }
+
+
+    public class MpaUSdRateDto
+    {
+        public int CurrencyId { get; set; }
+
+        public string IsoCode { get; set; }
+
+        public decimal USDRate { get; set; }
+    }
 
     public class TpGameTypeOptionDto
     {
@@ -79,7 +93,6 @@ namespace BackendSite.Service.Model.Mpa
 
         public string TypeName { get; set; }
     }
-
 
     public class Commission9WDto
     {
@@ -89,7 +102,6 @@ namespace BackendSite.Service.Model.Mpa
 
         public decimal Commission { get; set; }
     }
-
 
     public class TpCategoryDto
     {

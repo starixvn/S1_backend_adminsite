@@ -84,5 +84,15 @@ namespace BackendSite.Service.DAL.Interface
         /// <returns></returns>
         Task<IEnumerable<TpCategoryDto>> GetTpCategory();
 
+
+        /// <summary>
+        /// 取得Bonus
+        /// </summary>
+        /// <param name="siteId">站台Id</param>
+        /// <param name="starTime">起始時間</param>
+        /// <param name="endTime">結束時間</param>
+        /// <param name="format">日期 format 格式</param>
+        /// <returns>Bonus 資訊</returns>
+        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTime starTime, DateTime endTime, string format);
     }
 }
