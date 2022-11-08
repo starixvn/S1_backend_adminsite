@@ -9,6 +9,7 @@ using BackendSite.Service.Model.ApiModel;
 using NuGet.Packaging;
 using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Linq;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -35,14 +36,19 @@ namespace BackendSite.Service.BLL.Mpa
             // 存提款 
             var transactionResult = await GetTransactionByDateResult(request, groupByType);
 
+            // Bonus
+            var bonusResult = await GetBonusByDateResult(request, groupByType);
+
             // 注單 + 存提款資料合併
             var combineData = request.OrderBy
                 ? tpBetRecordResult
                     .Concat(transactionResult)
+                    .Concat(bonusResult)
                     .OrderBy(request)
                     .ToList()
                 : tpBetRecordResult
                     .Concat(transactionResult)
+                    .Concat(bonusResult)
                     .ToList();
 
             var combineResult = combineData.GroupBy(x => new
@@ -69,6 +75,7 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
                 AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.ValidTurnOver) / r.Sum(x => x.BetCount) : 0.00m,
                 Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
+                TotalBonus = r.Sum(x => x.TotalBonus)
             });
 
             var responseResult = new Dictionary<string, MpaWinLossByDateResponse>();
@@ -92,6 +99,7 @@ namespace BackendSite.Service.BLL.Mpa
                     detail.Margin = detail.Margin / rate;
                     detail.TotalDepositAmount = detail.TotalDepositAmount / rate;
                     detail.TotalWithDrawAmount = detail.TotalWithDrawAmount / rate;
+                    detail.TotalBonus = detail.TotalBonus / rate;
                 }
 
                 var result = new MpaWinLossByDateResponse
@@ -116,6 +124,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
                         ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
+                    TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByDate(combineResult, key)
                     : GetCurrencyDetailByDate(dateSummary)
@@ -168,7 +177,8 @@ namespace BackendSite.Service.BLL.Mpa
                 DepositCount = v.DepositCount,
                 TotalDepositAmount = v.TotalDepositAmount,
                 WithDrawCount = v.WithDrawCount,
-                TotalWithDrawAmount = v.TotalWithDrawAmount
+                TotalWithDrawAmount = v.TotalWithDrawAmount,
+                TotalBonus = v.TotalBonus
             });
         }
 
@@ -188,7 +198,8 @@ namespace BackendSite.Service.BLL.Mpa
                     DepositCount = v.DepositCount,
                     TotalDepositAmount = v.TotalDepositAmount,
                     WithDrawCount = v.WithDrawCount,
-                    TotalWithDrawAmount = v.TotalWithDrawAmount
+                    TotalWithDrawAmount = v.TotalWithDrawAmount,
+                    TotalBonus = v.TotalBonus
                 });
         }
 
@@ -1358,7 +1369,7 @@ namespace BackendSite.Service.BLL.Mpa
                             ? r.Key.Date.ToString("yyyy-MM-dd")
                             : r.Key.Date.ToString("yyyy-MM"),
                 Currency = currencyNameMapper[r.Key.CurrencyId],
-                TotalBonus = r.Sum(x=>x.BonusAmountClaim)
+                TotalBonus = r.Sum(x => x.BonusAmountClaim)
             }).ToList();
 
 
