@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL.Mpa;
+﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa;
@@ -15,10 +16,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     {
 
         public readonly MpaWinLossBLL _MaMpaWinLossBll;
+        private readonly ExcelBLL _excelBll;
 
-        public MpaWinLossReportController(MpaWinLossBLL MaMpaWinLossBll)
+        public MpaWinLossReportController(MpaWinLossBLL MaMpaWinLossBll, ExcelBLL excelBll)
         {
             this._MaMpaWinLossBll = MaMpaWinLossBll;
+            _excelBll = excelBll;
         }
 
         [HttpPost]
@@ -35,9 +38,17 @@ namespace BackendSite.Controllers.ApiV2.Report
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
-            }  
+            }
 
             return apiResult;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByDateExport");
         }
 
         [HttpPost]
@@ -58,6 +69,15 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Month);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
+        }
+
 
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossRequest request)

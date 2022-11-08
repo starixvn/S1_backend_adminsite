@@ -444,10 +444,10 @@ namespace BackendSite.Service.Model.Mpa
 
     public class MpaWinLossByDateDto
     {
-        [JsonIgnore]
+        //[JsonIgnore]
         public string Date { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
 
