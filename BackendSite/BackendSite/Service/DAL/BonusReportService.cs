@@ -19,7 +19,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
         {
-            SetBonusReportRequest(request, out var siteId,out var promotionTypes,out var promotionCategoryIds, out var statuses, out var pageSize, out var startIndex);
+            SetBonusReportRequest(request, out var siteId, out var promotionTypes, out var promotionCategoryIds, out var statuses, out var pageSize, out var startIndex);
 
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteId);
@@ -67,6 +67,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request)
         {
+
             SetBonusReportExportRequest(request, out var siteIds, out var promotionTypes,out var promotionCategoryIds,out var statuses);
 
             var p = new DynamicParameters();
@@ -98,6 +99,7 @@ namespace BackendSite.Service.DAL
         /// <param name="request"></param>
         /// <param name="siteIds"></param>
         /// <param name="statuses"></param>
+
         private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, 
             out string siteIds,
             out string promotionTypes,
@@ -127,7 +129,7 @@ namespace BackendSite.Service.DAL
             out int startIndex)
         {
             siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
-            promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x=>(int)x));
+            promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x => (int)x));
             promotionCategoryIds = JsonConvert.SerializeObject(request.PromotionCategoryIds);
             statuses = JsonConvert.SerializeObject(request.Statuses);
             pageSize = Math.Abs(request.PageSize);
