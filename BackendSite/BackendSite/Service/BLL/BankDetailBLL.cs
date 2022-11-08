@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
@@ -120,21 +116,9 @@ namespace BackendSite.Service.BLL
         {
             var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
             
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(1),
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
-        
-        /*public IEnumerable<BankInfoOff> GetAllBankInfoOff()
-        {
-            var bankInfoOffList = localBankService.GetAllBankAccountOff();
-            return bankInfoOffList;
-        }
-
-        public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
-        {
-            var bankInfoOffList = localBankService.GetBankAccountOff(siteId);
-            return bankInfoOffList;
-        }*/
         
         public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount)
         {
