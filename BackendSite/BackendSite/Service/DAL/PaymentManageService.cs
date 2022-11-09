@@ -438,6 +438,16 @@ namespace BackendSite.Service.DAL
             });
         }
         
+        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
+        {
+            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPayForSetting_Get", new
+            {
+                _SiteId = siteId,
+                _CurrencyId = currencyId,
+                _ChannelId = channelId
+            });
+        }
+        
         public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string @operator)
         {
             using var conn = new MySqlConnection(_connectionString);

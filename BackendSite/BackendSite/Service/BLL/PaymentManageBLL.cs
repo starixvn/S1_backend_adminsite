@@ -107,10 +107,9 @@ namespace BackendSite.Service.BLL
             return _paymentManageService.UpdatePaySettingStatus(input, @operator);
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
+        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
-            return _paymentManageService.GetBankSysInfoList(siteId, payId)
-                .OrderBy(x=>x.CurrencyId);
+            return _paymentManageService.GetBankInfoPayForSetting(siteId, currencyId, channelId);
         }
 
         public void UpdateBankInfo(int PayId, int SysId, int Status, string Operator)

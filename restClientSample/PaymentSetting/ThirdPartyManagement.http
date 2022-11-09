@@ -89,13 +89,14 @@ Content-Type: application/json
 }
 
 ###
-# 取得三方支援的銀行
+# 取得渠道支援的銀行
 POST {{url}}/apiV2/ThirdPartyManagement/GetBankInfoList HTTP/1.1
 Content-Type: application/json
 
 {
     "siteId": 1,
-    "payId": 1
+    "currencyId": 2,
+    "channelId": 356
 }
 
 ###
