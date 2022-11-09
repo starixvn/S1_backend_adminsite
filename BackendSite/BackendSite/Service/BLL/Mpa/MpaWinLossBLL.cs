@@ -397,6 +397,25 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var key in keys)
             {
+                // 決定原本的資料要不要 轉換匯率
+                var details = exportData.Where(x => x.TpGameTypeName == key).ToList();
+                foreach (var detail in details)
+                {
+                    var rate = request.DisplayGroupBreakdownInOriginalCurrency
+                        ? 1
+                        : rateMap[detail.Currency];
+
+                    detail.TurnOver = detail.TurnOver / rate;
+                    detail.ValidTurnOver = detail.ValidTurnOver / rate;
+                    detail.GGR = detail.GGR / rate;
+                    detail.PlayerWinLoss = detail.PlayerWinLoss / rate;
+                    detail.ProgressiveWin = detail.ProgressiveWin / rate;
+                    detail.ProgressiveBet = detail.ProgressiveBet / rate;
+                    detail.Commission = detail.Commission / rate;
+                    detail.AvgBetAmount = detail.AvgBetAmount / rate;
+                    detail.Margin = detail.Margin / rate;
+                }
+
                 var dateSummary = combineResult.Where(x => x.TpGameTypeName == key).ToList();
                 foreach (var detail in dateSummary)
                 {
@@ -475,7 +494,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             var combineResult = request.OrderBy
                 ? tpBetRecordResult.OrderBy(request)
-                : tpBetRecordResult.OrderBy(r => r.TpGameTypeName).ThenBy(x => x.Currency).ToList();
+                : tpBetRecordResult.OrderBy(r => r.TpGameTypeName).ThenBy(x => x.Currency).AsEnumerable();
 
             var rateMap = await GetCurrencyNameRateMapper();
             var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();
@@ -649,13 +668,30 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var key in keys)
             {
-                var dateSummary = combineResult.Where(x => x.TpCategoryName == key).ToList();
-                foreach (var detail in dateSummary)
+                // 決定原本的資料要不要 轉換匯率
+                var details = exportData.Where(x => x.TpCategoryName == key).ToList();
+                foreach (var detail in details)
                 {
                     var rate = request.DisplayGroupBreakdownInOriginalCurrency
                         ? 1
                         : rateMap[detail.Currency];
 
+                    detail.TurnOver = detail.TurnOver / rate;
+                    detail.ValidTurnOver = detail.ValidTurnOver / rate;
+                    detail.GGR = detail.GGR / rate;
+                    detail.PlayerWinLoss = detail.PlayerWinLoss / rate;
+                    detail.ProgressiveWin = detail.ProgressiveWin / rate;
+                    detail.ProgressiveBet = detail.ProgressiveBet / rate;
+                    detail.Commission = detail.Commission / rate;
+                    detail.AvgBetAmount = detail.AvgBetAmount / rate;
+                    detail.Margin = detail.Margin / rate;
+                }
+
+
+                var dateSummary = combineResult.Where(x => x.TpCategoryName == key).ToList();
+                foreach (var detail in dateSummary)
+                {
+                    var rate = rateMap[detail.Currency];
                     detail.TurnOver = detail.TurnOver / rate;
                     detail.ValidTurnOver = detail.ValidTurnOver / rate;
                     detail.GGR = detail.GGR / rate;
