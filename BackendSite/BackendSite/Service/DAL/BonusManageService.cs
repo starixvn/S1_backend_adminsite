@@ -619,8 +619,8 @@ namespace BackendSite.Service.DAL
             p.Add("_CategoryId", promotion.CategoryId);
             p.Add("_PeriodFrom", promotion.PeriodFromTime?.ToUnixTimeSeconds());
             p.Add("_PeriodTo", promotion.PeriodToTime?.ToUnixTimeSeconds());
-            p.Add("_DisplayFrom", promotion.DisplayFromTime?.ToUnixTimeSeconds() ?? promotion.PeriodFromTime?.ToUnixTimeSeconds());
-            p.Add("_DisplayTo", promotion.DisplayToTime?.ToUnixTimeSeconds() ?? promotion.PeriodToTime?.ToUnixTimeSeconds());
+            p.Add("_DisplayFrom", promotion.DisplayFromTime?.ToUnixTimeSeconds() ?? 0);
+            p.Add("_DisplayTo", promotion.DisplayToTime?.ToUnixTimeSeconds() ?? 0);
             p.Add("_ExpiryDays", promotion.ExpiryDays);
             p.Add("_Sort", promotion.Sort);
             p.Add("_Status", promotion.Status);
