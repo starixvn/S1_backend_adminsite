@@ -1,9 +1,10 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
-    public class IovationReportBLL
+    public class IovationReportBLL : IIovationReportBLL
     {
         private readonly IovationReportService _iovationReport;
 

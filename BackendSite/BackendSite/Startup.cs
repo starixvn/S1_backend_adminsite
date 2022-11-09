@@ -78,6 +78,7 @@ namespace BackendSite
             }
 
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
+            services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ReferralManagementDecorator>();
@@ -86,6 +87,7 @@ namespace BackendSite
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IIovationReportService, IovationReportService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
