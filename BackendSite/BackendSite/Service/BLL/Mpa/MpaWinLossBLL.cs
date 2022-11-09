@@ -101,6 +101,10 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.Add(result);
             }
 
+            exportData = request.OrderBy
+                ? exportData.OrderBy(request)
+                : exportData.OrderBy(x => x.Date).ThenBy(x => x.Currency).ToList();
+
             // total
             exportData.Add(new MpaWinLossByDateDto()
             {
@@ -127,9 +131,8 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
             });
 
-            return request.OrderBy ? exportData.OrderBy(request) : exportData.OrderBy(x => x.Date).ThenBy(x => x.Currency);
+            return exportData;
         }
-
 
         public async Task<Dictionary<string, MpaWinLossByDateResponse>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
@@ -360,6 +363,94 @@ namespace BackendSite.Service.BLL.Mpa
 
         #region GroupBy TpGameType
 
+        public async Task<IEnumerable<MpaWinLossByTpGameTypeDto>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
+            // 注單資料
+            var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
+            var tpBetRecordResult = data.TpBetRecordResult;
+
+            var combineResult = request.OrderBy
+                ? tpBetRecordResult.OrderBy(request)
+                : tpBetRecordResult;
+
+            var rateMap = await GetCurrencyNameRateMapper();
+            var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();
+            var exportData = new List<MpaWinLossByTpGameTypeDto>();
+            exportData.AddRange(combineResult);
+
+            foreach (var key in keys)
+            {
+                var dateSummary = combineResult.Where(x => x.TpGameTypeName == key).ToList();
+                foreach (var detail in dateSummary)
+                {
+                    var rate = request.DisplayGroupBreakdownInOriginalCurrency
+                        ? 1
+                        : rateMap[detail.Currency];
+
+                    detail.TurnOver = detail.TurnOver / rate;
+                    detail.ValidTurnOver = detail.ValidTurnOver / rate;
+                    detail.GGR = detail.GGR / rate;
+                    detail.PlayerWinLoss = detail.PlayerWinLoss / rate;
+                    detail.ProgressiveWin = detail.ProgressiveWin / rate;
+                    detail.ProgressiveBet = detail.ProgressiveBet / rate;
+                    detail.Commission = detail.Commission / rate;
+                    detail.AvgBetAmount = detail.AvgBetAmount / rate;
+                    detail.Margin = detail.Margin / rate;
+                }
+
+                var result = new MpaWinLossByTpGameTypeDto
+                {
+                    TpGameTypeName = key,
+                    Currency = "All",
+                    TurnOver = dateSummary.Sum(x => x.TurnOver),
+                    ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
+                    GGR = dateSummary.Sum(x => x.GGR),
+                    PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    Commission = dateSummary.Sum(x => x.Commission),
+                    BetCount = dateSummary.Sum(x => x.BetCount),
+                    UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
+                    AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
+                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        : 0.00m,
+
+                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
+                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                        : 0.00m
+                };
+
+                exportData.Add(result);
+            }
+
+            exportData = request.OrderBy
+                ? exportData.OrderBy(request)
+                : exportData.OrderBy(x => x.TpGameTypeName).ThenBy(x => x.Currency).ToList();
+
+            // total
+            exportData.Add(new MpaWinLossByTpGameTypeDto()
+            {
+                TpGameTypeName = "total",
+                TurnOver = exportData.Sum(x => x.TurnOver),
+                ValidTurnOver = exportData.Sum(x => x.ValidTurnOver),
+                GGR = exportData.Sum(x => x.GGR),
+                PlayerWinLoss = exportData.Sum(x => x.PlayerWinLoss),
+                ProgressiveWin = exportData.Sum(x => x.ProgressiveWin),
+                ProgressiveBet = exportData.Sum(x => x.ProgressiveBet),
+                Commission = exportData.Sum(x => x.Commission),
+                BetCount = exportData.Sum(x => x.BetCount),
+                AvgBetAmount = (exportData.Sum(x => x.BetCount) != 0 && exportData.Sum(x => x.TurnOver) != 0)
+                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
+                    : 0.00m,
+                UniquePlayers = data.UniquePlayers,
+                Margin = (exportData.Sum(x => x.GGR) != 0 && exportData.Sum(x => x.TurnOver) != 0)
+                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.TurnOver)
+                    : 0.00m
+            });
+
+            return exportData;
+        }
+
         public async Task<Dictionary<string, MpaWinLossByTpGameTypeResponse>> GetMapWinLossByTpGameTypeResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
@@ -370,7 +461,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             var combineResult = request.OrderBy
                 ? tpBetRecordResult.OrderBy(request)
-                : tpBetRecordResult;
+                : tpBetRecordResult.OrderBy(r => r.TpGameTypeName).ThenBy(x => x.Currency).ToList();
 
             var rateMap = await GetCurrencyNameRateMapper();
             var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();

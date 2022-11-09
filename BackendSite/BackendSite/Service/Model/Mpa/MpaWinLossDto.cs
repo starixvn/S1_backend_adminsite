@@ -495,11 +495,8 @@ namespace BackendSite.Service.Model.Mpa
 
     public class MpaWinLossByTpGameTypeDto
     {
-        [JsonIgnore]
         public string TpGameTypeName { get; set; }
 
-        [JsonIgnore]
-        //MYR、CNY...etc
         public string Currency { get; set; }
 
         public decimal TurnOver { get; set; }

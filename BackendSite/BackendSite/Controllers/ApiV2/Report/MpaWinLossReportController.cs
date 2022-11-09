@@ -99,6 +99,14 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeExport(request, MpaWinLossGroupByTypeEnum.GameType);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
+        }
+
+        [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>();
