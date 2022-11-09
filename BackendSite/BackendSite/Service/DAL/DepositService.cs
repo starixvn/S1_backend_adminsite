@@ -51,7 +51,7 @@ namespace BackendSite.Service.DAL
                 StartDate = startDate,
                 EndDate = endDate,
                 DepositId = depositId,
-                TransId = DepositId,
+                TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId ,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
                 Agent = string.IsNullOrEmpty(agent) ? null : agent ,
                 CurrencyId = JsonConvert.SerializeObject(currencyId),
