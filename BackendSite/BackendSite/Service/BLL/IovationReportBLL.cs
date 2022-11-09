@@ -16,7 +16,8 @@ namespace BackendSite.Service.BLL
         {
             var startTime = request.StartTime.ToUniversalTime().DateTime;
             var endTime = request.EndTime.ToUniversalTime().DateTime;
-            var data = await _iovationReport.GetListAsync(request.CurrencyId, request.DeviceType.ToString(), request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
+            var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString();
+            var data = await _iovationReport.GetListAsync(request.CurrencyId, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
             var iovationReport = data.IovationReport.Select(a => new IovationReport()
             {
                 UserName = a.UserName,
