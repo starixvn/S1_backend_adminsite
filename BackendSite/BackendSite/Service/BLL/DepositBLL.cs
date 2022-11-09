@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
 using BackendSite.Extensions;
+using BackendSite.Controllers.ApiV2.Finance.Deposit;
 
 namespace BackendSite.Service.BLL
 {
@@ -190,9 +191,9 @@ namespace BackendSite.Service.BLL
             return _depositAccountingService.GetDepositAccountingByTransId(transId);
         }
         
-        public int EditDepositAccounting(string transId, string accountNo ,string memo ,string Operator)
+        public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
-            return _depositAccountingService.EditDepositAccounting(transId,accountNo,memo,Operator);
+            return _depositAccountingService.EditDepositAccounting(input);
         }
         
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(
