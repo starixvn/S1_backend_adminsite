@@ -41,7 +41,7 @@ namespace BackendSite.Service.BLL.Mpa
             var bonusResult = await GetBonusByDateResult(request, groupByType);
 
             // 組合結果
-            var combineResult = ByDateCombineResult(request, tpBetRecordResult, transactionResult, bonusResult).ToList();
+            var combineResult = ByDateCombineResult(request, tpBetRecordResult, transactionResult, bonusResult);
 
             var exportData = new List<MpaWinLossByDateDto>();
             exportData.AddRange(combineResult);
@@ -51,13 +51,32 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var key in keys)
             {
-                var dateSummary = combineResult.Where(x => x.Date == key).ToList();
-                foreach (var detail in dateSummary)
+                // 決定原本的資料要不要 轉換匯率
+                var details = exportData.Where(x => x.Date == key).ToList();
+                foreach (var detail in details)
                 {
                     var rate = request.DisplayGroupBreakdownInOriginalCurrency
                         ? 1
                         : rateMap[detail.Currency];
 
+                    detail.TurnOver = detail.TurnOver / rate;
+                    detail.ValidTurnOver = detail.ValidTurnOver / rate;
+                    detail.GGR = detail.GGR / rate;
+                    detail.PlayerWinLoss = detail.PlayerWinLoss / rate;
+                    detail.ProgressiveWin = detail.ProgressiveWin / rate;
+                    detail.ProgressiveBet = detail.ProgressiveBet / rate;
+                    detail.Commission = detail.Commission / rate;
+                    detail.AvgBetAmount = detail.AvgBetAmount / rate;
+                    detail.Margin = detail.Margin / rate;
+                    detail.TotalDepositAmount = detail.TotalDepositAmount / rate;
+                    detail.TotalWithDrawAmount = detail.TotalWithDrawAmount / rate;
+                    detail.TotalBonus = detail.TotalBonus / rate;
+                }
+
+                var dateSummary = combineResult.Where(x => x.Date == key).ToList();
+                foreach (var detail in dateSummary)
+                {
+                    var rate = rateMap[detail.Currency];
                     detail.TurnOver = detail.TurnOver / rate;
                     detail.ValidTurnOver = detail.ValidTurnOver / rate;
                     detail.GGR = detail.GGR / rate;
@@ -381,10 +400,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var dateSummary = combineResult.Where(x => x.TpGameTypeName == key).ToList();
                 foreach (var detail in dateSummary)
                 {
-                    var rate = request.DisplayGroupBreakdownInOriginalCurrency
-                        ? 1
-                        : rateMap[detail.Currency];
-
+                    var rate = rateMap[detail.Currency];
                     detail.TurnOver = detail.TurnOver / rate;
                     detail.ValidTurnOver = detail.ValidTurnOver / rate;
                     detail.GGR = detail.GGR / rate;
