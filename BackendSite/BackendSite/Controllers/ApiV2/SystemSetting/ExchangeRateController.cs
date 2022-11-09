@@ -16,12 +16,14 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         private readonly ExchangeUSDRateBLL _ExchangeUSDRateBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBLL;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBLL;
 
         public ExchangeRateController(IServiceProvider provider)
         {
             _ExchangeUSDRateBLL = provider.GetRequiredService<ExchangeUSDRateBLL>();
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         /// <summary>
