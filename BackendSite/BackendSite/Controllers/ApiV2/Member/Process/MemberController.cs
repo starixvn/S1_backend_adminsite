@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
@@ -28,11 +29,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
-        private readonly BonusManageBLL _bonusManageBll;
+        private readonly ILogger<MemberController> _logger;
 
         public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll,
             CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
-            BonusManageBLL bonusManageBll,
+            ILogger<MemberController> logger,
             NewAuthorizeBLL newAuthorizeBll,
             PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
             ExcelBLL excelBll,
@@ -42,7 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
-            _bonusManageBll = bonusManageBll;
+            _logger = logger;
             _newAuthorizeBll = newAuthorizeBll;
             _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
             _excelBll = excelBll;
@@ -68,6 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentAsyncMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
@@ -99,6 +101,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
@@ -132,6 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
