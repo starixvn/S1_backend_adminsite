@@ -37,7 +37,7 @@ namespace BackendSite.Service.DAL
 
             #region totalAmountSummary
 
-            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V6", p)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V7", p)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -83,8 +83,9 @@ namespace BackendSite.Service.DAL
             p.Add("_BaseCurrencyId", request.BaseCurrencyId);
             p.Add("_CategoryTypes", promotionCategoryIds);
             p.Add("_Statuses", statuses);
+            p.Add("_AtPages", atPages);
 
-            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V10", p);
+            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V11", p);
         }
 
         public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
