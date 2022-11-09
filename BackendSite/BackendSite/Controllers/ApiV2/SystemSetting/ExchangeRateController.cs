@@ -35,12 +35,13 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 1 })]
-        public ApiListResult<CurrencyUSDRate> GetUSDRateList()
+        public ApiResult<IEnumerable<CurrencyUSDRate>> GetUSDRateList()
         {
-            return new ApiListResult<CurrencyUSDRate>((int)ErrorCodeEnum.Success, "Success")
-            { 
-                Data = _ExchangeUSDRateBLL.GetExchangeUSDRate(),
-            };
+            var siteId = _authorizeBll.CheckBrand();
+            var siteCurrencyList = _serverInfoBLL.GetSiteList().First(x => x.SiteId == siteId).ICurrencyList;
+            var data = _ExchangeUSDRateBLL.GetExchangeUSDRate().Where(i => siteCurrencyList.Contains(i.CurrencyId));
+
+            return new ApiResult<IEnumerable<CurrencyUSDRate>>((int)ErrorCodeEnum.Success, "Success", data);
         }
 
         /// <summary>
