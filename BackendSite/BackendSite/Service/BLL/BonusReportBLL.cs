@@ -51,7 +51,9 @@ namespace BackendSite.Service.BLL
                     CancelBonusAmount = r.CancelBonusAmount,
                     ExpiredCancel = r.ExpiredCancel,
                     Operator = string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
-                    DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
+                    DepositInfo = CheckDepositInfoFormatter(r.DepositInfo),
+                    CategoryName = r.CategoryName,
+                    AtPage = r.AtPage.ToString()
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages,
@@ -91,7 +93,9 @@ namespace BackendSite.Service.BLL
                 ExpiredCancel = r.ExpiredCancel,
                 Operator =
                 string.IsNullOrWhiteSpace(r.Operator) ? string.Empty : r.Operator.Replace("\"", string.Empty),
-                DepositInfo = CheckDepositInfoFormatter(r.DepositInfo)
+                DepositInfo = CheckDepositInfoFormatter(r.DepositInfo),
+                CategoryName = r.CategoryName,
+                AtPage = r.AtPage.ToString()
             });
             
 

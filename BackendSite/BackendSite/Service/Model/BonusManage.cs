@@ -45,7 +45,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (UnixDisplayFrom != null)
+                if (UnixDisplayFrom != null && UnixDisplayFrom.Value != 0)
                 {
                     return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayFrom.Value);
                 }
@@ -58,7 +58,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (UnixDisplayTo != null)
+                if (UnixDisplayTo != null && UnixDisplayTo.Value != 0)
                 {
                     return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayTo.Value);
                 }

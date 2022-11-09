@@ -19,7 +19,8 @@ namespace BackendSite.Service.DAL
 
         public async Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
         {
-            SetBonusReportRequest(request, out var siteId, out var promotionTypes, out var promotionCategoryIds, out var statuses, out var pageSize, out var startIndex);
+            SetBonusReportRequest(request, out var siteId, out var promotionTypes, out var promotionCategoryIds,
+                out var statuses, out var atPages, out var pageSize, out var startIndex);
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteId);
             p.Add("_BonusCode", request.BonusCode);
@@ -32,10 +33,11 @@ namespace BackendSite.Service.DAL
             p.Add("_BaseCurrencyId", request.BaseCurrencyId);
             p.Add("_CategoryTypes", promotionCategoryIds);
             p.Add("_Statuses", statuses);
+            p.Add("_AtPages", atPages);
 
             #region totalAmountSummary
 
-            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V6", p)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V7", p)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -55,7 +57,7 @@ namespace BackendSite.Service.DAL
 
             var result = new BonusReportDtoWrapper
             {
-                Data = await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfo_Get_V10", p),
+                Data = await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfo_Get_V11", p),
                 TotalPages = p.Get<int?>("_TotalPages") ?? 0,
                 RowCount = p.Get<int?>("_RowCount") ?? 0,
                 TotalAmountSummary = currencyTotalAmount
@@ -66,7 +68,8 @@ namespace BackendSite.Service.DAL
 
         public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request)
         {
-            SetBonusReportExportRequest(request, out var siteIds, out var promotionTypes, out var promotionCategoryIds, out var statuses);
+            SetBonusReportExportRequest(request, out var siteIds, out var promotionTypes,
+                out var promotionCategoryIds, out var statuses, out var atPages);
 
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
@@ -80,8 +83,9 @@ namespace BackendSite.Service.DAL
             p.Add("_BaseCurrencyId", request.BaseCurrencyId);
             p.Add("_CategoryTypes", promotionCategoryIds);
             p.Add("_Statuses", statuses);
+            p.Add("_AtPages", atPages);
 
-            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V10", p);
+            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V11", p);
         }
 
         public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
@@ -101,12 +105,14 @@ namespace BackendSite.Service.DAL
             out string siteIds,
             out string promotionTypes,
             out string promotionCategoryIds,
-            out string statuses)
+            out string statuses,
+            out string atPages)
         {
             siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
             promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x => (int)x));
             promotionCategoryIds = JsonConvert.SerializeObject(request.PromotionCategoryIds);
             statuses = JsonConvert.SerializeObject(request.Statuses);
+            atPages = JsonConvert.SerializeObject(request.AtPages);
         }
 
         /// <summary>
@@ -122,6 +128,7 @@ namespace BackendSite.Service.DAL
             out string promotionTypes,
             out string promotionCategoryIds,
             out string statuses,
+            out string atPages,
             out int pageSize,
             out int startIndex)
         {
@@ -129,6 +136,7 @@ namespace BackendSite.Service.DAL
             promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x => (int)x));
             promotionCategoryIds = JsonConvert.SerializeObject(request.PromotionCategoryIds);
             statuses = JsonConvert.SerializeObject(request.Statuses);
+            atPages = JsonConvert.SerializeObject(request.AtPages);
             pageSize = Math.Abs(request.PageSize);
             startIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize);
         }
