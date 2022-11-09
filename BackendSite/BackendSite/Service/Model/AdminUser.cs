@@ -21,9 +21,8 @@
     {
         public int UserId { set; get; }
         public string UserName { set; get; }
-
-        //public string Token { set; get; }
         public string LangId { set; get; }
+        public int SiteId { get; set; }
     }
 
     public class ChangePwd
