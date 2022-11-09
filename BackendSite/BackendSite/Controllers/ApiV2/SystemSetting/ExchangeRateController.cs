@@ -16,12 +16,14 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         private readonly ExchangeUSDRateBLL _ExchangeUSDRateBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBLL;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBLL;
 
         public ExchangeRateController(IServiceProvider provider)
         {
             _ExchangeUSDRateBLL = provider.GetRequiredService<ExchangeUSDRateBLL>();
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         /// <summary>
@@ -37,9 +39,12 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 1 })]
         public ApiListResult<CurrencyUSDRate> GetUSDRateList()
         {
+            var siteId = _authorizeBll.CheckBrand();
+            var siteCurrencyList = _serverInfoBLL.GetSiteList().First(x => x.SiteId == siteId).ICurrencyList;
+
             return new ApiListResult<CurrencyUSDRate>((int)ErrorCodeEnum.Success, "Success")
             { 
-                Data = _ExchangeUSDRateBLL.GetExchangeUSDRate(),
+                Data = _ExchangeUSDRateBLL.GetExchangeUSDRate().Where(i => siteCurrencyList.Contains(i.CurrencyId)),
             };
         }
 
