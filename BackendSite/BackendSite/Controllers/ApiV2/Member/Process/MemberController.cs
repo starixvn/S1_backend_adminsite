@@ -31,7 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<MemberController> _logger;
 
-        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll,
+        public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll,
             CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
             ILogger<MemberController> logger,
             NewAuthorizeBLL newAuthorizeBll,
@@ -39,6 +39,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             ExcelBLL excelBll,
             IMemberQuery memberQuery)
         {
+            _bonusApiUrl = configuration.GetValue<string>("BonusService");
+            _courierAdapter = courierAdapter;
             _memberCommand = memberCommand;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
