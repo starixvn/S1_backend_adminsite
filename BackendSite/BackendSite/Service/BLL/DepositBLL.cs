@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
