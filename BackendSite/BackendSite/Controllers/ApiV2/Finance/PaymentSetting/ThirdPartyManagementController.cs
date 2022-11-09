@@ -28,10 +28,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         #region API Model
 
-        public class GetBankListByPayIdRequest
+        public class GetBankListForSettingRequest
         {
             public int SiteId { get; set; }
-            public int PayId { get; set; }
+            public int CurrencyId { get; set; }
+            public int ChannelId { get; set; }
         }
         
         public class GetPayListRequest
@@ -119,10 +120,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
-        public ApiResult GetBankInfoList(GetBankListByPayIdRequest request)
+        public ApiResult GetBankInfoList(GetBankListForSettingRequest request)
         {
             var result =
-                _paymentManageBll.GetBankSysInfoList(request.SiteId, request.PayId);
+                _paymentManageBll.GetBankInfoPayForSetting(request.SiteId, request.CurrencyId, request.ChannelId);
 
             return new ApiResult<IEnumerable<PayListBankInfoSys>>
             {
