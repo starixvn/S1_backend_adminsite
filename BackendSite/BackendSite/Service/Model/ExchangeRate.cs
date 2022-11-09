@@ -2,12 +2,6 @@
 
 namespace BackendSite.Service.Model
 {
-    public class GetExchangeUSDRateRequest
-    {
-        [Required]
-        public int CurrencyId { get; set; }
-    }
-
     public class CurrencyUSDRate
     {
         public int CurrencyId { get; set; }
