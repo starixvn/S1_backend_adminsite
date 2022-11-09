@@ -15,7 +15,13 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             // 過濾 UserName
             if (string.IsNullOrEmpty(request.UserName)) return data;
             {
-                data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName );
+                data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
+            }
+
+            //For product has jackpot: GGR = - (Player WL – Progressive Win) – Progressive Bet
+            foreach (var item in data)
+            {
+                item.WinLossSummary -= item.ProgressiveWinSummary;
             }
 
             return data;
