@@ -89,15 +89,13 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
             var p = new DynamicParameters(
-                new
-                {
-                    CustId = custId,
-                    PromoCategoryId = promoCategoryId,
-                    StartDate = startDate,
+                new { CustId = custId, 
+                    PromoCategoryIds = promoCategoryIds,
+                    StartDate = startDate, 
                     EndDate = endDate,
                     RefTransId = refTransId,
                     PageSize = pageSize
@@ -106,8 +104,8 @@ namespace BackendSite.Service.DAL
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V3", p);
+            
+            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V4", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;

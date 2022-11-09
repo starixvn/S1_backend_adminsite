@@ -120,10 +120,10 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,
+        public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
+            return walletService.GetBonusLog(custId, JsonConvert.SerializeObject(promoCategoryIds), startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
         }
 

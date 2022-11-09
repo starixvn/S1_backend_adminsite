@@ -293,7 +293,7 @@ namespace BackendSite.Controllers.Api
                 : DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
 
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                getBonusLogReq.PromoCategoryId,
+                new List<int>() { getBonusLogReq.PromoCategoryId },
                 startDate,
                 endDate,
                 getBonusLogReq.RefTransId,
