@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -18,16 +19,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
-        private readonly BonusManageBLL _bonusManageBll;
+        private readonly ILogger<MemberController> _logger;
 
         public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, CustInfoBLL custInfoBll,
-            ServerInfoBLL serverInfoBll, BonusManageBLL bonusManageBll)
+            ServerInfoBLL serverInfoBll, ILogger<MemberController> logger)
         {
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
-            _bonusManageBll = bonusManageBll;
+            _logger = logger;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -47,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentAsyncMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
@@ -78,6 +80,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
@@ -111,6 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
