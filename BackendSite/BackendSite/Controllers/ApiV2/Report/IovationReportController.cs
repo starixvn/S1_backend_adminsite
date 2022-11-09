@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -12,10 +13,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class IovationReportController : ControllerBase
     {
         private readonly IovationReportBLL _iovationReport;
-
-        public IovationReportController(IovationReportBLL iovationReport)
+        private readonly ExcelBLL _excelBll;
+        
+        public IovationReportController(IovationReportBLL iovationReport, ExcelBLL excelBll)
         {
             _iovationReport = iovationReport;
+            _excelBll = excelBll;
         }
 
         [HttpPost]
@@ -38,7 +41,10 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         public async Task<IActionResult> Export(IovationReportExportRequest request)
         {
-            throw new NotImplementedException();
+            var exportData = await _iovationReport.GetListWithoutPageAsync(request);
+
+            var stream = _excelBll.Export(exportData, offset: request.StartTime.Offset);
+            return _excelBll.ExcelFile(stream, "IovationReport");
         }
     }
 }

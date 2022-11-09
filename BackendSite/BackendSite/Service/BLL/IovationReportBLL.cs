@@ -38,5 +38,26 @@ namespace BackendSite.Service.BLL
                 RowCount = data.RowCount
             };
         }
+
+        public async Task<IEnumerable<IovationReport>> GetListWithoutPageAsync(IovationReportExportRequest request)
+        {
+            var startTime = request.StartTime.ToUniversalTime().DateTime;
+            var endTime = request.EndTime.ToUniversalTime().DateTime;
+            var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString();
+            var data = await _iovationReport.GetListWithoutPageAsync(request.CurrencyId, deviceType, request.DeviceId, request.UserName, startTime, endTime);
+            var iovationReport = data.Select(a => new IovationReport()
+            {
+                UserName = a.UserName,
+                DeviceId = a.DeviceId,
+                Allow = a.Allow,
+                DeviceType = a.DeviceType,
+                Score = a.Score,
+                Frequency = a.Frequency,
+                AssociateAccount = a.AssociateAccount,
+                LastUsedTime = new DateTimeOffset(a.LastUsedTime, TimeSpan.Zero),
+            });
+
+            return iovationReport;
+        }
     }
 }

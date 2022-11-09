@@ -39,5 +39,18 @@ namespace BackendSite.Service.DAL
             };
             return data;
         }
+
+        public async Task<IEnumerable<IovationReportData>> GetListWithoutPageAsync(int currencyId, string deviceType, string deviceId, string userName, DateTime startTime, DateTime endTime)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_DeviceType", deviceType);
+            p.Add("_UserName", userName);
+            p.Add("_DeviceId", deviceId);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
+            var result = await _reportDbClient.QueryAsync<IovationReportData>("Admin_IovationReportExport_Get", p);
+            return result;
+        }
     }
 }
