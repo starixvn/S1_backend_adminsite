@@ -25,19 +25,17 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         }
 
         /// <summary>
-        /// System Setting > Exchange  Rate 取得指定幣別對美元的匯率
+        /// System Setting > Exchange  Rate 取得幣別清單對美元的匯率
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：System Setting > Exchange Rate [Submit]
         /// </remarks>
-        /// <param name="request">
-        /// </param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 1 })]
-        public ApiListResult<CurrencyUSDRate> GetUSD(GetExchangeUSDRateRequest request)
+        public ApiListResult<CurrencyUSDRate> GetUSDRateList()
         {
             return new ApiListResult<CurrencyUSDRate>((int)ErrorCodeEnum.Success, "Success")
             { 
