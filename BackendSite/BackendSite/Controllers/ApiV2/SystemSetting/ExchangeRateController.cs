@@ -37,11 +37,12 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 1 })]
-        public ApiResult<GetExchangeUSDRateResponse> GetUSD(GetExchangeUSDRateRequest request)
+        public ApiListResult<CurrencyUSDRate> GetUSD(GetExchangeUSDRateRequest request)
         {
-            var data = _ExchangeUSDRateBLL.GetExchangeUSDRate(request.CurrencyId);
-
-            return new ApiResult<GetExchangeUSDRateResponse>((int)ErrorCodeEnum.Success, "Success", data);
+            return new ApiListResult<CurrencyUSDRate>((int)ErrorCodeEnum.Success, "Success")
+            { 
+                Data = _ExchangeUSDRateBLL.GetExchangeUSDRate(),
+            };
         }
 
         /// <summary>
@@ -59,14 +60,15 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 3 })]
         public ApiResult SetUSD(SetExchangeUSDRateRequest request)
         {
-            var oldUSDRate = _ExchangeUSDRateBLL.GetExchangeUSDRate(request.CurrencyId);
-            var result = _ExchangeUSDRateBLL.SetExchangeUSDRate(request);
+            var oldUSDRate = _ExchangeUSDRateBLL.GetExchangeUSDRate().First(i => i.CurrencyId == request.CurrencyId);
+            var userName = _authorizeBll.GetAuthData().UserName;
+            var result = _ExchangeUSDRateBLL.SetExchangeUSDRate(request, userName);
 
             if (result)
             {
                 _adjustmentLogReportBLL.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
-                    Operator = _authorizeBll.GetAuthData().UserName,
+                    Operator = userName,
                     SiteId = _authorizeBll.CheckBrand(),
                     CurrencyId = request.CurrencyId,
                     ActionType = ActionType.Update,

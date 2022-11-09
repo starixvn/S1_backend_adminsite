@@ -1,6 +1,10 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.BLL
 {
@@ -13,14 +17,16 @@ namespace BackendSite.Service.BLL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);        
         }
 
-        public GetExchangeUSDRateResponse GetExchangeUSDRate(int CurrencyId)
+        public IEnumerable<CurrencyUSDRate> GetExchangeUSDRate()
         {
-            return _mainDbClient.QueryFirst<GetExchangeUSDRateResponse>("Admin_CurrencyRate_Get", new { CurrencyId });
+            return _mainDbClient.Query<CurrencyUSDRate>("Admin_CurrencyRate_Get");
         }
 
-        public bool SetExchangeUSDRate(SetExchangeUSDRateRequest request)
+        public bool SetExchangeUSDRate(SetExchangeUSDRateRequest request, string userName)
         {
-            return _mainDbClient.Execute("Admin_CurrencyRate_Set", request) > 0;
+            var p = new DynamicParameters(request);
+            p.Add("LastUpdateUser", userName);
+            return _mainDbClient.Execute("Admin_CurrencyRate_Set", p) > 0;
         }
     }
 }
