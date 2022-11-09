@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -21,19 +22,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
+
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ExcelBLL _excelBll;
 
-        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
-                NewAuthorizeBLL newAuthorizeBll,
-                PaymentAdjustmentReportBLL paymentAdjustmentReportBll, 
-                ExcelBLL excelBll, 
-                IMemberQuery memberQuery)
+        private readonly string _bonusApiUrl;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly BonusManageBLL _bonusManageBll;
+
+        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll,
+            CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
+            BonusManageBLL bonusManageBll,
+            NewAuthorizeBLL newAuthorizeBll,
+            PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
+            ExcelBLL excelBll,
+            IMemberQuery memberQuery)
         {
             _memberCommand = memberCommand;
             _custPhotoIdBll = custPhotoIdBll;
             _custInfoBll = custInfoBll;
             _serverInfoBll = serverInfoBll;
+            _bonusManageBll = bonusManageBll;
             _newAuthorizeBll = newAuthorizeBll;
             _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
             _excelBll = excelBll;
@@ -63,6 +72,70 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<IEnumerable<GetPromotionCashbackResponse>> GetPromotionCashback(GetPromotionCashbackRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetPromotionCashbackResponse>>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionListV3";
+                var req = new CustPromotionRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = false,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    PromotionType = (int)PromotionTypeEnum.Cashback
+                };
+
+                apiResult = _courierAdapter.MyPostAsync<IEnumerable<GetPromotionCashbackResponse>, CustPromotionRequest>(apiUrl, req).Result;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<GetPromotionDetailResponse> GetPromotionDetail(GetPromotionDetailRequest request)
+        {
+                
+            var apiResult = new ApiResult<GetPromotionDetailResponse>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionDetail";
+                var req = new PromotionDetailRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = true,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    BonusCode = request.BonusCode
+                };
+
+                apiResult = _courierAdapter.MyPostAsync<GetPromotionDetailResponse, PromotionDetailRequest>(apiUrl, req).Result ??
+                            new ApiResult<GetPromotionDetailResponse>();
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
             return apiResult;
         }
 

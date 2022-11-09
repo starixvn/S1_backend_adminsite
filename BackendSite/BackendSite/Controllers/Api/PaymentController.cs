@@ -38,6 +38,14 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
+        public class GetRebateLogByCustReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
         public PaymentController(IConfiguration configuration,
             PaymentBLL paymentBLL,
             CustInfoBLL custInfoBLL,
@@ -105,14 +113,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
 
-        public class GetRebateLogByCustReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
-
         public class CustTpBetRecordListOneWeekReq
         {
             public int CustId { get; set; }
@@ -146,31 +146,12 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
-        public class BonusCashBackInfoListDetail
-        {
-            public int errorCode { set; get; }
-            public string custName { set; get; }
-            public string massage { set; get; }
-            public decimal WinlostAmountCountCalculation { set; get; }
-            public decimal Percentage { set; get; }
-        }
-
         public class VipRebateInfoByCustIdPara
         {
             public int CustId { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int PageNumber { get; set; }
-        }
-
-        public class VipRebateInfoParaExport
-        {
-            public string SelectSite { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string User { get; set; }
-            public int CategoryId { get; set; }
         }
 
         public class CustTpBetRecordListReq
