@@ -153,6 +153,17 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> GetWinLossByPlayerExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerExport(request, MpaWinLossGroupByTypeEnum.Player);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
+        }
+
+  
+
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerDetailResponse>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {

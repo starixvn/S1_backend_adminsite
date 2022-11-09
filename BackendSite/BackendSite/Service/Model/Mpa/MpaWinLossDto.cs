@@ -578,8 +578,6 @@ namespace BackendSite.Service.Model.Mpa
 
         public string TpUserName { get; set; }
 
-        //[JsonIgnore]
-        //MYR、CNY...etc
         public string Currency { get; set; }
 
         public string GameTypeName { get; set; }
