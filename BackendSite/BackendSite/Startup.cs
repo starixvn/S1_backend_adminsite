@@ -7,6 +7,7 @@ using BackendSite.ExceptionHandling;
 using NSwag;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
@@ -103,6 +104,9 @@ namespace BackendSite
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
             services.AddTransient<IIovationReportService, IovationReportService>();
+            services.AddTransient<IMpaWinLossService, MpaWinLossService>();
+            services.AddScoped<MpaWinLossBLL>();
+       
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

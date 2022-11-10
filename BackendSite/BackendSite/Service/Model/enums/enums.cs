@@ -1491,6 +1491,45 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    public enum MpaTransactionRelaySummaryTypeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum MpaWinLossGroupByTypeEnum
+    {
+        Date = 1,
+        Month = 2,
+        GameType = 3,
+        Currency = 4,
+        Player = 5,
+        TpCategory = 6
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 GameType 的 GGR 計算方法需要客製
+    /// </summary>
+    public enum MpaGGRCustomizationGameTypeEnum
+    {
+        OneGamingPoker = 41,
+        V8Poker = 42
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 TpId 的 佣金來源從別的地方抓取
+    /// </summary>
+    public enum MpaCommissionCustomizationTpIdEnum
+    {
+        NineW = 31,
+    }
+
+    public enum MpaDateType
+    {
+        SettledDate = 1,
+        CreatedDate = 2
+    }
+
     public enum HotGameTopCategory
     {
         HotGame = 1,
