@@ -99,6 +99,21 @@ namespace BackendSite.Service.Library
                 return false;
             }
         }
+        
+        public async Task<bool> KeyExistsAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.KeyExistsAsync(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
 
         public async Task<TItem> StringGetAsync<TItem>(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
@@ -108,6 +123,22 @@ namespace BackendSite.Service.Library
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 var json = await db.StringGetAsync(key);
                 return JsonConvert.DeserializeObject<TItem>(json);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
+        }
+        
+        public async Task<string> StringGetAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var json = await db.StringGetAsync(key);
+                return json.ToString();
             }
             catch (Exception ex)
             {
