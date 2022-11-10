@@ -13,12 +13,12 @@ namespace BackendSite.Service.Model.Mpa
         /// <summary>
         /// 結算起始時間
         /// </summary>
-        public DateTime StarTime { get; set; }
+        public DateTimeOffset StarTime { get; set; }
 
         /// <summary>
         /// 結算結束時間
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
 
         
         /// <summary>

@@ -15,8 +15,8 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTime starTime,
-            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+        Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime,
+            DateTimeOffset endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
 
         /// <summary>
@@ -29,8 +29,8 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTime starTime,
-            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+        Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTimeOffset starTime,
+            DateTimeOffset endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
 
         /// <summary>
@@ -43,8 +43,8 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTime starTime,
-            DateTime endTime, string format);
+        Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime,
+            DateTimeOffset endTime, string format);
 
         /// <summary>
         /// 取的幣別的 USD 匯率，目前先從 Currency 取的，未來可能替換成 匯率商 API
@@ -75,8 +75,8 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        IEnumerable<Commission9WDto> Get9WCommission(DateTime starTime,
-            DateTime endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+        IEnumerable<Commission9WDto> Get9WCommission(DateTimeOffset starTime,
+            DateTimeOffset endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
         /// <summary>
         /// 取得 TpCategoryId + TpCategoryName
@@ -93,6 +93,6 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="endTime">結束時間</param>
         /// <param name="format">日期 format 格式</param>
         /// <returns>Bonus 資訊</returns>
-        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTime starTime, DateTime endTime, string format);
+        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format);
     }
 }

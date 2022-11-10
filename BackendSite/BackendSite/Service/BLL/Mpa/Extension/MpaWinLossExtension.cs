@@ -18,6 +18,19 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
 
+            if (!request.NoDraw)
+            {
+                //Win = 1,Lost = 2,Refund = 3,/*Reject, Refund, Void*/,Draw = 4,Related = 5,FreeBetWin = 6
+                data = data.Where(x => x.TicketStatus != 4);
+            }
+
+            if (!request.IncludeFreeSpins)
+            {
+                //Win = 1,Lost = 2,Refund = 3,/*Reject, Refund, Void*/,Draw = 4,Related = 5,FreeBetWin = 6
+                data = data.Where(x => x.TicketStatus != 6);
+            }
+
+
             //For product has jackpot: GGR = - (Player WL – Progressive Win) – Progressive Bet
             foreach (var item in data)
             {
@@ -58,7 +71,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaTpBetRecordDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordDto> data,
             MpaWinLossRequest request,
             string format,
-            Func<DateTime, DateTime, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission)
+            Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission)
         {
             var commission = getCommission(request.StarTime, request.EndTime, format, request.DateType);
 

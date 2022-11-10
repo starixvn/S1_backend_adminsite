@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Security.Policy;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -17,28 +16,28 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTime starTime, DateTime endTime, string format,
+        public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTime starTime, DateTime endTime, string format,
+        public Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var closingBalanceTimeZone = siteId == 1 ? " 00:00:00" : " 23:00:00"; // +8時區 00:00:00  +7時區 23:00:00
-            var closingEndTime = siteId == 1 ? endTime : endTime.AddDays(-1); // +8時區今天 +7 時區-1天
+            var closingEndTime = siteId == 1 ? endTime.ToUniversalTime().DateTime : endTime.ToUniversalTime().DateTime.AddDays(-1); // +8時區今天 +7 時區-1天
 
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
             p.Add("_ClosingEndTime", closingEndTime, dbType: DbType.DateTime);
@@ -46,12 +45,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByPlayer_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTime starTime, DateTime endTime, string format)
+        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             return _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get", p);
         }
@@ -74,12 +73,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TpGameTypeOptionDto>("Common_TpGameType_Get");
         }
 
-        public IEnumerable<Commission9WDto> Get9WCommission(DateTime starTime, DateTime endTime, string format,
+        public IEnumerable<Commission9WDto> Get9WCommission(DateTimeOffset starTime, DateTimeOffset endTime, string format,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
-            p.Add("_StartTime", starTime.ToUniversalTime(), dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime(), dbType: DbType.DateTime);
+            p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int16);
             return _reportDbClient.Query<Commission9WDto>("Admin_9WCommission_Get", p);
@@ -90,12 +89,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
 
-        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTime starTime, DateTime endTime, string format)
+        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", starTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
 
             return _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get", p);
