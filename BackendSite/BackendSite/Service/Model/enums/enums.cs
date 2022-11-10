@@ -527,6 +527,12 @@ namespace BackendSite.Service.Model.enums
         Seamless = 1,
         Transfer = 2
     }
+    
+    public enum BonusAtPageEnum
+    {
+        Promotion = 0,
+        Deposit = 1
+    }
 
     #endregion
 
