@@ -86,47 +86,6 @@ namespace BackendSite.Service.BLL
                 ref pageNumber, out totalPages, out rowCount);
         }
 
-        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize,
-            ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber,
-                out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
-        {
-            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                currencyId, baseCurrencyId, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount,
-                ref currencyAmount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
-        {
-            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate, currencyId,
-                baseCurrencyId, rebateCategoriesId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            return walletService.GetRebateInfoByCust(CustId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate)
-        {
-            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
-        }
-
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
             return walletService.GetPromotionCategory();
@@ -422,6 +381,36 @@ namespace BackendSite.Service.BLL
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
             return adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+        }
+
+        public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
+        {   
+            var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
+            if (checkData == null)
+            {
+                return new CheckPayoutBonusCodeRep
+                {
+                    HasBonusCode = false
+                };
+            }
+
+            var promoCategories = _bonusManageService.GetPromoCategories(checkData.WalletType)
+                .FirstOrDefault(x => x.Id == checkData.CategoryId && x.TpId == checkData.TpId);
+            return new CheckPayoutBonusCodeRep
+            {
+                HasBonusCode = true,
+                BonusCode = bonusCode,
+                RollOver = checkData.RollOver,
+                WinOver = checkData.WinOver,
+                Bonus = checkData.Bonus,
+                TpId = checkData.TpId,
+                CategoryId = checkData.CategoryId,
+                Name = promoCategories?.Name ?? string.Empty,
+                WalletType = checkData.WalletType,
+                TierAmountList = checkData.TierAmountList,
+                BonusType = (int)checkData.BonusType,
+                PromotionType =checkData.PromotionType,            
+            };
         }
     }
 }

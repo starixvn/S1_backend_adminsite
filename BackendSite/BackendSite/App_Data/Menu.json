@@ -516,41 +516,11 @@
         "Childs": null
       },
       {
-        "Key": "BonusImport",
-        "Title": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Controller": "Marketing",
-        "Action": "BonusImport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
         "Key": "PendingBonus",
         "Title": "Pending Bonus",
         "FuncKey": "Marketing/PendingBonus",
         "Controller": "Marketing",
         "Action": "PendingBonus",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "RebateInfoReport",
-        "Title": "Rebate Info",
-        "FuncKey": "Marketing/RebateInfoReport",
-        "Controller": "Marketing",
-        "Action": "RebateInfoReport",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "RebateLogReport",
-        "Title": "Rebate Report",
-        "FuncKey": "Marketing/RebateLogReport",
-        "Controller": "Marketing",
-        "Action": "RebateLogReport",
         "Icon": "",
         "Roles": null,
         "Childs": null

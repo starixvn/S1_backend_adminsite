@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
 using BackendSite.Extensions;
-
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly Common _common;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -72,6 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         #endregion
@@ -205,6 +207,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
         }
 
+        public class CustInfoReq
+        {
+            public int CustId { get; set; }
+            public string UserName { get; set; }
+            public string Reason { get; set; }
+        }
+
+        public class CustInfosReq : CustInfoReq
+        {
+            public string sabaId { get; set; }
+            public int SiteId { get; set; }
+        }
         #endregion
 
         public class CustInfoListRequest : ApiRequestPageModel
@@ -751,29 +765,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _custInfoBll.GetCustBonus(request.CustId);
             return new ApiResult<IEnumerable<CustBonus>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
-        /// CustomerManage/GetRebateInfoByCustId 取得客戶返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
-        [HttpPost]
-        public ApiResult GetRebateInfoByCustId(CustIdRequest request)
-        {
-            var data = _paymentBll.GetRebateInfoByCust(request.CustId);
-            return new ApiResult<IEnumerable<RebateInfo>>
             {
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -3123,5 +3114,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        [HttpPost]
+        public ApiResult<CustInfoDetail> GetCustInfoDetails(CustInfosReq custInfosReq)
+        {
+            var apiResult = new ApiResult<CustInfoDetail>();
+
+            var custUsername = string.IsNullOrEmpty(custInfosReq.UserName) ? null : custInfosReq.UserName;
+            var custId = (string.IsNullOrEmpty(custInfosReq.sabaId)) ? null : _common.TpIdToCustId(custInfosReq.sabaId);
+
+            var custInfosDetail = _custInfoBll.GetCustInfoDetails(custId, custUsername, custInfosReq.SiteId);
+
+            if (custInfosDetail != null)
+            {
+                if (custInfosDetail.Status == 1)
+                {
+                    apiResult.Data = custInfosDetail;
+                    apiResult.ErrorCode = 0;
+                }
+                else if (custInfosDetail.Status == 2)
+                {
+                    apiResult.Message = "Suspend Status.";
+                    apiResult.ErrorCode = 999;
+                }
+                else
+                {
+                    apiResult.Message = "Closed Status.";
+                    apiResult.ErrorCode = 999;
+                }
+            }
+            else
+            {
+                apiResult.Message = "No find";
+            }
+
+            return apiResult;
+        }
     }
 }
