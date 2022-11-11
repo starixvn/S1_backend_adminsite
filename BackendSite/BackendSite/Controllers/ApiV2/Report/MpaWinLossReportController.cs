@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -13,10 +14,10 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MpaWinLossReportController : ControllerBase
     {
 
-        public readonly MpaWinLossBLL _MaMpaWinLossBll;
+        public readonly IMpaWinLossBLL _MaMpaWinLossBll;
         private readonly ExcelBLL _excelBll;
 
-        public MpaWinLossReportController(MpaWinLossBLL MaMpaWinLossBll, ExcelBLL excelBll)
+        public MpaWinLossReportController(IMpaWinLossBLL MaMpaWinLossBll, ExcelBLL excelBll)
         {
             this._MaMpaWinLossBll = MaMpaWinLossBll;
             _excelBll = excelBll;
