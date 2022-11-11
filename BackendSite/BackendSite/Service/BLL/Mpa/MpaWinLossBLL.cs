@@ -5,10 +5,11 @@ using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.BLL.Interface;
 
 namespace BackendSite.Service.BLL.Mpa
 {
-    public class MpaWinLossBLL
+    public class MpaWinLossBLL : IMpaWinLossBLL
     {
         private readonly IMpaWinLossService _mpaWinLossService;
         private readonly ICacheHelper _redisHelper;
@@ -2191,7 +2192,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// 取得每個TpGameType + Name
         /// </summary>
         /// <returns></returns>
-        public async Task<Dictionary<int, string>> GetTpGameTypeMapper()
+        private async Task<Dictionary<int, string>> GetTpGameTypeMapper()
         {
             const string redisKey = "MpaTpGameTypeMapper";
             var data = await _redisHelper.TryGetOrCreateAsync(redisKey,
@@ -2202,7 +2203,7 @@ namespace BackendSite.Service.BLL.Mpa
         }
 
 
-        public async Task<Dictionary<int, string>> GetTpCategoryMapper()
+        private async Task<Dictionary<int, string>> GetTpCategoryMapper()
         {
             const string redisKey = "MpaTpCategoryMapper";
             var data = await _redisHelper.TryGetOrCreateAsync(redisKey,

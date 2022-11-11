@@ -88,6 +88,7 @@ namespace BackendSite
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
+            services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
@@ -105,9 +106,7 @@ namespace BackendSite
             services.AddTransient<IBonusApiService, BonusApiService>();
             services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
-            services.AddScoped<MpaWinLossBLL>();
-       
-
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
