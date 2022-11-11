@@ -147,12 +147,10 @@ namespace BackendSite.Controllers.ApiV2.Report
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
-                    request.CategoryIds, request.BaseCurrencyId,request.PayoutStatuses);
+                    request.CategoryIds, request.BaseCurrencyId, request.PayoutStatuses);
 
             foreach (var data in searchResult.VipRebateInfoList)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-            }
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
 
             var stream = _excelBll.ExportV2(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "VipRebateReport");
