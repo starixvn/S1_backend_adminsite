@@ -158,7 +158,7 @@ namespace BackendSite.Service.DAL
                     TimeZone = timeZone
                 });
 
-            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V2";
+            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V3";
             return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
