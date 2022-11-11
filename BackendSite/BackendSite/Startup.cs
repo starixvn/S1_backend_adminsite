@@ -87,8 +87,7 @@ namespace BackendSite
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
-            services.AddScoped<MpaWinLossBLL>();
-       
+            services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
