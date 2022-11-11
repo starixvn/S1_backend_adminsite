@@ -5,8 +5,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using static BackendSite.Controllers.ApiV2.Member.Process.CustomerManageController;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -77,6 +75,12 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
         }
+        public class GetVipRebateDetailRequest
+        {
+            public int CustId { get; set; }
+            public int TpCategoryId { get; set; }
+            public string RefId { get; set; }
+        }
 
         #endregion
 
@@ -141,12 +145,10 @@ namespace BackendSite.Controllers.ApiV2.Report
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
-                    request.CategoryIds, request.BaseCurrencyId,request.PayoutStatuses);
+                    request.CategoryIds, request.BaseCurrencyId, request.PayoutStatuses);
 
             foreach (var data in searchResult.VipRebateInfoList)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-            }
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
 
             var stream = _excelBll.ExportV2(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "VipRebateReport");
@@ -172,5 +174,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+
     }
 }
