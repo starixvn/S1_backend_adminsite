@@ -120,7 +120,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
         public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
         {
+            var ts = TimeSpan.Parse(request.Timezone.TrimStart('+'));
             var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId);
+            foreach(var item in exportData)
+            {
+                item.SelectTime = item.SelectTime.ToOffset(ts);
+            }
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WorldCupEventReport");
         }
