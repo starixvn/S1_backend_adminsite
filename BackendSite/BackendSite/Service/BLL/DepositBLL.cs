@@ -38,6 +38,7 @@ namespace BackendSite.Service.BLL
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
@@ -48,6 +49,7 @@ namespace BackendSite.Service.BLL
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,

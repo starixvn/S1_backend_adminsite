@@ -203,7 +203,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.TransId,
                 request.UserName);
             
-            var stream = _excelBll.Export(data, offset: offset);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "DepositAccountList");
         }
     }
