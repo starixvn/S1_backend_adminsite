@@ -531,8 +531,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionWalletTypeEnum
     {
-        Seamless = 1,
-        Transfer = 2
+        Transfer = 0,
+        Seamless = 1
     }
     
     public enum BonusAtPageEnum
