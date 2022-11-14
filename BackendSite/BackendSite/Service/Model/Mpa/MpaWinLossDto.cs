@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace BackendSite.Service.Model.Mpa
 {
     /// <summary>
-    /// WinLoss By 日期 or 月份
+    /// BetRecord 日期 or 月份
     /// </summary>
     public class MpaTpBetRecordDto
     {
@@ -30,6 +30,14 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
     }
+
+    public class MpaTpBetRecordWrapper
+    {
+        public List<MpaTpBetRecordDto> OriginBetRecord { get; set; }
+
+        public List<MpaTpBetRecordDto> AlreadyMultiplyRateBetRecord { get; set; }
+    }
+
 
     /// <summary>
     /// 存提款資訊
@@ -59,6 +67,14 @@ namespace BackendSite.Service.Model.Mpa
         public int RowCount { get; set; }
     }
 
+    public class TransactionRelayWrapper
+    {
+        public List<TransactionRelayDto> OriginTransaction { get; set; }
+
+        public List<TransactionRelayDto> AlreadyMultiplyRateTransaction { get; set; }
+    }
+
+
     /// <summary>
     /// Bonus 資訊
     /// </summary>
@@ -77,6 +93,28 @@ namespace BackendSite.Service.Model.Mpa
         public decimal BonusAmountClaim { get; set; }
     }
 
+    public class MpaWinLossBonusWrapper
+    {
+        public List<MpaWinLossBonusDto> OriginBonus { get; set; }
+
+        public List<MpaWinLossBonusDto> AlreadyMultiplyRateBonus { get; set; }
+    }
+
+
+    public class MpaRateDto
+    {
+        public DateTime RateDate { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public string CurrencyName { get; set; }
+
+        public int TargetCurrencyId { get; set; }
+
+        public string TargetCurrencyName { get; set; }
+
+        public decimal Rate { get; set; }
+    }
 
     public class MpaUSdRateDto
     {
@@ -486,15 +524,33 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordByDateWrapper
     {
-        public IEnumerable<MpaWinLossByDateDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByDateDto> OriginTpBetRecordResult { get; set; }
+
+        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }
 
+    public class TransactionByDateWrapper
+    {
+        public IEnumerable<MpaWinLossByDateDto> OriginTransactionResult { get; set; }
+
+        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateTransactionResult { get; set; }
+    }
+
+    public class BonusByDateWrapper
+    {
+        public IEnumerable<MpaWinLossByDateDto> OriginBonusResult { get; set; }
+
+        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateBonusResult { get; set; }
+    }
 
 
     public class MpaWinLossByTpGameTypeDto
     {
+        [JsonIgnore]
+        public string Date { get; set; }
+
         public string TpGameTypeName { get; set; }
 
         public string Currency { get; set; }
@@ -524,7 +580,9 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordByTpGameTypeWrapper
     {
-        public IEnumerable<MpaWinLossByTpGameTypeDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByTpGameTypeDto> OriginTpBetRecordResult { get; set; }
+
+        public IEnumerable<MpaWinLossByTpGameTypeDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }
@@ -565,7 +623,9 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordByTpCategoryWrapper
     {
-        public IEnumerable<MpaWinLossByTpCategoryDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByTpCategoryDto> OriginTpBetRecordResult { get; set; }
+
+        public IEnumerable<MpaWinLossByTpCategoryDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }
@@ -619,10 +679,34 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordByPlayerWrapper
     {
-        public IEnumerable<MpaWinLossByPlayerDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByPlayerDto> OriginTpBetRecordResult { get; set; }
+
+        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
 
         public int UniquePlayers { get; set; }
     }
+
+    public class TransactionByPlayerWrapper
+    {
+        public IEnumerable<MpaWinLossByPlayerDto> OriginTransactionResult { get; set; }
+
+        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateTransactionResult { get; set; }
+    }
+
+    public class BonusByPlayerWrapper
+    {
+        public IEnumerable<MpaWinLossByPlayerDto> OriginBonusResult { get; set; }
+
+        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateBonusResult { get; set; }
+    }
+
+    public class MpaWinLossByPlayerWrapper
+    {
+        public IEnumerable<MpaWinLossByPlayerDto> OriginData { get; set; }
+
+        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateData { get; set; }
+    }
+
 
 
     public class MpaWinLossByCurrencyDto
@@ -666,8 +750,60 @@ namespace BackendSite.Service.Model.Mpa
 
     public class TpBetRecordByCurrencyWrapper
     {
-        public IEnumerable<MpaWinLossByCurrencyDto> TpBetRecordResult { get; set; }
+        public IEnumerable<MpaWinLossByCurrencyDto> OriginBetRecord { get; set; }
+
+        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateBetRecord { get; set; }
 
         public int UniquePlayers { get; set; }
+    }
+
+
+    public class TransactionByCurrencyWrapper
+    {
+        public IEnumerable<MpaWinLossByCurrencyDto> OriginTransaction { get; set; }
+
+        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateTransaction { get; set; }
+    }
+
+    public class BonusByCurrencyWrapper
+    {
+        public IEnumerable<MpaWinLossByCurrencyDto> OriginBonus { get; set; }
+
+        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateBonus { get; set; }
+    }
+
+
+
+
+
+
+
+    public class MpaWinLossByTpGameTypeExportDto
+    {
+        public string TpGameTypeName { get; set; }
+
+        public string Currency { get; set; }
+
+        public decimal TurnOver { get; set; }
+
+        public decimal ValidTurnOver { get; set; }
+
+        public decimal GGR { get; set; }
+
+        public decimal PlayerWinLoss { get; set; }
+
+        public decimal ProgressiveWin { get; set; }
+
+        public decimal ProgressiveBet { get; set; }
+
+        public decimal Commission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public decimal AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public decimal Margin { get; set; }
     }
 }

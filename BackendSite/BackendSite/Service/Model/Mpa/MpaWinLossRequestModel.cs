@@ -53,6 +53,9 @@ namespace BackendSite.Service.Model.Mpa
         public bool DisplayGroupBreakdownInOriginalCurrency;
 
 
+        public int BaseCurrencyId { get; set; }
+
+
         public bool OrderBy { get; set; }
 
         /// <summary>

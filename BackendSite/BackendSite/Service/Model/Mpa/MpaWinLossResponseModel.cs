@@ -232,7 +232,6 @@ namespace BackendSite.Service.Model.Mpa
         public decimal Margin { get; set; }
     }
 
-
     public class MpaWinLossByCurrencyResponse
     {
         [JsonProperty(Order = 0)]

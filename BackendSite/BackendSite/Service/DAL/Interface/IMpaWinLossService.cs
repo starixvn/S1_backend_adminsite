@@ -46,20 +46,10 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime,
             DateTimeOffset endTime, string format);
 
-        /// <summary>
-        /// 取的幣別的 USD 匯率，目前先從 Currency 取的，未來可能替換成 匯率商 API
-        /// </summary>
-        /// <returns></returns>
+
         Task<IEnumerable<MpaUSdRateDto>> GetMpaUsdRate();
 
-        /// <summary>
-        /// 透過 UserName/tpUserName 取得 CustId
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <param name="userName"></param>
-        /// <returns></returns>
-        int GetCustIdByUserName(int siteId, string userName);
-
+        
         /// <summary>
         /// 取得所有 TpGameTypeID/TpGameTypeName
         /// </summary>
@@ -94,5 +84,13 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format">日期 format 格式</param>
         /// <returns>Bonus 資訊</returns>
         Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format);
+
+        /// <summary>
+        /// 取得指定期間內的匯率資料
+        /// </summary>
+        /// <param name="starTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MpaRateDto>> GetMpaRate(DateTimeOffset starTime, DateTimeOffset endTime);
     }
 }

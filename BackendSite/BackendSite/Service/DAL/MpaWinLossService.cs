@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Security.Policy;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -98,6 +99,15 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
 
             return _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get", p);
+        }
+
+        public Task<IEnumerable<MpaRateDto>> GetMpaRate(DateTimeOffset starTime, DateTimeOffset endTime)
+        {
+            var p = new DynamicParameters();
+            p.Add("_RateDateStart", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_RateDateEnd", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+
+            return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);
         }
     }
 }
