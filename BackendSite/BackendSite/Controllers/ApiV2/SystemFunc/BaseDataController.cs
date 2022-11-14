@@ -614,7 +614,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(Convert.ToInt32(request.WalletType));
+                apiResult.Data = _bonusManageBll.GetPromoCategoriesV2(Convert.ToInt32(request.WalletType));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
