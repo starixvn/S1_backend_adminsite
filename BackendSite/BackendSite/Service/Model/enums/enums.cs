@@ -245,6 +245,13 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7, //No Use
         Error = 99 //No Use
     }
+    
+    public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
+    }
 
     #endregion
 
