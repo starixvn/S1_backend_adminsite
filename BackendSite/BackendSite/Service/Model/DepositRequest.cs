@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
         public string TransId { set; get; }
         public int DepositType { set; get; }
         public int CurrencyId { get; set; }
+        public string IsoCode { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string Email { set; get; }
