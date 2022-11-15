@@ -207,8 +207,9 @@ namespace BackendSite.Service.BLL
                 DepositPointLevel = customer.PointLevel,
                 Currency = customer.CurrencyName,
                 Identity = customer.Identity,
-                AffiliatesName = customer.AffiliatesName,
-                AffiliatesCode = customer.AffiliatesCode,
+                AgentName = customer.Agent,
+                AffiliatesId = customer.AffId,
+                AffiliatesCode = customer.AffCode,
                 RegisteredTime = customer.RegTime,
                 FirstDepositTime = customer.FirstDepositTime,
                 LastLoginTime = customer.LastLoginTime,
@@ -218,8 +219,8 @@ namespace BackendSite.Service.BLL
                 BirthYear = customer.BirthYear,
                 Email = email,
                 MobileNumber = $"({customer.AreaCode}) {phoneNo}",
-                Address = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity,
-                    customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
+                Address = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst,
+                    customer.AddressCity, customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
                 IsRisk = customer.IsRisk,
                 IsKyc = customer.IsKyc,
                 IsTest = customer.IsTest,
@@ -229,10 +230,10 @@ namespace BackendSite.Service.BLL
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
-                var affInfo =
-                    await _affiliateApi.QueryAffInfo(customer.AffPlayerName, customer.CurrencyName, customer.SiteId);
+                var affInfo = await _affiliateApi.QueryAffInfo(customer.AffPlayerName, customer.CurrencyName, customer.SiteId);
                 if (affInfo != null)
                 {
+                    affInfo.AffiliateCode = customer.AffiliateCode;
                     customerBasicInfo.AffInfo = affInfo;
                 }
             }
