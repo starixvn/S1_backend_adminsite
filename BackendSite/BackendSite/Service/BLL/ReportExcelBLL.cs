@@ -665,10 +665,14 @@ namespace BackendSite.Service.BLL
                     }
                     else
                     {
-                        if (!(item.Value is string))
+                        if (notSummaryTitles.Contains(colName))
+                        {
+                            ws.Cells[currentRow, colIdx].Value = string.Empty;
+                        }
+                        else if (item.Value is not string)
                         {
                             ws.Cells[currentRow, colIdx].Value = value;
-                        }
+                        } 
                     }
 
                     ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;

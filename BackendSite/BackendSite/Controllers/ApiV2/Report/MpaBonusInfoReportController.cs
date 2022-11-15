@@ -455,7 +455,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var notSummaryTitles = new List<string>
             {
-                "Key", "Currency","%Change","BonusCode","BonusName","UserName","RegisteredDate","SignupUrl","AffCode"
+                "Key", "Currency","%Change","BonusCode","BonusName",
+                "UserName","RegisteredDate","SignupUrl","AffCode","TotalDepositAmount",
+                "TotalWithdrawalAmount","TotalBonusAmountClaimed_Detail"
             };
 
             #endregion
