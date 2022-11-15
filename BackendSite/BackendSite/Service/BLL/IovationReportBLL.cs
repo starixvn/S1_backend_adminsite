@@ -23,12 +23,12 @@ namespace BackendSite.Service.BLL
             {
                 UserName = a.UserName,
                 DeviceId = a.DeviceId,
-                Allow = a.Allow,
+                Allow = a.Iovation,
                 DeviceType = a.DeviceType,
                 Score = a.Score,
                 Frequency = a.Frequency,
                 AssociateAccount = a.AssociateAccount,
-                LastUsedTime = new DateTimeOffset(a.LastUsedTime, TimeSpan.Zero),
+                LastUsedTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero),
             });
 
             return new IovationReportPageResult<IovationReport>()
@@ -50,12 +50,12 @@ namespace BackendSite.Service.BLL
             {
                 UserName = a.UserName,
                 DeviceId = a.DeviceId,
-                Allow = a.Allow,
+                Allow = a.Iovation,
                 DeviceType = a.DeviceType,
                 Score = a.Score,
                 Frequency = a.Frequency,
                 AssociateAccount = a.AssociateAccount,
-                LastUsedTime = new DateTimeOffset(a.LastUsedTime, TimeSpan.Zero),
+                LastUsedTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero),
             });
 
             return iovationReport;
