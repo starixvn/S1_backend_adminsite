@@ -187,11 +187,6 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
-        {
-            return await serverInfoService.GetLanguageList(siteId, currencyId);
-        }
-
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
         {
             List<AssignBrand> assignSites = new List<AssignBrand>();
@@ -245,5 +240,9 @@ namespace BackendSite.Service.BLL
             }
         }
 
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
+        }
     }
 }

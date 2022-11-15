@@ -283,12 +283,6 @@ namespace BackendSite.Service.Model
         public string TpGameTypeName { get; set; }
     }
 
-    public class PromotionType
-    {
-        public int Type { get; set; }
-        public string PromotionTypeName { get; set; }
-    }
-
     public class PromotionCashBack
     {
         public int GameType { get; set; }
@@ -400,6 +394,12 @@ namespace BackendSite.Service.Model
         public int Key { get; set; }
     }
 
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
+    }
+
     public class TierAmount
     {
         public decimal Bonus { get; set; }
@@ -408,4 +408,6 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
     }
+
+
 }

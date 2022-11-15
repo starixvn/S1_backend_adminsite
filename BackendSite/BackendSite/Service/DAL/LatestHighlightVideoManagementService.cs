@@ -27,17 +27,17 @@ namespace BackendSite.Service.DAL
             var result = new LatestHighlightVideoDataResult();
             var props = new DynamicParameters();
 
-            props.Add("PageNumber", para.PageNumber,DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("PageNumber", Math.Abs(para.PageNumber),DbType.Int32,ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("PageSize", para.PageSize);
+            props.Add("StartIndex", (Math.Abs(para.PageNumber) - 1) * para.PageSize ,dbType: DbType.Int32);
+            props.Add("PageSize", Math.Abs(para.PageSize));
             props.Add("StartDate", para.StartDate);
             props.Add("EndDate", para.EndDate);
             props.Add("LangId", para.Lang == 0 ? null : ((LangType)para.Lang).ToString()) ;
             props.Add("SelectSite", para.SelectSite != null ? para.SelectSite.Any() ? JsonConvert.SerializeObject(para.SelectSite) : null : null);
 
-            var tempResult = _reportDbClient.Query<LatestHighlightVideoData>("Admin_LatestHighlightVideo_Get", props);
+            var tempResult = _reportDbClient.Query<LatestHighlightVideoData>("Admin_LatestHighlightVideo_Get_V2", props);
 
             result.LatestHighlightVideoDatas = tempResult.ToList();
             result.PageNumber = props.Get<int?>("PageNumber") ?? 0;

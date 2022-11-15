@@ -2,7 +2,6 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using static BackendSite.Controllers.Api.TpController;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 using System.Drawing.Drawing2D;
@@ -16,17 +15,17 @@ namespace BackendSite.Service.BLL
         private readonly CourierAdapter _courierAdapter;
         private readonly string _apiUrl;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly int _balanceTimeoutSecond;
         private readonly ICacheHelper _redisHelper;
+        private readonly int _balanceTimeoutSecond;
 
         public TpBLL(IServiceProvider provider)
         {
             _serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
-            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
@@ -47,33 +46,40 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         }
-        public async Task<IEnumerable<TpWallet>> GetTpWalletAsync(int custId)
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferTpWalletWithCacheAsync(int custId)
         {
-            var key = $"TpWallet:{custId}";
-            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(5),
-                async () => await GetTpWalletList());
-            async Task<IEnumerable<TpWallet>> GetTpWalletList()
-            {
-                var tpWalletList = _thirdPartyService.GetTpWallet(custId);
-                var tasks = tpWalletList.Select(async x =>
+            var key = $"TransferTpWallet_{custId}";
+            
+            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(10),
+                () => GetTransferTpWalletAsync(custId));
+        }
+        
+        private async Task<IEnumerable<TpWallet>> GetTransferTpWalletAsync(int custId)
+        {
+            var tpWalletList = await _thirdPartyService.GetTransferTpWallet(custId);
+            
+            var tasks = tpWalletList
+                .Where(x => !string.IsNullOrEmpty(x.TpUserName))
+                .Select(async x =>
                 {
-                    if (x.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
+                    var tpInfo = new TpInfo
                     {
-                        var tpInfo = new TpInfo
-                        {
-                            TpId = x.TpId,
-                            CustId = custId,
-                        };
-                        var apiResult = await GetBalanceAsync(tpInfo);
-                        if (apiResult.Data != null)
-                        {
-                            x.Balance = apiResult.Data.balance;
-                        }
+                        TpId = x.TpId,
+                        CustId = custId,
+                    };
+                    
+                    var apiResult = await GetBalanceAsync(tpInfo);
+                    
+                    if(apiResult.Data != null)
+                    {
+                        x.Balance = apiResult.Data.balance;
                     }
                 });
-                await Task.WhenAll(tasks);
-                return tpWalletList;
-            }
+            
+            await Task.WhenAll(tasks);
+
+            return tpWalletList;
         }
 
         public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
@@ -224,12 +230,14 @@ namespace BackendSite.Service.BLL
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
 
-        public async Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
+        public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
         {
-            var key = $"TpCategory:{siteId}";
-            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
-                async () => await GetSiteTpCategoryListAsync(siteId));
+            var key = $"TpCategory_{siteId}";
+
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => GetSiteTpCategoryListAsync(siteId));
         }
+        
         private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
         {
             var tpList = await _thirdPartyService.GetSiteTpListAllAsync(siteId);

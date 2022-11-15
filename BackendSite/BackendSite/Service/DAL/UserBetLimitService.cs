@@ -157,6 +157,13 @@ namespace BackendSite.Service.DAL
             p.Add("CategoryId", categoryId);
             return await ReportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
         }
+        
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CategoryId", categoryId);
+            return await ReportDbClient.QueryAsync<SiteTpListIfo>("Admin_TpListByCategory_Get", p);
+        }
 
         public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
         {
