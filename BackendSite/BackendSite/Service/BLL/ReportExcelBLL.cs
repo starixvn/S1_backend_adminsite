@@ -657,6 +657,12 @@ namespace BackendSite.Service.BLL
                     {
                         ws.Cells[currentRow, colIdx].Value = "TOTAL：";
                     }
+                    else if (colName.Contains('%'))
+                    {
+                        var a = totaldata["TotalBonusAmountClaimed"];
+                        var b = totaldata["CompareTotalBonusAmountClaimed"];
+                        ws.Cells[currentRow, colIdx].Value = $"{ decimal.ToInt32(b != 0 ? (a / b - 1) * 100 : 0)}%";
+                    }
                     else
                     {
                         if (!(item.Value is string))
