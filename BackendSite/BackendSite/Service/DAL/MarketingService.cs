@@ -60,8 +60,7 @@ namespace BackendSite.Service.DAL
 
         public int DeletePointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel },commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel });
         }
     }
 }
