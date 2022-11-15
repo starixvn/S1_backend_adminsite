@@ -325,7 +325,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, string userName, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -344,7 +344,7 @@ namespace BackendSite.Service.DAL
                 EndDate = endDate,
                 DepositId = depositId,
                 TransId = DepositId,
-                UserName = userName,
+                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
                 Agent = agent,
                 CurrencyId = currencyId,
                 Status = status,
