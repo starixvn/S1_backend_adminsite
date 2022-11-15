@@ -147,9 +147,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var currencyAmountRecord = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
-
-            if (string.IsNullOrWhiteSpace(request.UserName))
-                request.UserName = null;
             
             var depositList = _depositBll.GetDepositRequestList(
                 new List<int> {request.SiteId},
@@ -192,6 +189,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public IActionResult Export(GetListExportRequest request)
         {
+            var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            
             var exportDeposit = _depositBll.GetDepositExportList(
                 JsonConvert.SerializeObject(new List<int> {request.SiteId}),
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
@@ -200,7 +199,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.DepositId,
-                request.UserName,
+                userNames,
                 string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
                 JsonConvert.SerializeObject(request.CurrencyIds),
                 JsonConvert.SerializeObject(request.Statuses),

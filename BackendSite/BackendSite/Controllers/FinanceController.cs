@@ -118,7 +118,7 @@ namespace BackendSite.Controllers
                 depositListReq.DepositType,
                 startTime, endTime,
                 depositListReq.DepositId,
-                depositListReq.UserName,
+                new List<string> {depositListReq.UserName},
                 null,
                 depositListReq.CurrencyId,
                 depositListReq.Status,
