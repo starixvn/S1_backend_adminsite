@@ -282,8 +282,8 @@ public class CustomerBasicInfo
     public string Currency { get; set; }
     public int Identity { get; set; }
     public string AgentName { get; set; }
-    public string AffiliatesId { get; set; }
-    public string AffiliatesCode { get; set; }
+    public string SuperiorAffiliateId { get; set; }
+    public string SuperiorAffiliateCode { get; set; }
     public DateTimeOffset RegisteredTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
