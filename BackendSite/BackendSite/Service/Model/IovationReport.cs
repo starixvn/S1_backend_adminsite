@@ -23,10 +23,10 @@ public class IovationReportPageResult<T>
 
 public class IovationReportData
 {
-    public DateTime LastUsedTime { get; set; }
+    public DateTime UpdateTime { get; set; }
     public string UserName { get; set; }
     public string DeviceId { get; set; }
-    public string Allow { get; set; }
+    public string Iovation { get; set; }
     public string DeviceType { get; set; }
     public int Score { get; set; }
     public int Frequency { get; set; }
