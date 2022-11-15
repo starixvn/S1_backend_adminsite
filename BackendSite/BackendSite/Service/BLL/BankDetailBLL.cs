@@ -2,8 +2,9 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using YamlDotNet.Core.Tokens;
 
 namespace BackendSite.Service.BLL
 {
@@ -13,7 +14,6 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoService serverInfoService;
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
-        private readonly IMemoryCache cache;
         private readonly ICacheHelper _redisHelper;
         private static readonly PayComparer PayComparer = new();
 
@@ -23,7 +23,6 @@ namespace BackendSite.Service.BLL
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
             localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
-            cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
@@ -89,17 +88,8 @@ namespace BackendSite.Service.BLL
         {
             var sBankInfoSysListKey = $"SysBankList";
 
-            var sysBankList = cache.Get<IEnumerable<BankInfoSys>>(sBankInfoSysListKey);
-            if (sysBankList == null)
-            {
-                sysBankList = bankDetailService.GetSysBankList();
-                if (sysBankList != null)
-                {
-                    cache.Set(sBankInfoSysListKey, sysBankList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(10)));
-                }
-            }
-
-            return sysBankList;
+            return _redisHelper.TryGetOrCreate(sBankInfoSysListKey, TimeSpan.FromHours(10),
+                () => bankDetailService.GetSysBankList());
         }
         
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
@@ -114,7 +104,7 @@ namespace BackendSite.Service.BLL
         /// </summary>
         public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
-            var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
+            var key = $"OfflineBankAccount:{siteId}:{currencyId}";
             
             return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
