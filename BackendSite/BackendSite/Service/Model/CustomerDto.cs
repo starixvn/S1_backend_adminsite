@@ -216,9 +216,23 @@ public class CustomerDto
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; }
     public int Identity { get; set; }
-    public string AffiliatesName { get; set; }
-    public string AffiliatesCode { get; set; }
+    public string Agent { get; set; }
+    /// <summary>
+    /// 會員透過代理進來的推薦碼
+    /// </summary>
+    public string AffId { get; set; }
+    /// <summary>
+    /// 會員透過代理進來的推薦碼
+    /// </summary>
+    public string AffCode { get; set; }
+    /// <summary>
+    /// 會員名稱
+    /// </summary>
     public string AffPlayerName { get; set; }
+    /// <summary>
+    /// 會員本身的代理推薦碼
+    /// </summary>
+    public string AffiliateCode { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -267,8 +281,9 @@ public class CustomerBasicInfo
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
     public int Identity { get; set; }
-    public string AffiliatesName { get; set; }
-    public string AffiliatesCode { get; set; }
+    public string AgentName { get; set; }
+    public string SuperiorAffiliateId { get; set; }
+    public string SuperiorAffiliateCode { get; set; }
     public DateTimeOffset RegisteredTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -289,6 +304,7 @@ public class CustomerBasicInfo
 public class AffInfo
 {
     public string AffiliateName { get; set; }
+    public string AffiliateCode { get; set; }
     public string RevenueName { get; set; }
     public int TotalPlayers { get; set; }
     public decimal RevenueShare { get; set; }
