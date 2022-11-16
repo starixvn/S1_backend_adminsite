@@ -290,8 +290,7 @@ namespace BackendSite.Service.Model.enums
         CryptoPayment = 4,
         LoadCardPayment = 5,
         QrPayPayment = 6,
-        BankAutoChannel = 7,
-        EWalletWithdrawal = 8
+        BankAutoChannel = 7
     }
 
     public enum PayChannelStatusEnum
