@@ -23,8 +23,8 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
-        p.Add("_CurrencyList", currencyList);
-        p.Add("_StatusList", statusList);
+        p.Add("_CurrencyList", JsonConvert.SerializeObject(currencyList));
+        p.Add("_StatusList", JsonConvert.SerializeObject(statusList));
         p.Add("_Identity", identity);
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
