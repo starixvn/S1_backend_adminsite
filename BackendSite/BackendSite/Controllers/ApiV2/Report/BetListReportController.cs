@@ -66,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             request.PageNumber = -1; //export all
             var data = _betListBll.GetBetListReport(request, out var _);      
             foreach (var item in data)
-            {               
+            {
                 item.TransTime = item.TransTime.ToOffset(offset);
                 item.SettledTime = item.SettledTime.ToOffset(offset);
                 item.SetBetListTimeOffset(offset);

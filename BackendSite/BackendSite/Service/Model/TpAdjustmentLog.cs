@@ -76,8 +76,8 @@ public class GetCustTpAdjustmentLogRequestV2 : ApiRequestPageModel
 
     /// <summary>
     /// 0:All
-    /// 1: ToTp (¤T¤è¿ú¥]¥[¿ú)
-    /// 2:ToMain(¤T¤è¿ú¥]¦©¿ú)
+    /// 1: ToTp (ï¿½Tï¿½ï¿½ï¿½ï¿½]ï¿½[ï¿½ï¿½)
+    /// 2:ToMain(ï¿½Tï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½)
     /// </summary>
     public int Direction { get; set; }
 

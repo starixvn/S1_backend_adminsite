@@ -372,11 +372,11 @@ namespace BackendSite.Service.Model
     public class CheckPayoutBonusCodeRep
     {
         /// <summary>
-        /// Promotion類型
+        /// Promotion����
         /// </summary>
         public int PromotionType { get; set; }
         /// <summary>
-        /// 紅利種類
+        /// ���Q����
         /// 1 = Percentage,
         /// 2 = Amount
         /// </summary>
@@ -387,7 +387,7 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
         /// <summary>
-        /// Promotion的錢包類型：
+        /// Promotion�����]�����G
         /// 0 = Transfer Wallet
         /// 1 = Seamless Wallet
         /// </summary>
