@@ -208,7 +208,6 @@ namespace BackendSite.Service.DAL
             out int rowCount,
             ref List<string> CurrencyAmount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var tempCurrencyTotalAmount = new List<string>();
             var p = new DynamicParameters();
 
@@ -217,7 +216,7 @@ namespace BackendSite.Service.DAL
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = conn.Query<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V3", p).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -234,7 +233,7 @@ namespace BackendSite.Service.DAL
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
 
-            var depositList = conn.Query<PaymentAdjustment>("Admin_AdjustmentInfoByCust_Get_V3", p, commandType: CommandType.StoredProcedure);
+            var depositList = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoByCust_Get_V3", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -299,8 +298,8 @@ namespace BackendSite.Service.DAL
             p.Add("_Category", input.After.Category);
             p.Add("_Memo", input.After.Memo ?? string.Empty);
 
-            var success = conn
-                .Execute("Admin_LogAdminAdjustWallet_Set", p, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_LogAdminAdjustWallet_Set", trans, p) > 0;
 
             if (success)
             {
@@ -314,8 +313,8 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
-
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+            
                 if (logSuccess)
                 {
                     trans.Commit();
@@ -340,8 +339,8 @@ namespace BackendSite.Service.DAL
             p.Add("_Category", input.After.Category);
             p.Add("_Memo", input.After.Memo);
 
-            var success = conn
-                .Execute("Admin_AdjustmentInfo_Set", p, commandType: CommandType.StoredProcedure) > 0;
+            var success = _mainDbClient
+                .Execute("Admin_AdjustmentInfo_Set", trans, p) > 0;
 
             if (success)
             {
@@ -355,7 +354,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (logSuccess)
                 {

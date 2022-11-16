@@ -50,6 +50,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
         }
 
+        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
+        {
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V3", new DynamicParameters(new { _WalletType = walletType }));
+        }
+
         public IEnumerable<TpGameType> GetTpGameList()
         {
             return _reportDbClient.Query<TpGameType>("Admin_TpGameType_Get");
