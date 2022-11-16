@@ -77,7 +77,9 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.SetPayListStatus(siteId, payId, status);
 
             if (result)
-                ClearRedisPaySettingCache("PaymentSetting:*");
+            {
+                ClearRedisPaySettingCache("PaymentSetting:*", RedisDataBase.Payment);
+            }
             
             return result;
         }
@@ -104,7 +106,11 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.UpdatePaySetting(input, @operator);
 
             if (result)
-                ClearRedisPaySettingCache("PaySetting:*");
+            {
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
+            }
 
             return result;
         }
@@ -114,7 +120,11 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.UpdatePaySettingStatus(input, @operator);
 
             if (result)
-                ClearRedisPaySettingCache("PaySetting:*");
+            {
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
+            }
             
             return result;
         }
@@ -137,14 +147,16 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status,  @operator);
 
             if (result)
-                ClearRedisPaySettingCache($"PaySetting:OnlineBanking:*");
+            {
+                ClearRedisPaySettingCache("PaySetting:OnlineBanking:*", RedisDataBase.Shared);
+            }
             
             return result;
         }
 
-        private void ClearRedisPaySettingCache(string pattern)
+        private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)
         {
-            _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern))
+            _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern, db))
                 .ConfigureAwait(false);
         }
     }

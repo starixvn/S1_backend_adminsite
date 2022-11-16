@@ -322,7 +322,7 @@ namespace BackendSite.Service.BLL
 
             if (result)
             {
-                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}");
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
             }
 
             return result;
@@ -351,7 +351,7 @@ namespace BackendSite.Service.BLL
 
             if (result)
             {
-                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}");
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
             }
 
             return result;
