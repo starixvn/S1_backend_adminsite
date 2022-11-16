@@ -540,6 +540,7 @@ public class CustomerBalanceInfo
             return remainingTurnOver > 0 ? remainingTurnOver : 0;
         }
     }
+
     public decimal EligibleWithdrawal
     {
         get

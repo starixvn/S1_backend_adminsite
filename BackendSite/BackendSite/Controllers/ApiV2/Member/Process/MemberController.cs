@@ -1130,10 +1130,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<CustomerBalanceInfo>> GetCustomerBalanceInfo(GetCustomerBasicInfoRequest request)
         {
             return new ApiResult<CustomerBalanceInfo>()
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Data = await _memberQuery.GetCustomerBalanceInfoAsync(request.CustId)
-                };
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustomerBalanceInfoAsync(request.CustId)
+            };
         }
 
         /// <summary>

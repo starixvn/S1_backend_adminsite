@@ -38,6 +38,14 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
+        public class GetRebateLogByCustReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
         public PaymentController(IConfiguration configuration,
             PaymentBLL paymentBLL,
             CustInfoBLL custInfoBLL,
