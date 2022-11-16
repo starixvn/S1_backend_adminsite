@@ -23,34 +23,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ServerInfoBLL _serverInfoBll;
-
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ExcelBLL _excelBll;
-
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<MemberController> _logger;
 
-        public MemberController(IConfiguration configuration, CourierAdapter courierAdapter, IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll,
-            CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
-            BonusManageBLL bonusManageBll,
-            NewAuthorizeBLL newAuthorizeBll,
-            PaymentAdjustmentReportBLL paymentAdjustmentReportBll,
-            ExcelBLL excelBll,
-            IMemberQuery memberQuery)
+        public MemberController(IServiceProvider provider)
         {
-        	_bonusApiUrl = configuration.GetValue<string>("BonusService");
-            _courierAdapter = courierAdapter;
-            _memberCommand = memberCommand;
-            _custPhotoIdBll = custPhotoIdBll;
-            _custInfoBll = custInfoBll;
-            _serverInfoBll = serverInfoBll;
-            _newAuthorizeBll = newAuthorizeBll;
-            _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
-            _excelBll = excelBll;
-            _newAuthorizeBll = newAuthorizeBll;
-            _memberQuery = memberQuery;
-            _vipLevelBll = vipLevelBll;
+            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _memberCommand = provider.GetRequiredService<IMemberCommand>();
+            _custPhotoIdBll = provider.GetRequiredService<ICustPhotoIdBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _memberQuery = provider.GetRequiredService<IMemberQuery>();
+            _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _logger = provider.GetRequiredService<ILogger<MemberController>>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
