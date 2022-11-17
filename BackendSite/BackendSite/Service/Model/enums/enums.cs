@@ -253,6 +253,17 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
+    
+    public enum DepositActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63
+    }
 
     #endregion
 
