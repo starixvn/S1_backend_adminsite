@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model
         public string Agent { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+        public string DepositStatus { get; set; }
     }
     public class ExportRegLiveStatusData
     {
@@ -32,6 +33,7 @@ namespace BackendSite.Service.Model
         public string Note { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+        public string DepositStatus { get; set; }
     }
     public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
