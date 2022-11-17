@@ -44,6 +44,7 @@ public class MemberListDto
     public int Status { get; set; }
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
     public string IP { get; set; }
     public int DepositCnt { get; set; }
     public int WithdrawCnt { get; set; }
@@ -60,9 +61,9 @@ public class MemberListDto
     public string ShieldId { get; set; }
 }
 
-public class GetMemberListData
+public class GetMemberListPageData<T>
 {
-    public IEnumerable<MemberListDto> Data { get; set; }
+    public IEnumerable<T> Data { get; set; }
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
@@ -95,14 +96,6 @@ public class MemberList
     public decimal Bonus { get; set; }
     public string DeviceScore { get; set; }
     public string DeviceId { get; set; }
-}
-
-public class GetMemberListResponse
-{
-    public IEnumerable<MemberList> Data { get; set; }
-    public int PageNumber { get; set; }
-    public int TotalPages { get; set; }
-    public int RowCount { get; set; }
 }
 
 public class ExportMemberRequest
