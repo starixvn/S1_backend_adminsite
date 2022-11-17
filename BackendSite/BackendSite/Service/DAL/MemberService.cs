@@ -19,7 +19,7 @@ public class MemberService : IMemberService
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
-    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
+    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
@@ -29,6 +29,7 @@ public class MemberService : IMemberService
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
         p.Add("_AccountName", accountName);
+        p.Add("_AffiliateName", affiliateName);
         p.Add("_TpUserName", tpUserName);
         p.Add("_LoginIp", loginIp);
         p.Add("_VipList", JsonConvert.SerializeObject(vipList));
@@ -41,6 +42,7 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
+        p.Add("_UserType", userType);
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);

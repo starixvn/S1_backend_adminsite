@@ -40,6 +40,7 @@ namespace BackendSite.Service.BLL
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
+            var affiliateName = string.IsNullOrEmpty(request.AffiliateName) ? null : request.AffiliateName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
@@ -50,8 +51,8 @@ namespace BackendSite.Service.BLL
             var transType = GetTransType(request.TransId);
 
             var memberList = await _memberService.GetList(request.SiteId, request.CurrencyId, request.Status, request.Identity,
-                userName, request.Tags, request.VipLevel, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
-                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId,
+                userName, request.Tags, request.VipLevel, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
@@ -97,6 +98,7 @@ namespace BackendSite.Service.BLL
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
+            var affiliateName = string.IsNullOrEmpty(request.AffiliateName) ? null : request.AffiliateName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
@@ -107,7 +109,7 @@ namespace BackendSite.Service.BLL
             var transType = GetTransType(request.TransId);
 
             var memberList = await _memberService.GetExportData(request.SiteId, request.CurrencyId, request.Status,
-                request.Identity, userName, request.Tags, request.VipLevel, accountName, request.AffiliateName, tpUserName, loginIp, email, phoneNo,
+                request.Identity, userName, request.Tags, request.VipLevel, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
                 request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime);
 

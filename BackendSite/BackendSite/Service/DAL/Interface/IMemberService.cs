@@ -4,7 +4,12 @@ namespace BackendSite.Service.DAL.Interface;
 
 public interface IMemberService
 {
-    Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize);
+    Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber,
+        int pageSize);
     Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, IEnumerable<int> currencyList,
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
