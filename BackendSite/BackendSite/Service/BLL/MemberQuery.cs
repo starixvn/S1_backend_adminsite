@@ -34,7 +34,7 @@ namespace BackendSite.Service.BLL
             _siteConfig = siteConfig.Value;
         }
 
-        public async Task<GetMemberListResponse> GetListAsync(GetTempMemberListRequest request)
+        public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
@@ -55,7 +55,7 @@ namespace BackendSite.Service.BLL
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
-            var response = new GetMemberListResponse()
+            var response = new GetMemberListPageData<MemberList>()
             {
                 Data = memberList.Data.Select(a => new MemberList()
                 {
@@ -71,7 +71,7 @@ namespace BackendSite.Service.BLL
                         : JsonConvert.DeserializeObject<List<int>>(a.TagList),
                     Identity = a.Identity,
                     UserType = a.UserType,
-                    PointLevel = CalculatePointLevel(pointLevelInfo, a.CurrencyId, a.DepositCnt, a.WithdrawCnt, a.IsKyc),
+                    PointLevel = CalculatePointLevel(pointLevelInfo, a.CurrencyId, a.DepositCnt, a.WithdrawCnt, a.IsKyc, a.IsRisk, a.UserLevel),
                     Agent = a.Agent,
                     Status = a.Status,
                     IsTest = a.IsTest,
@@ -299,15 +299,16 @@ namespace BackendSite.Service.BLL
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
+        private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
-        private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc)
         {
-            var pointLevel = pointLevelInfos
+            var info = pointLevelInfos
                 .OrderByDescending(a=>a.PointLevel)
                 .FirstOrDefault(a => 
                     a.CurrencyId == currencyId && a.DepositCnt <= depositSum &&
-                    a.WithdrawalCnt <= withdrawSum && a.IsKyc == isKyc);;
-            return pointLevel?.PointLevel ?? 1;
+                    a.WithdrawalCnt <= withdrawSum && a.IsKyc == isKyc);
+            var pointLevel = info?.PointLevel ?? 1;
+            return isRisk ? Math.Min(userLevel, pointLevel) : Math.Max(userLevel, pointLevel);
         }
         private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
         {
