@@ -19,19 +19,19 @@ public class MemberService : IMemberService
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
-    public async Task<GetMemberListData> GetList(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
+    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
-        p.Add("_CurrencyList", currencyList);
-        p.Add("_StatusList", statusList);
+        p.Add("_CurrencyList", JsonConvert.SerializeObject(currencyList));
+        p.Add("_StatusList", JsonConvert.SerializeObject(statusList));
         p.Add("_Identity", identity);
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
         p.Add("_AccountName", accountName);
         p.Add("_TpUserName", tpUserName);
         p.Add("_LoginIp", loginIp);
-        p.Add("_VipList", vipList);
+        p.Add("_VipList", JsonConvert.SerializeObject(vipList));
         p.Add("_Email", email);
         p.Add("_PhoneNo", phoneNo);
         p.Add("_BankAccountNumber", bankAccountNumber);
@@ -50,7 +50,7 @@ public class MemberService : IMemberService
         p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
         p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
         var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V14", p);
-        var searchData = new GetMemberListData()
+        var searchData = new GetMemberListPageData<MemberListDto>()
         {
             Data = result,
             PageNumber = p.Get<int?>("_PageNumber") ?? 0,
