@@ -30,7 +30,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly AuthorizeBLL _authorizeBll;   
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
-
+        private readonly AuthorizeByPermissionBLL _authorizeByPermissionBll;
+        private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly Cryptor _cryptor;
+        
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
         private readonly string _awsWithdrawalAccountingFolder;
@@ -52,12 +55,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _authorizeByPermissionBll = provider.GetRequiredService<AuthorizeByPermissionBLL>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
+            
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
             _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
             _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
             _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
             _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            _usableActionType = new Dictionary<int, List<int>>
+            {
+                { 1, new List<int> {66,6,63,69,71} }, //Pending -> Draft,Reject,OnHold,Verified,ToKyc
+                { 2, new List<int> {66,69,71,6} },//On-Hold -> Draft,Verified,ToKyc,Reject
+                { 3, new List<int> {66,70,64,6} },//Verified -> Draft,Process,Pending,Reject
+                { 4, new List<int> {66,69,65} },//Process -> Draft ,Verified ,Approved 
+                { 6, new List<int> {66,68} },//Approved -> Draft,Manual Rejected
+                { 7, new List<int> {66,67} },//Reject -> Draft,Manual Approved
+                { 8, new List<int> {66,64,6} }//ToKyc -> Draft,Pending,Reject
+            };
         }
 
         #endregion
@@ -177,6 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
@@ -203,6 +220,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.SelectCalCode,
                 request.Agent,
                 out var totalPages,out var rowCount, ref currencyAmount);
+
+            foreach (var data in withdrawalRequestList)
+            {
+                data.TransferPin = _cryptor.Decrypt(data.TransferPin);
+                data.LoginPin = _cryptor.Decrypt(data.LoginPin);
+                data.MobilePin = _cryptor.Decrypt(data.MobilePin);
+                data.CorporateID = _cryptor.Decrypt(data.CorporateID);
+            }
             
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -224,6 +249,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 2 })]
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
@@ -308,12 +334,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
 
+            if (withdrawalRequest != null)
+            {
+                var usableActionButton = GetUsableActionButton(withdrawalRequest);
+                withdrawalRequest.UsableActionButton = usableActionButton;
+            }
+            
             if (withdrawalRequest.Operator == User.Identity.Name)
             {
                 withdrawalRequest.SameOperator = true;
@@ -355,6 +388,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
         {
@@ -375,6 +409,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
@@ -615,6 +650,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
@@ -674,6 +710,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {
@@ -765,6 +802,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        
+        private List<int> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
+        {
+            var permissionList = _authorizeByPermissionBll.GetUserPermission(28);
+            var usableList = _usableActionType[withdrawalRequest.Status];
+            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+                    
+            if (withdrawalRequest.WithdrawalType == (int) WithdrawalTypeEnum.LocalBank)
+            {
+                usableActionButton.Remove((int) WithdrawalActionEnum.ManualApproved);
+                usableActionButton.Remove((int) WithdrawalActionEnum.ManualRejected);
+            }
+            
+            return usableActionButton;
+        }
         #endregion
 
     }

@@ -334,6 +334,20 @@ namespace BackendSite.Service.Model.enums
         ToKyc = 8,
         Error = 99 //No Use
     }
+    
+    public enum WithdrawalActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63,
+        Verified = 69,
+        Process = 70,
+        ToKyc = 71
+    }
 
     #endregion
 
