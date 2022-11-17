@@ -120,15 +120,15 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,
+        public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
+            return walletService.GetBonusLog(custId, JsonConvert.SerializeObject(promoCategoryIds), startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
         }
 
         public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize,
-            ref int pageNumber, out int totalPages, out int rowCount)
+    ref int pageNumber, out int totalPages, out int rowCount)
         {
             return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber,
                 out totalPages, out rowCount);
@@ -167,6 +167,7 @@ namespace BackendSite.Service.BLL
         {
             return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
+
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
@@ -460,6 +461,36 @@ namespace BackendSite.Service.BLL
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
             return adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+        }
+
+        public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
+        {   
+            var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
+            if (checkData == null)
+            {
+                return new CheckPayoutBonusCodeRep
+                {
+                    HasBonusCode = false
+                };
+            }
+
+            var promoCategories = _bonusManageService.GetPromoCategories(checkData.WalletType)
+                .FirstOrDefault(x => x.Id == checkData.CategoryId && x.TpId == checkData.TpId);
+            return new CheckPayoutBonusCodeRep
+            {
+                HasBonusCode = true,
+                BonusCode = bonusCode,
+                RollOver = checkData.RollOver,
+                WinOver = checkData.WinOver,
+                Bonus = checkData.Bonus,
+                TpId = checkData.TpId,
+                CategoryId = checkData.CategoryId,
+                Name = promoCategories?.Name ?? string.Empty,
+                WalletType = checkData.WalletType,
+                TierAmountList = checkData.TierAmountList,
+                BonusType = (int)checkData.BonusType,
+                PromotionType =checkData.PromotionType,            
+            };
         }
     }
 }

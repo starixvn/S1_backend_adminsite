@@ -90,6 +90,31 @@ namespace BackendSite.Service.Model
     }
 
 
+    public class PaymentAdjustmentReportExport
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int CustId { get; set; }
+        public string SiteName { get; set; }
+        public string TransId { get; set; }
+        public string AdjustTypeName { get; set; }
+        [ExportIgnore]
+        public int AdjustCategory { get; set; }
+        public string AdjustCategoryName { get; set; }
+        public string UserName { get; set; }
+        public string CurrencyName { get; set; }
+        public decimal Amount { get; set; }
+        public string CreateTime { get; set; }
+        public string StatusName { get; set; }
+        public string Memo { set; get; }
+        public string SabaID { get; set; }
+        public string Operator { get; set; }
+        public string WalletType { get; set; }
+        public string CategoryName { get; set; }
+
+        public string DepositId { get; set; }
+    }
+
 
     #endregion
 }

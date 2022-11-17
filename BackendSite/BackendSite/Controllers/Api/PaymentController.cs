@@ -38,6 +38,14 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
+        public class GetRebateLogByCustReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
         public PaymentController(IConfiguration configuration,
             PaymentBLL paymentBLL,
             CustInfoBLL custInfoBLL,
@@ -105,14 +113,6 @@ namespace BackendSite.Controllers.Api
             public int PageNumber { get; set; }
         }
 
-        public class GetRebateLogByCustReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
-
         public class CustTpBetRecordListOneWeekReq
         {
             public int CustId { get; set; }
@@ -146,31 +146,12 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
-        public class BonusCashBackInfoListDetail
-        {
-            public int errorCode { set; get; }
-            public string custName { set; get; }
-            public string massage { set; get; }
-            public decimal WinlostAmountCountCalculation { set; get; }
-            public decimal Percentage { set; get; }
-        }
-
         public class VipRebateInfoByCustIdPara
         {
             public int CustId { get; set; }
             public long? StartDate { get; set; }
             public long? EndDate { get; set; }
             public int PageNumber { get; set; }
-        }
-
-        public class VipRebateInfoParaExport
-        {
-            public string SelectSite { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public string User { get; set; }
-            public int CategoryId { get; set; }
         }
 
         public class CustTpBetRecordListReq
@@ -312,7 +293,7 @@ namespace BackendSite.Controllers.Api
                 : DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
 
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                getBonusLogReq.PromoCategoryId,
+                new List<int>() { getBonusLogReq.PromoCategoryId },
                 startDate,
                 endDate,
                 getBonusLogReq.RefTransId,
@@ -1125,8 +1106,8 @@ namespace BackendSite.Controllers.Api
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-
-            var stream = _excelBLL.Export(searchResult.VipRebateInfoList);
+            
+            var stream = _excelBLL.ExportV2(searchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

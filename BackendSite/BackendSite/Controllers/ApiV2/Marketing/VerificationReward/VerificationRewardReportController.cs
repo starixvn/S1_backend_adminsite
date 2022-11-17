@@ -96,7 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                 request.StartDate,
                 request.EndDate);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
     }

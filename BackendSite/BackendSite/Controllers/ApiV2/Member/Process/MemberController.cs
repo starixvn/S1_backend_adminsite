@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -23,23 +25,24 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentReportBll;
         private readonly ExcelBLL _excelBll;
+        private readonly string _bonusApiUrl;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly ILogger<MemberController> _logger;
 
-        public MemberController(IMemberCommand memberCommand, ICustPhotoIdBLL custPhotoIdBll, IVipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ServerInfoBLL serverInfoBll,
-                NewAuthorizeBLL newAuthorizeBll,
-                PaymentAdjustmentReportBLL paymentAdjustmentReportBll, 
-                ExcelBLL excelBll, 
-                IMemberQuery memberQuery)
+        public MemberController(IServiceProvider provider)
         {
-            _memberCommand = memberCommand;
-            _custPhotoIdBll = custPhotoIdBll;
-            _custInfoBll = custInfoBll;
-            _serverInfoBll = serverInfoBll;
-            _newAuthorizeBll = newAuthorizeBll;
-            _paymentAdjustmentReportBll = paymentAdjustmentReportBll;
-            _excelBll = excelBll;
-            _newAuthorizeBll = newAuthorizeBll;
-            _memberQuery = memberQuery;
-            _vipLevelBll = vipLevelBll;
+            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _memberCommand = provider.GetRequiredService<IMemberCommand>();
+            _custPhotoIdBll = provider.GetRequiredService<ICustPhotoIdBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _paymentAdjustmentReportBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _memberQuery = provider.GetRequiredService<IMemberQuery>();
+            _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _logger = provider.GetRequiredService<ILogger<MemberController>>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
@@ -59,10 +62,77 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, MethodExtension.GetCurrentAsyncMethod());
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<IEnumerable<GetPromotionCashbackResponse>> GetPromotionCashback(GetPromotionCashbackRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetPromotionCashbackResponse>>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionListV3";
+                var req = new CustPromotionRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = false,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    PromotionType = (int)PromotionTypeEnum.Cashback
+                };
+
+                apiResult = _courierAdapter.MyPostAsync<IEnumerable<GetPromotionCashbackResponse>, CustPromotionRequest>(apiUrl, req).Result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
+            return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        public ApiResult<GetPromotionDetailResponse> GetPromotionDetail(GetPromotionDetailRequest request)
+        {
+                
+            var apiResult = new ApiResult<GetPromotionDetailResponse>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var apiUrl = $"{_bonusApiUrl}GetPromotionDetail";
+                var req = new PromotionDetailRequest
+                {
+                    SiteId = custInfo.SiteId,
+                    CustId = custInfo.CustId,
+                    CurrencyId = custInfo.CurrencyId,
+                    DeviceType = (int)PromotionDeviceTypeEnum.GetAll,
+                    IsLogin = true,
+                    LangId = custInfo.UserLang,
+                    DefLang = custInfo.UserLang,
+                    BonusCode = request.BonusCode
+                };
+
+                apiResult = _courierAdapter.MyPostAsync<GetPromotionDetailResponse, PromotionDetailRequest>(apiUrl, req).Result ??
+                            new ApiResult<GetPromotionDetailResponse>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+        
             return apiResult;
         }
 

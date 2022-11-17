@@ -39,9 +39,10 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
-            var currencyList = string.Join(',', request.CurrencyId.ToArray());
-            var statusList = string.Join(',', request.Status.ToArray());
-            var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
+            var currencyList = request.CurrencyId ?? new List<int>();
+            var statusList = request.Status ?? new List<int>();
+            var tagList = request.Tags ?? new List<int>();
+            var vipList = request.VipLevel ?? new List<int>();
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
@@ -53,7 +54,7 @@ namespace BackendSite.Service.BLL
             var transType = GetTransType(request.TransId);
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
-                userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+                userName, tagList, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);

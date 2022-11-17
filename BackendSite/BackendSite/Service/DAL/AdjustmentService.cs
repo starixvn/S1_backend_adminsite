@@ -581,5 +581,15 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<AdjustmentDepositLog>("Admin_AdjustmentDepositLog_GetByTransId", props)
                 .FirstOrDefault();
         }
+
+        public CheckPayoutBonusCodeData CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
+        {
+            var props = new DynamicParameters(new {
+                BonusCode = bonusCode,
+                SiteId = siteId,
+                CurrencyId = currencyId,
+            }); 
+            return _reportDbClient.QueryFirst<CheckPayoutBonusCodeData>("Admin_CheckPayoutBonusCode_Get", props);
+        }
     }
 }
