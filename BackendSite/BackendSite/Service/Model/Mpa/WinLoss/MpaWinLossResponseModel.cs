@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BackendSite.Service.Model.Mpa
+namespace BackendSite.Service.Model.Mpa.WinLoss
 {
     public class MpaWinLossByDateResponse
     {

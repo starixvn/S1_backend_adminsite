@@ -2,7 +2,7 @@
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Report

@@ -1,7 +1,7 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
-namespace BackendSite.Service.Model.Mpa
+namespace BackendSite.Service.Model.Mpa.WinLoss
 {
     /// <summary>
     /// BetRecord 日期 or 月份
@@ -170,7 +170,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -188,13 +188,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 9)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
 
         [JsonProperty(Order = 11)]
         public int DepositCount { get; set; }
@@ -231,7 +231,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -249,13 +249,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 9)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
     }
 
     public class MpaWinLossByTpCategoryCurrencyDetailDto
@@ -267,7 +267,7 @@ namespace BackendSite.Service.Model.Mpa
         [JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
-        
+
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
 
@@ -275,7 +275,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -293,13 +293,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 9)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
     }
 
     public class MpaWinLossByPlayerCurrencyDetailDto
@@ -318,7 +318,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 4)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 5)]
         public decimal PlayerWinLoss { get; set; }
@@ -336,16 +336,16 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 11)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 12)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
 
         [JsonProperty(Order = 13)]
-        public decimal ClosingBalance { get; set;}
+        public decimal ClosingBalance { get; set; }
 
         [JsonProperty(Order = 14)]
         public int DepositCount { get; set; }
@@ -376,7 +376,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 3)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 4)]
         public decimal PlayerWinLoss { get; set; }
@@ -394,13 +394,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 9)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 10)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 11)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
 
         [JsonProperty(Order = 12)]
         public int DepositCount { get; set; }
@@ -434,7 +434,7 @@ namespace BackendSite.Service.Model.Mpa
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => (-1 * PlayerWinLoss) + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -452,13 +452,13 @@ namespace BackendSite.Service.Model.Mpa
         public int BetCount { get; set; }
 
         [JsonProperty(Order = 8)]
-        public decimal AvgBetAmount => (BetCount != 0 && TurnOver != 0) ? (TurnOver / BetCount) : 0.00m;
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
 
         [JsonProperty(Order = 9)]
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => (GGR != 0 && TurnOver != 0) ? (GGR / TurnOver) : 0.00m;
+        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
 
         [JsonProperty(Order = 11)]
         public int DepositCount { get; set; }

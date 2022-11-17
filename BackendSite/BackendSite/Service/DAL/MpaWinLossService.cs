@@ -3,7 +3,7 @@ using System.Security.Policy;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using Dapper;
 
 namespace BackendSite.Service.DAL
