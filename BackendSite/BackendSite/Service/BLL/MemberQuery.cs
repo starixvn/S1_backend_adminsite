@@ -34,15 +34,17 @@ namespace BackendSite.Service.BLL
             _siteConfig = siteConfig.Value;
         }
 
-        public async Task<GetMemberListResponse> GetListAsync(GetTempMemberListRequest request)
+        public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
-            var currencyList = string.Join(',', request.CurrencyId.ToArray());
-            var statusList = string.Join(',', request.Status.ToArray());
-            var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
+            var currencyList = request.CurrencyId ?? new List<int>();
+            var statusList = request.Status ?? new List<int>();
+            var tagList = request.Tags ?? new List<int>();
+            var vipList = request.VipLevel ?? new List<int>();
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
+            var affiliateName = string.IsNullOrEmpty(request.AffiliateName) ? null : request.AffiliateName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
@@ -53,12 +55,12 @@ namespace BackendSite.Service.BLL
             var transType = GetTransType(request.TransId);
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
-                userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
-                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId,
+                userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
-            var response = new GetMemberListResponse()
+            var response = new GetMemberListPageData<MemberList>()
             {
                 Data = memberList.Data.Select(a => new MemberList()
                 {
@@ -68,13 +70,12 @@ namespace BackendSite.Service.BLL
                     CustId = a.CustId,
                     UserName = a.UserName,
                     SabaId = a.SabaId,
-                    AffiliateCode = a.AffiliateCode,
-                    TagList = string.IsNullOrEmpty(a.TagList)
-                        ? new List<int>()
-                        : JsonConvert.DeserializeObject<List<int>>(a.TagList),
+                    AffiliateCode = a.AffCode,
+                    AffiliateName = a.AffiliateName,
+                    TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
                     Identity = a.Identity,
                     UserType = a.UserType,
-                    PointLevel = CalculatePointLevel(pointLevelInfo, a.CurrencyId, a.DepositCnt, a.WithdrawCnt, a.IsKyc),
+                    PointLevel = CalculatePointLevel(pointLevelInfo, a.CurrencyId, a.DepositCnt, a.WithdrawCnt, a.IsKyc, a.IsRisk, a.UserLevel),
                     Agent = a.Agent,
                     Status = a.Status,
                     IsTest = a.IsTest,
@@ -101,10 +102,8 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
-            var currencyList = string.Join(',', request.CurrencyId.ToArray());
-            var statusList = string.Join(',', request.Status.ToArray());
-            var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
+            var affiliateName = string.IsNullOrEmpty(request.AffiliateName) ? null : request.AffiliateName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
@@ -114,11 +113,10 @@ namespace BackendSite.Service.BLL
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
 
-            var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
-                request.Identity, userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo,
+            var memberList = await _memberService.GetExportData(request.SiteId, request.CurrencyId, request.Status,
+                request.Identity, userName, request.Tags, request.VipLevel, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
-                request.IovationLevel,
-                deviceId, request.DateType, startTime, endTime);
+                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime);
 
             var exportData = memberList.Select(a => new MemberExportData()
             {
@@ -302,15 +300,16 @@ namespace BackendSite.Service.BLL
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
+        private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
-        private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc)
         {
-            var pointLevel = pointLevelInfos
+            var info = pointLevelInfos
                 .OrderByDescending(a=>a.PointLevel)
                 .FirstOrDefault(a => 
                     a.CurrencyId == currencyId && a.DepositCnt <= depositSum &&
-                    a.WithdrawalCnt <= withdrawSum && a.IsKyc == isKyc);;
-            return pointLevel?.PointLevel ?? 1;
+                    a.WithdrawalCnt <= withdrawSum && a.IsKyc == isKyc);
+            var pointLevel = info?.PointLevel ?? 1;
+            return isRisk ? Math.Min(userLevel, pointLevel) : Math.Max(userLevel, pointLevel);
         }
         private DateTimeOffset? Convert(DateTime? dateTime, TimeSpan ts)
         {
