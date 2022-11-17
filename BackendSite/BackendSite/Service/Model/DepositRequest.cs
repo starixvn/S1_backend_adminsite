@@ -9,6 +9,7 @@ namespace BackendSite.Service.Model
     {
         public string TransId { set; get; }
         public int DepositType { set; get; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public int CurrencyId { get; set; }
         public string IsoCode { set; get; }
         public int CustId { set; get; }
@@ -38,6 +39,8 @@ namespace BackendSite.Service.Model
                 };
         public int FirstDeposit { set; get; }
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
+        public List<int> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
         private DateTimeOffset? _depositTime;

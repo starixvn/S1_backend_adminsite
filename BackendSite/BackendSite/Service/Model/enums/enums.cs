@@ -234,6 +234,17 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7, //No Use
         Error = 99 //No Use
     }
+    
+	public enum DepositActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63
+    }
 
     #endregion
 
