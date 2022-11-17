@@ -48,8 +48,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V2", new { _SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V3", new { _SiteId = siteId });
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
@@ -57,9 +56,9 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
         }
 
-        public IEnumerable<BankInfoPay> GetCryptoPayList()
+        public IEnumerable<BankInfoPay> GetCryptoPayList(int siteId)
         {
-            return _reportDbClient.Query<BankInfoPay>("Common_CryptoPayForPayout_Get");
+            return _mainDbClient.Query<BankInfoPay>("Common_CryptoPayForPayout_Get_V2", new { _SiteId = siteId });
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)

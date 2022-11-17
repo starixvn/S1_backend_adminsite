@@ -1,14 +1,12 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class ThirdPartyManagementController : ControllerBase
@@ -16,7 +14,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Fields
 
         private readonly PaymentManageBLL _paymentManageBll;
-        private readonly PermissionBLL _permissionBll;
 
         #endregion
 
@@ -25,20 +22,34 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         public ThirdPartyManagementController(IServiceProvider provider)
         {
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
-            _permissionBll = provider.GetRequiredService<PermissionBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetBankListByPayIdRequest
+        public class GetBankListForSettingRequest
         {
-            public int PayId { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public int ChannelId { get; set; }
         }
-
+        
+        public class GetPayListRequest
+        {
+            public int SiteId { get; set; }
+        }
+        
+        public class SetPayListStatusRequest
+        {
+            public int SiteId { get; set; }
+            public int PayId { get; set; }
+            public PayListStatusEnum Status { get; set; }
+        }
+        
         public class UpdateBankInfoByPayIdRequest
         {
+            public int SiteId { get; set; }
             public int PayId { get; set; }
 
             public int SysId { get; set; }
@@ -53,182 +64,85 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         #region Actions
 
-        /// <summary>
-        /// ThirdPartyManagement/GetList 取得第三方支付資料清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management
-        /// </remarks>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult GetList()
+        public ApiResult GetPaySettingList(GetPaySettingListRequest request)
         {
-            var result = new ApiResult<FrontEndDatas>();
+            var result = _paymentManageBll.GetPaySettingList(new GetPaySettingListParams(request),
+                request.PageNumber, request.PageSize, out var pageInfo);
 
-            result.Data = _paymentManageBll.GetPayInfoList();
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return result;
+            return new ApiListResult<PaySetting>(ErrorCodeEnum.Success, pageInfo, result);
         }
 
-        /// <summary>
-        /// ThirdPartyManagement/UpdatePayInfo 更新第三方支付資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management > Pay Tab > Click Pay [Status]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdatePayInfo(ApiRequestWithLog<UpdatePayInfo> request)
+        public ApiResult SetPaySetting(UpdatePaySettingParams request)
         {
-            var result = new ApiResult();
-            var success = _paymentManageBll.UpdatePayList(new ParamsWithLog<UpdatePayInfo>(request, User.Identity.Name));
+            var success = _paymentManageBll.UpdatePaySetting(request, User.Identity.Name);
             
-            if (success)
+            return new ApiResult
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
-            }
-            return result;
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
         }
 
-        /// <summary>
-        /// ThirdPartyManagement/UpdatePayChannel 更新支付渠道資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click Channel [Status]
-        /// 
-        ///            Finance > Payment Management > Pay Tab > Channel Tab > Click Channel [Edit]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdatePayChannel(ApiRequestWithLog<UpdatePayChannel> request)
+        public ApiResult SetPaySettingStatus(UpdatePaySettingStatusParams request)
         {
-            var result = new ApiResult();
-
-            var success = _paymentManageBll.UpdatePayChannel(new ParamsWithLog<UpdatePayChannel>(request, User.Identity.Name));
+            var success = _paymentManageBll.UpdatePaySettingStatus(request, User.Identity.Name);
             
-            if (success)
+            return new ApiResult
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
+        }
+        
+        [HttpPost]
+        public ApiResult GetPayList(GetPayListRequest request)
+        {
+            var result = _paymentManageBll.GetPayList(request.SiteId)
+                .Where(x => x.PayStatus == PayListStatusEnum.Enable);
+
+            return new ApiResult<IEnumerable<PayListInfo>>
             {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
-            }
-            return result;
+                Data = result,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
         }
 
-        /// <summary>
-        /// ThirdPartyManagement/UpdatePayCurrency 更新支付幣別資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click Currency [Edit]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage", "f_pm_editAmountRule" })]
         [HttpPost]
-        public ApiResult UpdatePayCurrency(ApiRequestWithLog<UpdatePayCurrency> request)
+        public ApiResult SetPayListStatus(SetPayListStatusRequest request)
         {
-            var result = new ApiResult();
-            var success = false;
-            if (_permissionBll.CheckPermission("Finance/PaymentManage", "f_pm_editAmountRule"))
+            var success = _paymentManageBll.SetPayListStatus(request.SiteId, request.PayId, request.Status);
+            
+            return new ApiResult
             {
-                //有權限，可以修改數字規則和固定數字清單
-                success = _paymentManageBll.UpdatePayCurrency(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
-            }
-            else
-            {
-                //沒有權限
-                success = _paymentManageBll.UpdatePayCurrencyAmount(new ParamsWithLog<UpdatePayCurrency>(request, User.Identity.Name));
-            }
-            if (success)
-            {
-                result.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                result.ErrorCode = (int)ErrorCodeEnum.Fail;
-                result.Message = "Update failed.";
-            }
-            return result;
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
         }
 
-        //重複的邏輯...UpdatePayCurrency
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
-        //[HttpPost]
-        //public ApiResult UpdatePayCurrencyAmount([FromForm] int ChannelId, [FromForm] int CurrencyId, [FromForm] decimal MinAmount, [FromForm] decimal MaxAmount)
-        //{
-        //    var result = new ApiResult();
-
-        //    _paymentManageBll.UpdatePayCurrency(ChannelId, CurrencyId, MinAmount, MaxAmount, User.Identity.Name);
-
-        //    result.ErrorCode = (int)ErrorCodeEnum.Success;
-
-        //    return result;
-        //}
-
-        /// <summary>
-        /// ThirdPartyManagement/GetBankListByPayId 取得指定第三方支付銀行清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click [Type]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult GetBankListByPayId(GetBankListByPayIdRequest request)
+        public ApiResult GetBankInfoList(GetBankListForSettingRequest request)
         {
-            var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
+            var result =
+                _paymentManageBll.GetBankInfoPayForSetting(request.SiteId, request.CurrencyId, request.ChannelId);
 
-            result.Data = _paymentManageBll.GetBankSysInfoList(request.PayId);
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return result;
+            return new ApiResult<IEnumerable<PayListBankInfoSys>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
-        /// <summary>
-        /// ThirdPartyManagement/UpdateBankInfoByPayId 更新指定第三方支付銀行資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Payment Management > Pay Tab > Channel Tab > Click [Type] > Click [Status]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/PaymentManage" })]
         [HttpPost]
-        public ApiResult UpdateBankInfoByPayId(UpdateBankInfoByPayIdRequest request)
+        public ApiResult SetBankStatus(UpdateBankInfoByPayIdRequest request)
         {
-            var result = new ApiResult<IEnumerable<PayListBankInfoSys>>();
+            var user = User.Identity.Name;
+            var result = _paymentManageBll
+                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, user);
 
-            _paymentManageBll.UpdateBankInfo(request.PayId, request.SysId, (int)request.Status, User.Identity.Name);
-            result.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return result;
+            return new ApiResult
+            {
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
         }
 
         #endregion

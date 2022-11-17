@@ -2,15 +2,15 @@
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
-    public class VipLevelService
+    public class VipLevelService : IVipLevelService
     {
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
@@ -28,24 +28,31 @@ namespace BackendSite.Service.DAL
             var vipLevelSetting = _mainDbClient.Query<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
             return vipLevelSetting;
         }
-        
-        public Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
+
+        public async Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId)
         {
-            return _mainDbClient
-                .QueryAsync<VipLevelSetting>("Admin_VipLevel_Get", new DynamicParameters(new { SiteId = siteId }));
+            return await _reportDbClient.QueryAsync<VipLevelSetting>("Admin_VipLevel_Get",
+                new DynamicParameters(new { SiteId = siteId }));
         }
 
         public VipLevelInfo GetVipLevelInfo(int CustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var vipLevelInfo = conn.QueryFirstOrDefault<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId },
-                commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                CustId = CustId
+            });
+            var vipLevelInfo = _mainDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3",props);
             return vipLevelInfo;
+        }
+        
+        public async Task<VipLevelInfoDto> GetVipLevelInfoAsync(int custId)
+        {
+            return await _reportDbClient.QueryFirstAsync<VipLevelInfoDto>("Admin_CustVipLevel_Get_V4",
+                new DynamicParameters(new { CustId = custId }));
         }
 
         public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
             props.Add("_PageSize", pageSize);
@@ -53,29 +60,53 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }
+        
+        public async Task<IEnumerable<VipLevelLogDto>> GetVipLevelLogAsync(int custId)
+        {
+            return await _reportDbClient.QueryAsync<VipLevelLogDto>("Admin_CustVipLevelLog_Get_V5",
+                new DynamicParameters(new { CustId = custId }));
+        }
 
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustVipLevel_Set",
-                new { SiteId, CustId, UserName, VipLevel, Memo, Operator }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_CustVipLevel_Set",
+                new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
+        }
+        
+        public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator)
+        {
+            var p = new DynamicParameters(new
+            {
+                SiteId = siteId, CustId = custId, UserName = userName, 
+                VipLevel = vipLevel, Memo = memo, Operator = updator
+            });
+            return await _mainDbClient.ExecuteAsync("Admin_CustVipLevel_Set", p);
         }
 
         public int SetVipLevelManually(int SiteId, int CustId, string UserName, int Manually, string Memo,
             string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustVipLevelManually_Set",
-                new { SiteId, CustId, UserName, Manually, Memo, Operator }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_CustVipLevelManually_Set",
+                new { SiteId, CustId, UserName, Manually, Memo, Operator });
             return result;
+        }
+
+        public async Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string memo, string updator)
+        {
+            var p = new DynamicParameters(new
+            {
+                SiteId = siteId, CustId = custId, UserName = userName, 
+                Manually = manually, Memo = memo, Operator = updator
+            });
+            return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
 
         public IEnumerable<VipSettingModel> GetVipSetting(int vipType)

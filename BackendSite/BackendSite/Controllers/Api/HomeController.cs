@@ -72,6 +72,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             [Required]
             public string txtPW { set; get; }
+            public string redirectUrl { set; get; }
         }
 
         public class DashBoardPara
@@ -140,10 +141,13 @@ namespace BackendSite.Controllers.Api
             await HttpContext.SignInAsync("backend",
                                  new ClaimsPrincipal(claimsIdentity));
 
+            if (string.IsNullOrWhiteSpace(loginModel.redirectUrl))
+                loginModel.redirectUrl = Url.Action("Index", "Home");
+
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = Url.Action("Index", "Home")
+                Message = loginModel.redirectUrl
             };
         }
 
@@ -319,7 +323,7 @@ namespace BackendSite.Controllers.Api
             var CanSearchSite = new List<int>();
 
             _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite,8);
+            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite, 8);
 
             return new ApiResult<DashBoardData>
             {
