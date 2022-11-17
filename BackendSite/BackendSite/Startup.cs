@@ -11,6 +11,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite
 {
@@ -42,6 +43,7 @@ namespace BackendSite
             services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
+            services.AddSingleton<Cryptor>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -75,11 +77,16 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-            
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<IBonusReportService, BonusReportService>();
+            services.AddTransient<IHotEventService, HotEventService>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -120,6 +127,9 @@ namespace BackendSite
 
             services.AddOpenApiDocument();//Swagger Setting
 
+            services.AddOptionListByDB<TpGameTypeOption>("Admin_TpGameType_Get");
+            services.AddOptionListByDB<TpListOption>("Common_TpList_Get");
+            services.AddOptionListByDB<CurrencyOption>("Common_Currency_Get");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -160,10 +170,6 @@ namespace BackendSite
                 #endregion
 
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseEndpoints(endpoints =>

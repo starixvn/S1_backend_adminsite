@@ -41,6 +41,7 @@ namespace BackendSite.Service.DAL
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
             para.Add("_Agent", input.Agent ?? string.Empty);
+            para.Add("_Channels", input.SupportChannels.Any() ? JsonConvert.SerializeObject(input.SupportChannels) : null, DbType.String);
             para.Add("_StartIndex", input.StartIndex);
             para.Add("_PageSize", input.PageSize);
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -77,7 +78,7 @@ namespace BackendSite.Service.DAL
             para.Add("_Memo", input.Memo);
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
-            para.Add("_SupportQR", input.SupportQr);
+            para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
@@ -237,17 +238,6 @@ namespace BackendSite.Service.DAL
                 trans.Rollback();
             }
             return result;
-        }
-        public bool AddBankDetail(int siteId, BankDetail bankDetail)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("BankDetail_Ins", new { SiteId = siteId, SysId = bankDetail.SysId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
-        }
-
-        public bool EditBankDetail(int siteId, BankDetail bankDetail)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("BankDetail_Set", new { SiteId = siteId, SysId = bankDetail.BankId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
         }
 
         public IEnumerable<BankInfoSys> GetSysBankList()

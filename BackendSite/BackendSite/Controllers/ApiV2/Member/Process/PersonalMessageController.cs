@@ -253,7 +253,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public IActionResult ExportSendMessageBatchResultReport(ExportMessageBatchReq req)
         {
             var data = _messageBll.GetBatchMessageSendLog(req.BatchId);
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
 
             return _excelBll.ExcelFile(stream, "SendMessageBatchResult");
         }
@@ -489,7 +489,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                resultMessage = ex.ToString();
+                resultMessage = ex.Message;
                 errorCode = (int)SendMessageStatus.Failed;
             }
         }

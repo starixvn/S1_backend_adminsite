@@ -45,33 +45,40 @@ namespace BackendSite.Service.Library
                 throw;
             }
         }
+        
+        public async Task<TResponse> PostAsync<TResponse, TRequest>(string url, TRequest request, int timeout = 0)
+        {
+            try
+            {
+                TResponse result = default;
+                using var client = new HttpClient();
+                var jsonReq = JsonConvert.SerializeObject(request);
+                var content = new StringContent(jsonReq, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        //public async Task<ApiResult<T>> PostMembersite<T, U>(string url, U oTpInfo)
-        //{
-        //    ApiResult<T> oApiResult = null;
-        //    using var client = new HttpClient();
-        //    var fooJSON = JsonConvert.SerializeObject(oTpInfo);
-        //    var fooContent = new StringContent(fooJSON, Encoding.UTF8, "application/json");
-        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SignKey"]));
-        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                if (timeout != 0)
+                {
+                    client.Timeout = TimeSpan.FromSeconds(timeout);
+                }
+                
+                _logger.LogInformation($"url:{url}, request:{jsonReq}");
+                using var response = await client.PostAsync(url, content);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"response:{responseBody}");
+                    result = JsonConvert.DeserializeObject<TResponse>(responseBody);
+                }
+                
+                return result;
 
-        //    var token = new JwtSecurityToken(
-        //    issuer: _configuration["JwtSettings:Issuer"],
-        //    expires: DateTime.Now.AddMinutes(30),
-        //    signingCredentials: creds);
-        //    var Token = new JwtSecurityTokenHandler().WriteToken(token);
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Token);
-        //    _logger.LogInformation($"url:{url}, request:{fooJSON}");
-        //    using var response = await client.PostAsync(url, fooContent);
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var responseBody = await response.Content.ReadAsStringAsync();
-        //        _logger.LogInformation($"response:{responseBody}");
-        //        oApiResult = JsonConvert.DeserializeObject<ApiResult<T>>(responseBody);
-        //    }
-
-        //    return oApiResult;
-        //}
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
+        }
     }
 }

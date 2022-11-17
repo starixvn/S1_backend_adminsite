@@ -197,7 +197,7 @@ namespace BackendSite.Controllers.Api
                 userName);
 
 
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return _excelBLL.ExcelFile(stream, "WithdrawalInfoAndAccountList");
         }
