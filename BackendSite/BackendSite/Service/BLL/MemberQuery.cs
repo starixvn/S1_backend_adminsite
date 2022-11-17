@@ -39,6 +39,10 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
+            var currencyList = request.CurrencyId ?? new List<int>();
+            var statusList = request.Status ?? new List<int>();
+            var tagList = request.Tags ?? new List<int>();
+            var vipList = request.VipLevel ?? new List<int>();
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
             var affiliateName = string.IsNullOrEmpty(request.AffiliateName) ? null : request.AffiliateName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
@@ -50,8 +54,8 @@ namespace BackendSite.Service.BLL
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
 
-            var memberList = await _memberService.GetList(request.SiteId, request.CurrencyId, request.Status, request.Identity,
-                userName, request.Tags, request.VipLevel, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+            var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
+                userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
@@ -66,7 +70,8 @@ namespace BackendSite.Service.BLL
                     CustId = a.CustId,
                     UserName = a.UserName,
                     SabaId = a.SabaId,
-                    AffiliateCode = a.AffiliateCode,
+                    AffiliateCode = a.AffCode,
+                    AffiliateName = a.AffiliateName,
                     TagList = string.IsNullOrEmpty(a.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(a.TagList),
                     Identity = a.Identity,
                     UserType = a.UserType,
