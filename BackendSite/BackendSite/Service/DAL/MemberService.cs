@@ -61,22 +61,24 @@ public class MemberService : IMemberService
         return searchData;
     }
 
-    public async Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, 
-        int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, 
-        string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, 
-        int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate)
+    public async Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
-        p.Add("_CurrencyList", currencyList);
-        p.Add("_StatusList", statusList);
+        p.Add("_CurrencyList", JsonConvert.SerializeObject(currencyList));
+        p.Add("_StatusList", JsonConvert.SerializeObject(statusList));
         p.Add("_Identity", identity);
         p.Add("_UserName", userName);
         p.Add("_TagList", JsonConvert.SerializeObject(tags));
         p.Add("_AccountName", accountName);
+        p.Add("_AffiliateName", affiliateName);
         p.Add("_TpUserName", tpUserName);
         p.Add("_LoginIp", loginIp);
-        p.Add("_VipList", vipList);
+        p.Add("_VipList", JsonConvert.SerializeObject(vipList));
         p.Add("_Email", email);
         p.Add("_PhoneNo", phoneNo);
         p.Add("_BankAccountNumber", bankAccountNumber);
@@ -86,6 +88,7 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
+        p.Add("_UserType", userType);
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);
