@@ -23,8 +23,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<TpWallet> GetTpWallet(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<TpWallet>("TpWallet_Get", new { CustId = custId });
         }
         
         public async Task<IEnumerable<TpWallet>> GetTransferTpWallet(int custId)
@@ -54,8 +53,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var tpTransferInfoList = conn.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            var tpTransferInfoList = _reportDbClient.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -152,8 +150,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site });
         }
 
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)

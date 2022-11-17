@@ -229,8 +229,8 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5, //No Use
-        QRPay = 6 ,
+        LoadCard = 5,
+        QRPay = 6,
         BankAutoChannel = 7
     }
 
@@ -245,6 +245,13 @@ namespace BackendSite.Service.Model.enums
         Expired = 6, //No Use
         OnHold = 7, //No Use
         Error = 99 //No Use
+    }
+    
+    public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
     }
 
     #endregion
@@ -283,7 +290,7 @@ namespace BackendSite.Service.Model.enums
         CryptoPayment = 4,
         LoadCardPayment = 5,
         QrPayPayment = 6,
-        EWalletWithdrawal = 8
+        BankAutoChannel = 7
     }
 
     public enum PayChannelStatusEnum
@@ -333,7 +340,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalTypeEnum
     {
-        Undefine = 0, //No Use
+        Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4
@@ -579,8 +586,14 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionWalletTypeEnum
     {
-        Seamless = 1,
-        Transfer = 2
+        Transfer = 0,
+        Seamless = 1
+    }
+    
+    public enum BonusAtPageEnum
+    {
+        Promotion = 0,
+        Deposit = 1
     }
 
     #endregion
@@ -1250,6 +1263,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1425,7 +1439,29 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         All = 2,
     }
-    
+
+    public enum IovationDeviceType
+    {
+        MAC = 1,
+        PC,
+        iOS,
+        ANDROID,
+        BLACKBERRY,
+        CHROMEOS,
+        HANDHELD_OTHER,
+        IPHONE,
+        IPOD,
+        IPAD,
+        LINUX,
+        NINTENDO,
+        PLAYSTATION,
+        XBOX,
+        UNIX,
+        WINDOWS,
+        WINDOWS_MOBILE,
+        UNKNOWN
+    }
+
     #region SlotGamesManagement
     
     public enum SlotGameCategoryEnum
@@ -1449,8 +1485,56 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
+    
+    public enum PaymentReportGroupByEnum
+    {
+        Date = 1,
+        Month = 2,
+        Gateway = 3,
+        Type = 4,
+        Currency = 5
+    }
 
     #endregion
+
+    public enum MpaTransactionRelaySummaryTypeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum MpaWinLossGroupByTypeEnum
+    {
+        Date = 1,
+        Month = 2,
+        GameType = 3,
+        Currency = 4,
+        Player = 5,
+        TpCategory = 6
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 GameType 的 GGR 計算方法需要客製
+    /// </summary>
+    public enum MpaGGRCustomizationGameTypeEnum
+    {
+        OneGamingPoker = 41,
+        V8Poker = 42
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 TpId 的 佣金來源從別的地方抓取
+    /// </summary>
+    public enum MpaCommissionCustomizationTpIdEnum
+    {
+        NineW = 31,
+    }
+
+    public enum MpaDateType
+    {
+        SettledDate = 1,
+        CreatedDate = 2
+    }
 
     public enum HotGameTopCategory
     {

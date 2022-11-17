@@ -200,6 +200,7 @@ namespace BackendSite.Service.Model
         public string PayName { get; set; }
         public int ChannelId { get; set; }
         public string ChannelName { get; set; }
+        public string GroupName { get; set; }
         public PayChannelTypeEnum Type { get; set; }
         public int Mode { get; set; }
         public decimal MinAmount { get; set; }

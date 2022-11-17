@@ -23,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly IConfiguration _configuration;
         private readonly CourierAdapter _courierAdapter;
+        private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
         private readonly ILogger<DepositBLL> _logger;
 
@@ -33,6 +34,7 @@ namespace BackendSite.Service.BLL
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
@@ -41,7 +43,9 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
@@ -289,9 +293,9 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, string userName,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
-            return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userName, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
+            return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userNames, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 
@@ -324,7 +328,14 @@ namespace BackendSite.Service.BLL
         
         public bool EditDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            return depositService.EditDepositLimitInfo(input);
+            var result = depositService.EditDepositLimitInfo(input);
+
+            if (result)
+            {
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
+            }
+
+            return result;
         }
 
         public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
@@ -346,7 +357,14 @@ namespace BackendSite.Service.BLL
         
         public bool DeleteDepositLimitV2(ParamsWithLog<DepositLimitModel> input)
         {
-            return depositService.DeleteDepositLimitInfoV2(input);
+            var result = depositService.DeleteDepositLimitInfoV2(input);
+
+            if (result)
+            {
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
+            }
+
+            return result;
         }
         
         public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,

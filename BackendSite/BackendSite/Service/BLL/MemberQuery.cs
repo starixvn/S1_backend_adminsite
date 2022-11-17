@@ -39,9 +39,6 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
-            var currencyList = string.Join(',', request.CurrencyId.ToArray());
-            var statusList = string.Join(',', request.Status.ToArray());
-            var vipList = request.VipLevel != null ? string.Join(',', request.VipLevel.ToArray()) : null;
             var accountName = string.IsNullOrEmpty(request.AccountName) ? null : request.AccountName;
             var tpUserName = string.IsNullOrEmpty(request.TpUserName) ? null : request.TpUserName;
             var loginIp = string.IsNullOrEmpty(request.LoginIp) ? null : request.LoginIp;
@@ -52,8 +49,8 @@ namespace BackendSite.Service.BLL
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
 
-            var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
-                userName, request.Tags, vipList, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+            var memberList = await _memberService.GetList(request.SiteId, request.CurrencyId, request.Status, request.Identity,
+                userName, request.Tags, request.VipLevel, accountName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
@@ -207,8 +204,9 @@ namespace BackendSite.Service.BLL
                 DepositPointLevel = customer.PointLevel,
                 Currency = customer.CurrencyName,
                 Identity = customer.Identity,
-                AffiliatesName = customer.AffiliatesName,
-                AffiliatesCode = customer.AffiliatesCode,
+                AgentName = customer.Agent,
+                SuperiorAffiliateId = customer.AffId,
+                SuperiorAffiliateCode = customer.AffCode,
                 RegisteredTime = customer.RegTime,
                 FirstDepositTime = customer.FirstDepositTime,
                 LastLoginTime = customer.LastLoginTime,
@@ -218,8 +216,8 @@ namespace BackendSite.Service.BLL
                 BirthYear = customer.BirthYear,
                 Email = email,
                 MobileNumber = $"({customer.AreaCode}) {phoneNo}",
-                Address = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst, customer.AddressCity,
-                    customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
+                Address = AddressFormat.Format(customer.AddressLineSecond, customer.AddressLineFirst,
+                    customer.AddressCity, customer.AddressPostCode, customer.AddressState, customer.AddressCountry),
                 IsRisk = customer.IsRisk,
                 IsKyc = customer.IsKyc,
                 IsTest = customer.IsTest,
@@ -229,10 +227,10 @@ namespace BackendSite.Service.BLL
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
-                var affInfo =
-                    await _affiliateApi.QueryAffInfo(customer.AffPlayerName, customer.CurrencyName, customer.SiteId);
+                var affInfo = await _affiliateApi.QueryAffInfo(customer.AffPlayerName, customer.CurrencyName, customer.SiteId);
                 if (affInfo != null)
                 {
+                    affInfo.AffiliateCode = customer.AffiliateCode;
                     customerBasicInfo.AffInfo = affInfo;
                 }
             }

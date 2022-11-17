@@ -1,10 +1,10 @@
 ﻿using System.Data;
-using BackendSite.Controllers.ApiV2.Finance.Deposit;
-using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
 using Dapper;
+using BackendSite.Controllers.ApiV2.Finance.Deposit;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL

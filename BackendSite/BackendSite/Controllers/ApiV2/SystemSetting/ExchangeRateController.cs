@@ -16,32 +16,34 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         private readonly ExchangeUSDRateBLL _ExchangeUSDRateBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBLL;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBLL;
 
         public ExchangeRateController(IServiceProvider provider)
         {
             _ExchangeUSDRateBLL = provider.GetRequiredService<ExchangeUSDRateBLL>();
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         /// <summary>
-        /// System Setting > Exchange  Rate 取得指定幣別對美元的匯率
+        /// System Setting > Exchange  Rate 取得幣別清單對美元的匯率
         /// </summary>
         /// <remarks>
         /// Http Method：POST
         /// 
         /// Func Path：System Setting > Exchange Rate [Submit]
         /// </remarks>
-        /// <param name="request">
-        /// </param>
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 1 })]
-        public ApiResult<GetExchangeUSDRateResponse> GetUSD(GetExchangeUSDRateRequest request)
+        public ApiResult<IEnumerable<CurrencyUSDRate>> GetUSDRateList()
         {
-            var data = _ExchangeUSDRateBLL.GetExchangeUSDRate(request.CurrencyId);
+            var siteId = _authorizeBll.CheckBrand();
+            var siteCurrencyList = _serverInfoBLL.GetSiteList().First(x => x.SiteId == siteId).ICurrencyList;
+            var data = _ExchangeUSDRateBLL.GetExchangeUSDRate().Where(i => siteCurrencyList.Contains(i.CurrencyId));
 
-            return new ApiResult<GetExchangeUSDRateResponse>((int)ErrorCodeEnum.Success, "Success", data);
+            return new ApiResult<IEnumerable<CurrencyUSDRate>>((int)ErrorCodeEnum.Success, "Success", data);
         }
 
         /// <summary>
@@ -59,14 +61,15 @@ namespace BackendSite.Controllers.ApiV2.SystemSetting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 129, 3 })]
         public ApiResult SetUSD(SetExchangeUSDRateRequest request)
         {
-            var oldUSDRate = _ExchangeUSDRateBLL.GetExchangeUSDRate(request.CurrencyId);
-            var result = _ExchangeUSDRateBLL.SetExchangeUSDRate(request);
+            var oldUSDRate = _ExchangeUSDRateBLL.GetExchangeUSDRate().First(i => i.CurrencyId == request.CurrencyId);
+            var userName = _authorizeBll.GetAuthData().UserName;
+            var result = _ExchangeUSDRateBLL.SetExchangeUSDRate(request, userName);
 
             if (result)
             {
                 _adjustmentLogReportBLL.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
-                    Operator = _authorizeBll.GetAuthData().UserName,
+                    Operator = userName,
                     SiteId = _authorizeBll.CheckBrand(),
                     CurrencyId = request.CurrencyId,
                     ActionType = ActionType.Update,
