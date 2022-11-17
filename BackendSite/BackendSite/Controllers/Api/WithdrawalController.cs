@@ -413,7 +413,7 @@ namespace BackendSite.Controllers.Api
                 .GetOfflineBankAccount(req.SiteId, req.CurrencyId)
                 .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank)
+                            && x.Channel != TransferChannelEnum.PSP)
                 .OrderBy(x => x.SettingStatus);
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>

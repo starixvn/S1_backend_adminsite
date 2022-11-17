@@ -274,7 +274,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var data = _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank)
+                            && x.Channel != TransferChannelEnum.PSP)
                 .OrderBy(x => x.SettingStatus);
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>
