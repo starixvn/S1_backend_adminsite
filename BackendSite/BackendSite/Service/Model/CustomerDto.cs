@@ -37,18 +37,20 @@ public class MemberListDto
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string SabaId { get; set; }
-    public string AffiliateCode { get; set; }
+    public string AffCode { get; set; }
     public string TagList { get; set; }
     public int UserLevel { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
+    public bool IsRisk { get; set; }
     public string IP { get; set; }
     public int DepositCnt { get; set; }
     public int WithdrawCnt { get; set; }
     public int Identity { get; set; }
     public int UserType { get; set; }
+    public string AffiliateName { get; set; }
     public string LevelName { get; set; }
     public DateTime RegTime { get; set; }
     public DateTime? ReloadTime { get; set; }
@@ -60,9 +62,9 @@ public class MemberListDto
     public string ShieldId { get; set; }
 }
 
-public class GetMemberListData
+public class GetMemberListPageData<T>
 {
-    public IEnumerable<MemberListDto> Data { get; set; }
+    public IEnumerable<T> Data { get; set; }
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
@@ -95,14 +97,6 @@ public class MemberList
     public decimal Bonus { get; set; }
     public string DeviceScore { get; set; }
     public string DeviceId { get; set; }
-}
-
-public class GetMemberListResponse
-{
-    public IEnumerable<MemberList> Data { get; set; }
-    public int PageNumber { get; set; }
-    public int TotalPages { get; set; }
-    public int RowCount { get; set; }
 }
 
 public class ExportMemberRequest
@@ -216,9 +210,23 @@ public class CustomerDto
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; }
     public int Identity { get; set; }
-    public string AffiliatesName { get; set; }
-    public string AffiliatesCode { get; set; }
+    public string Agent { get; set; }
+    /// <summary>
+    /// 會員透過代理進來的推薦碼
+    /// </summary>
+    public string AffId { get; set; }
+    /// <summary>
+    /// 會員透過代理進來的推薦碼
+    /// </summary>
+    public string AffCode { get; set; }
+    /// <summary>
+    /// 會員名稱
+    /// </summary>
     public string AffPlayerName { get; set; }
+    /// <summary>
+    /// 會員本身的代理推薦碼
+    /// </summary>
+    public string AffiliateCode { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -267,8 +275,9 @@ public class CustomerBasicInfo
     public int DepositPointLevel { get; set; }
     public string Currency { get; set; }
     public int Identity { get; set; }
-    public string AffiliatesName { get; set; }
-    public string AffiliatesCode { get; set; }
+    public string AgentName { get; set; }
+    public string SuperiorAffiliateId { get; set; }
+    public string SuperiorAffiliateCode { get; set; }
     public DateTimeOffset RegisteredTime { get; set; }
     public DateTimeOffset? FirstDepositTime { get; set; }
     public DateTimeOffset LastLoginTime { get; set; }
@@ -289,6 +298,7 @@ public class CustomerBasicInfo
 public class AffInfo
 {
     public string AffiliateName { get; set; }
+    public string AffiliateCode { get; set; }
     public string RevenueName { get; set; }
     public int TotalPlayers { get; set; }
     public decimal RevenueShare { get; set; }
