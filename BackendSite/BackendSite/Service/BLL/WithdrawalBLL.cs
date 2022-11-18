@@ -110,7 +110,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalRequest(withdrawalId);
         }
 
-        public IEnumerable<Comments> GetWithdrawalRequestComment(string transId)
+        public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(string transId)
         {
             var withdrawalRequest = GetWithdrawalRequest(transId);
             var results = _withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId,

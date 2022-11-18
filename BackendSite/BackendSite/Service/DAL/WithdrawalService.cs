@@ -143,10 +143,10 @@ namespace BackendSite.Service.DAL
                 new { WithdrawalId = withdrawalId }, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
+        public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<Comments>("WithdrawalRequestComment_Get_V2",
+            return conn.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
                 new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 

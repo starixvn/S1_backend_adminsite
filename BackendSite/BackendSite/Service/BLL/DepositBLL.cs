@@ -268,7 +268,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<Comments> GetDepositRequestComment(string transId)
+        public IEnumerable<DepositComments> GetDepositRequestComment(string transId)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var depositId);
