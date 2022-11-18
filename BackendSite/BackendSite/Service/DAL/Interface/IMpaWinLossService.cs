@@ -47,9 +47,6 @@ namespace BackendSite.Service.DAL.Interface
             DateTimeOffset endTime, string format);
 
 
-        Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo();
-
-        
         /// <summary>
         /// 取得所有 TpGameTypeID/TpGameTypeName
         /// </summary>

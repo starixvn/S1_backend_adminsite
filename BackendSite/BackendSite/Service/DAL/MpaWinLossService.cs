@@ -56,19 +56,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get", p);
         }
 
-        public Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
-        {
-            return _reportDbClient.QueryAsync<MpaCurrencyDto>("Admin_CurrencyInfo_Get");
-        }
-
-        public int GetCustIdByUserName(int siteId, string userName)
-        {
-            var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_UserName", userName, dbType: DbType.String);
-            return _reportDbClient.QueryFirst<int>("Admin_CustIdByUserName_Get", p);
-        }
-
         public Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption()
         {
             return _reportDbClient.QueryAsync<TpGameTypeOptionDto>("Common_TpGameType_Get");

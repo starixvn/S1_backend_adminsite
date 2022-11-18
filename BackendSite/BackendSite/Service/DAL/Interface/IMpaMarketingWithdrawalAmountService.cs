@@ -7,6 +7,7 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(int siteId,
             DateTimeOffset startTime, DateTimeOffset endTime);
 
-
+        Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(int siteId,
+            DateTimeOffset startTime, DateTimeOffset endTime);
     }
 }

@@ -1960,23 +1960,8 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<Dictionary<int, string>> GetCurrencyIsoCodeMapper()
         {
-            var usdRateResult = await GetMpaCurrencyInfo();
-            return usdRateResult
-                .ToDictionary(k => k.CurrencyId, v => v.IsoCode);
+            return await _mpaCommonService.GetCurrencyIsoCodeMapper();
         }
-
-        /// <summary>
-        /// 取得每個幣別資訊 + Usd 匯率
-        /// </summary>
-        /// <returns></returns>
-        private Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
-        {
-            const string redisKey = "MpaCurrnecyInfo";
-            return _redisHelper.TryGetOrCreateAsync(redisKey,
-                TimeSpan.FromHours(12),
-                () => _mpaWinLossService.GetMpaCurrencyInfo());
-        }
-
 
         /// <summary>
         /// 取得每個TpGameType + Name

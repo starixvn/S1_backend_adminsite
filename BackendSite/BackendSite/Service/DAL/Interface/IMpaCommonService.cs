@@ -22,5 +22,12 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="baseCurrencyId"></param>
         /// <returns></returns>
         decimal MapperExchangeRate(IEnumerable<MpaRateDto> source, DateTime date, int currencyId, int baseCurrencyId);
+
+        /// <summary>
+        /// 取得幣別對應
+        /// </summary>
+        /// <returns></returns>
+        Task<Dictionary<int, string>> GetCurrencyIsoCodeMapper();
+
     }
 }

@@ -58,6 +58,17 @@ namespace BackendSite.Service.DAL
 
         }
 
+        public async Task<Dictionary<int, string>> GetCurrencyIsoCodeMapper()
+        {
+            const string redisKey = "MpaCurrencyInfo";
+            var data = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                TimeSpan.FromHours(12), GetMpaCurrencyInfo);
+
+            var mapper = data.ToDictionary(k => k.CurrencyId, v => v.IsoCode);
+
+            return mapper;
+        }
+
         private Task<IEnumerable<MpaRateDto>> GetRateFromDb(DateTimeOffset starTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();
@@ -66,6 +77,10 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);
         }
+
+        private Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
+        {
+            return _reportDbClient.QueryAsync<MpaCurrencyDto>("Admin_CurrencyInfo_Get");
+        }
     }
 }
-

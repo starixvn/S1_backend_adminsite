@@ -1,6 +1,10 @@
 ﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model.Mpa.Marketing;
+using BackendSite.Extensions;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -8,12 +12,15 @@ namespace BackendSite.Service.BLL.Mpa
     {
         private readonly IMpaMarketingWithdrawalAmountService _withdrawalAmountService;
         private readonly IMpaCommonService _mapMpaCommonService;
+        private readonly ICacheHelper _cacheHelper;
 
         public MpaMarketingWithdrawalAmountBLL(IMpaMarketingWithdrawalAmountService withdrawalAmountService,
-            IMpaCommonService mapMpaCommonService)
+            IMpaCommonService mapMpaCommonService,
+            ICacheHelper cacheHelper)
         {
             _withdrawalAmountService = withdrawalAmountService;
             _mapMpaCommonService = mapMpaCommonService;
+            _cacheHelper = cacheHelper;
         }
 
         public async Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request)
@@ -21,7 +28,7 @@ namespace BackendSite.Service.BLL.Mpa
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.StartDate,
                 request.EndDate)).ToList();
 
-            await MultiplyExchangeRate(withSummaryResult,request);
+            await MultiplyExchangeRate(withSummaryResult, request);
 
             var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.CompareFromDate,
                 request.CompareToDate)).ToList();
@@ -40,7 +47,48 @@ namespace BackendSite.Service.BLL.Mpa
             return response;
         }
 
-        private async Task MultiplyExchangeRate(List<MpaMarketingWithdrawalAmountSummaryDto> source, WithdrawalAmountRequest request)
+        public async Task<WithdrawalAmountDetailResponseWrapper> GetWithdrawalAmountDetailAsync(WithdrawalAmountRequest request)
+        {
+            var pageInfo = new PageInfo();
+            var key = request.GetRedisKey();
+            var masterKey = $"MpaWithdrawalAmountDetail:{key}";
+            var sortKey = $"{masterKey}:{request.OrderByProperty}:{request.OrderByDirection}";
+            var cacheTime = TimeSpan.FromMinutes(5);
+
+            var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
+                    request.EndDate)).ToList();
+
+            await MultiplyExchangeRate(withDetails, request);
+
+            var currencyIdMapper = await _mapMpaCommonService.GetCurrencyIsoCodeMapper();
+            var data = withDetails.GroupBy(x => new
+            {
+                x.UserName,
+                x.CurrencyId,
+                x.RegisteredDate,
+            }).Select(r => new WithdrawalAmountDetailData
+            {
+                UserName = r.Key.UserName,
+                CurrencyName = currencyIdMapper[r.Key.CurrencyId],
+                RegisteredDate = RegisteredDateFormatter(r.Key.RegisteredDate),
+                WithdrawalCount = r.Sum(x => x.WithdrawalCount),
+                WithdrawalAmount = r.Sum(x => x.WithdrawalAmount),
+            }).ToList();
+
+            var response = new WithdrawalAmountDetailResponseWrapper()
+            {
+                Data = data.Skip((request.PageNumber - 1) * request.PageSize)
+                    .Take(request.PageSize),
+                TotalPages = Convert.ToInt32(Math.Ceiling(data.Count / (double)request.PageSize)),
+                RowCount = data.Count,
+                PageNumber = request.PageNumber
+            };
+
+            return response;
+        }
+
+        private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source, WithdrawalAmountRequest request)
+            where TEntity : class, IMpaMarketingWithdrawalAmountBaseDto
         {
             var rateList = (await _mapMpaCommonService.GetMpaExchangeRate(request.StartDate, request.EndDate)).ToList();
 
@@ -62,5 +110,24 @@ namespace BackendSite.Service.BLL.Mpa
             return result;
         }
 
+        private static string RegisteredDateFormatter(DateTime registeredDate)
+        {
+            var originRegisteredDate = registeredDate.ToString("dd-MM-yyyy hh:mm:ss");
+            //todo 
+            return originRegisteredDate;
+        }
+
+        private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        {
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(masterKey, cacheTime, list);
+                if (orderBy)
+                {
+                    _cacheHelper.StringSetAsync(sortKey, sortKey, cacheTime);
+                }
+            });
+        }
     }
 }
