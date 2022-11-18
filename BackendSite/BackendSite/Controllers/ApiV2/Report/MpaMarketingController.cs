@@ -1,5 +1,7 @@
-﻿using BackendSite.Service.BLL.Mpa;
+﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,19 +13,31 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class MpaMarketingController : ControllerBase
     {
-        private readonly MpaMarketingWithdrawalAmountBLL _marketingWithdrawalAmountBll;
+        private readonly IMpaMarketingWithdrawalAmountBLL _marketingWithdrawalAmountBll;
 
-        public MpaMarketingController(MpaMarketingWithdrawalAmountBLL marketingWithdrawalAmountBll)
+        public MpaMarketingController(IMpaMarketingWithdrawalAmountBLL marketingWithdrawalAmountBll)
         {
             this._marketingWithdrawalAmountBll = marketingWithdrawalAmountBll;
         }
 
         [HttpPost]
-        public async Task<ApiResult<object>> WithdrawalSummaryAsync(WithdrawalAmountRequest request)
+        public async Task<ApiResult<WithdrawalAmountSummaryResponse>> WithdrawalSummaryAsync(WithdrawalAmountRequest request)
         {
+            var apiResult = new ApiResult<WithdrawalAmountSummaryResponse>();
 
-            await Task.Delay(1);
-            return null;
+            try
+            {
+                var data = await _marketingWithdrawalAmountBll.GetWithdrawalAmountSummaryAsync(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
         }
 
         [HttpPost]

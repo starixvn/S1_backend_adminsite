@@ -81,8 +81,7 @@ namespace BackendSite
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
-
-            services.AddTransient<MpaMarketingWithdrawalAmountBLL>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>(); 
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();

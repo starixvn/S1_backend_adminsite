@@ -10,8 +10,8 @@
 
         public int CompareWithdrawalUsers { get; set; }
 
-        public int WithdrawalAmountChangeRate { get; set; }
+        public string WithdrawalAmountChangeRate { get; set; }
 
-        public int WithdrawalUsersChangeRate { get; set; }
+        public string WithdrawalUsersChangeRate { get; set; }
     }
 }
