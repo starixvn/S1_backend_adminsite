@@ -116,7 +116,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal Rate { get; set; }
     }
 
-    public class MpaUSdRateDto
+    public class MpaCurrencyDto
     {
         public int CurrencyId { get; set; }
 

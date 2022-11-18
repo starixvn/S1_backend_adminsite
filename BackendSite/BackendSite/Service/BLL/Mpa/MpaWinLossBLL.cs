@@ -12,11 +12,13 @@ namespace BackendSite.Service.BLL.Mpa
     public class MpaWinLossBLL : IMpaWinLossBLL
     {
         private readonly IMpaWinLossService _mpaWinLossService;
+        private readonly IMpaCommonService _mpaCommonService;
         private readonly ICacheHelper _redisHelper;
 
-        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper)
+        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService)
         {
             _mpaWinLossService = mpaWinLossService;
+            _mpaCommonService = mpaCommonService;
             _redisHelper = redisHelper;
         }
 
@@ -1958,7 +1960,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<Dictionary<int, string>> GetCurrencyIsoCodeMapper()
         {
-            var usdRateResult = await GetMpaUSdRate();
+            var usdRateResult = await GetMpaCurrencyInfo();
             return usdRateResult
                 .ToDictionary(k => k.CurrencyId, v => v.IsoCode);
         }
@@ -1967,12 +1969,12 @@ namespace BackendSite.Service.BLL.Mpa
         /// 取得每個幣別資訊 + Usd 匯率
         /// </summary>
         /// <returns></returns>
-        private Task<IEnumerable<MpaUSdRateDto>> GetMpaUSdRate()
+        private Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
         {
-            const string redisKey = "MpaUsdRate";
+            const string redisKey = "MpaCurrnecyInfo";
             return _redisHelper.TryGetOrCreateAsync(redisKey,
                 TimeSpan.FromHours(12),
-                () => _mpaWinLossService.GetMpaUsdRate());
+                () => _mpaWinLossService.GetMpaCurrencyInfo());
         }
 
 
@@ -2046,10 +2048,10 @@ namespace BackendSite.Service.BLL.Mpa
                 originTransaction = originTransaction.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
             }
 
-            var mapRate = (await _mpaWinLossService.GetMpaRate(request.StarTime, request.EndTime)).ToList();
+            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
 
             var alreadyMultiplyRateTransaction = (from item in originTransaction
-            let rate = GetMpaRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+            let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
             select new TransactionRelayDto()
             {
                 Date = item.Date,
@@ -2098,9 +2100,9 @@ namespace BackendSite.Service.BLL.Mpa
                 originBonus = originBonus.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
             }
 
-            var mapRate = (await _mpaWinLossService.GetMpaRate(request.StarTime, request.EndTime)).ToList();
+            var mapRate = (await  _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
             var alreadyMultiplyRateBonus = (from item in originBonus
-            let rate = GetMpaRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+            let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
             select new MpaWinLossBonusDto()
             {
                 Date = item.Date,
@@ -2148,35 +2150,6 @@ namespace BackendSite.Service.BLL.Mpa
             return format;
         }
 
-        private static decimal GetMpaRate(IEnumerable<MpaRateDto> source, DateTime date, int currencyId, int baseCurrencyId)
-        {
-            //是否是當天
-            if (date == DateTime.Today)
-            {
-                return source
-                    .FirstOrDefault(r => r.RateDate.ToString("yyyy-MM-dd") == date.ToString("yyyy-MM-dd")
-                                         && r.CurrencyId == currencyId
-                                         && r.TargetCurrencyId == baseCurrencyId)!.Rate;
-            }
-
-            //是否是當月
-            if (date.ToString("yyyy-MM") == DateTime.Now.ToString("yyyy-MM"))
-            {
-                return source
-                    .Where(r => r.RateDate.ToString("yyyy-MM") == DateTime.Now.ToString("yyyy-MM")
-                     && r.CurrencyId == currencyId
-                     && r.TargetCurrencyId == baseCurrencyId).MaxBy(r => r.RateDate)!.Rate;
-            }
-
-
-            //抓同年同月的最後一筆匯率
-            var lastDay = date.AddMonths(1).AddDays(-date.AddMonths(1).Day).ToString("yyyy-MM-dd");
-            return source.FirstOrDefault(r => r.RateDate.ToString("yyyy-MM-dd") == lastDay
-                                              && r.CurrencyId == currencyId
-                                              && r.TargetCurrencyId == baseCurrencyId)!.Rate;
-
-        }
-
         private async Task<MpaTpBetRecordWrapper> GetTpBetRecord(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var wrapperResult = new MpaTpBetRecordWrapper();
@@ -2190,9 +2163,9 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
 
-            var mapRate = (await _mpaWinLossService.GetMpaRate(request.StarTime, request.EndTime)).ToList();
+            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
-                                                          let rate = GetMpaRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                          let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
                                                           select new MpaTpBetRecordDto()
                                                           {
                                                               Date = item.Date,

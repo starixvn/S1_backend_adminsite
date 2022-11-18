@@ -81,6 +81,9 @@ namespace BackendSite
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
+
+            services.AddTransient<MpaMarketingWithdrawalAmountBLL>();
+
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
@@ -88,7 +91,11 @@ namespace BackendSite
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
+            services.AddTransient<IMpaCommonService, MpaCommonService>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
+
             
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

@@ -47,7 +47,7 @@ namespace BackendSite.Service.DAL.Interface
             DateTimeOffset endTime, string format);
 
 
-        Task<IEnumerable<MpaUSdRateDto>> GetMpaUsdRate();
+        Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo();
 
         
         /// <summary>
@@ -84,13 +84,5 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format">日期 format 格式</param>
         /// <returns>Bonus 資訊</returns>
         Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format);
-
-        /// <summary>
-        /// 取得指定期間內的匯率資料
-        /// </summary>
-        /// <param name="starTime"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>
-        Task<IEnumerable<MpaRateDto>> GetMpaRate(DateTimeOffset starTime, DateTimeOffset endTime);
     }
 }

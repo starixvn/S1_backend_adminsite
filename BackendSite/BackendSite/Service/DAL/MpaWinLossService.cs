@@ -56,9 +56,9 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get", p);
         }
 
-        public Task<IEnumerable<MpaUSdRateDto>> GetMpaUsdRate()
+        public Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
         {
-            return _reportDbClient.QueryAsync<MpaUSdRateDto>("Admin_CurrencyUSDRate_Get");
+            return _reportDbClient.QueryAsync<MpaCurrencyDto>("Admin_CurrencyInfo_Get");
         }
 
         public int GetCustIdByUserName(int siteId, string userName)
@@ -99,15 +99,6 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
 
             return _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get", p);
-        }
-
-        public Task<IEnumerable<MpaRateDto>> GetMpaRate(DateTimeOffset starTime, DateTimeOffset endTime)
-        {
-            var p = new DynamicParameters();
-            p.Add("_RateDateStart", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_RateDateEnd", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-
-            return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);
         }
     }
 }
