@@ -191,6 +191,21 @@ namespace BackendSite.Service.Model
         public string CurrencyName { get; set; }
     }
 
+    public class WithdrawalComments
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string Comment { get; set; }
+        public int Action { get; set; }
+        public string ActionName => Enum.GetName(typeof(WithdrawalStatusEnum), Action);
+        public decimal ActualDeposit { get; set; }
+        public string Operator { get; set; }
+    }
+    
     public class WithdrawalLimit
     {
         public int SiteId { get; set; }

@@ -169,9 +169,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetWithdrawalRequestComment(WithdrawalReq withdrawalReq)
+        public ApiResult<IEnumerable<WithdrawalComments>> GetWithdrawalRequestComment(WithdrawalReq withdrawalReq)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalComments>>();
             var comments = withdrawalBLL.GetWithdrawalRequestComment(withdrawalReq.TransId);
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;

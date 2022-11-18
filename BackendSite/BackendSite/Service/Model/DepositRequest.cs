@@ -274,20 +274,17 @@ namespace BackendSite.Service.Model
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
     }
-    public class Comments
+    public class DepositComments
     {
         private DateTimeOffset _createTime { get; set; }
-
-        public string Comment { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        public string Comment { get; set; }
         public int Action { get; set; }
-
-        public string ActionString { get; set; }
-
+        public string ActionName => Enum.GetName(typeof(DepositStatusEnum), Action);
         public decimal ActualDeposit { get; set; }
         public string Operator { get; set; }
     }
