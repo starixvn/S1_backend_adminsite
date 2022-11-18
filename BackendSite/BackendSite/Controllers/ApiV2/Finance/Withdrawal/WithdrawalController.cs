@@ -390,9 +390,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
+        public ApiResult<IEnumerable<WithdrawalComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalComments>>();
             var comments = _withdrawalBll.GetWithdrawalRequestComment(request.TransId);
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
