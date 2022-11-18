@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.Mpa.Marketing;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.Mpa.Marketing;
 
 namespace BackendSite.Service.BLL.Interface
 {
@@ -6,6 +7,6 @@ namespace BackendSite.Service.BLL.Interface
     {
         Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request);
 
-        Task<WithdrawalAmountDetailResponseWrapper> GetWithdrawalAmountDetailAsync(WithdrawalAmountRequest request);
+        List<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request ,out IPageInfo pageInfo);
     }
 }

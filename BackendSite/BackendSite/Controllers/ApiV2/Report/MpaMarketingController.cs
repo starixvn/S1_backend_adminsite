@@ -41,17 +41,17 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
-        public async Task<ApiListResult<WithdrawalAmountDetailData>> WithdrawalDetailsAsync(WithdrawalAmountRequest request)
+        public ApiListResult<WithdrawalAmountDetailData> WithdrawalDetailsAsync(WithdrawalAmountRequest request)
         {
             var apiResult = new ApiListResult<WithdrawalAmountDetailData>();
 
             try
             {
-                var result = await _marketingWithdrawalAmountBll.GetWithdrawalAmountDetailAsync(request);
-                apiResult.Data = result.Data;
-                apiResult.PageNumber = result.PageNumber;
-                apiResult.RowCount = result.RowCount;
-                apiResult.TotalPages = result.TotalPages;
+                var result =  _marketingWithdrawalAmountBll.GetWithdrawalAmountDetail(request, out var pageInfo);
+                apiResult.Data = result;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.RowCount = pageInfo.RowCount;
+                apiResult.TotalPages = pageInfo.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

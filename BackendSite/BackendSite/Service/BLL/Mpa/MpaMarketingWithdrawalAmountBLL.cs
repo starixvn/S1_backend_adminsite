@@ -4,7 +4,6 @@ using BackendSite.Service.Model.Mpa.Marketing;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
-using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -26,12 +25,12 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request)
         {
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.StartDate,
-                request.EndDate)).ToList();
+                request.EndDate)).Where(x=> request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRate(withSummaryResult, request);
 
             var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.CompareFromDate,
-                request.CompareToDate)).ToList();
+                request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
             await MultiplyExchangeRate(compareWithSummaryResult, request);
 
             var response = new WithdrawalAmountSummaryResponse
@@ -47,20 +46,48 @@ namespace BackendSite.Service.BLL.Mpa
             return response;
         }
 
-        public async Task<WithdrawalAmountDetailResponseWrapper> GetWithdrawalAmountDetailAsync(WithdrawalAmountRequest request)
+        public List<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request, out IPageInfo pageInfo)
         {
-            var pageInfo = new PageInfo();
+            pageInfo = new PageInfo();
             var key = request.GetRedisKey();
             var masterKey = $"MpaWithdrawalAmountDetail:{key}";
             var sortKey = $"{masterKey}:{request.OrderByProperty}:{request.OrderByDirection}";
             var cacheTime = TimeSpan.FromMinutes(5);
 
-            var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
-                    request.EndDate)).ToList();
+            if (_cacheHelper.KeyExists(masterKey))
+            {
+                //Sort
+                if (request.OrderBy && !_cacheHelper.KeyExists(sortKey))
+                {
+                    //取出全部資料重新排序
+                    var sortData = _cacheHelper.GetListByRange<WithdrawalAmountDetailData>(masterKey, 0, -1).OrderBy(request);
+                    //刪除舊資料重設cache
+                    if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
+                    {
+                        AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
+                    }
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, request.PageNumber, request.PageSize);
+                    return sortData.GetRange(sortIndex, sortCount);
+                }
 
-            await MultiplyExchangeRate(withDetails, request);
+                //Export
+                if (request.PageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<WithdrawalAmountDetailData>(masterKey, 0, request.PageNumber);
+                }
 
-            var currencyIdMapper = await _mapMpaCommonService.GetCurrencyIsoCodeMapper();
+                //Redis Pagination
+                var total = (int)_cacheHelper.GetListLength(masterKey);
+                var (startIndex, endIndex) = pageInfo.RedisPagination(total, request.PageNumber, request.PageSize);
+                return _cacheHelper.GetListByRange<WithdrawalAmountDetailData>(masterKey, startIndex, endIndex);
+            }
+
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
+                request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+
+            MultiplyExchangeRate(withDetails, request).Wait();
+
+            var currencyIdMapper = _mapMpaCommonService.GetCurrencyIsoCodeMapper().Result;
             var data = withDetails.GroupBy(x => new
             {
                 x.UserName,
@@ -75,16 +102,17 @@ namespace BackendSite.Service.BLL.Mpa
                 WithdrawalAmount = r.Sum(x => x.WithdrawalAmount),
             }).ToList();
 
-            var response = new WithdrawalAmountDetailResponseWrapper()
-            {
-                Data = data.Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize),
-                TotalPages = Convert.ToInt32(Math.Ceiling(data.Count / (double)request.PageSize)),
-                RowCount = data.Count,
-                PageNumber = request.PageNumber
-            };
+            var list = request.OrderBy ? data.OrderBy(request) : data;
+            AddCache(list, masterKey, sortKey, cacheTime, request.OrderBy);
 
-            return response;
+            //Export
+            if (request.PageNumber == -1 || data.Count == 0)
+            {
+                return list;
+            }
+
+            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            return list.GetRange(index, count);
         }
 
         private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source, WithdrawalAmountRequest request)
@@ -101,23 +129,48 @@ namespace BackendSite.Service.BLL.Mpa
 
         private static string GetPercent(decimal divisor, decimal dividend)
         {
-            var percent = 1 - (divisor / dividend);
+            decimal percent;
 
-            if (divisor < dividend) percent *= -1;
+            if (divisor < dividend)
+            {
+                percent = 1 - (divisor / dividend);
+                percent *= -1;
+            }
+            else
+            {
+                percent = 1 - (dividend / divisor);
+            }
 
             var result = percent.ToString("0%");
-
             return result;
         }
 
         private static string RegisteredDateFormatter(DateTime registeredDate)
         {
             var originRegisteredDate = registeredDate.ToString("dd-MM-yyyy hh:mm:ss");
-            //todo 
-            return originRegisteredDate;
+            var originMonthNum = originRegisteredDate.Substring(3, 2);
+
+            var monthText = originMonthNum switch
+            {
+                "01" => "Jan",
+                "02" => "Feb",
+                "03" => "Mar",
+                "04" => "Apr",
+                "05" => "May",
+                "06" => "jun",
+                "07" => "Jul",
+                "08" => "Aug",
+                "09" => "Sep",
+                "10" => "Oct",
+                "11" => "Nov",
+                "12" => "Dec",
+                _ => string.Empty
+            };
+
+            return $"{originRegisteredDate.Substring(0, 3)}{monthText}{originRegisteredDate.Substring(5, originRegisteredDate.Length - 5)}";
         }
 
-        private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(List<WithdrawalAmountDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

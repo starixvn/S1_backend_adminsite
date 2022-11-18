@@ -23,7 +23,7 @@ namespace BackendSite.Service.DAL
             var redisKey = $"MpaExchangeRate:{starTime:yyyy-MM-dd HH:mm:ss}:{endTime:yyyy-MM-dd HH:mm:ss}";
 
             var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
-                TimeSpan.FromHours(12),
+                TimeSpan.FromMinutes(10),
                 () => GetRateFromDb(starTime,endTime));
 
             return exchangeRate;
