@@ -257,9 +257,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                             && x.Channel != TransferChannelEnum.PSP)
                 .OrderBy(x => x.SettingStatus);
 
-            // withdrawal 有 verified approved 權限才顯示密碼
-            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal
-                && _permissionBll.CheckPermission(28, new []{65, 69}))
+            // 有 withdrawal / deposit approved 權限才顯示密碼
+            if ((request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
+                || (request.Purpose == TransferAccountPurposeEnum.Deposit && _permissionBll.CheckPermission(27, new []{65})))
             {
                 foreach (var d in data)
                 {
