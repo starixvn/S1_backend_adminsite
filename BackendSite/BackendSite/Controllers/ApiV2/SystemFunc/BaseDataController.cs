@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly MarketingBLL _marketingBll;
 		private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
@@ -94,6 +95,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 金額，取提款金流商列表以外非必填
             /// </summary>
             public decimal? Amount { get; set; }
+            /// <summary>
+            /// 取提款金流商列表以外非必填
+            /// </summary>
+            public int? CustId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -282,9 +287,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                             && x.Channel != TransferChannelEnum.PSP)
                 .OrderBy(x => x.SettingStatus);
 
-            // withdrawal 有 verified approved 權限才顯示密碼
-            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal
-                && _permissionBll.CheckPermission(28, new []{65, 69}))
+            // 有 withdrawal / deposit approved 權限才顯示密碼
+            if ((request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
+                || (request.Purpose == TransferAccountPurposeEnum.Deposit && _permissionBll.CheckPermission(27, new []{65})))
             {
                 foreach (var d in data)
                 {
@@ -322,7 +327,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var authData = _authorizeBll.GetAuthData();
             var result = _bankDetailBll
-                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount);
+                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId);
             
             return new ApiResult<IEnumerable<Pay>>
             {

@@ -61,6 +61,13 @@ namespace BackendSite.Service.BLL
                 () => _custInfoService.GetCustInfo(custId),
                 RedisDataBase.Shared);
         }
+        
+        public int GetPointLevelWithCache(int custId)
+        {
+            return _redisHelper.TryGetOrCreate($"PointLevel:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetPointLevel(custId),
+                RedisDataBase.Shared);
+        }
 
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
