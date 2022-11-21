@@ -5,6 +5,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
@@ -32,6 +33,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 		private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly Cryptor _cryptor;
 
         #endregion
 
@@ -53,6 +56,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
         #endregion
@@ -276,6 +281,21 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                             && x.AccountStatus == TransferAccountStatusEnum.Open
                             && x.Channel != TransferChannelEnum.PSP)
                 .OrderBy(x => x.SettingStatus);
+
+            // withdrawal 有 verified approved 權限才顯示密碼
+            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal
+                && _permissionBll.CheckPermission(28, new []{65, 69}))
+            {
+                foreach (var d in data)
+                {
+                    d.BankLoginAccount = _cryptor.Decrypt(d.BankLoginAccount);
+                    d.BankLoginPassword = _cryptor.Decrypt(d.BankLoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                    d.MobilePin = _cryptor.Decrypt(d.MobilePin);
+                    d.CorporateID = _cryptor.Decrypt(d.CorporateID);
+                }
+            }
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
