@@ -1353,6 +1353,13 @@ namespace BackendSite.Service.BLL
             return permissions.All(permission => userPermission?.Contains(permission) ?? false);
         }
         
+        public bool CheckPermissionAny(int menuId, IEnumerable<int> permissions)
+        {
+            var userPermission = GetUserPermissionByMenuId(menuId);
+
+            return permissions.Any(permission => userPermission?.Contains(permission) ?? false);
+        }
+        
         #endregion
 
         #endregion
