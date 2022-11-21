@@ -129,9 +129,9 @@ namespace BackendSite.Service.DAL
                 props);
         }
 
-        public IEnumerable<Comments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
+        public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
-            return _mainDbClient.Query<Comments>("WithdrawalRequestComment_Get_V2",
+            return _mainDbClient.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
                 new { WithdrawalId = withdrawalId, SiteId = siteId });
         }
 
