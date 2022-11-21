@@ -12,6 +12,7 @@ namespace BackendSite.Service.BLL
         private readonly BankDetailService bankDetailService;
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly IMemoryCache cache;
         private readonly ICacheHelper _redisHelper;
 
@@ -22,6 +23,7 @@ namespace BackendSite.Service.BLL
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
             cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -117,12 +119,19 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount)
+        public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
             var result = localBankService.GetBankInfoPayList(siteId)
                 .Where(x => x.SysId == sysId
                             && x.CurrencyId == currencyId
-                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
                 .GroupBy(x => x.PayId)
                 .Select(g =>
                 {

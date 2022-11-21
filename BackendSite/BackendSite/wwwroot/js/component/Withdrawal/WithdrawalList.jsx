@@ -253,7 +253,7 @@ import DateTimePicker from 'react-datetime';
                             var channelName = result.data.cryptoCurrency === result.data.network
                                 ? result.data.network
                                 : `${result.data.cryptoCurrency}-${result.data.network}`;
-                            await this.onGetPayList(result.data.currencyId, result.data.sysId, result.data.siteId, result.data.amount);
+                            await this.onGetPayList(result.data.currencyId, result.data.sysId, result.data.siteId, result.data.amount, result.data.custId);
                             await this.onGetEWalletPayList(result.data.currencyId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
                             await this.onGetCryptoPayList(result.data.currencyId, channelName, result.data.siteId, result.data.amount);
@@ -406,9 +406,9 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));
         }
 
-        async onGetPayList(currencyId, sysId, siteId, amount) {
+        async onGetPayList(currencyId, sysId, siteId, amount, custId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId, Amount: amount })
+            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId, Amount: amount, CustId: custId })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;

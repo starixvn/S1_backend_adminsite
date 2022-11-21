@@ -83,6 +83,7 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
             public string ChannelName { get; set; }
             public decimal Amount { get; set; }
+            public int? CustId { get; set; }
         }
 
         [HttpPost]
@@ -416,7 +417,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest req)
         {
             var result = bankDetailBLL
-                .GetBankInfoPayList(req.SiteId, req.CurrencyId, req.SysId, req.Amount);
+                .GetBankInfoPayList(req.SiteId, req.CurrencyId, req.SysId, req.Amount, req.CustId);
             
             return new ApiResult<IEnumerable<Pay>>
             {

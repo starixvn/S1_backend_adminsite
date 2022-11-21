@@ -89,6 +89,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 金額，取提款金流商列表以外非必填
             /// </summary>
             public decimal? Amount { get; set; }
+            /// <summary>
+            /// 取提款金流商列表以外非必填
+            /// </summary>
+            public int? CustId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -297,7 +301,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var authData = _authorizeBll.GetAuthData();
             var result = _bankDetailBll
-                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount);
+                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId);
             
             return new ApiResult<IEnumerable<Pay>>
             {
