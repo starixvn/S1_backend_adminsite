@@ -35,16 +35,6 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
-        public IActionResult RebateInfoReport()
-        {
-            return View();
-        }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
-        public IActionResult RebateLogReport()
-        {
-            return View();
-        }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
         public IActionResult PendingBonus()
         {
@@ -58,12 +48,6 @@ namespace BackendSite.Controllers
         }
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/BannerManage" })]
         public IActionResult BannerManage()
-        {
-            return View();
-        }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
-        public IActionResult BonusImport()
         {
             return View();
         }
@@ -103,11 +87,7 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateMangetment" })]
-        public IActionResult VipRebateMangetment()
-        {
-            return View();
-        }
+
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipRebateInfoReport" })]
         public IActionResult VipRebateInfoReport()
         {
@@ -173,5 +153,18 @@ namespace BackendSite.Controllers
         {
             return View();
         }
+        
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/SlotGamesManagement" })]
+        public IActionResult SlotGamesManagement()
+		{
+            return View();
+        }     
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/CategoryManagement" })]
+        public IActionResult CategoryManagement()
+        {
+            return View();
+        }  
+
     }
 }

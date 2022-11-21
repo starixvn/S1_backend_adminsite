@@ -43,6 +43,7 @@ namespace BackendSite
             services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
+            services.AddSingleton<Cryptor>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -78,7 +79,9 @@ namespace BackendSite
 
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ReferralManagementDecorator>();
+            services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();

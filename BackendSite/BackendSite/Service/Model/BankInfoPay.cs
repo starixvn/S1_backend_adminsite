@@ -46,17 +46,4 @@
         /// </summary>
         public int ChannelId { get; set; }
     }
-    
-    public class PayComparer : IEqualityComparer<Pay>
-    {
-        public bool Equals(Pay t1, Pay t2)
-        {
-            return (t1.PayId == t2.PayId);
-        }
-
-        public int GetHashCode(Pay t)
-        {
-            return t.ToString().GetHashCode();
-        }
-    }
 }

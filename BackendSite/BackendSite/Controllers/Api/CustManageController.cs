@@ -563,29 +563,6 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        /// <summary>
-        /// CustManage/GetRebateInfo 取得客戶返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Rebate Info
-        /// 
-        /// </remarks>
-        /// <param name="custBonusReq"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
-        [HttpPost]
-        public ApiResult GetRebateInfoByCust(CustBonusReq custBonusReq)
-        {
-            var data = _paymentBll.GetRebateInfoByCust(custBonusReq.CustId);
-            return new ApiResult<IEnumerable<RebateInfo>>
-            {
-                Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
         #endregion
 
         #region CustInfo > Switch On IsKyc、IsRisk、PhoneVerified、EmailVerified
@@ -1707,8 +1684,8 @@ namespace BackendSite.Controllers.Api
             var apiListResult = new ApiListResult<CustBankInfoLog>();
             apiListResult.ErrorCode = 0;
             var bankInfoPay = _custInfoBll.GetCustBankInfoLogList(bankInfoLogListReq.CustId,
-                1000,
                 1,
+                1000,
                 out var totalPages,
                 out var rowCount);
             apiListResult.Data = bankInfoPay;
@@ -1845,11 +1822,9 @@ namespace BackendSite.Controllers.Api
                     case PromotionTypeEnum.FstDeposit:
                     case PromotionTypeEnum.ReDeposit:
                     case PromotionTypeEnum.FreeBet:
-                    case PromotionTypeEnum.WalletBonus:
-                    case PromotionTypeEnum.Rebate:
                     case PromotionTypeEnum.Cashback:
-                    case PromotionTypeEnum.StaticPage:
-                    case PromotionTypeEnum.RetentionBonus:
+                    case PromotionTypeEnum.SpecialBonus:
+                    case PromotionTypeEnum.RetentionFreeBet:
 
                         //確認剩餘本金
                         var refundAmount = remainingBonus - data.BonusAmount;
@@ -2095,7 +2070,7 @@ namespace BackendSite.Controllers.Api
                 if (data.ThirdTimeCall != string.Empty)
                     data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20, data.ThirdTimeCall.Length - 20)}";
             }
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -2581,7 +2556,7 @@ namespace BackendSite.Controllers.Api
                 {
                     data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                stream = _excelBll.Export(exportData);
+                stream = _excelBll.ExportV2(exportData);
             }
             else
             {
@@ -2590,7 +2565,7 @@ namespace BackendSite.Controllers.Api
                 {
                     data.RegTime = new DateTimeOffset(data.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 }
-                stream = _excelBll.Export(exportData);
+                stream = _excelBll.ExportV2(exportData);
             }
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Registration_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
 using BackendSite.Service.Library;
-using Microsoft.Extensions.DependencyInjection;
-using System.Dynamic;
 
 namespace BackendSite.Service.DAL
 {

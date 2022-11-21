@@ -118,7 +118,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, TimeSpan.Zero);
             }
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "DepositTimeReport");
         }
 

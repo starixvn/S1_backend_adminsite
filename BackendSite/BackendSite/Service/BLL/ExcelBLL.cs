@@ -94,7 +94,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
+        public virtual byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -118,6 +118,7 @@ namespace BackendSite.Service.BLL
 
         public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
             var ws = p.Workbook.Worksheets.Add(nameof(t));
@@ -148,7 +149,9 @@ namespace BackendSite.Service.BLL
             p.Save();
             return ms.ToArray();
         }
-
+        
+        
+        
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,

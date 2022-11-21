@@ -308,53 +308,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
-        /// <summary>
-        /// GetAllData/GetAllBankCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            var data = bankInfoOff
-                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetAllCalCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
-            var data = bankInfoOff
-                .Select(x => new CalCodeModel
-                {
-                    Id = x.Id,
-                    SysId = x.SysId,
-                    AccountName = x.AccountName,
-                    AccountNo = x.AccountNo,
-                    BankCode = x.BankCode , 
-                    SiteName = x.SiteName
-                });
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
 
         //==============================================================================================================================================
         // TP 相關
@@ -569,14 +522,22 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
-                Data = _bonusManageBll.GetPromotionType(request.isPayout),
+                Data = _bonusManageBll.GetPromotionType(request.isPayout, request.isNew),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
         public class GetPromotionTypeRequest
         {
+            /// <summary>
+            /// Bonus Payout使用
+            /// </summary>
             public bool isPayout { get; set; } = false;
+
+            /// <summary>
+            /// 新後台Bonus Manage使用，排除Rebate
+            /// </summary>
+            public bool isNew { get; set; } = true;
         }
 
         #endregion

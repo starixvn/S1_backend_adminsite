@@ -259,7 +259,8 @@ namespace BackendSite.Controllers.Api
                 else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
+                    var bankInfoOff = bankDetailBLL
+                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
                         .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
 
                     if (bankInfoOff != null)
@@ -395,15 +396,20 @@ namespace BackendSite.Controllers.Api
 
         //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(GetPayListRequest req)
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(GetPayListRequest req)
         {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = bankDetailBLL.GetBankInfoOff(req.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == req.CurrencyId && (x.Purpose & 2) > 0)
-                .OrderBy(x => x.BSort);
-            apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var data = bankDetailBLL
+                .GetOfflineBankAccount(req.SiteId, req.CurrencyId)
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel != TransferChannelEnum.PSP)
+                .OrderBy(x => x.SettingStatus);
+            
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = data,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
         }
 
         [HttpPost]
@@ -910,7 +916,7 @@ namespace BackendSite.Controllers.Api
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
