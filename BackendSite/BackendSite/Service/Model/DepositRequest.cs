@@ -107,6 +107,7 @@ namespace BackendSite.Service.Model
         public int VipLevel { set; get; }
         public string Operator { set; get; }
         public string Agent { set; get; }
+        public string DepositFrom { set; get; }
     }
 
     public class DepositInfoForExport
