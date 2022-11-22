@@ -1885,10 +1885,7 @@ namespace BackendSite.Service.BLL
                             .Where(y => y.TransferType == x)
                             .Sum(y => y.Summary);
                         
-                        return new TransferTypeSummary
-                        {
-                            Summary = sum
-                        };
+                        return sum;
                     });
 
                     var accountInfo = report.AccountInfoList.FirstOrDefault(x => x.FinancialId == g.Key.FinancialId);
@@ -1924,12 +1921,9 @@ namespace BackendSite.Service.BLL
                     var details =
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
-                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            var sum = g.Sum(y => y.Details[x.ToString()]);
                             
-                            return new TransferTypeSummary
-                            {
-                                Summary = sum
-                            };
+                            return sum;
                         });
                     
                     return new BankFinancialReportAgentSummary
@@ -1960,12 +1954,9 @@ namespace BackendSite.Service.BLL
                     var details =
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
-                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            var sum = g.Sum(y => y.Details[x.ToString()]);
                             
-                            return new TransferTypeSummary
-                            {
-                                Summary = sum
-                            };
+                            return sum;
                         });
                     
                     return new BankFinancialReportChannelSummary
@@ -1996,12 +1987,9 @@ namespace BackendSite.Service.BLL
                     var details =
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
-                            var sum = g.Sum(y => y.Details[x.ToString()].Summary);
+                            var sum = g.Sum(y => y.Details[x.ToString()]);
                             
-                            return new TransferTypeSummary
-                            {
-                                Summary = sum
-                            };
+                            return sum;
                         });
                     
                     var d = g.First();

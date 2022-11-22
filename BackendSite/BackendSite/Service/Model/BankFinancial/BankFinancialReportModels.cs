@@ -75,14 +75,9 @@ public class BankFinancialReportResult
     public IEnumerable<FinancialAccountOpenBalanceResult> AccountInfoList { get; set; }
 }
 
-public class TransferTypeSummary
-{
-    public decimal Summary { get; set; }
-}
-
 public class BankFinancialReportSummaryBaseModel
 {
-    public Dictionary<string, TransferTypeSummary> Details { get; set; }
+    public Dictionary<string, decimal> Details { get; set; }
     public decimal Fees { get; set; }
     public decimal? OpenBalance { get; set; }
     public decimal? ClosingBalance { get; set; }
