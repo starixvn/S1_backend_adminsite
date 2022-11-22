@@ -24,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly PendingFundBLL _pendingFundBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
-        private readonly AuthorizeByPermissionBLL _authorizeByPermissionBll;
+        private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<int, List<int>> _usableActionType;
         
         private readonly int _mainWalletType;
@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _pendingFundBll = provider.GetRequiredService<PendingFundBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _authorizeByPermissionBll = provider.GetRequiredService<AuthorizeByPermissionBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _mainWalletType = configuration.GetValue<int>("MainWalletType");
             _usableActionType = new Dictionary<int, List<int>>
             {
@@ -526,7 +526,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         private List<int> GetUsableActionButton(DepositRequest depositRequest)
         {
-            var permissionList = _authorizeByPermissionBll.GetUserPermission(27);
+            var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
             var usableList = _usableActionType[depositRequest.Status];
             var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
                     
