@@ -3,6 +3,13 @@ import React from 'react';
 import { Dropdown } from 'semantic-ui-react';
 
 (function($, React, ReactDOM, i18n, axios, moment) {
+    const BankCardStatus = {
+        0: "Initial",
+        1: "Open",
+        2: "Suspend",
+        3: "Closed",
+        4: "Maintenance"
+    };
 
     class DepositSubmissionForm extends React.Component {
         constructor(props) {
@@ -106,7 +113,7 @@ import { Dropdown } from 'semantic-ui-react';
                             const options = result.data.map(d => ({
                                 "key": d.accountNo + d.sysId,
                                 "value": d.accountNo,
-                                "text": d.accountNo + '   (' + d.bankCode + ' - ' + d.accountName + ') ',
+                                "text": `[${BankCardStatus[d.settingStatus]}] ` + d.accountNo + '   (' + d.bankCode + ' - ' + d.accountName + ') ',
                                 "accountname": d.accountName,
                                 "accountno": d.accountNo,
                                 "accountstatus": d.accountStatus,

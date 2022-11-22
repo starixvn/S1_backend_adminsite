@@ -11,11 +11,6 @@ namespace BackendSite.Service.BLL
         private readonly AdminUserService adminUserService;
         private readonly Tools tools;
         private readonly IHttpContextAccessor httpContextAccessor;
-        
-        public AuthorizeBLL()
-        {
-
-        }
 
         public AuthorizeBLL(IHttpContextAccessor httpContextAccessor, AdminUserService adminUserService, Tools tools)
         {

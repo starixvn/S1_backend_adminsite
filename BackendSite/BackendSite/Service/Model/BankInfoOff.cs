@@ -39,6 +39,7 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
+        public TransferChannelEnum Channel { get; set; }
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public string AccountCode { get; set; }
@@ -62,6 +63,13 @@ namespace BackendSite.Service.Model
         public int SysId { get; set; }
         public string BankCode { get; set; }
         public string BankName { get; set; }
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
     }
     
     public class BankCodeModel

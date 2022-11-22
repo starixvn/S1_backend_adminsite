@@ -70,7 +70,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans) > 0;
             if (result)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -113,7 +113,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans) > 0;
             if (result)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -158,7 +158,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_PayCurrency_Set", props, conn, trans) > 0;
             if (result)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -201,7 +201,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans) > 0;
             if (result)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -215,9 +215,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int payId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             var SpName = "Admin_BankInfoSys_Get";
-            return conn.Query<PayListBankInfoSys>(SpName, new {PayId = payId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<PayListBankInfoSys>(SpName, new {PayId = payId });
         }
 
         public void UpdateBankInfo(int payId, int sysId, int status, string @operator)

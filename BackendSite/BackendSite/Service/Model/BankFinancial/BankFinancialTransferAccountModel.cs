@@ -69,6 +69,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string BankLoginUrl { get; set; }
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
@@ -79,6 +83,11 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 初始金額
         /// </summary>
         public decimal InitialAmount { get; set; }
+
+        /// <summary>
+        /// 讀寫 初始金額計算時間
+        /// </summary>
+        public DateTimeOffset InitialTime { get; set; }
 
         /// <summary>
         /// 讀寫 超過餘額警示

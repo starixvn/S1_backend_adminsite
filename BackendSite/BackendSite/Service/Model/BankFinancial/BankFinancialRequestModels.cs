@@ -82,6 +82,11 @@ namespace BackendSite.Service.Model.BankFinancial
         public decimal InitialAmount { get; set; }
 
         /// <summary>
+        /// 讀寫 初始金額計算時間
+        /// </summary>
+        public DateTimeOffset InitialTime { get; set; }
+
+        /// <summary>
         /// 讀寫 超過餘額警示
         /// </summary>
         public decimal MaxBalanceAlertAmount { get; set; }
@@ -104,6 +109,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string BankLoginUrl { get; set; }
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
     }
     
     public class GetAgentListRequest

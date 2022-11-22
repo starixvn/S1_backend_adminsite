@@ -144,15 +144,19 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            
+            var offset = request.StartDate.Offset;
             var exportData = _referralManagementBll.GetReferralCustListExport(
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.UserName,
                 request.CurrencyId,
                 startTime,
                 endTime);
-
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            foreach (var item in exportData)
+            {
+                item.RegTime = item.RegTime.ToOffset(offset);
+                item.RewardTime = item.RewardTime?.ToOffset(offset);
+            }
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "ReferralReport");
         }
     }

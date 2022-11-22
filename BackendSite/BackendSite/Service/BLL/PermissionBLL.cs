@@ -7,26 +7,30 @@ namespace BackendSite.Service.BLL
 {
     public class PermissionBLL
     {
-        private readonly AdminGroupService adminGroupService;
-        private readonly PermissionService permissionService;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly AdminUserService adminUserService;
-        private readonly ServerInfoService serverInfoService;
-        private readonly AdminService adminService;
+        private readonly AdminGroupService _adminGroupService;
+        private readonly PermissionService _permissionService;
+        private readonly AuthorizeBLL _authorizeBll;
+        private readonly AdminUserService _adminUserService;
+        private readonly ServerInfoService _serverInfoService;
+        private readonly AdminService _adminService;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly NewAdminUserService _newAdminUserService;
 
-        public PermissionBLL(PermissionService permissionService, AdminGroupService adminGroupService, AuthorizeBLL authorizeBLL, AdminUserService adminUserService, ServerInfoService serverInfoService, AdminService adminService)
+        public PermissionBLL(IServiceProvider provider)
         {
-            this.permissionService = permissionService;
-            this.adminGroupService = adminGroupService;
-            this.authorizeBLL = authorizeBLL;
-            this.adminUserService = adminUserService;
-            this.serverInfoService = serverInfoService;
-            this.adminService = adminService;
+            _permissionService = provider.GetRequiredService<PermissionService>();
+            _adminGroupService = provider.GetRequiredService<AdminGroupService>();
+            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _adminUserService = provider.GetRequiredService<AdminUserService>();
+            _serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _adminService = provider.GetRequiredService<AdminService>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _newAdminUserService = provider.GetRequiredService<NewAdminUserService>();
         }
 
         public IEnumerable<FuncPermissionModel> GetPermissionJSONData()
         {
-            var result = JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(permissionService.GetPermissionJSONData());
+            var result = JsonConvert.DeserializeObject<IEnumerable<FuncPermissionModel>>(_permissionService.GetPermissionJSONData());
             return result;
         }
 
@@ -60,20 +64,20 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GroupPermisison> GetUserPermission(int GroupSEQ)
         {
-            var permission = adminGroupService.GetGroupPermissions(GroupSEQ);
+            var permission = _adminGroupService.GetGroupPermissions(GroupSEQ);
             return permission;
         }
 
         public GroupPermisison GetUserPermission(int GroupSEQ, string FuncKey)
         {
-            var permission = adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
+            var permission = _adminGroupService.GetGroupPermissions(GroupSEQ)?.FirstOrDefault(x => string.Equals(x.FuncKey, FuncKey, StringComparison.OrdinalIgnoreCase));
             return permission;
         }
 
         public IEnumerable<FuncPermissionModel> GetGroupPermissionModel(int GroupSEQ)
         {
             var result = GetPermissionJSONData();
-            var permissions = adminGroupService.GetGroupPermissions(GroupSEQ);
+            var permissions = _adminGroupService.GetGroupPermissions(GroupSEQ);
             if (permissions.Any())
             {
                 foreach (var item in result)
@@ -182,8 +186,8 @@ namespace BackendSite.Service.BLL
 
         public bool CheckPermission(string FuncKey, string SubFuncKey)
         {
-            var authData = authorizeBLL.GetAuthData();
-            var loginUser = adminUserService.GetUser(authData.UserId);
+            var authData = _authorizeBll.GetAuthData();
+            var loginUser = _adminUserService.GetUser(authData.UserId);
 
             var result = false;
             if (loginUser.IsSuper)
@@ -224,8 +228,8 @@ namespace BackendSite.Service.BLL
 
         public bool CheckPermission(int GroupSEQ, string FuncKey, string SubFuncKey)
         {
-            var authData = authorizeBLL.GetAuthData();
-            var loginUser = adminUserService.GetUser(authData.UserId);
+            var authData = _authorizeBll.GetAuthData();
+            var loginUser = _adminUserService.GetUser(authData.UserId);
 
             var result = false;
             var permissions = GetUserPermission(GroupSEQ);
@@ -252,8 +256,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<string> GetSubFunckeys(string FuncKey)
         {
-            var authData = authorizeBLL.GetAuthData();
-            var loginUser = adminUserService.GetUser(authData.UserId);
+            var authData = _authorizeBll.GetAuthData();
+            var loginUser = _adminUserService.GetUser(authData.UserId);
             IEnumerable<string> result = null;
             if (loginUser.IsSuper)
             {
@@ -303,8 +307,8 @@ namespace BackendSite.Service.BLL
         {
             var result = false;
 
-            var authData = authorizeBLL.GetAuthData();
-            var loginUser = adminUserService.GetUser(authData.UserId);
+            var authData = _authorizeBll.GetAuthData();
+            var loginUser = _adminUserService.GetUser(authData.UserId);
 
             if (loginUser.IsSuper)
             {
@@ -327,14 +331,14 @@ namespace BackendSite.Service.BLL
         #region RolePermission
         public IEnumerable<RolePermission> GetRolePermission(int role)
         {
-            return permissionService.GetRolePermission(role);
+            return _permissionService.GetRolePermission(role);
         }
         public IEnumerable<UserAllPremission> GetUserAllPremission(int? role, int userId, int siteId)
         {
             List<UserAllPremission> userAllPremission = new List<UserAllPremission>();
             if (role != null)
             {
-                var rolePermission = permissionService.GetRolePermission(role.Value).ToList();
+                var rolePermission = _permissionService.GetRolePermission(role.Value).ToList();
                 rolePermission.ForEach(x =>
                 {
                     var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
@@ -342,7 +346,7 @@ namespace BackendSite.Service.BLL
                 });
             }
 
-            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
+            var Permission = _permissionService.GetUserPermissionData(userId, siteId).ToList();
             Permission.ForEach(x =>
             {
                 var permission = JsonConvert.DeserializeObject<List<int>>(x.Permission);
@@ -370,8 +374,8 @@ namespace BackendSite.Service.BLL
         {
             NewPermission result = new NewPermission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu();
+            var permissionList = _adminService.GetAllAdminPermission();
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             if (loginUser.IsSuper)
@@ -398,7 +402,7 @@ namespace BackendSite.Service.BLL
                 }
                 //permissionReslut.AddRange(GetAllRolePermissionMenu(0, heirIdList, menuList, permissionList));
                 permissionReslut.AddRange(GerPermission(PermissionTypeEnum.AddRole, 0, heirIdList, menuList, permissionList));
-                var userSiteList = serverInfoService.GetSiteList().ToList();
+                var userSiteList = _serverInfoService.GetSiteList().ToList();
                 result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
                 result.Permission = permissionReslut;
             }
@@ -454,11 +458,11 @@ namespace BackendSite.Service.BLL
         {
             RoleData result = new RoleData();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu();
+            var permissionList = _adminService.GetAllAdminPermission();
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
-            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            var rolePermissions = _permissionService.GetRolePermission(role).ToList();
             if (loginUser.IsSuper)
             {
                 foreach (var funcData in assignFuncDatas)
@@ -494,7 +498,7 @@ namespace BackendSite.Service.BLL
                 }
                 //permissionReslut.AddRange(GetRolePermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions));
                 permissionReslut.AddRange(GerPermission(PermissionTypeEnum.UpdateRole, 0, heirIdList, menuList, permissionList, rolePermissions));
-                var userSiteList = serverInfoService.GetSiteList().ToList();
+                var userSiteList = _serverInfoService.GetSiteList().ToList();
                 result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
                 result.Permission = permissionReslut;
             }
@@ -579,23 +583,23 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<AdminRole> GetAdminRole()
         {
-            return permissionService.GetAdminRole();
+            return _permissionService.GetAdminRole();
         }
         public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId, string Operator)
         {
-            return permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId, Operator);
+            return _permissionService.AddAdminRole(siteId, roleName, remark, currencyList, permission, userId, Operator);
         }
         public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
-            return permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission, Operator);
+            return _permissionService.UpdateAdminRole(role, roleName, remark, currencyList, permission, Operator);
         }
         public void DeleteAdminRole(int role)
         {
-            permissionService.DeleteAdminRole(role);
+            _permissionService.DeleteAdminRole(role);
         }
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
         {
-            var result = permissionService.GetRoleList(roleName, siteId).ToList();
+            var result = _permissionService.GetRoleList(roleName, siteId).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
@@ -615,11 +619,11 @@ namespace BackendSite.Service.BLL
         #region UserPermission
         public IEnumerable<UserPermissionData> GetUserPermissionData(int userId,int siteId)
         {
-            return permissionService.GetUserPermissionData(userId, siteId);
+            return _permissionService.GetUserPermissionData(userId, siteId);
         }
         public IEnumerable<UserList> GetAdminUserList(string userName,int siteId)
         {
-            var result = permissionService.GetAdminUserList(userName, siteId).ToList();
+            var result = _permissionService.GetAdminUserList(userName, siteId).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
@@ -637,7 +641,7 @@ namespace BackendSite.Service.BLL
         {
             if (loginUser.IsSuper)
             {
-                var userSiteList = serverInfoService.GetSiteList().ToList();
+                var userSiteList = _serverInfoService.GetSiteList().ToList();
                 return userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
             }
             else
@@ -649,11 +653,11 @@ namespace BackendSite.Service.BLL
         {
             AddUserPremission result = new AddUserPremission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu();
+            var permissionList = _adminService.GetAllAdminPermission();
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
-            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            var rolePermissions = _permissionService.GetRolePermission(role).ToList();
             if (loginUser.IsSuper)
             {
                 foreach (var funcData in assignFuncDatas)
@@ -763,19 +767,19 @@ namespace BackendSite.Service.BLL
         public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission, Operator);
+            return _permissionService.AddAdminUser(siteId, role, userName, password, currencyList, userPermission, Operator);
         }
 
         public UpdateUserPermission GetUpdateAdminUser(int role, int userId,int siteId, AdminUserV2 loginUser)
         {
             UpdateUserPermission result = new UpdateUserPermission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu();
+            var permissionList = _adminService.GetAllAdminPermission();
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
-            var rolePermissions = permissionService.GetRolePermission(role).ToList();
-            var Permission = permissionService.GetUserPermissionData(userId, siteId).ToList();
+            var rolePermissions = _permissionService.GetRolePermission(role).ToList();
+            var Permission = _permissionService.GetUserPermissionData(userId, siteId).ToList();
             if (loginUser.IsSuper)
             {
                 foreach (var funcData in assignFuncDatas)
@@ -821,7 +825,7 @@ namespace BackendSite.Service.BLL
                     });
                 }
                 permissionReslut.AddRange(GetUserPermissionMenu(0, heirIdList, menuList, permissionList, rolePermissions,null, Permission));
-                var userSiteList = serverInfoService.GetSiteList().ToList();
+                var userSiteList = _serverInfoService.GetSiteList().ToList();
                 result.CurrencyList = userSiteList.FirstOrDefault(x => x.SiteId == loginUser.SiteId).ICurrencyList;
                 result.Permission = permissionReslut;
             }
@@ -915,26 +919,26 @@ namespace BackendSite.Service.BLL
         public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var userPermission = GetUserPermission(role, permission);
-            return permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission, Operator);
+            return _permissionService.UpdateAdminUser(siteId, userId, role, currencyList, userPermission, Operator);
         }
         public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq>input)
         {
-            return permissionService.SetAdminUserPassword(input);
+            return _permissionService.SetAdminUserPassword(input);
         }
         public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
-            return permissionService.SetAdminUserStatus(input);
+            return _permissionService.SetAdminUserStatus(input);
         }
         #endregion
 
         #region AssignBrand
         public IEnumerable<AdminBrandRole> GetAdminBrandRole(int role)
         {
-            return permissionService.GetAdminBrandRole(role);
+            return _permissionService.GetAdminBrandRole(role);
         }
         public IEnumerable<AdminBrandData> GetAssignBrand(IEnumerable<int> selectSite, string userName)
         {
-            var assignBrand = permissionService.GetAssignBrand(selectSite, userName).ToList();
+            var assignBrand = _permissionService.GetAssignBrand(selectSite, userName).ToList();
 
             var assignBrandData = assignBrand.GroupBy(x => (x.UserId, x.UserName), (key, value) =>
              new AdminBrandData { UserId = key.UserId,
@@ -948,11 +952,11 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<UserBrand> GetUserBrand(int userId)
         {
-            return permissionService.GetUserBrand(userId);
+            return _permissionService.GetUserBrand(userId);
         }
         public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
-            return permissionService.SetAdminBrand(input, userName, beforeUserBrands, afterUserBrands);
+            return _permissionService.SetAdminBrand(input, userName, beforeUserBrands, afterUserBrands);
         }
         #endregion
 
@@ -1288,7 +1292,7 @@ namespace BackendSite.Service.BLL
         private List<SetPermission> GetUserPermission(int role, List<SetPermission> permission)
         {
             List<SetPermission> userPermission = new List<SetPermission>();
-            var rolePermissions = permissionService.GetRolePermission(role).ToList();
+            var rolePermissions = _permissionService.GetRolePermission(role).ToList();
             permission.ForEach(x =>
             {
                 if (rolePermissions.Exists(y => y.MenuId == x.DisPlayKey))
@@ -1316,7 +1320,50 @@ namespace BackendSite.Service.BLL
             return userPermission;
         }
         #endregion
+        
+        #region Check Permission New
 
-        #endregion   
+        public IEnumerable<UserAllPremission> GetUserAllPermission()
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var siteId = _newAuthorizeBll.CheckBrand();
+            var loginUser = _newAdminUserService.GetUserV2(authData.UserId, siteId);
+            
+            if (loginUser.Role == null)
+            {
+                return GetUserAllPremission(null, authData.UserId, siteId);
+            }
+            
+            var userRole = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.Role);
+            
+            return GetUserAllPremission(userRole?.FirstOrDefault(), authData.UserId, siteId);
+        }
+        
+        public IEnumerable<int> GetUserPermissionByMenuId(int menuId)
+        {
+            var permissions = GetUserAllPermission();
+            
+            return permissions.FirstOrDefault(x => x.MenuId == menuId)?.Permission;
+        }
+
+        public bool CheckPermission(int menuId, IEnumerable<int> permissions, bool matchAll = true)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var siteId = _newAuthorizeBll.CheckBrand();
+            var loginUser = _newAdminUserService.GetUserV2(authData.UserId, siteId);
+
+            if (loginUser.IsSuper)
+                return true;
+            
+            var userPermission = GetUserPermissionByMenuId(menuId);
+
+            return matchAll
+                ? permissions.All(permission => userPermission?.Contains(permission) ?? false)
+                : permissions.Any(permission => userPermission?.Contains(permission) ?? false);
+        }
+        
+        #endregion
+
+        #endregion
     }
 }

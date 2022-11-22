@@ -619,7 +619,7 @@ namespace BackendSite.Controllers.Api
                 if (data.EndFlowTime != null)
                     data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DepositTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         [HttpPost]

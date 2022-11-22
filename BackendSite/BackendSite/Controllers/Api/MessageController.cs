@@ -628,7 +628,7 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportSendMessageBatchResultReport(int BatchId)
         {
             var data = messageBLL.GetBatchMessageSendLog(BatchId);
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return File(stream,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
