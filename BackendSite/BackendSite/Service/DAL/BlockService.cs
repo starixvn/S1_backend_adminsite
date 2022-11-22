@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("IP", null);
-            return await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+            return await _mainDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
         }
 
         public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
