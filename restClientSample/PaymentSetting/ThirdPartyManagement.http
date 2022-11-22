@@ -34,6 +34,21 @@ Content-Type: application/json
     "status": 2
 }
 
+###
+# 設定支付三方後台登入資訊
+POST {{url}}/apiV2/ThirdPartyManagement/SetPayListLoginInfo HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "payId": 5,
+    "loginUrl": "https://www.google.com.tw/",
+    "loginAccount": "testaccount",
+    "loginPassword": "testpw123wer",
+    "transferPin": "",
+    "loginPin": ""
+}
+
 
 ###
 # 取得支付三方設定列表

@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Fields
 
         private readonly PaymentManageBLL _paymentManageBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly Cryptor _cryptor;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -22,6 +26,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         public ThirdPartyManagementController(IServiceProvider provider)
         {
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -45,6 +52,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public int SiteId { get; set; }
             public int PayId { get; set; }
             public PayListStatusEnum Status { get; set; }
+        }
+        
+        public class SetPayListLoginInfoRequest
+        {
+            public int SiteId { get; set; }
+            public int PayId { get; set; }
+            public string LoginUrl { get; set; }
+            public string LoginAccount { get; set; }
+            public string LoginPassword { get; set; }
+            public string TransferPin { get; set; }
+            public string LoginPin { get; set; }
         }
         
         public class UpdateBankInfoByPayIdRequest
@@ -101,6 +119,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             var result = _paymentManageBll.GetPayList(request.SiteId)
                 .Where(x => x.PayStatus == PayListStatusEnum.Enable);
 
+            if (_permissionBll.CheckPermission(39, new []{15}))
+            {
+                foreach (var d in result)
+                {
+                    d.LoginAccount = _cryptor.Decrypt(d.LoginAccount);
+                    d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                }
+            }
+
             return new ApiResult<IEnumerable<PayListInfo>>
             {
                 Data = result,
@@ -111,7 +140,30 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult SetPayListStatus(SetPayListStatusRequest request)
         {
-            var success = _paymentManageBll.SetPayListStatus(request.SiteId, request.PayId, request.Status);
+            var authData = _authorizeBll.GetAuthData();
+            var success = _paymentManageBll.SetPayListStatus(request.SiteId, request.PayId, request.Status, authData.UserName);
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
+        }
+        
+        [HttpPost]
+        public ApiResult SetPayListLoginInfo(SetPayListLoginInfoRequest request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var success = _paymentManageBll.SetPayListLoginInfo(new SetPayListLoginInfoParams
+            {
+                SiteId = request.SiteId,
+                PayId = request.PayId,
+                LoginUrl = request.LoginUrl,
+                LoginAccount = _cryptor.Encrypt(request.LoginAccount),
+                LoginPassword = _cryptor.Encrypt(request.LoginPassword),
+                LoginPin = _cryptor.Encrypt(request.LoginPin),
+                TransferPin = _cryptor.Encrypt(request.TransferPin),
+                Operator = authData.UserName
+            });
             
             return new ApiResult
             {
@@ -135,9 +187,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult SetBankStatus(UpdateBankInfoByPayIdRequest request)
         {
-            var user = User.Identity.Name;
+            var authData = _authorizeBll.GetAuthData();
             var result = _paymentManageBll
-                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, user);
+                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, authData.UserName);
 
             return new ApiResult
             {
