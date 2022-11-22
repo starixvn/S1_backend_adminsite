@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-   // [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AppLinkController : ControllerBase
@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > App Link Management > Select [Site Name]
         /// </remarks>
         /// <param name="request"></param>
-       // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<AppLinkTable>> GetList(GetAppLinkTableReq request)
         {
@@ -63,7 +63,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > App Link Management > Select [Site Name] > [Edit] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-       // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 3 })]
         [HttpPost]
         public async Task<ApiResult> Set(SetAppLinkReq request)
         {
