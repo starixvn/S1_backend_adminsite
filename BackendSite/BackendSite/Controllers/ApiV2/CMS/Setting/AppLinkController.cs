@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+   // [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AppLinkController : ControllerBase
@@ -41,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > App Link Management > Select [Site Name]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/AppLinkManagement" })]
+       // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<AppLinkTable>> GetList(GetAppLinkTableReq request)
         {
@@ -63,15 +63,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > App Link Management > Select [Site Name] > [Edit] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/AppLinkManagement" })]
+       // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 65, 3 })]
         [HttpPost]
-        public ApiResult Set(SetAppLinkReq request)
+        public async Task<ApiResult> Set(SetAppLinkReq request)
         {
             var apiResult = new ApiResult();
             try
             {
-                if (_appLinkTableBll.SetAppLink(request.SiteId, (int)request.AppType, request.Domain, (int)request.ProtocolType,
-                    _authorizeBll.GetAuthData().UserName) > 0)
+                if (await _appLinkTableBll.SetAppLink(request.SiteId, request.AppType, request.Domain, request.ProtocolType,
+                    _authorizeBll.GetAuthData().UserName))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
