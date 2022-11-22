@@ -103,19 +103,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         public class CustIdWithDateRangeRequest : CustIdRequest
         {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         /// <summary>
@@ -302,46 +291,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public bool ExportTransferWallet { get; set; } = false;
         }
 
-        public class ExportCustInfoListRequest
-        {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? BirDate { get; set; }
-            public int? BirMonth { get; set; }
-            public int? BirYear { get; set; }
-            public string UserName { get; set; }
-            public string AccountName { get; set; }
-            public string LoginIp { get; set; }
-            public string TransId { get; set; }
-            public string TpUserName { get; set; }
-            public string Email { get; set; }
-            public string PhoneNo { get; set; }
-            public int? AffId { get; set; }
-            public string BankAccountNumber { get; set; }
-            public IEnumerable<int> Statuses { get; set; }
-            public string AffCode { get; set; }
-        }
-
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
@@ -499,14 +448,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public EnableRebateEnum Status { get; set; }
         }
 
-        public class GetFinancialLogRequest : CustIdWithDateRangeNullAndPageRequest
+        public class GetFinancialLogRequest : ApiRequestPageModel
         {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
+            public int FinancialType { get; set; }
+        }
+        public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
+        {
+            public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
+        }
+
+        public class GetVipRebateDetailRequest
+        {
+            public int CustId { get; set; }
+            public int TpCategoryId { get; set; }
+            public string RefId { get; set; }
         }
 
         public class GetBonusLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
-            public int PromoCategoryId { get; set; }
+            public IEnumerable<int> PromoCategoryIds { get; set; }
             public string RefTransId { get; set; }
         }
 
@@ -521,10 +485,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int CategoryId { get; set; }
         }
 
-        public class CustTpBetRecordDetailListbyGameTypeReq : CustIdWithDateRangeAndPageRequest
+        public class CustTpBetRecordDetailListbyGameTypeReq : ApiRequestPageModel
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         public class GetCustInfoWithBalanceRequest
@@ -550,7 +517,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
+        
+        public class GetCustTPWalletResult
+        {
+            public decimal TotalTpWalletBalance { get; set; }
+            public IEnumerable<TpWallet> TpWalletList { get; set; }
+        }
+        
+        public class GetTodayDashboardRequest
+        {
+            public int CustId { get; set; }
+            public int CurrencyId { get; set; }
+        }
 
+        public class GetGameTypeListRequset
+        {
+            public IEnumerable<int> TPCategoryList { get; set; }
+        }
+
+        public class GetWinLoseSummaryDetailRequset : CustIdWithDateRangeRequest
+        {
+            public IEnumerable<int> GameTypes { get; set; }
+        }
         #endregion
 
         #region CSD > Customer Administration
@@ -1659,7 +1647,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
         public ApiResult GetBonusLogByCustId(GetBonusLogRequest request)
         {
@@ -1668,7 +1656,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
 
             var data = _paymentBll.GetBonusLog(request.CustId,
-                request.PromoCategoryId,
+                request.PromoCategoryIds,
                 startDate,
                 endDate,
                 request.RefTransId,
@@ -1701,24 +1689,65 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<FinancialLog> GetFinancialLogByCustId(GetFinancialLogRequest request)
         {
-            var startDate = request.StartDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow.GetMonthBeginning();
-            var endDate = request.EndDate?.ToUniversalTime().DateTime ?? DateTime.UtcNow;
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
 
             var data = _paymentBll.GetFinancialLog(
                 request.CustId,
                 startDate,
                 endDate,
                 request.RefTransId,
+                request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
                 out var pageInfo);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
+
+
+        /// <summary>
+        /// CustomerManage/GetFinancialLogByCustIdExport 匯出指定客戶金融紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Financial Log > [Search] > [Export Excel]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        {
+            request.PageNumber = -1; //export all
+            var offset = request.StartDate.Offset;      
+            var startDate = request.StartDate.ToUniversalTime().DateTime;
+            var endDate = request.EndDate.ToUniversalTime().DateTime;
+
+            var data = _paymentBll.GetFinancialLog(
+                request.CustId,
+                startDate,
+                endDate,
+                request.RefTransId,
+                request.FinancialType,
+                request.PageSize,
+                request.PageNumber,
+                out var _);
+
+            foreach (var item in data)
+            {
+                item.CreateTime = item.CreateTime.ToOffset(offset);
+            }
+
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "FinancialLog");
+        }
+
 
         #endregion
 
@@ -1734,9 +1763,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(CustIdWithDateRangeNullAndPageRequest request)
+        public ApiListResultCurrencyAmount<VipRebateInfo> GetVipRebateInfoByCustId(GetVipRebateLogRequest request)
         {
             var startDate = request.StartDate != new DateTimeOffset() ? request.StartDate?.DateTime : null;
             var endDate = request.EndDate != new DateTimeOffset() ? request.EndDate?.DateTime : null;
@@ -1745,6 +1774,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CustId,
                 startDate,
                 endDate,
+                request.PayoutStatuses,
                 request.PageSize,
                 request.PageNumber);
 
@@ -1755,6 +1785,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 PageNumber = searchResult.PageNumber,
                 RowCount = searchResult.RowCount,
                 CurrencyAmount = searchResult.CurrencyAmount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustomerManage/GetVipRebateDetail 取得指定客戶VIP回扣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD > Customer Administration > Click[UserName] > Vip Rebate Log > [Search] > [Detail]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
+        [HttpPost]
+        public ApiResult<IEnumerable<VipRebateDetail>> GetVipRebateDetail(GetVipRebateDetailRequest request)
+        {
+            return new ApiResult<IEnumerable<VipRebateDetail>>
+            {
+                Data = _paymentBll.GetVipRebateDetail(request.CustId, request.TpCategoryId, request.RefId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -1773,7 +1824,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
         {
@@ -1781,8 +1832,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Data = _paymentBll.GetCustTpBetRecordList(
                     request.CustId,
-                    request.StartDate.DateTime,
-                    request.EndDate.DateTime),
+                    request.StartDate.ToUniversalTime().DateTime,
+                    request.EndDate.ToUniversalTime().DateTime,
+                    request.StartDate.Offset),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
@@ -1799,7 +1851,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordListOneDayRes>> GetCustTpBetRecordByDay(
             CustTpBetRecordListOneDayReq req)
@@ -1810,8 +1862,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = _paymentBll.GetCustTpBetRecordListOneDay(
                     req.CustId,
                     req.SelDate.Date,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1827,7 +1879,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordbyCategoryIdRes>> GetCustTpBetRecordByCategoryId(
             CustTpBetRecordListbyCategoryIdReq req)
@@ -1839,8 +1891,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.CustId,
                     req.SelDate.Date,
                     req.CategoryId,
-                    req.StartDate.DateTime,
-                    req.EndDate.DateTime)
+                    req.StartDate.ToUniversalTime().DateTime,
+                    req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
         }
@@ -1856,10 +1908,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
-        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(
-            CustTpBetRecordDetailListbyGameTypeReq req)
+        public ApiListResult<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailByGameType(CustTpBetRecordDetailListbyGameTypeReq req)
         {
             var apiResult = new ApiListResult<TpBetRecordDetailbyGameType>();
             var pageSize = req.PageSize;
@@ -1868,14 +1919,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var pageNumber = req.PageNumber;
             var result = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
-                req.StartDate.DateTime,
-                req.EndDate.DateTime,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime,
                 pageSize,
                 ref pageNumber,
                 ref totalPages,
-                ref rowCount);
+                ref rowCount,
+                req.StartDate.Offset);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiResult.Data = result;
@@ -2422,7 +2473,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_turnoverReport" })]
         [HttpPost]
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
@@ -2967,6 +3017,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
+        
+        [HttpPost]
+        public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var result =
+                await _custInfoBll.GetCustDashBoardTodayAsync(request.CustId, custInfo.CurrencyId);
+
+            return new ApiResult<CustDashBoardTodayModel>
+            {
+                ErrorCode = (int) ErrorCodeEnum.Success,
+                Data = result
+            };
+        }
 
         #endregion
 
@@ -3008,16 +3072,121 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpWallet>>> GetCustTPWalletAsync(CustIdRequest request)
+        public async Task<ApiResult<GetCustTPWalletResult>> GetCustTPWalletAsync(CustIdRequest request)
         {
+            var wallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
 
-            var custTPWallet = await _custInfoBll.GetCustTPWalletAsync(request.CustId);
-
-            return new ApiResult<IEnumerable<TpWallet>>
+            return new ApiResult<GetCustTPWalletResult>
             {
-                Data = custTPWallet,
+                Data = new GetCustTPWalletResult
+                {
+                    TotalTpWalletBalance = wallet.Sum(x => x.Balance),
+                    TpWalletList = wallet
+                },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Bank list
+        public ApiListResult<BlockBankAcc> GetBankList(CustIdRequest request)
+        {
+            var BankList = _custInfoBll.GetBankList(request.CustId);
+            return new ApiListResult<BlockBankAcc>
+            {
+                Data = BankList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet List
+        public ApiListResult<BlockEWalletAcc> GetEWalletList(CustIdRequest request)
+        {
+            var EWalletList = _custInfoBll.GetEWalletList(request.CustId);
+            return new ApiListResult<BlockEWalletAcc>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > E-Wallet Log
+        public ApiListResult<CustEWalletLog> GetEWalletLog(CustIdWithDateRangeAndPageRequest request)
+        {
+            var EWalletList = _custInfoBll.GetCustEWalletLogList(request.CustId,
+                request.PageSize,
+                request.PageNumber,
+                out var totalPages,
+                out var rowCount);
+            return new ApiListResult<CustEWalletLog>
+            {
+                Data = EWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                RowCount = rowCount,
+                TotalPages = totalPages
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > IP Log
+        public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
+        {
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
+            return new ApiListResult<CustLoginLog>
+            {
+                Data = IPLog,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Turnover
+        public ApiListResult<GameType> GetGameTypeList(GetGameTypeListRequset request)
+        {
+            var GameTypeList = _custInfoBll.GetGameTypeList(request.TPCategoryList);
+            return new ApiListResult<GameType>
+            {
+                Data = GameTypeList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > DashboardWinLossGroup
+        public ApiResult<DashboardWinLossGroupData> GetDashboardWinLossGroup(CustIdRequest request)
+        {
+            var dashboardWinLossGroup = _custInfoBll.GetDashboardWinLossGroup(request.CustId);
+            return new ApiResult<DashboardWinLossGroupData>
+            {
+                Data = dashboardWinLossGroup,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary
+        public ApiListResult<WinLoseSummary> GetWinLoseSummary(CustIdRequest request)
+        {
+            var winLoseSummary = _custInfoBll.GetWinLoseSummary(request.CustId);
+            return new ApiListResult<WinLoseSummary>
+            {
+                Data = winLoseSummary,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > WinLoseSummary > Detail
+        public ApiListResult<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(GetWinLoseSummaryDetailRequset request)
+        {
+            var winLoseSummaryDetail = _custInfoBll.GetWinLoseSummaryDetail(request.CustId, JsonConvert.SerializeObject(request.GameTypes));
+            return new ApiListResult<WinLoseSummaryDetailResult>
+            {
+                Data = winLoseSummaryDetail,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
