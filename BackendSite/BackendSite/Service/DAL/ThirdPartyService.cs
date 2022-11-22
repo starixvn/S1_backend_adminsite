@@ -23,9 +23,18 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<TpWallet> GetTpWallet(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<TpWallet>("TpWallet_Get", new { CustId = custId });
         }
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferTpWallet(int custId)
+        {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId
+            }); 
+            return await _reportDbClient.QueryAsync<TpWallet>("Admin_TransferTpWalletInfo_Get", p);
+        }
+        
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
             string TransId,
             DateTimeOffset startDate,
@@ -44,8 +53,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var tpTransferInfoList = conn.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            var tpTransferInfoList = _reportDbClient.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -114,10 +122,35 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+
+        public async Task<TpAdjustmentLogWrapper> GetCustTpAdjustmentLogV2(GetCustTpAdjustmentLogParamsV2 input)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", input.CustId, dbType: DbType.Int32);
+            p.Add("_SiteId", input.SiteId, dbType: DbType.Int32);
+            p.Add("_TpId", input.TpId, dbType: DbType.Int32);
+            p.Add("_Direction", input.Direction, dbType: DbType.Int16);
+            p.Add("_StartTime", input.StartTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", input.EndTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_PageSize", input.PageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", input.StartIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = new TpAdjustmentLogWrapper
+            {
+                Data = await _reportDbClient.QueryAsync<TpAdjustmentLogV2>("Admin_CustLogAdminAdjustWallet_Get_V2", p),
+                TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+                RowCount = p.Get<int?>("_RowCount") ?? 0
+            };
+
+            return result;
+        }
+
+
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site });
         }
 
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
