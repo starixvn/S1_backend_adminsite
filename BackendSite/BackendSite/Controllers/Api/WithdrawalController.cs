@@ -414,12 +414,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest req)
+        public ApiResult<IEnumerable<PayInfo>> GetPayList(GetPayListRequest req)
         {
             var result = bankDetailBLL
                 .GetBankInfoPayList(req.SiteId, req.CurrencyId, req.SysId, req.Amount, req.CustId);
             
-            return new ApiResult<IEnumerable<Pay>>
+            return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
                 ErrorCode = 0
