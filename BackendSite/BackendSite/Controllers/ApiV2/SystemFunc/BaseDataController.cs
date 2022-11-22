@@ -260,6 +260,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int SiteId { get; set; }
         }
 
+        public class GetTpBySiteAndCurrencyReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -902,6 +908,22 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
 
             return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得該幣別支援的tpList
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpBySiteAndCurrency(GetTpBySiteAndCurrencyReq request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
+
+            var tpList = _tpBll.GetTpBySiteAndCurrency(request.SiteId,request.CurrencyId);
+            apiListResult.Data = tpList;
+            apiListResult.ErrorCode = 0;
+            return apiListResult;
         }
     }
 }
