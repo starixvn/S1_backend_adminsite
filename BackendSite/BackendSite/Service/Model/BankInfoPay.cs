@@ -20,6 +20,11 @@
         public int SSort { get; set; }
         public decimal MinAmount { get; set; }
         public decimal MaxAmount { get; set; }
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
     }
     
     public class EWalletPay
@@ -45,5 +50,17 @@
         /// 渠道ID
         /// </summary>
         public int ChannelId { get; set; }
+    }
+    
+    public class PayInfo
+    {
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public int ChannelId { get; set; }
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
     }
 }

@@ -1367,18 +1367,20 @@ namespace BackendSite.Service.BLL
             return permissions.FirstOrDefault(x => x.MenuId == menuId)?.Permission;
         }
 
-        public bool CheckPermission(int menuId, IEnumerable<int> permissions)
+        public bool CheckPermission(int menuId, IEnumerable<int> permissions, bool matchAll = true)
         {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var siteId = _newAuthorizeBll.CheckBrand();
+            var loginUser = _newAdminUserService.GetUserV2(authData.UserId, siteId);
+
+            if (loginUser.IsSuper)
+                return true;
+            
             var userPermission = GetUserPermissionByMenuId(menuId);
 
-            return permissions.All(permission => userPermission?.Contains(permission) ?? false);
-        }
-        
-        public bool CheckPermissionAny(int menuId, IEnumerable<int> permissions)
-        {
-            var userPermission = GetUserPermissionByMenuId(menuId);
-
-            return permissions.Any(permission => userPermission?.Contains(permission) ?? false);
+            return matchAll
+                ? permissions.All(permission => userPermission?.Contains(permission) ?? false)
+                : permissions.Any(permission => userPermission?.Contains(permission) ?? false);
         }
         
         #endregion

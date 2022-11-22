@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly NewAuthorizeBLL _authorizeBll;
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
+        private readonly PaymentManageBLL _paymentManageBll;
 
         #endregion
 
@@ -58,6 +59,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
+            _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
         }
 
         #endregion
@@ -98,6 +100,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 取提款金流商列表以外非必填
             /// </summary>
             public int? CustId { get; set; }
+        }
+        
+        public class GetPaymentListRequest
+        {
+            /// <summary>
+            /// 支付Id，帶null可取全部
+            /// </summary>
+            public int? PayId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -320,18 +330,71 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetPayList
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
+        public ApiResult GetPayList(GetPayListRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
             var result = _bankDetailBll
-                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId);
+                .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId)
+                .ToList();
             
-            return new ApiResult<IEnumerable<Pay>>
+            if (_permissionBll.CheckPermission(28, new []{65}))
+            {
+                result.ForEach(d =>
+                {
+                    d.LoginAccount = _cryptor.Decrypt(d.LoginAccount);
+                    d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                });
+            }
+            
+            return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// 取得金流列表
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetPaymentList(GetPaymentListRequest request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayList(authData.SiteId)
+                .Where(x => x.PayStatus == PayListStatusEnum.Enable
+                    && (request.PayId == null || x.PayId == request.PayId));
+
+            if (_permissionBll.CheckPermission(27, new []{65}))
+            {
+                foreach (var d in data)
+                {
+                    d.LoginAccount = _cryptor.Decrypt(d.LoginAccount);
+                    d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                }
+            }
+
+            var result = data.Select(x => new PayInfo
+            {
+                PayId = x.PayId,
+                PayName = x.PayName,
+                LoginUrl = x.LoginUrl,
+                LoginAccount = x.LoginAccount,
+                LoginPassword = x.LoginPassword,
+                LoginPin = x.TransferPin,
+                TransferPin = x.TransferPin
+            });
+
+            return new ApiResult<IEnumerable<PayInfo>>
+            {
+                Data = result,
+                ErrorCode = (int) ErrorCodeEnum.Success
             };
         }
 

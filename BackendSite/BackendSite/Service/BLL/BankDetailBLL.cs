@@ -107,7 +107,7 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
+        public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
             var pointLevel = -1;
             if (custId != null)
@@ -124,11 +124,16 @@ namespace BackendSite.Service.BLL
                 .Select(g =>
                 {
                     var d = g.First();
-                    return new Pay
+                    return new PayInfo
                     {
                         PayId = g.Key,
                         PayName = d.PayName,
-                        ChannelId = d.ChannelId
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
                     };
                 });
             
