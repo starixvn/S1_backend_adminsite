@@ -281,16 +281,6 @@
       },
       {
         "Key": "",
-        "Title": "Balance Adjustment (Batch)",
-        "FuncKey": "Finance/BalanceAdjustmentBatch",
-        "Controller": "Finance",
-        "Action": "BalanceAdjustmentBatch",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
         "Title": "Bonus Payout",
         "FuncKey": "Finance/BonusPayout",
         "Controller": "Finance",
