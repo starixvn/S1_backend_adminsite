@@ -233,7 +233,7 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7, //No Use
         Error = 99 //No Use
     }
-    
+
     public enum DepositTimeStatusEnum
     {
         Approved = 3,
@@ -385,7 +385,7 @@ namespace BackendSite.Service.Model.enums
         Debit = 1,
         Credit = 2
     }
-    
+
     public enum WithdrawalLimitAdjustmentReasonEnum
     {
         [Description("None - (Default)")]
@@ -442,19 +442,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
     #endregion
 
     #region AdminUser
@@ -534,7 +534,7 @@ namespace BackendSite.Service.Model.enums
         Transfer = 0,
         Seamless = 1
     }
-    
+
     public enum BonusAtPageEnum
     {
         Promotion = 0,
@@ -550,7 +550,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
-    
+
     public enum PromotionCashBackSettingLevelEnum
     {
         [Description("0代表包含所有 VIP 等級")]
@@ -683,7 +683,8 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
-        WithdrawalLimitAdjustment = 73
+        WithdrawalLimitAdjustment = 73,
+        AppQRCode = 74
     }
 
     #region BankFinancialTransferInfoLog
@@ -793,9 +794,9 @@ namespace BackendSite.Service.Model.enums
         /// 第三方支付
         /// </summary>
         PSP = 3,
-        
+
         Finance = 4,
-        
+
         MC = 5
     }
 
@@ -894,8 +895,8 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferStatusEnum
     {
-        Success = 0, 
-        Fail = 1, 
+        Success = 0,
+        Fail = 1,
         Pending = 2,
         PendingD = 3
     }
@@ -919,18 +920,6 @@ namespace BackendSite.Service.Model.enums
         SettledForInvalid = 2,
         SettledForValidNotRollover = 3,
         Cheating = 4
-    }
-
-    public enum AppLinkAppType
-    {
-        Android = 1,
-        IOS = 2
-    }
-
-    public enum AppLinkProtocolType
-    {
-        HTTP = 1,
-        HTTPS = 2
     }
 
     public enum CryptoCurrencyEnum
@@ -1018,7 +1007,7 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-    
+
     public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
@@ -1035,7 +1024,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
-    
+
     public enum BankCardManagementPurposeEnum
     {
         Deposit = 1,
@@ -1050,7 +1039,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
     }
-    
+
     public enum BankCardManagementSupportChannelEnum
     {
         [Description("Bank Transfer")]
@@ -1123,14 +1112,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppTypeEnum
     {
+        [Description("Android")]
         Android = 1,
-        Ios = 2
+        [Description("IOS")]
+        IOS = 2
     }
 
     public enum ProtocolTypeEnum
     {
-        Http = 1,
-        Https = 2
+        [Description("HTTP")]
+        HTTP = 1,
+        [Description("HTTPS")]
+        HTTPS = 2
     }
 
     #endregion
@@ -1241,7 +1234,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1272,7 +1265,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1354,7 +1347,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         Closed = 2,
     }
-    public enum SlotGameStatusEnum 
+    public enum SlotGameStatusEnum
     {
         Closed = 0,
         Open = 1
@@ -1362,7 +1355,7 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
     public enum BlockEWalletStatus
-    { 
+    {
         Lock = 1,
         Unlock = 2
     }
