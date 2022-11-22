@@ -30,7 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly AuthorizeBLL _authorizeBll;   
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
-        private readonly AuthorizeByPermissionBLL _authorizeByPermissionBll;
+        private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<int, List<int>> _usableActionType;
         private readonly Cryptor _cryptor;
         
@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _authorizeByPermissionBll = provider.GetRequiredService<AuthorizeByPermissionBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
             
             var configuration = provider.GetRequiredService<IConfiguration>();
@@ -805,7 +805,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         
         private List<int> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
         {
-            var permissionList = _authorizeByPermissionBll.GetUserPermission(28);
+            var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
             var usableList = _usableActionType[withdrawalRequest.Status];
             var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
                     
