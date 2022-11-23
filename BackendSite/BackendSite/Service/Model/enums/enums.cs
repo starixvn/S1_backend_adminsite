@@ -1298,13 +1298,18 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
+        [Description("Android")]
         Android = 1,
+        [Description("IOS")]
         IOS = 2,
+        [Description("Desktop")]
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
+        [Description("HTTP")]
         HTTP = 1,
+        [Description("HTTPS")]
         HTTPS = 2
     }
     #endregion
