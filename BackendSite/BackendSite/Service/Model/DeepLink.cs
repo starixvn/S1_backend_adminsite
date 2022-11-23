@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -18,8 +19,11 @@ namespace BackendSite.Service.Model
         public string SiteName { get; set; }
         public string Domain { get; set; }
         public DeepLinkTableTypeEnum Type { get; set; }
+        public string TypeName => Type.GetDescription();
         public DeepLinkTableProtocolTypeEnum ProtocolType { get; set; }
+        public string ProtocolTypeName => ProtocolType.GetDescription();
         public int DeepLinkId { get; set; }
+
     }
     public class SetDeepLinkReq
     {
