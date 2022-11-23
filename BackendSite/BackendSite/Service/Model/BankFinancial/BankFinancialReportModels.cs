@@ -122,9 +122,10 @@ public class BankFinancialReportAgentSummary : BankFinancialReportSummaryBaseMod
 
 public class BankFinancialReportAccountSummary : BankFinancialReportSummaryBaseModel
 {
-    
-    public string AccountNo { get; set; }
-    public string DisplayName { get; set; }
+    /// <summary>
+    /// DisplayName
+    /// </summary>
+    public string Key { get; set; }
     [JsonIgnore]
     public TransferTypeEnum TransferType { get; set; }
     [JsonIgnore]
