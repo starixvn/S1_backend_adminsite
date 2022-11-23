@@ -1033,6 +1033,25 @@ namespace BackendSite.Service.BLL
 
         #endregion
 
+        public IEnumerable<MultilevelReport<MultilevelReport<T>>> ParsePaymentReportForFrontEnd<T>(
+            Dictionary<string, Dictionary<string, T>> data)
+        {
+            var result = data.Select(g =>
+            {
+                return new MultilevelReport<MultilevelReport<T>>
+                {
+                    Key = g.Key,
+                    Children = g.Value.Select(x => new MultilevelReport<T>
+                    {
+                        Key = x.Key,
+                        Children = new List<T> {x.Value}
+                    })
+                };
+            });
+            
+            return result;
+        }
+        
         public Dictionary<string, Dictionary<string, DepositPaymentReport>> GetDepositPaymentReport(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {

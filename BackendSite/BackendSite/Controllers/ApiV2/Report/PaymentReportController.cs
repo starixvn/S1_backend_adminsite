@@ -37,14 +37,16 @@ namespace BackendSite.Controllers.ApiV2.Report
             var data = _reportBll.GetDepositPaymentReport(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
 
+            var result = _reportBll.ParsePaymentReportForFrontEnd(data);
+            
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
             
-            return new ApiResult<Dictionary<string, Dictionary<string, DepositPaymentReport>>>
+            return new ApiResult<IEnumerable<MultilevelReport<MultilevelReport<DepositPaymentReport>>>>
             {
-                Data = data,
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -65,15 +67,17 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var data = _reportBll.GetWithdrawalPaymentReport(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+            
+            var result = _reportBll.ParsePaymentReportForFrontEnd(data);
 
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
             
-            return new ApiResult<Dictionary<string, Dictionary<string, WithdrawalPaymentReport>>>
+            return new ApiResult<IEnumerable<MultilevelReport<MultilevelReport<WithdrawalPaymentReport>>>>
             {
-                Data = data,
+                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
