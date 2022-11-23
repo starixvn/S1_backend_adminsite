@@ -1930,13 +1930,13 @@ namespace BackendSite.Service.BLL
                     {
                         CurrencyId = g.Key.CurrencyId,
                         Channel = g.Key.Channel,
-                        Agent = g.Key.Agent,
+                        Key = g.Key.Agent,
                         Details = details,
                         Fees = g.Sum(x => x.Fees),
                         OpenBalance = g.Sum(x => x.OpenBalance),
                         NetBalance = g.Sum(x => x.NetBalance),
                         ClosingBalance = g.Sum(x => x.ClosingBalance),
-                        AccountDetails = g
+                        Children = g
                     };
                 });
             
@@ -1962,13 +1962,13 @@ namespace BackendSite.Service.BLL
                     return new BankFinancialReportChannelSummary
                     {
                         CurrencyId = g.Key.CurrencyId,
-                        Channel = g.Key.Channel.ToString(),
+                        Key = g.Key.Channel.ToString(),
                         Details = details,
                         Fees = g.Sum(x => x.Fees),
                         OpenBalance = g.Sum(x => x.OpenBalance),
                         NetBalance = g.Sum(x => x.NetBalance),
                         ClosingBalance = g.Sum(x => x.ClosingBalance),
-                        AgentDetails = g
+                        Children = g
                     };
                 });
             
@@ -1996,13 +1996,13 @@ namespace BackendSite.Service.BLL
                     return new BankFinancialReportCurrencySummary
                     {
                         CurrencyId = g.Key,
-                        Currency = g.Key.ToString(),
+                        Key = g.Key.ToString(),
                         Details = details,
                         Fees = g.Sum(x => x.Fees),
                         OpenBalance = g.Sum(x => x.OpenBalance),
                         NetBalance = g.Sum(x => x.NetBalance),
                         ClosingBalance = g.Sum(x => x.ClosingBalance),
-                        ChannelDetails = g
+                        Children = g
                     };
                 });
             
