@@ -636,10 +636,12 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             string depositId,
+            int custId,
             int startIndex,
             int pageSize,
             out int totalPages,
-            out int rowCount)
+            out int rowCount,
+            out List<TotalAmount> currencyTotalAmount)
         {
             var props = new DynamicParameters();
             int.TryParse(depositId, out var tempDepositId);
@@ -650,17 +652,34 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_Statuses", statuses);
             props.Add("_CurrencyIds", currencyIds);
+            props.Add("_CustId", custId);
+            
+
+            #region totalAmountSummary
+
+            currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositStatusTimeTotalAmount_Get", props).ToList();
+            if (currencyTotalAmount.Count > 0)
+            {
+                currencyTotalAmount.Add(new TotalAmount()
+                {
+                    Currency = "Total",
+                    Record = currencyTotalAmount.Sum(r => r.Record)
+                });
+            }
+
+            #endregion
+
             props.Add("_StartIndex", startIndex);
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V4", props).ToList();
+            var result = _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTime_Get_V5", props).ToList();
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
             return result;
         }
-        public List<DepositTimeList> GetExportData(string siteIds, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
+        public List<DepositTimeList> GetExportData(string siteIds, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds, int custId)
         {
             int.TryParse(depositId, out var tempDepositId);
 
@@ -671,7 +690,8 @@ namespace BackendSite.Service.DAL
             props.Add("_CurrencyIds", currencyIds);
             props.Add("_DepositId", tempDepositId);
             props.Add("_Statuses", statuses);
-            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V4", props).ToList();
+            props.Add("_CustId", custId);
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V5", props).ToList();
 
         }
         public bool SetDepositRequestAmount(ParamsWithLog<SetAmountRequest> input)

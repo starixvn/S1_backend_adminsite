@@ -286,6 +286,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? ApprovedTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -316,6 +317,8 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SiteIds { get; set; }
         public IEnumerable<int> CurrencyId { get; set; }
         public IEnumerable<DepositStatusEnum> Status { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
 
     public class DepositTimeExportData
@@ -332,6 +335,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? EndFlowTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
     }
     public class SetAmountRequest
     {
