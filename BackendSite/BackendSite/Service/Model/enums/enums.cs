@@ -247,7 +247,7 @@ namespace BackendSite.Service.Model.enums
         Adjustment = 98,
         Error = 99 //No Use
     }
-    
+
     public enum DepositTimeStatusEnum
     {
         Approved = 3,
@@ -444,7 +444,7 @@ namespace BackendSite.Service.Model.enums
         Debit = 1,
         Credit = 2
     }
-    
+
     public enum WithdrawalLimitAdjustmentReasonEnum
     {
         [Description("None - (Default)")]
@@ -535,7 +535,6 @@ namespace BackendSite.Service.Model.enums
         Withdrawal = 10,
         Other = 11
     }
-
     #endregion
 
     #region AdminUser
@@ -615,7 +614,7 @@ namespace BackendSite.Service.Model.enums
         Transfer = 0,
         Seamless = 1
     }
-    
+
     public enum BonusAtPageEnum
     {
         Promotion = 0,
@@ -631,7 +630,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
-    
+
     public enum PromotionCashBackSettingLevelEnum
     {
         [Description("0代表包含所有 VIP 等級")]
@@ -767,7 +766,8 @@ namespace BackendSite.Service.Model.enums
         SetCurrencyUSDRate = 58,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
-        WithdrawalLimitAdjustment = 73
+        WithdrawalLimitAdjustment = 73,
+        AppQRCode = 74
     }
 
     #region BankFinancialTransferInfoLog
@@ -880,9 +880,9 @@ namespace BackendSite.Service.Model.enums
         /// 第三方支付
         /// </summary>
         PSP = 3,
-        
+
         Finance = 4,
-        
+
         MC = 5
     }
 
@@ -1027,6 +1027,7 @@ namespace BackendSite.Service.Model.enums
         Cheating = 4
     }
 
+
     public enum AppLinkAppType
     {
         Android = 1,
@@ -1116,7 +1117,7 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-    
+
     public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
@@ -1133,7 +1134,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
-    
+
     public enum BankCardManagementPurposeEnum
     {
         Deposit = 1,
@@ -1148,7 +1149,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
     }
-    
+
     public enum BankCardManagementSupportChannelEnum
     {
         [Description("Bank Transfer")]
@@ -1231,14 +1232,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppTypeEnum
     {
+        [Description("Android")]
         Android = 1,
-        Ios = 2
+        [Description("IOS")]
+        IOS = 2
     }
 
     public enum ProtocolTypeEnum
     {
-        Http = 1,
-        Https = 2
+        [Description("HTTP")]
+        HTTP = 1,
+        [Description("HTTPS")]
+        HTTPS = 2
     }
 
     #endregion
@@ -1356,6 +1361,7 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
+
 
     public enum ManualRewardPointCategoryEnum
     {
@@ -1571,7 +1577,7 @@ namespace BackendSite.Service.Model.enums
         TopCasino = 5
     }
     public enum BlockEWalletStatus
-    { 
+    {
         Lock = 1,
         Unlock = 2
     }

@@ -21,6 +21,7 @@ public class BlockIpToS3
     }
     public async Task<int> Upload()
     {
+        Directory.CreateDirectory(_folder);
         var filePath = Path.Combine(_folder, _fileName);
         var blockIps = await _blockService.GetBlockIPList();
         var ipLines = blockIps.Select(a => a.IP).ToList();

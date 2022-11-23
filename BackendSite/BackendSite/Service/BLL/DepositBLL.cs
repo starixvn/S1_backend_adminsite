@@ -368,7 +368,7 @@ namespace BackendSite.Service.BLL
         }
         
         public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,
-            out int totalPages, out int rowCount)
+            out int totalPages, out int rowCount, out List<TotalAmount> currencyTotalAmount)
         {
             var result = depositService.DepositTimeReportGet(JsonConvert.SerializeObject(para.SiteIds),
                 JsonConvert.SerializeObject(para.CurrencyId),
@@ -376,10 +376,12 @@ namespace BackendSite.Service.BLL
                 para.StartDate.DateTime,
                 para.EndDate.DateTime,
                 para.DepositId,
+                para.CustId,
                 (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),
                 Math.Abs(para.PageSize),
                 out totalPages,
-                out rowCount);
+                out rowCount,
+                out currencyTotalAmount);
 
             if (result.Any())
             {
@@ -402,11 +404,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
+        public async Task<IEnumerable<DepositTimeExportData>> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds, string memberId)
         {
             var exportDataToExcel = new List<DepositTimeExportData>();
+            int custId = 0;
+            if (!string.IsNullOrWhiteSpace(memberId))
+            {
+                var custSimpleInfo = await custInfoBLL.GetCustId(null, memberId, JsonConvert.DeserializeObject<List<int>>(selectSite).FirstOrDefault());
+                if (custSimpleInfo != null)
+                    custId = custSimpleInfo.CustId;
+                else
+                    return exportDataToExcel;
+            }
 
-            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds);
+            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds, custId);
 
             result?.ForEach(x =>
             {
@@ -433,7 +444,8 @@ namespace BackendSite.Service.BLL
                     CompleteTime = GetTimeString(ts),
                     ToApprovedTime = x.ToApprovedTime,
                     EndFlowTime = x.ApprovedTime,
-                    ApprovedBy = x.ApprovedBy
+                    ApprovedBy = x.ApprovedBy,
+                    StatementTime = x.StatementTime,
                 });
             });
             return exportDataToExcel;
