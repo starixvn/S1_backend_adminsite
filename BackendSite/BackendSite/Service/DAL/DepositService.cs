@@ -227,7 +227,7 @@ namespace BackendSite.Service.DAL
                         var userName = p.Get<string>("UserName");
                         result = walletService.SetBalance(custId, siteId, userName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out _, out var is1stDepoist, conn, trans);
 
-                        if (result > 0)
+                        if (result >= 0)
                         {
                             result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out _, conn, trans);
                         }
