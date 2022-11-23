@@ -65,8 +65,8 @@ namespace BackendSite.Service.DAL
             {
                 SiteId = siteId,
                 DeepLinkId = deepLinkId,
-                Type = (int)type,
-                ProtocolType = (int)protocolType,
+                Type = type,
+                ProtocolType = protocolType,
                 Domain = domain,
                 LastUpdateUser = lastUpdateUser
             };

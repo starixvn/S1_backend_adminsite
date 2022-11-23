@@ -73,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 67, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 66, 3 })]
         public async Task<ApiResult> Set(SetDeepLinkReq req)
         {
             var apiResult = new ApiResult();
