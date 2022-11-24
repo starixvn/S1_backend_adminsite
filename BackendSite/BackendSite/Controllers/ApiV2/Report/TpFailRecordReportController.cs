@@ -339,7 +339,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 Info = x.Info
             });
 
-            var stream = _excelBll.Export(resultData);
+            var stream = _excelBll.ExportV2(resultData);
 
             return _excelBll.ExcelFile(stream, "TpFailedRecordReport");
         }

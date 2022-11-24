@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.Api
                 data.ExpiryTime = new DateTimeOffset(data.ExpiryTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(ExportData);
+            var stream = excelBLL.ExportV2(ExportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BonusInfo_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
