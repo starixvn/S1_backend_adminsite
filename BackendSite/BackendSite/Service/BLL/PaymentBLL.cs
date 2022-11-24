@@ -87,7 +87,7 @@ namespace BackendSite.Service.BLL
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
             }
 
-            var list = data.OrderByDescending(i => i.CreateTime).ThenBy(x => x.Id).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id).ToList();
 
             SetTpTransferMemo(list);
 
