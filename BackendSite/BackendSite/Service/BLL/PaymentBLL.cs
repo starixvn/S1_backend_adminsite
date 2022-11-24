@@ -62,12 +62,12 @@ namespace BackendSite.Service.BLL
             var parameters = new
             {
                 CustId = custId,
-                StartDate  = startDate,
+                StartDate = startDate,
                 EndDate = endDate,
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            var list = data.OrderByDescending(i => i.CreateTime).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ThenBy(x => x.Id).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
@@ -118,7 +118,7 @@ namespace BackendSite.Service.BLL
                       TurnOver = tpBetRecord.Stake,
                       ValidBet = tpBetRecord.ValidBet ?? 0,
                       WinlostAmount = tpBetRecord.WinlostAmount,
-                      SettlementType = tpBetRecord.SettlementType,   
+                      SettlementType = tpBetRecord.SettlementType,
                       BonusId = tpBetRecord.BonusId,
                   })
                 .GroupBy(x => new
@@ -247,11 +247,11 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(IEnumerable<int> siteId, IEnumerable<int> currencyId,
-            int pageNumber,int pageSize,out int totalPages,out int rowCount)
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
             return adjustmentService.GetAdjustmentData(JsonConvert.SerializeObject(siteId),
                 JsonConvert.SerializeObject(currencyId),
-                (Math.Abs(pageNumber)-1)*Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
@@ -283,7 +283,7 @@ namespace BackendSite.Service.BLL
                 .Select(x => new TpBetRecordByDate
                 {
                     SettledDate = x.Key.SettledDate,
-                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),               
+                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
@@ -297,12 +297,12 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode,int promotionType, int siteId,int currencyId)
+        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
         {
             var result = new BalanceAdjustBonusCodeRep();
             var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
 
-            if(balanceAdjustBonusCodeData != null)
+            if (balanceAdjustBonusCodeData != null)
             {
                 var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeData.WalletType).Where(x => x.Id == balanceAdjustBonusCodeData.CategoryId && x.TpId == balanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
@@ -357,16 +357,16 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
-            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
+            return adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
-        
+
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
-            return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+            return adjustmentService.GetAdjustmentDepositLogByTransId(transId);
         }
 
         public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
-        {   
+        {
             var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
             if (checkData == null)
             {
@@ -391,7 +391,7 @@ namespace BackendSite.Service.BLL
                 WalletType = checkData.WalletType,
                 TierAmountList = checkData.TierAmountList,
                 BonusType = (int)checkData.BonusType,
-                PromotionType =checkData.PromotionType,            
+                PromotionType = checkData.PromotionType,
             };
         }
     }
