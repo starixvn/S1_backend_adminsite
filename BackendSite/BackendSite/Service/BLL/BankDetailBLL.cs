@@ -164,12 +164,19 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<Pay> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount)
+        public IEnumerable<Pay> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
             var result = localBankService.GetCryptoPayList(siteId)
                 .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
                             && x.CurrencyId == currencyId
-                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
                 .GroupBy(x => x.PayId)
                 .Select(g =>
                 {

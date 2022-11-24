@@ -453,7 +453,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetPayListRequest req)
         {
             var result =
-                bankDetailBLL.GetCryptoPayList(req.SiteId, req.CurrencyId, req.ChannelName, req.Amount);
+                bankDetailBLL.GetCryptoPayList(req.SiteId, req.CurrencyId, req.ChannelName, req.Amount, req.CustId);
 
             return new ApiResult<IEnumerable<Pay>>
             {

@@ -77,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public TransferAccountPurposeEnum Purpose { get; set; }
         }
 
-        public class GetPayListRequest
+        public class GetOnlinePayListRequest
         {
             /// <summary>
             /// 幣別
@@ -88,11 +88,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int SysId { get; set; }
             /// <summary>
-            /// 金額，取提款金流商列表以外非必填
+            /// 取提款金流商列表時必填
             /// </summary>
             public decimal? Amount { get; set; }
             /// <summary>
-            /// 取提款金流商列表以外非必填
+            /// 取提款金流商列表時必填
             /// </summary>
             public int? CustId { get; set; }
         }
@@ -116,9 +116,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public string ChannelName { get; set; }
             /// <summary>
-            /// 金額，取提款金流商列表以外非必填
+            /// 取提款金流商列表時必填
             /// </summary>
             public decimal? Amount { get; set; }
+            /// <summary>
+            /// 取提款金流商列表時必填
+            /// </summary>
+            public int? CustId { get; set; }
         }
 
         public class GetTpGameTypeListByCategoryReq
@@ -261,7 +265,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetBankInfoOffList
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(GetBankInfoOffListRequest request)
         {
@@ -294,7 +297,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetPayList 取得指定行動支付清單
+        /// BaseData/GetOnlinePayList 取得指定OnlinePayment支付清單
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -306,14 +309,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult GetPayList(GetPayListRequest request)
+        public ApiResult GetOnlinePayList(GetOnlinePayListRequest request)
         {
+            
             var authData = _authorizeBll.GetAuthData();
             var result = _bankDetailBll
                 .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId)
                 .ToList();
             
-            if (_permissionBll.CheckPermission(28, new []{65}))
+            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
             {
                 result.ForEach(d =>
                 {
@@ -332,7 +336,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
         
         /// <summary>
-        /// 取得金流列表
+        /// 取得金流商資訊列表
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -344,7 +348,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .Where(x => x.PayStatus == PayListStatusEnum.Enable
                     && (request.PayId == null || x.PayId == request.PayId));
 
-            if (_permissionBll.CheckPermission(27, new []{65}))
+            if (_permissionBll.CheckPermission(27, new []{67})) // Deposit Operator => Manual Approved
             {
                 foreach (var d in data)
                 {
@@ -385,7 +389,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetEWalletPayList
         [HttpPost]
         public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq request)
         {
@@ -424,7 +427,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var authData = _authorizeBll.GetAuthData();
             var result =
-                _bankDetailBll.GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount);
+                _bankDetailBll.GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount, request.CustId);
 
             return new ApiResult<IEnumerable<Pay>>
             {
