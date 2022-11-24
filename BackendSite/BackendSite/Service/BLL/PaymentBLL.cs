@@ -81,12 +81,13 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+
             if (financialType != 0)
             {
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
             }
 
-            var list = data.OrderByDescending(i => i.CreateTime).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ThenBy(x => x.Id).ToList();
 
             SetTpTransferMemo(list);
 
@@ -421,7 +422,7 @@ namespace BackendSite.Service.BLL
         }
 
         public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
-        {   
+        {
             var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
             if (checkData == null)
             {
@@ -446,7 +447,7 @@ namespace BackendSite.Service.BLL
                 WalletType = checkData.WalletType,
                 TierAmountList = checkData.TierAmountList,
                 BonusType = (int)checkData.BonusType,
-                PromotionType =checkData.PromotionType,            
+                PromotionType = checkData.PromotionType,
             };
         }
     }
