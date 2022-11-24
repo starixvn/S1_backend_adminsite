@@ -293,7 +293,7 @@ namespace BackendSite.Controllers.Api
                 : DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
 
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                getBonusLogReq.PromoCategoryId,
+                new List<int>() { getBonusLogReq.PromoCategoryId },
                 startDate,
                 endDate,
                 getBonusLogReq.RefTransId,
@@ -1106,8 +1106,8 @@ namespace BackendSite.Controllers.Api
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-
-            var stream = _excelBLL.Export(searchResult.VipRebateInfoList);
+            
+            var stream = _excelBLL.ExportV2(searchResult.VipRebateInfoList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

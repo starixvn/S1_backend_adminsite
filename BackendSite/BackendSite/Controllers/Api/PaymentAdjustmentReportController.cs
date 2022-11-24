@@ -138,7 +138,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return excelBLL.ExcelFile(stream, "PaymentAdjustmentReport");
         }
 

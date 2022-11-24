@@ -76,7 +76,7 @@ namespace BackendSite.Controllers.Api
             var utcStartDate = new DateTimeOffset(startDate.ToUniversalTime().DateTime, TimeSpan.Zero);
             var utcEndDate = new DateTimeOffset(endDate.ToUniversalTime().DateTime, TimeSpan.Zero);
             var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPage(siteIds, currencyId, userName, utcStartDate, utcEndDate);
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VerificationReward_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

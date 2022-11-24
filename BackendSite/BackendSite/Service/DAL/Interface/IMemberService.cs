@@ -4,8 +4,17 @@ namespace BackendSite.Service.DAL.Interface;
 
 public interface IMemberService
 {
-    Task<GetMemberListData> GetList(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize);
-    Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, string currencyList, string statusList, int identity, string userName, IEnumerable<int> tags, string vipList, string accountName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int dateType, DateTime startDate, DateTime endDate);
+    Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber,
+        int pageSize);
+    Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate);
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
     Task<string> GetCustomerTagsAsync(int custId);
