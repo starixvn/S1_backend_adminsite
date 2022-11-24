@@ -839,9 +839,11 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
     class BonusWallet extends React.Component {
 
         render() {
+            console.log("08-this.props.BonusWallet",this.props.BonusWallet);
             let BonusWalletRows = this.props.BonusWallet != null ?
                 <tbody>
                     {
+                        
                         this.props.BonusWallet.map(x => {
                             return (
                                 <tr>
@@ -1431,6 +1433,7 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                 elgibleWithdrawal = data.balance - elgibleWithdrawal;
 
                 if (data.tpWallet != null) {
+                    console.log("09-data.tpWallet",data.tpWallet);
                     tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function (wallet) {
                         return <li key={wallet.tpId} className="wallet-item table-detail">
                             <span className="wallet-name">{wallet.tpName}</span>
@@ -1454,7 +1457,12 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                     promotions = <Promotion Promotions={data.promotions} CancelBonus={this.cancelBonus.bind(this)} />;
                 }
 
-                if(data.iTagList.length > 0){
+                console.log("10-1-tagData",tagData);
+                if(Object.keys(tagData || {}).length != 0)
+                {
+                if(data.iTagList.length > 0)
+                {
+                    
                     for(let i=0; i < data.iTagList.length;i++){
                         tagData.forEach(element=>{
                             if(element.id === data.iTagList[i]){
@@ -1463,12 +1471,17 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                         })
                     }
                 }
+                }
                 
 
                 tag = tagList.toString();
-                tagSelectList = tagData.map(obj=>{
-                    return <option key={`tag-list-${obj.id}`} value={obj.id}>{obj.tagName}</option>;
-                })
+                console.log("10-2-tagData",tagData);
+                if(Object.keys(tagData || {}).length != 0)
+                {
+                    tagSelectList = tagData.map(obj=>{
+                        return <option key={`tag-list-${obj.id}`} value={obj.id}>{obj.tagName}</option>;
+                    })
+                }
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
@@ -2872,7 +2885,7 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                 13: 'ca_personalMsg',
                 14: 'ca_turnoverReport'
             }
-
+            console.log("11-1-this._Tabs",this._Tabs);
             var tabBtn = this._Tabs.filter((item, index) => {
                 return authSubKeys[index] === undefined || subFuncKeys.includes(authSubKeys[index]);
             }).map(function (item, index) {
