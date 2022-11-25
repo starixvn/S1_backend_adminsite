@@ -124,6 +124,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
+
             _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
             var eventNameList = new List<string>(); eventNameList.Add(request.EventName);
 

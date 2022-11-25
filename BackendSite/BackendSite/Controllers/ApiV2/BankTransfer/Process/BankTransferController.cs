@@ -198,7 +198,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
                 request.Reason,
                 null);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "TransferInfoList");
         }
 

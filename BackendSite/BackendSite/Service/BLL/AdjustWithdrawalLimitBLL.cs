@@ -1,21 +1,24 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
     public class AdjustWithdrawalLimitBLL
     {
-        private readonly AdjustmentService adjustmentService;
+        private readonly AdjustmentService _adjustmentService;
+        private readonly ILogger<AdjustWithdrawalLimitBLL> _logger;
         
 
-        public AdjustWithdrawalLimitBLL(AdjustmentService adjustmentService, CustInfoBLL custInfoBLL)
+        public AdjustWithdrawalLimitBLL(IServiceProvider provider)
         {
-            this.adjustmentService = adjustmentService;
+            _adjustmentService = provider.GetRequiredService<AdjustmentService>();
+            _logger = provider.GetRequiredService<ILogger<AdjustWithdrawalLimitBLL>>();
         }
 
         public WalletInfo GetCustWalletInfo(int CustId)
         {
-            var walletInfo = adjustmentService.GetWithdrawalLimitInfo(CustId);
+            var walletInfo = _adjustmentService.GetWithdrawalLimitInfo(CustId);
             decimal Balance = 0;
             decimal DifferenceAmount = 0;
             decimal AvailableBalance = 0;
@@ -43,7 +46,7 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            return adjustmentService.GetAdjustWithdrawalLimitsLog(CustId,
+            return _adjustmentService.GetAdjustWithdrawalLimitsLog(CustId,
                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
@@ -56,11 +59,34 @@ namespace BackendSite.Service.BLL
             int SiteId,
             string Operator)
         {
-            return adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo,
+            return _adjustmentService.SetAdjustWithdrawalLimit(withdrawalLimitInfo,
                 UserName,
                 CurrencyId,
                 SiteId,
                 Operator);
+        }
+
+
+        public (bool Success, string Message) SetAdjustWithdrawalLimitV2(SetAdjustWithdrawalLimitParams input)
+        {
+            var (resultCode, transId) = _adjustmentService.SetAdjustWithdrawalLimitV2(input);
+            
+            if (resultCode == (int) ErrorCodeEnum.Success)
+            {
+                return (true, $"TransId: {transId}");
+            }
+            
+            var msg = resultCode switch
+            {
+                -21 => "Debit amount can not more then difference amount",
+                -22 => "Insert AdjustWithdrawalLimitInfo failed.",
+                -2 => "SetWithdrawalLimit failed.",
+                -3 => "CreateAdminAdjustmentInfoLog failed.",
+                _ => $"Unknown error, resultCode: {resultCode}"
+            };
+                
+            _logger.LogError(msg);
+            return (false, msg);
         }
     }
 }

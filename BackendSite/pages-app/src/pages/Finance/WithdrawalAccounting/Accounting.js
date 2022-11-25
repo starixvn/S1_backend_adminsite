@@ -5,6 +5,14 @@ import {
   number_toFixed,
 } from "../../../module/Formatting/NumberFormat";
 
+const BankCardStatus = {
+  0: "Initial",
+  1: "Open",
+  2: "Suspend",
+  3: "Closed",
+  4: "Maintenance"
+};
+
 const EditPanel = (props) => {
   var accountingAmount = 0;
   for (var i = 0; i < props.ForCaculateDatas.AccountingDatas.length; i++) {
@@ -170,7 +178,7 @@ const GetBankAccountOptions = (list) => {
     list.forEach((x) => {
       Options.push({
         value: x.accountNo,
-        displayText: x.bankCode + "-" + x.accountName + "-" + x.accountNo,
+        displayText: `[${BankCardStatus[x.settingStatus]}] ` + x.bankCode + "-" + x.accountName + "-" + x.accountNo,
       });
     });
   }

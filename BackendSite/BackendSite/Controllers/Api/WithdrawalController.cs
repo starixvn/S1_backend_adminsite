@@ -251,7 +251,8 @@ namespace BackendSite.Controllers.Api
                 else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                 {
                     var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalRequest.SiteId)
+                    var bankInfoOff = bankDetailBLL
+                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
                         .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
 
                     if (bankInfoOff != null)
@@ -394,15 +395,20 @@ namespace BackendSite.Controllers.Api
 
         //有新舊API，這支是舊API，另一支新的API=api/BaseData/GetBankInfoOffList
         [HttpPost]
-        public ApiResult<IEnumerable<BankInfoOff>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(WithdrawalReq3 withdrawalReq)
         {
-            var apiResult = new ApiResult<IEnumerable<BankInfoOff>>();
-            var bankInfoOff = bankDetailBLL.GetBankInfoOff(withdrawalReq.SiteId);
-            bankInfoOff = bankInfoOff.Where(x => x.CurrencyId == withdrawalReq.CurrencyId && (x.Purpose & 2) > 0)
-                .OrderBy(x => x.BSort);
-            apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var data = bankDetailBLL
+                .GetOfflineBankAccount(withdrawalReq.SiteId, withdrawalReq.CurrencyId)
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.LocalBank)
+                .OrderBy(x => x.SettingStatus);
+            
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = data,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
         }
 
         public class Pay
@@ -417,7 +423,7 @@ namespace BackendSite.Controllers.Api
         public ApiResult<IEnumerable<Pay>> GetPayList(WithdrawalReq3 withdrawalReq)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = bankDetailBLL.GetBankInfoPay();
+            var bankInfoPay = bankDetailBLL.GetBankInfoPay(withdrawalReq.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == withdrawalReq.CurrencyId && x.SysId == withdrawalReq.SysId
                             select new Pay
@@ -941,7 +947,7 @@ namespace BackendSite.Controllers.Api
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"WithdrawalTime_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -1022,6 +1028,47 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualApproval(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualApproval(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualApproval Fail. {ex.Message}"
+                };
+            }
+        }
+
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList", "f_wd_manualApprovedReject" })]
+        [HttpPost]
+        public async Task<ApiResult> WithdrawalManualReject(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await withdrawalBLL.WithdrawalManualReject(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualReject Fail. {ex.Message}"
+                };
+            }
+        }
         #region Private Methods
 
         /// <summary>

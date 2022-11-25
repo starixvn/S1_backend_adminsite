@@ -23,7 +23,7 @@
             i18n.Add(lbl_Txt, selLangBLL.GetResourceValue(lbl_Txt));
     }
 
-    for (var currency = 1; currency <= 61; currency++)
+    for (var currency = 1; currency <= 74; currency++)
     {
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));

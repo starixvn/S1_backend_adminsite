@@ -1,31 +1,33 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
     public class CustTurnoverService
     {
-        private readonly IConfiguration configuration;
-        public CustTurnoverService(IConfiguration configuration)
+        private readonly MySqlClient _reportDbClient;
+        public CustTurnoverService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<CustTurnover> GetCustTurnover(int CustId,
-            string GameTypes,
+            IEnumerable<int> GameTypes,
             DateTimeOffset StartTime,
             DateTimeOffset EndTime)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<CustTurnover>("Admin_TpBetRecord_GetByCustId_V4", new
+            return _reportDbClient.Query<CustTurnover>("Admin_TpBetRecord_GetByCustId_V4", new
             {
                 CustId = CustId,
-                GameList = GameTypes,
+                GameList = JsonConvert.SerializeObject(GameTypes),
                 StartDate = StartTime.DateTime,
                 EndDate = EndTime.DateTime
-            }, commandType: CommandType.StoredProcedure);
+            });
         }
     }
 }

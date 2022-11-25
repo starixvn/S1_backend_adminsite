@@ -137,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "RewardBonusReport");
         }
     }
