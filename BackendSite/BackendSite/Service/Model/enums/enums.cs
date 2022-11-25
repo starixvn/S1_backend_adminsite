@@ -1592,4 +1592,13 @@ namespace BackendSite.Service.Model.enums
         NonDepoist = 1,
         Deposited = 2,
     }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
+    }
 }

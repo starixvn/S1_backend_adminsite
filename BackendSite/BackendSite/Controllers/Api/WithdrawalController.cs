@@ -11,6 +11,7 @@ using Amazon.S3.Model;
 using System.Net;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -35,6 +36,7 @@ namespace BackendSite.Controllers.Api
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ILogger<WithdrawalController> _logger;
         private readonly AWSS3Helper _s3Helper;
+        private readonly ServerInfoBLL serverInfoBLL;
 
         public WithdrawalController(IServiceProvider provider)
         {
@@ -49,7 +51,7 @@ namespace BackendSite.Controllers.Api
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalController>>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-
+            serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
             payApiUrl = configuration.GetValue<string>("PayService");
 
             awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
@@ -869,19 +871,40 @@ namespace BackendSite.Controllers.Api
             {
                 var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate).AddHours(8);
                 var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate).AddHours(8);
-                var req = new WithdrawalTimeReportPara
-                {
-                    WithdrawalId = para.WithdrawalId,
-                    StartDate = startTime,
-                    EndDate = endTime,
-                    SiteIds = para.SelectSite,
-                    CurrencyId = para.CurrencyId,
-                    Status = para.Status,
-                    PageNumber = para.PageNumber,
-                    PageSize = para.PageSize
-                };
 
-                var searchResult = withdrawalBLL.WithdrawalTimeReportGet(req);
+                var selectStatus = new List<int>();
+                if (para.Status == 0)
+                {
+                    selectStatus.Add(3);
+                    selectStatus.Add(4);
+                    selectStatus.Add(5);
+                    selectStatus.Add(6);
+                    selectStatus.Add(7);
+                }
+                else
+                {
+                    selectStatus.Add(para.Status);
+                }
+
+                var siteInfoList = serverInfoBLL.GetSiteList();
+
+                var currencyIdList = new List<int>();
+
+                if (para.CurrencyId == 0)
+                {
+                    foreach (var site in siteInfoList)
+                    {
+                        currencyIdList.AddRange(site.ICurrencyList);
+                    }
+                    currencyIdList = currencyIdList.GroupBy(x => x).Select(y => y.First()).ToList();
+                }
+                else
+                {
+                    currencyIdList.Add(para.CurrencyId);
+                }
+
+                var searchResult = withdrawalBLL.WithdrawalTimeReportGet(JsonConvert.SerializeObject(para.SelectSite),
+                para.WithdrawalId, startTime, endTime, JsonConvert.SerializeObject(selectStatus), JsonConvert.SerializeObject(currencyIdList), 0, para.PageNumber, para.PageSize, out List<TotalAmount> currencyTotalAmount);
 
                 foreach (var data in searchResult.WithdrawalTimeList)
                 {
@@ -913,13 +936,45 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
-        public IActionResult ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
+        public async Task<IActionResult> ExportWithdrawalTime(string selectSite, string withdrawalId, long startDate, long endDate,
             int status, int currencyId)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(endDate);
+
+            var selectStatus = new List<int>();
+            if (status == 0)
+            {
+                selectStatus.Add((int)WithdrawalTimeStatusEnum.Verify);
+                selectStatus.Add((int)WithdrawalTimeStatusEnum.Process);
+                selectStatus.Add((int)WithdrawalTimeStatusEnum.Cancelled);
+                selectStatus.Add((int)WithdrawalTimeStatusEnum.Approved);
+                selectStatus.Add((int)WithdrawalTimeStatusEnum.Reject);
+            }
+            else
+            {
+                selectStatus.Add(status);
+            }
+
+            var siteInfoList = serverInfoBLL.GetSiteList();
+
+            var currencyIdList = new List<int>();
+
+            if (currencyId == 0)
+            {
+                foreach (var site in siteInfoList)
+                {
+                    currencyIdList.AddRange(site.ICurrencyList);
+                }
+                currencyIdList = currencyIdList.GroupBy(x => x).Select(y => y.First()).ToList();
+            }
+            else
+            {
+                currencyIdList.Add(currencyId);
+            }
+
             var exportData =
-                withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, status, currencyId);
+                await withdrawalBLL.WithdrawalTimeExportGet(selectSite, withdrawalId, startTime, endTime, JsonConvert.SerializeObject(selectStatus), JsonConvert.SerializeObject(currencyIdList), string.Empty);
 
             foreach (var data in exportData)
             {
