@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
-            public string EventName { get; set; }
+            public IEnumerable<string> EventNames { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -59,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
-            public string EventName { get; set; }
+            public IEnumerable<string> EventNames { get; set; }
         }
 
         #endregion
@@ -80,7 +80,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             var apiResult = new ApiResult<DrawPrizeReportResult>();
 
             _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
-            var eventNameList = new List<string>(); eventNameList.Add(request.EventName);
 
             try
             {
@@ -90,7 +89,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
                     CurrencyId = request.CurrencyIds,
                     StartDate = request.StartDate.ToString("yyyy-MM-dd"),
                     EndDate = request.EndDate.ToString("yyyy-MM-dd"),
-                    EventName = eventNameList,
+                    EventName = request.EventNames,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                 };
@@ -124,14 +123,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         {
 
             _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
-            var eventNameList = new List<string>(); eventNameList.Add(request.EventName);
 
             var exportData = _prizeBll.GetExportData(
                 JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
                 request.StartDate.ToString("yyyy-MM-dd"),
                 request.EndDate.ToString("yyyy-MM-dd"),
                 JsonConvert.SerializeObject(request.CurrencyIds),
-                JsonConvert.SerializeObject(eventNameList),
+                JsonConvert.SerializeObject(request.EventNames),
                 timeSpan.Hours);
 
             var stream = _excelBll.Export(exportData);
