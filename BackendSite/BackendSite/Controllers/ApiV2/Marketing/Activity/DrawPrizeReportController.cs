@@ -38,9 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
         public class GetListRequest : ApiRequestPageModel
         {
-            // public string StartDate { get; set; }
-            //public string EndDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
@@ -57,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
         public class ExportRequest
         {
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
@@ -88,7 +86,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             {
                 var param = new PrizeSelect()
                 {
-                    SelectSite = request.SiteIds,
+                    SelectSite = new List<int>() { request.SiteId },
                     CurrencyId = request.CurrencyIds,
                     StartDate = request.StartDate.ToString("yyyy-MM-dd"),
                     EndDate = request.EndDate.ToString("yyyy-MM-dd"),
@@ -128,7 +126,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
             var eventNameList = new List<string>(); eventNameList.Add(request.EventName);
 
             var exportData = _prizeBll.GetExportData(
-                JsonConvert.SerializeObject(request.SiteIds),
+                JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
                 request.StartDate.ToString("yyyy-MM-dd"),
                 request.EndDate.ToString("yyyy-MM-dd"),
                 JsonConvert.SerializeObject(request.CurrencyIds),
