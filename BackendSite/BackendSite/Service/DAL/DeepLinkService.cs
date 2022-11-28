@@ -74,7 +74,7 @@ namespace BackendSite.Service.DAL
             if (conn.Execute("Admin_DeepLinkTable_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
                 result = false;
 
-            if (!await AddNewOprateLog(siteId, asignBeforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebatePeriod,
+            if (!await AddNewOprateLog(siteId, asignBeforeData, afterData, AdminAdjustmentLogMenuEnum.ProviderAppDownload,
                 (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
                 result = false;
 

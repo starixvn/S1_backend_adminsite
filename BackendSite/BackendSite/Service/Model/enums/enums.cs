@@ -767,7 +767,8 @@ namespace BackendSite.Service.Model.enums
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73,
-        AppQRCode = 74
+        AppQRCode = 74,
+        ProviderAppDownload = 75
     }
 
     #region BankFinancialTransferInfoLog
@@ -1185,12 +1186,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
@@ -1591,5 +1588,14 @@ namespace BackendSite.Service.Model.enums
         NoRecord = 0,
         NonDepoist = 1,
         Deposited = 2,
+    }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
     }
 }

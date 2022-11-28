@@ -36,9 +36,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             private DateTimeOffset? _startTime;
             private DateTimeOffset? _endTime;
-            private DateTimeOffset? _sportBattleDateTime;
-
-            public bool IsAdd { get; set; }
             public int SiteId { get; set; }
             public string BannerName { get; set; }
             public BannerTypeEnum BannerType { get; set; }
@@ -63,22 +60,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 }
             }
             public string BonusCode { get; set; }
-            public int? MatchId { get; set; }
             public int? TpId { get; set; }
             public string GameId { get; set; }
             public string UrlRouter { get; set; }
-            public DateTimeOffset? SportBattleDateTime
-            {
-                get => _sportBattleDateTime;
-                set
-                {
-                    if (value != null)
-                        _sportBattleDateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? SportCategoryId { get; set; }
-            public int? SportLeaguesId { get; set; }
-            public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
             public IEnumerable<BannerDetails> Specific { get; set; }
             public int Sort { get; set; }
         }
@@ -105,17 +89,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public BannerStatusEnum Status { get; set; }
         }
         
-        public class GetHotEventListReq : ApiRequestPageModel
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<BannerStatusEnum> Statuses { get; set; }
-        }
-        
-        public class GetHotEventReq
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-        }
+        // public class GetHotEventListReq : ApiRequestPageModel
+        // {
+        //     public IEnumerable<int> SiteIds { get; set; }
+        //     public IEnumerable<BannerStatusEnum> Statuses { get; set; }
+        // }
+        //
+        // public class GetHotEventReq
+        // {
+        //     public int SiteId { get; set; }
+        //     public string BannerName { get; set; }
+        // }
 
         #endregion
 
@@ -224,33 +208,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     StartTime = request.StartTime,
                     EndTime = request.EndTime,
                     BonusCode = request.BonusCode,
-                    MatchId = request.MatchId,
                     TpId = request.TpId,
                     GameId = request.GameId,
-                    UrlRouter = request.UrlRouter,
-                    SportBattleDateTime = request.SportBattleDateTime,
-                    SportCategoryId = request.SportCategoryId,
-                    SportLeaguesId = request.SportLeaguesId,
-                    SportTeamsId = request.SportTeamsId,
+                    UrlRouter = string.IsNullOrEmpty(request.UrlRouter)? null : Enum.GetName(typeof(UrlRouterEnum),int.Parse(request.UrlRouter)),
                     Specific = request.Specific,
                     Sort = request.Sort
                 };
-
                 var user = _authorizeBll.GetAuthData().UserName;
                 var errorCode = _bannerManageBll.SetBanner(data, user);
-
-                if (request.IsAdd)
-                {
-                    apiResult.ErrorCode = errorCode == 1 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
-                }
-                else
-                {
-                    apiResult.ErrorCode = errorCode == 2 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
-                    if (errorCode == 1)
-                    {
-                        apiResult.Message = "The Banner Name setting already exists which with same Site.";
-                    }
-                }
+                
+                apiResult.ErrorCode = errorCode >= 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
+                
             }
             catch (MySqlException sqlException)
             {
@@ -323,76 +291,77 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         
-        /// <summary>
-        /// Banner/GetHotEventList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing >  Hot Event Management
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
-        {
-            var apiResult = new ApiListResult<HotEventList>();
-            try
-            {
-                var statusList = req.Statuses.Select(x => (int)x);
+        // /// <summary>
+        // /// Banner/GetHotEventList
+        // /// </summary>
+        // /// <remarks>
+        // /// Http Method：POST
+        // /// 
+        // /// Func Path：Marketing >  Hot Event Management
+        // /// </remarks>
+        // /// <param name="req"></param>
+        // [HttpPost]
+        // public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
+        // {
+        //     var apiResult = new ApiListResult<HotEventList>();
+        //     try
+        //     {
+        //         var statusList = req.Statuses.Select(x => (int)x);
+        //
+        //
+        //         apiResult.Data = _bannerManageBll.GetHotEventList(req.SiteIds,
+        //             statusList,
+        //             req.PageNumber, req.PageSize, out var totalPages, out var rowCount);
+        //         apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //         apiResult.TotalPages = totalPages;
+        //         apiResult.RowCount = rowCount;
+        //         apiResult.PageNumber = req.PageNumber;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //         apiResult.Message = ex.Message;
+        //         apiResult.RawMessage = ex.ToString();
+        //     }
+        //     return apiResult;
+        // }
 
-
-                apiResult.Data = _bannerManageBll.GetHotEventList(req.SiteIds,
-                    statusList,
-                    req.PageNumber, req.PageSize, out var totalPages, out var rowCount);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.TotalPages = totalPages;
-                apiResult.RowCount = rowCount;
-                apiResult.PageNumber = req.PageNumber;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
-            return apiResult;
-        }
-
-        /// <summary>
-        /// Banner/GetHotEvent 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing >  Hot Event Management > [Edit]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
-        {
-            var apiResult = new ApiResult<BannerInfo>();
-            try
-            {
-                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName, 0);
-                if (result != null)
-                {
-                    apiResult.Data = result;
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                }
-                else
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
-                    apiResult.Message = "The Hot Event Detail No Data";
-                }
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
-            return apiResult;
-        }
+        // /// <summary>
+        // /// Banner/GetHotEvent 
+        // /// </summary>
+        // /// <remarks>
+        // /// Http Method：POST
+        // /// 
+        // /// Func Path：Marketing >  Hot Event Management > [Edit]
+        // /// </remarks>
+        // /// <param name="req"></param>
+        // [HttpPost]
+        // public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
+        // {
+        //     var apiResult = new ApiResult<BannerInfo>();
+        //     try
+        //     {
+        //         var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName, 0);
+        //         if (result != null)
+        //         {
+        //             apiResult.Data = result;
+        //             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //         }
+        //         else
+        //         {
+        //             apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
+        //             apiResult.Message = "The Hot Event Detail No Data";
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+        //         apiResult.Message = ex.Message;
+        //         apiResult.RawMessage = ex.ToString();
+        //     }
+        //     return apiResult;
+        // }
+        
         #endregion
     }
 }
