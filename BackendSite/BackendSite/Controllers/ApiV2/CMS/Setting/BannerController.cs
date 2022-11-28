@@ -62,7 +62,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public string BonusCode { get; set; }
             public int? TpId { get; set; }
             public string GameId { get; set; }
-            public string UrlRouter { get; set; }
+            public int UrlRouter { get; set; }
             public IEnumerable<BannerDetails> Specific { get; set; }
             public int Sort { get; set; }
         }
@@ -210,7 +210,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     BonusCode = request.BonusCode,
                     TpId = request.TpId,
                     GameId = request.GameId,
-                    UrlRouter = request.UrlRouter,
+                    UrlRouter = Enum.GetName(typeof(UrlRouterEnum), request.UrlRouter),
                     Specific = request.Specific,
                     Sort = request.Sort
                 };
