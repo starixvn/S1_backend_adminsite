@@ -69,10 +69,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetBankInfoOffListRequest
         {
             /// <summary>
-            /// 品牌ID
-            /// </summary>
-            public int SiteId { get; set; }
-            /// <summary>
             /// 幣別
             /// </summary>
             public int CurrencyId { get; set; }
@@ -291,15 +287,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// 
         /// Func Path：Global Func.
         /// 
-        /// Use：Finance > Withdrawal Request > [select Pay], When Type = 2.Local Bank.
-        /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffList(GetBankInfoOffListRequest request)
         {
-            var data = _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
+            var authData = _authorizeBll.GetAuthData();
+            var data = _bankDetailBll.GetOfflineBankAccount(authData.SiteId, request.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
                             && x.Channel != TransferChannelEnum.PSP)
