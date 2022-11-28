@@ -31,14 +31,9 @@ namespace BackendSite.Service.DAL
             p.Add("StartTime", bannerInfo.StartTime?.DateTime);
             p.Add("EndTime", bannerInfo.EndTime?.DateTime);
             p.Add("BonusCode", bannerInfo.BonusCode);
-            p.Add("MatchId", bannerInfo.MatchId);
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
             p.Add("UrlRouter", bannerInfo.UrlRouter);
-            p.Add("SportBattleDateTime", bannerInfo.SportBattleDateTime?.DateTime);
-            p.Add("SportCategoryId", bannerInfo.SportCategoryId);
-            p.Add("SportLeaguesId", bannerInfo.SportLeaguesId);
-            p.Add("SportTeamsId", JsonConvert.SerializeObject(bannerInfo.SportTeamsId));
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
@@ -85,25 +80,9 @@ namespace BackendSite.Service.DAL
                 result.StartTime = Convert.ToDateTime(queryResult.StartTime);
                 result.EndTime = Convert.ToDateTime(queryResult.EndTime);
                 result.BonusCode = queryResult.BonusCode;
-                result.MatchId = Convert.ToInt32(queryResult.MatchId);
                 result.TpId = Convert.ToInt32(queryResult.TpId);
                 result.GameId = queryResult.GameId;
                 result.UrlRouter = queryResult.UrlRouter;
-                result.SportBattleDateTime = queryResult.SportBattleDateTime == null ? null : Convert.ToDateTime(queryResult.SportBattleDateTime);
-                result.SportCategoryId = Convert.ToInt32(queryResult.SportCategoryId);
-                result.SportLeaguesId = Convert.ToInt32(queryResult.SportLeaguesId);
-                if (queryResult.SportTeamsId != null)
-                {
-                    result.SportTeamsId = JsonConvert.DeserializeObject<IEnumerable<BannerSportTeamsDetails>>(queryResult.SportTeamsId, new JsonSerializerSettings
-                    {
-                        Formatting = Formatting.Indented,
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-                }
-                else
-                {
-                    result.SportTeamsId = null;
-                }
                 result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryResult.Specific, new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,

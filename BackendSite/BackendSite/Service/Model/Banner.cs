@@ -31,23 +31,9 @@ namespace BackendSite.Service.Model
         public int ActionMode { get; set; }
         public int ShowStatus { get; set; }
         public string BonusCode { get; set; }
-        public int? MatchId { get; set; }
         public int? TpId { get; set; }
         public string GameId { get; set; }
         public string UrlRouter { get; set; }
-        private DateTimeOffset? _sportBattleDateTime { set; get; }
-        public DateTimeOffset? SportBattleDateTime 
-        {
-            get => _sportBattleDateTime;
-            set
-            {
-                if (value != null)
-                    _sportBattleDateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
-            }
-        }
-        public int? SportCategoryId { get; set; }
-        public int? SportLeaguesId { get; set; }
-        public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
     }

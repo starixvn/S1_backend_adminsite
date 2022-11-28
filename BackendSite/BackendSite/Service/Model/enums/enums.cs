@@ -1010,12 +1010,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
