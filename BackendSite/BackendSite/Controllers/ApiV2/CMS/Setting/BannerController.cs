@@ -210,7 +210,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     BonusCode = request.BonusCode,
                     TpId = request.TpId,
                     GameId = request.GameId,
-                    UrlRouter = string.IsNullOrEmpty(request.UrlRouter)? null : Enum.GetName(typeof(UrlRouterEnum), request.UrlRouter),
+                    UrlRouter = string.IsNullOrEmpty(request.UrlRouter)? null : Enum.GetName(typeof(UrlRouterEnum),int.Parse(request.UrlRouter)),
                     Specific = request.Specific,
                     Sort = request.Sort
                 };
