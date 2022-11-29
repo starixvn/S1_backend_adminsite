@@ -2105,10 +2105,16 @@ namespace BackendSite.Service.BLL
         {
             var except = new[]
             {
-                TransferTypeEnum.Undefined
+                TransferTypeEnum.Undefined,
+                TransferTypeEnum.Deposit,
+                TransferTypeEnum.Withdrawal
             };
-
-            return EnumExtension.EnumToIEnumerable(except);
+            
+            var result = EnumExtension.EnumToIEnumerable(except).ToList();
+            result.Insert(0, TransferTypeEnum.Deposit);
+            result.Insert(1, TransferTypeEnum.Withdrawal);
+            
+            return result;
         }
         
         #endregion
