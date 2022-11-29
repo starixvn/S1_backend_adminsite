@@ -15,15 +15,22 @@ namespace BackendSite.Service.Model
     }
     public class GetDeepLinkRep
     {
+        private DateTimeOffset _lastUpdateTime;
         public int SiteId { get; set; }
         public string SiteName { get; set; }
-        public string Domain { get; set; }
+        public int DeepLinkId { get; set; }
+        public string DeepLinkName { get; set; }
         public DeepLinkTableTypeEnum Type { get; set; }
         public string TypeName => Type.GetDescription();
         public DeepLinkTableProtocolTypeEnum ProtocolType { get; set; }
         public string ProtocolTypeName => ProtocolType.GetDescription();
-        public int DeepLinkId { get; set; }
-
+        public string Domain { get; set; }
+        public string LastUpdateUser { get; set; }
+        public DateTimeOffset LastUpdateTime
+        {
+            get => _lastUpdateTime;
+            set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
     public class SetDeepLinkReq
     {
