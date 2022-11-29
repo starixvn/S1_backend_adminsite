@@ -4,6 +4,9 @@ using BackendSite.Service.Model.Mpa.Marketing;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
+using System.Reflection;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -115,9 +118,111 @@ namespace BackendSite.Service.BLL.Mpa
             return list.GetRange(index, count);
         }
 
+
+        public byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData, 
+            List<WithdrawalAmountDetailData> detailsData,
+            bool isCompare, 
+            string summaryTitle,
+            string detailTitle,
+            IEnumerable<PropertyInfo> properties = null)
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add(nameof(summaryData)); // summary sheets
+            var ws2 = p.Workbook.Worksheets.Add(nameof(detailsData)); // detail sheets
+
+            if (summaryData != null)
+            {
+                // 第一列
+                var firstRow = ws.Cells[1, 1, 1, 4];
+                firstRow.Merge = true;
+                firstRow.Value = summaryTitle;
+                firstRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                firstRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
+
+                // 第二列
+                var toCell = isCompare ? 4 : 2;
+                var secondRow = ws.Cells[2, 1, 2, toCell];
+                secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                secondRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                ws.Cells[2, 1].Value = "";
+                ws.Cells[2, 2].Value = "Report Date";
+                ws.Cells[2, 2].EntireColumn.Width = 20;
+
+                ws.Cells[3, 1].Value = "Total Withdrawal Amount";
+                ws.Cells[3, 1].EntireColumn.Width = 30;
+                ws.Cells[4, 1].Value = "Total Withdrawal Users";
+                ws.Cells[4, 1].EntireColumn.Width = 30;
+
+                if (isCompare)
+                {
+                    ws.Cells[2, 3].Value = "Compare Date";
+                    ws.Cells[2, 3].EntireColumn.Width = 20;
+
+                    ws.Cells[2, 4].Value = "% Change";
+                    ws.Cells[2, 4].EntireColumn.Width = 20;
+
+                    ws.Cells[3, 2].Value = summaryData.WithdrawalAmount;
+                    ws.Cells[3, 3].Value = summaryData.CompareWithdrawalAmount;
+                    ws.Cells[3, 4].Value = summaryData.WithdrawalAmountChangeRate;
+                    ws.Cells[3, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+                    ws.Cells[4, 2].Value = summaryData.WithdrawalUsers;
+                    ws.Cells[4, 3].Value = summaryData.CompareWithdrawalUsers;
+                    ws.Cells[4, 4].Value = summaryData.WithdrawalUsersChangeRate;
+                    ws.Cells[4, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                }
+                else
+                {
+                    ws.Cells[3, 2].Value = summaryData.WithdrawalAmount;
+                    ws.Cells[4, 2].Value = summaryData.WithdrawalUsers;
+                }
+            }
+
+            if (detailsData.Any())
+            {
+                properties ??= detailsData.FirstOrDefault()?.GetType().GetProperties();
+
+                var rows = detailsData.Count() + 1;
+                if (properties != null)
+                {
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws2.Cells[2, 1].LoadFromCollection(detailsData, true);
+                        ws2.Cells[2, 1].Value = "#";
+
+                        // 第二列
+                        var secondRow = ws2.Cells[1, 1, 2, cols];
+                        secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        secondRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                        // 第一列
+                        var firstRow = ws2.Cells[1, 1, 1, cols];
+                        firstRow.Value = detailTitle;
+                        firstRow.Merge = true;
+                        firstRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        firstRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
+
+                        //設定欄位寬度
+                        ws2.Cells[2, 1, rows, cols].EntireColumn.Width = 20;
+                    }
+                }
+            }
+
+            p.Save();
+            return ms.ToArray();
+        }
+
         private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source, WithdrawalAmountRequest request)
             where TEntity : class, IMpaMarketingWithdrawalAmountBaseDto
         {
+            request.EndDate = request.EndDate.AddMonths(1).AddDays(-request.EndDate.AddMonths(1).Day);
             var rateList = (await _mapMpaCommonService.GetMpaExchangeRate(request.StartDate, request.EndDate)).ToList();
 
             foreach (var item in source)

@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model.Mpa.Marketing
+﻿using Newtonsoft.Json;
+
+namespace BackendSite.Service.Model.Mpa.Marketing
 {
     public class WithdrawalAmountSummaryResponse
     {
@@ -17,6 +19,9 @@
 
     public class WithdrawalAmountDetailData
     {
+        [JsonIgnore]
+         public int Num { get; set; }
+
          public string UserName { get; set; }
 
         public string CurrencyName { get; set; }
