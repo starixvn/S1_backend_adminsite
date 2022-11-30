@@ -485,8 +485,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<CryptoInfoData> GetCryptoInfoData()
         {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.GetCryptoInfoData(authData.SiteId);
 
             return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }

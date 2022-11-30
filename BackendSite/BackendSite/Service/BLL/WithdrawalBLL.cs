@@ -701,15 +701,20 @@ namespace BackendSite.Service.BLL
         }
         
 
-        public CryptoInfoData GetCryptoInfoData()
+        public CryptoInfoData GetCryptoInfoData(int siteId)
         {
-            var infos = _withdrawalLimitService.GetCryptoInfoList();
+            var infos = _withdrawalLimitService.GetCryptoInfoList(siteId);
             var cryptoCurrency = infos
-                .Select(x => new CryptoCurrency
+                .GroupBy(x => x.CurrencyId)
+                .Select(x =>
                 {
-                    CurrencyId = x.CurrencyId,
-                    CurrencyName = x.CurrencyName
-                }).Distinct(new CryptoCurrencyComparer());
+                    var d = x.First();
+                    return new CryptoCurrency
+                    {
+                        CurrencyId = d.CurrencyId,
+                        CurrencyName = d.CurrencyName
+                    };
+                });
 
             var cryptoNetwork = infos.Select(x => new CryptoNetwork
             {

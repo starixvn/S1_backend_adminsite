@@ -808,7 +808,9 @@ namespace BackendSite.Service.Model.enums
         
         Finance = 4,
         
-        MC = 5
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>
