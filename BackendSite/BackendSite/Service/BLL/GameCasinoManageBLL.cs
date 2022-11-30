@@ -42,6 +42,11 @@ namespace BackendSite.Service.BLL
             return gameCasinoManageService.GetTpList();
         }
 
+        public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()
+        {
+            return gameCasinoManageService.GetSlotCategoryList();
+        }
+
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
             var result = gameCasinoManageService.GameCasinoByTPIdV2(gameCasinoPara);
