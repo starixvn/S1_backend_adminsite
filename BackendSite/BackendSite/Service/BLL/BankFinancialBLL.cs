@@ -1902,7 +1902,7 @@ namespace BackendSite.Service.BLL
                         Fees = g.Sum(x => x.FeeSummary),
                         OpenBalance = openBalance,
                         NetBalance = netBalance,
-                        ClosingBalance = openBalance - netBalance
+                        ClosingBalance = openBalance + netBalance
                     };
                 });
             
@@ -2051,7 +2051,7 @@ namespace BackendSite.Service.BLL
                     {
                         {"Open Balance", openBalance.ToString()},
                         {"Net Balance", netBalance.ToString()},
-                        {"Closing Balance", (openBalance - netBalance).ToString()}
+                        {"Closing Balance", (openBalance + netBalance).ToString()}
                     });
 
                     return item;
