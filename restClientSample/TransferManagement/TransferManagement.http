@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+# @url=http://localhost:9158
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+@url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -77,7 +77,7 @@ POST {{url}}/apiV2/BankTransferAccount/Set HTTP/1.1
 Content-Type: application/json
 
 {
-    "id": 0,
+    "id": 511,
     "siteId": 1,
     "currencyId": 2,
     "sysId": null,
@@ -96,7 +96,7 @@ Content-Type: application/json
     "maxBalanceAlertAmount": 0,
     "reason": 1,
     "remark": null,
-    "status": 1,
+    "status": 2,
     "bankLoginUrl": "",
     "bankLoginAccount": "",
     "bankLoginPassword": "",
