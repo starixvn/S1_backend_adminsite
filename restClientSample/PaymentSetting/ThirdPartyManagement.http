@@ -163,3 +163,19 @@ Content-Type: application/json
     "siteId": 1,
     "currencyId": 2
 }
+
+###
+# 取得加密貨幣列表
+POST {{url}}/apiV2/ThirdPartyManagement/GetCryptoInfoList HTTP/1.1
+Content-Type: application/json
+
+###
+# 更新加密貨幣狀態
+POST {{url}}/apiV2/ThirdPartyManagement/SetCryptoInfoStatus HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 96,
+    "network": 1,
+    "status": 1
+}

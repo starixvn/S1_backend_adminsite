@@ -883,8 +883,10 @@ namespace BackendSite.Service.Model.enums
         PSP = 3,
 
         Finance = 4,
-
-        MC = 5
+        
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>

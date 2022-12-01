@@ -25,11 +25,11 @@ namespace BackendSite.Service.BLL
         private readonly BankDetailBLL _bankDetailBll;
         private readonly MySqlClient _mainDbClient;
         private readonly Common _common;
-        private readonly WalletService _walletService;
         private readonly ILogger<WithdrawalBLL> _logger;
         private readonly IConfiguration _configuration;
         private readonly string payApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly PaymentManageService _paymentManageService;
 
         private readonly Dictionary<int, bool> _isConvert = new Dictionary<int, bool>()
         {
@@ -54,12 +54,12 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
             _common = provider.GetRequiredService<Common>();
-            _walletService = provider.GetRequiredService<WalletService>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _configuration = provider.GetRequiredService<IConfiguration>();
             payApiUrl = _configuration.GetValue<string>("PayService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _paymentManageService = provider.GetRequiredService<PaymentManageService>();
         }
 
         #endregion
@@ -763,15 +763,20 @@ namespace BackendSite.Service.BLL
         }
         
 
-        public CryptoInfoData GetCryptoInfoData()
+        public CryptoInfoData GetCryptoInfoData(int siteId)
         {
-            var infos = _withdrawalLimitService.GetCryptoInfoList();
+            var infos = _paymentManageService.GetCryptoInfoList(siteId);
             var cryptoCurrency = infos
-                .Select(x => new CryptoCurrency
+                .GroupBy(x => x.CurrencyId)
+                .Select(x =>
                 {
-                    CurrencyId = x.CurrencyId,
-                    CurrencyName = x.CurrencyName
-                }).Distinct(new CryptoCurrencyComparer());
+                    var d = x.First();
+                    return new CryptoCurrency
+                    {
+                        CurrencyId = d.CurrencyId,
+                        CurrencyName = d.CurrencyName
+                    };
+                });
 
             var cryptoNetwork = infos.Select(x => new CryptoNetwork
             {

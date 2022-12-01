@@ -290,24 +290,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// <summary>
-        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<CryptoInfoData> GetCryptoInfoData()
-        {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
-
-            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
-        }
-
         /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
         /// </summary>
         /// <remarks>
@@ -493,6 +475,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
 
             return apiResult;
+        }
+        
+        /// <summary>
+        /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Crypto Withdrawal Limit Management > Crypto Filter
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<CryptoInfoData> GetCryptoInfoData()
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.GetCryptoInfoData(authData.SiteId);
+
+            return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }
 
         /// <summary>

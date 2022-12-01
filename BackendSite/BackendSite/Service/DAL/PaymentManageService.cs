@@ -604,6 +604,61 @@ namespace BackendSite.Service.DAL
                 
             return false;
         }
+        
+        public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
+            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get_V2", new {_SiteId = siteId});
+        
+        public bool SetCryptoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            #region props
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_Network", network);
+            props.Add("_Status", status);
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", siteId);
+            logParam.Add("_CurrencyId", currencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                CryptoCurrency = currencyId.ToString(),
+                Network = network,
+                Status = (status == GeneralStatusEnum.Enable ? GeneralStatusEnum.Disable : GeneralStatusEnum.Enable).ToString()
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                CryptoCurrency = currencyId.ToString(),
+                Network = network,
+                Status = status.ToString()
+            }));
+            logParam.Add("_Operator", @operator);
+            #endregion
+
+            var setResult = _mainDbClient.Execute("Admin_CryptoNetwork_Set", props, conn, trans);
+            if (setResult > 0)
+            {
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
+                if (logResult > 0)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+            
+            return false;
+        }
 
         #endregion
     }

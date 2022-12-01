@@ -158,6 +158,14 @@ namespace BackendSite.Service.BLL
             
             return result;
         }
+        
+        public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
+            => _paymentManageService.GetCryptoInfoList(siteId);
+        
+        public bool SetCryptoInfoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
+        {
+            return _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
+        }
 
         private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)
         {
