@@ -321,7 +321,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                                         }
                                         else
                                         {
-                                            apiResult.Add(new ApiResult() { ErrorCode = apiOnlineResult.ErrorCode, Message = $"{apiOnlineResult.Message}. Username: {custUsername}. SabaId: {sabaId}." });
+                                            apiResult.Add(new ApiResult() { ErrorCode = apiOnlineResult.ErrorCode, Message = $"Fail. {apiOnlineResult.Message} Username: {custUsername}. SabaId: {sabaId}." });
                                         }
                                     }
                                 }
@@ -357,7 +357,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                                         SabaId = sabaId,
                                         BonusCode = request.BonusCode,
                                         PromotionType = request.PromotionType.ToString(),
-                                        Amount = request.Amount,
                                         DepositId = depositId
                                     };
                                     if (!AddLog(custInfosDetail.CurrencyId, JsonConvert.SerializeObject(detailInfo)))
@@ -372,7 +371,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                                             BonusCode = request.BonusCode,
                                             Memo = string.Empty,
                                             Operator = authData.UserName,
-                                            Amount = request.Amount,
                                             PromotionType = (int)request.PromotionType,
                                             DepositId = depositId,
                                         };
