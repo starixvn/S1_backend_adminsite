@@ -1,9 +1,8 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Report
@@ -22,6 +21,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             this._MaMpaWinLossBll = MaMpaWinLossBll;
             _excelBll = excelBll;
         }
+
+        #region GroupBy Date
 
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossRequest request)
@@ -50,6 +51,10 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "WinLossByDateExport");
         }
 
+        #endregion
+
+        #region GroupBy Month
+
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossRequest request)
         {
@@ -76,6 +81,10 @@ namespace BackendSite.Controllers.ApiV2.Report
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
         }
+
+        #endregion
+
+        #region GroupBy TpGameType
 
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossRequest request)
@@ -104,6 +113,10 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
         }
 
+        #endregion
+
+        #region GroupBy TpCategory
+
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
         {
@@ -131,6 +144,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "WinLossByTpCategoryExport");
         }
 
+        #endregion
+
+        #region GroupBy Player
 
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>> GetWinLossByPlayer(MpaWinLossRequest request)
@@ -159,7 +175,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
         }
 
-        
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerDetailResponse>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {
@@ -179,6 +194,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        #endregion
+
+        #region GroupBy Currency
 
         [HttpPost]
         public async Task<ApiResult<Dictionary<string, MpaWinLossByCurrencyResponse>>> GetWinLossByCurrency(MpaWinLossRequest request)
@@ -199,7 +217,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request)
         {
@@ -207,5 +224,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByCurrencyExport");
         }
+
+        #endregion
     }
 }

@@ -1,5 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 
 namespace BackendSite.Service.DAL.Interface
 {
@@ -46,19 +46,6 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime,
             DateTimeOffset endTime, string format);
 
-        /// <summary>
-        /// 取的幣別的 USD 匯率，目前先從 Currency 取的，未來可能替換成 匯率商 API
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<MpaUSdRateDto>> GetMpaUsdRate();
-
-        /// <summary>
-        /// 透過 UserName/tpUserName 取得 CustId
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <param name="userName"></param>
-        /// <returns></returns>
-        int GetCustIdByUserName(int siteId, string userName);
 
         /// <summary>
         /// 取得所有 TpGameTypeID/TpGameTypeName

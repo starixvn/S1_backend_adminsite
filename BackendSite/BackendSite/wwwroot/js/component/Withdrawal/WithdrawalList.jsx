@@ -1286,7 +1286,7 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-10, 'days').format('l')} />
+                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-2, 'days').format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">

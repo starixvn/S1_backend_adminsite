@@ -1,5 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {
