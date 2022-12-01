@@ -7,6 +7,7 @@ using BackendSite.ExceptionHandling;
 using NSwag;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
@@ -44,6 +45,7 @@ namespace BackendSite
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
+            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -77,15 +79,39 @@ namespace BackendSite
 
             }
 
+            services.AddTransient<IMemberQuery, MemberQuery>();
+            services.AddTransient<IMemberCommand, MemberCommand>();
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
+            services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
+            services.AddTransient<IVipLevelBLL, VipLevelBLL>();
+            services.AddTransient<ITagBLL, TagBLL>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
+            services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>(); 
+
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
+            services.AddTransient<IMemberService, MemberService>();
+            services.AddTransient<IVipLevelService, VipLevelService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IDeviceService, DeviceService>();
+            services.AddTransient<IAdminLogService, AdminLogService>();
+            services.AddTransient<IMarketingService, MarketingService>();
+            services.AddTransient<IAffiliateApiService, AffiliateApiService>();
+            services.AddTransient<IBonusApiService, BonusApiService>();
+            services.AddTransient<IIovationReportService, IovationReportService>();
+            services.AddTransient<IMpaWinLossService, MpaWinLossService>();
+            services.AddTransient<IMpaCommonService, MpaCommonService>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
+
+            
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

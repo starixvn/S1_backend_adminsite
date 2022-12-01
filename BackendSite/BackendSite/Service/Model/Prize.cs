@@ -83,6 +83,23 @@
         public int RowCount { get; set; }
         public List<string> CurrencyAmount { get; set; }
     }
+    public class DrawPrizeReportResult
+    {
+        public List<DrawPrize> Data { get; set; }
+        public List<DrawPrizeReportOverviewResult> CurrencyAmount { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
+    public class DrawPrizeReportOverviewResult
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int TotalRecord { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
+
     public class PrizeLogResult
     {
         public List<PrizeLogData> PrizeLogData { get; set; }

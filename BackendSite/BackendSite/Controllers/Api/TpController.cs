@@ -261,7 +261,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
 
-            var TPList = tpBLL.GetTpBySiteAndCurrency(TpDetailPara);
+            var TPList = tpBLL.GetTpBySiteAndCurrency(TpDetailPara.Site,TpDetailPara.Currency);
             apiListResult.Data = TPList;
             apiListResult.ErrorCode = 0;
             return apiListResult;
