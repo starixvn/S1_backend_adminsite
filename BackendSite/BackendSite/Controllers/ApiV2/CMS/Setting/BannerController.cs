@@ -196,17 +196,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public ApiResult SetBanner(SetRequest request)
         {
             var apiResult = new ApiResult();
-
+            
             var urlRouter = new Dictionary<string, string>()
             {
-                {"1","sports"},
-                {"2","live-casino"},
-                {"3","referral"},
-                {"4","leaderBoard"},
-                {"5","angPow"},
-                {"6","lottery"}
+                {"01","sports"},
+                {"02","live-casino"},
+                {"03","referral"},
+                {"04","leaderBoard"},
+                {"05","angPow"},
+                {"06","lottery"},
+                {"22","liveCasino"},
+                {"32","liveCasino"}
             };
             
+            var router = string.IsNullOrEmpty(request.UrlRouter) ? 
+                null : urlRouter.ContainsKey($"{request.SiteId}{request.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}{request.UrlRouter}"] : urlRouter[$"0{request.UrlRouter}"] ;
             try
             {
                 var data = new BannerInfo
@@ -221,7 +226,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     BonusCode = request.BonusCode,
                     TpId = request.TpId,
                     GameId = request.GameId,
-                    UrlRouter = string.IsNullOrEmpty(request.UrlRouter)? null : urlRouter[request.UrlRouter],
+                    UrlRouter = router,
                     Specific = request.Specific,
                     Sort = request.Sort
                 };
