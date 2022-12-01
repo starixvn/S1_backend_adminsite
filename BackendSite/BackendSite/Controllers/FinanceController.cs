@@ -91,7 +91,6 @@ namespace BackendSite.Controllers
             public long endDate { get; set; }
             public string Status { get; set; }
             public string LevelStatus { get; set; }
-            public int AmountType { get; set; }
             public string Amount { get; set; }
         }
 
@@ -119,12 +118,13 @@ namespace BackendSite.Controllers
                 depositListReq.DepositType,
                 startTime, endTime,
                 depositListReq.DepositId,
-                depositListReq.UserName,
+                new List<string> {depositListReq.UserName},
+                null,
                 depositListReq.CurrencyId,
                 depositListReq.Status,
                 depositListReq.LevelStatus,
-                depositListReq.AmountType,
-                depositListReq.Amount,
+                -1,
+                -1,
                 depositListReq.SelectPayId);
 
             foreach (var data in exportDeposit)
@@ -158,35 +158,39 @@ namespace BackendSite.Controllers
         [HttpPost]
         public IActionResult ExportWithdrawalList(WithdrawalListReq withdrawalListReq)
         {
-            List<WithdrawalInfoForExportData> exportData = new List<WithdrawalInfoForExportData>();
+            var exportData = new List<WithdrawalInfoForExportData>();
             var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
-            var SelectSite = "[" + withdrawalListReq.SelectSite + "]";
-            var WithdrawalType = "[" + withdrawalListReq.withdrawalType + "]";
-            var CurrencyId = "[" + withdrawalListReq.CurrencyId + "]";
-            var Status = "[" + withdrawalListReq.status + "]";
-            var VipStatus = $"[{withdrawalListReq.LevelStatus}]";
+            var selectSite = "[" + withdrawalListReq.SelectSite + "]";
+            var withdrawalType = "[" + withdrawalListReq.withdrawalType + "]";
+            var currencyId = "[" + withdrawalListReq.CurrencyId + "]";
+            var status = "[" + withdrawalListReq.status + "]";
+            var vipStatus = $"[{withdrawalListReq.LevelStatus}]";
 
-            var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(SelectSite,
-                WithdrawalType,
-                startTime, endTime, withdrawalListReq.WithdrawalId,
-                withdrawalListReq.UserName, CurrencyId,
-                Status, VipStatus,
-                withdrawalListReq.AmountType, withdrawalListReq.Amount,
+            var exportWithdrawal = withdrawalBLL.GetWithdrawalExportList(
+                selectSite,
+                withdrawalType,
+                startTime, 
+                endTime, 
+                withdrawalListReq.WithdrawalId,
+                withdrawalListReq.UserName, 
+                currencyId,
+                status,
+                vipStatus,
+                -1,
+                -1,
+                null,
+                null,
+                null,
                 withdrawalListReq.WithdrawalMethod);
 
             foreach (var data in exportWithdrawal)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.UpdateTime != null)
-                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.FlowEndTime != null)
-                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 if (!string.IsNullOrWhiteSpace(data.EWalletName))
                 {
-                    int length = data.AccountNo.Length;
-                    int rightLength = length - 4;
+                    var length = data.AccountNo.Length;
+                    var rightLength = length - 4;
                     if (rightLength > 0)
                     {
                         data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
@@ -228,7 +232,7 @@ namespace BackendSite.Controllers
                 });
             }
 
-             var stream = excelBLL.ExportV2(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{nameof(exportWithdrawal)}{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
@@ -293,13 +297,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }

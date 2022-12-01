@@ -2,14 +2,12 @@
 using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {

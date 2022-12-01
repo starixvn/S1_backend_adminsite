@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalController : ControllerBase
@@ -30,7 +30,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly AuthorizeBLL _authorizeBll;   
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
-
+        private readonly PermissionBLL _permissionBll;
+        private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly Cryptor _cryptor;
+        
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
         private readonly string _awsWithdrawalAccountingFolder;
@@ -52,13 +55,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
+            
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
             _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
             _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
             _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
             _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            _usableActionType = new Dictionary<int, List<int>>
+            {
+                { 1, new List<int> {66,6,63,69,71} }, //Pending -> Draft,Reject,OnHold,Verified,ToKyc
+                { 2, new List<int> {66,69,71,6} },//On-Hold -> Draft,Verified,ToKyc,Reject
+                { 3, new List<int> {66,70,64,6} },//Verified -> Draft,Process,Pending,Reject
+                { 4, new List<int> {66,69,65} },//Process -> Draft ,Verified ,Approved 
+                { 6, new List<int> {66,68} },//Approved -> Draft,Manual Rejected
+                { 7, new List<int> {66,67} },//Reject -> Draft,Manual Approved
+                { 8, new List<int> {66,64,6} }//ToKyc -> Draft,Pending,Reject
+            };
         }
 
         #endregion
@@ -69,7 +84,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
@@ -86,11 +101,45 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> LevelStatuses { get; set; }
-            public int AmountType { get; set; }
-            public string Amount { get; set; }
             public WithdrawalMethodEnum WithdrawalMethod { get; set; }
+            public IEnumerable<string> SelectBankCode { get; set; }
+            public IEnumerable<int> SelectCalCode { get; set; }
+            public string Agent { get; set; }
+            public decimal StartAmount { get; set; }
+            public decimal EndAmount { get; set; }
+
         }
 
+        public class GetExportRequest
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public int SiteId { get; set; }
+            public string WithdrawalId { get; set; }
+            public string UserName { get; set; }
+            public IEnumerable<int> WithdrawalTypes { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+            public IEnumerable<int> Statuses { get; set; }
+            public IEnumerable<int> LevelStatuses { get; set; }
+            public WithdrawalMethodEnum WithdrawalMethod { get; set; }
+            public IEnumerable<string> SelectBankCode { get; set; }
+            public IEnumerable<int> SelectCalCode { get; set; }
+            public string Agent { get; set; }
+            public decimal StartAmount { get; set; }
+            public decimal EndAmount { get; set; }
+
+        }
+        
         public class GetByTransIdRequest
         {
             public string TransId { get; set; }
@@ -104,6 +153,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public int? WithdrawalType { set; get; }
             public int? SelId { set; get; }
             public int? ChannelId { set; get; }
+            public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
         }
 
         public class ReqWithdrawalOnline
@@ -118,22 +168,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
         }
-
-        public class WithdrawalPicUrl
-        {
-            public string Url { get; set; }
-        }
-
+        
         public class UploadPictureRequest : GetByTransIdRequest
         {
-            public string Pic { get; set; }
+            public IEnumerable<string> Pic { get; set; }
         }
 
         public class DeletePictureRequest : GetByTransIdRequest
         {
+            public int Number { get; set; }
         }
-
-
+        
         #endregion
 
         #region Actions
@@ -148,27 +193,48 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
-            var totalPages = 0;
-            var rowCount = 0;
-            var CurrencyAmount = new List<string>();
+            var currencyAmount = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
-            var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(request.SiteIds,
-                request.WithdrawalTypes, request.StartDate.DateTime, request.EndDate.DateTime,
-                request.WithdrawalId, userNames , request.CurrencyIds,
-                request.Statuses, request.LevelStatuses, request.PageSize, request.AmountType, request.Amount, request.PageNumber,request.WithdrawalMethod
-                , out totalPages,
-                out rowCount, ref CurrencyAmount);
+            
+            var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(
+                new List<int> {request.SiteId},
+                request.WithdrawalTypes, 
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                request.WithdrawalId, 
+                userNames,
+                request.CurrencyIds,
+                request.Statuses,
+                request.LevelStatuses, 
+                request.PageSize, 
+                request.StartAmount, 
+                request.EndAmount,
+                request.PageNumber,
+                request.WithdrawalMethod,
+                request.SelectBankCode,
+                request.SelectCalCode,
+                request.Agent,
+                out var totalPages,out var rowCount, ref currencyAmount);
+
+            foreach (var data in withdrawalRequestList)
+            {
+                data.TransferPin = _cryptor.Decrypt(data.TransferPin);
+                data.LoginPin = _cryptor.Decrypt(data.LoginPin);
+                data.MobilePin = _cryptor.Decrypt(data.MobilePin);
+                data.CorporateID = _cryptor.Decrypt(data.CorporateID);
+            }
+            
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiListResult.PageNumber = request.PageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            apiListResult.CurrencyAmountRecord = currencyAmount;
 
             return apiListResult;
         }
@@ -183,39 +249,36 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 2 })]
         [HttpPost]
-        public IActionResult Export(GetListRequest request)
+        public IActionResult Export(GetExportRequest request)
         {
-            List<WithdrawalInfoForExportData> exportData = new List<WithdrawalInfoForExportData>();
-            var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(JsonConvert.SerializeObject(request.SiteIds),
+            var exportData = new List<WithdrawalInfoForExportData>();
+            var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            
+            var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(
+                JsonConvert.SerializeObject(new List<int>{request.SiteId}),
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.WithdrawalId,
-                request.UserName,
+                userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
                 JsonConvert.SerializeObject(request.CurrencyIds),
                 JsonConvert.SerializeObject(request.Statuses),
                 JsonConvert.SerializeObject(request.LevelStatuses),
-                request.AmountType,
-                request.Amount,
+                request.StartAmount, 
+                request.EndAmount,
+                request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
+                request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
+                string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
                 request.WithdrawalMethod);
-
-            //foreach (var item in data)
-            //{
-            //    item.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-            //    if (item.DepositTime != null)
-            //        item.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
-            //    if (item.UpdateTime != null)
-            //        item.UpdateTime = new DateTimeOffset(data.UpdateTime.Value.DateTime, TimeSpan.Zero);
-            //}
-
+            
             foreach (var data in exportWithdrawal)
             {
                 if (!string.IsNullOrWhiteSpace(data.EWalletName))
                 {
-                    int length = data.AccountNo.Length;
-                    int rightLength = length - 4;
+                    var length = data.AccountNo.Length;
+                    var rightLength = length - 4;
                     if (rightLength > 0)
                     {
                         data.AccountNo = $"****{data.AccountNo.Substring(4, rightLength)}";
@@ -271,13 +334,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
 
+            if (withdrawalRequest != null)
+            {
+                var usableActionButton = GetUsableActionButton(withdrawalRequest);
+                withdrawalRequest.UsableActionButton = usableActionButton;
+            }
+            
             if (withdrawalRequest.Operator == User.Identity.Name)
             {
                 withdrawalRequest.SameOperator = true;
@@ -285,14 +354,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             try
             {
-                if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
+                if (withdrawalRequest.Status is 4 or 6)
                 {
                     var getRequest = new GetObjectRequest();
-                    var key = string.Format("{0}/{1}_{2}.png", _awsWithdrawalFolder, request.TransId,
-                        withdrawalRequest.BankSlipPicCount);
+                    var key = $"{_awsWithdrawalFolder}/{request.TransId}_{withdrawalRequest.BankSlipPicCount}.png";
                     getRequest.BucketName = _awsWithdrawalBucketName;
                     getRequest.Key = key;
-                    var getResponse = await _s3Helper.GetObjectAsync(getRequest);
+                    await _s3Helper.GetObjectAsync(getRequest);
                     withdrawalRequest.HasPic = true;
                 }
                 else
@@ -306,7 +374,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
 
             apiResult.Data = withdrawalRequest;
-            apiResult.ErrorCode = 0;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
         }
 
@@ -320,11 +388,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
+        public ApiResult<IEnumerable<WithdrawalComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalComments>>();
             var comments = _withdrawalBll.GetWithdrawalRequestComment(request.TransId);
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
@@ -341,39 +409,39 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
-            var withdrawConfirmReuslt = -1;
+            var withdrawConfirmResult = -1;
             var authData = _authorizeBll.GetAuthData();
 
             switch (request.Action)
             {
                 case (int)WithdrawalStatusEnum.Draft:
-                    withdrawConfirmReuslt = _withdrawalBll.WithdrawalDraft(request.TransId,
+                    withdrawConfirmResult = _withdrawalBll.WithdrawalDraft(request.TransId,
                         request.Comment,
                         User.Identity.Name);
                     break;
                 case (int)WithdrawalStatusEnum.Pending:
-                    withdrawConfirmReuslt = _withdrawalBll.WithdrawalPending(request.TransId,
+                    withdrawConfirmResult = _withdrawalBll.WithdrawalPending(request.TransId,
                         request.Comment,
                         User.Identity.Name);
                     break;
                 case (int)WithdrawalStatusEnum.OnHold:
-                    withdrawConfirmReuslt = _withdrawalBll.WithdrawalOnHold(request.TransId,
+                    withdrawConfirmResult = _withdrawalBll.WithdrawalOnHold(request.TransId,
                         request.Comment,
                         User.Identity.Name);
                     break;
                 case (int)WithdrawalStatusEnum.Verify:
-                    withdrawConfirmReuslt = _withdrawalBll.WithdrawalVerify(request.TransId,
+                    withdrawConfirmResult = _withdrawalBll.WithdrawalVerify(request.TransId,
                         request.Comment,
                         User.Identity.Name);
                     break;
                 case (int)WithdrawalStatusEnum.Process:
                     {
-                        if (request.WithdrawalType == null || request.WithdrawalType == (int)WithdrawalTypeEnum.Undefine)
+                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefined)
                         {
                             apiResult.ErrorCode = 1101;
                             apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -387,12 +455,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             case (int)WithdrawalTypeEnum.OnlinePayment:
                                 withdrawalInfo.PayId = request.SelId;
                                 break;
+                            
                             case (int)WithdrawalTypeEnum.LocalBank:
                                 {
                                     var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                                     var bankInfoOff = _bankDetailBll
                                         .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
                                         .FirstOrDefault(x => x.BankId == request.SelId);
+
+                                    if (request.WithdrawalAccountingModels == null)
+                                    {
+                                        apiResult.ErrorCode = 1101;
+                                        apiResult.Message = "Required Withdrawal Accounting data";
+                                        return apiResult;
+                                    }
+
+                                    var sumAmount = request.WithdrawalAccountingModels.Sum(model => model.Amount);
+                                    if ( withdrawalRequest.Amount != sumAmount )
+                                    {
+                                        apiResult.ErrorCode = 1101;
+                                        apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
+                                        return apiResult;
+                                    }
 
                                     if (bankInfoOff != null)
                                     {
@@ -404,24 +488,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                     }
                                     break;
                                 }
+                            
                             case (int)WithdrawalTypeEnum.CryptoPay:
                                 withdrawalInfo.PayId = request.SelId;
                                 withdrawalInfo.ChannelId = request.ChannelId;
                                 break;
                         }
 
-                        var custId = 0;
-                        var amount = 0m;
-                        withdrawConfirmReuslt = _withdrawalBll.WithdrawalProcess(request.TransId,
+                        withdrawConfirmResult = _withdrawalBll.WithdrawalProcess(
+                            request.TransId,
                             request.Comment,
                             User.Identity.Name,
+                            // authData.UserId,
+                            1,
                             JsonConvert.SerializeObject(withdrawalInfo),
                             request.WithdrawalType,
-                            out custId, out amount);
+                            request.WithdrawalAccountingModels,
+                            out var custId, out var amount );
 
-                        if (withdrawConfirmReuslt > 0 &&
-                            ((request.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment) ||
-                             (request.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)))
+                        if (withdrawConfirmResult > 0 &&
+                            request.WithdrawalType is (int)WithdrawalTypeEnum.OnlinePayment or (int)WithdrawalTypeEnum.CryptoPay)
                         {
                             var reqWithdrawalOnline = new ReqWithdrawalOnline
                             {
@@ -437,17 +523,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                             };
 
-                            var myUrl = "";
-                            if (request.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
-                                myUrl = $"{_payApiUrl}CryptoWithdrawal";
-                            else
-                                myUrl = $"{_payApiUrl}Withdrawal";
+                            var myUrl = request.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay ? 
+                                $"{_payApiUrl}CryptoWithdrawal" : $"{_payApiUrl}Withdrawal";
 
                             var apiOnlineResult =
                                 await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
                             if (apiOnlineResult == null)
                             {
-                                withdrawConfirmReuslt = _withdrawalBll.WithdrawalVerify(request.TransId,
+                                _withdrawalBll.WithdrawalVerify(request.TransId,
                                     apiResult.Message, User.Identity.Name);
                                 apiResult.ErrorCode = 1101;
                                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
@@ -455,7 +538,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             }
                             else if (apiOnlineResult.ErrorCode != 0)
                             {
-                                withdrawConfirmReuslt = _withdrawalBll.WithdrawalVerify(request.TransId,
+                                _withdrawalBll.WithdrawalVerify(request.TransId,
                                     apiOnlineResult.Message, User.Identity.Name);
                                 return apiOnlineResult;
                             }
@@ -467,10 +550,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         //Check has pic or not
                         var hasPic = await CheckWithdrawalPictureAsync(request.TransId);
 
-                        withdrawConfirmReuslt = _withdrawalBll.WithdrawalApproved(request.TransId, request.Comment,
-                            User.Identity.Name, authData.UserId, hasPic);
+                        withdrawConfirmResult = _withdrawalBll.WithdrawalApproved(request.TransId, request.Comment,
+                            User.Identity.Name, authData.UserId , hasPic);
 
-                        if (withdrawConfirmReuslt > 0)
+                        if (withdrawConfirmResult > 0)
                         {
                             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                             var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
@@ -480,7 +563,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             title = string.Format(title, request.TransId);
                             var content = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                             content = string.Format(content, request.TransId);
-                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmResult);
 
                             #region Copy Picture
 
@@ -496,10 +579,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     }
                 case (int)WithdrawalStatusEnum.Rejected:
                     {
-                        withdrawConfirmReuslt =
+                        withdrawConfirmResult =
                             _withdrawalBll.WithdrawalRejected(request.TransId, request.Comment, User.Identity.Name);
 
-                        if (withdrawConfirmReuslt > 0)
+                        if (withdrawConfirmResult > 0)
                         {
                             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                             var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
@@ -509,19 +592,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             title = string.Format(title, request.TransId);
                             var content = _selLangBll.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                             content = string.Format(content, request.TransId);
-                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmResult);
                         }
                         break;
                     }
                 case (int)WithdrawalStatusEnum.ToKyc:
-                    withdrawConfirmReuslt = _withdrawalBll.WithdrawalToKyc(request.TransId,
+                    withdrawConfirmResult = _withdrawalBll.WithdrawalToKyc(request.TransId,
                         request.Comment,
                         User.Identity.Name);
                     break;
 
             }
 
-            if (withdrawConfirmReuslt <= 0)
+            if (withdrawConfirmResult <= 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
@@ -546,15 +629,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > Withdrawal Pic
         /// </remarks>
         /// <param name="transId"></param>
-        /// <param name="BankSlipPicCount"></param>
+        /// <param name="number"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
         [HttpGet]
-        public ActionResult GetPicture(string transId, int BankSlipPicCount)
+        public ActionResult GetPicture(string transId, int number)
         {
-            var WithdrawalPic = _withdrawalBll.GetWithdrawalPicCount(transId);
-            return Redirect(string.Format("{0}{1}/{2}_{3}.png", _awsWithdrawalUrl, _awsWithdrawalFolder, transId,
-                WithdrawalPic.BankSlipPicCount));
+            //var WithdrawalPic = _withdrawalBll.GetWithdrawalPicCount(transId);
+            return Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{number}.png");
         }
 
         /// <summary>
@@ -569,40 +650,48 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId);
+                var requestCount = request.Pic.Count();
+                var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId , requestCount);
                 if (result)
                 {
-                    var WithdrawalPic = _withdrawalBll.GetWithdrawalPicCount(request.TransId);
-                    var x = request.Pic.Replace("data:image/png;base64,", "");
-                    var bytes = Convert.FromBase64String(x);
-                    var stream = new MemoryStream(bytes);
+                    var withdrawalPic = _withdrawalBll.GetWithdrawalPicCount(request.TransId);
+                    
+                    var count = 1;
+                    foreach (var pic in request.Pic)
+                    {
+                        var countName = withdrawalPic.BankSlipPicCount - requestCount + count;
+                        var x = pic.Replace("data:image/png;base64,", "");
+                        var bytes = Convert.FromBase64String(x);
+                        var stream = new MemoryStream(bytes);
 
-                    var putRequest = new PutObjectRequest();
-                    var key = string.Format("{0}/{1}_{2}.png", _awsWithdrawalFolder, request.TransId,
-                        WithdrawalPic.BankSlipPicCount);
-                    putRequest.BucketName = _awsWithdrawalBucketName; // Your bucket name
-                    putRequest.ContentType = "image/png";
-                    putRequest.InputStream = stream;
-                    putRequest.Key = key;
+                        var putRequest = new PutObjectRequest();
+                        var key = $"{_awsWithdrawalFolder}/{request.TransId}_{countName}.png";
+                        putRequest.BucketName = _awsWithdrawalBucketName; // Your bucket name
+                        putRequest.ContentType = "image/png";
+                        putRequest.InputStream = stream;
+                        putRequest.Key = key;
+                        await _s3Helper.PutObjectAsync(putRequest);
 
-                    var putResponse = await _s3Helper.PutObjectAsync(putRequest);
-                    apiResult.ErrorCode = 0;
+                        count += 1;
+                    }
+                    
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
                 {
-                    apiResult.ErrorCode = 999;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 }
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = 999;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -621,26 +710,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var WithdrawalPic = _withdrawalBll.GetWithdrawalPicCount(request.TransId);
-
                 var deleteRequest = new DeleteObjectRequest();
-                var key = string.Format("{0}/{1}_{2}.png", _awsWithdrawalFolder, request.TransId,
-                    WithdrawalPic.BankSlipPicCount);
+                var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
                 deleteRequest.BucketName = _awsWithdrawalBucketName;
                 deleteRequest.Key = key;
-                var Response = await _s3Helper.DeleteObjectAsync(deleteRequest);
-                apiResult.ErrorCode = 0;
+                await _s3Helper.DeleteObjectAsync(deleteRequest);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = 999;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 
@@ -689,17 +775,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 var withdrawalPicCount = _withdrawalBll.GetWithdrawalPicCount(transId);
 
-                var request = new CopyObjectRequest();
-                var withdrawalKey = $"{_awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png";
-                //NameingRule:{TransId}_{Seq}_{UploadTimes}
-                var accountingKey = $"{_awsWithdrawalAccountingFolder}/{transId}_1_1.png";
-                request.SourceBucket = _awsWithdrawalBucketName;
-                request.SourceKey = withdrawalKey;
-                request.DestinationBucket = _awsWithdrawalBucketName;
-                request.DestinationKey = accountingKey;
-                var response = await _s3Helper.CopyObjectAsync(request);
-
-                return response.HttpStatusCode == HttpStatusCode.OK;
+                for (var seq = 1; seq <= withdrawalPicCount.BankSlipPicCount; seq++)
+                {
+                    var request = new CopyObjectRequest();
+                    var withdrawalKey = $"{_awsWithdrawalFolder}/{transId}_{seq}.png";
+                    var accountingKey = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_1.png";
+                    request.SourceBucket = _awsWithdrawalBucketName;
+                    request.SourceKey = withdrawalKey;
+                    request.DestinationBucket = _awsWithdrawalBucketName;
+                    request.DestinationKey = accountingKey;
+                    var response = await _s3Helper.CopyObjectAsync(request);
+                    if (response.HttpStatusCode != HttpStatusCode.OK)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
             catch (AmazonS3Exception ex)
             {
@@ -711,6 +802,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
+        
+        private List<int> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
+        {
+            var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
+            var usableList = _usableActionType[withdrawalRequest.Status];
+            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+                    
+            if (withdrawalRequest.WithdrawalType == (int) WithdrawalTypeEnum.LocalBank)
+            {
+                usableActionButton.Remove((int) WithdrawalActionEnum.ManualApproved);
+                usableActionButton.Remove((int) WithdrawalActionEnum.ManualRejected);
+            }
+            
+            return usableActionButton;
+        }
         #endregion
 
     }
