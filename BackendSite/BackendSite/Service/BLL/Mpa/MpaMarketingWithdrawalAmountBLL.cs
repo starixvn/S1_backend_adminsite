@@ -44,8 +44,8 @@ namespace BackendSite.Service.BLL.Mpa
                 WithdrawalUsers = withSummaryResult.DistinctBy(x => x.CustId).Count(),
                 CompareWithdrawalUsers = compareWithSummaryResult.DistinctBy(x => x.CustId).Count()
             };
-            response.WithdrawalAmountChangeRate = GetPercent(response.WithdrawalAmount, response.CompareWithdrawalAmount);
-            response.WithdrawalUsersChangeRate = GetPercent(response.WithdrawalUsers, response.CompareWithdrawalUsers);
+            response.WithdrawalAmountChangeRate = _mapMpaCommonService.GetPercent(response.WithdrawalAmount, response.CompareWithdrawalAmount);
+            response.WithdrawalUsersChangeRate = _mapMpaCommonService.GetPercent(response.WithdrawalUsers, response.CompareWithdrawalUsers);
 
             return response;
         }
@@ -233,24 +233,6 @@ namespace BackendSite.Service.BLL.Mpa
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
                 item.WithdrawalAmount = item.WithdrawalAmount / rate;
             }
-        }
-
-        private static string GetPercent(decimal divisor, decimal dividend)
-        {
-            decimal percent;
-
-            if (divisor < dividend)
-            {
-                percent = 1 - (divisor / dividend);
-                percent *= -1;
-            }
-            else
-            {
-                percent = 1 - (dividend / divisor);
-            }
-
-            var result = percent.ToString("0%");
-            return result;
         }
 
         private static string RegisteredDateFormatter(DateTime registeredDate)

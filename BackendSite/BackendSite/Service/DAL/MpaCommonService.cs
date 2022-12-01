@@ -69,6 +69,24 @@ namespace BackendSite.Service.DAL
             return mapper;
         }
 
+        public string GetPercent(decimal divisor, decimal dividend)
+        {
+            decimal percent;
+
+            if (divisor < dividend)
+            {
+                percent = 1 - (divisor / dividend);
+                percent *= -1;
+            }
+            else
+            {
+                percent = 1 - (dividend / divisor);
+            }
+
+            var result = percent.ToString("0%");
+            return result;
+        }
+
         private Task<IEnumerable<MpaRateDto>> GetRateFromDb(DateTimeOffset starTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();

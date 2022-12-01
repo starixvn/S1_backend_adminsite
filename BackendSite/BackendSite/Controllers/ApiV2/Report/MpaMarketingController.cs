@@ -7,6 +7,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using NPOI.HPSF;
 
 namespace BackendSite.Controllers.ApiV2.Report
@@ -17,14 +18,18 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MpaMarketingController : ControllerBase
     {
         private readonly IMpaMarketingWithdrawalAmountBLL _marketingWithdrawalAmountBll;
+        private readonly IMpaMarketingDepositAmountBLL _marketingDepositAmountBll;
         private readonly ExcelBLL _excelBll;
 
-        public MpaMarketingController(IMpaMarketingWithdrawalAmountBLL marketingWithdrawalAmountBll, ExcelBLL excelBll)
+        public MpaMarketingController(IServiceProvider provider)
         {
-            this._marketingWithdrawalAmountBll = marketingWithdrawalAmountBll;
-            this._excelBll = excelBll;
+            this._marketingWithdrawalAmountBll = provider.GetRequiredService<IMpaMarketingWithdrawalAmountBLL>();
+            this._marketingDepositAmountBll = provider.GetRequiredService<IMpaMarketingDepositAmountBLL>();
+            this._excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
+        #region Withdrawal
+        
         [HttpPost]
         public async Task<ApiResult<WithdrawalAmountSummaryResponse>> WithdrawalSummaryAsync(WithdrawalAmountRequest request)
         {
@@ -90,5 +95,33 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return _excelBll.ExcelFile(stream, $"WithdrawalExport{Guid.NewGuid()}");
         }
+
+        #endregion
+
+        #region Deposit
+
+        [HttpPost]
+        public async Task<ApiResult<DepositAmountSummaryResponse>> DepositSummaryAsync(DepositAmountRequest request)
+        {
+            var apiResult = new ApiResult<DepositAmountSummaryResponse>();
+
+            try
+            {
+                var data = await _marketingDepositAmountBll.GetDepositAmountSummaryAsync(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+
+
+        #endregion
     }
 }
