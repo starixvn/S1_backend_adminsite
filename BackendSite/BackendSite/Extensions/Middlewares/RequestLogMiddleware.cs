@@ -14,6 +14,7 @@ namespace BackendSite.Extensions.Middlewares
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
         private readonly AuthorizeBLL _authorizeBLL;
+        private readonly Tools _tools;
 
         #endregion
 
@@ -28,6 +29,7 @@ namespace BackendSite.Extensions.Middlewares
             _next = next;
             _logger = factory.CreateLogger("RequestLog");
             _authorizeBLL = authorizeBLL;
+            _tools = tools;
         }
 
         #endregion
@@ -62,6 +64,7 @@ namespace BackendSite.Extensions.Middlewares
                     : content;
 
                 var authData = _authorizeBLL.GetAuthData();
+                LogContext.PushProperty("ClientIp", _tools.GetClientIP(context));
                 LogContext.PushProperty("UserId", authData?.UserId);
                 LogContext.PushProperty("UserName", authData?.UserName);
                 {
