@@ -1,8 +1,9 @@
 ﻿using System.Data;
+using System.Security.Policy;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -53,19 +54,6 @@ namespace BackendSite.Service.DAL
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             return _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get", p);
-        }
-
-        public Task<IEnumerable<MpaUSdRateDto>> GetMpaUsdRate()
-        {
-            return _reportDbClient.QueryAsync<MpaUSdRateDto>("Admin_CurrencyUSDRate_Get");
-        }
-
-        public int GetCustIdByUserName(int siteId, string userName)
-        {
-            var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_UserName", userName, dbType: DbType.String);
-            return _reportDbClient.QueryFirst<int>("Admin_CustIdByUserName_Get", p);
         }
 
         public Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption()
