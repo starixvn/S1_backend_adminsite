@@ -37,5 +37,19 @@ namespace BackendSite.Service.Model.Mpa.Marketing
             return key;
         }
 
+        public DateTimeOffset GetEndDate()
+        {
+            //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
+            var endDate = EndDate.AddMonths(1).AddDays(EndDate.AddMonths(1).Day);
+            return endDate;
+        }
+
+        public DateTimeOffset GetCompareEndDate()
+        {
+            //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
+            var endDate = CompareToDate.AddMonths(1).AddDays(CompareToDate.AddMonths(1).Day);
+            return endDate;
+        }
+
     }
 }

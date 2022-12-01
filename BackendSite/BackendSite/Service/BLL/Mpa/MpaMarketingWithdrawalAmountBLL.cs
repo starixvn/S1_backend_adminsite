@@ -28,13 +28,14 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request)
         {
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.StartDate,
-                request.EndDate)).Where(x=> request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+                request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
-            await MultiplyExchangeRate(withSummaryResult, request);
+            await MultiplyExchangeRate(withSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
             var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.CompareFromDate,
                 request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            await MultiplyExchangeRate(compareWithSummaryResult, request);
+
+            await MultiplyExchangeRate(compareWithSummaryResult, request.CompareFromDate, request.GetCompareEndDate(), request.BaseCurrencyId);
 
             var response = new WithdrawalAmountSummaryResponse
             {
@@ -88,7 +89,7 @@ namespace BackendSite.Service.BLL.Mpa
             var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
                 request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
-            MultiplyExchangeRate(withDetails, request).Wait();
+            MultiplyExchangeRate(withDetails, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 
             var currencyIdMapper = _mapMpaCommonService.GetCurrencyIsoCodeMapper().Result;
             var data = withDetails.GroupBy(x => new
@@ -119,9 +120,9 @@ namespace BackendSite.Service.BLL.Mpa
         }
 
 
-        public byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData, 
+        public byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData,
             List<WithdrawalAmountDetailData> detailsData,
-            bool isCompare, 
+            bool isCompare,
             string summaryTitle,
             string detailTitle,
             IEnumerable<PropertyInfo> properties = null)
@@ -219,15 +220,17 @@ namespace BackendSite.Service.BLL.Mpa
             return ms.ToArray();
         }
 
-        private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source, WithdrawalAmountRequest request)
+        private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int baseCurrencyId)
             where TEntity : class, IMpaMarketingWithdrawalAmountBaseDto
         {
-            request.EndDate = request.EndDate.AddMonths(1).AddDays(-request.EndDate.AddMonths(1).Day);
-            var rateList = (await _mapMpaCommonService.GetMpaExchangeRate(request.StartDate, request.EndDate)).ToList();
+            var rateList = (await _mapMpaCommonService.GetMpaExchangeRate(startDate, endDate)).ToList();
 
             foreach (var item in source)
             {
-                var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, request.BaseCurrencyId);
+                var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
                 item.WithdrawalAmount = item.WithdrawalAmount / rate;
             }
         }
