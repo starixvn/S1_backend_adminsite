@@ -1016,7 +1016,11 @@ import DateTimePicker from 'react-datetime';
                 },
                 onInitialized: function () {
                     state.selectType.length = 0;
-                    state.selectType.push(3)
+                    (searchFilter.selectType) ?
+                        searchFilter.selectType.forEach(function (obj) {
+                            state.selectType.push(parseInt(obj));
+                        })
+                        : state.selectType.push(3);
                 }
             });
             (state.MutiSelRefresh) ? $('#selectType').multiselect('select', searchFilter.selectType) : $('#selectType').multiselect('select', 3);
