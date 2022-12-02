@@ -57,7 +57,7 @@ namespace BackendSite.Extensions.Middlewares
                     try
                     {
                         var jbody = JObject.Parse(recordContent);
-                        if (jbody.TryGetValue("Data", StringComparison.Ordinal, out var pwd)
+                        if (jbody.TryGetValue("data", StringComparison.Ordinal, out var pwd)
                               && !string.IsNullOrEmpty(pwd.ToString()))
                         {
                             jbody["data"] = "********";
