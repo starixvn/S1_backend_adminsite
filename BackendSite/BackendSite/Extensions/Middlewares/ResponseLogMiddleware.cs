@@ -51,7 +51,8 @@ namespace BackendSite.Extensions.Middlewares
                     .ReadToEndAsync();
                 using (LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds))
                 {
-                if (path.Contains("ResetPwd", StringComparison.OrdinalIgnoreCase))
+                if (path.Contains("ResetPassword", StringComparison.OrdinalIgnoreCase) ||
+                    path.Contains("ResetPwd", StringComparison.OrdinalIgnoreCase))
                 {
                     try
                     {
@@ -59,7 +60,7 @@ namespace BackendSite.Extensions.Middlewares
                         if (jbody.TryGetValue("Data", StringComparison.Ordinal, out var pwd)
                               && !string.IsNullOrEmpty(pwd.ToString()))
                         {
-                            jbody["Data"] = "********";
+                            jbody["data"] = "********";
                         }
                         recordContent = jbody.ToString();
                     }
