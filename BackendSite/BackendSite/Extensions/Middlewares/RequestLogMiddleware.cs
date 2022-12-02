@@ -88,37 +88,25 @@ namespace BackendSite.Extensions.Middlewares
                         try
                         {
                             var jbody = JObject.Parse(content);
-                            if (jbody.TryGetValue("Password", StringComparison.OrdinalIgnoreCase, out var pwd)
-                               && !string.IsNullOrEmpty(pwd.ToString()))
+                            var passWordCheckList = new List<string>
                             {
-                                jbody["Password"] = "********";
-                            }
-                            if (jbody.TryGetValue("UserPwd", StringComparison.OrdinalIgnoreCase, out var upwd)
-                               && !string.IsNullOrEmpty(upwd.ToString()))
-                            {
-                                jbody["UserPwd"] = "********";
-                            }
-                            if (jbody.TryGetValue("txtPW", StringComparison.OrdinalIgnoreCase, out var txtPW)
-                               && !string.IsNullOrEmpty(txtPW.ToString()))
-                            {
-                                jbody["txtPW"] = "********";
-                            }
-                            if (jbody.TryGetValue("OldPwd", StringComparison.OrdinalIgnoreCase, out var oldPwd)
-                                && !string.IsNullOrEmpty(oldPwd.ToString()))
-                            {
-                                jbody["OldPwd"] = "********";
-                            }
-                            if (jbody.TryGetValue("NewPwd", StringComparison.OrdinalIgnoreCase, out var newPwd)
-                                && !string.IsNullOrEmpty(newPwd.ToString()))
-                            {
-                                jbody["NewPwd"] = "********";
-                            }
+                                "Password", "password", "PassWord",
+                                "userPwd", "txtPW", "OldPwd", "NewPwd",
+                            };
 
+                            foreach (var word in passWordCheckList)
+                            {
+                                if (jbody.TryGetValue(word, StringComparison.Ordinal, out var pwd)
+                                && !string.IsNullOrEmpty(pwd.ToString()))
+                                {
+                                    jbody[word] = "********";
+                                }
+                            }                      
                             content = jbody.ToString();
                         }
                         catch
                         {
-
+                            // ignore
                         }   
                     }
 
