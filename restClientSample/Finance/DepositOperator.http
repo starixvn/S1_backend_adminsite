@@ -1,0 +1,36 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得 Payment Info
+# payId帶null可取全部
+POST {{url}}/apiV2/BaseData/GetPaymentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "payId": 20
+}
+
+
+###
+# 取得 Bank Info
+POST {{url}}/apiV2/BaseData/GetBankInfoOffList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2,
+    "purpose": 1
+}

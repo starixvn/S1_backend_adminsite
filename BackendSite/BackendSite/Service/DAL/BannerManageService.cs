@@ -28,22 +28,17 @@ namespace BackendSite.Service.DAL
             p.Add("BannerType", bannerInfo.BannerType);
             p.Add("ActionMode", bannerInfo.ActionMode);
             p.Add("ShowStatus", bannerInfo.ShowStatus);
-            p.Add("UnixStartTime", bannerInfo.UnixStartTime);
-            p.Add("UnixEndTime", bannerInfo.UnixEndTime);
+            p.Add("StartTime", bannerInfo.StartTime?.DateTime);
+            p.Add("EndTime", bannerInfo.EndTime?.DateTime);
             p.Add("BonusCode", bannerInfo.BonusCode);
-            p.Add("MatchId", bannerInfo.MatchId);
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
             p.Add("UrlRouter", bannerInfo.UrlRouter);
-            p.Add("UnixSportBattleDateTime", bannerInfo.UnixSportBattleDateTime);
-            p.Add("SportCategoryId", bannerInfo.SportCategoryId);
-            p.Add("SportLeaguesId", bannerInfo.SportLeaguesId);
-            p.Add("SportTeamsId", JsonConvert.SerializeObject(bannerInfo.SportTeamsId));
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);
             p.Add("AdminUser", user);
             
-            return _mainDbClient.Execute("Admin_Banner_Set_V2", p);
+            return _mainDbClient.Execute("Admin_Banner_Set_V3", p);
         }
         public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
             string status,string currencies ,int startIndex,
@@ -61,7 +56,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V5", props);
+            var result = _reportDbClient.Query<BannerInfoList>("Admin_BannerList_Get_V6", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -85,25 +80,9 @@ namespace BackendSite.Service.DAL
                 result.StartTime = Convert.ToDateTime(queryResult.StartTime);
                 result.EndTime = Convert.ToDateTime(queryResult.EndTime);
                 result.BonusCode = queryResult.BonusCode;
-                result.MatchId = Convert.ToInt32(queryResult.MatchId);
                 result.TpId = Convert.ToInt32(queryResult.TpId);
                 result.GameId = queryResult.GameId;
                 result.UrlRouter = queryResult.UrlRouter;
-                result.SportBattleDateTime = queryResult.SportBattleDateTime == null ? null : Convert.ToDateTime(queryResult.SportBattleDateTime);
-                result.SportCategoryId = Convert.ToInt32(queryResult.SportCategoryId);
-                result.SportLeaguesId = Convert.ToInt32(queryResult.SportLeaguesId);
-                if (queryResult.SportTeamsId != null)
-                {
-                    result.SportTeamsId = JsonConvert.DeserializeObject<IEnumerable<BannerSportTeamsDetails>>(queryResult.SportTeamsId, new JsonSerializerSettings
-                    {
-                        Formatting = Formatting.Indented,
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-                }
-                else
-                {
-                    result.SportTeamsId = null;
-                }
                 result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryResult.Specific, new JsonSerializerSettings
                 {
                     Formatting = Formatting.Indented,
@@ -132,6 +111,22 @@ namespace BackendSite.Service.DAL
 
             return errorCode;
         }
+        
+        public int DeleteBanner(int siteId, string bannerName , int currency)
+        {
+            var errorCode = 0;
+            try
+            {
+                _mainDbClient.Execute("Admin_Banner_Del", new DynamicParameters(new { _SiteId = siteId, _BannerName = bannerName, _CurrencyId = currency }));
+            }
+            catch (Exception)
+            {
+                errorCode = 999;
+            }
+
+            return errorCode;
+        }
+        
         public IEnumerable<HotEventList> GetHotEventList(string siteIds,
             string status, int startIndex,
             int pageSize, out int totalPages, out int rowCount)

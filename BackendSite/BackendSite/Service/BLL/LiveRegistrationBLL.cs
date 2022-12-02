@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
                     Status = a.Status,
                     RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
                     LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
-                    UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, timezone)
+                    UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, a.DepositStatus, timezone)
                 });
             return new LiveRegistrationResponse()
             {
@@ -78,7 +78,7 @@ namespace BackendSite.Service.BLL
                     LastActiveTime = new DateTimeOffset(x.LastActiveTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
                     Note = x.Note,
-                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, timezone) 
+                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, x.DepositStatus, timezone) 
                 });
             return list;
         }
@@ -129,18 +129,26 @@ namespace BackendSite.Service.BLL
             return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
         }
 
-        private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator, TimeSpan timezone)
+        private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator, string rawDepositStatus, TimeSpan timezone)
         {
             if (string.IsNullOrEmpty(rawUpdateTime) || string.IsNullOrEmpty(rawUpdateOperator)) return null;
 
             var updateTime = rawUpdateTime.Split(',');
             var updateOperator = rawUpdateOperator.Split(',');
+            var depositStatus = rawDepositStatus.Split(',');
             return updateTime.Zip(updateOperator, (c, n) =>
             {
                 var originTime = DateTime.Parse(c);
                 var timeOffset = new DateTimeOffset(originTime, TimeSpan.Zero);
                 var datetime = timeOffset.ToOffset(timezone).DateTime;
                 return $"{datetime:yyyy-MM-dd HH:mm:ss}-{n}";
+            }).Zip(depositStatus, (x, y) =>
+            {
+                var status = Convert.ToInt32(y);
+                if (status == (int)CustomerTeleStatusEnum.NoRecord)
+                    return x;
+                else
+                    return $"{x}({Enum.GetName(typeof(CustomerTeleStatusEnum), status)})";
             }).ToList();
         }
 
