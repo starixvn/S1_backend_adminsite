@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Text;
+
+using Newtonsoft.Json.Linq;
+
 using Serilog.Context;
 
 namespace BackendSite.Extensions.Middlewares
@@ -48,7 +51,24 @@ namespace BackendSite.Extensions.Middlewares
                     .ReadToEndAsync();
                 using (LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds))
                 {
-                    _logger.LogInformation($"RESPONSE: {recordContent}");
+                if (path.Contains("ResetPwd", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var jbody = JObject.Parse(recordContent);
+                        if (jbody.TryGetValue("Data", StringComparison.Ordinal, out var pwd)
+                              && !string.IsNullOrEmpty(pwd.ToString()))
+                        {
+                            jbody["Data"] = "********";
+                        }
+                        recordContent = jbody.ToString();
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                }
+                _logger.LogInformation($"RESPONSE: {recordContent}");
                 }
 
                 responseBodyStream.Seek(0, SeekOrigin.Begin);
