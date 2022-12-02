@@ -93,21 +93,40 @@ namespace BackendSite.Extensions.Middlewares
                                 "Password", "password", "PassWord",
                                 "userPwd", "txtPW", "OldPwd", "NewPwd",
                             };
-
+                            
                             foreach (var word in passWordCheckList)
                             {
+
                                 if (jbody.TryGetValue(word, StringComparison.Ordinal, out var pwd)
                                 && !string.IsNullOrEmpty(pwd.ToString()))
                                 {
                                     jbody[word] = "********";
                                 }
-                            }                      
+                            }
                             content = jbody.ToString();
                         }
                         catch
                         {
                             // ignore
                         }   
+                    }
+
+                    if (path.Contains("SetAdminUserPassword", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var jbody = JObject.Parse(content);
+                            var password = jbody["after"]["password"].ToString();
+                            if (!string.IsNullOrEmpty(password))
+                            {
+                                jbody["after"]["password"] = "********";
+                            }                          
+                            content = jbody.ToString();
+                        }
+                        catch
+                        {
+                            // ignore
+                        }
                     }
 
                     _logger.LogInformation(
