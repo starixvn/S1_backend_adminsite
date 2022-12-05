@@ -288,7 +288,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     }
                         break;
                 }
-
+                var withdrawalLimitAmount = request.WithdrawalLimitOption == 1
+                    ? request.Amount * request.WithdrawalLimitAmount
+                    : 0;
                 var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit()
                 {
                     CustId = custInfo.CustId,
@@ -299,7 +301,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     AdjustType = (int) request.AdjustmentType,
                     SiteName = custInfo.SiteName,
                     Operator = authData.UserName,
-                    WithdrawalLimitAmount = request.WithdrawalLimitAmount,
+                    WithdrawalLimitAmount = withdrawalLimitAmount,
                     WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                     Memo = request.Memo,
                     Category = request.ReasonId,
