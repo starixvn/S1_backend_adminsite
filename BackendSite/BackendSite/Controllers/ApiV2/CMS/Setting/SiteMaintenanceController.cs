@@ -25,7 +25,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
 
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 101, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 117, 1 })]
         public async Task<ApiResult> Get(SiteMaintainRequest request)
         {
             try
@@ -49,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 101, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 117, 3 })]
         public async Task<ApiResult> Update(SiteMaintainRequest request)
         {
             try

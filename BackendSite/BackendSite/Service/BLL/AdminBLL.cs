@@ -3,7 +3,9 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Security.Claims;
 
 namespace BackendSite.Service.BLL
@@ -17,6 +19,7 @@ namespace BackendSite.Service.BLL
         private readonly NewAdminUserService newAdminUserService;
         private readonly PermissionBLL permissionBLL;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHostEnvironment environment;
 
         public AdminBLL(Tools tools,
             AdminService adminService,
@@ -24,7 +27,8 @@ namespace BackendSite.Service.BLL
             AdminUserService adminUserService,
             NewAdminUserService newAdminUserService,
             PermissionBLL permissionBLL,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IHostEnvironment environment)
         {
             this.tools = tools;
             this.adminService = adminService;
@@ -33,6 +37,7 @@ namespace BackendSite.Service.BLL
             this.newAdminUserService = newAdminUserService;
             this.permissionBLL = permissionBLL;
             this.httpContextAccessor = httpContextAccessor;
+            this.environment = environment;
         }
 
         //暫無使用
@@ -116,12 +121,15 @@ namespace BackendSite.Service.BLL
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser)
         {
             var result = new List<AdminMenuModel>();
-            var menuList =  adminService.GetAllAdminMenu();
-            var permissionList =  adminService.GetAllAdminPermission();
+            var menuList = adminService.GetAllAdminMenu();
+            var permissionList = adminService.GetAllAdminPermission();
 
             //Enable & Sort
             menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
             permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+
+            if (environment.IsProduction())
+                menuList = menuList.Where(x => x.Id != 22);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
@@ -143,7 +151,7 @@ namespace BackendSite.Service.BLL
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
                 userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
             }
-            
+
             foreach (var funcData in assignFuncDatas)
             {
                 var permissionData = new List<AdminPermissionModel>();
@@ -166,7 +174,7 @@ namespace BackendSite.Service.BLL
                         Name = funcData.Name,
                         Permission = permissionData
                     });
-                }          
+                }
             }
 
             result.AddRange(await GetAllMenu(0, loginUser, heirIdList, menuList, permissionList, userAllPremission));
@@ -255,7 +263,7 @@ namespace BackendSite.Service.BLL
                                     });
                                 }
                             }
-                        }                               
+                        }
                     }
                 }
 
@@ -288,14 +296,14 @@ namespace BackendSite.Service.BLL
         }
         public bool CheckAdminUserDuplicate(string userName)
         {
-            return  newAdminUserService.GetAdminUserByUserName(userName) != null;
+            return newAdminUserService.GetAdminUserByUserName(userName) != null;
         }
         public AdminUserData GetUserV2(int userId)
         {
             return newAdminUserService.GetUserV2(userId);
         }
 
-        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd,string NewPwd)
+        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd, string NewPwd)
         {
             string Md5Userpwd = null;
             OldPwd = tools.MD5Encrypt(OldPwd);

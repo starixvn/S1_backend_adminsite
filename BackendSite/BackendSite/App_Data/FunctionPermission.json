@@ -417,21 +417,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "Bonus Import",
-        "FuncKey": "Marketing/BonusImport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Rebate Info",
-        "FuncKey": "Marketing/RebateInfoReport",
-        "Enable": false
-      },
-      {
-        "DisplayKey": "Rebate Report",
-        "FuncKey": "Marketing/RebateLogReport",
-        "Enable": false
-      },
-      {
         "DisplayKey": "Referral Management",
         "FuncKey": "Marketing/ReferralManagement",
         "Enable": false

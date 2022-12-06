@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Library;
-using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
-using BackendSite.Service.Model.Store.PointSetting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {

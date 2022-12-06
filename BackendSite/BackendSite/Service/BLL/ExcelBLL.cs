@@ -118,6 +118,7 @@ namespace BackendSite.Service.BLL
 
         public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
             var ws = p.Workbook.Worksheets.Add(nameof(t));

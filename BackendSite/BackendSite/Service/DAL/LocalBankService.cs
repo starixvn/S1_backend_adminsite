@@ -18,18 +18,33 @@ namespace BackendSite.Service.DAL
              _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
             _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
         }
-
-        public IEnumerable<BankInfoOff> GetAllBankAccountOff()
+        
+        /// <summary>
+        /// API V2 使用，取代 GetAllBankAccountOff、GetBankAccountOff
+        /// </summary>
+        public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoOff>("Admin_BankAccountOff_Get", commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _CurrencyId = currencyId
+            });
+            
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+
+            return a;
+        }
+
+        /*public IEnumerable<BankInfoOff> GetAllBankAccountOff()
+        {
+            return _reportDbClient.Query<BankInfoOff>("Admin_BankAccountOff_Get");
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOff(int siteId)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<BankInfoOff>("BankAccountOff_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        }
+        }*/
 
         public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
@@ -39,14 +54,12 @@ namespace BackendSite.Service.DAL
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<EWalletPay>("Common_EWalletPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
         }
 
         public IEnumerable<BankInfoPay> GetCryptoPayList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<BankInfoPay>("Common_CryptoPayForPayout_Get", commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoPay>("Common_CryptoPayForPayout_Get");
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)

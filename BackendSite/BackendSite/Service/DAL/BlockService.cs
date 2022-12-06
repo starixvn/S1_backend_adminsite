@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("IP", null);
-            return await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+            return await _mainDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
         }
 
         public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
@@ -284,10 +284,11 @@ namespace BackendSite.Service.DAL
                             AccountNum = input.After.AccountNum,
                             IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
                             AccountName = x.AccountName,
-                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock,
+                            Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
                         if(result == 0)
                         {
                             trans.Rollback();
@@ -361,10 +362,11 @@ namespace BackendSite.Service.DAL
                         AccountNum = input.Before.AccountNum,
                         IFSCCode = string.IsNullOrWhiteSpace(input.Before.IFSCCode) ? "" : input.Before.IFSCCode,
                         AccountName = input.Before.CustId,
-                        Status = CustBankInfoLogStatus.Release
+                        Status = CustBankInfoLogStatus.Release,
+                        Operator = input.Operator
                     });
 
-                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
 
                     if(result <= 0)
                     {

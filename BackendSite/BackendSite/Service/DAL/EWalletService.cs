@@ -3,15 +3,9 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BackendSite.Service.DAL
 {
@@ -20,14 +14,11 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly MySqlClient _ipTableClient;
-        private readonly CustInfoService _custInfoService;
         public EWalletService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
-            _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
 
         public IEnumerable<BlockEWalletAcc> GetBlockEWalletAcc(DateTime startDate, DateTime endDate, int status, string accountNum, IEnumerable<int> currencyId, string userName, IEnumerable<int> eWalletId)
@@ -35,17 +26,17 @@ namespace BackendSite.Service.DAL
             var jsonSelectStatus = string.Empty;
             if (status == 0)
             {
-                var tempList = new List<int>() { 1, 2 };
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Lock, (int)BlockEWalletStatus.Unlock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else if (status == 1)
             {
-                var tempList = new List<int>() { 1 };
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Lock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else
             {
-                var tempList = new List<int>() { 2 };
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Unlock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
 
@@ -137,10 +128,11 @@ namespace BackendSite.Service.DAL
                             SysId = input.After.SysId,
                             AccountNum = input.After.AccountNum,
                             AccountName = x.AccountName,
-                            Status = input.After.Status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? (int)EWalletinfoLogStatusEnum.Lock : (int)EWalletinfoLogStatusEnum.Unlock,
+                            Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -194,7 +186,7 @@ namespace BackendSite.Service.DAL
 
             if (result > 0)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
 
                 if (!logResult)
                 {
@@ -211,9 +203,10 @@ namespace BackendSite.Service.DAL
                         SysId = input.Before.SysId,
                         AccountNum = input.Before.AccountNum,
                         AccountName = x.AccountName,
-                        Status = (int)EWalletinfoLogStatusEnum.Release
+                        Status = (int)EWalletinfoLogStatusEnum.Release,
+                        Operator = input.Operator
                     });
-                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set", prop, conn, trans);
+                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
                     if (result == 0)
                     {
                         trans.Rollback();

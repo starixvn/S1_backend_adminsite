@@ -29,19 +29,19 @@ namespace BackendSite.Service.BLL
             if (!IPAddress.TryParse(input.After.IP, out _))
                 return 0;
 
-            var returnValue = await _blockIpToS3.Upload(input.After.IP);
+            var returnValue = _blockService.SetBlockIP(input);
             if (returnValue > 0)
             {
-                returnValue = _blockService.SetBlockIP(input);
+                returnValue = await _blockIpToS3.Upload();
             }
             return returnValue;
         }
         public async Task<int> DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
-            var returnValue = await _blockIpToS3.DeleteIp(input.Before.IP);
+            var returnValue = _blockService.DeleteBlockIP(input);
             if (returnValue > 0)
             {
-                returnValue = _blockService.DeleteBlockIP(input);
+                returnValue = await _blockIpToS3.Upload();
             }
             return returnValue;
         }
