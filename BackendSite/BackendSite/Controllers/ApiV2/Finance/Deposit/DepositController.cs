@@ -8,10 +8,11 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositController : ControllerBase
@@ -485,6 +486,39 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
         }
 
+        public ApiResult DepositMessageStatusList()
+        {
+            var apiResult = new ApiResult<List<EnumTypeModel>>();
+            var result = new List<EnumTypeModel>();
+
+            foreach (DepositMessageStatus status in Enum.GetValues(typeof(DepositMessageStatus)))
+            {
+                result.Add(new EnumTypeModel
+                {
+                    Name = status.GetDescription(),
+                    Value = (int)status
+                });
+            }
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public ApiResult SetDepositMessage(ApiRequestWithLog<DepositMessageRequest> request)
+        {
+            if (_depositBll.SetDepositMessage(
+                    new ParamsWithLog<DepositMessageRequest>(request, User.Identity.Name)) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
         #region Private function
 
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)

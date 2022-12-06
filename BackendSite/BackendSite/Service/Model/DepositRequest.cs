@@ -354,4 +354,10 @@ namespace BackendSite.Service.Model
 
         public decimal Amount { get; set; }
     }
+
+    public class DepositMessageRequest
+    {
+        public DepositMessageStatus Status { get; set; }
+        public int DepositId { get; set; }
+    }
 }
