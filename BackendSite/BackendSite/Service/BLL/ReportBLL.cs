@@ -19,6 +19,7 @@ namespace BackendSite.Service.BLL
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace BackendSite.Service.BLL
             _common = provider.GetRequiredService<Common>();
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
@@ -983,23 +985,30 @@ namespace BackendSite.Service.BLL
             var key = $"GameStatisticalReport:{getListInput.SiteId}:{getListInput.StartDate}:{getListInput.EndDate}";
             var source = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
                 () => GetGameStatisticalSource(getListInput));
-            return ProcessGameStatisticalSource(source);
+            return ProcessGameStatisticalSource(FilterSorce(getListInput.SiteId, source));
         }
 
-        public Dictionary<string,IEnumerable<GameStatisticalDao>> ConvertToExport(IEnumerable<GameStatisticalByCurrencyDto> data)
+        public Dictionary<string, IEnumerable<GameStatisticalDao>> ConvertToExport(IEnumerable<GameStatisticalByCurrencyDto> data)
         {
             var result = new Dictionary<string, IEnumerable<GameStatisticalDao>>();
             foreach (var d in data)
                 result.Add(d.CurrencyName, d.CategoryDetail.SelectMany(y => y.GameDetail));
-            
+
             return result;
         }
 
         private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
             => reportService.GetGameStatisticalReport(getListInput);
 
+        private IEnumerable<GameStatisticalDao> FilterSorce(int siteId, IEnumerable<GameStatisticalDao> source)
+        {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2().First(x => x.SiteId == siteId);
+            return source.Where(x => userServerInfo.ICurrencyList.Contains(x.CurrencyId));
+        }
+
         private List<GameStatisticalByCurrencyDto> ProcessGameStatisticalSource(IEnumerable<GameStatisticalDao> source)
         {
+            var userServerInfos = _serverInfoBll.GetSiteListByLoginUserV2();
             var currencyList = source.Select(t => new { CurrencyId = t.CurrencyId, CurrencyName = t.CurrencyName }).Distinct()
                 .ToDictionary(t => t.CurrencyId, t => t.CurrencyName).OrderBy(x => x.Key);
             var categoryList = source.Select(t => new { CategoryId = t.CategoryId, CategoryName = t.CategoryName }).Distinct()
