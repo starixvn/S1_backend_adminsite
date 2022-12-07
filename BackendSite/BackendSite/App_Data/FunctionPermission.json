@@ -125,6 +125,10 @@
             "FuncKey": "ca_setCustTag"
           },
           {
+            "DisplayKey": "Disable Rebate Payout",
+            "FuncKey": "ca_rebatePayout"
+          },
+          {
             "DisplayKey": "Line Unbind",
             "FuncKey": "ca_lineUnbind"
           }
@@ -634,5 +638,6 @@
         "Enable": false
       }
     ]
-  }  
+  }
+
 ]

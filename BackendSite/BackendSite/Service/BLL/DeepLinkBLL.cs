@@ -17,13 +17,15 @@ namespace BackendSite.Service.BLL
         {
             return _deepLinkService.GetDeepLinkList();
         }
-        public IEnumerable<GetDeepLinkRep> GetDeepLinkTable(int siteId,int deepLinkId)
+        public IEnumerable<GetDeepLinkRep> GetDeepLinkTable(int siteId, int deepLinkId,
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            var deepLinkTable = _deepLinkService.GetDeepLinkTable(siteId, deepLinkId).ToList();
+            var deepLinkTable = GetDeepLink(siteId, deepLinkId,
+                pageNumber, pageSize, out totalPages, out rowCount).ToList();
             var siteList = _serverInfoService.GetSiteList().ToList();
             foreach (int DeepLinkTableType in Enum.GetValues(typeof(DeepLinkTableTypeEnum)))
             {
-                if(deepLinkTable.Find(x=> (int)x.Type == DeepLinkTableType) == null)
+                if (deepLinkTable.Find(x => (int)x.Type == DeepLinkTableType) == null)
                 {
                     deepLinkTable.Add(new GetDeepLinkRep()
                     {
@@ -36,11 +38,20 @@ namespace BackendSite.Service.BLL
                     });
                 }
             }
-            return deepLinkTable.OrderBy(x=> x.Type);
+            return deepLinkTable.OrderBy(x => x.Type);
         }
-        public int SetDeepLink(int siteId, DeepLinkTableTypeEnum type, string domain, DeepLinkTableProtocolTypeEnum protocolType, int deepLinkId, string lastUpdateUser)
+
+        public IEnumerable<GetDeepLinkRep> GetDeepLink(int siteId, int deepLinkId,
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return _deepLinkService.SetDeepLink(siteId, type, domain, protocolType, deepLinkId, lastUpdateUser);
+            return _deepLinkService.GetDeepLinkTable(siteId, deepLinkId, (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize),
+                out totalPages, out rowCount);
+        }
+
+        public  async Task<bool> SetDeepLink(int siteId, DeepLinkTableTypeEnum type, string domain, DeepLinkTableProtocolTypeEnum protocolType, int deepLinkId, string lastUpdateUser)
+        {
+            return await _deepLinkService.SetDeepLink(siteId, type, domain, protocolType, deepLinkId, lastUpdateUser);
         }
     }
 }

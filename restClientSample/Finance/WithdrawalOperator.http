@@ -1,0 +1,37 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得OnlinePayment支付渠道列表
+POST {{url}}/apiV2/BaseData/GetOnlinePayList HTTP/1.1
+Content-Type: application/json
+
+{
+    "sysId": 37,
+    "currencyId": 2,
+    "amount": 2000,
+    "custId": 249951
+}
+
+###
+# 取得 Bank Info
+POST {{url}}/apiV2/BaseData/GetBankInfoOffList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2,
+    "purpose": 2
+}

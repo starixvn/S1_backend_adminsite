@@ -1,353 +1,240 @@
-﻿using BackendSite.Attributes;
-using BackendSite.ExceptionHandling;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
-namespace BackendSite.Controllers.ApiV2.BankTransfer.Process
+namespace BackendSite.Controllers.ApiV2.BankTransfer.Process;
+
+[Authorize(AuthenticationSchemes = "backendV2")]
+[Route("apiV2/[controller]/[action]")]
+[ApiController]
+public class BankTransferController : ControllerBase
 {
-    [Authorize(AuthenticationSchemes = "backend")]
-    [Route("apiV2/[controller]/[action]")]
-    [ApiController]
-    public class BankTransferController : ControllerBase
+    #region Constructors
+
+    public BankTransferController(IServiceProvider provider)
     {
-        #region Fields
-
-        private readonly AuthorizeBLL _authorizeBll;
-        private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly ExcelBLL _excelBll;
-
-        #endregion
-
-        #region Constructors
-
-        public BankTransferController(IServiceProvider provider)
-        {
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
-        }
-
-        #endregion
-
-        #region API Model
-
-        public class GetListRequest
-        {
-            private DateTimeOffset _transFromDate;
-            private DateTimeOffset _transToDate;
-            public TransferTypeEnum? TransferType { get; set; }
-            public DateTimeOffset? TransFromDate
-            {
-                get => _transFromDate;
-                set
-                {
-                    if (value != null)
-                        _transFromDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? TransToDate
-            {
-                get => _transToDate;
-                set
-                {
-                    if (value != null)
-                        _transToDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public string FromAccountNo { get; set; }
-            public string FromAccountDisplayName { get; set; }
-            public string ToAccountNo { get; set; }
-            public string ToAccountDisplayName { get; set; }
-            public int? Reason { get; set; }
-            public string TransferId { get; set; }
-        }
-
-        public class TransferIdRequest
-        {
-            public string TransferId { get; set; }
-        }
-
-        public class ProcessedImage
-        {
-            public string FileName { get; set; }
-            public byte[] FileBytes { get; set; }
-        }
-
-        public class BankFinancialTransferInfoTransDetailModelForSet
-        {
-            public string Detail { get; set; }
-            public IFormFile UploadReceipt { get; set; }
-        }
-
-        #endregion
-
-        #region Action
-
-        /// <summary>
-        /// BankTransfer/GetList 取得銀行轉帳資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Bank Transfer > Transfer Info Management > [Submit](Query)
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        [HttpPost]
-        public ApiResult<IEnumerable<BankFinancialTransferInfoTransDetailModel>> GetList(GetListRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferInfoTransDetailModel>>();
-
-            if (string.IsNullOrWhiteSpace(request.FromAccountNo))
-            {
-                request.FromAccountNo = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.FromAccountDisplayName))
-            {
-                request.FromAccountDisplayName = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.ToAccountNo))
-            {
-                request.ToAccountNo = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.ToAccountDisplayName))
-            {
-                request.ToAccountDisplayName = null;
-            }
-
-            var transFromDate = request.TransFromDate != new DateTimeOffset() ? request.TransFromDate?.DateTime : null;
-            var transToDate = request.TransToDate != new DateTimeOffset() ? request.TransToDate?.DateTime : null;
-
-
-            apiResult.Data = _bankFinancialBll.GetTransferInfoList(false,
-                                                                   request.TransferType,
-                                                                   transFromDate,
-                                                                   transToDate,
-                                                                   request.FromAccountNo,
-                                                                   request.FromAccountDisplayName,
-                                                                   request.ToAccountNo,
-                                                                   request.ToAccountDisplayName,
-                                                                   request.Reason,
-                                                                   request.TransferId);
-            foreach (var data in apiResult.Data.ToArray())
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// BankTransfer/Export 匯出銀行轉帳資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Export Excel]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        [HttpPost]
-        public IActionResult Export(GetListRequest request)
-        {
-
-            if (string.IsNullOrWhiteSpace(request.FromAccountNo))
-            {
-                request.FromAccountNo = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.FromAccountDisplayName))
-            {
-                request.FromAccountDisplayName = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.ToAccountNo))
-            {
-                request.ToAccountNo = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(request.ToAccountDisplayName))
-            {
-                request.ToAccountDisplayName = null;
-            }
-
-            var transFromDate = request.TransFromDate != new DateTimeOffset() ? request.TransFromDate?.DateTime : null;
-            var transToDate = request.TransToDate != new DateTimeOffset() ? request.TransToDate?.DateTime : null;
-
-            var exportData = _bankFinancialBll.GetTransferInfoList(false,
-                request.TransferType,
-                transFromDate,
-                transToDate,
-                request.FromAccountNo,
-                request.FromAccountDisplayName,
-                request.ToAccountNo,
-                request.ToAccountDisplayName,
-                request.Reason,
-                null);
-
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "TransferInfoList");
-        }
-
-        /// <summary>
-        /// BankTransfer/GetByTransferId 取得指定銀行轉帳資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Edit]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        [HttpPost]
-        public ApiResult<BankFinancialTransferInfoTransDetailModel> GetByTransferId(TransferIdRequest request)
-        {
-            var apiResult = new ApiResult<BankFinancialTransferInfoTransDetailModel>();
-
-            var result = _bankFinancialBll.GetTransferInfoList(true,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               request.TransferId);
-
-            if (result.Count() == 1)
-            {
-                var data = result.FirstOrDefault();
-
-                var receipt = _bankFinancialBll.GetTransferIngoReceipt(data.TransferId);
-
-                var authData = _authorizeBll.GetAuthData();
-                //var dateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, TimeSpan.Zero);
-
-                if (receipt != null)
-                {
-                    data.UploadReceiptName = receipt.PicFileName;
-                    data.TransferPic = receipt.TransferPic;
-                }
-
-                data.Updator = authData.UserId;
-                data.UpdatorName = authData.UserName;
-                //data.UpdateTime = dateTime;
-
-                apiResult.Data = data;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "The Transfer Account Detail Is Not Exist.");
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// BankTransfer/Set 新增/更新指定銀行轉帳資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Edit] > [Submit]
-        /// 
-        /// Bank Transfer > Transfer Info Management > [Create] > [Submit]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        [HttpPost]
-        public ApiResult Set([FromForm] BankFinancialTransferInfoTransDetailModelForSet request)
-        {
-            var apiResult = new ApiResult();
-
-            //request.TransferInfoDetail.CreateTime = new DateTimeOffset(request.TransferInfoDetail.CreateTime.DateTime, TimeSpan.Zero);
-            //request.TransferInfoDetail.UpdateTime = new DateTimeOffset(request.TransferInfoDetail.UpdateTime.DateTime, TimeSpan.Zero);
-            var transferInfoDetails = JsonConvert.DeserializeObject<BankFinancialTransferInfoTransDetailModel>(request.Detail);
-
-            var (status, count, message) = _bankFinancialBll.SetTransferInfo(transferInfoDetails, request.UploadReceipt);
-
-            if (status)
-            {
-                apiResult.Message = message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, message);
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
-        /// BankTransfer/Delete 刪除指定銀行轉帳資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Delete]
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        [HttpPost]
-        public ApiResult Delete(TransferIdRequest request)
-        {
-            var apiResult = new ApiResult();
-
-            var (status, count, message) = _bankFinancialBll.DeleteTransferInfo(request.TransferId);
-
-            if (status)
-            {
-                apiResult.RawMessage = message;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, message);
-            }
-
-            return new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success, Message = message };
-        }
-
-        /// <summary>
-        /// 預覽上傳圖片
-        /// </summary>
-        /// <param name="uploadReceipt"></param>
-        /// <returns></returns>
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/TransferManage" })]
-        //[HttpPost]
-        //public ApiResult<ProcessedImage> ReviewTransferReceiptPic([FromForm] IFormFile uploadReceipt)
-        //{
-        //    var processedImage = new ProcessedImage();
-        //    var apiResult = new ApiResult<ProcessedImage>();
-        //    var transferReceipt = _bankFinancialBll.ProcessImage(uploadReceipt);
-
-        //    processedImage.FileName = transferReceipt.FileName;
-        //    processedImage.FileBytes = transferReceipt.FileBytes;
-        //    apiResult.Data = processedImage;
-
-        //    return apiResult;
-        //}
-
-        #endregion
+        _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+        _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
+        _excelBll = provider.GetRequiredService<ExcelBLL>();
     }
+
+    #endregion
+
+    #region Fields
+
+    private readonly AuthorizeBLL _authorizeBll;
+    private readonly BankFinancialBLL _bankFinancialBll;
+    private readonly ExcelBLL _excelBll;
+
+    #endregion
+
+    #region API Model
+
+    public class TransferIdRequest
+    {
+        public string TransferId { get; set; }
+    }
+
+    #endregion
+
+    #region Action
+
+    /// <summary>
+    ///     BankTransfer/GetList 取得銀行轉帳資料
+    /// </summary>
+    /// <remarks>
+    ///     Http Method：POST
+    ///     Func Path：Bank Transfer > Transfer Info Management > [Submit](Query)
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public ApiListResult<BankFinancialTransferInfoTransDetailModel> GetList(GetTransferInfoListRequest request)
+    {
+        var result = _bankFinancialBll.GetFinancialTransferInfoList(
+            new GetTransferInfoListParams(request), request.PageNumber, request.PageSize, out var pageInfo);
+
+        foreach (var data in result)
+        {
+            data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+            data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+        }
+
+        return new ApiListResult<BankFinancialTransferInfoTransDetailModel>(ErrorCodeEnum.Success, pageInfo, result);
+    }
+
+    /// <summary>
+    ///     BankTransfer/Export 匯出銀行轉帳資料
+    /// </summary>
+    /// <remarks>
+    ///     Http Method：POST
+    ///     Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Export Excel]
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public IActionResult Export(ExportTransferInfoListRequest request)
+    {
+        var offset = request.StartTime.Offset;
+        var exportData = _bankFinancialBll.ExportFinancialTransferInfoList(
+            new GetTransferInfoListParams(request));
+
+        var stream = _excelBll.ExportV2(exportData);
+        return _excelBll.ExcelFile(stream, "TransferInfoList");
+    }
+
+    /// <summary>
+    ///     BankTransfer/GetByTransferId 取得指定銀行轉帳資料
+    /// </summary>
+    /// <remarks>
+    ///     Http Method：POST
+    ///     Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Edit]
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public ApiResult<BankFinancialTransferInfoTransDetailModel> GetByTransferId(TransferIdRequest request)
+    {
+        var apiResult = new ApiResult<BankFinancialTransferInfoTransDetailModel>();
+        var result = _bankFinancialBll.GetFinancialTransferInfoById(request.TransferId);
+
+        if (result != null)
+        {
+            var receipt = _bankFinancialBll.GetTransferIngoReceipt(result.TransferId);
+            var authData = _authorizeBll.GetAuthData();
+            result.ReceiptUrl = receipt?.PicFileName;
+            result.Updator = authData.UserId;
+            result.UpdatorName = authData.UserName;
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+        }
+        else
+        {
+            throw new AdminException(ErrorCodeEnum.Fail, "The Transfer Account Detail Is Not Exist.");
+        }
+
+        return apiResult;
+    }
+
+    /// <summary>
+    ///     BankTransfer/Set 新增/更新指定銀行轉帳資料
+    /// </summary>
+    /// <remarks>
+    ///     Http Method：POST
+    ///     Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Edit] > [Submit]
+    ///     Bank Transfer > Transfer Info Management > [Create] > [Submit]
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult> Set([FromForm] BankTransferInfoSetRequest request)
+    {
+        var authData = _authorizeBll.GetAuthData();
+        var detail = new BankFinancialTransferInfoTransDetailModel
+        {
+            TransferId = request.TransferId,
+            TransDate = request.TransDate,
+            TransactionType = request.TransactionType,
+            TransferType = request.TransferType,
+            FromSiteId = (int) request.SiteId,
+            FromSiteName = request.SiteId.GetDescription(),
+            ToSiteId = (int) request.SiteId,
+            ToSiteName = request.SiteId.GetDescription(),
+            FromChannel = request.FromChannel,
+            FromAgent = request.FromAgent,
+            FromPayId = request.FromPayId,
+            FromCurrencyId = request.FromCurrencyId,
+            FromSysId = request.FromSysId,
+            FromAccountNo = request.FromAccountNo,
+            FromAccountDisplayName = request.FromAccountDisplayName,
+            FromAmount = request.FromAmount,
+            FromFee = request.FromFee,
+            ToChannel = request.ToChannel,
+            ToAgent = request.ToAgent,
+            ToPayId = request.ToPayId,
+            ToCurrencyId = request.ToCurrencyId,
+            ToSysId = request.ToSysId,
+            ToAccountNo = request.ToAccountNo,
+            ToAccountDisplayName = request.ToAccountDisplayName,
+            ToAmount = request.ToAmount,
+            ToFee = request.ToFee,
+            Reason = request.Reason,
+            Remark = request.Remark,
+            Updator = authData.UserId,
+            UpdatorName = authData.UserName
+        };
+        
+        var (success, count, message) = await _bankFinancialBll.SetTransferInfo(detail, request.UploadReceipt);
+
+        return new ApiResult
+        {
+            ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+            Message = message
+        };
+    }
+
+    /// <summary>
+    ///     BankTransfer/Delete 刪除指定銀行轉帳資料
+    /// </summary>
+    /// <remarks>
+    ///     Http Method：POST
+    ///     Func Path：Bank Transfer > Transfer Info Management > [Submit](Query) > [Delete]
+    /// </remarks>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    /// <exception cref="AdminException"></exception>
+    [HttpPost]
+    public ApiResult Delete(TransferIdRequest request)
+    {
+        var apiResult = new ApiResult();
+        var authData = _authorizeBll.GetAuthData();
+        var (status, count, message) = _bankFinancialBll.DeleteTransferInfo(request.TransferId, authData.UserName);
+
+        if (status)
+        {
+            apiResult.RawMessage = message;
+            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+        }
+        else
+        {
+            throw new AdminException(ErrorCodeEnum.Fail, message);
+        }
+
+        return new ApiResult {ErrorCode = (int) ErrorCodeEnum.Success, Message = message};
+    }
+
+    [HttpPost]
+    public ApiResult<IEnumerable<SelectListItem>> GetTransferTypeList()
+    {
+        var except = new[]
+        {
+            TransferTypeEnum.Undefined,
+            TransferTypeEnum.Deposit,
+            TransferTypeEnum.Withdrawal
+        };
+
+        return new ApiResult<IEnumerable<SelectListItem>>
+        {
+            ErrorCode = (int) ErrorCodeEnum.Success,
+            Data = EnumExtension.EnumToSelectListItem(except)
+        };
+    }
+    
+    [HttpPost]
+    public ApiResult<IEnumerable<SelectListItem>> GetTransactionTypeList()
+    {
+        return new ApiResult<IEnumerable<SelectListItem>>
+        {
+            ErrorCode = (int) ErrorCodeEnum.Success,
+            Data = EnumExtension.EnumToSelectListItem<TransactionTypeEnum>()
+        };
+    }
+
+    #endregion
 }
