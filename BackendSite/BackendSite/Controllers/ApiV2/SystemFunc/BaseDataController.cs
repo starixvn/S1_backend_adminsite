@@ -449,13 +449,25 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <returns></returns>
         //有新舊API，這支是新API，另一支新的API=api/Withdrawal/GetCryptoPayList
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetCryptoPayListRequest request)
+        public ApiResult<IEnumerable<PayInfo>> GetCryptoPayList(GetCryptoPayListRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
-            var result =
-                _bankDetailBll.GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount, request.CustId);
+            var result = _bankDetailBll
+                .GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount, request.CustId)
+                .ToList();
+            
+            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
+            {
+                result.ForEach(d =>
+                {
+                    d.LoginAccount = _cryptor.Decrypt(d.LoginAccount);
+                    d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                });
+            }
 
-            return new ApiResult<IEnumerable<Pay>>
+            return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
