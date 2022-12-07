@@ -250,11 +250,11 @@ namespace BackendSite.Service.DAL
                                 result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
                             }
                         }
-                        
+
                         if (result > 0 && canReward)
                         {
                             var resultCode = InsertDepositRewardPointQueue(transId, conn, trans);
-                            if (resultCode != (int) ErrorCodeEnum.Success)
+                            if (resultCode != (int)ErrorCodeEnum.Success)
                             {
                                 _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
                             }
@@ -382,7 +382,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
         {
             var props = new DynamicParameters();
@@ -408,15 +408,15 @@ namespace BackendSite.Service.DAL
                 input.After.DepositMin,
                 input.After.DepositMax
             };
-            
+
             var result = _mainDbClient.Execute("Admin_DepositLimitInfo_Ins", tran, param) > 0;
             if (result)
             {
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Create);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", null, DbType.String);
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
@@ -429,7 +429,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
@@ -444,34 +444,34 @@ namespace BackendSite.Service.DAL
             {
                 _SiteId = input.SiteId,
                 _CurrencyId = input.CurrencyId,
-                _Infos = JsonConvert.SerializeObject(input.After) 
+                _Infos = JsonConvert.SerializeObject(input.After)
             };
-            
-            var result = _mainDbClient.Execute("Admin_DepositLimitInfoReNew_Ins",  tran, param) > 0;
+
+            var result = _mainDbClient.Execute("Admin_DepositLimitInfoReNew_Ins", tran, param) > 0;
             if (result)
             {
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Create);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Create);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", null, DbType.String);
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
                 logParam.Add("_Operator", input.Operator);
 
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins",  tran, logParam) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
                     tran.Commit();
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
-        
+
         public bool EditDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -493,8 +493,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
@@ -507,11 +507,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
-        
+
         public bool EditDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
@@ -521,17 +521,17 @@ namespace BackendSite.Service.DAL
             {
                 _SiteId = input.SiteId,
                 _CurrencyId = input.CurrencyId,
-                _Infos = JsonConvert.SerializeObject(input.After) 
+                _Infos = JsonConvert.SerializeObject(input.After)
             };
             var result = _mainDbClient.Execute("Admin_DepositLimitInfoReNew_Set", tran, param) > 0;
-            
+
             if (result)
             {
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
@@ -544,11 +544,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
-        
+
         public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
         {
             return _mainDbClient.QueryFirst<DepositLimitInfo>("Admin_DepositLimitInfoDetail_Get", new DynamicParameters(new { SiteId = siteId, DepositType = depositType, CurrencyId = currencyId, VipLevel = vipLevel }));
@@ -572,8 +572,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Delete);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", null, DbType.String);
@@ -586,7 +586,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
@@ -602,15 +602,15 @@ namespace BackendSite.Service.DAL
                 input.CurrencyId,
                 input.Before.VipLevel
             };
-            
+
             var result = _mainDbClient.Execute("Admin_DepositLimitInfoReNew_Del", tran, param) > 0;
             if (result)
             {
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.DepositLimitation);
-                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.DepositLimitation);
+                logParam.Add("_ActionType", (int)ActionType.Delete);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
                 logParam.Add("_AfterDetailInfo", null, DbType.String);
@@ -623,11 +623,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             tran.Rollback();
             return false;
         }
-        
+
         public IEnumerable<DepositTimeList> DepositTimeReportGet(string siteIds,
             string currencyIds,
             string statuses,
@@ -696,7 +696,7 @@ namespace BackendSite.Service.DAL
         {
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var depositId);
-            
+
             var props = new DynamicParameters();
             props.Add("_DepositId", depositId);
             props.Add("_Amount", input.After.Amount);
@@ -718,8 +718,17 @@ namespace BackendSite.Service.DAL
 
             _ = _mainDbClient.Execute("Service_DepositRewardPointQueue_Ins", trans, para);
             var resultCode = para.Get<int?>("_Result") ?? -9;
-            
+
             return resultCode;
+        }
+
+        public bool SetDepositMessage(ParamsWithLog<DepositMessageRequest> input)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositId", input.After.DepositId);
+            props.Add("_Status", (int)input.After.Status);
+
+            return _mainDbClient.Execute("Admin_DepositMessage_Set", props) > 0;
         }
     }
 }
