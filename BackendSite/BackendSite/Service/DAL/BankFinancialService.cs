@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using System.Data;
 using BackendSite.Service.Library;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -231,6 +232,17 @@ namespace BackendSite.Service.DAL
         {
             var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
+        }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            var parameters = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
+            });
+            return _reportDbClient
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V3", parameters);
         }
 
         public int GetTransferDataCount(string accountNo)

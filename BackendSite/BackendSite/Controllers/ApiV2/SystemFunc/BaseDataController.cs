@@ -228,21 +228,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetBankCodeListRequest
         {
             /// <summary>
-            /// 品牌ID
-            /// </summary>
-            public int SiteId { get; set; }
-            /// <summary>
             /// 幣別
             /// </summary>
             public int CurrencyId { get; set; }
-        }
-        
-        public class GetCalCodeListRequest
-        {
-            /// <summary>
-            /// 品牌ID
-            /// </summary>
-            public int SiteId { get; set; }
         }
 
         #endregion
@@ -789,20 +777,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<BankCodeModel>> GetBankCodeList(GetBankCodeListRequest request)
+        public ApiResult GetBankCodeList(GetBankCodeListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
-            var bankInfoOff =
-                _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
-                    .Select(x => new BankCodeModel
-                    {
-                        SysId = x.SysId,
-                        BankCode = x.BankCode ,
-                        BankName = x.BankName
-                    }).Distinct(new BankCodeModelComparer());
-            apiResult.Data = bankInfoOff;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            var authData = _authorizeBll.GetAuthData();
+            var data = _bankDetailBll.GetBankCodeList(authData.SiteId)
+                .Where(x => request.CurrencyId == 0 || x.CurrencyId == request.CurrencyId);
+         
+            return new ApiResult<IEnumerable<BankCodeModel>>
+            {
+                Data = data,
+                ErrorCode = 0
+            };
         }
         
         /// <summary>
@@ -814,23 +799,25 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<CalCodeModel>> GetCalCodeList(GetCalCodeListRequest request)
+        public ApiResult GetCalCodeList()
         {
-            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
-            var bankInfoOff = 
-                _bankDetailBll.GetOfflineBankAccount(request.SiteId);
-            bankInfoOff = bankInfoOff
-                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit))
-                .OrderBy(x => x.BankId);
-            var data = bankInfoOff
+            var authData = _authorizeBll.GetAuthData();
+            var accountList = 
+                _bankFinancialBll.GetFinancialAccountList(authData.SiteId, new [] {TransferAccountPurposeEnum.Deposit});
+            var data = accountList
                 .Select(x => new CalCodeModel
                 {
-                    BankId = x.BankId,
-                    CalCodeName = x.DisplayName
+                    BankId = x.FinancialId,
+                    CalCodeName = x.DisplayName,
+                    CurrencyId = x.CurrencyId,
+                    SysId = x.SysId
                 });
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
+            
+            return new ApiResult<IEnumerable<CalCodeModel>>
+            {
+                Data = data,
+                ErrorCode = 0
+            };
         }
         /// <summary>
         /// 取得第三方遊戲分類清單
