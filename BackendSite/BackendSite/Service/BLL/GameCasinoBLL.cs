@@ -33,5 +33,12 @@ namespace BackendSite.Service.BLL
                     CName = gameName.cs
                 }).ToList();
         }
+        
+        public async Task<IEnumerable<GameCasinoDataV3>> GetGameIdByTpIdAndCategoryId(int tpId,int categoryId)
+        {
+            var casinoGames = await _gameCasinoService.GetGameIdByTpIdAndCategoryId(tpId,categoryId);
+
+            return casinoGames;
+        }
     }
 }

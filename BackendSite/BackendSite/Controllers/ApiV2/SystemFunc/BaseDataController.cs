@@ -146,6 +146,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int TpId { get; set; }
         }
+        
+        public class GetGameIdByTpIdAndCategoryIdReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
+        
 
         public class GetTagRequest
         {
@@ -564,6 +571,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(request.TpId);
                 apiResult.Data = gameCasinoData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetGameIdByTpIdAndCategoryId 取得第三方全部遊戲類型GameId
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Slot Tp List 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<GameCasinoDataV3>>> GetGameIdByTpIdAndCategoryId(GetGameIdByTpIdAndCategoryIdReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GameCasinoDataV3>>();
+            try
+            {
+                var gameIdData = await _gameCasinoBll.GetGameIdByTpIdAndCategoryId(request.TpId,request.CategoryId);
+                apiResult.Data = gameIdData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
