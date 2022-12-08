@@ -536,7 +536,7 @@ namespace BackendSite.Service.DAL
         
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoSys_GetV2", new
+            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get", new
             {
                 _PayId = payId,
                 _SiteId = siteId

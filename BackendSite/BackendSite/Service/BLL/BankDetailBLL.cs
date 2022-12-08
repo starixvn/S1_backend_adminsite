@@ -107,6 +107,11 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
+        public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
+        {
+            return localBankService.GetBankCodeList(siteId);
+        }
+        
         public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
             var pointLevel = -1;
