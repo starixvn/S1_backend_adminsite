@@ -738,7 +738,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
                     .Select(x => new BankCodeModel
                     {
-                        BankId = x.BankId,
+                        SysId = x.SysId,
                         BankCode = x.BankCode ,
                         BankName = x.BankName ,
                         CurrencyId = x.CurrencyId
