@@ -768,7 +768,8 @@ namespace BackendSite.Service.Model.enums
         SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
-        ProviderAppDownload = 75
+        ProviderAppDownload = 75,
+        SetDepositMessage = 76
     }
 
     #region BankFinancialTransferInfoLog
@@ -1599,5 +1600,17 @@ namespace BackendSite.Service.Model.enums
         Cancelled = 5,
         Approved = 6,
         Reject = 7
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3
     }
 }

@@ -441,4 +441,10 @@ namespace BackendSite.Service.Model
         public int? BankId { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
     }
+
+    public class DepositMessageRequest
+    {
+        public DepositMessageStatus Status { get; set; }
+        public int DepositId { get; set; }
+    }
 }
