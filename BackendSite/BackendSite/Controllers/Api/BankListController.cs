@@ -84,7 +84,7 @@ namespace BackendSite.Controllers.Api
             var bankInfoOff = bankDetailBLL.GetOfflineBankAccount()
                 .Select(x => new BankCodeModel
                 {
-                    BankId = x.BankId,
+                    SysId = x.SysId,
                     CurrencyId = x.CurrencyId,
                     BankCode = x.BankCode,
                     BankName = x.BankName
