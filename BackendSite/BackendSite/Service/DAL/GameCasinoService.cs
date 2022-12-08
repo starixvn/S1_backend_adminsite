@@ -28,5 +28,16 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        public async Task<IEnumerable<GameCasinoDataV3>> GetGameIdByTpIdAndCategoryId(int tpId,int categoryId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_TpId", tpId);
+            props.Add("_CategoryId", categoryId);
+
+            var result = await _reportDbClient.QueryAsync<GameCasinoDataV3>("Admin_GetGameIdByTpIdAndCategoryId_Get", props);
+
+            return result;
+        }
     }
 }
