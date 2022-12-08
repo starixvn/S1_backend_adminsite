@@ -7,6 +7,7 @@ using Amazon.CloudFront.Model;
 using Microsoft.Extensions.Options;
 using BackendSite.Service.Model;
 using BackendSite.Extensions;
+using Dapper;
 
 namespace BackendSite.Service.BLL
 {
@@ -16,6 +17,7 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _s3Helper;
         private readonly AWSCloudFrontHelper _cloudFrontHelper;
         private readonly string _fileName;
+        private readonly MySqlClient _mainDbClient;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -24,6 +26,7 @@ namespace BackendSite.Service.BLL
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
@@ -42,7 +45,7 @@ namespace BackendSite.Service.BLL
             return response;
         }
 
-        public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request)
+        public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
             var siteMaintainObject = new 
             {
@@ -82,6 +85,24 @@ namespace BackendSite.Service.BLL
                 }
             };
             var createResponse = await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
+            if (createResponse.HttpStatusCode.IsSuccess())
+            {
+                #region InfoLog
+
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", request.SiteId);
+                logParam.Add("_CurrencyId", 0);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+                logParam.Add("_ActionType", (int)ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", null);
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(request));
+                logParam.Add("_Operator", Operator);
+
+                #endregion
+
+                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam);
+            }
             return createResponse.HttpStatusCode.IsSuccess();
         }
 
