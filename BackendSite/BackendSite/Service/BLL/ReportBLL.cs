@@ -1,10 +1,15 @@
-﻿using BackendSite.Extensions;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.GameStatisticalReport;
 using BackendSite.Service.Model.Option;
+using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 
 namespace BackendSite.Service.BLL
@@ -17,6 +22,8 @@ namespace BackendSite.Service.BLL
         private readonly Common _common;
         private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly ICacheHelper _redisHelper;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -28,6 +35,8 @@ namespace BackendSite.Service.BLL
             _common = provider.GetRequiredService<Common>();
             _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #endregion
@@ -915,10 +924,10 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
         {
-            var baseDate = DateTime.ParseExact($"{date} 00:00", "yyyy-MM-dd HH:mm", null).ToOffset(timeZone);           
+            var baseDate = DateTime.ParseExact($"{date} 00:00", "yyyy-MM-dd HH:mm", null).ToOffset(timeZone);
             var startDate = baseDate.ToUniversalTime().DateTime;
             var endDate = baseDate.ToUniversalTime().AddDays(1).AddMilliseconds(-1).DateTime;
-           
+
             var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = betList
                 .Where(i => i.GameType == gameId && (i.SettlementType == 1 || i.SettlementType == 3))
@@ -927,32 +936,32 @@ namespace BackendSite.Service.BLL
                   tpGameType => tpGameType.Type,
                   (tpBetRecord, tpGameType) => new TpBetRecordDataModel
                   {
-                        TpId = tpBetRecord.TpId,
-                        TpName= _common.GetTpName(tpBetRecord.TpId),
-                        TransId= tpBetRecord.TransId,
-                        CategoryId= tpGameType.CategoryId,
-                        CategoryName= tpGameType.CategoryName,
-                        GameId= tpBetRecord.GameType,
-                        GameName= tpGameType.TypeName,
-                        CustId= tpBetRecord.CustId,
-                        UserName= tpBetRecord.UserName,
-                        CurrencyId= tpBetRecord.CurrencyId,
-                        Code= _common.GetCurrencyIsoCode(tpBetRecord.CurrencyId),
-                        SiteId= tpBetRecord.SiteId,
-                        SiteName= _common.GetSiteName(tpBetRecord.SiteId),
-                        TpUserName= tpBetRecord.TpUserName,
-                        TransTime= tpBetRecord.TransTime.ToOffset(baseDate.Offset).DateTime,
-                        SettledTime= tpBetRecord.SettledTime.ToOffset(baseDate.Offset).DateTime,
-                        Stake= tpBetRecord.Stake,
-                        ValidBet= tpBetRecord.ValidBet ?? 0,
-                        Revenue= tpBetRecord.Revenue ?? 0,
-                        WinLostAmount= tpBetRecord.WinlostAmount,
-                        SettlementType= tpBetRecord.SettlementType,
-                        TicketStatus= tpBetRecord.TicketStatus,
-                        OriginalState= tpBetRecord.OriginalState,
-                        TicketKey= (int)tpBetRecord.TicketKey,
-                        BonusId= tpBetRecord.BonusId,
-                        CreateTime= tpBetRecord.CreateTime.ToOffset(baseDate.Offset).DateTime
+                      TpId = tpBetRecord.TpId,
+                      TpName = _common.GetTpName(tpBetRecord.TpId),
+                      TransId = tpBetRecord.TransId,
+                      CategoryId = tpGameType.CategoryId,
+                      CategoryName = tpGameType.CategoryName,
+                      GameId = tpBetRecord.GameType,
+                      GameName = tpGameType.TypeName,
+                      CustId = tpBetRecord.CustId,
+                      UserName = tpBetRecord.UserName,
+                      CurrencyId = tpBetRecord.CurrencyId,
+                      Code = _common.GetCurrencyIsoCode(tpBetRecord.CurrencyId),
+                      SiteId = tpBetRecord.SiteId,
+                      SiteName = _common.GetSiteName(tpBetRecord.SiteId),
+                      TpUserName = tpBetRecord.TpUserName,
+                      TransTime = tpBetRecord.TransTime.ToOffset(baseDate.Offset).DateTime,
+                      SettledTime = tpBetRecord.SettledTime.ToOffset(baseDate.Offset).DateTime,
+                      Stake = tpBetRecord.Stake,
+                      ValidBet = tpBetRecord.ValidBet ?? 0,
+                      Revenue = tpBetRecord.Revenue ?? 0,
+                      WinLostAmount = tpBetRecord.WinlostAmount,
+                      SettlementType = tpBetRecord.SettlementType,
+                      TicketStatus = tpBetRecord.TicketStatus,
+                      OriginalState = tpBetRecord.OriginalState,
+                      TicketKey = (int)tpBetRecord.TicketKey,
+                      BonusId = tpBetRecord.BonusId,
+                      CreateTime = tpBetRecord.CreateTime.ToOffset(baseDate.Offset).DateTime
                   });
             return result;
         }
@@ -969,9 +978,222 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
             => reportService.GetRewardBonusReport(input, out totalPages, out rowCount);
-        
+
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
+
+        #region Game Statistical Report
+
+        public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
+        {
+            var key = $"GameStatisticalReport:{getListInput.SiteId}:{getListInput.StartDate}:{getListInput.EndDate}";
+            var source = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+                () => GetGameStatisticalSource(getListInput));
+            return ProcessGameStatisticalSource(FilterSorce(getListInput.SiteId, source));
+        }
+        public Dictionary<string, IEnumerable<GameStatisticalDao>> ConvertToExport(IEnumerable<GameStatisticalByCurrencyDto> data)
+        {
+            var result = new Dictionary<string, IEnumerable<GameStatisticalDao>>();
+            foreach (var d in data)
+                result.Add(d.CurrencyName, d.CategoryDetail.SelectMany(y => y.GameDetail));
+
+            return result;
+        }
         
+        private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
+            => reportService.GetGameStatisticalReport(getListInput);
+
+        private IEnumerable<GameStatisticalDao> FilterSorce(int siteId, IEnumerable<GameStatisticalDao> source)
+        {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2().First(x => x.SiteId == siteId);
+            return source.Where(x => userServerInfo.ICurrencyList.Contains(x.CurrencyId));
+        }
+
+        private List<GameStatisticalByCurrencyDto> ProcessGameStatisticalSource(IEnumerable<GameStatisticalDao> source)
+        {
+            var userServerInfos = _serverInfoBll.GetSiteListByLoginUserV2();
+            var currencyList = source.Select(t => new { CurrencyId = t.CurrencyId, CurrencyName = t.CurrencyName }).Distinct()
+                .ToDictionary(t => t.CurrencyId, t => t.CurrencyName).OrderBy(x => x.Key);
+            var categoryList = source.Select(t => new { CategoryId = t.CategoryId, CategoryName = t.CategoryName }).Distinct()
+                .ToDictionary(t => t.CategoryId, t => t.CategoryName).OrderBy(x => x.Key);
+
+            var result = new List<GameStatisticalByCurrencyDto>();
+
+            foreach (var currency in currencyList)
+            {
+                var currencySummaryItem = new GameStatisticalByCurrencyDto() { CurrencyId = currency.Key, CurrencyName = currency.Value };
+                var categorySummaryList = new List<GameStatisticalByCategoryDto>();
+                foreach (var category in categoryList)
+                {
+                    var categorySummaryItem = new GameStatisticalByCategoryDto() { CategoryId = category.Key, CategoryName = category.Value };
+                    var detail = source.Where(x => x.CurrencyId == currency.Key && x.CategoryId == category.Key).OrderByDescending(x => x.ValidBetSummary);
+
+                    if (detail.Count() == 0) continue;
+                    categorySummaryItem.GameDetail = detail;
+                    categorySummaryList.Add(categorySummaryItem);
+                }
+                currencySummaryItem.CategoryDetail = categorySummaryList;
+                result.Add(currencySummaryItem);
+            }
+            return result;
+        }
+
+        #endregion
+
+        public IEnumerable<MultilevelReport<MultilevelReport<T>>> ParsePaymentReportForFrontEnd<T>(
+            Dictionary<string, Dictionary<string, T>> data)
+        {
+            var result = data.Select(g =>
+            {
+                return new MultilevelReport<MultilevelReport<T>>
+                {
+                    Key = g.Key,
+                    Children = g.Value.Select(x => new MultilevelReport<T>
+                    {
+                        Key = x.Key,
+                        Children = new List<T> {x.Value}
+                    })
+                };
+            });
+            
+            return result;
+        }
+        
+        public Dictionary<string, Dictionary<string, DepositPaymentReport>> GetDepositPaymentReport(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportDepositDetail(input);
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.DepositType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+            
+            var result = gData.ToDictionary(data => data.Key, data => data.GroupBy(x => x.CurrencyId)
+                    .ToDictionary(x => x.Key.ToString(), x =>
+                    {
+                        var count = x.Count();
+                        var totalDepositAmount = x.Sum(y => y.ActualDeposit);
+                        return new DepositPaymentReport
+                        {
+                            TotalDepositCount = count,
+                            AverageDepositAmount = decimal.Round(totalDepositAmount / count, 4),
+                            FirstDepositCount = x.Count(y => y.FirstDeposit),
+                            TotalDepositAmount = totalDepositAmount,
+                            AverageProcessingTime = 
+                                TimeSpan.FromMilliseconds(x.Average(y => y.FlowEndTime.UtcTicks - y.CreateTime.UtcTicks))
+                                    .ToString(@"hh\:mm\:ss")
+                        };
+                    }));
+            
+            return result;
+        }
+        
+        
+
+        public Dictionary<string, Dictionary<string, WithdrawalPaymentReport>> GetWithdrawalPaymentReport(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportWithdrawalDetail(input);
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.WithdrawalType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+            
+            var result = gData.ToDictionary(data => data.Key, data => data.GroupBy(x => x.CurrencyId)
+                .ToDictionary(x => x.Key.ToString(), x =>
+                {
+                    var count = x.Count();
+                    var totalDepositAmount = x.Sum(y => y.Amount);
+                    return new WithdrawalPaymentReport
+                    {
+                        TotalWithdrawalCount = count,
+                        AverageWithdrawalAmount = decimal.Round(totalDepositAmount / count, 2),
+                        TotalWithdrawalAmount = totalDepositAmount,
+                        AverageProcessingTime =
+                            TimeSpan.FromMilliseconds(x.Average(y => y.FlowEndTime.UtcTicks - y.CreateTime.UtcTicks))
+                                .ToString(@"hh\:mm\:ss")
+                    };
+                }));
+            
+            return result;
+        }
+
+        public byte[] ExportPaymentReport<T>(Dictionary<string, Dictionary<string, T>> data) where T : class
+        {
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Report");
+
+            sheet.CreateHeaders<T>(freeze: true, index: 1);
+            
+            var gCellStyle = workbook.CreateCellStyle();
+            gCellStyle.BorderBottom = BorderStyle.Medium;
+            gCellStyle.FillForegroundColor = IndexedColors.LightCornflowerBlue.Index;
+            gCellStyle.FillPattern = FillPattern.SolidForeground;
+            
+            var subCellStyle = workbook.CreateCellStyle();
+            subCellStyle.BorderBottom = BorderStyle.Thin;
+            subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
+            subCellStyle.FillPattern = FillPattern.SolidForeground;
+            
+            var props = typeof(T).GetProperties();
+            var index = 1;
+            foreach (var gData in data)
+            {
+                var groupCell = sheet.CreateRow(index).CreateCell(0);
+                groupCell.SetCellValue(gData.Key);
+                groupCell.CellStyle = gCellStyle;
+                
+                index++;
+
+                foreach (var (key, value) in gData.Value)
+                {
+                    var row = sheet.CreateRow(index);
+                    var subGroupCell = row.CreateCell(0);
+                    subGroupCell.SetCellValue(key);
+                    subGroupCell.CellStyle = subCellStyle;
+                    
+                    var i = 1;
+                    foreach (var prop in props)
+                    {
+                        var val = value.GetType().GetProperty(prop.Name)?.GetValue(value);
+                        row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
+                   
+                        i++;
+                    }
+                    index++;
+                }
+            }
+            
+            sheet.AutoSizeColumn(0);
+
+            using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+            
+            return result;
+        }
     }
 }

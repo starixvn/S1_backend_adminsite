@@ -37,6 +37,12 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.UpdateBannerStatus(siteId, bannerName, status, user);
         }
+        
+        public int DeleteBanner(int siteId, string bannerName , int currency)
+        {
+            return bannerManageService.DeleteBanner(siteId, bannerName, currency);
+        }
+        
         public IEnumerable<HotEventList> GetHotEventList(IEnumerable<int> siteId,
             IEnumerable<int> status, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {

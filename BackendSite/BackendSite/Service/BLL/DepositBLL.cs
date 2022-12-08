@@ -23,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly IConfiguration _configuration;
         private readonly CourierAdapter _courierAdapter;
+        private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
         private readonly ILogger<DepositBLL> _logger;
 
@@ -31,6 +32,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -41,26 +43,28 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
             IEnumerable<int> selectCalCode,
-            DateTime startDate, 
+            DateTime startDate,
             DateTime endDate,
             string depositId,
             IEnumerable<string> userNames,
+            string agent,
             IEnumerable<int> currencyId, 
             IEnumerable<int> status,
             IEnumerable<int> levelStatus, 
-            int pageSize, 
-            int amountType, 
-            string amount,
+            int pageSize,
+            decimal startAmount, 
+            decimal endAmount,
             IEnumerable<int> payIds,
-            int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
+            int pageNumber, out int totalPages, out int rowCount, ref List<TotalAmount> currencyAmountRecord)
         {
-            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userNames, currencyId, status, levelStatus, pageSize, amountType, amount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmount);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, depositId, userNames,agent, currencyId, status, levelStatus, pageSize, startAmount, endAmount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmountRecord);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,
@@ -139,7 +143,7 @@ namespace BackendSite.Service.BLL
 
             return depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
         }
-        
+
         private int ValidateDepositReceiptPic(string transId)
         {
             var depositId = 0;
@@ -147,7 +151,7 @@ namespace BackendSite.Service.BLL
             int.TryParse(m.Value, out depositId);
             return depositId;
         }
-        
+
         public DepositRequest GetDepositRequest(string transId)
         {
             var serverInfo = serverInfoService.GetModel();
@@ -178,7 +182,7 @@ namespace BackendSite.Service.BLL
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out var totalPages,
                 out var rowCount);
-            
+
             return new GetDepositAccountingListModel()
             {
                 Datas = result.ToList(),
@@ -187,17 +191,17 @@ namespace BackendSite.Service.BLL
                 TotalPages = totalPages
             };
         }
-        
+
         public DepositAccountingModel GetDepositAccountingByTransId(string transId)
         {
             return _depositAccountingService.GetDepositAccountingByTransId(transId);
         }
-        
+
         public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
             return _depositAccountingService.EditDepositAccounting(input);
         }
-        
+
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(
             string siteIds,
             string currencyIds,
@@ -217,7 +221,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<Comments> GetDepositRequestComment(string transId)
+        public IEnumerable<DepositComments> GetDepositRequestComment(string transId)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var depositId);
@@ -237,56 +241,61 @@ namespace BackendSite.Service.BLL
                 forStatus,
                 DepositStatusEnum.Approved,
                 depositRequest,
+                null,
                 CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
 
             return result;
         }
 
-        public int DepositRejectd(string transId, decimal actualDeposit, string comment, string Operator)
+        public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Rejected, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Rejected, null ,null);
         }
 
-        public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator)
+        public int DepositDraft(string transId, decimal actualDeposit, string comment, string Operator, DepositDraftSetRequest draftInfo)
         {
             var forStatus = new List<int>
             {
+                (int) DepositStatusEnum.Draft,
                 (int) DepositStatusEnum.Pending,
-                (int) DepositStatusEnum.OnHold
+                (int) DepositStatusEnum.Paid,
+                (int) DepositStatusEnum.Approved,
+                (int) DepositStatusEnum.Rejected,
+                (int) DepositStatusEnum.Canceled,
+                (int) DepositStatusEnum.Expired,
+                (int) DepositStatusEnum.OnHold,
+                (int) DepositStatusEnum.Error
             };
 
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Draft, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Draft, null , draftInfo);
         }
         public int DepositOnHold(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatusEnum.Pending);
+            var forStatus = new List<int> {(int)DepositStatusEnum.Pending};
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.OnHold, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.OnHold, null , null);
         }
         public int DepositPending(string transId, decimal actualDeposit, string comment, string Operator)
         {
-            var forStatus = new List<int>();
-            forStatus.Add((int)DepositStatusEnum.OnHold);
+            var forStatus = new List<int> {(int)DepositStatusEnum.OnHold};
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Pending, null);
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Pending, null ,null);
         }
         public DepositReceipt GetDepositReceipt(string transId)
         {
-            var depositId = 0;
             var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out depositId);
+            int.TryParse(m.Value, out var depositId);
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, string userName, string currencyId, string status, string levelStatus, int amountType, string amount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
-            return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userName, currencyId, status, levelStatus, amountType, amount, payIds);
+            return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userNames, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
         }
         public IEnumerable<DepositLimitCurrencyInfo> GetDepositLimitCurrencyList(int siteId, int depositType) => depositService.GetDepositLimitCurrencyList(siteId, depositType);
 
@@ -298,7 +307,7 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
-        
+
         public IEnumerable<DepositLimitInfo> GetDepositLimitInfos(int siteId, int currencyId)
             => depositService.GetDepositLimitInfos(siteId, currencyId);
 
@@ -306,7 +315,7 @@ namespace BackendSite.Service.BLL
         {
             return depositService.AddDepositLimitInfo(input);
         }
-        
+
         public bool AddDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
             return depositService.AddDepositLimitInfo(input);
@@ -316,18 +325,25 @@ namespace BackendSite.Service.BLL
         {
             return depositService.EditDepositLimitInfo(input);
         }
-        
+
         public bool EditDepositLimit(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            return depositService.EditDepositLimitInfo(input);
+            var result = depositService.EditDepositLimitInfo(input);
+
+            if (result)
+            {
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
+            }
+
+            return result;
         }
 
         public DepositLimitInfo GetDepositLimitInfo(int siteId, int depositType, int currencyId, int vipLevel)
         {
-            var currentUpperPoint = depositService.GetDepositLimitInfo(siteId, depositType ,currencyId, vipLevel);
+            var currentUpperPoint = depositService.GetDepositLimitInfo(siteId, depositType, currencyId, vipLevel);
             return currentUpperPoint;
         }
-        
+
         public bool DeleteDepositLimit(ParamsWithLog<DepositLimitModel> input)
         {
             var currentUpperPoint =
@@ -338,14 +354,21 @@ namespace BackendSite.Service.BLL
 
             return depositService.DeleteDepositLimitInfo(input);
         }
-        
+
         public bool DeleteDepositLimitV2(ParamsWithLog<DepositLimitModel> input)
         {
-            return depositService.DeleteDepositLimitInfoV2(input);
+            var result = depositService.DeleteDepositLimitInfoV2(input);
+
+            if (result)
+            {
+                _cacheHelper.KeyDelete($"DepositLimitInfoList:{input.SiteId}", RedisDataBase.Member);
+            }
+
+            return result;
         }
-        
+
         public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,
-            out int totalPages, out int rowCount)
+            out int totalPages, out int rowCount, out List<TotalAmount> currencyTotalAmount)
         {
             var result = depositService.DepositTimeReportGet(JsonConvert.SerializeObject(para.SiteIds),
                 JsonConvert.SerializeObject(para.CurrencyId),
@@ -353,10 +376,12 @@ namespace BackendSite.Service.BLL
                 para.StartDate.DateTime,
                 para.EndDate.DateTime,
                 para.DepositId,
+                para.CustId,
                 (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),
                 Math.Abs(para.PageSize),
                 out totalPages,
-                out rowCount);
+                out rowCount,
+                out currencyTotalAmount);
 
             if (result.Any())
             {
@@ -379,11 +404,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
+        public async Task<IEnumerable<DepositTimeExportData>> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds, string memberId)
         {
             var exportDataToExcel = new List<DepositTimeExportData>();
+            int custId = 0;
+            if (!string.IsNullOrWhiteSpace(memberId))
+            {
+                var custSimpleInfo = await custInfoBLL.GetCustId(null, memberId, JsonConvert.DeserializeObject<List<int>>(selectSite).FirstOrDefault());
+                if (custSimpleInfo != null)
+                    custId = custSimpleInfo.CustId;
+                else
+                    return exportDataToExcel;
+            }
 
-            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds);
+            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds, custId);
 
             result?.ForEach(x =>
             {
@@ -410,7 +444,8 @@ namespace BackendSite.Service.BLL
                     CompleteTime = GetTimeString(ts),
                     ToApprovedTime = x.ToApprovedTime,
                     EndFlowTime = x.ApprovedTime,
-                    ApprovedBy = x.ApprovedBy
+                    ApprovedBy = x.ApprovedBy,
+                    StatementTime = x.StatementTime,
                 });
             });
             return exportDataToExcel;
@@ -478,14 +513,14 @@ namespace BackendSite.Service.BLL
                 BeforeDetailInfo = JsonConvert.SerializeObject(input.Before),
                 AfterDetailInfo = JsonConvert.SerializeObject(input.After)
             };
-            
+
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
 
                 return 0;
             }
-            
+
             if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
             {
                 scope.Dispose();
@@ -511,6 +546,41 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PaymentGateWayOptions> GetPaymentGateWayOptions()
         {
             return depositService.GetPaymentGateWayOptions();
+        }
+
+        public int SetDepositMessage(ParamsWithLog<DepositMessageRequest> input)
+        {
+            var result = 1;
+            using var scope = new TransactionScope();
+
+            if (!depositService.SetDepositMessage(input))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                RefTransId = input.TransId,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetDepositMessage,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(input.After)
+            };
+
+            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+            {
+                scope.Dispose();
+
+                return 0;
+            }
+
+            scope.Complete();
+            return result;
         }
     }
 }

@@ -6,10 +6,11 @@ using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VipLevelReviewController : ControllerBase
@@ -38,10 +39,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
             public VipSettingStatusEnum VipType { get; set; }
-            public VipStatus Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
-        
+
         public class UpdateVipUpgradeReviewReq
         {
             public IEnumerable<int> CustIdList { get; set; }
@@ -54,24 +56,27 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
-            public VipStatus Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
-        
+
         public class ExportVipUpgradeReviewListReq
         {
             public int SiteId { get; set; }
             public string YearMonth { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
-        
+
         public class ExportVipDowngradeReviewListReq
         {
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
 
         #endregion
@@ -88,11 +93,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 1 })]
         [HttpPost]
         public ApiListResult<VipUpgradeReviewDetailModel> GetUpgradeList(VipUpgradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, req.Status, req.UserName, req.PageNumber, req.PageSize);
+            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, req.PageNumber, req.PageSize, JsonConvert.SerializeObject(req.CurrencyId));
 
             foreach (var data in result.Data)
             {
@@ -123,11 +128,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 2 })]
         [HttpPost]
         public IActionResult ExportUpgradeList(ExportVipUpgradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, (VipStatus)req.Status, req.UserName);
+            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, JsonConvert.SerializeObject(req.CurrencyId));
             var exportList = data.Select(d => new ExportVipUpgradeReviewModel
             {
                 SiteId = d.SiteId,
@@ -164,7 +169,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_update" })]
         [HttpPost]
         public ApiResult UpdateUpgrade(UpdateVipUpgradeReviewReq req)
         {
@@ -198,11 +202,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 1 })]
         [HttpPost]
         public ApiListResult<VipDowngradeReviewDetailModel> GetDowngradeList(VipDowngradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, req.Status, req.UserName, req.PageNumber, req.PageSize);
+            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName, req.PageNumber, req.PageSize);
             foreach (var data in result.Data)
             {
                 data.CalculateTime = new DateTimeOffset(data.CalculateTime.DateTime, TimeSpan.Zero);
@@ -232,11 +236,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 2 })]
         [HttpPost]
         public IActionResult ExportDowngradeList(ExportVipDowngradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, (VipStatus)req.Status, req.UserName);
+            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName);
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
             {
                 SiteId = d.SiteId,
