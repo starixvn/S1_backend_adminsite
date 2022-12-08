@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using BackendSite.Service.Model;
 using BackendSite.Extensions;
 using Dapper;
+using System.Data;
 
 namespace BackendSite.Service.BLL
 {
@@ -90,12 +91,12 @@ namespace BackendSite.Service.BLL
                 #region InfoLog
 
                 var logParam = new DynamicParameters();
-                logParam.Add("_SiteId", request.SiteId);
+                logParam.Add("_SiteId", (int)request.SiteId);
                 logParam.Add("_CurrencyId", 0);
-                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SiteMaintenance);
                 logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
-                logParam.Add("_BeforeDetailInfo", null);
+                logParam.Add("_BeforeDetailInfo", null, DbType.String);
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(request));
                 logParam.Add("_Operator", Operator);
 
