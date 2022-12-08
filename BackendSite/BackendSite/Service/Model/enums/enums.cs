@@ -769,7 +769,8 @@ namespace BackendSite.Service.Model.enums
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
-        SetDepositMessage = 76
+        SetDepositMessage = 76,
+        SiteMaintenance = 77
     }
 
     #region BankFinancialTransferInfoLog
