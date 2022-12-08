@@ -74,7 +74,7 @@ namespace BackendSite.Service.Model
     
     public class BankCodeModel
     {
-        public int SysId { get; set; }
+        public int BankId { get; set; }
         public int CurrencyId { get; set; }
         public string BankCode { get; set; }
         public string BankName { get; set; }
@@ -105,7 +105,7 @@ namespace BackendSite.Service.Model
     {
         public bool Equals(BankCodeModel t1, BankCodeModel t2)
         {
-            return (t1.SysId == t2.SysId);
+            return (t1.BankId == t2.BankId);
         }
 
         public int GetHashCode(BankCodeModel t)
