@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 { 1, new List<int> {66,6,63,69,71} }, //Pending -> Draft,Reject,OnHold,Verified,ToKyc
                 { 2, new List<int> {66,69,71,6} },//On-Hold -> Draft,Verified,ToKyc,Reject
                 { 3, new List<int> {66,70,64,6} },//Verified -> Draft,Process,Pending,Reject
-                { 4, new List<int> {66,69,65} },//Process -> Draft ,Verified ,Approved 
+                { 4, new List<int> {66,69,65,67,68} },//Process -> Draft ,Verified ,Approved,ManualApproved,ManualRejected
                 { 6, new List<int> {66,68} },//Approved -> Draft,Manual Rejected
                 { 7, new List<int> {66,67} },//Reject -> Draft,Manual Approved
                 { 8, new List<int> {66,64,6} }//ToKyc -> Draft,Pending,Reject
@@ -876,7 +876,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove((int) WithdrawalActionEnum.ManualApproved);
                 usableActionButton.Remove((int) WithdrawalActionEnum.ManualRejected);
             }
-            
+            else
+            {
+                usableActionButton.Remove((int) WithdrawalActionEnum.Draft);
+                usableActionButton.Remove((int) WithdrawalActionEnum.Verified);
+                usableActionButton.Remove((int) WithdrawalActionEnum.Approved);
+            }
+
             return usableActionButton;
         }
         #endregion
