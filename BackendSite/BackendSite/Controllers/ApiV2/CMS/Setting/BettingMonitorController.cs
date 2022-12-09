@@ -42,8 +42,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public class BaseSetting
         {
-            public int SiteId { get; set; }
-            public int CurrencyId { get; set; }
             public int TpId { get; set; }
             public int GameType { get; set; }
         }
@@ -90,17 +88,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        public ApiResult SetSetting(SetRequest request)
+        public ApiResult SetSetting(ApiRequestWithLog<SetRequest> request)
         {
-            var result = _bettingMonitorBll.SetSetting(
-                request.SiteId,
-                request.CurrencyId,
-                request.TpId,
-                request.GameType,
-                request.Frequency,
-                request.Status,
-                User.Identity.Name);
-
+            var result = _bettingMonitorBll.SetSetting(new ParamsWithLog<SetRequest>(request, User.Identity.Name));
+            
             var apiResult = new ApiResult();
             if (result)
             {
@@ -116,14 +107,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
-        public ApiResult DelSetting(SetRequest request)
+        public ApiResult DelSetting(ApiRequestWithLog<BaseSetting> request)
         {
-            var result = _bettingMonitorBll.DelSetting(
-                request.SiteId,
-                request.CurrencyId,
-                request.TpId,
-                request.GameType);
-
+            var result = _bettingMonitorBll.DelSetting(new ParamsWithLog<BaseSetting>(request, User.Identity.Name));
+            
             var apiResult = new ApiResult();
             if (result)
             {

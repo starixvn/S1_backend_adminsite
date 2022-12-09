@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 
@@ -36,14 +37,14 @@ namespace BackendSite.Service.BLL
                 out rowCount);
         }
         
-        public bool SetSetting(int siteId, int currencyId, int tpId, int gameType, int frequency, int status, string user)
+        public bool SetSetting(ParamsWithLog<BettingMonitorController.SetRequest> input)
         {
-            return _bettingMonitorService.SetSetting(siteId, currencyId, tpId, gameType, frequency, status, user);
+            return _bettingMonitorService.SetSetting(input);
         }
         
-        public bool DelSetting(int siteId, int currencyId, int tpId, int gameType)
+        public bool DelSetting(ParamsWithLog<BettingMonitorController.BaseSetting> input)
         {
-            return _bettingMonitorService.DelSetting(siteId, currencyId, tpId, gameType);
+            return _bettingMonitorService.DelSetting(input);
         }
     }
 }
