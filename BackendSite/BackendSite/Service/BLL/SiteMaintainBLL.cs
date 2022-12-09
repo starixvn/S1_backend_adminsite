@@ -90,6 +90,12 @@ namespace BackendSite.Service.BLL
             {
                 #region InfoLog
 
+                var after = new
+                {
+                    Maintain = request.Maintain,
+                    BeginTime = request.BeginTime,
+                    EndTime = request.EndTime,
+                };
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", (int)request.SiteId);
                 logParam.Add("_CurrencyId", 0);
@@ -97,7 +103,7 @@ namespace BackendSite.Service.BLL
                 logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", null, DbType.String);
-                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(request));
+                logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(after));
                 logParam.Add("_Operator", Operator);
 
                 #endregion
