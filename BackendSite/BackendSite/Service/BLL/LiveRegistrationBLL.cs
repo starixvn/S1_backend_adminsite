@@ -44,7 +44,8 @@ namespace BackendSite.Service.BLL
                     Status = a.Status,
                     RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
                     LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
-                    UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, a.DepositStatus, timezone)
+                    UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, a.DepositStatus, timezone),
+                    ReferralUrl = a.ReferralUrl
                 });
             return new LiveRegistrationResponse()
             {
@@ -78,7 +79,8 @@ namespace BackendSite.Service.BLL
                     LastActiveTime = new DateTimeOffset(x.LastActiveTime, TimeSpan.Zero),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
                     Note = x.Note,
-                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, x.DepositStatus, timezone) 
+                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, x.DepositStatus, timezone),
+                    ReferralUrl = x.ReferralUrl
                 });
             return list;
         }
