@@ -643,7 +643,8 @@ namespace BackendSite.Service.Model.enums
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
-        WithdrawalSubmission = 57
+        WithdrawalSubmission = 57,
+        BettingMonitor =58,
     }
 
     #region BankFinancialTransferInfoLog
