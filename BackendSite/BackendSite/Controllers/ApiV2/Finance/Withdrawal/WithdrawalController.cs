@@ -340,11 +340,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-
+            
             if (withdrawalRequest != null)
             {
-                var usableActionButton = GetUsableActionButton(withdrawalRequest);
-                withdrawalRequest.UsableActionButton = usableActionButton;
+                withdrawalRequest.WithdrawalAccountingModels = _withdrawalBll.GetWithdrawalAccountingByTransId(request.TransId);
+                withdrawalRequest.UsableActionButton = GetUsableActionButton(withdrawalRequest);
             }
             
             if (withdrawalRequest.Operator == User.Identity.Name)
