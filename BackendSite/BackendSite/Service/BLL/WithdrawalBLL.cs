@@ -981,6 +981,12 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
+        public IEnumerable<WithdrawalAccountingModel> GetWithdrawalAccountingByTransId(string transId)
+        {
+            var result = _withdrawalBankAccountingService.GetByTransId(transId);
+            return result;
+        }
+        
         public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try

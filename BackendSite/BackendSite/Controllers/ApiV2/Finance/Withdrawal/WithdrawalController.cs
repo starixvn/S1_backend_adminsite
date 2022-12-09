@@ -340,11 +340,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-
+            
             if (withdrawalRequest != null)
             {
-                var usableActionButton = GetUsableActionButton(withdrawalRequest);
-                withdrawalRequest.UsableActionButton = usableActionButton;
+                withdrawalRequest.WithdrawalAccountingModels = _withdrawalBll.GetWithdrawalAccountingByTransId(request.TransId);
+                withdrawalRequest.UsableActionButton = GetUsableActionButton(withdrawalRequest);
             }
             
             if (withdrawalRequest.Operator == User.Identity.Name)
@@ -618,6 +618,68 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
+        /// <summary>
+        /// Withdrawal/ManualApproval
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > [ManualApproval]
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> ManualApproval(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await _withdrawalBll.WithdrawalManualApproval(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualApproval Fail. {ex.Message}"
+                };
+            }
+        }
+        
+        /// <summary>
+        /// Withdrawal/ManualReject
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Finance > Withdrawal Request > [Search] > Click [Trxn.ID] > [ManualReject]
+        /// </remarks>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> ManualReject(WithdrawalManualRequest para)
+        {
+            try
+            {
+                para.Operator = User.Identity.Name;
+                para.ThirdId = string.Empty;
+                var response = await _withdrawalBll.WithdrawalManualReject(para);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = $"ManualReject Fail. {ex.Message}"
+                };
+            }
+        }
+        
         /// <summary>
         /// Withdrawal/GetPicture 取得提款圖擋
         /// </summary>

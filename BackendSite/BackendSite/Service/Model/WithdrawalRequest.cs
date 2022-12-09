@@ -93,6 +93,7 @@ namespace BackendSite.Service.Model
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
+        public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
     }
     public class WithdrawalInfo
     {
