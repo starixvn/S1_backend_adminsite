@@ -236,6 +236,15 @@ namespace BackendSite.Service.Model.enums
         Error = 99 //No Use
     }
     
+    public enum SelectDepositStatusEnum
+    {
+        Pending = 1,
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        OnHold = 7
+    }
+    
 	public enum DepositActionEnum
     {
         Draft = 66, 
