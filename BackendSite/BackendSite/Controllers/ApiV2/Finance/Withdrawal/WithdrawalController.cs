@@ -694,10 +694,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <param name="number"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetPicture(string transId, int number)
+        public List<ActionResult> GetPicture(string transId, int number)
         {
-            //var WithdrawalPic = _withdrawalBll.GetWithdrawalPicCount(transId);
-            return Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{number}.png");
+            var result = new List<ActionResult>();
+            if (number == -1)
+            {
+                var withdrawalPic = _withdrawalBll.GetWithdrawalPicCount(transId).BankSlipPicCount;
+                for (var i = 1; i <= withdrawalPic; i++)
+                {
+                    var pic = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{i}.png");
+                    result.Add(pic);
+                }
+            }
+            else
+            {
+                var pic = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{number}.png");
+                result.Add(pic);
+            }
+           
+            return result;
         }
 
         /// <summary>
