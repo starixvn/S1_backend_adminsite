@@ -16,7 +16,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
 
         private readonly BannerManageBLL _bannerManageBll;
-        private readonly AuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -25,55 +24,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public BannerController(IServiceProvider provider)
         {
             _bannerManageBll = provider.GetRequiredService<BannerManageBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
         }
 
         #endregion
 
         #region API Model
-
-        public class SetRequest
-        {
-            private DateTimeOffset? _startTime;
-            private DateTimeOffset? _endTime;
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public BannerTypeEnum BannerType { get; set; }
-            public BannerActionModeEnum ActionMode { get; set; }
-            public ShowStatusEnum ShowStatus { get; set; }
-            public DateTimeOffset? StartTime
-            {
-                get => _startTime;
-                set
-                {
-                    if (value != null)
-                        _startTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndTime
-            {
-                get => _endTime;
-                set
-                {
-                    if (value != null)
-                        _endTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public string BonusCode { get; set; }
-            public int? TpId { get; set; }
-            public string GameId { get; set; }
-            public int? CategoryId { get; set; }
-            public string UrlRouter { get; set; }
-            public IEnumerable<BannerDetails> Specific { get; set; }
-            public int Sort { get; set; }
-        }
-
-        public class GetBannerRequest
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public int CurrencyId { get; set; }
-        }
 
         public class GetListRequest : ApiRequestPageModel
         {
@@ -82,25 +37,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
         }
-
-        public class UpdateStatusRequest
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public BannerStatusEnum Status { get; set; }
-        }
-        
-        // public class GetHotEventListReq : ApiRequestPageModel
-        // {
-        //     public IEnumerable<int> SiteIds { get; set; }
-        //     public IEnumerable<BannerStatusEnum> Statuses { get; set; }
-        // }
-        //
-        // public class GetHotEventReq
-        // {
-        //     public int SiteId { get; set; }
-        //     public string BannerName { get; set; }
-        // }
 
         #endregion
 
@@ -194,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult SetBanner(SetRequest request)
+        public ApiResult SetBanner(ApiRequestWithLog<SetRequest> request)
         {
             var apiResult = new ApiResult();
             
@@ -210,31 +146,19 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {"32","liveCasino"}
             };
             
-            var router = string.IsNullOrEmpty(request.UrlRouter) ? 
-                null : urlRouter.ContainsKey($"{request.SiteId}{request.UrlRouter}") ? 
-                    urlRouter[$"{request.SiteId}{request.UrlRouter}"] : urlRouter[$"0{request.UrlRouter}"] ;
+            var router = string.IsNullOrEmpty(request.After.UrlRouter) ? 
+                null : urlRouter.ContainsKey($"{request.SiteId}{request.After.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}{request.After.UrlRouter}"] : urlRouter[$"0{request.After.UrlRouter}"] ;
+            request.After.UrlRouter = router;
+            
+            var beforeRouter = string.IsNullOrEmpty(request.Before.UrlRouter) ? 
+                null : urlRouter.ContainsKey($"{request.SiteId}{request.Before.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}{request.Before.UrlRouter}"] : urlRouter[$"0{request.Before.UrlRouter}"] ;
+            request.Before.UrlRouter = beforeRouter;
+
             try
             {
-                var data = new BannerInfo
-                {
-                    SiteId = request.SiteId,
-                    BannerName = request.BannerName,
-                    BannerType = (int)request.BannerType,
-                    ActionMode = (int)request.ActionMode,
-                    ShowStatus = (int)request.ShowStatus,
-                    StartTime = request.StartTime,
-                    EndTime = request.EndTime,
-                    BonusCode = request.BonusCode,
-                    TpId = request.TpId,
-                    CategoryId = request.CategoryId,
-                    GameId = request.GameId,
-                    UrlRouter = router,
-                    Specific = request.Specific,
-                    Sort = request.Sort
-                };
-                var user = _authorizeBll.GetAuthData().UserName;
-                var errorCode = _bannerManageBll.SetBanner(data, user);
-                
+                var errorCode = _bannerManageBll.SetBanner(new ParamsWithLog<SetRequest>(request, User.Identity.Name));
                 apiResult.ErrorCode = errorCode >= 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
                 
             }
@@ -264,13 +188,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult UpdateStatus(UpdateStatusRequest request)
+        public ApiResult UpdateStatus(ApiRequestWithLog<UpdateStatusRequest> request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var user = _authorizeBll.GetAuthData().UserName;
-                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(request.SiteId, request.BannerName, (int)request.Status, user);
+                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(
+                    new ParamsWithLog<UpdateStatusRequest>(request, User.Identity.Name));
             }
             catch (Exception ex)
             {
@@ -292,12 +216,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult DeleteBanner(GetBannerRequest request)
+        public ApiResult DeleteBanner(ApiRequestWithLog<GetBannerRequest> request)
         {
             var apiResult = new ApiResult();
             try
             {
-                apiResult.ErrorCode = _bannerManageBll.DeleteBanner(request.SiteId, request.BannerName, request.CurrencyId);
+                apiResult.ErrorCode = _bannerManageBll.DeleteBanner(
+                    new ParamsWithLog<GetBannerRequest>(request, User.Identity.Name));
             }
             catch (Exception ex)
             {
@@ -309,76 +234,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         
-        // /// <summary>
-        // /// Banner/GetHotEventList
-        // /// </summary>
-        // /// <remarks>
-        // /// Http Method：POST
-        // /// 
-        // /// Func Path：Marketing >  Hot Event Management
-        // /// </remarks>
-        // /// <param name="req"></param>
-        // [HttpPost]
-        // public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
-        // {
-        //     var apiResult = new ApiListResult<HotEventList>();
-        //     try
-        //     {
-        //         var statusList = req.Statuses.Select(x => (int)x);
-        //
-        //
-        //         apiResult.Data = _bannerManageBll.GetHotEventList(req.SiteIds,
-        //             statusList,
-        //             req.PageNumber, req.PageSize, out var totalPages, out var rowCount);
-        //         apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //         apiResult.TotalPages = totalPages;
-        //         apiResult.RowCount = rowCount;
-        //         apiResult.PageNumber = req.PageNumber;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //         apiResult.Message = ex.Message;
-        //         apiResult.RawMessage = ex.ToString();
-        //     }
-        //     return apiResult;
-        // }
-
-        // /// <summary>
-        // /// Banner/GetHotEvent 
-        // /// </summary>
-        // /// <remarks>
-        // /// Http Method：POST
-        // /// 
-        // /// Func Path：Marketing >  Hot Event Management > [Edit]
-        // /// </remarks>
-        // /// <param name="req"></param>
-        // [HttpPost]
-        // public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
-        // {
-        //     var apiResult = new ApiResult<BannerInfo>();
-        //     try
-        //     {
-        //         var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName, 0);
-        //         if (result != null)
-        //         {
-        //             apiResult.Data = result;
-        //             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-        //         }
-        //         else
-        //         {
-        //             apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
-        //             apiResult.Message = "The Hot Event Detail No Data";
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //         apiResult.Message = ex.Message;
-        //         apiResult.RawMessage = ex.ToString();
-        //     }
-        //     return apiResult;
-        // }
         
         #endregion
     }
