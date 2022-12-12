@@ -423,6 +423,7 @@ namespace BackendSite.Service.BLL
                     EndFlowTime = x.ApprovedTime,
                     ApprovedBy = x.ApprovedBy,
                     StatementTime = x.StatementTime,
+                    Operator = x.Operator
                 });
             });
             return exportDataToExcel;
