@@ -83,6 +83,7 @@ namespace BackendSite.Service.DAL
                 result.BonusCode = queryResult.BonusCode;
                 result.TpId = Convert.ToInt32(queryResult.TpId);
                 result.GameId = queryResult.GameId;
+                result.CategoryId = queryResult.CategoryId;
                 result.UrlRouter = queryResult.UrlRouter;
                 result.Specific = JsonConvert.DeserializeObject<IEnumerable<BannerDetails>>(queryResult.Specific, new JsonSerializerSettings
                 {
