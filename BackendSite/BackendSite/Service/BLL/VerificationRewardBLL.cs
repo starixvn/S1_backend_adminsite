@@ -74,7 +74,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReport(List<int> siteIds, int currencyId, string userName,
+        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReport(IEnumerable<int> siteIds, int currencyId, string userName,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
@@ -111,6 +111,76 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPage(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
         {
             var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExport(siteIds, currencyId, userName, startDate, endDate);
+            var listRewardModels = new List<ExportVerificationRewardModel>();
+            foreach (var data in custVerificationReward)
+            {
+                if (data.PhoneVerified && data.PhoneRewardTime.HasValue && data.PhoneReward != 0 && startDate < data.PhoneRewardTime.Value && endDate > data.PhoneRewardTime)
+                {
+                    var modelPhone = new ExportVerificationRewardModel()
+                    {
+                        SiteName = data.SiteName,
+                        UserName = data.UserName,
+                        Currency = data.Currency,
+                        SabaId = data.SabaId,
+                        Agent = data.Agent,
+                        VerificationType = "Phone Number",
+                        RewardAmount = data.PhoneReward,
+                        VerificationTime = data.PhoneRewardTime?.ToOffset(TimeSpan.FromHours(timezone)),
+                    };
+                    listRewardModels.Add(modelPhone); 
+                }
+
+                if (data.EmailVerified && data.EmailRewardTime.HasValue && data.EmailReward != 0 && startDate < data.EmailRewardTime.Value && endDate > data.EmailRewardTime)
+                {
+                    var modelEmail = new ExportVerificationRewardModel()
+                    {
+                        SiteName = data.SiteName,
+                        UserName = data.UserName,
+                        Currency = data.Currency,
+                        SabaId = data.SabaId,
+                        Agent = data.Agent,
+                        VerificationType = "Email",
+                        RewardAmount = data.EmailReward,
+                        VerificationTime = data.EmailRewardTime?.ToOffset(TimeSpan.FromHours(timezone)),
+                    };
+                    listRewardModels.Add(modelEmail);
+                }
+               
+            }
+
+            return listRewardModels;
+        }
+        
+        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReportV2(int siteId, int currencyId, int custId,
+            DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
+            out int rowCount)
+        {
+            var custVerificationReward =  _verificationRewardService.GetCustVerificationRewardV2(siteId, currencyId, custId, 
+                startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
+
+            return custVerificationReward.Select(data => new CustVerificationRewardModel
+                {
+                    SiteName = data.SiteName,
+                    CustId = data.CustId,
+                    UserName = data.UserName,
+                    SabaId = data.SabaId,
+                    Agent = data.Agent,
+                    CurrencyId = data.CurrencyId,
+                    Currency = data.Currency,
+                    PhoneVerified = data.PhoneVerified,
+                    PhoneReward = data.PhoneReward,
+                    PhoneRewardTime = data.PhoneRewardTime,
+                    EmailVerified = data.EmailVerified,
+                    EmailReward = data.EmailReward,
+                    EmailRewardTime = data.EmailRewardTime,
+                    VerificationReawardAmount = data.PhoneReward + data.EmailReward,
+                    VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime)
+                });
+        }
+        
+        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPageV2(int siteId, int currencyId, int custId, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
+        {
+            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExportV2(siteId, currencyId, custId, startDate, endDate);
             var listRewardModels = new List<ExportVerificationRewardModel>();
             foreach (var data in custVerificationReward)
             {
