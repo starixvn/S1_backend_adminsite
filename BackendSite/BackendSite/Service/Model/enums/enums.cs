@@ -776,6 +776,7 @@ namespace BackendSite.Service.Model.enums
         BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
+        SetBanner = 62,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,

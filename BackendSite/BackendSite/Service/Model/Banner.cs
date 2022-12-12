@@ -38,11 +38,57 @@ namespace BackendSite.Service.Model
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
     }
-    public class BannerSportTeamsDetails
+    
+    public class SetRequest
     {
-        public int Home { get; set; }
-        public int Away { get; set; }
+        private DateTimeOffset? _startTime;
+        private DateTimeOffset? _endTime;
+        public int SiteId { get; set; }
+        public string BannerName { get; set; }
+        public BannerTypeEnum BannerType { get; set; }
+        public BannerActionModeEnum ActionMode { get; set; }
+        public ShowStatusEnum ShowStatus { get; set; }
+        public DateTimeOffset? StartTime
+        {
+            get => _startTime;
+            set
+            {
+                if (value != null)
+                    _startTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public DateTimeOffset? EndTime
+        {
+            get => _endTime;
+            set
+            {
+                if (value != null)
+                    _endTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
+        public string BonusCode { get; set; }
+        public int? TpId { get; set; }
+        public string GameId { get; set; }
+        public int? CategoryId { get; set; }
+        public string UrlRouter { get; set; }
+        public IEnumerable<BannerDetails> Specific { get; set; }
+        public int Sort { get; set; }
     }
+
+    public class UpdateStatusRequest
+    {
+        public int SiteId { get; set; }
+        public string BannerName { get; set; }
+        public BannerStatusEnum Status { get; set; }
+    }
+    
+    public class GetBannerRequest
+    {
+        public int SiteId { get; set; }
+        public string BannerName { get; set; }
+        public int CurrencyId { get; set; }
+    }
+    
     public class BannerDetails
     {
         public int CurrencyId { get; set; }
