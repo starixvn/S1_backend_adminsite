@@ -33,6 +33,7 @@ namespace BackendSite.Service.DAL
             p.Add("BonusCode", bannerInfo.BonusCode);
             p.Add("TpId", bannerInfo.TpId);
             p.Add("GameId", bannerInfo.GameId);
+            p.Add("CategoryId", bannerInfo.CategoryId);
             p.Add("UrlRouter", bannerInfo.UrlRouter);
             p.Add("SpecificList", JsonConvert.SerializeObject(bannerInfo.Specific));
             p.Add("Sort", bannerInfo.Sort);

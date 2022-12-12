@@ -62,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public string BonusCode { get; set; }
             public int? TpId { get; set; }
             public string GameId { get; set; }
+            public int? CategoryId { get; set; }
             public string UrlRouter { get; set; }
             public IEnumerable<BannerDetails> Specific { get; set; }
             public int Sort { get; set; }
@@ -225,6 +226,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     EndTime = request.EndTime,
                     BonusCode = request.BonusCode,
                     TpId = request.TpId,
+                    CategoryId = request.CategoryId,
                     GameId = request.GameId,
                     UrlRouter = router,
                     Specific = request.Specific,

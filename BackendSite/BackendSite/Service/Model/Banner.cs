@@ -33,6 +33,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public int? TpId { get; set; }
         public string GameId { get; set; }
+        public int? CategoryId { get; set; }
         public string UrlRouter { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
