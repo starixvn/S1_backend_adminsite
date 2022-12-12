@@ -18,7 +18,7 @@ public class BlockIpToS3
     {
         _s3Helper = s3Helper;
         _blockService = blockService;
-        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "blockIp.txt" : "blockIp_test.txt";
+        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "geoblockIp.txt" : "geoblockIp_test.txt";
         _nginxIpKey = env.IsProduction() || env.EnvironmentName == "Release" ? "$remote_addr" : "$real_ip";
         _folder = Path.Combine(env.ContentRootPath, "NginxConfig");
     }
