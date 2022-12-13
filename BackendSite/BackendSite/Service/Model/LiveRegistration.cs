@@ -80,8 +80,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset LastActiveTime { get; set; }
         public string PhoneNo { get; set; }
         public string Note { get; set; }
-        public List<string> CallRecord { get; set; }
         public string ReferralUrl { get; set; }
+        public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult
     {
