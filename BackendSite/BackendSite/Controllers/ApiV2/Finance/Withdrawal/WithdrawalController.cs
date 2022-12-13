@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Data;
+using System.Net;
+using System.Xml.Linq;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
@@ -694,24 +696,33 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <param name="number"></param>
         /// <returns></returns>
         [HttpGet]
-        public List<ActionResult> GetPicture(string transId, int number)
+        public List<string> GetPicture(string transId, int number)
         {
-            var result = new List<ActionResult>();
+            using var client = new HttpClient();
+            
+            var result = new List<string>();
             if (number == -1)
             {
-                var withdrawalPic = _withdrawalBll.GetWithdrawalPicCount(transId).BankSlipPicCount;
-                for (var i = 1; i <= withdrawalPic; i++)
+                var data = _withdrawalBll.GetWithdrawalPicCount(transId);
+                if (data != null)
                 {
-                    var pic = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{i}.png");
-                    result.Add(pic);
+                    var picCount = _withdrawalBll.GetWithdrawalPicCount(transId).BankSlipPicCount;
+                    for (var i = 1; i <= picCount; i++)
+                    {
+                        var picUrl = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{i}.png").Url;
+                        var picRsp = client.GetAsync(picUrl).Result;
+                        if (picRsp.StatusCode == HttpStatusCode.OK)
+                        {
+                            result.Add(picUrl);
+                        }
+                    }
                 }
             }
             else
             {
-                var pic = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{number}.png");
+                var pic = Redirect($"{_awsWithdrawalUrl}{_awsWithdrawalFolder}/{transId}_{number}.png").Url;
                 result.Add(pic);
             }
-           
             return result;
         }
 
@@ -798,7 +809,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
                 deleteRequest.BucketName = _awsWithdrawalBucketName;
                 deleteRequest.Key = key;
-                await _s3Helper.DeleteObjectAsync(deleteRequest);
+                var a = await _s3Helper.DeleteObjectAsync(deleteRequest);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
