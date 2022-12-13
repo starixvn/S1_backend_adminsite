@@ -121,6 +121,27 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
 
+        [HttpPost]
+        public async Task<ApiResult<DepositSinUpSummaryResponse>> DepositSignUpUrlSummaryAsync(DepositAmountRequest request)
+        {
+            var apiResult = new ApiResult<DepositSinUpSummaryResponse>();
+
+            try
+            {
+                var data = await _marketingDepositAmountBll.GetDepositSinUpSummaryAsync(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+
 
         #endregion
     }

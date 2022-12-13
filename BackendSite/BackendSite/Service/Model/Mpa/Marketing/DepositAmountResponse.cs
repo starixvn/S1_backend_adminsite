@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model.Mpa.Marketing
+﻿using Newtonsoft.Json;
+
+namespace BackendSite.Service.Model.Mpa.Marketing
 {
     public class DepositAmountSummaryResponse
     {
@@ -7,5 +9,58 @@
         public decimal CompareDepositAmount { get; set; }
 
         public string ChangeRate { get; set; }
+    }
+
+    public class DepositSinUpSummaryResponse
+    {
+        [JsonProperty("signUpData")]
+        public List<SignUpDatSumDto> SignUpData { get; set; }
+
+        [JsonProperty("totalSummary")]
+        public SignUpTotalSummary TotalSummary { get; set; }
+    }
+
+    public class SignUpChildDto
+    {
+        [JsonProperty("signUpUrl")]
+        public string SignUpUrl { get; set; }
+
+        [JsonProperty("firstDepositAmount")]
+        public decimal FirstDepositAmount { get; set; }
+
+        [JsonProperty("totalDepositAmount")]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty("noOfPlayers")]
+        public int NoOfPlayers { get; set; }
+    }
+
+    public class SignUpDatSumDto
+    {
+        [JsonProperty("signUpSource")]
+        public string SignUpSource { get; set; }
+
+        [JsonProperty("signupUrl")]
+        public string SignUpUrl { get; set; }
+
+        [JsonProperty("firstDepositAmount")]
+        public decimal FirstDepositAmount { get; set; }
+
+        [JsonProperty("totalDepositAmount")]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty("noOfPlayers")]
+        public int NoOfPlayers { get; set; }
+
+        [JsonProperty("childs")]
+        public List<SignUpChildDto> Childs { get; set; }
+    }
+
+    public class SignUpTotalSummary
+    {
+        public decimal TotalDepositAmount { get; set; }
+        public decimal FirstDepositAmount { get; set; }
+
+        public int NoOfPlayers { get; set; }
     }
 }

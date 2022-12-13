@@ -6,5 +6,6 @@ namespace BackendSite.Service.BLL.Interface
     {
         Task<DepositAmountSummaryResponse> GetDepositAmountSummaryAsync(DepositAmountRequest request);
 
+        Task<DepositSinUpSummaryResponse> GetDepositSinUpSummaryAsync(DepositAmountRequest request);
     }
 }
