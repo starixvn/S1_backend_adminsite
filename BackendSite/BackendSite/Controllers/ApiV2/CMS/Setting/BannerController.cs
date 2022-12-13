@@ -193,8 +193,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(
-                    new ParamsWithLog<UpdateStatusRequest>(request, User.Identity.Name));
+                var result = _bannerManageBll.UpdateBannerStatus(new ParamsWithLog<UpdateStatusRequest>(request, User.Identity.Name)) >= 0;
+                
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+                
             }
             catch (Exception ex)
             {
@@ -221,8 +230,17 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                apiResult.ErrorCode = _bannerManageBll.DeleteBanner(
-                    new ParamsWithLog<GetBannerRequest>(request, User.Identity.Name));
+                var result =  _bannerManageBll.DeleteBanner(
+                    new ParamsWithLog<GetBannerRequest>(request, User.Identity.Name)) >= 0;
+
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
