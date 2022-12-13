@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Text;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {    
     public class GetTpBetRecordRequest
     {

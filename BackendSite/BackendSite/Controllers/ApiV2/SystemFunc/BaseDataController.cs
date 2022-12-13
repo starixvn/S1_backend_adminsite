@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using System.ComponentModel;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -137,7 +138,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetTpGameListReq
         {
+            [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
             public int TpId { get; set; }
+            
+            [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
             public int CategoryId { get; set; }
         }
 
@@ -151,10 +155,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetPromoCategoryRequest
         {
             /// <summary>
-            /// 0=全部, 1=主錢包, 2=體育錢包
+            /// 0=All, 1=Seamless Wallet, 2=Transfer Wallet
             /// </summary>
-            public int WalletType { get; set; }
-
+            public int? WalletType { get; set; }
         }
 
         public class GameTypeListReq
@@ -592,7 +595,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(request.WalletType);
+                apiResult.Data = _bonusManageBll.GetPromoCategoriesV2(Convert.ToInt32(request.WalletType));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

@@ -25,11 +25,11 @@ namespace BackendSite.Service.DAL
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
 
-        public async Task<IEnumerable<BlockIP>> GetBlockIPList()
+        public async Task<IEnumerable<T>> GetBlockIPList<T>()
         {
             var p = new DynamicParameters();
             p.Add("IP", null);
-            return await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+            return await _mainDbClient.QueryAsync<T>("Admin_BlockIP_Get", p);
         }
 
         public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
