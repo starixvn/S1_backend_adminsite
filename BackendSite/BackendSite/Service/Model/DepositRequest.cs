@@ -53,6 +53,7 @@ namespace BackendSite.Service.Model
                     _depositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
+        public int BankId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
