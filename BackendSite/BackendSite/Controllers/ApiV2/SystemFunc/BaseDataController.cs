@@ -754,6 +754,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             apiResult.ErrorCode = 0;
             return apiResult;
         }
+        
         /// <summary>
         /// 取得第三方遊戲分類清單
         /// </summary>
