@@ -481,11 +481,22 @@ namespace BackendSite.Service.DAL
                                 specialResult = (updateFlowEndResult == 0 || balanceResult == 0) ? 0 : 1;
                                 break;
                             
+                            case WithdrawalStatusEnum.Draft:
                             case WithdrawalStatusEnum.Process:
-
+                                
                                 if (!string.IsNullOrEmpty(accountingModelString))
                                 {
-                                    specialResult = SetWithdrawalAccounting(transId,accountingModelString,userId,conn,trans) > 0 ? 1 : 0;
+                                    var delResult = 1;
+                                    var accountingList = _withdrawalBankAccountingService.GetByTransId(transId);
+                                    if (accountingList.Any())
+                                    {
+                                        delResult = DelWithdrawalAccounting(transId,conn,trans) >= 0 ? 1 : 0;
+                                    }
+
+                                    if (delResult == 1)
+                                    {
+                                        specialResult = SetWithdrawalAccounting(transId,accountingModelString,userId,conn,trans) > 0 ? 1 : 0;
+                                    }
                                 }
                                 else
                                 {
@@ -521,35 +532,7 @@ namespace BackendSite.Service.DAL
                                             trans);
                                         break;
                                 }
-
-                                // if (dummyResult > 0)
-                                // {
-                                //     //Insert Withdrawal Accounting
-                                //     var withdrawalInfoItem = GetWithdrawalInfo(0, transId);
-                                //     if (withdrawalType == (int)WithdrawalTypeEnum.LocalBank)
-                                //     {
-                                //         var model = new WithdrawalBankAccountingModel()
-                                //         {
-                                //             TransId = withdrawalInfoItem.TransId,
-                                //             Seq = 1,
-                                //             BankAccountNo = withdrawalInfoItem.FromAccountNo,
-                                //             Amount = withdrawalInfoItem.Amount,
-                                //             ChargeFee = withdrawalInfoItem.ChargeFee,
-                                //             UploadPicTimes = hasPic ? 1 : 0,
-                                //             Creator = userId
-                                //         };
-                                //         if (_withdrawalBankAccountingService.Insert(model, conn, trans) > 0
-                                //             && _withdrawalBankAccountingService.InsertLog((int)ActionType.Create, model, conn, trans) > 0)
-                                //         {
-                                //             accountingResult = 1; //InsertAccounting Success.
-                                //         }
-                                //         else
-                                //         {
-                                //             accountingResult = 0; //InsertAccounting fail.
-                                //         }
-                                //     }
-                                // }
-
+                                
                                 specialResult = (updateFlowEndResult == 0 || dummyResult == 0 ) ? 0 : 1;
 
                                 break;
@@ -696,6 +679,24 @@ namespace BackendSite.Service.DAL
             {
                 //Execute in transaction
                 return conn.Execute("Admin_WithdrawalAccountingForProcess_Ins", p, trans, commandType: CommandType.StoredProcedure);
+            }
+        }
+        
+        private int DelWithdrawalAccounting(string transId , MySqlConnection conn = null, MySqlTransaction trans = null)
+        {
+            var p = new DynamicParameters();
+            p.Add("_TransId", transId);
+           
+            if (conn == null)
+            {
+                //No execute in transaction
+                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                return connection.Execute("Admin_WithdrawalBankAccountingByTransId_Del", p, commandType: CommandType.StoredProcedure);
+            }
+            else
+            {
+                //Execute in transaction
+                return conn.Execute("Admin_WithdrawalBankAccountingByTransId_Del", p, trans, commandType: CommandType.StoredProcedure);
             }
         }
         

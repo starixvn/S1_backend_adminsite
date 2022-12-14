@@ -363,7 +363,7 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Draft)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, null, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Pending)
             {
