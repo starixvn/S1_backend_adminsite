@@ -141,7 +141,28 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        [HttpPost]
+        public ApiListResult<DepositSignUpDetailData> DepositSignUpDetail(DepositAmountRequest request)
+        {
+            var apiResult = new ApiListResult<DepositSignUpDetailData>();
 
+            try
+            {
+                var result = _marketingDepositAmountBll.GetDepositSignUpDetail(request, out var pageInfo);
+                apiResult.Data = result;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.RowCount = pageInfo.RowCount;
+                apiResult.TotalPages = pageInfo.TotalPages;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
 
         #endregion
     }

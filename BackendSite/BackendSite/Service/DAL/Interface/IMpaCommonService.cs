@@ -38,5 +38,11 @@ namespace BackendSite.Service.DAL.Interface
         /// <returns></returns>
         string GetPercent(decimal divisor, decimal dividend);
 
+        /// <summary>
+        /// 處理註冊日期格是
+        /// </summary>
+        /// <param name="registeredDate"></param>
+        /// <returns></returns>
+        string RegisteredDateFormatter(DateTime registeredDate);
     }
 }

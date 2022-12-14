@@ -1,8 +1,10 @@
 ﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -289,6 +291,97 @@ namespace BackendSite.Service.BLL.Mpa
                     item.FirstDepositAmount = item.FirstDepositAmount / rate;
                 }
             }
+        }
+
+
+        public List<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
+        {
+            pageInfo = new PageInfo();
+            var key = request.GetRedisKey();
+            var masterKey = $"MpaDepositSignUpDetail:{key}";
+            var sortKey = $"{masterKey}:{request.OrderByProperty}:{request.OrderByDirection}";
+            var cacheTime = TimeSpan.FromMinutes(5);
+
+            if (_cacheHelper.KeyExists(masterKey))
+            {
+                //Sort
+                if (request.OrderBy && !_cacheHelper.KeyExists(sortKey))
+                {
+                    //取出全部資料重新排序
+                    var sortData = _cacheHelper.GetListByRange<DepositSignUpDetailData>(masterKey, 0, -1).OrderBy(request);
+                    //刪除舊資料重設cache
+                    if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
+                    {
+                        AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
+                    }
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, request.PageNumber, request.PageSize);
+                    return sortData.GetRange(sortIndex, sortCount);
+                }
+
+                //Export
+                if (request.PageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<DepositSignUpDetailData>(masterKey, 0, request.PageNumber);
+                }
+
+                //Redis Pagination
+                var total = (int)_cacheHelper.GetListLength(masterKey);
+                var (startIndex, endIndex) = pageInfo.RedisPagination(total, request.PageNumber, request.PageSize);
+                return _cacheHelper.GetListByRange<DepositSignUpDetailData>(masterKey, startIndex, endIndex);
+            }
+
+
+            var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(request.SiteId, request.StartDate,
+                request.EndDate).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+
+            MultiplyExchangeRateSinUpSummary(depositSignUpDetail,request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
+
+            var currencyIdMapper = _mapMpaCommonService.GetCurrencyIsoCodeMapper().Result;
+
+            var data = depositSignUpDetail.GroupBy(x => new
+            {
+                x.UserName,
+                x.SignUpUrl,
+                x.AffCode,
+                x.CurrencyId,
+                x.RegisteredDate,
+            }).Select(r => new DepositSignUpDetailData
+            {
+                UserName = r.Key.UserName,
+                CurrencyName = currencyIdMapper[r.Key.CurrencyId],
+                RegisteredDate = _mapMpaCommonService.RegisteredDateFormatter(r.Key.RegisteredDate),
+                SignUpUrl = r.Key.SignUpUrl,
+                AffCode = r.Key.AffCode,
+                DepositCount = r.Sum(x => x.DepositCount),
+                TotalDepositAmount = r.Sum(x => x.DepositAmount),
+                FirstDepositAmount = r.Sum(x => x.FirstDepositAmount),
+            }).ToList();
+
+            var list = request.OrderBy ? data.OrderBy(request) : data;
+            AddCache(list, masterKey, sortKey, cacheTime, request.OrderBy);
+
+            //Export
+            if (request.PageNumber == -1 || data.Count == 0)
+            {
+                return list;
+            }
+
+            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            return list.GetRange(index, count);
+
+        }
+
+        private void AddCache(List<DepositSignUpDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        {
+            // Add Cache by List      
+            _ = Task.Run(() =>
+            {
+                _cacheHelper.InsertList(masterKey, cacheTime, list);
+                if (orderBy)
+                {
+                    _cacheHelper.StringSetAsync(sortKey, sortKey, cacheTime);
+                }
+            });
         }
     }
 }

@@ -36,5 +36,15 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryAsync<MpaMarketingDepositSignUpSummaryDto>("Admin_MpaMarketingDepositSigUpSummary_Get", p);
         }
+
+        public IEnumerable<MpaMarketingDepositSignUpDetailDto> GetDepositSignUpDetail(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+
+            return _reportDbClient.Query<MpaMarketingDepositSignUpDetailDto>("Admin_MpaMarketingDepositSignUpDetail_Get", p);
+        }
     }
 }

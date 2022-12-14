@@ -9,5 +9,8 @@ namespace BackendSite.Service.DAL.Interface
 
         Task<IEnumerable<MpaMarketingDepositSignUpSummaryDto>> GetDepositSignUpSummaryAsync(int siteId,
             DateTimeOffset startTime, DateTimeOffset endTime);
+
+        IEnumerable<MpaMarketingDepositSignUpDetailDto> GetDepositSignUpDetail(int siteId,
+            DateTimeOffset startTime, DateTimeOffset endTime);
     }
 }

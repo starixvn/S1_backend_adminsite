@@ -39,8 +39,6 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
         public decimal FirstDepositAmount { get; set; }
 
-        public int DepositCount { get; set; }
-
         public string AffCode { get; set; }
 
         public string SignUpUrl { get; set; }
@@ -54,6 +52,28 @@ namespace BackendSite.Service.Model.Mpa.Marketing
         /// </summary>
         public string SignUpGroupName { get; set; }
     }
+
+    public class MpaMarketingDepositSignUpDetailDto : IMpaMarketingDepositSignUpBaseDto
+    {
+        public DateTime Date { get; set; }
+
+        public string UserName { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public decimal DepositAmount { get; set; }
+
+        public decimal FirstDepositAmount { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public string AffCode { get; set; }
+
+        public string SignUpUrl { get; set; }
+
+        public DateTime RegisteredDate { get; set; }
+    }
+
 
     public class SignUpConfig
     {

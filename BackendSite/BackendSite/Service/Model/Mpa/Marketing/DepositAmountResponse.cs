@@ -60,7 +60,29 @@ namespace BackendSite.Service.Model.Mpa.Marketing
     {
         public decimal TotalDepositAmount { get; set; }
         public decimal FirstDepositAmount { get; set; }
-
         public int NoOfPlayers { get; set; }
+    }
+
+
+    public class DepositSignUpDetailData
+    {
+        [JsonIgnore]
+        public int Num { get; set; }
+
+        public string UserName { get; set; }
+
+        public string CurrencyName { get; set; }
+
+        public string RegisteredDate { get; set; }
+
+        public string SignUpUrl { get; set; }
+
+        public string AffCode { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public decimal FirstDepositAmount { get; set; }
+
+        public decimal TotalDepositAmount { get; set; }
     }
 }
