@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
         private Task<IEnumerable<MpaRateDto>> GetRateFromDb(DateTimeOffset starTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_RateDateStart", starTime.Date, dbType: DbType.DateTime);
+            p.Add("_RateDateStart", starTime.Date.AddDays(-1), dbType: DbType.DateTime);
             p.Add("_RateDateEnd", endTime.Date, dbType: DbType.DateTime);
 
             return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);

@@ -83,39 +83,48 @@ namespace BackendSite.Service.BLL.Mpa
                         {
                             r.SignUpGroupName = mainSiteKey;
                         }
+
+                        //For the case if member register time < 20/08/2020, also count in main group
+                        if (request.SiteId == (int)SiteEnum.BWING && r.RegTime < new DateTime(2020, 08, 20))
+                        {
+                            r.SignUpGroupName = mainSiteKey; 
+                        }
                     });
                 }
             }
 
             foreach (var depositSignUp in depositSignUpSummaryResult)
             {
-                //AFF
-                if (!string.IsNullOrEmpty(depositSignUp.AffCode))
+                if (string.IsNullOrEmpty(depositSignUp.SignUpGroupName))
                 {
-                    depositSignUp.SignUpGroupName = "AFF";
-                    continue;
-                }
-
-                //CreditSite
-                if (sinSetting.CreditSiteAgentIds.Contains(depositSignUp.AgentId))
-                {
-                    depositSignUp.SignUpGroupName = sinSetting.CreditSiteName;
-                    continue;
-                }
-
-                //APP
-                if (!string.IsNullOrEmpty(depositSignUp.SignUpUrl))
-                {
-                    if (depositSignUp.SignUpUrl.Contains("app"))
+                    //AFF
+                    if (!string.IsNullOrEmpty(depositSignUp.AffCode))
                     {
-                        depositSignUp.SignUpGroupName = "APP";
+                        depositSignUp.SignUpGroupName = "AFF";
+                        continue;
                     }
-                }
 
-                depositSignUp.SignUpGroupName =
-                    string.IsNullOrEmpty(depositSignUp.SignUpUrl) ?
-                        "None"
-                        : "Landing Pages";
+                    //CreditSite
+                    if (sinSetting.CreditSiteAgentIds.Contains(depositSignUp.AgentId))
+                    {
+                        depositSignUp.SignUpGroupName = sinSetting.CreditSiteName;
+                        continue;
+                    }
+
+                    //APP
+                    if (!string.IsNullOrEmpty(depositSignUp.SignUpUrl))
+                    {
+                        if (depositSignUp.SignUpUrl.Contains("app"))
+                        {
+                            depositSignUp.SignUpGroupName = "APP";
+                        }
+                    }
+
+                    depositSignUp.SignUpGroupName =
+                        string.IsNullOrEmpty(depositSignUp.SignUpUrl) ?
+                            "None"
+                            : "Landing Pages";
+                }
             }
 
             #endregion

@@ -45,6 +45,8 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
         public string SignUpUrl { get; set; }
 
+        public DateTime RegTime { get; set; }
+
         public int AgentId { get; set; }
 
         /// <summary>
