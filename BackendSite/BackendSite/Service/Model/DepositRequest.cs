@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model
     public class DepositRequest
     {
         public string TransId { set; get; }
+        public int DepositId { set; get; }
         public int DepositType { set; get; }
         public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public int CurrencyId { get; set; }
