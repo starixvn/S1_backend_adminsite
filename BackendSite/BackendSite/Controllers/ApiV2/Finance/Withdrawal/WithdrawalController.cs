@@ -422,8 +422,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             switch (request.Action)
             {
                 case (int)WithdrawalStatusEnum.Draft:
+                    
+                    var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                    if (request.WithdrawalAccountingModels.Any() && withdrawalData.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
+                    {
+                        var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
+                        
+                        if ( withdrawalData.Amount != sumAmountData )
+                        {
+                            apiResult.ErrorCode = 1101;
+                            apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
+                            return apiResult;
+                        }
+                    }
                     withdrawConfirmResult = _withdrawalBll.WithdrawalDraft(request.TransId,
                         request.Comment,
+                        request.WithdrawalAccountingModels,
                         User.Identity.Name);
                     break;
                 case (int)WithdrawalStatusEnum.Pending:
@@ -902,13 +916,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove((int) WithdrawalActionEnum.ManualApproved);
                 usableActionButton.Remove((int) WithdrawalActionEnum.ManualRejected);
             }
-            else
+
+            if (withdrawalRequest.Status == (int) WithdrawalStatusEnum.Process &&
+                withdrawalRequest.WithdrawalType != (int) WithdrawalTypeEnum.LocalBank)
             {
-                usableActionButton.Remove((int) WithdrawalActionEnum.Draft);
                 usableActionButton.Remove((int) WithdrawalActionEnum.Verified);
                 usableActionButton.Remove((int) WithdrawalActionEnum.Approved);
+                
             }
-
+            
             return usableActionButton;
         }
         #endregion

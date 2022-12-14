@@ -211,25 +211,13 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
                 var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
                 throw new AdminException(ErrorCodeEnum.Fail,
                     $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify Can Set.");
             }
-
-            string accountingModelString = null;
-            if (accountingModels != null && accountingModels.Any() )
-            {
-                var seq = 1;
-                foreach (var model in accountingModels)
-                {
-                    model.Seq = seq;
-                    seq += 1;
-                }
-                accountingModelString = JsonConvert.SerializeObject(accountingModels);
-            }
+            var accountingModelString = SetAccountingString(accountingModels);
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -261,7 +249,7 @@ namespace BackendSite.Service.BLL
                 WithdrawalStatusEnum.OnHold, null, null, null, out _, out _);
         }
 
-        public int WithdrawalDraft(string transId, string comment, string updater)
+        public int WithdrawalDraft(string transId, string comment, IEnumerable<WithdrawalAccountingModel> accountingModels, string updater)
         {
             var forStatus = new List<int>
             {
@@ -278,10 +266,12 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
+            var accountingModelString = SetAccountingString(accountingModels);
+            
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
                 updater,
-                WithdrawalStatusEnum.Draft, null, null, null, out _, out _);
+                WithdrawalStatusEnum.Draft, null, null, accountingModelString, out _, out _);
         }
 
         public int WithdrawalPending(string transId, string comment, string updater)
@@ -1301,6 +1291,22 @@ namespace BackendSite.Service.BLL
         private bool DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
         {
             return _withdrawalBankAccountingService.SetFlow(ActionType.Delete, model);
+        }
+
+        private string SetAccountingString(IEnumerable<WithdrawalAccountingModel> accountingModels)
+        {
+            string accountingModelString = null;
+            if (accountingModels != null && accountingModels.Any() )
+            {
+                var seq = 1;
+                foreach (var model in accountingModels)
+                {
+                    model.Seq = seq;
+                    seq += 1;
+                }
+                accountingModelString = JsonConvert.SerializeObject(accountingModels);
+            }
+            return accountingModelString;
         }
 
         #region Withdrawal Submission
