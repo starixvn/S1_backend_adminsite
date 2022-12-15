@@ -37,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             private DateTimeOffset _endDate { get; set; }
             public string UserName { get; set; }
             public string SabaId { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
 
             public DateTimeOffset StartDate
             {
@@ -56,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public string UserName { get; set; }
             public string SabaId { get; set; }
 
@@ -90,7 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             var siteId = _authorizeBll.CheckBrand();
             var data = _verificationRewardBll.GetVerificationRewardReportV2(
                 siteId,
-                request.CurrencyId,
+                request.CurrencyIds,
                 await GetCustId(request.UserName, request.SabaId, siteId),
                 request.StartDate,
                 request.EndDate,
@@ -124,7 +124,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             var siteId = _authorizeBll.CheckBrand();
             var exportData = await _verificationRewardBll
                 .GetVerificationRewardWithoutPageV2(siteId,
-                request.CurrencyId,
+                request.CurrencyIds,
                 await GetCustId(request.UserName, request.SabaId, siteId),
                 request.StartDate,
                 request.EndDate);

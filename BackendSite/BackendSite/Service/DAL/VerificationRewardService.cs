@@ -95,13 +95,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(int siteId, int currencyId, int custId,
+        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(int siteId, IEnumerable<int> currencyIds, int custId,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
-            p.Add("_Currency", currencyId);
+            p.Add("_CurrencyIds", currencyIds == null || !currencyIds.Any() ? null : JsonConvert.SerializeObject(currencyIds), DbType.String);
             p.Add("_CustId", custId);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
@@ -116,11 +116,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(int siteId, int currencyId, int custId, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(int siteId, IEnumerable<int> currencyIds, int custId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
-            p.Add("_Currency", currencyId);
+            p.Add("_CurrencyIds", currencyIds == null || !currencyIds.Any() ? null : JsonConvert.SerializeObject(currencyIds), DbType.String);
             p.Add("_CustId", custId);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
