@@ -424,7 +424,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case (int)WithdrawalStatusEnum.Draft:
                     
                     var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                    if (request.WithdrawalAccountingModels.Any() && withdrawalData.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
+                    if (request.WithdrawalAccountingModels != null && withdrawalData.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
                     {
                         var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
                         
