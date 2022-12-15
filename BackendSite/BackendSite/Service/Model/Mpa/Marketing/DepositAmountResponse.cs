@@ -79,9 +79,9 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
         public string AffCode { get; set; }
 
-        public int DepositCount { get; set; }
-
         public decimal FirstDepositAmount { get; set; }
+
+        public int DepositCount { get; set; }
 
         public decimal TotalDepositAmount { get; set; }
     }

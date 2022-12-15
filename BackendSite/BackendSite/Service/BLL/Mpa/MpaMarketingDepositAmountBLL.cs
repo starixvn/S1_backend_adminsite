@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using System.Reflection;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
 using BackendSite.Extensions;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -89,7 +92,7 @@ namespace BackendSite.Service.BLL.Mpa
                         //For the case if member register time < 20/08/2020, also count in main group
                         if (request.SiteId == (int)SiteEnum.BWING && r.RegTime < new DateTime(2020, 08, 20))
                         {
-                            r.SignUpGroupName = mainSiteKey; 
+                            r.SignUpGroupName = mainSiteKey;
                         }
                     });
                 }
@@ -245,6 +248,41 @@ namespace BackendSite.Service.BLL.Mpa
             return response;
         }
 
+        public async Task<List<SignUpChildDto>> GetDepositSinUpSummaryExportData(DepositAmountRequest request)
+        {
+            var data = await GetDepositSinUpSummaryAsync(request);
+            var result = new List<SignUpChildDto>();
+
+            foreach (var item in data.SignUpData)
+            {
+                if (item.Childs != null)
+                {
+                    result.AddRange(item.Childs);
+                }
+                else
+                {
+                    var child = new SignUpChildDto()
+                    {
+                        SignUpUrl = item.SignUpUrl,
+                        FirstDepositAmount = item.FirstDepositAmount,
+                        TotalDepositAmount = item.TotalDepositAmount,
+                        NoOfPlayers = item.NoOfPlayers
+                    };
+                    result.Add(child);
+                }
+            }
+            result.Add(new SignUpChildDto()
+            {
+                SignUpUrl = "Total",
+                FirstDepositAmount = data.TotalSummary.FirstDepositAmount,
+                TotalDepositAmount = data.TotalSummary.TotalDepositAmount,
+                NoOfPlayers = data.TotalSummary.NoOfPlayers,
+            });
+
+            return result;
+        }
+
+
         private SignUpConfig GetSignUpSetting(DepositAmountRequest request)
         {
             var config = new SignUpConfig();
@@ -266,7 +304,7 @@ namespace BackendSite.Service.BLL.Mpa
                 case (int)SiteEnum.BWING:
                     config.AppDomain = "app.bwing.com";
                     config.CreditSiteAgentIds = new List<int>() { 106733 }; //'BwingRef01'
-                    config.CreditSiteName = " Bong88/Viva88";
+                    config.CreditSiteName = "Bong88/Viva88";
                     config.MainSiteInfo = _mpaDomainConfig["Bwing"];
                     break;
             }
@@ -292,7 +330,6 @@ namespace BackendSite.Service.BLL.Mpa
                 }
             }
         }
-
 
         public List<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
         {
@@ -334,7 +371,7 @@ namespace BackendSite.Service.BLL.Mpa
             var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(request.SiteId, request.StartDate,
                 request.EndDate).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
-            MultiplyExchangeRateSinUpSummary(depositSignUpDetail,request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
+            MultiplyExchangeRateSinUpSummary(depositSignUpDetail, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 
             var currencyIdMapper = _mapMpaCommonService.GetCurrencyIsoCodeMapper().Result;
 
@@ -382,6 +419,133 @@ namespace BackendSite.Service.BLL.Mpa
                     _cacheHelper.StringSetAsync(sortKey, sortKey, cacheTime);
                 }
             });
+        }
+
+        public byte[] ExportMpaDeposit(DepositAmountSummaryResponse depositAmountSummary,
+            List<SignUpChildDto> depositSinUpSummary,
+            List<DepositSignUpDetailData> depositSignUpDetail,
+            DepositAmountRequest request)
+        {
+            var currencyIdMapper = _mapMpaCommonService.GetCurrencyIsoCodeMapper().Result;
+            var title = $"Withdrawal Amount, {request.StartDate.ToString("yyyy-dd-MM")} - {request.EndDate.ToString("yyyy-dd-MM")}, View in {currencyIdMapper[request.BaseCurrencyId]}";
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add(nameof(depositAmountSummary)); // AmountSummary
+            var ws2 = p.Workbook.Worksheets.Add(nameof(depositSinUpSummary)); // SinUpSummary
+            var ws3 = p.Workbook.Worksheets.Add(nameof(depositSignUpDetail)); // detail
+
+            if (depositAmountSummary != null)
+            {
+                // 第一列
+                var firstRow = ws.Cells[1, 1, 1, 4];
+                firstRow.Merge = true;
+                firstRow.Value = title;
+                firstRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                firstRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
+
+                // 第二列
+                var toCell = request.IsCompare ? 4 : 2;
+                var secondRow = ws.Cells[2, 1, 2, toCell];
+                secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                secondRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                ws.Cells[2, 1].Value = "Total";
+                ws.Cells[2, 1].EntireColumn.Width = 20;
+
+                ws.Cells[2, 2].Value = "Report Date";
+                ws.Cells[2, 2].EntireColumn.Width = 20;
+
+                ws.Cells[3, 1].Value = "TDeposit Amount";
+                ws.Cells[3, 1].EntireColumn.Width = 30;
+
+                ws.Cells[3, 2].Value = depositAmountSummary.DepositAmount;
+                ws.Cells[3, 2].EntireColumn.Width = 30;
+
+                if (request.IsCompare)
+                {
+                    ws.Cells[2, 3].Value = "Compare Date";
+                    ws.Cells[2, 3].EntireColumn.Width = 20;
+
+                    ws.Cells[2, 4].Value = "% Change";
+                    ws.Cells[2, 4].EntireColumn.Width = 20;
+
+                    ws.Cells[3, 3].Value = depositAmountSummary.CompareDepositAmount;
+                    ws.Cells[3, 4].Value = depositAmountSummary.ChangeRate;
+                    ws.Cells[3, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                }
+            }
+
+            if (depositSinUpSummary.Any())
+            {
+                IEnumerable<PropertyInfo> depositSinUpSummaryProperties = null;
+                depositSinUpSummaryProperties = depositSinUpSummary.FirstOrDefault()?.GetType().GetProperties();
+
+                var rows = depositSinUpSummary.Count() + 1;
+                if (depositSinUpSummaryProperties != null)
+                {
+                    var cols = depositSinUpSummaryProperties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws2.Cells[2, 1].LoadFromCollection(depositSinUpSummary, true);
+
+                        // 第二列
+                        var secondRow = ws2.Cells[1, 1, 2, cols];
+                        secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        secondRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                        // 第一列
+                        var firstRow = ws2.Cells[1, 1, 1, cols];
+                        firstRow.Value = title;
+                        firstRow.Merge = true;
+                        firstRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        firstRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
+
+                        //設定欄位寬度
+                        ws2.Cells[2, 1, rows, cols].EntireColumn.Width = 20;
+                    }
+                }
+            }
+
+            if (depositSignUpDetail.Any())
+            {
+                IEnumerable<PropertyInfo> depositSignUpDetailProperties = null;
+                depositSignUpDetailProperties = depositSignUpDetail.FirstOrDefault()?.GetType().GetProperties();
+
+                var rows = depositSignUpDetail.Count() + 1;
+                if (depositSignUpDetailProperties != null)
+                {
+                    var cols = depositSignUpDetailProperties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws3.Cells[2, 1].LoadFromCollection(depositSignUpDetail, true);
+                        ws3.Cells[2, 1].Value = "#";
+
+                        // 第二列
+                        var secondRow = ws3.Cells[1, 1, 2, cols];
+                        secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        secondRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+
+                        // 第一列
+                        var firstRow = ws3.Cells[1, 1, 1, cols];
+                        firstRow.Value = title;
+                        firstRow.Merge = true;
+                        firstRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                        firstRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
+
+                        //設定欄位寬度
+                        ws3.Cells[2, 1, rows, cols].EntireColumn.Width = 20;
+                    }
+                }
+            }
+
+            p.Save();
+            return ms.ToArray();
         }
     }
 }
