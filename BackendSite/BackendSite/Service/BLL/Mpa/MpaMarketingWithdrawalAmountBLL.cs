@@ -44,8 +44,8 @@ namespace BackendSite.Service.BLL.Mpa
                 WithdrawalUsers = withSummaryResult.DistinctBy(x => x.CustId).Count(),
                 CompareWithdrawalUsers = compareWithSummaryResult.DistinctBy(x => x.CustId).Count()
             };
-            response.WithdrawalAmountChangeRate = GetPercent(response.WithdrawalAmount, response.CompareWithdrawalAmount);
-            response.WithdrawalUsersChangeRate = GetPercent(response.WithdrawalUsers, response.CompareWithdrawalUsers);
+            response.WithdrawalAmountChangeRate = _mapMpaCommonService.GetPercent(response.WithdrawalAmount, response.CompareWithdrawalAmount);
+            response.WithdrawalUsersChangeRate = _mapMpaCommonService.GetPercent(response.WithdrawalUsers, response.CompareWithdrawalUsers);
 
             return response;
         }
@@ -101,7 +101,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 UserName = r.Key.UserName,
                 CurrencyName = currencyIdMapper[r.Key.CurrencyId],
-                RegisteredDate = RegisteredDateFormatter(r.Key.RegisteredDate),
+                RegisteredDate = _mapMpaCommonService.RegisteredDateFormatter(r.Key.RegisteredDate),
                 WithdrawalCount = r.Sum(x => x.WithdrawalCount),
                 WithdrawalAmount = r.Sum(x => x.WithdrawalAmount),
             }).ToList();
@@ -233,49 +233,6 @@ namespace BackendSite.Service.BLL.Mpa
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
                 item.WithdrawalAmount = item.WithdrawalAmount / rate;
             }
-        }
-
-        private static string GetPercent(decimal divisor, decimal dividend)
-        {
-            decimal percent;
-
-            if (divisor < dividend)
-            {
-                percent = 1 - (divisor / dividend);
-                percent *= -1;
-            }
-            else
-            {
-                percent = 1 - (dividend / divisor);
-            }
-
-            var result = percent.ToString("0%");
-            return result;
-        }
-
-        private static string RegisteredDateFormatter(DateTime registeredDate)
-        {
-            var originRegisteredDate = registeredDate.ToString("dd-MM-yyyy hh:mm:ss");
-            var originMonthNum = originRegisteredDate.Substring(3, 2);
-
-            var monthText = originMonthNum switch
-            {
-                "01" => "Jan",
-                "02" => "Feb",
-                "03" => "Mar",
-                "04" => "Apr",
-                "05" => "May",
-                "06" => "jun",
-                "07" => "Jul",
-                "08" => "Aug",
-                "09" => "Sep",
-                "10" => "Oct",
-                "11" => "Nov",
-                "12" => "Dec",
-                _ => string.Empty
-            };
-
-            return $"{originRegisteredDate.Substring(0, 3)}{monthText}{originRegisteredDate.Substring(5, originRegisteredDate.Length - 5)}";
         }
 
         private void AddCache(List<WithdrawalAmountDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
