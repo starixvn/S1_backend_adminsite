@@ -151,11 +151,11 @@ namespace BackendSite.Service.BLL
             return listRewardModels;
         }
         
-        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReportV2(int siteId, int currencyId, int custId,
+        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReportV2(int siteId, IEnumerable<int> currencyIds, int custId,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
-            var custVerificationReward =  _verificationRewardService.GetCustVerificationRewardV2(siteId, currencyId, custId, 
+            var custVerificationReward =  _verificationRewardService.GetCustVerificationRewardV2(siteId, currencyIds, custId, 
                 startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
 
             return custVerificationReward.Select(data => new CustVerificationRewardModel
@@ -178,9 +178,9 @@ namespace BackendSite.Service.BLL
                 });
         }
         
-        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPageV2(int siteId, int currencyId, int custId, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
+        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPageV2(int siteId, IEnumerable<int> currencyIds, int custId, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
         {
-            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExportV2(siteId, currencyId, custId, startDate, endDate);
+            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExportV2(siteId, currencyIds, custId, startDate, endDate);
             var listRewardModels = new List<ExportVerificationRewardModel>();
             foreach (var data in custVerificationReward)
             {
