@@ -88,10 +88,20 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         public async Task<ApiListResult<CustVerificationRewardModel>> Get(GetRequest request)
         {
             var siteId = _authorizeBll.CheckBrand();
+            var custId = await GetCustId(request.UserName, request.SabaId, siteId);
+            if (custId == null)
+            {
+                return new ApiListResult<CustVerificationRewardModel>
+                {
+                    Data = Array.Empty<CustVerificationRewardModel>(),
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            
             var data = _verificationRewardBll.GetVerificationRewardReportV2(
                 siteId,
                 request.CurrencyIds,
-                await GetCustId(request.UserName, request.SabaId, siteId),
+                custId.Value,
                 request.StartDate,
                 request.EndDate,
                 request.PageSize,
@@ -122,28 +132,31 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         public async Task<IActionResult> Export(ExportRequest request)
         {
             var siteId = _authorizeBll.CheckBrand();
-            var exportData = await _verificationRewardBll
-                .GetVerificationRewardWithoutPageV2(siteId,
-                request.CurrencyIds,
-                await GetCustId(request.UserName, request.SabaId, siteId),
-                request.StartDate,
-                request.EndDate);
+            var custId = await GetCustId(request.UserName, request.SabaId, siteId);
+
+            var exportData = custId == null
+                ? Array.Empty<ExportVerificationRewardModel>()
+                : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(siteId,
+                    request.CurrencyIds,
+                    custId.Value,
+                    request.StartDate,
+                    request.EndDate);
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
 
-        private async Task<int> GetCustId(string userName, string sabaId, int siteId)
+        private async Task<int?> GetCustId(string userName, string sabaId, int siteId)
         {
             if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(sabaId))
                 return 0;
             
             if (!string.IsNullOrWhiteSpace(sabaId))
-                return _common.TpIdToCustId(sabaId) ?? 0;
+                return _common.TpIdToCustId(sabaId);
             
             var cust = await _custInfoBll.GetCustId(null, userName, siteId);
             
-            return cust.CustId;
+            return cust?.CustId;
         }
     }
 }
