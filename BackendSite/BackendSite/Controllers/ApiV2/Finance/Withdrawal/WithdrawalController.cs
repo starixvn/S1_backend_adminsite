@@ -72,6 +72,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 { 2, new List<int> {66,69,71,6} },//On-Hold -> Draft,Verified,ToKyc,Reject
                 { 3, new List<int> {66,70,64,6} },//Verified -> Draft,Process,Pending,Reject
                 { 4, new List<int> {66,69,65,67,68} },//Process -> Draft ,Verified ,Approved,ManualApproved,ManualRejected
+                { 5, new List<int> {66} },//Canceled -> Draft
                 { 6, new List<int> {66,68} },//Approved -> Draft,Manual Rejected
                 { 7, new List<int> {66,67} },//Reject -> Draft,Manual Approved
                 { 8, new List<int> {66,64,6} }//ToKyc -> Draft,Pending,Reject
