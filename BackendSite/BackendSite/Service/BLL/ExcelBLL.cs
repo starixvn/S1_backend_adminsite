@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
+using Org.BouncyCastle.Utilities;
+using NPOI.SS.Formula.Functions;
+using BackendSite.Service.Model.Mpa.Marketing;
 
 namespace BackendSite.Service.BLL
 {
@@ -148,9 +152,7 @@ namespace BackendSite.Service.BLL
             p.Save();
             return ms.ToArray();
         }
-        
-        
-        
+
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,
