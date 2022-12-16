@@ -384,6 +384,7 @@ namespace BackendSite.Service.Model
     {
         public string PromotionCategory { set; get; }
         public string BonusCode { set; get; }
+        public string Description { set; get; }
         public decimal Bonus { get; set; }
         public decimal RemainingTurnover { get; set; }
     }
