@@ -81,10 +81,7 @@ namespace BackendSite.Service.BLL
             var custVerificationReward =  _verificationRewardService.GetCustVerificationReward(siteIds, currencyId, userName, 
                 startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
 
-            var listRewardModels = new List<CustVerificationRewardModel>();
-            foreach (var data in custVerificationReward)
-            {
-                var model = new CustVerificationRewardModel()
+            return custVerificationReward.Select(data => new CustVerificationRewardModel()
                 {
                     SiteName = data.SiteName,
                     CustId = data.CustId,
@@ -101,11 +98,7 @@ namespace BackendSite.Service.BLL
                     EmailRewardTime = data.EmailRewardTime,
                     VerificationReawardAmount = data.PhoneReward + data.EmailReward,
                     VerificationReawardTime = GetVerificationReawardTime(data.PhoneRewardTime, data.EmailRewardTime)
-                };
-                listRewardModels.Add(model);
-            }
-
-            return listRewardModels;
+                });
         }
         
         public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPage(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
