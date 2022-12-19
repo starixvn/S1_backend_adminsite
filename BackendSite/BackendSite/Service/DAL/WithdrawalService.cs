@@ -461,6 +461,10 @@ namespace BackendSite.Service.DAL
                 if (result > 0)
                 {
                     //step2: Set WithdrawalLog
+                    if (!string.IsNullOrEmpty(accountingModelString))
+                    {
+                        comment += $"Comment :{comment} , AccountingModel :{accountingModelString}";
+                    }
                     var logResult = SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, updater, conn, trans);
                     var specialResult = 0;
 
