@@ -32,66 +32,62 @@ namespace BackendSite.Controllers.ApiV2.Report
         #endregion
 
         [HttpPost]
-        public ApiResult GetDepositReport(GetDepositPaymentReportRequest request)
+        public async Task<ApiResult> GetDepositReportAsync(GetDepositPaymentReportRequest request)
         {
-            var data = _reportBll.GetDepositPaymentReport(
+            var data = await _reportBll.GetDepositPaymentReportAsync(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-
-            var result = _reportBll.ParsePaymentReportForFrontEnd(data);
-            
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            
-            return new ApiResult<IEnumerable<MultilevelReport<MultilevelReport<DepositPaymentReport>>>>
-            {
-                Data = result,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        [HttpPost]
-        public IActionResult ExportDepositReport(GetDepositPaymentReportRequest request)
-        {
-            var data = _reportBll.GetDepositPaymentReport(
-                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
-            var result = _reportBll.ExportPaymentReport(data);
-
-            return _excelBll.ExcelFile(result, "DepositReport");
-        }
-        
-        [HttpPost]
-        public ApiResult GetWithdrawalReport(GetWithdrawalPaymentReportRequest request)
-        {
-            var data = _reportBll.GetWithdrawalPaymentReport(
-                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
-            var result = _reportBll.ParsePaymentReportForFrontEnd(data);
 
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
             
-            return new ApiResult<IEnumerable<MultilevelReport<MultilevelReport<WithdrawalPaymentReport>>>>
+            return new ApiResult<IEnumerable<DepositPaymentReportSummary>>
             {
-                Data = result,
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        // [HttpPost]
+        // public IActionResult ExportDepositReport(GetDepositPaymentReportRequest request)
+        // {
+        //     var data = _reportBll.GetDepositPaymentReport(
+        //         new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+        //     
+        //     var result = _reportBll.ExportPaymentReport(data);
+        //
+        //     return _excelBll.ExcelFile(result, "DepositReport");
+        // }
+        
+        [HttpPost]
+        public async Task<ApiResult> GetWithdrawalReport(GetWithdrawalPaymentReportRequest request)
+        {
+            var data = await _reportBll.GetWithdrawalPaymentReportAsync(
+                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+            
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            
+            return new ApiResult<IEnumerable<WithdrawalPaymentReportSummary>>
+            {
+                Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
         
-        [HttpPost]
-        public IActionResult ExportWithdrawalReport(GetWithdrawalPaymentReportRequest request)
-        {
-            var data = _reportBll.GetWithdrawalPaymentReport(
-                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
-            var result = _reportBll.ExportPaymentReport(data);
-
-            return _excelBll.ExcelFile(result, "WithdrawalReport");
-        }
+        // [HttpPost]
+        // public IActionResult ExportWithdrawalReport(GetWithdrawalPaymentReportRequest request)
+        // {
+        //     var data = _reportBll.GetWithdrawalPaymentReport(
+        //         new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+        //     
+        //     var result = _reportBll.ExportPaymentReport(data);
+        //
+        //     return _excelBll.ExcelFile(result, "WithdrawalReport");
+        // }
         
         [HttpPost]
         public ApiResult GetDepositType()
