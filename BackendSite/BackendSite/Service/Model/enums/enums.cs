@@ -364,7 +364,8 @@ namespace BackendSite.Service.Model.enums
         Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum

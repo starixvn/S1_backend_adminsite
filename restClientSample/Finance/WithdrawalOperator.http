@@ -35,3 +35,27 @@ Content-Type: application/json
     "currencyId": 2,
     "purpose": 2
 }
+
+###
+# 取得CryptoWallet列表
+# 回傳值非空陣列時顯示CryptoWallet選項
+POST {{url}}/apiV2/BaseData/GetCryptoWalletList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2
+}
+
+###
+# CryptoWallet 送出
+POST {{url}}/apiV2/Withdrawal/SendToNext HTTP/1.1
+Content-Type: application/json
+
+{
+    "comment": "test",
+    "transId": "WD136052",
+    "withdrawalInfo": "{\"Network\": \"ERC20\", \"NickName\": \"\", \"AccountNo\": \"0x23E717D9401C96cD987fCc746Ed998de83f15Ccf\", \"CurrencyId\": 96, \"AccountName\": \"測試\", \"AccountType\": \"crypto\"}",
+    "action": 4,
+    "selId": 511,
+    "withdrawalType": 5
+}
