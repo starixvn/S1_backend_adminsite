@@ -1321,10 +1321,12 @@ namespace BackendSite.Service.BLL
             string accountingModelString = null;
             if (accountingModels != null && accountingModels.Any() )
             {
+                var bankAccountList = _bankDetailBll.GetOfflineBankAccount();
                 var seq = 1;
                 foreach (var model in accountingModels)
                 {
                     model.Seq = seq;
+                    model.BankAccountNo = bankAccountList.FirstOrDefault(x => x.BankId == model.BankId)?.DisplayName;
                     seq += 1;
                 }
                 accountingModelString = JsonConvert.SerializeObject(accountingModels);
