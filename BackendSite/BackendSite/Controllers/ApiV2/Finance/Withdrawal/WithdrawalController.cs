@@ -388,6 +388,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 withdrawalInfo.PayId = request.SelId;
                                 break;
                             case (int)WithdrawalTypeEnum.LocalBank:
+                            case (int)WithdrawalTypeEnum.CryptoWallet:
                                 {
                                     var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                                     var bankInfoOff = _bankDetailBll
