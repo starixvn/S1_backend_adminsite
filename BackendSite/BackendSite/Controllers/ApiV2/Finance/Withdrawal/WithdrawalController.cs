@@ -955,14 +955,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var usableList = _usableActionType[withdrawalRequest.Status];
             var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
                     
-            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank)
+            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
             {
                 usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
                 usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
             }
 
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
-                withdrawalRequest.WithdrawalType is not WithdrawalTypeEnum.LocalBank)
+                withdrawalRequest.WithdrawalType is not WithdrawalTypeEnum.LocalBank and WithdrawalTypeEnum.CryptoWallet)
             {
                 usableActionButton.Remove(WithdrawalActionEnum.Verified);
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
