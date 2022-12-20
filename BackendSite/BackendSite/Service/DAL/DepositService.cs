@@ -194,6 +194,8 @@ namespace BackendSite.Service.DAL
             var result = 0;
             try
             {
+                var beforeDepositData = GetDepositRequest(depositId, siteId);
+                
                 using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
                 conn.Open();
                 using var trans = conn.BeginTransaction();
@@ -219,7 +221,6 @@ namespace BackendSite.Service.DAL
                     {
                         var calCodeList = _bankFinancialService.GetTransferAccountList();
                         draftInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == draftInfo.BankId)?.DisplayName;
-                        var beforeDepositData = GetDepositRequest(depositId, siteId);
                         comment =
                             $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{draftInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{draftInfo.StatementTime}] ]";
                     }
