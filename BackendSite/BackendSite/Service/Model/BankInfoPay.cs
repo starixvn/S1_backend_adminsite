@@ -20,6 +20,11 @@
         public int SSort { get; set; }
         public decimal MinAmount { get; set; }
         public decimal MaxAmount { get; set; }
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
     }
     
     public class EWalletPay
@@ -47,16 +52,15 @@
         public int ChannelId { get; set; }
     }
     
-    public class PayComparer : IEqualityComparer<Pay>
+    public class PayInfo
     {
-        public bool Equals(Pay t1, Pay t2)
-        {
-            return (t1.PayId == t2.PayId);
-        }
-
-        public int GetHashCode(Pay t)
-        {
-            return t.ToString().GetHashCode();
-        }
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public int ChannelId { get; set; }
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
     }
 }

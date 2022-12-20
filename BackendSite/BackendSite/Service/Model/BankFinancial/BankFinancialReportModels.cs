@@ -75,14 +75,9 @@ public class BankFinancialReportResult
     public IEnumerable<FinancialAccountOpenBalanceResult> AccountInfoList { get; set; }
 }
 
-public class TransferTypeSummary
-{
-    public decimal Summary { get; set; }
-}
-
 public class BankFinancialReportSummaryBaseModel
 {
-    public Dictionary<string, TransferTypeSummary> Details { get; set; }
+    public Dictionary<string, decimal> Details { get; set; }
     public decimal Fees { get; set; }
     public decimal? OpenBalance { get; set; }
     public decimal? ClosingBalance { get; set; }
@@ -92,17 +87,24 @@ public class BankFinancialReportSummaryBaseModel
 
 public class BankFinancialReportCurrencySummary : BankFinancialReportSummaryBaseModel
 {
+    [JsonIgnore]
     public CurrencyEnum CurrencyId { get; set; }
-    public string Currency { get; set; }
-    public IEnumerable<BankFinancialReportChannelSummary> ChannelDetails { get; set; }
+    /// <summary>
+    /// Currency
+    /// </summary>
+    public string Key { get; set; }
+    public IEnumerable<BankFinancialReportChannelSummary> Children { get; set; }
 }
 
 public class BankFinancialReportChannelSummary : BankFinancialReportSummaryBaseModel
 {
     [JsonIgnore]
     public CurrencyEnum CurrencyId { get; set; }
-    public string Channel { get; set; }
-    public IEnumerable<BankFinancialReportAgentSummary> AgentDetails { get; set; }
+    /// <summary>
+    /// Channel
+    /// </summary>
+    public string Key { get; set; }
+    public IEnumerable<BankFinancialReportAgentSummary> Children { get; set; }
 }
 
 public class BankFinancialReportAgentSummary : BankFinancialReportSummaryBaseModel
@@ -111,15 +113,19 @@ public class BankFinancialReportAgentSummary : BankFinancialReportSummaryBaseMod
     public CurrencyEnum CurrencyId { get; set; }
     [JsonIgnore]
     public TransferChannelEnum Channel { get; set; }
-    public string Agent { get; set; }
-    public IEnumerable<BankFinancialReportAccountSummary> AccountDetails { get; set; }
+    /// <summary>
+    /// Agent
+    /// </summary>
+    public string Key { get; set; }
+    public IEnumerable<BankFinancialReportAccountSummary> Children { get; set; }
 }
 
 public class BankFinancialReportAccountSummary : BankFinancialReportSummaryBaseModel
 {
-    
-    public string AccountNo { get; set; }
-    public string DisplayName { get; set; }
+    /// <summary>
+    /// DisplayName
+    /// </summary>
+    public string Key { get; set; }
     [JsonIgnore]
     public TransferTypeEnum TransferType { get; set; }
     [JsonIgnore]

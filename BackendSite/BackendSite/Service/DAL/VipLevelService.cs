@@ -118,24 +118,28 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipUpgradeReviewDataModel> GetVipUpgradeReviewList(int siteId,
             string calculateMonth,
-            int status,
+            string selectStatus,
             string userName,
             int pageSize,
             int startIndex,
+            string currencyIds,
+            string vipLevel,
             out int totalPages,
             out int rowCount)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CalculateMonth", calculateMonth);
-            props.Add("_Status", status);
+            props.Add("_SelectStatus", selectStatus);
             props.Add("_UserName", userName);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_VipLevel", vipLevel);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get_V2", props);
+            var result = _reportDbClient.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get_V3", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -157,8 +161,10 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipDowngradeReviewDataModel> GetVipDowngradeReviewList(int siteId,
             string calculateYearMonth,
-            int status,
+            string selectStatus,
+            string currencyId,
             string userName,
+            string vipLevel,
             int pageSize,
             int startIndex,
             out int totalPages,
@@ -167,13 +173,15 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CalculateYearMonth", calculateYearMonth);
-            props.Add("_Status", status);
+            props.Add("_SelectStatus", selectStatus);
+            props.Add("_CurrencyIds", currencyId);
             props.Add("_UserName", userName);
+            props.Add("_VipLevel", vipLevel);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get_V2", props);
+            var result = _reportDbClient.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get_V3", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;

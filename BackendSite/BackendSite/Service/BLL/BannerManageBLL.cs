@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Controllers.ApiV2.CMS.Setting;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 
@@ -7,16 +8,14 @@ namespace BackendSite.Service.BLL
     public class BannerManageBLL
     {
         private readonly BannerManageService bannerManageService;
-        private readonly ServerInfoBLL serverInfoBLL;
 
-        public BannerManageBLL(BannerManageService bannerManageService, ServerInfoBLL serverInfoBLL)
+        public BannerManageBLL(BannerManageService bannerManageService)
         {
             this.bannerManageService = bannerManageService;
-            this.serverInfoBLL = serverInfoBLL;
         }
-        public int SetBanner(BannerInfo bannerInfo, string user)
+        public int SetBanner(ParamsWithLog<SetRequest> input )
         {
-            return bannerManageService.SetBanner(bannerInfo, user);
+            return bannerManageService.SetBanner(input);
         }
         public IEnumerable<BannerInfoList> GetBannerList(IEnumerable<int> siteId, IEnumerable<int> bannerTypeId,
             IEnumerable<int> status, IEnumerable<int> currency, int pageNumber, int pageSize, out int totalPages, out int rowCount)
@@ -33,14 +32,14 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.GetBanner(siteId, bannerName, currency);
         }
-        public int UpdateBannerStatus(int siteId, string bannerName, int status, string user)
+        public int UpdateBannerStatus(ParamsWithLog<UpdateStatusRequest> input)
         {
-            return bannerManageService.UpdateBannerStatus(siteId, bannerName, status, user);
+            return bannerManageService.UpdateBannerStatus(input);
         }
         
-        public int DeleteBanner(int siteId, string bannerName , int currency)
+        public int DeleteBanner(ParamsWithLog<GetBannerRequest> input)
         {
-            return bannerManageService.DeleteBanner(siteId, bannerName, currency);
+            return bannerManageService.DeleteBanner(input);
         }
         
         public IEnumerable<HotEventList> GetHotEventList(IEnumerable<int> siteId,

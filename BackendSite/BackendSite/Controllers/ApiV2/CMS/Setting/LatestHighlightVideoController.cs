@@ -95,7 +95,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS > GameCasinoManagement
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LatestHighlightVideoManagement" })]
         [HttpPost]
         public ApiListResult<LatestHighlightVideoData> GetList(GetListRequest request)
         {
@@ -130,7 +129,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS > GameCasinoManagement
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LatestHighlightVideoManagement" })]
         [HttpPost]
         public ApiResult Update(SetRequest request)
         {
@@ -166,7 +164,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS > GameCasinoManagement
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/LatestHighlightVideoManagement" })]
         [HttpPost]
         public ApiResult Create(CreateRequest request)
         {

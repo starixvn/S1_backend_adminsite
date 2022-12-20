@@ -244,14 +244,35 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        Adjustment = 98,
         Error = 99 //No Use
     }
     
+    public enum SelectDepositStatusEnum
+    {
+        Pending = 1,
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        OnHold = 7
+    }
+
     public enum DepositTimeStatusEnum
     {
         Approved = 3,
         Rejected = 4,
         Canceled = 5
+    }
+    
+    public enum DepositActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63
     }
 
     #endregion
@@ -343,7 +364,8 @@ namespace BackendSite.Service.Model.enums
         Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum
@@ -358,6 +380,20 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         ToKyc = 8,
         Error = 99 //No Use
+    }
+    
+    public enum WithdrawalActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63,
+        Verified = 69,
+        Process = 70,
+        ToKyc = 71
     }
 
     #endregion
@@ -418,7 +454,7 @@ namespace BackendSite.Service.Model.enums
         Debit = 1,
         Credit = 2
     }
-    
+
     public enum WithdrawalLimitAdjustmentReasonEnum
     {
         [Description("None - (Default)")]
@@ -509,7 +545,6 @@ namespace BackendSite.Service.Model.enums
         Withdrawal = 10,
         Other = 11
     }
-
     #endregion
 
     #region AdminUser
@@ -589,7 +624,7 @@ namespace BackendSite.Service.Model.enums
         Transfer = 0,
         Seamless = 1
     }
-    
+
     public enum BonusAtPageEnum
     {
         Promotion = 0,
@@ -605,7 +640,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
-    
+
     public enum PromotionCashBackSettingLevelEnum
     {
         [Description("0代表包含所有 VIP 等級")]
@@ -739,9 +774,15 @@ namespace BackendSite.Service.Model.enums
         ReleaseEWalletAccount = 56,
         WithdrawalSubmission = 57,
         SetCurrencyUSDRate = 58,
+        BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
-        WithdrawalLimitAdjustment = 73
+        SetBanner = 62,
+        WithdrawalLimitAdjustment = 73,
+        AppQRCode = 74,
+        ProviderAppDownload = 75,
+        SetDepositMessage = 76,
+        SiteMaintenance = 77
     }
 
     #region BankFinancialTransferInfoLog
@@ -854,10 +895,12 @@ namespace BackendSite.Service.Model.enums
         /// 第三方支付
         /// </summary>
         PSP = 3,
-        
+
         Finance = 4,
         
-        MC = 5
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>
@@ -1001,6 +1044,7 @@ namespace BackendSite.Service.Model.enums
         Cheating = 4
     }
 
+
     public enum AppLinkAppType
     {
         Android = 1,
@@ -1090,7 +1134,7 @@ namespace BackendSite.Service.Model.enums
     {
         LastStatusUpdateTime = 2,
     }
-    
+
     public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
@@ -1107,7 +1151,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
-    
+
     public enum BankCardManagementPurposeEnum
     {
         Deposit = 1,
@@ -1122,7 +1166,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
     }
-    
+
     public enum BankCardManagementSupportChannelEnum
     {
         [Description("Bank Transfer")]
@@ -1158,12 +1202,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
@@ -1205,14 +1245,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppTypeEnum
     {
+        [Description("Android")]
         Android = 1,
-        Ios = 2
+        [Description("IOS")]
+        IOS = 2
     }
 
     public enum ProtocolTypeEnum
     {
-        Http = 1,
-        Https = 2
+        [Description("HTTP")]
+        HTTP = 1,
+        [Description("HTTPS")]
+        HTTPS = 2
     }
 
     #endregion
@@ -1267,13 +1311,18 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
+        [Description("Android")]
         Android = 1,
+        [Description("IOS")]
         IOS = 2,
+        [Description("Desktop")]
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
+        [Description("HTTP")]
         HTTP = 1,
+        [Description("HTTPS")]
         HTTPS = 2
     }
     #endregion
@@ -1330,6 +1379,7 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
+
 
     public enum ManualRewardPointCategoryEnum
     {
@@ -1545,8 +1595,62 @@ namespace BackendSite.Service.Model.enums
         TopCasino = 5
     }
     public enum BlockEWalletStatus
-    { 
+    {
         Lock = 1,
         Unlock = 2
+    }
+    public enum CustomerTeleStatusEnum
+    {
+        NoRecord = 0,
+        NonDepoist = 1,
+        Deposited = 2,
+    }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3
+    }
+    public enum NovaVipLevelEnum
+    {
+        VintageClub = 1,
+        SilverClub = 2,
+        GoldClub = 3,
+        TitaniumClub = 4,
+        DiamondClub = 5,
+        NovaClub = 6
+    }
+    public enum Goal123VipLevelEnum
+    {
+        BronzeClub = 1,
+        SilverClub = 2,
+        GoldClub = 3,
+        TitaniumClub = 4,
+        DiamondClub = 5,
+        Goal123Club = 6
+    }
+    public enum BwingVipLevelEnum
+    {
+        BronzeClub = 1,
+        SilverClub = 2,
+        GoldClub = 3,
+        TitaniumClub = 4,
+        DiamondClub = 5,
+        BwingVvvip = 6
     }
 }

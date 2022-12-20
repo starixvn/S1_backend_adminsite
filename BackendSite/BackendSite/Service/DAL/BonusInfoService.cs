@@ -320,5 +320,43 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
             return result.ToList();
         }
+        
+        public List<MpaMarketingBonus> GetMpaMarketingBonus(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            
+            var result = _mainDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+
+            return result.ToList();
+        }
+        
+        public List<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            
+            var result = _mainDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
+
+            return result.ToList();
+        }
     }
 }

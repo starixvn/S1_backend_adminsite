@@ -72,9 +72,9 @@ namespace BackendSite.Service.BLL
             return _paymentManageService.GetPayList(siteId);
         }
         
-        public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status)
+        public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
-            var result = _paymentManageService.SetPayListStatus(siteId, payId, status);
+            var result = _paymentManageService.SetPayListStatus(siteId, payId, status, @operator);
 
             if (result)
             {
@@ -83,7 +83,12 @@ namespace BackendSite.Service.BLL
             
             return result;
         }
-
+        
+        public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
+        {
+            return _paymentManageService.SetPayListLoginInfo(input);
+        }
+        
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input,
             int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
@@ -152,6 +157,14 @@ namespace BackendSite.Service.BLL
             }
             
             return result;
+        }
+        
+        public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
+            => _paymentManageService.GetCryptoInfoList(siteId);
+        
+        public bool SetCryptoInfoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
+        {
+            return _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
         }
 
         private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)

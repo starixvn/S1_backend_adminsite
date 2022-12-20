@@ -267,15 +267,120 @@ namespace BackendSite.Service.DAL
                 .Query<PayListInfo>("Admin_SitePayList_Get", new DynamicParameters(new { _SiteId = siteId }));
         }
         
-        public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status)
+        public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
-            return _mainDbClient .Execute("Admin_SitePayList_Status_Set",
-                new DynamicParameters(new
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var pay = GetPayList(siteId)
+                .First(x => x.PayId == payId);
+
+            #region props
+
+            var props = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _PayId = payId,
+                _Status = (int) status
+            });
+            
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", siteId);
+            logParam.Add("_CurrencyId", 0);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                pay.PayName,
+                Status = pay.Status.ToString()
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                pay.PayName,
+                Status = status.ToString()
+            }));
+            logParam.Add("_Operator", @operator);
+            #endregion
+
+            if (_mainDbClient.Execute("Admin_SitePayList_Status_Set", props, conn, trans) > 0)
+            {
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
                 {
-                    _SiteId = siteId,
-                    _PayId = payId,
-                    _Status = (int)status
-                })) > 0;
+                    trans.Commit();
+                    return true;
+                }
+            }
+            
+            trans.Rollback();
+            return false;
+        }
+        
+        public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var pay = GetPayList(input.SiteId)
+                .First(x => x.PayId == input.PayId);
+
+            #region props
+
+            var props = new DynamicParameters(new
+            {
+                _SiteId = input.SiteId,
+                _PayId = input.PayId,
+                _LoginUrl = input.LoginUrl,
+                _LoginAccount = input.LoginAccount,
+                _LoginPassword = input.LoginPassword,
+                _LoginPin = input.LoginPin,
+                _TransferPin = input.TransferPin
+            });
+            
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", 0);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                pay.PayName,
+                pay.LoginUrl,
+                pay.LoginAccount,
+                pay.LoginPassword,
+                pay.LoginPin,
+                pay.TransferPin
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                pay.PayName,
+                input.LoginUrl,
+                input.LoginAccount,
+                input.LoginPassword,
+                input.LoginPin,
+                input.TransferPin
+            }));
+            logParam.Add("_Operator", input.Operator);
+            #endregion
+
+            if (_mainDbClient.Execute("Admin_SitePayList_LoginInfo_Set", props, conn, trans) > 0)
+            {
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+            
+            trans.Rollback();
+            return false;
         }
         
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input, int pageSize, int startIndex, out int totalPages, out int rowCount)
@@ -431,7 +536,7 @@ namespace BackendSite.Service.DAL
         
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoSys_GetV2", new
+            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get", new
             {
                 _PayId = payId,
                 _SiteId = siteId
@@ -497,6 +602,61 @@ namespace BackendSite.Service.DAL
 
             trans.Rollback();
                 
+            return false;
+        }
+        
+        public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
+            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get_V2", new {_SiteId = siteId});
+        
+        public bool SetCryptoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            #region props
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_Network", network);
+            props.Add("_Status", status);
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", siteId);
+            logParam.Add("_CurrencyId", currencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                CryptoCurrency = currencyId.ToString(),
+                Network = network,
+                Status = (status == GeneralStatusEnum.Enable ? GeneralStatusEnum.Disable : GeneralStatusEnum.Enable).ToString()
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                CryptoCurrency = currencyId.ToString(),
+                Network = network,
+                Status = status.ToString()
+            }));
+            logParam.Add("_Operator", @operator);
+            #endregion
+
+            var setResult = _mainDbClient.Execute("Admin_CryptoNetwork_Set", props, conn, trans);
+            if (setResult > 0)
+            {
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
+                if (logResult > 0)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+
+            trans.Rollback();
+            
             return false;
         }
 

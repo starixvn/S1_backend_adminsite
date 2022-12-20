@@ -1,7 +1,7 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
-namespace BackendSite.Service.Model.Mpa
+namespace BackendSite.Service.Model.Mpa.WinLoss
 {
     public class MpaWinLossRequest : IOrderBy
     {
@@ -20,7 +20,7 @@ namespace BackendSite.Service.Model.Mpa
         /// </summary>
         public DateTimeOffset EndTime { get; set; }
 
-        
+
         /// <summary>
         /// 所有供應商的所有類型遊戲
         /// </summary>
@@ -53,6 +53,9 @@ namespace BackendSite.Service.Model.Mpa
         public bool DisplayGroupBreakdownInOriginalCurrency;
 
 
+        public int BaseCurrencyId { get; set; }
+
+
         public bool OrderBy { get; set; }
 
         /// <summary>
@@ -73,7 +76,7 @@ namespace BackendSite.Service.Model.Mpa
         /// </summary>
         public int PageNumber { get; set; }
 
-         
+
         /// <summary>
         /// 一頁顯示幾筆
         /// </summary>

@@ -192,13 +192,13 @@ namespace BackendSite.Service.BLL
             return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
         {
             var UserSiteList = _serverInfoService.GetSiteList();
             IEnumerable<SiteTpListIfo> result = null;
-            if (UserSiteList.Where(x => x.SiteId == TpDetailPara.Site).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(TpDetailPara.Currency))
+            if (UserSiteList.Where(x => x.SiteId == siteId).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(currency))
             {
-                result = _thirdPartyService.GetTpBySiteAndCurrency(TpDetailPara);
+                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId,currency);
             }
             return result;
         }

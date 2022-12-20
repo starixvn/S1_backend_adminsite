@@ -16,7 +16,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
 
         private readonly BannerManageBLL _bannerManageBll;
-        private readonly AuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -25,70 +24,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public BannerController(IServiceProvider provider)
         {
             _bannerManageBll = provider.GetRequiredService<BannerManageBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
         }
 
         #endregion
 
         #region API Model
-
-        public class SetRequest
-        {
-            private DateTimeOffset? _startTime;
-            private DateTimeOffset? _endTime;
-            private DateTimeOffset? _sportBattleDateTime;
-
-            public bool IsAdd { get; set; }
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public BannerTypeEnum BannerType { get; set; }
-            public BannerActionModeEnum ActionMode { get; set; }
-            public ShowStatusEnum ShowStatus { get; set; }
-            public DateTimeOffset? StartTime
-            {
-                get => _startTime;
-                set
-                {
-                    if (value != null)
-                        _startTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndTime
-            {
-                get => _endTime;
-                set
-                {
-                    if (value != null)
-                        _endTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public string BonusCode { get; set; }
-            public int? MatchId { get; set; }
-            public int? TpId { get; set; }
-            public string GameId { get; set; }
-            public string UrlRouter { get; set; }
-            public DateTimeOffset? SportBattleDateTime
-            {
-                get => _sportBattleDateTime;
-                set
-                {
-                    if (value != null)
-                        _sportBattleDateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? SportCategoryId { get; set; }
-            public int? SportLeaguesId { get; set; }
-            public IEnumerable<BannerSportTeamsDetails> SportTeamsId { get; set; }
-            public IEnumerable<BannerDetails> Specific { get; set; }
-            public int Sort { get; set; }
-        }
-
-        public class GetBannerRequest
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public int CurrencyId { get; set; }
-        }
 
         public class GetListRequest : ApiRequestPageModel
         {
@@ -96,25 +36,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int CurrencyId { get; set; }
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
-        }
-
-        public class UpdateStatusRequest
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
-            public BannerStatusEnum Status { get; set; }
-        }
-        
-        public class GetHotEventListReq : ApiRequestPageModel
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<BannerStatusEnum> Statuses { get; set; }
-        }
-        
-        public class GetHotEventReq
-        {
-            public int SiteId { get; set; }
-            public string BannerName { get; set; }
         }
 
         #endregion
@@ -209,48 +130,37 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult SetBanner(SetRequest request)
+        public ApiResult SetBanner(ApiRequestWithLog<SetRequest> request)
         {
             var apiResult = new ApiResult();
+            
+            var urlRouter = new Dictionary<string, string>()
+            {
+                {"01","sports"},
+                {"02","live-casino"},
+                {"03","referral"},
+                {"04","leaderBoard"},
+                {"05","angPow"},
+                {"06","lottery"},
+                {"22","liveCasino"},
+                {"32","liveCasino"}
+            };
+            
+            var router = string.IsNullOrEmpty(request.After.UrlRouter) ? 
+                null : urlRouter.ContainsKey($"{request.SiteId}{request.After.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}{request.After.UrlRouter}"] : urlRouter[$"0{request.After.UrlRouter}"] ;
+            request.After.UrlRouter = router;
+            
+            var beforeRouter = string.IsNullOrEmpty(request.Before.UrlRouter) ? 
+                null : urlRouter.ContainsKey($"{request.SiteId}{request.Before.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}{request.Before.UrlRouter}"] : urlRouter[$"0{request.Before.UrlRouter}"] ;
+            request.Before.UrlRouter = beforeRouter;
+
             try
             {
-                var data = new BannerInfo
-                {
-                    SiteId = request.SiteId,
-                    BannerName = request.BannerName,
-                    BannerType = (int)request.BannerType,
-                    ActionMode = (int)request.ActionMode,
-                    ShowStatus = (int)request.ShowStatus,
-                    StartTime = request.StartTime,
-                    EndTime = request.EndTime,
-                    BonusCode = request.BonusCode,
-                    MatchId = request.MatchId,
-                    TpId = request.TpId,
-                    GameId = request.GameId,
-                    UrlRouter = request.UrlRouter,
-                    SportBattleDateTime = request.SportBattleDateTime,
-                    SportCategoryId = request.SportCategoryId,
-                    SportLeaguesId = request.SportLeaguesId,
-                    SportTeamsId = request.SportTeamsId,
-                    Specific = request.Specific,
-                    Sort = request.Sort
-                };
-
-                var user = _authorizeBll.GetAuthData().UserName;
-                var errorCode = _bannerManageBll.SetBanner(data, user);
-
-                if (request.IsAdd)
-                {
-                    apiResult.ErrorCode = errorCode == 1 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
-                }
-                else
-                {
-                    apiResult.ErrorCode = errorCode == 2 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
-                    if (errorCode == 1)
-                    {
-                        apiResult.Message = "The Banner Name setting already exists which with same Site.";
-                    }
-                }
+                var errorCode = _bannerManageBll.SetBanner(new ParamsWithLog<SetRequest>(request, User.Identity.Name));
+                apiResult.ErrorCode = errorCode >= 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
+                
             }
             catch (MySqlException sqlException)
             {
@@ -278,13 +188,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult UpdateStatus(UpdateStatusRequest request)
+        public ApiResult UpdateStatus(ApiRequestWithLog<UpdateStatusRequest> request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var user = _authorizeBll.GetAuthData().UserName;
-                apiResult.ErrorCode = _bannerManageBll.UpdateBannerStatus(request.SiteId, request.BannerName, (int)request.Status, user);
+                var result = _bannerManageBll.UpdateBannerStatus(new ParamsWithLog<UpdateStatusRequest>(request, User.Identity.Name)) >= 0;
+                
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+                
             }
             catch (Exception ex)
             {
@@ -306,12 +225,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult DeleteBanner(GetBannerRequest request)
+        public ApiResult DeleteBanner(ApiRequestWithLog<GetBannerRequest> request)
         {
             var apiResult = new ApiResult();
             try
             {
-                apiResult.ErrorCode = _bannerManageBll.DeleteBanner(request.SiteId, request.BannerName, request.CurrencyId);
+                var result =  _bannerManageBll.DeleteBanner(
+                    new ParamsWithLog<GetBannerRequest>(request, User.Identity.Name)) >= 0;
+
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
             }
             catch (Exception ex)
             {
@@ -323,76 +252,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         
-        /// <summary>
-        /// Banner/GetHotEventList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing >  Hot Event Management
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiListResult<HotEventList> GetHotEventList(GetHotEventListReq req)
-        {
-            var apiResult = new ApiListResult<HotEventList>();
-            try
-            {
-                var statusList = req.Statuses.Select(x => (int)x);
-
-
-                apiResult.Data = _bannerManageBll.GetHotEventList(req.SiteIds,
-                    statusList,
-                    req.PageNumber, req.PageSize, out var totalPages, out var rowCount);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.TotalPages = totalPages;
-                apiResult.RowCount = rowCount;
-                apiResult.PageNumber = req.PageNumber;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
-            return apiResult;
-        }
-
-        /// <summary>
-        /// Banner/GetHotEvent 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing >  Hot Event Management > [Edit]
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public ApiResult<BannerInfo> GetHotEvent(GetHotEventReq req)
-        {
-            var apiResult = new ApiResult<BannerInfo>();
-            try
-            {
-                var result = _bannerManageBll.GetBanner(req.SiteId, req.BannerName, 0);
-                if (result != null)
-                {
-                    apiResult.Data = result;
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                }
-                else
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
-                    apiResult.Message = "The Hot Event Detail No Data";
-                }
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-                apiResult.RawMessage = ex.ToString();
-            }
-            return apiResult;
-        }
+        
         #endregion
     }
 }

@@ -150,6 +150,12 @@ namespace BackendSite.Service.Model
         public PayListStatusEnum Status => PayStatus == PayListStatusEnum.Enable
             ? SitePayStatus
             : PayStatus;
+        
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
     }
 
     public class UpdatePaySettingStatusParams
@@ -169,6 +175,18 @@ namespace BackendSite.Service.Model
         public PayChannelTypeEnum? Type { get; set; }
         public PayListStatusEnum? Globalstatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }
+    }
+    
+    public class SetPayListLoginInfoParams
+    {
+        public int SiteId { get; set; }
+        public int PayId { get; set; }
+        public string LoginUrl { get; set; }
+        public string LoginAccount { get; set; }
+        public string LoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string Operator { get; set; }
     }
 
     public class GetPaySettingListParams

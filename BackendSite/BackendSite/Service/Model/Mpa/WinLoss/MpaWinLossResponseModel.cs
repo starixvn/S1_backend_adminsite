@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BackendSite.Service.Model.Mpa
+namespace BackendSite.Service.Model.Mpa.WinLoss
 {
     public class MpaWinLossByDateResponse
     {
@@ -231,7 +231,6 @@ namespace BackendSite.Service.Model.Mpa
         [JsonProperty(Order = 11)]
         public decimal Margin { get; set; }
     }
-
 
     public class MpaWinLossByCurrencyResponse
     {

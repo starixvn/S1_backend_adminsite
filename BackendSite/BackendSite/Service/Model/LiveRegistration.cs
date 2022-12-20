@@ -20,6 +20,8 @@ namespace BackendSite.Service.Model
         public string Agent { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+        public string DepositStatus { get; set; }
+        public string ReferralUrl { get; set; }
     }
     public class ExportRegLiveStatusData
     {
@@ -32,6 +34,8 @@ namespace BackendSite.Service.Model
         public string Note { get; set; }
         public string UpdateAt { get; set; }
         public string Operator { get; set; }
+        public string DepositStatus { get; set; }
+        public string ReferralUrl { get; set; }
     }
     public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
@@ -76,6 +80,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset LastActiveTime { get; set; }
         public string PhoneNo { get; set; }
         public string Note { get; set; }
+        public string ReferralUrl { get; set; }
         public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult
@@ -108,6 +113,7 @@ namespace BackendSite.Service.Model
         public int DepositStatus { get; set; }
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
+        public string ReferralUrl { get; set; }
     }
     public class TeleCsdUpdateReq
     {

@@ -31,17 +31,20 @@ namespace BackendSite.Service.Model
         public int WithdrawalId { set; get; }
         public string TransId { set; get; }
         public int WithdrawalType { set; get; }
+        public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalTypeEnum), WithdrawalType);
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string Email { set; get; }
         public string WithdrawalInfo { set; get; }
         public int CurrencyId { set; get; }
+        public string IsoCode { get; set; }
         public int SiteId { set; get; }
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
         public string Comment { set; get; }
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(WithdrawalStatusEnum), Status);
         public string SiteName { set; get; }
         public string BankName { set; get; }
         public string BankCode { set; get; }
@@ -85,6 +88,12 @@ namespace BackendSite.Service.Model
         public int EWalletSysId { get; set; }
         public int? DeviceScore { set; get; }
         public string Agent { get; set; }
+        public List<int> UsableActionButton { set; get; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
+        public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
     }
     public class WithdrawalInfo
     {
@@ -153,6 +162,7 @@ namespace BackendSite.Service.Model
         public string NetWork { set; get; }
         public decimal CryptoAmount { set; get; }
         public int CurrencyId { set; get; }
+        public string IsoCode { get; set; }
         public bool IsTest { set; get; }
         public decimal Amount { set; get; }
         public string BankName { set; get; }
@@ -182,6 +192,21 @@ namespace BackendSite.Service.Model
         public string CurrencyName { get; set; }
     }
 
+    public class WithdrawalComments
+    {
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string Comment { get; set; }
+        public int Action { get; set; }
+        public string ActionName => Enum.GetName(typeof(WithdrawalStatusEnum), Action);
+        public decimal ActualDeposit { get; set; }
+        public string Operator { get; set; }
+    }
+    
     public class WithdrawalLimit
     {
         public int SiteId { get; set; }
@@ -285,10 +310,12 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public IEnumerable<int> SiteIds { get; set; }
-        public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public IEnumerable<int> CurrencyId { get; set; }
+        public IEnumerable<int> Status { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
     public class WithdrawalTimeData
     {
@@ -433,6 +460,7 @@ namespace BackendSite.Service.Model
     {
         public int Seq { set; get; }
         public int BankId { set; get; }
+        public string BankAccountNo { set; get; }
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }

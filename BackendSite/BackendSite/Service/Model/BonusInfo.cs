@@ -125,36 +125,4 @@ namespace BackendSite.Service.Model
         public int BonusId { set; get; }
         public string BonusCode { get; set; }
     }
-
-    public class MpaBonusInfo
-    {
-        public DateTime? RecordDate { get; set; }
-        public string BonusName { get; set; }
-        public string BonusCode { get; set; }
-        public int BonusType { get; set; }
-        public string TypeName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public string BonusStatus { get; set; }
-        public decimal GGR { get; set; }
-        public int RunningCount { get; set; }
-        public int CancelCount { get; set; }
-        public int FulFillCount { get; set; }
-        public int OtherPlatformCount { get; set; }
-        public int TotalClaimants{ get; set; }
-        public decimal TotalClaimedAmount { get; set; }
-        public decimal TotalDeposit { get; set; }
-        public decimal TotalWithdrawal { get; set; }
-    }
-
-    public class MpaBonusDetail
-    {
-        public string UserName { get; set; }
-        public string BonusCode { get; set; }
-        public DateTime ClaimDate { get; set; }
-        public decimal BonusAmountClaim { get; set; }
-        public int TransactionType{ get; set; }
-        public int ClaimStatus{ get; set; }
-        public decimal Completion { get; set; }
-    }
 }

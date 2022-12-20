@@ -2,28 +2,25 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using YamlDotNet.Core.Tokens;
 
 namespace BackendSite.Service.BLL
 {
     public class BankDetailBLL
     {
         private readonly BankDetailService bankDetailService;
-        private readonly ServerInfoService serverInfoService;
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly ICacheHelper _redisHelper;
-        private static readonly PayComparer PayComparer = new();
 
         public BankDetailBLL(IServiceProvider provider)
         {
             bankDetailService = provider.GetRequiredService<BankDetailService>();
-            serverInfoService = provider.GetRequiredService<ServerInfoService>();
             localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -110,21 +107,48 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        public IEnumerable<Pay> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount)
+        public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
         {
+            return localBankService.GetBankCodeList(siteId);
+        }
+        
+        public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
+        {
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
             var result = localBankService.GetBankInfoPayList(siteId)
                 .Where(x => x.SysId == sysId
                             && x.CurrencyId == currencyId
-                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
-                .Select(x => new Pay
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
                 {
-                    PayId = x.PayId,
-                    PayName = x.PayName,
-                    ChannelId = x.ChannelId
-                })
-                .Distinct(PayComparer);
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
+                    };
+                });
             
             return result;
+        }
+        
+        public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
+        {
+            var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
+            return bankInfoPayList;
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
@@ -133,19 +157,35 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<Pay> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount)
+        public IEnumerable<PayInfo> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
             var result = localBankService.GetCryptoPayList(siteId)
                 .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
                             && x.CurrencyId == currencyId
-                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount))
-                .Select(x => new Pay
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
                 {
-                    PayId = x.PayId,
-                    PayName = x.PayName,
-                    ChannelId = x.ChannelId
-                })
-                .Distinct(PayComparer);
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.LoginPin,
+                        LoginUrl = d.LoginUrl,
+                        TransferPin = d.TransferPin
+                    };
+                });
             
             return result;
         }

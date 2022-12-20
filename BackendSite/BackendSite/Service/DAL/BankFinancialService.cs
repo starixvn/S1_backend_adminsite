@@ -135,6 +135,8 @@ namespace BackendSite.Service.DAL
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
+                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
+                    _Network = bankFinancialTransferAccount.Network?.ToString(),
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
@@ -156,7 +158,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V5", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V6", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -444,40 +446,6 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialTransferInfo_Upd_V2";
-
-            return _mainDbClient.Execute(SpName, parameters);
-        }
-
-        public int InsertTransferInfoLog(ActionEnum action, BankFinancialTransferInfoModel bankFinancialTransferInfo)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _TransferId = bankFinancialTransferInfo.TransferId,
-                    _TransactionType = bankFinancialTransferInfo.TransactionType,
-                    _TransferType = bankFinancialTransferInfo.TransferType,
-                    _PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
-                    _TransDate = bankFinancialTransferInfo.TransDate.DateTime,
-                    _Channel = bankFinancialTransferInfo.Channel,
-                    _Agent = bankFinancialTransferInfo.Agent,
-                    _PayId = bankFinancialTransferInfo.PayId,
-                    _SiteId = bankFinancialTransferInfo.SiteId,
-                    _SiteName = bankFinancialTransferInfo.SiteName,
-                    _CustId = bankFinancialTransferInfo.CustId,
-                    _CurrencyId = bankFinancialTransferInfo.CurrencyId,
-                    _SysId = bankFinancialTransferInfo.SysId,
-                    _AccountNo = bankFinancialTransferInfo.AccountNo,
-                    _AccountDisplayName = bankFinancialTransferInfo.AccountDisplayName,
-                    _Amount = bankFinancialTransferInfo.Amount,
-                    _Fee = bankFinancialTransferInfo.Fee,
-                    _Reason = bankFinancialTransferInfo.Reason,
-                    _Remark = bankFinancialTransferInfo.Remark,
-                    //_OperateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
-                    _Operator = bankFinancialTransferInfo.Updator,
-                    _Action = action
-                });
-
-            var SpName = "Admin_BankFinancialTransferInfoLog_Ins_V2";
 
             return _mainDbClient.Execute(SpName, parameters);
         }

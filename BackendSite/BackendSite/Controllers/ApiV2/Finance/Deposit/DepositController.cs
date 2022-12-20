@@ -1,4 +1,5 @@
-﻿using BackendSite.ExceptionHandling;
+﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
@@ -7,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -23,6 +25,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly PendingFundBLL _pendingFundBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly Dictionary<int, List<int>> _usableActionType;
+        
         private readonly int _mainWalletType;
 
         #endregion
@@ -37,7 +42,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _pendingFundBll = provider.GetRequiredService<PendingFundBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _mainWalletType = configuration.GetValue<int>("MainWalletType");
+            _usableActionType = new Dictionary<int, List<int>>
+            {
+                { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
+                { 3, new List<int> {66} },//Approved -> Draft
+                { 4, new List<int> {66,67} },//Reject -> Draft,ManualApproved
+                { 5, new List<int> {66} },//Cancel -> Draft
+                { 7, new List<int> {66,64,67} }//On-Hold -> Draft,Pending,ManualApproved
+            };
         }
 
         #endregion
@@ -141,6 +155,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Request > [Submit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<DepositRequest> GetList(GetListRequest request)
         {
@@ -186,6 +201,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Request > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 2 })]
         [HttpPost]
         public IActionResult Export(GetListExportRequest request)
         {
@@ -222,6 +238,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > Deposit Info
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 1 })]
         [HttpPost]
         public ApiResult<DepositRequest> GetByTransId(GetByTransIdRequest request)
         {
@@ -229,6 +246,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             try
             {
                 var depositRequest = _depositBll.GetDepositRequest(request.TransId);
+                
+                if (depositRequest != null)
+                {
+                    var usableActionButton = GetUsableActionButton(depositRequest);
+                    depositRequest.UsableActionButton = usableActionButton;
+                }
                 
                 apiResult.Data = depositRequest;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -250,10 +273,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > Comment List
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 1 })]
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
+        public ApiResult<IEnumerable<DepositComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<DepositComments>>();
             var comments = _depositBll.GetDepositRequestComment(request.TransId);
 
             apiResult.Data = comments;
@@ -271,6 +295,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Request > [Submit] > Click [Trxn.ID] > [Draft] [OnHold] [Pending] [Approved] [Rejected]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]
         [HttpPost]
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
@@ -387,6 +412,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance > Deposit Request > [Submit] > Click CheckBox > [Reject Multiple]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 6 })]
         [HttpPost]
         public List<ApiResult> BatchRejected(BatchRejectedDepositList request)
         {
@@ -434,6 +460,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance > [Submit] > Click [Trxn.ID] > Deposit Info [Request Amount] > [Edit]
         /// </remarks>
         /// <param name="request"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]
         [HttpPost]
         public ApiResult SetAmountByTransId(ApiRequestWithLog<SetAmountRequest> request)
         {
@@ -474,6 +501,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return File(image, "image/jpeg");
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]
         [HttpPost]
         public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
         {
@@ -490,6 +518,39 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
         }
 
+        public ApiResult DepositMessageStatusList()
+        {
+            var apiResult = new ApiResult<List<EnumTypeModel>>();
+            var result = new List<EnumTypeModel>();
+
+            foreach (DepositMessageStatus status in Enum.GetValues(typeof(DepositMessageStatus)))
+            {
+                result.Add(new EnumTypeModel
+                {
+                    Name = status.GetDescription(),
+                    Value = (int)status
+                });
+            }
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public ApiResult SetDepositMessage(ApiRequestWithLog<DepositMessageRequest> request)
+        {
+            if (_depositBll.SetDepositMessage(
+                    new ParamsWithLog<DepositMessageRequest>(request, User.Identity.Name)) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
         #region Private function
 
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
@@ -497,6 +558,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return await _pendingFundBll.ProcessAsync(pendingFund);
         }
 
+        private List<int> GetUsableActionButton(DepositRequest depositRequest)
+        {
+            var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
+            var usableList = _usableActionType[depositRequest.Status];
+            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+                    
+            if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+            {
+                usableActionButton.Remove((int) DepositActionEnum.ManualApproved);
+            }
+            else if (depositRequest.DepositType != (int) DepositTypeEnum.LocalBanking)
+            {
+                usableActionButton.Remove((int) DepositActionEnum.Approved);
+            }
+
+            return usableActionButton;
+        }
+        
         #endregion
 
     }

@@ -157,6 +157,8 @@ namespace BackendSite.Service.Model.BankFinancial
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
+        public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
+        public string Network { get; set; }
     }
     
     public class BankFinancialTransferAccountDisplayModel
@@ -185,6 +187,8 @@ namespace BackendSite.Service.Model.BankFinancial
             CreatorName = data.CreatorName;
             UpdateTime = data.UpdateTime;
             UpdatorName = data.UpdatorName;
+            CryptoCurrency = data.CryptoCurrencyId?.ToString();
+            CryptoNetwork = data.Network;
         }
         
         public int Id { get; set; }
@@ -208,6 +212,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string Agent { get; set; }
 
         public int PayId { get; set; }
+
+        public string CryptoCurrency { get; set; }
+
+        public string CryptoNetwork { get; set; }
 
         public string PayName { get; set; }
 
@@ -241,6 +249,8 @@ namespace BackendSite.Service.Model.BankFinancial
         public string Channel { get; set; }
         public string Agent { get; set; }
         public string PayName { get; set; }
+        public string CryptoCurrency { get; set; }
+        public string CryptoNetwork { get; set; }
         public string AccountNo { get; set; }
         public string AccountName { get; set; }
         public string DisplayName { get; set; }

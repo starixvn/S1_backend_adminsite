@@ -8,7 +8,9 @@ namespace BackendSite.Service.Model
     public class DepositRequest
     {
         public string TransId { set; get; }
+        public int DepositId { set; get; }
         public int DepositType { set; get; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public int CurrencyId { get; set; }
         public string IsoCode { set; get; }
         public int CustId { set; get; }
@@ -38,6 +40,8 @@ namespace BackendSite.Service.Model
                 };
         public int FirstDeposit { set; get; }
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
+        public List<int> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
         private DateTimeOffset? _depositTime;
@@ -50,6 +54,7 @@ namespace BackendSite.Service.Model
                     _depositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
+        public int BankId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
@@ -104,6 +109,7 @@ namespace BackendSite.Service.Model
         public int VipLevel { set; get; }
         public string Operator { set; get; }
         public string Agent { set; get; }
+        public string DepositFrom { set; get; }
     }
 
     public class DepositInfoForExport
@@ -271,20 +277,17 @@ namespace BackendSite.Service.Model
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
     }
-    public class Comments
+    public class DepositComments
     {
         private DateTimeOffset _createTime { get; set; }
-
-        public string Comment { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        public string Comment { get; set; }
         public int Action { get; set; }
-
-        public string ActionString { get; set; }
-
+        public string ActionName => Enum.GetName(typeof(DepositStatusEnum), Action);
         public decimal ActualDeposit { get; set; }
         public string Operator { get; set; }
     }
@@ -362,6 +365,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? ApprovedTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
+        public string Operator { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -392,6 +397,8 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SiteIds { get; set; }
         public IEnumerable<int> CurrencyId { get; set; }
         public IEnumerable<DepositStatusEnum> Status { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
 
     public class DepositTimeExportData
@@ -408,6 +415,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? EndFlowTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
+        public string Operator { get; set; }
     }
     public class SetAmountRequest
     {
@@ -434,6 +443,13 @@ namespace BackendSite.Service.Model
     public class DepositDraftSetRequest
     {
         public int? BankId { get; set; }
+        public string DisplayName { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
+    }
+
+    public class DepositMessageRequest
+    {
+        public DepositMessageStatus Status { get; set; }
+        public int DepositId { get; set; }
     }
 }

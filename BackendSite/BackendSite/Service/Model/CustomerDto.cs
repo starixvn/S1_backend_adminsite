@@ -37,7 +37,7 @@ public class MemberListDto
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string SabaId { get; set; }
-    public string AffiliateCode { get; set; }
+    public string AffCode { get; set; }
     public string TagList { get; set; }
     public int UserLevel { get; set; }
     public string Agent { get; set; }
@@ -50,6 +50,7 @@ public class MemberListDto
     public int WithdrawCnt { get; set; }
     public int Identity { get; set; }
     public int UserType { get; set; }
+    public string AffiliateName { get; set; }
     public string LevelName { get; set; }
     public DateTime RegTime { get; set; }
     public DateTime? ReloadTime { get; set; }
@@ -198,6 +199,7 @@ public class CustomerDto
     public string SiteName { get; set; }
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string LevelName { get; set; }
     public string UserName { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
@@ -260,6 +262,7 @@ public class CustomerBasicInfo
 {
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string LevelName { get; set; }
     public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }
