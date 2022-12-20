@@ -150,6 +150,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public string SabaId { get; set; }
             public string UserName { get; set; }
             public int SiteId { get; set; }
+            /// <summary>
+            /// 1. Deposit, 2. Withdrawal
+            /// </summary>
+            public TransferAccountPurposeEnum Purpose { get; set; }
         }
 
         public class GetPromoCategoryRequest
@@ -379,40 +383,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<OfflineBankAccount>>();
-            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+            var custVerify =
+                _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out var custInfo);
 
-            if (result != ErrorCodeEnum.Success)
+            if (custVerify != ErrorCodeEnum.Success)
             {
-                throw new AdminException(result);
+                throw new AdminException(custVerify);
             }
 
-            if (custInfo != null)
+            if (custInfo == null)
             {
-                var bankInfoOff = _bankDetailBll
-                    .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
-                    .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit)
-                                && x.AccountStatus == TransferAccountStatusEnum.Open
-                                && x.SettingStatus == BankCardManagementStatusEnum.Open);
-
-                if (bankInfoOff != null)
+                return new ApiResult<IEnumerable<OfflineBankAccount>>
                 {
-                    apiResult.Data = bankInfoOff;
-                    apiResult.ErrorCode = 0;
-                }
-                else
-                {
-                    apiResult.ErrorCode = 21;
-                    apiResult.Message = "BankAccount not found.";
-                }
+                    ErrorCode = 21,
+                    Message = "Player not found."
+                };
             }
-            else
-            {
-                apiResult.ErrorCode = 21;
-                apiResult.Message = "Player not found.";
-            }
+                
+            var bankInfoOff = _bankDetailBll
+                .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
+                .Where(x => x.Purposes.Contains(request.Purpose) 
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.LocalBank);
 
-            return apiResult;
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = bankInfoOff,
+                ErrorCode = 0
+            };
+
         }
 
         /// <summary>
