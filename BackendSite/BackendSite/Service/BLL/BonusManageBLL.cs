@@ -111,6 +111,10 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetPromoCategories(walletType);
         }
+        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
+        {
+            return _bonusManageService.GetPromoCategoriesV2(walletType);
+        }
 
         public IEnumerable<TpGameType> GetTpGameList()
         {

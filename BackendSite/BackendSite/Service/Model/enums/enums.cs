@@ -239,6 +239,13 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7, //No Use
         Error = 99 //No Use
     }
+    
+    public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
+    }
 
     #endregion
 
@@ -552,8 +559,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionWalletTypeEnum
     {
-        Seamless = 1,
-        Transfer = 2
+        Transfer = 0,
+        Seamless = 1
     }
     
     public enum BonusAtPageEnum
@@ -1382,4 +1389,9 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
+    public enum BlockEWalletStatus
+    { 
+        Lock = 1,
+        Unlock = 2
+    }
 }

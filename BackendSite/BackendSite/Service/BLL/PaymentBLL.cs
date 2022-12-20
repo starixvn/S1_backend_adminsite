@@ -67,7 +67,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            var list = data.OrderByDescending(i => i.CreateTime).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id).ToList();
 
             // Add Cache by List      
             _ = Task.Run(() =>
@@ -384,7 +384,7 @@ namespace BackendSite.Service.BLL
         }
 
         public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
-        {   
+        {
             var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
             if (checkData == null)
             {
@@ -409,7 +409,7 @@ namespace BackendSite.Service.BLL
                 WalletType = checkData.WalletType,
                 TierAmountList = checkData.TierAmountList,
                 BonusType = (int)checkData.BonusType,
-                PromotionType =checkData.PromotionType,            
+                PromotionType = checkData.PromotionType,
             };
         }
     }

@@ -79,7 +79,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Finance  > BonusPayout > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 127, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 33, 5 })]
         [HttpPost]
         public async Task<ApiResult> SetBonusPayout(BonusPayoutReq request)
         {
@@ -87,6 +87,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
+                if (request.Amount <= 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Amount can't be zero or less than zero";
+                    return apiResult;
+                }
+                
                 var authData = _authorizeBll.GetAuthData();
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
