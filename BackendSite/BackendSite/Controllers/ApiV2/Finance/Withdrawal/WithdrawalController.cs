@@ -193,7 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public class SendToNextRequest : GetByTransIdRequest
         {
             public string Comment { set; get; }
-            public int Action { set; get; }
+            public WithdrawalStatusEnum Action { set; get; }
             public string WithdrawalInfo { set; get; }
             public WithdrawalTypeEnum? WithdrawalType { set; get; }
             public int? SelId { set; get; }
@@ -464,10 +464,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             switch (request.Action)
             {
-                case (int)WithdrawalStatusEnum.Draft:
+                case WithdrawalStatusEnum.Draft:
                     
                     var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                    if (request.WithdrawalAccountingModels != null && withdrawalData.WithdrawalType == WithdrawalTypeEnum.LocalBank)
+                    if (request.WithdrawalAccountingModels != null &&
+                        (withdrawalData.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
                     {
                         var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
                         
@@ -481,24 +482,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     withdrawConfirmResult = _withdrawalBll.WithdrawalDraft(request.TransId,
                         request.Comment,
                         request.WithdrawalAccountingModels,
-                        User.Identity.Name);
+                        authData.UserName);
                     break;
-                case (int)WithdrawalStatusEnum.Pending:
+                case WithdrawalStatusEnum.Pending:
                     withdrawConfirmResult = _withdrawalBll.WithdrawalPending(request.TransId,
                         request.Comment,
-                        User.Identity.Name);
+                        authData.UserName);
                     break;
-                case (int)WithdrawalStatusEnum.OnHold:
+                case WithdrawalStatusEnum.OnHold:
                     withdrawConfirmResult = _withdrawalBll.WithdrawalOnHold(request.TransId,
                         request.Comment,
-                        User.Identity.Name);
+                        authData.UserName);
                     break;
-                case (int)WithdrawalStatusEnum.Verify:
+                case WithdrawalStatusEnum.Verify:
                     withdrawConfirmResult = _withdrawalBll.WithdrawalVerify(request.TransId,
                         request.Comment,
-                        User.Identity.Name);
+                        authData.UserName);
                     break;
-                case (int)WithdrawalStatusEnum.Process:
+                case WithdrawalStatusEnum.Process:
                     {
                         if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefined)
                         {
@@ -558,9 +559,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         withdrawConfirmResult = _withdrawalBll.WithdrawalProcess(
                             request.TransId,
                             request.Comment,
-                            User.Identity.Name,
-                            // authData.UserId,
-                            1,
+                            authData.UserName,
+                            authData.UserId,
                             JsonConvert.SerializeObject(withdrawalInfo),
                             (int)request.WithdrawalType,
                             request.WithdrawalAccountingModels,
@@ -596,22 +596,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
                                 return apiResult;
                             }
-                            else if (apiOnlineResult.ErrorCode != 0)
+                            if (apiOnlineResult.ErrorCode != 0)
                             {
                                 _withdrawalBll.WithdrawalVerify(request.TransId,
-                                    apiOnlineResult.Message, User.Identity.Name);
+                                    apiOnlineResult.Message, authData.UserName);
                                 return apiOnlineResult;
                             }
                         }
                         break;
                     }
-                case (int)WithdrawalStatusEnum.Approved:
+                case WithdrawalStatusEnum.Approved:
                     {
                         //Check has pic or not
                         var hasPic = await CheckWithdrawalPictureAsync(request.TransId);
 
                         withdrawConfirmResult = _withdrawalBll.WithdrawalApproved(request.TransId, request.Comment,
-                            User.Identity.Name, authData.UserId , hasPic);
+                            authData.UserName, authData.UserId , hasPic);
 
                         if (withdrawConfirmResult > 0)
                         {
@@ -627,7 +627,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                             #region Copy Picture
 
-                            if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.LocalBank
+                            if ((withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
                                 && hasPic)
                             {
                                 await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
@@ -637,10 +637,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         }
                         break;
                     }
-                case (int)WithdrawalStatusEnum.Rejected:
+                case WithdrawalStatusEnum.Rejected:
                     {
                         withdrawConfirmResult =
-                            _withdrawalBll.WithdrawalRejected(request.TransId, request.Comment, User.Identity.Name);
+                            _withdrawalBll.WithdrawalRejected(request.TransId, request.Comment, authData.UserName);
 
                         if (withdrawConfirmResult > 0)
                         {
@@ -656,10 +656,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         }
                         break;
                     }
-                case (int)WithdrawalStatusEnum.ToKyc:
+                case WithdrawalStatusEnum.ToKyc:
                     withdrawConfirmResult = _withdrawalBll.WithdrawalToKyc(request.TransId,
                         request.Comment,
-                        User.Identity.Name);
+                        authData.UserName);
                     break;
 
             }
