@@ -437,6 +437,7 @@ namespace BackendSite.Service.Model
     public class DepositDraftSetRequest
     {
         public int? BankId { get; set; }
+        public string DisplayName { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
     }
 }

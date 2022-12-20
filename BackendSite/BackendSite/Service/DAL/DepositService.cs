@@ -16,6 +16,7 @@ namespace BackendSite.Service.DAL
         private readonly WalletService walletService;
         private readonly Common common;
         private readonly WithdrawalLimitService withdrawalLimitService;
+        private readonly BankFinancialService _bankFinancialService;
         private int payTypePosition = 100;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
@@ -27,6 +28,7 @@ namespace BackendSite.Service.DAL
             walletService = provider.GetRequiredService<WalletService>();
             common = provider.GetRequiredService<Common>();
             withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
@@ -214,6 +216,15 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
+                    if (status == DepositStatusEnum.Draft && draftInfo != null)
+                    {
+                        var calCodeList = _bankFinancialService.GetTransferAccountList();
+                        draftInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == draftInfo.BankId)?.DisplayName;
+                        var beforeDepositData = GetDepositRequest(depositId, siteId);
+                        comment =
+                            $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{draftInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{draftInfo.StatementTime}] ]";
+                    }
+                    
                     SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
 
                     if (status == DepositStatusEnum.Approved)
