@@ -83,7 +83,26 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
-        public string ChannelName { set; get; }
+
+        private string _channelName { set; get; }
+        public string ChannelName
+        {
+            get => _channelName;
+            set
+            {
+                if (!string.IsNullOrEmpty(CryptoCurrency))
+                {
+                    _channelName = CryptoCurrency == Network
+                        ? CryptoCurrency
+                        : $"{CryptoCurrency}-{Network}";
+                }
+                else
+                {
+                    _channelName = value;
+                }
+            }
+        }
+        
         public string EWalletName { get; set; }
         public int EWalletSysId { get; set; }
         public int? DeviceScore { set; get; }
