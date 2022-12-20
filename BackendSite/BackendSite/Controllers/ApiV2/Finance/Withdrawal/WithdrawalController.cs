@@ -962,7 +962,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
 
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
-                withdrawalRequest.WithdrawalType is not WithdrawalTypeEnum.LocalBank and WithdrawalTypeEnum.CryptoWallet)
+                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(WithdrawalActionEnum.Verified);
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
