@@ -782,7 +782,8 @@ namespace BackendSite.Service.Model.enums
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
-        SiteMaintenance = 77
+        SiteMaintenance = 77,
+        SetVideoInfo = 78
     }
 
     #region BankFinancialTransferInfoLog
