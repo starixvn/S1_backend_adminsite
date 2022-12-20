@@ -45,7 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
         }
 
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 61 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         [HttpPost]
         public async Task<ApiListResultCurrencyAmount<PromotionDto>> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
         {
