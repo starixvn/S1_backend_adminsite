@@ -1958,6 +1958,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiResult GetDepositInfoByCustId(GetDepositListByCustIdRequest request)
         {
             var data = _depositBll.GetDepositListByCust(request.CustId,
@@ -1997,6 +1998,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<TpTransferInfo> GetTpTransferInfoByCustId(GetTpTransferInfoListByCustIdRequest request)
         {
@@ -2033,6 +2035,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalInfoByCustId(GetWithdrawalListByCustIdRequest request)
         {
@@ -2073,6 +2076,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2218,6 +2222,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
         public ApiListResult<CustNote> GetCustNote(CustIdWithPageRequest request)
         {
@@ -2308,7 +2313,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
         public ApiListResult<PersonalMsg> GetPersonalMsg(CustIdWithPageRequest request)
         {
@@ -2519,7 +2524,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 24 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogByCustId(CustIdWithPageRequest request)
         {
@@ -2547,6 +2552,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLogByCustId(CustIdWithPageRequest request)
         {
@@ -2579,6 +2585,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendByCustId(CustIdWithDateRangeNullAndPageRequest request)
         {
@@ -2655,6 +2662,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdWithPageRequest request)
         {
@@ -3017,6 +3025,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
         {
@@ -3062,6 +3071,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > Bank list
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<BlockBankAcc> GetBankList(CustIdRequest request)
         {
             var BankList = _custInfoBll.GetBankList(request.CustId);
@@ -3074,6 +3084,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > E-Wallet List
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<BlockEWalletAcc> GetEWalletList(CustIdRequest request)
         {
             var EWalletList = _custInfoBll.GetEWalletList(request.CustId);
@@ -3086,6 +3097,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > E-Wallet Log
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<CustEWalletLog> GetEWalletLog(CustIdWithDateRangeAndPageRequest request)
         {
             var EWalletList = _custInfoBll.GetCustEWalletLogList(request.CustId,
