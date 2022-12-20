@@ -32,6 +32,18 @@ namespace BackendSite.Service.Model
         }
         public string Location { get; set; }
     }
+    
+    public class BlockIPForUpload
+    {
+        public string IP
+        {
+            get => $"{_IP} 1;";
+            set => _IP = value;
+        }
+
+        private string _IP { get; set; }
+    }
+    
     public class BlockBankAcc
     {
         public int CustId { get; set; }
