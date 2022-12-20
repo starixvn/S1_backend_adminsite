@@ -144,7 +144,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
+                if (withdrawalRequest.Status is WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved)
                 {
                     var getRequest = new GetObjectRequest();
                     var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId,
@@ -226,7 +226,7 @@ namespace BackendSite.Controllers.Api
 
                     #region Copy Picture
 
-                    if (withdrawalRequest.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
+                    if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.LocalBank
                         && hasPic)
                     {
                         timer.Restart();
