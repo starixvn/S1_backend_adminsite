@@ -467,7 +467,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalStatusEnum.Draft:
                     
                     var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                    if (request.WithdrawalAccountingModels != null && withdrawalData.WithdrawalType == WithdrawalTypeEnum.LocalBank)
+                    if (request.WithdrawalAccountingModels != null &&
+                        (withdrawalData.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
                     {
                         var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
                         
@@ -626,7 +627,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                             #region Copy Picture
 
-                            if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.LocalBank
+                            if ((withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
                                 && hasPic)
                             {
                                 await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);

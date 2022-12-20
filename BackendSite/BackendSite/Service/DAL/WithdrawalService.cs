@@ -548,9 +548,12 @@ namespace BackendSite.Service.DAL
                                             conn,
                                             trans);
                                         break;
+                                    case (int)WithdrawalTypeEnum.CryptoWallet:
+                                        dummyResult = 1;
+                                        break;
                                 }
                                 
-                                specialResult = (updateFlowEndResult == 0 || dummyResult == 0 ) ? 0 : 1;
+                                specialResult = updateFlowEndResult == 0 || dummyResult == 0 ? 0 : 1;
 
                                 break;
                             

@@ -134,7 +134,7 @@ namespace BackendSite.Service.BLL
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
+                var status = withdrawalRequest.Status;
                 throw new AdminException(ErrorCodeEnum.Fail,
                     $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Process Can Set.");
             }
