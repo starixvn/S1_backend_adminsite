@@ -83,22 +83,21 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
-
-        private string _channelName { set; get; }
+        public string PayChannelName { get; set; }
+        
         public string ChannelName
         {
-            get => _channelName;
-            set
+            get
             {
                 if (!string.IsNullOrEmpty(CryptoCurrency))
                 {
-                    _channelName = CryptoCurrency == Network
+                    return CryptoCurrency == Network
                         ? CryptoCurrency
                         : $"{CryptoCurrency}-{Network}";
                 }
                 else
                 {
-                    _channelName = value;
+                    return PayChannelName;
                 }
             }
         }
