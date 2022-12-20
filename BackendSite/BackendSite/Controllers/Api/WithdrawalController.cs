@@ -92,25 +92,36 @@ namespace BackendSite.Controllers.Api
         {
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             var pageNumber = withdrawalListReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
-            var CurrencyAmount = new List<string>();
+            var currencyAmount = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(withdrawalListReq.UserName, ',');
             var startTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(withdrawalListReq.endDate);
 
-            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(withdrawalListReq.SelectSite,
-                withdrawalListReq.withdrawalType, startTime, endTime,
-                withdrawalListReq.WithdrawalId, userNames , withdrawalListReq.CurrencyId,
-                withdrawalListReq.status, withdrawalListReq.LevelStatus, withdrawalListReq.PageSize, withdrawalListReq.AmountType, withdrawalListReq.Amount, pageNumber, withdrawalListReq.WithdrawalMethod
-                , out totalPages,
-                out rowCount, ref CurrencyAmount);
+            var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(
+                withdrawalListReq.SelectSite,
+                withdrawalListReq.withdrawalType, 
+                startTime, 
+                endTime,
+                withdrawalListReq.WithdrawalId,
+                userNames , 
+                withdrawalListReq.CurrencyId,
+                withdrawalListReq.status, 
+                withdrawalListReq.LevelStatus, 
+                withdrawalListReq.PageSize, 
+                -1,
+                -1, 
+                pageNumber, 
+                withdrawalListReq.WithdrawalMethod,
+                new List<string>(),
+                new List<int>(),
+                "",
+                out var totalPages, out var rowCount, ref currencyAmount);
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = 0;
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            apiListResult.CurrencyAmount = new List<string>();
 
             return apiListResult;
         }
@@ -159,9 +170,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetWithdrawalRequestComment(WithdrawalReq withdrawalReq)
+        public ApiResult<IEnumerable<WithdrawalComments>> GetWithdrawalRequestComment(WithdrawalReq withdrawalReq)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<WithdrawalComments>>();
             var comments = withdrawalBLL.GetWithdrawalRequestComment(withdrawalReq.TransId);
             apiResult.Data = comments;
             apiResult.ErrorCode = 0;
@@ -291,9 +302,9 @@ namespace BackendSite.Controllers.Api
                     var custId = 0;
                     var amount = 0m;
                     withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId,
-                        withdrawalReq.Comment, User.Identity.Name,
+                        withdrawalReq.Comment, User.Identity.Name,authData.UserId,
                         Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType,
-                        out custId, out amount);
+                        null,out custId, out amount);
 
                     if (withdrawConfirmReuslt > 0 &&
                         ((withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment) ||
@@ -350,7 +361,7 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Draft)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, null, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Pending)
             {
@@ -774,7 +785,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult();
             try
             {
-                var result = withdrawalBLL.UpdateWithdrawalPicCount(para.TransId);
+                var result = withdrawalBLL.UpdateWithdrawalPicCount(para.TransId , 1 );
                 if (result)
                 {
                     var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
