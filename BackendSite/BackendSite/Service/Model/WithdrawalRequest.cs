@@ -30,8 +30,8 @@ namespace BackendSite.Service.Model
         }
         public int WithdrawalId { set; get; }
         public string TransId { set; get; }
-        public int WithdrawalType { set; get; }
-        public string WithdrawalTypeName => Enum.GetName(typeof(WithdrawalTypeEnum), WithdrawalType);
+        public WithdrawalTypeEnum WithdrawalType { set; get; }
+        public string WithdrawalTypeName => WithdrawalType.ToString();
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string Email { set; get; }
@@ -43,8 +43,8 @@ namespace BackendSite.Service.Model
         public decimal ChargeFee { set; get; }
         public string Memo { set; get; }
         public string Comment { set; get; }
-        public int Status { set; get; }
-        public string StatusName => Enum.GetName(typeof(WithdrawalStatusEnum), Status);
+        public WithdrawalStatusEnum Status { set; get; }
+        public string StatusName => Status.ToString();
         public string SiteName { set; get; }
         public string BankName { set; get; }
         public string BankCode { set; get; }
@@ -73,8 +73,8 @@ namespace BackendSite.Service.Model
         private string FromAccountDisplayName { set; get; }
         public string CalCode => WithdrawalType switch
         {
-            (int)WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -88,7 +88,7 @@ namespace BackendSite.Service.Model
         public int EWalletSysId { get; set; }
         public int? DeviceScore { set; get; }
         public string Agent { get; set; }
-        public List<int> UsableActionButton { set; get; }
+        public List<WithdrawalActionEnum> UsableActionButton { set; get; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
