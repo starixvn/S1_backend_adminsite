@@ -83,7 +83,25 @@ namespace BackendSite.Service.Model
         public int Flag { set; get; }
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
-        public string ChannelName { set; get; }
+        public string PayChannelName { get; set; }
+        
+        public string ChannelName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(CryptoCurrency))
+                {
+                    return CryptoCurrency == Network
+                        ? CryptoCurrency
+                        : $"{CryptoCurrency}-{Network}";
+                }
+                else
+                {
+                    return PayChannelName;
+                }
+            }
+        }
+        
         public string EWalletName { get; set; }
         public int EWalletSysId { get; set; }
         public int? DeviceScore { set; get; }
@@ -101,13 +119,10 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public string IFSCCode { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? FromSysId { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FromAccountName { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FromAccountNo { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -122,9 +137,18 @@ namespace BackendSite.Service.Model
         public string AccountType { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string NickName { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Network { set; get; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? EWalletSysId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? TempExchangeRate { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? TempExchangeAmount { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? ExchangeRate { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? ExchangeAmount { get; set; }
     }
     public class WithdrawalInfoForExport
     {

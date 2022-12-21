@@ -37,23 +37,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         public class ExportWithdrawalTimeReq
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public string WithdrawalId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
             public IEnumerable<int> Status { get; set; }
             public IEnumerable<int> CurrencyId { get; set; }
             public string MemberId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         #endregion
@@ -130,13 +120,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public async Task<IActionResult> Export(ExportWithdrawalTimeReq req)
         {
             var exportData =
-                await _withdrawalBll.WithdrawalTimeExportGet(JsonConvert.SerializeObject(req.SiteIds), req.WithdrawalId, req.StartDate.DateTime, req.EndDate.DateTime, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.MemberId);
+                await _withdrawalBll.WithdrawalTimeExportGet(JsonConvert.SerializeObject(req.SiteIds)
+                , req.WithdrawalId
+                , new DateTimeOffset(req.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , new DateTimeOffset(req.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , JsonConvert.SerializeObject(req.Status)
+                , JsonConvert.SerializeObject(req.CurrencyId)
+                , req.MemberId);
+            TimeSpan offset = req.StartDate.Offset;
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                data.CreateTime = data.CreateTime.ToOffset(offset);
+                data.UpdateTime = data.UpdateTime.ToOffset(offset);
                 if (data.FlowEndTime != null)
-                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, TimeSpan.Zero);
+                    data.FlowEndTime = data.FlowEndTime?.ToOffset(offset);
             }
             var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
