@@ -36,23 +36,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public class ExportDepositTimeReq
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<DepositStatusEnum> Statuses { get; set; }
             public string DepositId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
             public string MemberId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         #endregion
@@ -119,18 +109,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public async Task<IActionResult> Export(ExportDepositTimeReq req)
         {
-            var exportData = await _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds),
-                req.DepositId, req.StartDate.DateTime, req.EndDate.DateTime,
-                JsonConvert.SerializeObject(req.Statuses), JsonConvert.SerializeObject(req.CurrencyIds),req.MemberId);
-
+            
+            var exportData = await _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds)
+                , req.DepositId
+                , new DateTimeOffset(req.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , new DateTimeOffset(req.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , JsonConvert.SerializeObject(req.Statuses)
+                , JsonConvert.SerializeObject(req.CurrencyIds)
+                ,req.MemberId);
+            TimeSpan offset = req.StartDate.Offset;
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                data.CreateTime = data.CreateTime.ToOffset(offset);
+                data.UpdateTime = data.UpdateTime.ToOffset(offset);
                 if (data.EndFlowTime != null)
-                    data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, TimeSpan.Zero);
+                    data.EndFlowTime = data.EndFlowTime?.ToOffset(offset);
                 if (data.StatementTime != null)
-                    data.StatementTime = new DateTimeOffset(data.StatementTime.Value.DateTime, TimeSpan.Zero);
+                    data.StatementTime = data.StatementTime?.ToOffset(offset);
             }
 
             var stream = _excelBll.ExportV2(exportData);
