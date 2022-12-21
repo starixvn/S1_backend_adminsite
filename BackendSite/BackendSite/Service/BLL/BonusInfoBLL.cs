@@ -232,5 +232,18 @@ namespace BackendSite.Service.BLL
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);
         }
+
+        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
+        {
+            var result = new List<BonusCodeInfo>()
+            {
+                new BonusCodeInfo(){ BonusId = 0 , BonusCode = string.Empty }
+            };
+            if (bonusIdList.Any(i => i > 0))
+            {
+                result.AddRange(_bonusInfoService.GetBonusCodeList(bonusIdList));
+            }          
+            return result;
+        }
     }
 }

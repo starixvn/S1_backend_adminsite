@@ -23,7 +23,7 @@
 
     var i18n = new Dictionary<string, string>();
 
-    for (var currency = 1; currency <= 61; currency++)
+    for (var currency = 1; currency <= 74; currency++)
     {
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
@@ -40,7 +40,6 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/component/Marketing/VipLevelReview.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
@@ -48,4 +47,5 @@
         window.LangCode = 'en'
         window.subFuncKeys = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(subFuncKeys));
     </script>
+    <script src="~/js/component/Marketing/VipLevelReview.min.js" asp-append-version="true"></script>
 }

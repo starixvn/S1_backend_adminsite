@@ -10,7 +10,7 @@
 @{
     var i18n = new Dictionary<string, string>();
 
-    for (var currency = 1; currency <= 61; currency++)
+    for (var currency = 1; currency <= 74; currency++)
     {
         if (!string.IsNullOrEmpty(selLangBLL.GetResourceValue($"Currency_{currency}")))
             i18n.Add($"lbl_Currency{currency}", selLangBLL.GetResourceValue($"Currency_{currency}"));
@@ -26,11 +26,11 @@
 <div id="content">
 </div>
 @section Scripts {
+    <script type="text/javascript">
+            $('.collapse').collapse();
+            window.RootUrl = '@Url.Content("~/api")';
+            $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
+        </script>
     <script src="~/common/js/component/scrollbar/jquery.overlayScrollbars.min.js"></script>
     <script src="~/js/component/Home/DashBoard.min.js" asp-append-version="true"></script>
-    <script type="text/javascript">
-        $('.collapse').collapse();
-        window.RootUrl = '@Url.Content("~/api")';
-        $.extend(i18n, @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n)));
-    </script>
 }

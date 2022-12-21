@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
-    public class GetTransferAccountInfoParams
+    public class GetTransferAccountInfoListParams
     {
-        public GetTransferAccountInfoParams(int id)
+        public GetTransferAccountInfoListParams(int id)
         {
             IsSetting = true;
             StrCurrencyIds = "[]";
@@ -19,7 +19,7 @@ namespace BackendSite.Service.Model.BankFinancial
             AccountNo = string.Empty;
             Id = id;
         }
-        public GetTransferAccountInfoParams(GetTransferAccountInfoListRequest req)
+        public GetTransferAccountInfoListParams(GetTransferAccountInfoListRequest req)
         {
             IsSetting = false;
             SiteId = req.SiteId;

@@ -9,6 +9,10 @@ using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
+using System.Drawing;
+using System.Transactions;
+using BackendSite.Service.Library;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -25,6 +29,7 @@ namespace BackendSite.Service.BLL
         private readonly string _bucketName;
         private readonly string _bucketUrl;
         private readonly string _folder;
+        private readonly Cryptor _cryptor;
 
         #endregion
 
@@ -42,6 +47,7 @@ namespace BackendSite.Service.BLL
             _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
             _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
             _folder = configuration.GetValue<string>("AwsFinanceFolder");
+            _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
         #endregion
@@ -84,7 +90,7 @@ namespace BackendSite.Service.BLL
             return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
         
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoParams input)
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoListParams input)
         {
             return _bankFinancialService.GetTransferAccountInfoListV2(input);
         }
@@ -115,15 +121,8 @@ namespace BackendSite.Service.BLL
 
             if (!isCreate)
             {
-                oldData = GetTransferAccountInfoListForDisplay(true, input.SiteId, input.Id).FirstOrDefault();
-
-                affectTransferData = _bankFinancialService.GetTransferDataCount(oldData.AccountNo);
-
-                if (affectTransferData > 0)
-                {
-
-                    updateTransferDataFlag = CheckKeyValueForSetTransferAccount(input, oldData);
-                }
+                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoListParams(input.Id))
+                    .FirstOrDefault();
             }
 
             var transferAccountModel = new BankFinancialTransferAccountModel
@@ -142,8 +141,12 @@ namespace BackendSite.Service.BLL
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : input.BankLoginAccount,
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : input.BankLoginPassword,
+                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
+                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
+                LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : _cryptor.Encrypt(input.LoginPin),
+                MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : _cryptor.Encrypt(input.MobilePin),
+                TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : _cryptor.Encrypt(input.TransferPin),
+                CorporateID = string.IsNullOrWhiteSpace(input.CorporateID) ? string.Empty : _cryptor.Encrypt(input.CorporateID),
                 InitialAmount = input.InitialAmount,
                 InitialTime = input.InitialTime,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
@@ -171,8 +174,12 @@ namespace BackendSite.Service.BLL
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
                     oldData.BankLoginUrl,
-                    oldData.BankLoginAccount,
-                    oldData.BankLoginPassword,
+                    BankLoginAccount = oldData.BankLoginAccount,
+                    BankLoginPassword = oldData.BankLoginPassword,
+                    TransferPin = oldData.TransferPin,
+                    MobilePin = oldData.MobilePin,
+                    LoginPin = oldData.LoginPin,
+                    CorporateID = oldData.CorporateID,
                     InitialAmount = oldData.InitialAmount,
                     InitialTime = oldData.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = oldData.MaxBalanceAlertAmount,
@@ -188,8 +195,12 @@ namespace BackendSite.Service.BLL
                     AccountName = input.AccountName,
                     DisplayName = input.DisplayName,
                     input.BankLoginUrl,
-                    input.BankLoginAccount,
-                    input.BankLoginPassword,
+                    transferAccountModel.BankLoginAccount,
+                    transferAccountModel.BankLoginPassword,
+                    transferAccountModel.TransferPin,
+                    transferAccountModel.MobilePin,
+                    transferAccountModel.LoginPin,
+                    transferAccountModel.CorporateID,
                     InitialAmount = input.InitialAmount,
                     InitialTime = input.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
                     MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,

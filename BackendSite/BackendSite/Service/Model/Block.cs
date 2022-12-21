@@ -1,16 +1,29 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
-    public class Block
+    public class GetBlockIPListRequest : ApiRequestPageModel
     {
+        public string IP { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
     }
+    public class BlockIPPageData
+    {
+        public IEnumerable<BlockIP> BlockIP { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
+
     public class BlockIP
     {
-        public String IP { get; set; }
-        public String Memo { get; set; }
-        public String Operator { get; set; }
+        public string IP { get; set; }
+        public string Memo { get; set; }
+        public string Operator { get; set; }
         private DateTimeOffset _createTime { get; set; }
         public DateTimeOffset CreateTime
         {
@@ -19,6 +32,18 @@ namespace BackendSite.Service.Model
         }
         public string Location { get; set; }
     }
+    
+    public class BlockIPForUpload
+    {
+        public string IP
+        {
+            get => $"{_IP} 1;";
+            set => _IP = value;
+        }
+
+        private string _IP { get; set; }
+    }
+    
     public class BlockBankAcc
     {
         public int CustId { get; set; }

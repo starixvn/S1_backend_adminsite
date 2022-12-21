@@ -65,12 +65,12 @@ namespace BackendSite.Controllers.Api
                     PageSize = prizeSelect.PageSize,
                 };
 
-                var prizeSearchResult = prizeBLL.PrizeSearch(param, 8);
-                apiResult.Data = prizeSearchResult.DrawPrize;
+                var prizeSearchResult = prizeBLL.PrizeSearch(param, 8,out List<string> currencyAmount);
+                apiResult.Data = prizeSearchResult.Data;
                 apiResult.PageNumber = prizeSearchResult.PageNumber;
                 apiResult.TotalPages = prizeSearchResult.TotalPages;
                 apiResult.RowCount = prizeSearchResult.RowCount;
-                apiResult.CurrencyAmount = prizeSearchResult.CurrencyAmount;
+                apiResult.CurrencyAmount = currencyAmount;
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -157,7 +157,7 @@ namespace BackendSite.Controllers.Api
             var exportData = prizeBLL.GetExportData(selectSite, startDate, endDate, JsonConvert.SerializeObject(currencyIdList),
                JsonConvert.SerializeObject(eventNameList), 8);
 
-            var stream = excelBLL.Export(exportData);
+            var stream = excelBLL.ExportV2(exportData);
             return excelBLL.ExcelFile(stream, "DrawPrizeReport");
         }
     }

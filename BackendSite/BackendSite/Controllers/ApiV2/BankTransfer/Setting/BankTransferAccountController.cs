@@ -1,6 +1,7 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
@@ -19,6 +20,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         private readonly NewAuthorizeBLL _authorizeBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly ExcelBLL _excelBll;
+        private readonly Cryptor _cryptor;
 
         #endregion
 
@@ -29,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
         #endregion
@@ -41,18 +44,21 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>> GetList(GetTransferAccountInfoListRequest req)
+        public ApiResult<IEnumerable<BankFinancialTransferAccountDisplayModel>> GetList(GetTransferAccountInfoListRequest req)
         {
-            var result =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(req));
+            var list =
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req));
 
-            foreach (var data in result)
+            foreach (var data in list)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
+
+            var result = 
+                list.Select(x => new BankFinancialTransferAccountDisplayModel(x));
             
-            return new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>
+            return new ApiResult<IEnumerable<BankFinancialTransferAccountDisplayModel>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -68,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public IActionResult Export(GetTransferAccountInfoListRequest request)
         {
             var datas =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(request));
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(request));
 
             var result = datas.Select(x =>
                 new BankFinancialTransferAccountExportModel
@@ -88,13 +94,20 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     InitialAmount = x.InitialAmount,
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
                     Remark = x.Remark,
+                    BankLoginUrl = x.BankLoginUrl,
+                    BankLoginAccount = _cryptor.Decrypt(x.BankLoginAccount),
+                    BankLoginPassword = _cryptor.Decrypt(x.BankLoginPassword),
+                    TransferPin = _cryptor.Decrypt(x.TransferPin),
+                    LoginPin = _cryptor.Decrypt(x.LoginPin),
+                    MobilePin = _cryptor.Decrypt(x.MobilePin),
+                    CorporateID = _cryptor.Decrypt(x.CorporateID),
                     CreateTime = new DateTimeOffset(x.CreateTime.DateTime, TimeSpan.Zero),
                     Creator = x.CreatorName,
                     UpdateTime = new DateTimeOffset(x.UpdateTime.DateTime, TimeSpan.Zero),
                     Updator = x.UpdatorName
                 });
             
-            var stream = _excelBll.Export(result);
+            var stream = _excelBll.ExportV2(result);
             return _excelBll.ExcelFile(stream, "TransferAccountInfoList");
         }
         
@@ -107,16 +120,24 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoByIdRequest req)
         {
             var result =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(req.Id));
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req.Id));
 
             if (!result.Any())
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "The Transfer Account Detail Is Not Exist.");
             }
 
+            var data = result.FirstOrDefault();
+            data.BankLoginAccount = _cryptor.Decrypt(data.BankLoginAccount);
+            data.BankLoginPassword = _cryptor.Decrypt(data.BankLoginPassword);
+            data.TransferPin = _cryptor.Decrypt(data.TransferPin);
+            data.LoginPin = _cryptor.Decrypt(data.LoginPin);
+            data.MobilePin = _cryptor.Decrypt(data.MobilePin);
+            data.CorporateID = _cryptor.Decrypt(data.CorporateID);
+
             return new ApiResult<BankFinancialTransferAccountDetailModel>
             {
-                Data = result.FirstOrDefault(),
+                Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -156,7 +177,11 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 Updator = authData.UserId,
                 BankLoginUrl = req.BankLoginUrl,
                 BankLoginAccount = req.BankLoginAccount,
-                BankLoginPassword = req.BankLoginPassword
+                BankLoginPassword = req.BankLoginPassword,
+                TransferPin = req.TransferPin,
+                LoginPin = req.LoginPin,
+                MobilePin = req.MobilePin,
+                CorporateID = req.CorporateID
             }, authData.UserName);
 
             return new ApiResult

@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using System.ComponentModel;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -79,6 +80,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 支付ID
             /// </summary>
             public int PayId { get; set; }
+            
+            public int SiteId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -136,7 +139,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetTpGameListReq
         {
+            [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
             public int TpId { get; set; }
+            
+            [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
             public int CategoryId { get; set; }
         }
 
@@ -150,10 +156,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetPromoCategoryRequest
         {
             /// <summary>
-            /// 0=全部, 1=主錢包, 2=體育錢包
+            /// 0=All, 1=Seamless Wallet, 2=Transfer Wallet
             /// </summary>
-            public int WalletType { get; set; }
-
+            public int? WalletType { get; set; }
         }
 
         public class GameTypeListReq
@@ -256,8 +261,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var data = _bankDetailBll.GetOfflineBankAccount(request.SiteId, request.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.SettingStatus == BankCardManagementStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank);
+                            && x.Channel == TransferChannelEnum.LocalBank)
+                .OrderBy(x => x.SettingStatus);
             
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
@@ -283,7 +288,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<Pay>> GetPayList(GetPayListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<Pay>>();
-            var bankInfoPay = _bankDetailBll.GetBankInfoPay();
+            var bankInfoPay = _bankDetailBll.GetBankInfoPay(request.SiteId);
             var _payInfo = (from x in bankInfoPay
                             where x.CurrencyId == request.CurrencyId && x.SysId == request.PayId
                             select new Pay
@@ -448,7 +453,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<RiskGameCasinoData>>();
             try
             {
-                var gameCasinoData = await _gameCasinoBll.GameCasinoByTPIdV3(request.TpId);
+                var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(request.TpId);
                 apiResult.Data = gameCasinoData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -591,7 +596,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories(request.WalletType);
+                apiResult.Data = _bonusManageBll.GetPromoCategoriesV2(Convert.ToInt32(request.WalletType));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

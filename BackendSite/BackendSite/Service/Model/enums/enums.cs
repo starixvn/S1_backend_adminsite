@@ -73,6 +73,12 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
+    }
+
     #endregion
 
     #region Withdrawal Submission For Frontend Use
@@ -233,6 +239,13 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7, //No Use
         Error = 99 //No Use
     }
+    
+    public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
+    }
 
     #endregion
 
@@ -373,11 +386,32 @@ namespace BackendSite.Service.Model.enums
 
     #region AdjustWithdrawalLimitInfo
 
-    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    public enum WithdrawalLimitAdjustmentAdjustTypeEnum
     {
         Debit = 1,
-        Credit = 2,
-        //Bonus = 3  NoUse
+        Credit = 2
+    }
+    
+    public enum WithdrawalLimitAdjustmentReasonEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     public enum AdjustWithdrawalLimitInfoStatusEnum
@@ -414,19 +448,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
     public enum AdjustmentCategoryEnum
     {
         [Description("None - (Default)")]
@@ -469,18 +503,36 @@ namespace BackendSite.Service.Model.enums
         FstDeposit = 1,
         ReDeposit = 2,
         FreeBet = 3,
-        Special = 4,
-        WalletBonus = 5,
         Rebate = 6,
         Cashback = 7,
-        StaticPage = 8,
-        RetentionBonus = 9
+        SpecialBonus = 8,
+        RetentionFreeBet = 9
+    }
+
+    public enum PromotionCategoryEnum
+    {
+        SlotsGame = 1,
+        LiveCasino = 2,
+        Fish = 3,
+        SabaSports = 4,
+        Lottery = 5,
+        Sports = 6,
+        PTSlotsGame = 7,
+        PTLiveCasino = 8,
+        SBSW = 9,
+        Mega888SlotRNGAndFishing = 10
+    }
+
+    public enum FullFillTypeEnum
+    {
+        RollOver = 1,
+        WinOver = 2
     }
 
     public enum PromotionStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum PromotionPeriodTypeEnum
@@ -492,6 +544,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionDeviceTypeEnum
     {
+        [Description("不區分 DeviceType")]
+        GetAll = 0,
         All = 1,
         Web = 2,
         App = 3
@@ -508,6 +562,12 @@ namespace BackendSite.Service.Model.enums
         Transfer = 0,
         Seamless = 1
     }
+    
+    public enum BonusAtPageEnum
+    {
+        Promotion = 0,
+        Deposit = 1
+    }
 
     #endregion
 
@@ -515,8 +575,14 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionCashBackSettingStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Enable = 1,
+        Disable = 2
+    }
+    
+    public enum PromotionCashBackSettingLevelEnum
+    {
+        [Description("0代表包含所有 VIP 等級")]
+        All = 0
     }
 
     public enum ReferralCustStatusEnum
@@ -542,8 +608,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionSpecificStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum BonusTypeEnum
@@ -645,7 +711,8 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
-        TransferInfoManagement = 60
+        TransferInfoManagement = 60,
+        WithdrawalLimitAdjustment = 73
     }
 
     #region BankFinancialTransferInfoLog
@@ -868,6 +935,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0,
+        Fail = 1,
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -892,7 +969,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum AppLinkAppType
     {
-        Andriod = 1,
+        Android = 1,
         IOS = 2
     }
 
@@ -929,7 +1006,8 @@ namespace BackendSite.Service.Model.enums
     {
         Saba = 1,
         Mega = 22,
-        PT = 27
+        PT = 27,
+        SBSW = 41
     }
 
     public enum BalanceAdjustmentType
@@ -1209,7 +1287,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1240,7 +1318,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1297,5 +1375,41 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
+    public enum BlockEWalletStatus
+    { 
+        Lock = 1,
+        Unlock = 2
+    }
 }

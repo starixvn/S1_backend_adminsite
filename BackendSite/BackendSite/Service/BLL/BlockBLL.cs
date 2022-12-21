@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Net;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 
@@ -7,40 +8,42 @@ namespace BackendSite.Service.BLL
     public class BlockBLL
     {
         private readonly BlockService _blockService;
+        private readonly BlockIpToS3 _blockIpToS3;
         private readonly CustInfoService _custInfoService;
         private readonly Tools _tools;
+        
         public BlockBLL(IServiceProvider provider)
         {
             _blockService  = provider.GetRequiredService<BlockService>();
+            _blockIpToS3 = provider.GetRequiredService<BlockIpToS3>();
             _custInfoService = provider.GetRequiredService<CustInfoService>();
             _tools = provider.GetRequiredService<Tools>();
+            
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
+        public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
         {
-            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), Math.Abs(pageSize), out totalPages, out rowCount);
-            if(result != null)
+            return await _blockService.GetBlockIPList(ip, startDate, endDate, pageNumber, Math.Abs(pageSize));
+        }
+        public async Task<int> SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
+        {
+            if (!IPAddress.TryParse(input.After.IP, out _))
+                return 0;
+
+            var returnValue = _blockService.SetBlockIP(input);
+            if (returnValue > 0)
             {
-                var ipCountryList = GetIPCountryList().ToList();
-                result.ToList().ForEach(x =>
-                {
-                    var ip = _tools.getIpNum(x.IP);
-                    var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
-                    if(location != null)
-                    {
-                        x.Location = location.Country;
-                    }
-                });
+                returnValue = await _blockIpToS3.Upload();
             }
-            return result;
+            return returnValue;
         }
-        public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
+        public async Task<int> DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
-            return _blockService.SetBlockIP(input);
-        }
-        public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
-        {
-            return _blockService.DeleteBlockIP(input);
+            var returnValue = _blockService.DeleteBlockIP(input);
+            if (returnValue > 0)
+            {
+                returnValue = await _blockIpToS3.Upload();
+            }
+            return returnValue;
         }
         public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
@@ -54,10 +57,6 @@ namespace BackendSite.Service.BLL
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
             return _blockService.BlockAccountSet(input);
-        }
-        private IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _blockService.GetIPCountryList();
         }
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {

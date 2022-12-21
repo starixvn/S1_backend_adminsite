@@ -220,6 +220,7 @@ namespace BackendSite.Service.Model
         public string LevelName { get; set; }
 
         public int Times { get; set; }
+        public decimal TotalWithdrawalMax { get; set; }
     }
     
     public class SetWithdrawalLimitInfo
@@ -229,6 +230,7 @@ namespace BackendSite.Service.Model
         public string VipLevelName { get; set; }
         public int WithdrawalMin { get; set; }
         public int WithdrawalMax { get; set; }
+        public int TotalWithdrawalMax { get; set; }
         [LogPropertyName("WithdrawalFrequency")]
         public int Times { get; set; }
     }
@@ -237,6 +239,7 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public double Amount { get; set; }
 
     }
@@ -433,5 +436,17 @@ namespace BackendSite.Service.Model
         public string Operator { set; get; }
         public DateTimeOffset? UpdateTime { set; get; }
         public DateTimeOffset? FlowEndTime { set; get; }
+    }
+    public class WithdrawalManualRequest
+    {
+        public string TransId { set; get; }
+        public string ThirdId { get; set; }
+        public string Operator { get; set; }
+    }
+    public class WithdrawalManualResponse
+    {
+        public int ErrorCode { get; set; }
+
+        public string Message { get; set; }
     }
 }

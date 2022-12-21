@@ -1,5 +1,3 @@
-using System;
-
 namespace BackendSite.Service.Model.Store
 {
     public class LastUpdateModel

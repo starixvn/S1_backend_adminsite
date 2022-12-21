@@ -337,7 +337,7 @@ import DateTimePicker from 'react-datetime';
             }
         }
 
-        /* Fatty pay 手動 Approval  */
+        /*  手動 Approval  */
         depositManualApproval() {
             let confirmString = "Are you sure deposit Manual Approval ?";
             if (confirm(confirmString)) {
@@ -424,7 +424,7 @@ import DateTimePicker from 'react-datetime';
                     btnGroup.push(<button key={7} type="button" className="btn btn-deposit-hold" onClick={this.onConfirm.bind(this, 7)}>On Hold(Risk Check)</button>);
                 if (data.status == dS.Pending && (data.depositType == 3 || data.depositType == 4))
                     btnGroup.push(<button key={3} type="button" className="btn btn-deposit-approved" onClick={this.onConfirm.bind(this, 3)}>Approved</button>);
-                if (data.status != dS.Approved && payid == 28 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* FattyPay=>payId是28 才顯示這顆按鈕。 */
+                if (data.status != dS.Approved && data.depositType != 3 && subFuncKeys.indexOf("f_dp_editAmount") > -1) /* depositType不為LocalBank 才顯示這顆按鈕。 */
                     btnGroup.push(<button type="button" className="btn btn-deposit-approved" onClick={this.depositManualApproval.bind(this)}>Manual Approved</button>);
                 if (data.status == dS.Pending)
                     btnGroup.push(<button key={4} type="button" className="btn btn-deposit-rejected" onClick={this.onConfirm.bind(this, 4)}>Rejected</button>);
@@ -1020,12 +1020,10 @@ import DateTimePicker from 'react-datetime';
                         searchFilter.selectType.forEach(function (obj) {
                             state.selectType.push(parseInt(obj));
                         })
-                        : Object.keys(TypeSelectOp).forEach(function (obj) {
-                            state.selectType.push(parseInt(obj));
-                        });
+                        : state.selectType.push(3);
                 }
             });
-            (state.MutiSelRefresh) ? $('#selectType').multiselect('select', searchFilter.selectType) : $('#selectType').multiselect('selectAll', false);
+            (state.MutiSelRefresh) ? $('#selectType').multiselect('select', searchFilter.selectType) : $('#selectType').multiselect('select', 3);
             $('#selectType').multiselect('updateButtonText');
         }
         
@@ -1334,7 +1332,7 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-10, 'days').format('l')} />
+                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-2, 'days').format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">

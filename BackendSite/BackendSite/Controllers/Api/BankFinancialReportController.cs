@@ -192,7 +192,7 @@ namespace BackendSite.Controllers.Api
             data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return _excelBLL.ExcelFile(stream, "TransferInfoReport");
         }
@@ -264,7 +264,7 @@ namespace BackendSite.Controllers.Api
                                                                 StartDate,
                                                                 EndDate,
                                                                 _common.TransferToTimeZoneFormat(8));
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return File(stream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
