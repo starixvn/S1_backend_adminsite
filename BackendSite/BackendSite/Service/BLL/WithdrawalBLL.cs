@@ -142,6 +142,11 @@ namespace BackendSite.Service.BLL
             var withdrawalInfo =
                 JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
             withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
+            if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.CryptoWallet)
+            {
+                withdrawalInfo.ExchangeRate = withdrawalInfo.TempExchangeRate;
+                withdrawalInfo.ExchangeAmount = withdrawalInfo.TempExchangeAmount;
+            }
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatusEnum.Approved, JsonConvert.SerializeObject(withdrawalInfo),

@@ -119,13 +119,10 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public string IFSCCode { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? FromSysId { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FromAccountName { get; set; }
-        //[JsonIgnore]
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string FromAccountNo { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -140,9 +137,18 @@ namespace BackendSite.Service.Model
         public string AccountType { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string NickName { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Network { set; get; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? EWalletSysId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? TempExchangeRate { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? TempExchangeAmount { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? ExchangeRate { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public decimal? ExchangeAmount { get; set; }
     }
     public class WithdrawalInfoForExport
     {
