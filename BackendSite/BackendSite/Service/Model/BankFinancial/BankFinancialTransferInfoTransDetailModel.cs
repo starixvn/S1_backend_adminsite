@@ -237,20 +237,54 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName { get; set; }
+        
+        public string ReceiptUrl { get; set; }
+    }
+    
+    public class BankTransferInfoSetRequest
+    {
+        private DateTimeOffset _transDate;
+        public string TransferId { get; set; }
+        public TransactionTypeEnum TransactionType { get; set; }
+        public TransferTypeEnum TransferType { get; set; }
+        public DateTimeOffset TransDate
+        {
+            get => _transDate;
+            set => _transDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            
+        }
+        public SiteEnum SiteId { get; set; }
 
-        /// <summary>
-        /// 圖檔名稱
-        /// </summary>
-        public string UploadReceiptName { get; set; }
+        #region From Data
 
-        /// <summary>
-        /// 圖檔Binary
-        /// </summary>
-        public byte[] TransferPic { get; set; }
+        public TransferChannelEnum FromChannel { get; set; }
+        public string FromAgent { get; set; }
+        public int? FromPayId { get; set; }
+        public int FromCurrencyId { get; set; }
+        public int FromSysId { get; set; }
+        public string FromAccountNo { get; set; }
+        public string FromAccountDisplayName { get; set; }
+        public decimal FromAmount { get; set; }
+        public decimal FromFee { get; set; }
 
-        /// <summary>
-        /// 讀寫 上傳收據
-        /// </summary>
+        #endregion
+
+        #region To Data
+
+        public TransferChannelEnum ToChannel { get; set; }
+        public string ToAgent { get; set; }
+        public int? ToPayId { get; set; }
+        public int ToCurrencyId { get; set; }
+        public int ToSysId { get; set; }
+        public string ToAccountNo { get; set; }
+        public string ToAccountDisplayName { get; set; }
+        public decimal ToAmount { get; set; }
+        public decimal ToFee { get; set; }
+
+        #endregion
+
+        public int? Reason { get; set; }
+        public string Remark { get; set; }
         public IFormFile UploadReceipt { get; set; }
     }
 }

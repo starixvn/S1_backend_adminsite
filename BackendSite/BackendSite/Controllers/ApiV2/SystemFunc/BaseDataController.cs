@@ -5,6 +5,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
@@ -788,6 +789,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        [HttpPost]
+        public ApiResult GetTransferAccountList(GetAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
         
         #region Private Methods
 

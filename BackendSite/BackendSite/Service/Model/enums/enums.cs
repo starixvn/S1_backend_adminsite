@@ -717,6 +717,7 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
+        TransferInfoManagement = 60,
         SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73
     }
@@ -863,23 +864,22 @@ namespace BackendSite.Service.Model.enums
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
-    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
-        [Description("只有加項")] OnlyPlus = 1,
+        [Description("Plus")] OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
-        [Description("只有減項")] OnlyMinus = 2,
+        [Description("Minus")] OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
-        [Description("一加一減")] PlusAndMinus = 3
+        [Description("FromTo")] PlusAndMinus = 3
     }
 
     /// <summary>
@@ -887,25 +887,43 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferTypeEnum
     {
-        /// <summary>
-        /// 存款(客戶戶頭=>公司戶頭)
-        /// </summary>
-        Deposit = 1,
-
-        /// <summary>
-        /// 提款(公司戶頭=>客戶戶頭)
-        /// </summary>
-        Withdrawal = 2,
-
-        /// <summary>
-        /// 轉帳(公司戶頭=>公司戶頭)
-        /// </summary>
-        Transfer = 3,
-
-        /// <summary>
-        /// 其他(手續費、利息...)
-        /// </summary>
-        Other = 4
+        Undefined = 0,
+        [Description("PSP")]
+        Psp = 2,
+        [Description("LOCAL BANK")]
+        LocalBank = 3,
+        [Description("BOUNC BACK")]
+        BounceBack = 4,
+        [Description("MARKETING")]
+        Marketing = 5,
+        [Description("BONUS")]
+        Bonus = 6,
+        [Description("INTEREST")]
+        Interest = 7,
+        [Description("TOP UP PHONE")]
+        ToUpPhone = 8,
+        [Description("FEES")]
+        Fees = 9,
+        [Description("UNCLAIM")]
+        Unclaimed = 10,
+        [Description("OVERCREDIT")]
+        OverCredit = 11,
+        [Description("OVERPAID")]
+        OverPaid = 12,
+        [Description("FRAUD")]
+        Fraud = 13,
+        [Description("FREEZE")]
+        Freeze = 14,
+        [Description("CURRENCY CONVERSION")]
+        CurrencyConversion = 15,
+        [Description("HEAD OFFICE")]
+        HeadOffice = 16,
+        [Description("FINANCE")]
+        Finance = 17,
+        [Description("ADVANCED")]
+        Advanced = 18,
+        [Description("TEST")]
+        Test = 19
     }
 
     /// <summary>
