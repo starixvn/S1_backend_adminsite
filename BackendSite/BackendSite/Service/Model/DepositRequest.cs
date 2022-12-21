@@ -358,6 +358,7 @@ namespace BackendSite.Service.Model
     public class DepositMessageRequest
     {
         public DepositMessageStatus Status { get; set; }
+        public string StatusName { get; set; }
         public int DepositId { get; set; }
     }
 }
