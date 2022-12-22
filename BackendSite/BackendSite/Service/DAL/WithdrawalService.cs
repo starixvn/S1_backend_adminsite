@@ -466,7 +466,8 @@ namespace BackendSite.Service.DAL
                 result = SetWithdrawalInfo(withdrawalId, siteId, comment,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
-                    (status == WithdrawalStatusEnum.Approved ? null : withdrawalInfo),
+                    (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
+                        ? null : withdrawalInfo),
                     withdrawalType,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
