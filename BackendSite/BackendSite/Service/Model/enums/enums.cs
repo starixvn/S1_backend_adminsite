@@ -1312,6 +1312,7 @@ namespace BackendSite.Service.Model.enums
         EWallet = 1,
         BankCard = 2
     }
+
     public enum CustBankInfoLogStatus
     {
         Create = 1,

@@ -1,4 +1,6 @@
+
 using BackendSite.Extensions;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -372,11 +374,11 @@ namespace BackendSite.Service.Model
     public class CheckPayoutBonusCodeRep
     {
         /// <summary>
-        /// PromotionÃþ«¬
+        /// Promotionï¿½ï¿½ï¿½ï¿½
         /// </summary>
         public int PromotionType { get; set; }
         /// <summary>
-        /// ¬õ§QºØÃþ
+        /// ï¿½ï¿½ï¿½Qï¿½ï¿½ï¿½ï¿½
         /// 1 = Percentage,
         /// 2 = Amount
         /// </summary>
@@ -387,7 +389,7 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
         /// <summary>
-        /// Promotionªº¿ú¥]Ãþ«¬¡G
+        /// Promotionï¿½ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½G
         /// 0 = Transfer Wallet
         /// 1 = Seamless Wallet
         /// </summary>
