@@ -1381,31 +1381,4 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Reject = 7
     }
-    public enum NovaVipLevelEnum
-    {
-        VintageClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        NovaClub = 6
-    }
-    public enum Goal123VipLevelEnum
-    {
-        BronzeClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        Goal123Club = 6
-    }
-    public enum BwingVipLevelEnum
-    {
-        BronzeClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        BwingVvvip = 6
-    }
 }
