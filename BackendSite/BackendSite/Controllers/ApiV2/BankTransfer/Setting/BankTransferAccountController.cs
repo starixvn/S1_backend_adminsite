@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoListByIdRequest req)
+        public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoByIdRequest req)
         {
             var result =
                 _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req.Id));
@@ -235,7 +235,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-
+        
         #endregion
     }
 }
