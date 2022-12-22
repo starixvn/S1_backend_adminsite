@@ -45,7 +45,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> CurrencyId { get; set; }
-            public IEnumerable<int> VipLevel { get; set; }
         }
 
         public class UpdateVipUpgradeReviewReq
@@ -63,7 +62,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> CurrencyId { get; set; }
-            public IEnumerable<int> VipLevel { get; set; }
         }
 
         public class ExportVipUpgradeReviewListReq
@@ -83,7 +81,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> CurrencyId { get; set; }
-            public IEnumerable<int> VipLevel { get; set; }
         }
 
         #endregion
@@ -104,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<VipUpgradeReviewDetailModel> GetUpgradeList(VipUpgradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, req.PageNumber, req.PageSize, JsonConvert.SerializeObject(req.CurrencyId), JsonConvert.SerializeObject(req.VipLevel));
+            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, req.PageNumber, req.PageSize, JsonConvert.SerializeObject(req.CurrencyId));
 
             foreach (var data in result.Data)
             {
@@ -139,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public IActionResult ExportUpgradeList(ExportVipUpgradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, JsonConvert.SerializeObject(req.CurrencyId), JsonConvert.SerializeObject(req.VipLevel));
+            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, JsonConvert.SerializeObject(req.CurrencyId));
             var exportList = data.Select(d => new ExportVipUpgradeReviewModel
             {
                 SiteId = d.SiteId,
@@ -176,6 +173,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public ApiResult UpdateUpgrade(UpdateVipUpgradeReviewReq req)
         {
@@ -213,7 +211,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResult<VipDowngradeReviewDetailModel> GetDowngradeList(VipDowngradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName, JsonConvert.SerializeObject(req.VipLevel), req.PageNumber, req.PageSize);
+            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName, req.PageNumber, req.PageSize);
             foreach (var data in result.Data)
             {
                 data.CalculateTime = new DateTimeOffset(data.CalculateTime.DateTime, TimeSpan.Zero);
@@ -247,7 +245,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public IActionResult ExportDowngradeList(ExportVipDowngradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName, JsonConvert.SerializeObject(req.VipLevel));
+            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName);
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
             {
                 SiteId = d.SiteId,
@@ -287,6 +285,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public ApiResult UpdateDowngrade(UpdateVipUpgradeReviewReq req)
         {
@@ -308,37 +307,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Update Fail."
                 };
             }
-        }
-
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 1 })]
-        [HttpPost]
-        public ApiResult GetVipLevelType()
-        {
-            var apiResult = new ApiResult<List<EnumTypeModel>>();
-            var result = new List<EnumTypeModel>();
-            int siteId = _newAuthorizeBLL.CheckBrand();
-            var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
-            string EnumName = siteId switch
-            {
-                1 => "NovaVipLevelEnum",
-                2 => "Goal123VipLevelEnum",
-                3 => "BwingVipLevelEnum",
-                _ => ""
-            };
-            var getType = allTypes.FirstOrDefault(t => string.Equals(t.Name, EnumName, StringComparison.OrdinalIgnoreCase));
-
-            foreach (var enumValue in Enum.GetValues(getType))
-            {
-                result.Add(new EnumTypeModel
-                {
-                    Name = Enum.GetName(getType, enumValue),
-                    Value = (int)enumValue
-                });
-            }
-            apiResult.Data = result;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
         }
         #endregion
     }

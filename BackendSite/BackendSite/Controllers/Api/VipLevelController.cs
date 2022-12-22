@@ -255,13 +255,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x=> x.SiteId == request.SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-            var vipLevelList = new List<int>();
-            vipLevelList.Add((int)NovaVipLevelEnum.VintageClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.SilverClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.GoldClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.TitaniumClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.DiamondClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.NovaClub);
             var statusList = new List<int>();
             if (request.Status == 0)
             {
@@ -281,8 +274,7 @@ namespace BackendSite.Controllers.Api
                 request.UserName,
                 request.PageNumber,
                 request.PageSize,
-                JsonConvert.SerializeObject(currencyIdList),
-                JsonConvert.SerializeObject(vipLevelList));
+                JsonConvert.SerializeObject(currencyIdList));
 
 
             foreach (var data in result.Data)
@@ -312,13 +304,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-            var vipLevelList = new List<int>();
-            vipLevelList.Add((int)NovaVipLevelEnum.VintageClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.SilverClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.GoldClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.TitaniumClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.DiamondClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.NovaClub);
             var statusList = new List<int>();
             if (Status == 0)
             {
@@ -336,8 +321,7 @@ namespace BackendSite.Controllers.Api
                 YearMonth,
                 JsonConvert.SerializeObject(statusList),
                 UserName,
-                JsonConvert.SerializeObject(currencyIdList),
-                JsonConvert.SerializeObject(vipLevelList));
+                JsonConvert.SerializeObject(currencyIdList));
 
 
 
@@ -400,13 +384,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == request.SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-            var vipLevelList = new List<int>();
-            vipLevelList.Add((int)NovaVipLevelEnum.VintageClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.SilverClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.GoldClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.TitaniumClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.DiamondClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.NovaClub);
             var statusList = new List<int>();
             if (request.Status == 0)
             {
@@ -425,7 +402,6 @@ namespace BackendSite.Controllers.Api
                 JsonConvert.SerializeObject(statusList),
                 JsonConvert.SerializeObject(currencyIdList),
                 request.UserName,
-                JsonConvert.SerializeObject(vipLevelList),
                 request.PageNumber,
                 request.PageSize);
 
@@ -469,13 +445,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-            var vipLevelList = new List<int>();
-            vipLevelList.Add((int)NovaVipLevelEnum.VintageClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.SilverClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.GoldClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.TitaniumClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.DiamondClub);
-            vipLevelList.Add((int)NovaVipLevelEnum.NovaClub);
             var statusList = new List<int>();
             if (Status == 0)
             {
@@ -493,8 +462,7 @@ namespace BackendSite.Controllers.Api
                 CalculateYearMonth,
                 JsonConvert.SerializeObject(statusList),
                 JsonConvert.SerializeObject(currencyIdList),
-                UserName,
-                JsonConvert.SerializeObject(vipLevelList));
+                UserName);
 
 
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
