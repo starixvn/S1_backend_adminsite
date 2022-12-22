@@ -453,7 +453,8 @@ namespace BackendSite.Service.DAL
                 result = SetWithdrawalInfo(withdrawalId, siteId, comment,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
-                    (status == WithdrawalStatusEnum.Approved ? null : withdrawalInfo),
+                    (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
+                        ? null : withdrawalInfo),
                     withdrawalType,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
@@ -595,7 +596,7 @@ namespace BackendSite.Service.DAL
                 Comment = comment,
                 ForStatus = forStatus,
                 Status = (int)status,
-                _WithdrawalInfo = withdrawalInfo,
+                WithdrawalInfo = withdrawalInfo,
                 WithdrawalType = withdrawalType,
                 RefId = (string)null,
                 Operator = updater
@@ -607,12 +608,12 @@ namespace BackendSite.Service.DAL
             if (conn == null)
             {
                 //No execute in transaction
-                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_Test", p);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set", p);
             }
             else
             {
                 //Execute in transaction
-                result = conn.Execute("Admin_WithdrawalInfo_Set_Test", p, trans, commandType: CommandType.StoredProcedure);
+                result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
             }
 
             custId = p.Get<int?>("CustId") ?? 0;
