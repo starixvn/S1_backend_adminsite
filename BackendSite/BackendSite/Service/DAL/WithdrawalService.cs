@@ -595,7 +595,7 @@ namespace BackendSite.Service.DAL
                 Comment = comment,
                 ForStatus = forStatus,
                 Status = (int)status,
-                WithdrawalInfo = withdrawalInfo,
+                _WithdrawalInfo = withdrawalInfo,
                 WithdrawalType = withdrawalType,
                 RefId = (string)null,
                 Operator = updater
@@ -607,12 +607,12 @@ namespace BackendSite.Service.DAL
             if (conn == null)
             {
                 //No execute in transaction
-                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set", p);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_Test", p);
             }
             else
             {
                 //Execute in transaction
-                result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                result = conn.Execute("Admin_WithdrawalInfo_Set_Test", p, trans, commandType: CommandType.StoredProcedure);
             }
 
             custId = p.Get<int?>("CustId") ?? 0;
