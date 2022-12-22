@@ -195,6 +195,7 @@ namespace BackendSite.Service.BLL
             {
                 CustId = customer.CustId,
                 VipLevel = customer.VipLevel,
+                LevelName = customer.LevelName,
                 VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,
