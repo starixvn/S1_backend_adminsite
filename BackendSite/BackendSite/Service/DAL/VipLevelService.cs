@@ -123,7 +123,6 @@ namespace BackendSite.Service.DAL
             int pageSize,
             int startIndex,
             string currencyIds,
-            string vipLevel,
             out int totalPages,
             out int rowCount)
         {
@@ -133,7 +132,6 @@ namespace BackendSite.Service.DAL
             props.Add("_SelectStatus", selectStatus);
             props.Add("_UserName", userName);
             props.Add("_CurrencyIds", currencyIds);
-            props.Add("_VipLevel", vipLevel);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -164,7 +162,6 @@ namespace BackendSite.Service.DAL
             string selectStatus,
             string currencyId,
             string userName,
-            string vipLevel,
             int pageSize,
             int startIndex,
             out int totalPages,
@@ -176,7 +173,6 @@ namespace BackendSite.Service.DAL
             props.Add("_SelectStatus", selectStatus);
             props.Add("_CurrencyIds", currencyId);
             props.Add("_UserName", userName);
-            props.Add("_VipLevel", vipLevel);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);

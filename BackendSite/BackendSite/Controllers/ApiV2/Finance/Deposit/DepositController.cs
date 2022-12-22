@@ -518,6 +518,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 73 })]
         public ApiResult DepositMessageStatusList()
         {
             var apiResult = new ApiResult<List<EnumTypeModel>>();
@@ -537,8 +539,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return apiResult;
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 73 })]
         public ApiResult SetDepositMessage(ApiRequestWithLog<DepositMessageRequest> request)
         {
+            request.After.StatusName = request.After.Status.ToString();
             if (_depositBll.SetDepositMessage(
                     new ParamsWithLog<DepositMessageRequest>(request, User.Identity.Name)) > 0)
             {

@@ -61,9 +61,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// <param name="req"></param>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 35, 1 })]
-        public async Task<ApiListResult<WithdrawalTimeList>> GetList(WithdrawalTimeReportPara req)
+        public async Task<ApiListResultCurrencyAmount<WithdrawalTimeList>> GetList(WithdrawalTimeReportPara req)
         {
-            var apiListResult = new ApiListResult<WithdrawalTimeList>();
+            var apiListResult = new ApiListResultCurrencyAmount<WithdrawalTimeList>();
             try
             {
                 if (!string.IsNullOrWhiteSpace(req.MemberId))
@@ -96,6 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 apiListResult.TotalPages = searchResult.TotalPages;
                 apiListResult.RowCount = searchResult.RowCount;
                 apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiListResult.CurrencyAmountRecord = currencyTotalAmount;
             }
             catch (Exception ex)
             {

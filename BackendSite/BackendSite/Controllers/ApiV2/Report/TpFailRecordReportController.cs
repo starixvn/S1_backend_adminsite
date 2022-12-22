@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Authorize(AuthenticationSchemes = "backend")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpFailRecordReportController : ControllerBase
@@ -157,7 +157,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 1 })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 1 })]
         public ApiListResult<TpFailRecordReport> GetList(GetListRequest request)
         {
             var siteInfoList = _serverInfoBll.GetSiteList();
@@ -233,7 +234,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="timezone">匯出資料顯示的時區(-12~14)</param>
         /// <returns>Excel File</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportV1(string siteIds,
             int tpId,
@@ -285,7 +287,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>Excel File</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
         public IActionResult Export(ExportRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.TransId))
