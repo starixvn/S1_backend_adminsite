@@ -49,16 +49,16 @@ namespace BackendSite.Controllers.ApiV2.Report
             };
         }
 
-        // [HttpPost]
-        // public IActionResult ExportDepositReport(GetDepositPaymentReportRequest request)
-        // {
-        //     var data = _reportBll.GetDepositPaymentReport(
-        //         new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-        //     
-        //     var result = _reportBll.ExportPaymentReport(data);
-        //
-        //     return _excelBll.ExcelFile(result, "DepositReport");
-        // }
+        [HttpPost]
+        public async Task<IActionResult> ExportDepositReport(GetDepositPaymentReportRequest request)
+        {
+            var data = await _reportBll.GetDepositPaymentReportAsync(
+                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+            
+            var result = ReportBLL.ExportPaymentReport<DepositPaymentReportSummary, DepositPaymentReportDetail>(data);
+        
+            return _excelBll.ExcelFile(result, "DepositReport");
+        }
         
         [HttpPost]
         public async Task<ApiResult> GetWithdrawalReport(GetWithdrawalPaymentReportRequest request)
@@ -78,16 +78,16 @@ namespace BackendSite.Controllers.ApiV2.Report
             };
         }
         
-        // [HttpPost]
-        // public IActionResult ExportWithdrawalReport(GetWithdrawalPaymentReportRequest request)
-        // {
-        //     var data = _reportBll.GetWithdrawalPaymentReport(
-        //         new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-        //     
-        //     var result = _reportBll.ExportPaymentReport(data);
-        //
-        //     return _excelBll.ExcelFile(result, "WithdrawalReport");
-        // }
+        [HttpPost]
+        public async Task<IActionResult> ExportWithdrawalReport(GetWithdrawalPaymentReportRequest request)
+        {
+            var data = await _reportBll.GetWithdrawalPaymentReportAsync(
+                new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
+            
+            var result = ReportBLL.ExportPaymentReport<WithdrawalPaymentReportSummary, WithdrawalPaymentReportDetail>(data);
+        
+            return _excelBll.ExcelFile(result, "WithdrawalReport");
+        }
         
         [HttpPost]
         public ApiResult GetDepositType()

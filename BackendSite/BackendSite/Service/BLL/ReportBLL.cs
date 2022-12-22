@@ -1020,7 +1020,18 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<DepositPaymentReportSummary>> GetDepositPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
-            var detailList = reportService.GetPaymentReportDepositDetail(input);
+            var detailList = reportService.GetPaymentReportDepositDetail(input)
+                .ToList();
+
+            if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
+            {
+                detailList.ForEach(x =>
+                {
+                    x.CreateTime = x.CreateTime.ToOffset(offset);
+                    x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
+                });
+            }
+            
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, GetEndDateForExchangeRate(input.EndTime))).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1055,8 +1066,8 @@ namespace BackendSite.Service.BLL
                             TotalDepositAmount = decimal.Round(gTotalDepositAmount, 4),
                             AverageProcessingTime =
                                 TimeSpan.FromMilliseconds(
-                                        gg.Average(x => x.FlowEndTime.UtcTicks - x.CreateTime.UtcTicks))
-                                    .ToString(@"hh\:mm\:ss")
+                                        gg.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                                    .ToString(@"d\.hh\:mm\:ss")
                         };
                     });
 
@@ -1072,8 +1083,8 @@ namespace BackendSite.Service.BLL
                     FirstDepositCount = g.Count(x => x.FirstDeposit),
                     TotalDepositAmount = decimal.Round(totalDepositAmount, 4),
                     AverageProcessingTime =
-                        TimeSpan.FromMilliseconds(g.Average(x => x.FlowEndTime.UtcTicks - x.CreateTime.UtcTicks))
-                            .ToString(@"hh\:mm\:ss")
+                        TimeSpan.FromMilliseconds(g.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                            .ToString(@"d\.hh\:mm\:ss")
                 };
             });
                 
@@ -1083,7 +1094,18 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<WithdrawalPaymentReportSummary>> GetWithdrawalPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
-            var detailList = reportService.GetPaymentReportWithdrawalDetail(input);
+            var detailList = reportService.GetPaymentReportWithdrawalDetail(input)
+                .ToList();
+            
+            if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
+            {
+                detailList.ForEach(x =>
+                {
+                    x.CreateTime = x.CreateTime.ToOffset(offset);
+                    x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
+                });
+            }
+            
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, input.EndTime)).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1111,13 +1133,14 @@ namespace BackendSite.Service.BLL
 
                         return new WithdrawalPaymentReportDetail
                         {
+                            Key = gg.Key.ToString(),
                             TotalWithdrawalCount = gCount,
                             AverageWithdrawalAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
                             TotalWithdrawalAmount = decimal.Round(gTotalDepositAmount, 4),
                             AverageProcessingTime =
                                 TimeSpan.FromMilliseconds(
-                                        gg.Average(x => x.FlowEndTime.UtcTicks - x.CreateTime.UtcTicks))
-                                    .ToString(@"hh\:mm\:ss")
+                                        gg.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                                    .ToString(@"d\.hh\:mm\:ss")
                         };
                     });
 
@@ -1132,15 +1155,17 @@ namespace BackendSite.Service.BLL
                     AverageWithdrawalAmount = decimal.Round(totalDepositAmount / count, 4),
                     TotalWithdrawalAmount = decimal.Round(totalDepositAmount, 4),
                     AverageProcessingTime =
-                        TimeSpan.FromMilliseconds(g.Average(x => x.FlowEndTime.UtcTicks - x.CreateTime.UtcTicks))
-                            .ToString(@"hh\:mm\:ss")
+                        TimeSpan.FromMilliseconds(g.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                            .ToString(@"d\.hh\:mm\:ss")
                 };
             });
                 
             return result;
         }
 
-        public byte[] ExportPaymentReport<T>(Dictionary<string, Dictionary<string, T>> data) where T : class
+        public static byte[] ExportPaymentReport<TSummary, TDetail>(IEnumerable<TSummary> data)
+            where TSummary: class, IPaymentReportSummary<TDetail>
+            where TDetail: class
         {
             if (!data.Any())
             {
@@ -1150,7 +1175,7 @@ namespace BackendSite.Service.BLL
             var workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Report");
 
-            sheet.CreateHeaders<T>(freeze: true, index: 1);
+            sheet.CreateHeaders<TDetail>(freeze: true, index: 1);
             
             var gCellStyle = workbook.CreateCellStyle();
             gCellStyle.BorderBottom = BorderStyle.Medium;
@@ -1161,30 +1186,44 @@ namespace BackendSite.Service.BLL
             subCellStyle.BorderBottom = BorderStyle.Thin;
             subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
             subCellStyle.FillPattern = FillPattern.SolidForeground;
-            
-            var props = typeof(T).GetProperties();
+
+            var skipSProps = new[] {"Children"};
+            var dProps = typeof(TDetail).GetProperties();
+            var sProps = typeof(TSummary).GetProperties()
+                .Where(x => !skipSProps.Contains(x.Name));
             var index = 1;
             foreach (var gData in data)
             {
-                var groupCell = sheet.CreateRow(index).CreateCell(0);
-                groupCell.SetCellValue(gData.Key);
-                groupCell.CellStyle = gCellStyle;
+                var groupRow = sheet.CreateRow(index);
+                
+                var idx = 0;
+                foreach (var prop in sProps)
+                {
+                    var groupCell = groupRow.CreateCell(idx);
+                    var val = typeof(TSummary).GetProperty(prop.Name)?.GetValue(gData);
+                    groupRow.CreateCell(idx).SetCellValue(val?.ToString());
+                    groupCell.CellStyle = gCellStyle;
+                    
+                    idx++;
+                }
                 
                 index++;
 
-                foreach (var (key, value) in gData.Value)
+                var children = typeof(TSummary).GetProperty("Children")?.GetValue(gData) as IEnumerable<TDetail>;
+                foreach (var detail in children)
                 {
                     var row = sheet.CreateRow(index);
-                    var subGroupCell = row.CreateCell(0);
-                    subGroupCell.SetCellValue(key);
-                    subGroupCell.CellStyle = subCellStyle;
                     
-                    var i = 1;
-                    foreach (var prop in props)
+                    var i = 0;
+                    foreach (var prop in dProps)
                     {
-                        var val = value.GetType().GetProperty(prop.Name)?.GetValue(value);
-                        row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
+                        var subGroupCell = row.CreateCell(i);
+                        var val = typeof(TDetail).GetProperty(prop.Name)?.GetValue(detail);
+                        row.CreateCell(i).SetCellValue(val?.ToString());
                    
+                        if (i == 0)
+                            subGroupCell.CellStyle = subCellStyle;
+                        
                         i++;
                     }
                     index++;

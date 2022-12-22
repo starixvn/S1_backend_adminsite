@@ -1,11 +1,18 @@
+using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Report;
 
+public interface IPaymentReportSummary<T>
+{
+    public IEnumerable<T> Children { get; set; }
+}
+
 public class DepositPaymentReportDetail
 {
+    [ExportIgnore]
     public string Key { get; set; }
     public int TotalDepositCount { get; set; }
     public decimal TotalDepositAmount { get; set; }
@@ -14,13 +21,14 @@ public class DepositPaymentReportDetail
     public string AverageProcessingTime { get; set; }
 }
 
-public class DepositPaymentReportSummary : DepositPaymentReportDetail
+public class DepositPaymentReportSummary : DepositPaymentReportDetail, IPaymentReportSummary<DepositPaymentReportDetail>
 {
     public IEnumerable<DepositPaymentReportDetail> Children { get; set; }
 }
 
 public class WithdrawalPaymentReportDetail
 {
+    [ExportIgnore]
     public string Key { get; set; }
     public int TotalWithdrawalCount { get; set; }
     public decimal TotalWithdrawalAmount { get; set; }
@@ -28,7 +36,7 @@ public class WithdrawalPaymentReportDetail
     public string  AverageProcessingTime { get; set; }
 }
 
-public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail
+public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail, IPaymentReportSummary<WithdrawalPaymentReportDetail>
 {
     public IEnumerable<WithdrawalPaymentReportDetail> Children { get; set; }
 }
