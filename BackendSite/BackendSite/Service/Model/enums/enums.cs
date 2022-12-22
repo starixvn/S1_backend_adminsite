@@ -721,7 +721,8 @@ namespace BackendSite.Service.Model.enums
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73,
-        AppQRCode = 74
+        AppQRCode = 74,
+        ProviderAppDownload = 75
     }
 
     #region BankFinancialTransferInfoLog
@@ -1231,13 +1232,18 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
+        [Description("Android")]
         Android = 1,
+        [Description("IOS")]
         IOS = 2,
+        [Description("Desktop")]
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
+        [Description("HTTP")]
         HTTP = 1,
+        [Description("HTTPS")]
         HTTPS = 2
     }
 
