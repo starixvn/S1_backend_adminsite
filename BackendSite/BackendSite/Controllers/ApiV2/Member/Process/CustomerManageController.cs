@@ -553,7 +553,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustInfoDetail> GetCustInfoList(CustInfoListRequest request)
         {
@@ -696,7 +695,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustInfoDetail(CustIdRequest request)
         {
@@ -736,7 +734,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<CustBonus>> GetBonusByCustId(CustIdRequest request)
         {
@@ -758,7 +755,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult SetCustStatusSwitch(CustStatusSwitchRequest request)
         {
@@ -849,7 +845,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </summary>
         /// <param name="verificationRewardReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
         {
@@ -1048,7 +1043,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpGet]
         public IActionResult GetCustPhotoId(CustIdRequest request)
         {
@@ -1076,7 +1070,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="custId"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm] int custId, [FromForm] IFormFile file)
         {
@@ -1127,7 +1120,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult DelCustPhotoId(CustIdRequest request)
         {
@@ -1164,7 +1156,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public async Task<ApiResult> ResetProfileAsync(CustIdRequest request)
         {
@@ -1248,7 +1239,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustBankInfo(CustIdRequest request)
         {
@@ -1298,7 +1288,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult ResetCustUSDTInfo(CustIdRequest request)
         {
@@ -1968,8 +1957,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiResult GetDepositInfoByCustId(GetDepositListByCustIdRequest request)
         {
             var data = _depositBll.GetDepositListByCust(request.CustId,
@@ -2009,7 +1998,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<TpTransferInfo> GetTpTransferInfoByCustId(GetTpTransferInfoListByCustIdRequest request)
         {
@@ -2046,7 +2035,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalInfoByCustId(GetWithdrawalListByCustIdRequest request)
         {
@@ -2087,7 +2076,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<PaymentAdjustment> GetAdjustmentInfoByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2125,7 +2114,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<LoginLog> GetLoginLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2234,7 +2222,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<CustNote> GetCustNote(CustIdWithPageRequest request)
         {
@@ -2266,7 +2253,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult SetCustNote(SetCustNoteRequest request)
         {
@@ -2500,7 +2486,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<GetAdminOperateLog> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2538,7 +2523,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 130, 24 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<CustBankInfoLog> GetBankInfoLogByCustId(CustIdWithPageRequest request)
         {
@@ -2566,7 +2551,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<CustCryptoWalletLog> GetCryptoWalletLogByCustId(CustIdWithPageRequest request)
         {
@@ -2599,7 +2584,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<ReferralFriend> GetRefFriendByCustId(CustIdWithDateRangeNullAndPageRequest request)
         {
@@ -2653,7 +2637,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<VipLevelInfo> GetVipLevelInfoByCustId(CustIdRequest request)
         {
@@ -2677,7 +2660,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResult<VipLevelLog> GetVipLevelLogByCustId(CustIdWithPageRequest request)
         {
@@ -2781,7 +2763,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiListResultCurrencyAmount<Promotion> GetPromotionByCustId(CustIdWithDateRangeAndPageRequest request)
         {
@@ -2822,7 +2803,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
         {
@@ -2896,7 +2876,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
         [HttpPost]
         public ApiResult<IEnumerable<int>> GetTagByCustId(CustIdRequest request)
         {
@@ -3043,7 +3022,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         [HttpPost]
         public ApiListResult<WithdrawalLimitLog> GetWithdrawalLimitLog(CustIdWithDateRangeAndPageRequest request)
         {
@@ -3089,6 +3068,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > Bank list
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<BlockBankAcc> GetBankList(CustIdRequest request)
         {
             var BankList = _custInfoBll.GetBankList(request.CustId);
@@ -3101,6 +3081,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > E-Wallet List
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<BlockEWalletAcc> GetEWalletList(CustIdRequest request)
         {
             var EWalletList = _custInfoBll.GetEWalletList(request.CustId);
@@ -3113,6 +3094,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #endregion
 
         #region CSD > Customer Administration > CustInfo > E-Wallet Log
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
         public ApiListResult<CustEWalletLog> GetEWalletLog(CustIdWithDateRangeAndPageRequest request)
         {
             var EWalletList = _custInfoBll.GetCustEWalletLogList(request.CustId,
