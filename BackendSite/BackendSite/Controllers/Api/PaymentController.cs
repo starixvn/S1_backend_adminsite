@@ -337,8 +337,6 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        }
-
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
