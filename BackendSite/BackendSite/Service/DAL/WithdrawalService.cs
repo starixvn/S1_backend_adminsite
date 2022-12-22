@@ -608,7 +608,7 @@ namespace BackendSite.Service.DAL
                 Comment = comment,
                 ForStatus = forStatus,
                 Status = (int)status,
-                WithdrawalInfo = withdrawalInfo,
+                _WithdrawalInfo = withdrawalInfo,
                 WithdrawalType = withdrawalType,
                 RefId = (string)null,
                 Operator = updater
@@ -621,12 +621,12 @@ namespace BackendSite.Service.DAL
             {
                 //No execute in transaction
                 using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-                result = connection.Execute("Admin_WithdrawalInfo_Set", p, commandType: CommandType.StoredProcedure);
+                result = connection.Execute("Admin_WithdrawalInfo_Set_Test", p, commandType: CommandType.StoredProcedure);
             }
             else
             {
                 //Execute in transaction
-                result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                result = conn.Execute("Admin_WithdrawalInfo_Set_Test", p, trans, commandType: CommandType.StoredProcedure);
             }
 
             custId = p.Get<int?>("CustId") ?? 0;
