@@ -464,7 +464,7 @@ namespace BackendSite.Service.BLL
         }
 
         public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
-        {   
+        {
             var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
             if (checkData == null)
             {
@@ -489,7 +489,7 @@ namespace BackendSite.Service.BLL
                 WalletType = checkData.WalletType,
                 TierAmountList = checkData.TierAmountList,
                 BonusType = (int)checkData.BonusType,
-                PromotionType =checkData.PromotionType,            
+                PromotionType = checkData.PromotionType,
             };
         }
     }

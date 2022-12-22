@@ -162,44 +162,6 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
     }
 
-    public class RebateLog
-    {
-        private DateTimeOffset _createTime { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string GameName { get; set; }
-        public string RebateTypeName { get; set; }
-        public decimal RedeemAmount { get; set; }
-        public string BonusCode { get; set; }
-
-        public DateTimeOffset CreateTime
-        {
-            get => _createTime;
-            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-    }
-
-    
-    
-    public class RebateInfo
-    {
-        private DateTimeOffset _claimTime { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string BonusCode { get; set; }
-        public string Description { get; set; }
-        public string RebateTypeName { get; set; }
-        public DateTimeOffset ClaimTime
-        {
-            get => _claimTime;
-            set => _claimTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-
-    }
-
     public class PromotionCategory
     {
         public int id { get; set; }
@@ -412,11 +374,11 @@ namespace BackendSite.Service.Model
     public class CheckPayoutBonusCodeRep
     {
         /// <summary>
-        /// PromotionÃþ«¬
+        /// Promotionï¿½ï¿½ï¿½ï¿½
         /// </summary>
         public int PromotionType { get; set; }
         /// <summary>
-        /// ¬õ§QºØÃþ
+        /// ï¿½ï¿½ï¿½Qï¿½ï¿½ï¿½ï¿½
         /// 1 = Percentage,
         /// 2 = Amount
         /// </summary>
@@ -427,7 +389,7 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
         /// <summary>
-        /// Promotionªº¿ú¥]Ãþ«¬¡G
+        /// Promotionï¿½ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½G
         /// 0 = Transfer Wallet
         /// 1 = Seamless Wallet
         /// </summary>

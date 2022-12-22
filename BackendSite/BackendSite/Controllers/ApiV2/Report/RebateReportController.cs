@@ -77,88 +77,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int BaseCurrencyId { get; set; }
         }
 
-        public class GetListForBonusRequest : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public string UserName { get; set; }
-            public int RebateType { get; set; }
-        }
-
-        public class ExportForBonusRequest
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public string UserName { get; set; }
-            public int RebateType { get; set; }
-        }
-
-        public class GetLogRequest : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public string UserName { get; set; }
-            public int CurrencyId { get; set; }
-            public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
-            public int RebateType { get; set; }
-        }
-
-        public class ExportRebateLogRequest
-        {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public string UserName { get; set; }
-            public int CurrencyId { get; set; }
-            public int BaseCurrencyId { get; set; }
-            public int RebateCategoriesId { get; set; }
-            public int RebateType { get; set; }
-        }
-
         public class GetVipRebateDetailRequest
         {
             public int CustId { get; set; }
@@ -229,12 +147,10 @@ namespace BackendSite.Controllers.ApiV2.Report
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
-                    request.CategoryIds, request.BaseCurrencyId,request.PayoutStatuses);
+                    request.CategoryIds, request.BaseCurrencyId, request.PayoutStatuses);
 
             foreach (var data in searchResult.VipRebateInfoList)
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-            }
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
 
             var stream = _excelBll.ExportV2(searchResult.VipRebateInfoList);
             return _excelBll.ExcelFile(stream, "VipRebateReport");
@@ -259,116 +175,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                 Data = _paymentBll.GetVipRebateDetail(request.CustId, request.TpCategoryId, request.RefId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
-        }
-
-        /// <summary>
-        /// RebateReport/GetListForBonus 取得獎金返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path： Marketing > Rebate Info Report > [Submit]
-        /// </remarks>
-        /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
-        [HttpPost]
-        public ApiListResult<RebateInfo> GetListForBonus(GetListForBonusRequest request)
-        {
-            var apiListResult = new ApiListResult<RebateInfo>();
-            var pageSize = 10;
-            var pageNumber = request.PageNumber;
-
-            apiListResult.Data = _paymentBll.GetRebateInfoList(request.SiteIds, request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.DateTime,
-                pageSize, ref pageNumber, out var totalPages, out var rowCount);
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.RowCount = rowCount;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.ErrorCode = 0;
-
-            return apiListResult;
-        }
-
-        /// <summary>
-        /// RebateReport/ExportForBonus 匯出獎金返水資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path： Marketing > Rebate Info Report > [Submit] > [Export Excel]
-        /// </remarks>
-        /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateInfoReport" })]
-        [HttpPost]
-        public IActionResult ExportForBonus(ExportForBonusRequest request)
-        {
-            var exportData = _paymentBll.GetRebateInfoExport(JsonConvert.SerializeObject(request.SiteIds), request.UserName, request.RebateType, request.StartDate.DateTime, request.EndDate.LocalDateTime);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "BonusRebateReport");
-        }
-
-        /// <summary>
-        /// RebateReport/GetLogForBonus 取得獎金返水紀錄
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path： Marketing > Rebate Log Report > [Submit] 
-        /// </remarks>
-        /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
-        [HttpPost]
-        public ApiListResultCurrencyAmount<RebateLog> GetLogForBonus(GetLogRequest request)
-        {
-            var apiListResult = new ApiListResultCurrencyAmount<RebateLog>();
-            var pageSize = 10;
-            var pageNumber = request.PageNumber;
-            var currencyAmount = new List<string>();
-            apiListResult.Data = _paymentBll.GetRebateLog(
-                request.SiteIds,
-                request.UserName,
-                request.RebateType,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                pageSize,
-                request.CurrencyId,
-                request.BaseCurrencyId,
-                request.RebateCategoriesId,
-                ref pageNumber, out var totalPages, out var rowCount, ref currencyAmount);
-
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.RowCount = rowCount;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.ErrorCode = 0;
-            apiListResult.CurrencyAmount = currencyAmount;
-
-            return apiListResult;
-        }
-
-        /// <summary>
-        /// RebateReport/ExportLogForBonus 匯出獎金返水紀錄
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path： Marketing > Rebate Log Report > [Submit] > [Export Excel]
-        /// </remarks>
-        /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/RebateLogReport" })]
-        [HttpPost]
-        public IActionResult ExportLogForBonus(ExportRebateLogRequest request)
-        {
-            var exportData = _paymentBll.GetRebateLogExport(
-                JsonConvert.SerializeObject(request.SiteIds),
-                request.UserName,
-                request.RebateType,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                request.CurrencyId,
-                request.BaseCurrencyId,
-                request.RebateCategoriesId);
-
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "BonusRebateLog"); ;
         }
 
     }
