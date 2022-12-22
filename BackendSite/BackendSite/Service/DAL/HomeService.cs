@@ -1,26 +1,41 @@
-﻿using Dapper;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
+using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
     public class HomeService
     {
-        private IConfiguration configuration;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public HomeService(IConfiguration configuration)
+        public HomeService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public int GetRegisteredCustomers(int SiteId, long StartDate, long EndDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QuerySingle<int>("Admin_RegisteredCustomer_Get", new { SiteId, StartDate, EndDate }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = SiteId,
+                StartDate = StartDate,
+                EndDate = EndDate,
+            });
+            return _mainDbClient.QueryFirst<int>("Admin_RegisteredCustomer_Get", props);
         }
         public int GetDepositCustomers(int SiteId, long StartDate, long EndDate)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.QuerySingle<int>("Admin_DepositCustomer_Get", new { SiteId, StartDate, EndDate }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = SiteId,
+                StartDate = StartDate,
+                EndDate = EndDate,
+            });
+            return _mainDbClient.QueryFirst<int>("Admin_DepositCustomer_Get", props);
         }
     }
 }

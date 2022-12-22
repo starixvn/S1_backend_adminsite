@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using LazZiya.ImageResize;
+using Org.BouncyCastle.Pkix;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 
@@ -89,6 +90,11 @@ namespace BackendSite.Service.BLL
             await using var ms = new System.IO.MemoryStream();
             await originImage.SaveAsync(ms, new JpegEncoder());
             return ms.ToArray();
+        }
+
+        public bool IsValidImageFormat(string contentType)
+        {
+            return string.Equals(contentType, "image/png") || string.Equals(contentType, "image/jpeg");
         }
     }
 }

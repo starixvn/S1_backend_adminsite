@@ -3,6 +3,22 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
+    public class TagDto
+    {
+        public int Id { get; set; }
+        public string TagName { get; set; }
+        public string TagColour { get; set; }
+        public string Description { get; set; }
+    }
+    
+    public class Tag
+    {
+        public int Id { get; set; }
+        public string TagName { get; set; }
+        public string TagColour { get; set; }
+        public string Description { get; set; }
+    }
+
     public class EditTagManagement
     {
         [LogIgnore]

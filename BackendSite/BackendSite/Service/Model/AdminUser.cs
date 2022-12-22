@@ -21,9 +21,8 @@
     {
         public int UserId { set; get; }
         public string UserName { set; get; }
-
-        //public string Token { set; get; }
         public string LangId { set; get; }
+        public int SiteId { get; set; }
     }
 
     public class ChangePwd
@@ -59,11 +58,6 @@
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
         public DateTime? LoginTime { set; get; }
-    }
-    public class UpdataAdminUserV2Role
-    {
-        public int UserId { set; get; }
-        public List<int> Role { get; set; }
     }
 
     public class AssignBrand

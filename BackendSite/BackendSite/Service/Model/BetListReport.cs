@@ -41,6 +41,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset EndTime { get; set; }
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
+
         /// <summary>
         /// 是否排序
         /// </summary>
@@ -55,6 +56,7 @@ namespace BackendSite.Service.Model
         /// 1=降序
         /// </summary>
         public OrderByDirection OrderByDirection { get; set; }
+
         public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
