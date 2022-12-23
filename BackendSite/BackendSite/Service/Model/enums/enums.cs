@@ -1450,6 +1450,13 @@ namespace BackendSite.Service.Model.enums
         TopLoseTwenty = 3
     }
 
+    public enum ShieldPlatform
+    {
+        Web = 1,
+        Ios = 2,
+        Android = 3,
+    }
+    
     public enum ShieldRiskTagged
     {
         IsBot = 1,
