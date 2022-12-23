@@ -9,7 +9,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VipLevelController : ControllerBase
@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="siteId"></param>
         /// <param name="excelUpload"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public async Task<List<ApiResult>> ChangeVipLevelBatchAsync([FromForm] ChangeVipLevelBatchRequest request)
         {
