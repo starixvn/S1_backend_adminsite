@@ -718,12 +718,14 @@ namespace BackendSite.Service.Model.enums
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
         SetCurrencyUSDRate = 58,
+        BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SiteMaintenance = 77
+     
     }
 
     #region BankFinancialTransferInfoLog
