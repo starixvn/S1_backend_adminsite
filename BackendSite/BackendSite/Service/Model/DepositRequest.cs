@@ -288,6 +288,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string DepositMessage { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -338,6 +339,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string SendMessage { get; set; }
     }
     public class SetAmountRequest
     {
