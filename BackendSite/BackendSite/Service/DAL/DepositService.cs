@@ -701,7 +701,7 @@ namespace BackendSite.Service.DAL
             props.Add("_DepositId", tempDepositId);
             props.Add("_Statuses", statuses);
             props.Add("_CustId", custId);
-            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V5", props).ToList();
+            return _reportDbClient.Query<DepositTimeList>("Admin_DepositStatusTimeExport_Get_V6", props).ToList();
 
         }
         public bool SetDepositRequestAmount(ParamsWithLog<SetAmountRequest> input)

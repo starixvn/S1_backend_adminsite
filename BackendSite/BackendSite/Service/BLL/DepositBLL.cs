@@ -431,6 +431,7 @@ namespace BackendSite.Service.BLL
                     var ts3 = ts1.Subtract(tsA).Duration();
                     x.ToApprovedTime = GetTimeString(ts3);
                 }
+
                 exportDataToExcel.Add(new DepositTimeExportData
                 {
                     SiteName = x.SiteName,
@@ -446,7 +447,8 @@ namespace BackendSite.Service.BLL
                     EndFlowTime = x.ApprovedTime,
                     ApprovedBy = x.ApprovedBy,
                     StatementTime = x.StatementTime,
-                    Operator = x.Operator
+                    Operator = x.Operator,
+                    SendMessage = string.IsNullOrEmpty(x.DepositMessage) ? string.Empty : GetSendMessage(JsonConvert.DeserializeObject<int[]>(x.DepositMessage))
                 });
             });
             return exportDataToExcel;
@@ -582,6 +584,16 @@ namespace BackendSite.Service.BLL
 
             scope.Complete();
             return result;
+        }
+
+        private string GetSendMessage(int[] depositMessages)
+        {
+            List<string> depositMessageList = new List<string>();
+            depositMessages.ToList().ForEach(x =>
+            {
+                depositMessageList.Add(((DepositMessageStatus)x).ToString());
+            });
+            return String.Join(", ", depositMessageList.ToArray());
         }
     }
 }
