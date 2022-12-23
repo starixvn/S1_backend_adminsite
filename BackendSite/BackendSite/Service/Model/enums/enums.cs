@@ -721,6 +721,7 @@ namespace BackendSite.Service.Model.enums
         BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
+        SetBanner = 62,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
@@ -1134,21 +1135,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
     {
-        GoToGame = 1,
-        GoToBonus = 2,
-        OpenWindow = 3,
-        RedirectPage = 4,
-        NoAction = 5
+        NoAction = 1,
+        GoToGame = 2,
+        GoToBonus = 3,
+        OpenWindow = 4,
+        RedirectPage = 5,
+        RedirectPagesOfThisSite = 6
     }
 
     public enum ShowStatusEnum
@@ -1164,6 +1162,16 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum UrlRouterEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        Referral = 3,
+        LeaderBoard = 4,
+        AngPow = 5,
+        Lottery = 6
+    }
+    
     #endregion
 
     #region AppLinkTable
