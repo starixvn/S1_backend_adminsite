@@ -665,9 +665,9 @@ namespace BackendSite.Service.DAL
             props.Add("_CustId", custId);
             
 
-            #region totalAmountSummary
+            #region totalSummary
 
-            currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositStatusTimeTotalAmount_Get", props).ToList();
+            currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DepositStatusTimeTotal_Get", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
