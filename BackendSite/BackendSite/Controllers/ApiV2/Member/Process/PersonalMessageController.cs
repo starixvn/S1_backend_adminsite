@@ -15,7 +15,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PersonalMessageController : ControllerBase
@@ -118,7 +118,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="personalMsg"></param>
         /// <param name="accountStatus"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
         [HttpPost]
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
@@ -248,7 +248,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 2 })]
         [HttpPost]
         public IActionResult ExportSendMessageBatchResultReport(ExportMessageBatchReq req)
         {
@@ -268,7 +268,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 4 })]
         [HttpPost]
         public ApiResult DeleteBatchMessage(DeleteBatchMessageReq req)
         {
@@ -296,7 +296,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > Edit > [Update]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
         [HttpPost]
         public ApiResult UpdateBatchMessage(UpdateBatchMessageReq req)
         {
@@ -341,7 +341,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Edit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
         [HttpPost]
         public ApiResult<BatchMsg> GetBatchMessage(GetBatchMessageReq req)
         {
@@ -368,7 +368,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > [Submit](Query)
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
         [HttpPost]
         public ApiListResult<BatchMsg> GetBatchMessageList(GetBatchMessageListReq req)
         {

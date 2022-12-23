@@ -2,14 +2,18 @@
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
 {
     public class DepositRequest
     {
         public string TransId { set; get; }
+        public int DepositId { set; get; }
         public int DepositType { set; get; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
         public int CurrencyId { get; set; }
+        public string IsoCode { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string Email { set; get; }
@@ -20,7 +24,12 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
         public string Comment { set; get; }
-        public DateTimeOffset CreateTime { set; get; }
+        private DateTimeOffset _createTime { set; get; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         [System.Text.Json.Serialization.JsonIgnore]
         public IDepositInfo oDepositInfo =>
                 DepositType switch
@@ -31,63 +40,104 @@ namespace BackendSite.Service.Model
                     _ => null
                 };
         public int FirstDeposit { set; get; }
-        //public string PostScript { set; get; }
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
+        public List<int> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
-        public DateTimeOffset? DepositTime { set; get; }
+        private DateTimeOffset? _depositTime;
+        public DateTimeOffset? DepositTime
+        {
+            get => _depositTime;
+            set
+            {
+                if (value != null)
+                    _depositTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        public int BankId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string PicFileName { set; get; }
-        
-        /*public string DisplayName { set; get; }
+        public string DisplayName { set; get; }
         public string CalCode =>
             DepositType switch
             {
-                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{BankCode}",
-                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{BankCode}",
+                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
                 (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
-            };*/
-
-        //public virtual IEnumerable<Comments> Comments { get; set; }
-
-        //public virtual string DepositTypeString { get; set; }
-        //public virtual string StatusString { get; set; }
+            };
         public int IsKyc { set; get; }
         public int IsRisk { set; get; }
         public string VipLevelName { set; get; }
         public int DepositCnt { set; get; }
         public int Flag { set; get; }
-        public DateTimeOffset? UpdateTime { set; get; }
+        private DateTimeOffset? _updateTime;
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _statementTime;
+        public DateTimeOffset? StatementTime
+        {
+            get => _statementTime;
+            set
+            {
+                if (value != null)
+                    _statementTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
+        private DateTimeOffset? _flowEndTime;
+        public DateTimeOffset? FlowEndTime
+        {
+            get => _flowEndTime;
+            set
+            {
+                if (value != null)
+                    _flowEndTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
         public string Operator { set; get; }
+        public string Agent { set; get; }
+        public string DepositFrom { set; get; }
     }
 
     public class DepositInfoForExport
     {
         public string TransId { set; get; }
+        [EpplusIgnore]
         public int DepositType { set; get; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
+        [EpplusIgnore]
         public int CurrencyId { get; set; }
+        public string Currency { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string NetWork { set; get; }
         public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
+        public string BankAgent { set; get; }
         public string SiteName { set; get; }
         public bool IsTest { set; get; }
         public decimal Amount { set; get; }
         public decimal ActualDeposit { set; get; }
         public string Comment { set; get; }
-        public DateTimeOffset CreateTime { set; get; }
         public bool FirstDeposit { set; get; }
-        public DateTimeOffset? DepositTime { set; get; }
         public string RefId { set; get; }
+        [EpplusIgnore]
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
@@ -103,18 +153,57 @@ namespace BackendSite.Service.Model
                 (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
-
-        //public virtual IEnumerable<Comments> Comments { get; set; }
-
-        //public virtual string DepositTypeString { get; set; }
-        //public virtual string StatusString { get; set; }
         public int IsKyc { set; get; }
         public int IsRisk { set; get; }
         public int DepositCnt { set; get; }
         public string Operator { set; get; }
-        public DateTimeOffset? UpdateTime { set; get; }
+        private DateTimeOffset _createTime { set; get; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+        }
+        private DateTimeOffset? _depositTime;
+        public DateTimeOffset? DepositTime
+        {
+            get => _depositTime;
+            set
+            {
+                if (value != null)
+                    _depositTime = new DateTimeOffset(value.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+        }
+        private DateTimeOffset? _updateTime;
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+        }
+        private DateTimeOffset? _statementTime;
+        public DateTimeOffset? StatementTime
+        {
+            get => _statementTime;
+            set
+            {
+                if (value != null)
+                    _statementTime = new DateTimeOffset(value.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+        }
+        private DateTimeOffset? _flowEndTime;
+        public DateTimeOffset? FlowEndTime
+        {
+            get => _flowEndTime;
+            set
+            {
+                if (value != null)
+                    _flowEndTime = new DateTimeOffset(value.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+        }
         public string AffiliateCode { get; set; }
-
     }
 
     public class DepositDetailSubmission
@@ -195,20 +284,17 @@ namespace BackendSite.Service.Model
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
     }
-    public class Comments
+    public class DepositComments
     {
         private DateTimeOffset _createTime { get; set; }
-
-        public string Comment { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+        public string Comment { get; set; }
         public int Action { get; set; }
-
-        public string ActionString { get; set; }
-
+        public string ActionName => Enum.GetName(typeof(DepositStatusEnum), Action);
         public decimal ActualDeposit { get; set; }
         public string Operator { get; set; }
     }
@@ -361,6 +447,13 @@ namespace BackendSite.Service.Model
         public string Message { get; set; }
 
         public decimal Amount { get; set; }
+    }
+    
+    public class DepositDraftSetRequest
+    {
+        public int? BankId { get; set; }
+        public string DisplayName { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
     }
 
     public class DepositMessageRequest
