@@ -711,7 +711,8 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
-        WithdrawalLimitAdjustment = 73
+        WithdrawalLimitAdjustment = 73,
+        SiteMaintenance = 77
     }
 
     #region BankFinancialTransferInfoLog
