@@ -1051,7 +1051,8 @@ namespace BackendSite.Service.Model.enums
         Fishing = 9 ,
         Promotion = 10 ,
         Vip = 11,
-        Deposit = 12
+        Deposit = 12,
+        Rewards = 13
     }
     
     #endregion
