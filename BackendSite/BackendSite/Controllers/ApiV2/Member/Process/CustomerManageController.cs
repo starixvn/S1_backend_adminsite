@@ -38,6 +38,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly Common _common;
+        private readonly AdminBLL _adminBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -74,6 +76,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _common = provider.GetRequiredService<Common>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -698,16 +702,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustInfoDetail(CustIdRequest request)
         {
-
-            var custInfoDetail = _custInfoBll.GetCustInfoDetail(request.CustId, null);
-
+            var authData = _newAuthorizeBll.GetAuthData();
+            var custInfoDetail = _custInfoBll.GetCustInfoDetail(request.CustId, null, authData.SiteId);
             if (custInfoDetail != null)
             {
-                if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+                if (!hasPermission)
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
                     custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
-                    custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                    if (custInfoDetail.CustLineProfile != null)
+                    {
+                        custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                    }
                 }
 
                 return new ApiResult<CustInfoDetail>
