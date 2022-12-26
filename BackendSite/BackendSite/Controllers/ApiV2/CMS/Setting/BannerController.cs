@@ -136,24 +136,35 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             
             var urlRouter = new Dictionary<string, string>()
             {
-                {"01","sports"},
-                {"02","live-casino"},
-                {"03","referral"},
-                {"04","leaderBoard"},
-                {"05","angPow"},
-                {"06","lottery"},
-                {"22","liveCasino"},
-                {"32","liveCasino"}
+                {"0_1","eSport"},
+                {"0_2","live-casino"},
+                {"2_2","liveCasino"},
+                {"3_2","liveCasino"},
+                {"0_3","referral"},
+                {"0_4","leaderBoard"},
+                {"0_5","angPow"},
+                {"0_6","lottery"},
+                {"0_7","slots"},
+                {"2_7","casino"},
+                {"3_7","casino"},
+                {"0_8","game"},
+                {"2_8","games"},
+                {"3_8","games"},
+                {"0_9","fishing"},
+                {"0_10","promotion"},
+                {"0_11","vip"},
+                {"0_12","deposit"},
+                
             };
             
             var router = string.IsNullOrEmpty(request.After.UrlRouter) ? 
-                null : urlRouter.ContainsKey($"{request.SiteId}{request.After.UrlRouter}") ? 
-                    urlRouter[$"{request.SiteId}{request.After.UrlRouter}"] : urlRouter[$"0{request.After.UrlRouter}"] ;
+                null : urlRouter.ContainsKey($"{request.SiteId}_{request.After.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}_{request.After.UrlRouter}"] : urlRouter[$"0_{request.After.UrlRouter}"] ;
             request.After.UrlRouter = router;
             
             var beforeRouter = string.IsNullOrEmpty(request.Before.UrlRouter) ? 
-                null : urlRouter.ContainsKey($"{request.SiteId}{request.Before.UrlRouter}") ? 
-                    urlRouter[$"{request.SiteId}{request.Before.UrlRouter}"] : urlRouter[$"0{request.Before.UrlRouter}"] ;
+                null : urlRouter.ContainsKey($"{request.SiteId}_{request.Before.UrlRouter}") ? 
+                    urlRouter[$"{request.SiteId}_{request.Before.UrlRouter}"] : urlRouter[$"0_{request.Before.UrlRouter}"] ;
             request.Before.UrlRouter = beforeRouter;
 
             try
