@@ -66,7 +66,7 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public string GetClientIP(Microsoft.AspNetCore.Http.HttpContext context)
         {
-            var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR" };
+            var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR", "X-Forwarded-For" };
 
             foreach (var Header in HeaderNames)
             {
