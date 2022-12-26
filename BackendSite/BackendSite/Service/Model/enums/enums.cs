@@ -73,6 +73,12 @@ namespace BackendSite.Service.Model.enums
         EmailVerified = 4
     }
 
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
+    }
+
     #endregion
 
     #region Withdrawal Submission For Frontend Use
@@ -455,6 +461,28 @@ namespace BackendSite.Service.Model.enums
         ThirdParty = 2
     }
 
+    public enum AdjustmentCategoryEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
+    }
+
     #endregion
 
     #region AdminUser
@@ -684,7 +712,9 @@ namespace BackendSite.Service.Model.enums
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
         WithdrawalLimitAdjustment = 73,
-        AppQRCode = 74
+        AppQRCode = 74,
+        SetBanner = 62,
+        SiteMaintenance = 77
     }
 
     #region BankFinancialTransferInfoLog
@@ -1076,21 +1106,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
     {
-        GoToGame = 1,
-        GoToBonus = 2,
-        OpenWindow = 3,
-        RedirectPage = 4,
-        NoAction = 5
+        NoAction = 1,
+        GoToGame = 2,
+        GoToBonus = 3,
+        OpenWindow = 4,
+        RedirectPage = 5,
+        RedirectPagesOfThisSite = 6
     }
 
     public enum ShowStatusEnum
@@ -1106,6 +1133,16 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum UrlRouterEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        Referral = 3,
+        LeaderBoard = 4,
+        AngPow = 5,
+        Lottery = 6
+    }
+    
     #endregion
 
     #region AppLinkTable
