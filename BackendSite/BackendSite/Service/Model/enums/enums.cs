@@ -1388,7 +1388,7 @@ namespace BackendSite.Service.Model.enums
         BirthdayRewardPoint = 1,
         SpecialRewardPoint = 2
     }
-    
+
     public enum CustBankInfoLogStatus
     {
         Create = 1,
