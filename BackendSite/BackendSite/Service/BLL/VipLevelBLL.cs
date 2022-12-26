@@ -133,9 +133,9 @@ namespace BackendSite.Service.BLL
 
         #region Public Methods
 
-        public GetVipUpgradeReviewListModel GetVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, int pageNumber, int pageSize, string currencyIds, string vipLevel)
+        public GetVipUpgradeReviewListModel GetVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, int pageNumber, int pageSize, string currencyIds)
         {
-            var data = GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, pageNumber, pageSize, currencyIds, vipLevel, out var totalPages, out var rowCount);
+            var data = GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, pageNumber, pageSize, currencyIds, out var totalPages, out var rowCount);
 
             var details = data.Select(p => new VipUpgradeReviewDetailModel(p)).ToList();
 
@@ -166,9 +166,9 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<VipUpgradeReviewDataModel> ExportVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, string currencyIds, string vipLevel)
+        public IEnumerable<VipUpgradeReviewDataModel> ExportVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, string currencyIds)
         {
-            return GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, 0, 0, currencyIds, vipLevel, out _, out _);
+            return GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, 0, 0, currencyIds, out _, out _);
         }
 
         public bool UpdateVipUpgradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
@@ -181,7 +181,6 @@ namespace BackendSite.Service.BLL
             string selectStatus,
             string currencyId,
             string userName,
-            string vipLevel,
             int pageNumber,
             int pageSize)
         {
@@ -190,7 +189,6 @@ namespace BackendSite.Service.BLL
                 selectStatus,
                 currencyId,
                 userName,
-                vipLevel,
                 pageNumber,
                 pageSize,
                 out var totalPages,
@@ -225,9 +223,9 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<VipDowngradeReviewDataModel> ExportVipDowngradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string currencyId, string userName, string vipLevel)
+        public IEnumerable<VipDowngradeReviewDataModel> ExportVipDowngradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string currencyId, string userName)
         {
-            return GetVipDowngradeReview(siteId, calculateYearMonth, selectStatus, currencyId, userName, vipLevel, 0, 0, out _, out _);
+            return GetVipDowngradeReview(siteId, calculateYearMonth, selectStatus, currencyId, userName, 0, 0, out _, out _);
         }
 
         public bool UpdateVipDowngradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
@@ -305,8 +303,7 @@ namespace BackendSite.Service.BLL
             string userName,
             int pageNumber,
             int pageSize,
-            string currencyIds,
-            string vipLevel,
+            string currencyIds,           
             out int totalPages,
             out int rowCount)
         {
@@ -317,7 +314,6 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 currencyIds,
-                vipLevel,
                 out totalPages,
                 out rowCount);
         }
@@ -352,7 +348,6 @@ namespace BackendSite.Service.BLL
             string selectStatus,
             string currencyId,
             string userName,
-            string vipLevel,
             int pageNumber,
             int pageSize,
             out int totalPages,
@@ -363,7 +358,6 @@ namespace BackendSite.Service.BLL
                 selectStatus,
                 currencyId,
                 string.IsNullOrEmpty(userName) ? null : userName,
-                vipLevel,
                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,

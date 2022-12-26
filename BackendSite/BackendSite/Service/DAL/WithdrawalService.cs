@@ -377,9 +377,9 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyIds", currencyIds);
             props.Add("CustId", custId);
 
-            #region totalAmountSummary
+            #region totalSummary
 
-            currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalStatusTimeTotalAmount_Get", props).ToList();
+            currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalStatusTimeTotal_Get", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -453,7 +453,8 @@ namespace BackendSite.Service.DAL
                 result = SetWithdrawalInfo(withdrawalId, siteId, comment,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
-                    (status == WithdrawalStatusEnum.Approved ? null : withdrawalInfo),
+                    (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
+                        ? null : withdrawalInfo),
                     withdrawalType,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
@@ -535,9 +536,12 @@ namespace BackendSite.Service.DAL
                                             conn,
                                             trans);
                                         break;
+                                    case (int)WithdrawalTypeEnum.CryptoWallet:
+                                        dummyResult = 1;
+                                        break;
                                 }
                                 
-                                specialResult = (updateFlowEndResult == 0 || dummyResult == 0 ) ? 0 : 1;
+                                specialResult = updateFlowEndResult == 0 || dummyResult == 0 ? 0 : 1;
 
                                 break;
                             

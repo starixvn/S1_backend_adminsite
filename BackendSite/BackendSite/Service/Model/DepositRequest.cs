@@ -2,6 +2,7 @@
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -115,8 +116,12 @@ namespace BackendSite.Service.Model
     public class DepositInfoForExport
     {
         public string TransId { set; get; }
+        [EpplusIgnore]
         public int DepositType { set; get; }
+        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
+        [EpplusIgnore]
         public int CurrencyId { get; set; }
+        public string Currency { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public string NetWork { set; get; }
@@ -130,7 +135,9 @@ namespace BackendSite.Service.Model
         public string Comment { set; get; }
         public bool FirstDeposit { set; get; }
         public string RefId { set; get; }
+        [EpplusIgnore]
         public int Status { set; get; }
+        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
         public string BankName { set; get; }
@@ -367,6 +374,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string DepositMessage { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -417,6 +425,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string SendMessage { get; set; }
     }
     public class SetAmountRequest
     {
@@ -450,6 +459,7 @@ namespace BackendSite.Service.Model
     public class DepositMessageRequest
     {
         public DepositMessageStatus Status { get; set; }
+        public string StatusName { get; set; }
         public int DepositId { get; set; }
     }
 }

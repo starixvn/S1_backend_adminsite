@@ -782,7 +782,8 @@ namespace BackendSite.Service.Model.enums
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
-        SiteMaintenance = 77
+        SiteMaintenance = 77,
+        SetVideoInfo = 78
     }
 
     #region BankFinancialTransferInfoLog
@@ -1449,6 +1450,13 @@ namespace BackendSite.Service.Model.enums
         TopLoseTwenty = 3
     }
 
+    public enum ShieldPlatform
+    {
+        Web = 1,
+        Ios = 2,
+        Android = 3,
+    }
+    
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1625,32 +1633,5 @@ namespace BackendSite.Service.Model.enums
         PaymentNotReceived = 2,
         [Description("Deposit refunded")]
         DepositRefunded = 3
-    }
-    public enum NovaVipLevelEnum
-    {
-        VintageClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        NovaClub = 6
-    }
-    public enum Goal123VipLevelEnum
-    {
-        BronzeClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        Goal123Club = 6
-    }
-    public enum BwingVipLevelEnum
-    {
-        BronzeClub = 1,
-        SilverClub = 2,
-        GoldClub = 3,
-        TitaniumClub = 4,
-        DiamondClub = 5,
-        BwingVvvip = 6
     }
 }
