@@ -151,9 +151,21 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
+        {
+            var siteList = new int[] { siteId };
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        private CustInfoDetail GetCustInfoDetail(int custId, string userName, IEnumerable<int> siteList)
+        {
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
@@ -871,6 +883,22 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
+            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
+            var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
+            if (sabaWallet != null)
+            {
+                result.SabaWallet = sabaWallet.Balance;
+            }
+            if (ptwallet != null)
+            {
+                result.PTWallet = ptwallet.Balance;
+            }
+            return result;
+        }
+        public async Task<MemberExportData> GetTransferWalletAsync(MemberExportData custInfoDetailForExport)
+        {
+            var result = custInfoDetailForExport;
+            var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
             if (sabaWallet != null)
