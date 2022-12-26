@@ -154,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {"0_10","promotion"},
                 {"0_11","vip"},
                 {"0_12","deposit"},
-                
+                {"0_13","rewards"}
             };
             
             var router = string.IsNullOrEmpty(request.After.UrlRouter) ? 
