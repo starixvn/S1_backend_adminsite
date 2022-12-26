@@ -166,6 +166,15 @@ namespace BackendSite.Service.Model
         public PayChannelStatusEnum Status { get; set; }
     }
     
+    public class UpdatePaySettingChargeFeeParams
+    {
+        public int SiteId { get; set; }
+        public CurrencyEnum CurrencyId { get; set; }
+        public int ChannelId { get; set; }
+        public decimal Percentage { get; set; }
+        public decimal PreCount { get; set; }
+    }
+    
     public class GetPaySettingListRequest : ApiRequestPageModel
     {
         public int SiteId { get; set; }
@@ -237,6 +246,8 @@ namespace BackendSite.Service.Model
         public PayListStatusEnum SitePayStatus { get; set; }
         public PayListStatusEnum Globalstatus => SitePayStatus;
         public PayChannelMethodEnum Method { get; set; }
+        public decimal ChargeFeePercentage { get; set; }
+        public decimal ChargeFeePreCount { get; set; }
     }
     
     public class PayChannelInfo
