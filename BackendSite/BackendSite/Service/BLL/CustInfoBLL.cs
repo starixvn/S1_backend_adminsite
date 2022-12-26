@@ -157,9 +157,21 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
+        {
+            var siteList = new int[] { siteId };
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        private CustInfoDetail GetCustInfoDetail(int custId, string userName, IEnumerable<int> siteList)
+        {
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
