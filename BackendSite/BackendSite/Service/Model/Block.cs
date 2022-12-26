@@ -97,6 +97,11 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string UserName { get; set; }
     }
+    public class DeviceUser
+    {
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+    }
     public class BlockAccountSetRequest
     {
         public int SysId { get; set; }
@@ -117,6 +122,11 @@ namespace BackendSite.Service.Model
     public class BlockIPRequest
     {
         public String IP { get; set; }
+    }
+    public class GetDeviceUserListRequest
+    {
+        public int CustId { get; set; }
+        public string DeviceId { get; set; }
     }
     public class SetBlockIPRequest : BlockIPRequest
     {

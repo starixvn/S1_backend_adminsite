@@ -65,7 +65,7 @@ namespace BackendSite.Service.Model
         public ApiListResult() : this(9000, "") { }
         public ApiListResult(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
         public ApiListResult(int ErrorCode, string Message) : base(ErrorCode, Message) { }
-        public ApiListResult(ErrorCodeEnum errorCode, IPageInfo pageInfo, IEnumerable<TData> data) : base((int)errorCode, "") 
+        public ApiListResult(ErrorCodeEnum errorCode, IPageInfo pageInfo, IEnumerable<TData> data) : base((int)errorCode, "")
         {
             Data = data;
             PageNumber = pageInfo.PageNumber;
@@ -103,7 +103,6 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
         public List<string> CurrencyAmount { get; set; }
-
         public List<TotalAmount> CurrencyAmountRecord { get; set; }
         public string PageRange { get; set; }
     }

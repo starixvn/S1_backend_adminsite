@@ -5,7 +5,18 @@
         public string VipLevel { get; set; }
         public int Manually { get; set; }
         public DateTimeOffset QualifiedTime { get; set; }
-
+    }
+    public class MemberVipLevelInfo
+    {
+        public string VipLevel { get; set; }
+        public int Manually { get; set; }
+        public DateTimeOffset QualifiedTime { get; set; }
+    }
+    public class VipLevelInfoDto
+    {
+        public string VipLevel { get; set; }
+        public int Manually { get; set; }
+        public DateTime QualifiedTime { get; set; }
     }
     public class VipLevelLog
     {
@@ -13,6 +24,22 @@
         public int NewLevel { get; set; }
         public string Memo { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
+        public string Updaters { get; set; }
+    }
+    public class MemberVipLevelLog
+    {
+        public string OldLevel { get; set; }
+        public string NewLevel { get; set; }
+        public string Memo { get; set; }
+        public DateTimeOffset UpdateTime { get; set; }
+        public string Updaters { get; set; }
+    }
+    public class VipLevelLogDto
+    {
+        public string OldLevel { get; set; }
+        public string NewLevel { get; set; }
+        public string Memo { get; set; }
+        public DateTime UpdateTime { get; set; }
         public string Updaters { get; set; }
     }
     public class VipLevelSetting

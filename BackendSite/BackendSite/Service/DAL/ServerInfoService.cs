@@ -22,14 +22,20 @@ namespace BackendSite.Service.DAL
         public ServerInfo GetModel()
         {
             var siteId = 1;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = siteId
+            });
+            return _mainDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", props);
         }
 
         public ServerInfo GetModelWithSiteId(int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<ServerInfo>("ServerInfo_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = siteId
+            });
+            return _mainDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", props);
         }
 
         public IEnumerable<ServerInfo> GetSiteList()
@@ -61,8 +67,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var adminOperateLogList = conn.Query<GetAdminOperateLog>("Log_LogAdminOperateInfo_Get_V3", p, commandType: CommandType.StoredProcedure);
+            var adminOperateLogList = _mainDbClient.Query<GetAdminOperateLog>("Log_LogAdminOperateInfo_Get_V3", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
