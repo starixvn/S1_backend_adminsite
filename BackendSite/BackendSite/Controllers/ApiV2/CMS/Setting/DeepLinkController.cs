@@ -1,13 +1,14 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DeepLinkController : ControllerBase
@@ -27,26 +28,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         #endregion
 
-        /// <summary>
-        /// DeepLink/GetDeepLinkList 
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Marketing > Deep Link Management 
-        /// </remarks>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
-        public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
-        {
-            var apiResult = new ApiResult<IEnumerable<DeepLink>>
-            {
-                Data = _deepLinkBLL.GetDeepLinkList(),
-                ErrorCode = 0
-            };
+        #region API Model
 
-            return apiResult;
+        public class GetListRequest : ApiRequestPageModel
+        {
+            public int SiteId { get; set; }
+            public int DeepLinkId { get; set; }
         }
+
+        #endregion
 
         /// <summary>
         /// DeepLink/GetDeepLinkTable 
@@ -56,22 +46,25 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// 
         /// Func Path：Marketing > Deep Link Management 
         /// </remarks>
-        // <param name="req"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
-        public ApiResult<IEnumerable<GetDeepLinkRep>> GetDeepLinkTable(GetDeepLinkReq req)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 66, 1 })]
+        public ApiListResult<GetDeepLinkRep> GetList(GetListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<GetDeepLinkRep>>
+            var apiResult = new ApiListResult<GetDeepLinkRep>
             {
-                Data = _deepLinkBLL.GetDeepLinkTable(req.SiteId, req.DeepLinkId),
-                ErrorCode = 0
+                Data = _deepLinkBLL.GetDeepLink(request.SiteId, request.DeepLinkId,
+                request.PageNumber, request.PageSize, out int totalPages, out int rowCount),
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                PageNumber = request.PageNumber,
+                TotalPages = totalPages,
+                RowCount = rowCount
             };
 
             return apiResult;
         }
 
         /// <summary>
-        /// DeepLink/SetDeepLink 
+        /// DeepLink/Set
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -80,11 +73,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
-        public ApiResult SetDeepLink(SetDeepLinkReq req)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 66, 3 })]
+        public async Task<ApiResult> Set(SetDeepLinkReq req)
         {
             var apiResult = new ApiResult();
-            if (_deepLinkBLL.SetDeepLink(req.SiteId, req.Type, req.Domain, req.ProtocolType, req.DeepLinkId, _authorizeBLL.GetAuthData().UserName) > 0)
+            if (await _deepLinkBLL.SetDeepLink(req.SiteId, req.Type, req.Domain, req.ProtocolType, req.DeepLinkId, _authorizeBLL.GetAuthData().UserName))
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");

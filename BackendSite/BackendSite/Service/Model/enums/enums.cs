@@ -713,6 +713,7 @@ namespace BackendSite.Service.Model.enums
         WithdrawalSubmission = 57,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
+        ProviderAppDownload = 75,
         SetBanner = 62,
         SiteMaintenance = 77
     }
@@ -1214,13 +1215,18 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
+        [Description("Android")]
         Android = 1,
+        [Description("IOS")]
         IOS = 2,
+        [Description("Desktop")]
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
+        [Description("HTTP")]
         HTTP = 1,
+        [Description("HTTPS")]
         HTTPS = 2
     }
 
