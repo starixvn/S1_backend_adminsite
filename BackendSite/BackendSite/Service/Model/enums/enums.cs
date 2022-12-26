@@ -1214,7 +1214,7 @@ namespace BackendSite.Service.Model.enums
         GoToBonus = 3,
         OpenWindow = 4,
         RedirectPage = 5,
-        RedirectPagesOfThisSite = 6
+        GoToLobby = 6
     }
 
     public enum ShowStatusEnum
@@ -1232,12 +1232,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum UrlRouterEnum
     {
-        Sports = 1,
+        ESport = 1,
         Casino = 2,
         Referral = 3,
         LeaderBoard = 4,
         AngPow = 5,
-        Lottery = 6
+        Lottery = 6,
+        Slots = 7,
+        Game = 8 ,
+        Fishing = 9 ,
+        Promotion = 10 ,
+        Vip = 11,
+        Deposit = 12
     }
     
     #endregion
