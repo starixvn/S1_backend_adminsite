@@ -45,7 +45,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (UnixDisplayFrom != null)
+                if (UnixDisplayFrom != null && UnixDisplayFrom.Value != 0)
                 {
                     return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayFrom.Value);
                 }
@@ -58,7 +58,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                if (UnixDisplayTo != null)
+                if (UnixDisplayTo != null && UnixDisplayTo.Value != 0)
                 {
                     return DateTimeExtensions.UnixToDateTimeOffset(UnixDisplayTo.Value);
                 }
@@ -99,13 +99,7 @@ namespace BackendSite.Service.Model
         public int? PromotionAction { get; set; }
         public int AutoExtend { get; set; }
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
-        public IEnumerable<string> CurrencyList
-        {
-            get 
-            {
-                return string.IsNullOrEmpty(Currencys) ? default: JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
-            }
-        }
+        public IEnumerable<string> CurrencyList => string.IsNullOrEmpty(Currencys) ? new List<string>() : JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
         public string Currencys { get; set; }
     }
 

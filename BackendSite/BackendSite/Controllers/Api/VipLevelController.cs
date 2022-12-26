@@ -305,7 +305,7 @@ namespace BackendSite.Controllers.Api
                     QualifiedTime = d.QualifiedTime == null ? "First Time Upgrade" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
                     LastUpdateUser = d.LastUpdateUser
                 }).ToList();
-            var stream = _excelBLL.Export(exportList);
+            var stream = _excelBLL.ExportV2(exportList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -411,7 +411,7 @@ namespace BackendSite.Controllers.Api
                 QualifiedTime = d.QualifiedTime == null ? "" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
                 LastUpdateUser = d.LastUpdateUser
             }).ToList();
-            var stream = _excelBLL.Export(exportList);
+            var stream = _excelBLL.ExportV2(exportList);
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipDowngrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

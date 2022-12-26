@@ -268,7 +268,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 {
                     case (int)PromotionTypeEnum.FstDeposit
                         or (int)PromotionTypeEnum.FreeBet or (int)PromotionTypeEnum.Cashback
-                        or (int)PromotionTypeEnum.SpecialBonus or (int)PromotionTypeEnum.RetentionFreeBet:
+                        or (int)PromotionTypeEnum.RetentionFreeBet:
                     {
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
@@ -440,7 +440,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
 
             return _excelBll.ExcelFile(stream, "ScratchCardList");
         }
