@@ -49,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query)
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 1 })]
         [HttpPost]
         public ApiListResult<TagData> GetTagList(GetTagDataReq req)
         {
@@ -85,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query) > Click[Edit] > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 74 })]
         [HttpPost]
         public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
@@ -110,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query) > Change[Status]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 74 })]
         [HttpPost]
         public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
