@@ -711,12 +711,14 @@ namespace BackendSite.Service.Model.enums
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
+        BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetBanner = 62,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SiteMaintenance = 77
+        
     }
 
     #region BankFinancialTransferInfoLog
