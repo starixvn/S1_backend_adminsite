@@ -134,6 +134,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
+        {
+            var result = _paymentManageService.UpdatePaySettingChargeFee(input, @operator);
+
+            if (result)
+            {
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
+            }
+            
+            return result;
+        }
+        
         public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
             return _paymentManageService.GetBankInfoPayForSetting(siteId, currencyId, channelId);

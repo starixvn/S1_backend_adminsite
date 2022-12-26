@@ -94,7 +94,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult SetPaySetting(UpdatePaySettingParams request)
         {
-            var success = _paymentManageBll.UpdatePaySetting(request, User.Identity.Name);
+            var authData = _authorizeBll.GetAuthData();
+            var success = _paymentManageBll.UpdatePaySetting(request, authData.UserName);
             
             return new ApiResult
             {
@@ -105,7 +106,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public ApiResult SetPaySettingStatus(UpdatePaySettingStatusParams request)
         {
-            var success = _paymentManageBll.UpdatePaySettingStatus(request, User.Identity.Name);
+            var authData = _authorizeBll.GetAuthData();
+            var success = _paymentManageBll.UpdatePaySettingStatus(request, authData.UserName);
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
+        }
+        
+        [HttpPost]
+        public ApiResult SetPaySettingChargeFee(UpdatePaySettingChargeFeeParams request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var success = _paymentManageBll.UpdatePaySettingChargeFee(request, authData.UserName);
             
             return new ApiResult
             {

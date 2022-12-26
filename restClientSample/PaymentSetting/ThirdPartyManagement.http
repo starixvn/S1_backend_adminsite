@@ -104,6 +104,19 @@ Content-Type: application/json
 }
 
 ###
+# 支付三方手續費設定
+POST {{url}}/apiV2/ThirdPartyManagement/SetPaySettingChargeFee HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyId": 2,
+    "channelId": 9,
+    "percentage": 2,
+    "preCount": 10
+}
+
+###
 # 取得渠道支援的銀行
 POST {{url}}/apiV2/ThirdPartyManagement/GetBankInfoList HTTP/1.1
 Content-Type: application/json
