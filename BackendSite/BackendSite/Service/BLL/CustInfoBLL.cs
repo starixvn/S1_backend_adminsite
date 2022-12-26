@@ -868,6 +868,22 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
+        public async Task<MemberExportData> GetTransferWalletAsync(MemberExportData custInfoDetailForExport)
+        {
+            var result = custInfoDetailForExport;
+            var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
+            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
+            var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
+            if (sabaWallet != null)
+            {
+                result.SabaWallet = sabaWallet.Balance;
+            }
+            if (ptwallet != null)
+            {
+                result.PTWallet = ptwallet.Balance;
+            }
+            return result;
+        }
 
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
         {

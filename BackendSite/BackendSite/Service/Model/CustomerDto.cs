@@ -169,6 +169,8 @@ public class MemberExportData
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
     public bool IsRisk { get; set; }
+    public decimal SabaWallet { get; set; }
+    public decimal PTWallet { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
     public string Email { get; set; }
