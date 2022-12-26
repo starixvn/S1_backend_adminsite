@@ -260,4 +260,20 @@ namespace BackendSite.Service.Model.BankFinancial
         public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
+    
+    public class BankFinancialTransferAccount
+    {
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public int SysId { get; set; }
+        public string BankCode { get; set; }
+        public TransferChannelEnum Channel { get; set; }
+        public string Agent { get; set; }
+        public int PayId { get; set; }
+        public string PayName { get; set; }
+        public string AccountNo { get; set; }
+        public string AccountName { get; set; }
+        public string DisplayName { get; set; }
+        public TransferAccountStatusEnum Status { get; set; }
+    }
 }
