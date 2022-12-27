@@ -136,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
 
+
         public class GameCasinoByTpIdReq
         {
             public int TpId { get; set; }
