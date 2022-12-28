@@ -14,12 +14,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly BlockBLL _blockBLL;
+        private readonly CustInfoBLL _custInfoBll;
         #endregion
 
         #region Constructors
         public BlockController(IServiceProvider provider)
         {
             _blockBLL = provider.GetRequiredService<BlockBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
         #endregion
 
@@ -227,6 +229,27 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return new ApiListResult<IPUser>
             {
                 Data = IPUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// Block/GetDeviceUserList 取得相同DeviceId關聯帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<DeviceUser>>> GetDeviceUserList(GetDeviceUserListRequest request)
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            
+            var deviceUserList = await _blockBLL.GetDeviceUserList(customer.SiteId, request.DeviceId);
+            return new ApiResult<IEnumerable<DeviceUser>>
+            {
+                Data = deviceUserList,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

@@ -714,12 +714,12 @@ namespace BackendSite.Service.Model.enums
         SetCurrencyUSDRate = 58,
         BettingMonitor = 59,
         TransferInfoManagement = 60,
+        SetCustomerInfo = 61,
         SetBanner = 62,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SiteMaintenance = 77
-        
     }
 
     #region BankFinancialTransferInfoLog
@@ -1258,7 +1258,8 @@ namespace BackendSite.Service.Model.enums
         Tp = 2,
         Bonus = 3,
         Admin = 4,
-        Payment = 5
+        Payment = 5,
+        Token = 6
     }
 
     #endregion
@@ -1299,6 +1300,13 @@ namespace BackendSite.Service.Model.enums
         BWING = 3
     }
 
+    public enum AffSiteEnum
+    {
+        N88 = 1,
+        N8G = 2,
+        N8B = 3
+    }
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1307,6 +1315,7 @@ namespace BackendSite.Service.Model.enums
         EWallet = 1,
         BankCard = 2
     }
+
     public enum CustBankInfoLogStatus
     {
         Create = 1,
