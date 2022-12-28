@@ -544,6 +544,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public ApiResult SetDepositMessage(ApiRequestWithLog<DepositMessageRequest> request)
         {
             request.After.StatusName = request.After.Status.ToString();
+            request.After.ActionName = request.After.Action.ToString();
             if (_depositBll.SetDepositMessage(
                     new ParamsWithLog<DepositMessageRequest>(request, User.Identity.Name)) > 0)
             {
