@@ -20,9 +20,9 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect, int timeZone)
+        public DrawPrizeReportResult PrizeSearch(PrizeSelect prizeSelect, int timeZone,out List<string> currencyAmount)
         {
-            var searchResult = new PrizeSearchResult();
+            var searchResult = new DrawPrizeReportResult();
             var tempCurrencyTotalAmount = new List<string>();
             var props = new DynamicParameters();
             var startDate = new DateTimeOffset(Convert.ToDateTime(prizeSelect.StartDate), TimeSpan.FromHours(timeZone)).ToUniversalTime();
@@ -35,16 +35,16 @@ namespace BackendSite.Service.DAL
             props.Add("_EventNames", JsonConvert.SerializeObject(prizeSelect.EventName));
 
             #region GetCurrencyTotalAmount
-            
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_DrawPrizeTotalAmount_Get_V4", props).ToList();
-            if (currencyTotalAmount.Count > 0)
+
+            searchResult.CurrencyAmount = _reportDbClient.Query<DrawPrizeReportOverviewResult>("Admin_DrawPrizeTotalAmount_Get_V5", props).ToList();
+            if (searchResult.CurrencyAmount.Count > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                searchResult.CurrencyAmount.ForEach(x =>
                 {
-                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
+                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.CurrencyName, Math.Round(x.TotalAmount, 2)));
                 });
             }
-            searchResult.CurrencyAmount = tempCurrencyTotalAmount;
+            currencyAmount = tempCurrencyTotalAmount;
 
             #endregion
 
@@ -56,7 +56,7 @@ namespace BackendSite.Service.DAL
             
             var result = _reportDbClient.Query<DrawPrize>("Admin_DrawPrize_Get_V4", props);
             
-            searchResult.DrawPrize = result.ToList();
+            searchResult.Data = result.ToList();
             searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
             
