@@ -111,6 +111,8 @@ namespace BackendSite.Service.Model
         public string Operator { set; get; }
         public string Agent { set; get; }
         public string DepositFrom { set; get; }
+        public string FromBankCode { set; get; }
+        public string FromBankName { set; get; }
     }
 
     public class DepositInfoForExport
