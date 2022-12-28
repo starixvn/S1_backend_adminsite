@@ -463,5 +463,8 @@ namespace BackendSite.Service.Model
         public DepositMessageStatus Status { get; set; }
         public string StatusName { get; set; }
         public int DepositId { get; set; }
+        public Decimal ActualDeposit { get; set; }
+        public DepositStatusEnum Action { get; set; }
+        public string ActionName { get; set; }
     }
 }

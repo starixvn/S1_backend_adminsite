@@ -317,7 +317,7 @@ namespace BackendSite.Service.DAL
                 conn, trans);
         }
 
-        private int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)
+        public int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)
         {
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.Execute("DepositLog_Ins",
