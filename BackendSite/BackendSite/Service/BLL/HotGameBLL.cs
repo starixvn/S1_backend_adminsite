@@ -235,7 +235,14 @@ namespace BackendSite.Service.BLL
             var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
             request.TpLogo = $"{_siteConfig.Value[site.SiteName].BannerURL}{TpLogoPath}/{request.TpId}.png";
 
-            var result = await _hotGameService.CreateOrUpdateV2(request, updateOperator);;
+            //後端自行組 GameLogo 物件
+            request.GameLogo = new GameLogo()
+            {
+                HotGamePcUrl = request.HotGamePcUrl,
+                HotGameMobileUrl = request.HotGameMobileUrl
+            };
+
+            var result = await _hotGameService.CreateOrUpdateV2(request, updateOperator);
             if(result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
             return result;
         }
