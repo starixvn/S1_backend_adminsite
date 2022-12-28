@@ -8,6 +8,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
