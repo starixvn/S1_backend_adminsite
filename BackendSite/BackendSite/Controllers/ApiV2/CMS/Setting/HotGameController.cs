@@ -194,21 +194,5 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 })
             };
         }
-
-        /// <summary>
-        /// 根據 TpId 取得三方的 Slot Game 遊戲清單，回傳空陣列表示 該 Tp 沒有SlotGame
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 95, 1 })]
-        public async Task<ApiResult<IEnumerable<HotGameOfGameCasinoDto>>> GetHotGameOfGameCasino(GetHotGameOfGameCasinoRequest request)
-        {
-            return new ApiResult<IEnumerable<HotGameOfGameCasinoDto>>()
-            {
-                ErrorCode = 0,
-                Data = await _hotGame.GetHotGameOfGameCasino(request.TpId)
-            };
-        }
     }
 }
