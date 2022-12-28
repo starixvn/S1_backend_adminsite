@@ -169,6 +169,8 @@ namespace BackendSite.Service.Model
         public int TpGameType { get; set; }
         public int TpCategory { get; set; }
         public string GameName { get; set; }
+        public string HotGamePcUrl { get; set; }
+        public string HotGameMobileUrl { get; set; }
         public GameLogo GameLogo { get; set; }
         public string TpLogo { get; set; }
         public HotGameTopCategory TopCategory { get; set; }
@@ -234,7 +236,7 @@ namespace BackendSite.Service.Model
         public string GameId { get; set; }
         public int TpId { get; set; }
         public int TpGameType { get; set; }
-        public string TpCategory { get; set; }
+        public int TpCategory { get; set; }
         public string TpCategoryName { get; set; }
         public string HotGamePcUrl { get; set; }
         public string HotGameMobileUrl { get; set; }
@@ -297,7 +299,7 @@ namespace BackendSite.Service.Model
         public string GameId { get; set; }
         public int TpId { get; set; }
         public int TpGameType { get; set; }
-        public string TpCategory { get; set; }
+        public int TpCategory { get; set; }
         public string TpCategoryName { get; set; }
         public string GameLogo { get; set; }
         public HotGameTopCategory TopCategory { get; set; }
