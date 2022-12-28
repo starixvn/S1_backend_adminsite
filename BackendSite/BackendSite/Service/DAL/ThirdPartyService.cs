@@ -124,7 +124,6 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-
         public async Task<TpAdjustmentLogWrapper> GetCustTpAdjustmentLogV2(GetCustTpAdjustmentLogParamsV2 input)
         {
             var p = new DynamicParameters();
@@ -149,8 +148,8 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-
-         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+   
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = currency, SiteId = siteId }, commandType: CommandType.StoredProcedure);
