@@ -545,6 +545,7 @@ namespace BackendSite.Service.Model.enums
         Withdrawal = 10,
         Other = 11
     }
+
     #endregion
 
     #region AdminUser

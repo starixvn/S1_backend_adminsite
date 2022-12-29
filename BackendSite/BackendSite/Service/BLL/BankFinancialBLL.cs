@@ -9,6 +9,10 @@ using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
+using System.Drawing;
+using System.Transactions;
+using BackendSite.Service.Library;
+using Microsoft.Extensions.DependencyInjection;
 using NPOI.XSSF.UserModel;
 using NuGet.Packaging;
 
@@ -93,7 +97,7 @@ namespace BackendSite.Service.BLL
             return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
         
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoParams input)
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoListParams input)
         {
             return _bankFinancialService.GetTransferAccountInfoListV2(input);
         }
@@ -124,7 +128,7 @@ namespace BackendSite.Service.BLL
 
             if (!isCreate)
             {
-                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoParams(input.Id))
+                oldData = GetTransferAccountInfoList(new GetTransferAccountInfoListParams(input.Id))
                     .FirstOrDefault();
             }
 

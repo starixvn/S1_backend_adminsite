@@ -122,7 +122,6 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-
         public async Task<TpAdjustmentLogWrapper> GetCustTpAdjustmentLogV2(GetCustTpAdjustmentLogParamsV2 input)
         {
             var p = new DynamicParameters();

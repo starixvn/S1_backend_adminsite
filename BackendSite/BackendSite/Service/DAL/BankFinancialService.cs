@@ -76,7 +76,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
         }
         
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoParams input)
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
         {
             var parameters = new DynamicParameters(
                 new
