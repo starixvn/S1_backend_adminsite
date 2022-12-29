@@ -530,7 +530,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get

@@ -2471,7 +2471,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   request.GameTypes,
+                                                    request.GameTypes,
                                                    request.StartDate,
                                                    request.EndDate);
             return new ApiResult<dynamic>

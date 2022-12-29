@@ -2,12 +2,12 @@
 using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
             para.Add("_CurrencyId", input.CurrencyId);
             para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : null, DbType.String);
             para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
-            para.Add("_SysIds", JsonConvert.SerializeObject(input.SysIds));
+            para.Add("_SysIds", input.Purposes.Any() ? JsonConvert.SerializeObject(input.SysIds) : null, DbType.String);
             para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : null, DbType.String);
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);

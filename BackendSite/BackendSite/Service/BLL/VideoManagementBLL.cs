@@ -5,23 +5,23 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class LatestHighlightVideoManagementBLL
+    public class VideoManagementBLL
     {
-        private readonly LatestHighlightVideoManagementService highlightVideoManagementService;
+        private readonly VideoManagementService videoManagementService;
         private readonly ServerInfoService serverInfoService;
 
-        public LatestHighlightVideoManagementBLL(LatestHighlightVideoManagementService highlightVideoManagementService, ServerInfoService serverInfoService)
+        public VideoManagementBLL(VideoManagementService highlightVideoManagementService, ServerInfoService serverInfoService)
         {
-            this.highlightVideoManagementService = highlightVideoManagementService;
+            this.videoManagementService = highlightVideoManagementService;
             this.serverInfoService = serverInfoService;
         }
-        public LatestHighlightVideoDataResult GetLatestHighlightVideoData(GetLatestHighlightVideoDataPara para)
+        public VideoDataResult GetVideoData(GetVideoDataPara para)
         {
-            return highlightVideoManagementService.GetLatestHighlightVideoData(para);
+            return videoManagementService.GetVideoData(para);
         }
-        public int SetLatestHighlightVideo(SetLatestHighlightVideoPara para,string user)
+        public bool SetVideoInfo(ParamsWithLog<SetVideoPara> input)
         {
-            return highlightVideoManagementService.SetLatestHighlightVideo(para, user);
+            return videoManagementService.SetVideoInfo(input);
         }
         public IEnumerable<GetSiteLangData> GetSiteLangData(int siteId)
         {
@@ -31,12 +31,12 @@ namespace BackendSite.Service.BLL
             langList.ForEach(x => result.Add(new GetSiteLangData() { LangId = x,Link= string.Empty,Title = string.Empty}));
             return result;
         }
-        public void InsertLatestHighlightVideo(InsrtLatestHighlightVideoPara para, string user)
+        public void InsertLatestHighlightVideo(InsertVideoPara para, string user)
         {
             var siteLangData = JsonConvert.DeserializeObject<List<GetSiteLangData>>(para.Detail);
             //remove資料不完全的
             siteLangData.RemoveAll(x => string.IsNullOrWhiteSpace(x.Link) || string.IsNullOrWhiteSpace(x.Title));
-            highlightVideoManagementService.InsertLatestHighlightVideo(para.SiteId, para.Date, siteLangData, user);
+            videoManagementService.InsertLatestHighlightVideo(para.SiteId, para.Date, siteLangData, user);
         }
 
         public void AddLog(string menu, ActionType actionType, string detailInfo, string user)
