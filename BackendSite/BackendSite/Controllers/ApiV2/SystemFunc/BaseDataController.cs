@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
@@ -30,6 +31,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly NewAuthorizeBLL _authorizeBll;
         private readonly MarketingBLL _marketingBll;
+        private readonly WinLostReportBLL _winLostReportBll;
+        private readonly ReportBLL _reportBll;
+        private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
         private readonly PaymentManageBLL _paymentManageBll;
@@ -50,6 +54,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _marketingBll = provider.GetRequiredService<MarketingBLL>();
+            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+            _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
@@ -125,11 +131,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
+        
+        public class GetTpListByCategoryReq
+        {
+            public int CategoryId { get; set; }
+        }
+        
+        public class GetTpGameTypeByCategoryAndTpIdReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
+
 
         public class GameCasinoByTpIdReq
         {
             public int TpId { get; set; }
         }
+        
+        public class GetGameIdByTpIdAndCategoryIdReq
+        {
+            public int TpId { get; set; }
+            public int CategoryId { get; set; }
+        }
+        
 
         public class GetTagRequest
         {
@@ -142,6 +167,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class SiteIdRequest
         {
             public int SiteId { get; set; }
+        }
+
+        public class TpCategoryByTpIdRequest
+        {
+            public int TpId { get; set; }
         }
 
         public class GetTpGameListReq
@@ -158,6 +188,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public string SabaId { get; set; }
             public string UserName { get; set; }
             public int SiteId { get; set; }
+            /// <summary>
+            /// 1. Deposit, 2. Withdrawal
+            /// </summary>
+            public TransferAccountPurposeEnum Purpose { get; set; }
         }
 
         public class GetPromoCategoryRequest
@@ -233,6 +267,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CurrencyId { get; set; }
         }
 
+        public class GetTpBySiteAndCurrencyReq
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -445,40 +485,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankInfoOffListByCustVerify(GetBankInfoOffListByCustVerifyRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<OfflineBankAccount>>();
-            var result = _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out CustInfoDetail custInfo);
+            var custVerify =
+                _custVerifyBll.CustVerify(request.SiteId, request.UserName, request.SabaId, out var custInfo);
 
-            if (result != ErrorCodeEnum.Success)
+            if (custVerify != ErrorCodeEnum.Success)
             {
-                throw new AdminException(result);
+                throw new AdminException(custVerify);
             }
 
-            if (custInfo != null)
+            if (custInfo == null)
             {
-                var bankInfoOff = _bankDetailBll
-                    .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
-                    .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Deposit)
-                                && x.AccountStatus == TransferAccountStatusEnum.Open
-                                && x.SettingStatus == BankCardManagementStatusEnum.Open);
-
-                if (bankInfoOff != null)
+                return new ApiResult<IEnumerable<OfflineBankAccount>>
                 {
-                    apiResult.Data = bankInfoOff;
-                    apiResult.ErrorCode = 0;
-                }
-                else
-                {
-                    apiResult.ErrorCode = 21;
-                    apiResult.Message = "BankAccount not found.";
-                }
+                    ErrorCode = 21,
+                    Message = "Player not found."
+                };
             }
-            else
-            {
-                apiResult.ErrorCode = 21;
-                apiResult.Message = "Player not found.";
-            }
+                
+            var bankInfoOff = _bankDetailBll
+                .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
+                .Where(x => x.Purposes.Contains(request.Purpose) 
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.LocalBank);
 
-            return apiResult;
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = bankInfoOff,
+                ErrorCode = 0
+            };
+
         }
 
         /// <summary>
@@ -503,6 +538,24 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// BaseData/GetTpListbyCategory 取得指定第三方遊戲類型清單
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
+        {
+            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
+            return apiResult;
+        }
+        
+        /// <summary>
         /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>
         /// <remarks>
@@ -520,6 +573,35 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 var gameCasinoData = await _gameCasinoBll.GetGameCasinoByTpId(request.TpId);
                 apiResult.Data = gameCasinoData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// BaseData/GetGameIdByTpIdAndCategoryId 取得第三方全部遊戲類型GameId
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Slot Tp List 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<GameCasinoDataV3>>> GetGameIdByTpIdAndCategoryId(GetGameIdByTpIdAndCategoryIdReq request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GameCasinoDataV3>>();
+            try
+            {
+                var gameIdData = await _gameCasinoBll.GetGameIdByTpIdAndCategoryId(request.TpId,request.CategoryId);
+                apiResult.Data = gameIdData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -819,6 +901,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = 0
             };
         }
+        
         /// <summary>
         /// 取得第三方遊戲分類清單
         /// </summary>
@@ -830,6 +913,31 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<TpCategory>>
             {
                 Data = await _tpBll.GetTpCategoryListAsync(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得第三方遊戲分類清單ByTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
+        {
+            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x=>x.TpId == request.TpId);
+            var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
+            
+            var categoryList = await _reportBll.GetTpCategoryList();
+            
+            var query = categoryList.Join(categories, a => a.CategoryId, b => b,
+                (a, b) => new TpCategory {CategoryId = a.CategoryId, CategoryName = a.CategoryName});
+            
+            var apiResult = new ApiResult<IEnumerable<TpCategory>>
+            {
+                Data = query,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -852,5 +960,72 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
+        
+        [HttpPost]
+        public ApiResult GetTransferAccountList(GetAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+
+        
+        /// <summary>
+        /// 取得第三方遊戲類型清單ByCategoryAndTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
+        {
+            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var result = data.Where(x => x.TpId == request.TpId);
+            
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// 取得該幣別支援的tpList
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpBySiteAndCurrency(GetTpBySiteAndCurrencyReq request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
+
+            var tpList = _tpBll.GetTpBySiteAndCurrency(request.SiteId,request.CurrencyId);
+            apiListResult.Data = tpList;
+            apiListResult.ErrorCode = 0;
+            return apiListResult;
+        }
+        
+        #region Private Methods
+
+        private class BankInfoPayComparer : IEqualityComparer<Pay>
+        {
+            public bool Equals(Pay t1, Pay t2)
+            {
+                return (t1.PayId == t2.PayId);
+            }
+
+            public int GetHashCode(Pay t)
+            {
+                return t.ToString().GetHashCode();
+            }
+        }
+
+        #endregion
+
     }
 }

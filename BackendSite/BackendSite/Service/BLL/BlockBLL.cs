@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
@@ -29,19 +30,19 @@ namespace BackendSite.Service.BLL
             if (!IPAddress.TryParse(input.After.IP, out _))
                 return 0;
 
-            var returnValue = await _blockIpToS3.Upload(input.After.IP);
+            var returnValue = _blockService.SetBlockIP(input);
             if (returnValue > 0)
             {
-                returnValue = _blockService.SetBlockIP(input);
+                returnValue = await _blockIpToS3.Upload();
             }
             return returnValue;
         }
         public async Task<int> DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
-            var returnValue = await _blockIpToS3.DeleteIp(input.Before.IP);
+            var returnValue = _blockService.DeleteBlockIP(input);
             if (returnValue > 0)
             {
-                returnValue = _blockService.DeleteBlockIP(input);
+                returnValue = await _blockIpToS3.Upload();
             }
             return returnValue;
         }
@@ -66,6 +67,13 @@ namespace BackendSite.Service.BLL
         public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
             return _blockService.ReleaseAccount(input);
+        }
+
+        public async Task<IEnumerable<DeviceUser>> GetDeviceUserList(int siteId, string deviceId)
+        {
+            if(siteId == (int)SiteEnum.NOVA88) 
+                return await _blockService.GetIoavationAssociatedList(deviceId);
+            return await _blockService.GetShieldAssociatedList(deviceId);
         }
     }
 }
