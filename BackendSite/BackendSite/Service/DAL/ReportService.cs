@@ -173,7 +173,7 @@ namespace BackendSite.Service.DAL
                 {
                     _SiteIds = JsonConvert.SerializeObject(input.SiteIds),
                     _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
-                    _TpId = input.TpId,
+                    _TpIds = JsonConvert.SerializeObject(input.TpIds),
                     _FromTransTime = input.FromTransTime,
                     _ToTransTime = input.ToTransTime,
                     _UserName = input.UserName,
@@ -184,8 +184,9 @@ namespace BackendSite.Service.DAL
             parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var spName = "Admin_TpBetFailureRecord_Get_V2";
+            var spName = "Admin_TpBetFailureRecord_Get_V3";
             var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
+
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
 
@@ -199,14 +200,14 @@ namespace BackendSite.Service.DAL
                 {
                     _SiteIds = JsonConvert.SerializeObject(input.SiteIds),
                     _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
-                    _TpId = input.TpId,
+                    _TpIds = JsonConvert.SerializeObject(input.TpIds),
                     _FromTransTime = input.FromTransTime,
                     _ToTransTime = input.ToTransTime,
                     _UserName = input.UserName,
                     _TransId = input.TransId
                 });
 
-            var spName = "Admin_TpBetFailureRecordForExport_Get_V2";
+            var spName = "Admin_TpBetFailureRecordForExport_Get_V3";
             var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
 
             return result;

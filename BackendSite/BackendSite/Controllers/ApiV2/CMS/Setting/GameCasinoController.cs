@@ -19,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         private readonly GameCasinoManageBLL _gameCasinoManageBll;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly LatestHighlightVideoManagementBLL _highlightVideoManagementBll;
+        private readonly VideoManagementBLL _highlightVideoManagementBll;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _gameCasinoManageBll = provider.GetRequiredService<GameCasinoManageBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _highlightVideoManagementBll = provider.GetRequiredService<LatestHighlightVideoManagementBLL>();
+            _highlightVideoManagementBll = provider.GetRequiredService<VideoManagementBLL>();
         }
 
         #endregion

@@ -146,7 +146,7 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if (withdrawalRequest.Status == 4 || withdrawalRequest.Status == 6)
+                if (withdrawalRequest.Status is WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved)
                 {
                     var getRequest = new GetObjectRequest();
                     var key = string.Format("{0}/{1}_{2}.png", awsWithdrawalFolder, withdrawalReq.TransId,
@@ -228,7 +228,7 @@ namespace BackendSite.Controllers.Api
 
                     #region Copy Picture
 
-                    if (withdrawalRequest.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
+                    if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.LocalBank
                         && hasPic)
                     {
                         timer.Restart();
@@ -363,7 +363,7 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Draft)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, null, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Pending)
             {
@@ -463,12 +463,12 @@ namespace BackendSite.Controllers.Api
         }
         
         [HttpPost]
-        public ApiResult<IEnumerable<Pay>> GetCryptoPayList(GetPayListRequest req)
+        public ApiResult<IEnumerable<PayInfo>> GetCryptoPayList(GetPayListRequest req)
         {
             var result =
                 bankDetailBLL.GetCryptoPayList(req.SiteId, req.CurrencyId, req.ChannelName, req.Amount, req.CustId);
 
-            return new ApiResult<IEnumerable<Pay>>
+            return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
                 ErrorCode = 0

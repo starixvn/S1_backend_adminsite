@@ -247,6 +247,15 @@ namespace BackendSite.Service.Model.enums
         Adjustment = 98,
         Error = 99 //No Use
     }
+    
+    public enum SelectDepositStatusEnum
+    {
+        Pending = 1,
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        OnHold = 7
+    }
 
     public enum DepositTimeStatusEnum
     {
@@ -355,7 +364,8 @@ namespace BackendSite.Service.Model.enums
         Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum
@@ -535,6 +545,7 @@ namespace BackendSite.Service.Model.enums
         Withdrawal = 10,
         Other = 11
     }
+
     #endregion
 
     #region AdminUser
@@ -764,11 +775,16 @@ namespace BackendSite.Service.Model.enums
         ReleaseEWalletAccount = 56,
         WithdrawalSubmission = 57,
         SetCurrencyUSDRate = 58,
+        BettingMonitor = 59,
         TransferInfoManagement = 60,
         SetCustomerInfo = 61,
+        SetBanner = 62,
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
-        ProviderAppDownload = 75
+        ProviderAppDownload = 75,
+        SetDepositMessage = 76,
+        SiteMaintenance = 77,
+        SetVideoInfo = 78
     }
 
     #region BankFinancialTransferInfoLog
@@ -1199,7 +1215,7 @@ namespace BackendSite.Service.Model.enums
         GoToBonus = 3,
         OpenWindow = 4,
         RedirectPage = 5,
-        RedirectPagesOfThisSite = 6
+        GoToLobby = 6
     }
 
     public enum ShowStatusEnum
@@ -1217,12 +1233,19 @@ namespace BackendSite.Service.Model.enums
 
     public enum UrlRouterEnum
     {
-        Sports = 1,
+        ESport = 1,
         Casino = 2,
         Referral = 3,
         LeaderBoard = 4,
         AngPow = 5,
-        Lottery = 6
+        Lottery = 6,
+        Slots = 7,
+        Game = 8 ,
+        Fishing = 9 ,
+        Promotion = 10 ,
+        Vip = 11,
+        Deposit = 12,
+        Rewards = 13
     }
     
     #endregion
@@ -1373,7 +1396,7 @@ namespace BackendSite.Service.Model.enums
         BirthdayRewardPoint = 1,
         SpecialRewardPoint = 2
     }
-    
+
     public enum CustBankInfoLogStatus
     {
         Create = 1,
@@ -1435,6 +1458,13 @@ namespace BackendSite.Service.Model.enums
         TopLoseTwenty = 3
     }
 
+    public enum ShieldPlatform
+    {
+        Web = 1,
+        Ios = 2,
+        Android = 3,
+    }
+    
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1599,5 +1629,17 @@ namespace BackendSite.Service.Model.enums
         Cancelled = 5,
         Approved = 6,
         Reject = 7
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3
     }
 }

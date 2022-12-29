@@ -384,6 +384,7 @@ namespace BackendSite.Service.Model
     {
         public string PromotionCategory { set; get; }
         public string BonusCode { set; get; }
+        public string Description { set; get; }
         public decimal Bonus { get; set; }
         public decimal RemainingTurnover { get; set; }
     }
@@ -824,6 +825,7 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public int SettlementType { set; get; }
+        public string TpUserName  { get; set; }
     }
     public class WinLoseSummaryDetailResult
     {
@@ -832,5 +834,6 @@ namespace BackendSite.Service.Model
         public decimal StakeNotRollover { set; get; }
         public int GameType { set; get; }
         public string GameName { get; set; }
+        public string TpUserName { get; set; }
     }
 }

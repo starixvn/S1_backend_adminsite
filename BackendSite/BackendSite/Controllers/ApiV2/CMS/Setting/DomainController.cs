@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 1 })]
         [HttpPost]
         public ApiListResult<DomainTable> GetList(GetListRequest request)
         {
@@ -104,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Add Domain] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 5 })]
         [HttpPost]
         public ApiResult Create(CreateRequest request)
         {
@@ -154,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Delete]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 4 })]
         [HttpPost]
         public ApiResult Delete(DeleteRequest request)
         {
@@ -181,7 +181,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Edit] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 3 })]
         [HttpPost]
         public ApiResult Update(UpdateRequest request)
         {

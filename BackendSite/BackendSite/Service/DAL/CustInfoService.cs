@@ -1124,7 +1124,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
         {
-            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V3", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)

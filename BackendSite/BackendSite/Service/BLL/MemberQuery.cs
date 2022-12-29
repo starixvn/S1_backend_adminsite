@@ -20,8 +20,9 @@ namespace BackendSite.Service.BLL
         private readonly PermissionBLL _permissionBll;
         private readonly AdminBLL _adminBll;
         private readonly Tools _tools;
+        private readonly CustInfoBLL _custInfoBll;
 
-        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll)
         {
             _memberService = memberService;
             _deviceService = deviceService;
@@ -32,6 +33,7 @@ namespace BackendSite.Service.BLL
             _affiliateApi = affiliateApi;
             _tools = tools;
             _siteConfig = siteConfig.Value;
+            _custInfoBll = custInfoBll;
         }
 
         public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
@@ -122,7 +124,7 @@ namespace BackendSite.Service.BLL
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
                 request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime);
 
-            var exportData = memberList.Select(a => new MemberExportData()
+            var data = memberList.Select(a => new MemberExportData()
             {
                 SiteName = a.SiteName,
                 UserName = a.UserName,
@@ -151,7 +153,20 @@ namespace BackendSite.Service.BLL
                 AffiliateCode = a.AffiliateCode,
                 LastActivityIp = a.LastActivityIp
             });
-            return exportData;
+            if (request.ExportTransferWallet) 
+            {
+                var exportDatas = new List<MemberExportData>();
+                var tasks = data.Select(async x =>
+                {
+                    var exportData = await _custInfoBll.GetTransferWalletAsync(x);
+                    exportDatas.Add(exportData);
+                });
+                await Task.WhenAll(tasks);
+                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                return exportDatas;
+            }
+            return data;
         }
 
         private int GetTransType(string transId)
@@ -195,6 +210,7 @@ namespace BackendSite.Service.BLL
             {
                 CustId = customer.CustId,
                 VipLevel = customer.VipLevel,
+                LevelName = customer.LevelName,
                 VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,

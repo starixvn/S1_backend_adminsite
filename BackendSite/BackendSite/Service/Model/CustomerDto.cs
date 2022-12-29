@@ -169,6 +169,8 @@ public class MemberExportData
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
     public bool IsRisk { get; set; }
+    public decimal SabaWallet { get; set; }
+    public decimal PTWallet { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
     public string Email { get; set; }
@@ -199,6 +201,7 @@ public class CustomerDto
     public string SiteName { get; set; }
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string LevelName { get; set; }
     public string UserName { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
@@ -261,6 +264,7 @@ public class CustomerBasicInfo
 {
     public int CustId { get; set; }
     public int VipLevel { get; set; }
+    public string LevelName { get; set; }
     public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }

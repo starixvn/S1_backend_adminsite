@@ -255,7 +255,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x=> x.SiteId == request.SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-
             var statusList = new List<int>();
             if (request.Status == 0)
             {
@@ -276,6 +275,7 @@ namespace BackendSite.Controllers.Api
                 request.PageNumber,
                 request.PageSize,
                 JsonConvert.SerializeObject(currencyIdList));
+
 
             foreach (var data in result.Data)
             {
@@ -304,7 +304,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-
             var statusList = new List<int>();
             if (Status == 0)
             {
@@ -385,7 +384,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == request.SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-
             var statusList = new List<int>();
             if (request.Status == 0)
             {
@@ -447,7 +445,6 @@ namespace BackendSite.Controllers.Api
             var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
             var currencyIdList = new List<int>();
             currencyIdList.AddRange(siteInfo.ICurrencyList);
-
             var statusList = new List<int>();
             if (Status == 0)
             {
@@ -466,6 +463,7 @@ namespace BackendSite.Controllers.Api
                 JsonConvert.SerializeObject(statusList),
                 JsonConvert.SerializeObject(currencyIdList),
                 UserName);
+
 
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
             {

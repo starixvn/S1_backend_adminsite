@@ -107,6 +107,11 @@ namespace BackendSite.Service.BLL
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
+        public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
+        {
+            return localBankService.GetBankCodeList(siteId);
+        }
+        
         public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
             var pointLevel = -1;
@@ -152,7 +157,7 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<Pay> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
+        public IEnumerable<PayInfo> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
             var pointLevel = -1;
             if (custId != null)
@@ -169,11 +174,16 @@ namespace BackendSite.Service.BLL
                 .Select(g =>
                 {
                     var d = g.First();
-                    return new Pay
+                    return new PayInfo
                     {
                         PayId = g.Key,
                         PayName = d.PayName,
-                        ChannelId = d.ChannelId
+                        ChannelId = d.ChannelId,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.LoginPin,
+                        LoginUrl = d.LoginUrl,
+                        TransferPin = d.TransferPin
                     };
                 });
             

@@ -69,10 +69,53 @@ namespace BackendSite.Service.DAL
             return mapper;
         }
 
+        public string GetPercent(decimal divisor, decimal dividend)
+        {
+            decimal percent;
+
+            if (divisor < dividend)
+            {
+                percent = 1 - (divisor / dividend);
+                percent *= -1;
+            }
+            else
+            {
+                percent = 1 - (dividend / divisor);
+            }
+
+            var result = percent.ToString("0%");
+            return result;
+        }
+
+        public string RegisteredDateFormatter(DateTime registeredDate)
+        {
+            var originRegisteredDate = registeredDate.ToString("dd-MM-yyyy hh:mm:ss");
+            var originMonthNum = originRegisteredDate.Substring(3, 2);
+
+            var monthText = originMonthNum switch
+            {
+                "01" => "Jan",
+                "02" => "Feb",
+                "03" => "Mar",
+                "04" => "Apr",
+                "05" => "May",
+                "06" => "jun",
+                "07" => "Jul",
+                "08" => "Aug",
+                "09" => "Sep",
+                "10" => "Oct",
+                "11" => "Nov",
+                "12" => "Dec",
+                _ => string.Empty
+            };
+
+            return $"{originRegisteredDate.Substring(0, 3)}{monthText}{originRegisteredDate.Substring(5, originRegisteredDate.Length - 5)}";
+        }
+
         private Task<IEnumerable<MpaRateDto>> GetRateFromDb(DateTimeOffset starTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_RateDateStart", starTime.Date, dbType: DbType.DateTime);
+            p.Add("_RateDateStart", starTime.Date.AddDays(-1), dbType: DbType.DateTime);
             p.Add("_RateDateEnd", endTime.Date, dbType: DbType.DateTime);
 
             return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);

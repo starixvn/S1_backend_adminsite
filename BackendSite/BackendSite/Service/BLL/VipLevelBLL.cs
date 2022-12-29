@@ -303,7 +303,7 @@ namespace BackendSite.Service.BLL
             string userName,
             int pageNumber,
             int pageSize,
-            string currencyIds,
+            string currencyIds,           
             out int totalPages,
             out int rowCount)
         {

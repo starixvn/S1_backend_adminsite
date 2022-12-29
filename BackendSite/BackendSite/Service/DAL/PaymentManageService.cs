@@ -534,9 +534,60 @@ namespace BackendSite.Service.DAL
             return false;
         }
         
+        public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
+        {
+            using var conn = new MySqlConnection(_connectionString);
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
+                .First(x => x.CurrencyId == input.CurrencyId);
+
+            #region props
+            var props = new DynamicParameters();
+            props.Add("_SiteId", input.SiteId);
+            props.Add("_CurrencyId", (int)input.CurrencyId);
+            props.Add("_ChannelId", input.ChannelId);
+            props.Add("_ChargeFeePercentage", input.Percentage);
+            props.Add("_ChargeFeePreCount", input.PreCount);
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                paySetting.ChannelName,
+                Status = paySetting.Status.ToString()
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                paySetting.ChannelName,
+                input.Percentage,
+                input.PreCount
+            }));
+            logParam.Add("_Operator", @operator);
+            #endregion
+
+            if (_mainDbClient.Execute("Admin_PaySetting_ChargeFee_Set", props, conn, trans) > 0)
+            {
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                {
+                    trans.Commit();
+                    return true;
+                }
+            }
+            
+            trans.Rollback();
+            return false;
+        }
+        
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoSys_GetV2", new
+            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get", new
             {
                 _PayId = payId,
                 _SiteId = siteId
