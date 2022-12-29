@@ -33,7 +33,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly MarketingBLL _marketingBll;
         private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
-        private static readonly BankInfoPayComparer bankInfoPayComparer = new BankInfoPayComparer();
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
         private readonly PaymentManageBLL _paymentManageBll;
@@ -1009,23 +1008,5 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             apiListResult.ErrorCode = 0;
             return apiListResult;
         }
-        
-        #region Private Methods
-
-        private class BankInfoPayComparer : IEqualityComparer<Pay>
-        {
-            public bool Equals(Pay t1, Pay t2)
-            {
-                return (t1.PayId == t2.PayId);
-            }
-
-            public int GetHashCode(Pay t)
-            {
-                return t.ToString().GetHashCode();
-            }
-        }
-
-        #endregion
-
     }
 }
