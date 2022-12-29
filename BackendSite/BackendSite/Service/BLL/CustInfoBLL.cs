@@ -1118,7 +1118,8 @@ namespace BackendSite.Service.BLL
                 GameName = y.First().GameName,
                 GameType = y.Key,
                 StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
-                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0)
+                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0),
+                TpUserName = y.First().TpUserName
             }).ToList();
 
             return result;
