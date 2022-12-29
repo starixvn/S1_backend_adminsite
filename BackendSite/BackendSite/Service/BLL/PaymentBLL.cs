@@ -81,6 +81,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+
             if (financialType != 0)
             {
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
@@ -114,12 +115,11 @@ namespace BackendSite.Service.BLL
                 {
                     var tpId = financialLog.Type - 2000;
                     var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
-                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
-                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
+                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ?
+                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";
                 }
             }
         }
-
         public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {

@@ -5,7 +5,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {

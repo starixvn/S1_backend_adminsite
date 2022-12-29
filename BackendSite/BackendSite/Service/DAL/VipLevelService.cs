@@ -6,6 +6,7 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -36,9 +37,11 @@ namespace BackendSite.Service.DAL
 
         public VipLevelInfo GetVipLevelInfo(int CustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var vipLevelInfo = conn.QueryFirstOrDefault<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId },
-                commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                CustId = CustId
+            });
+            var vipLevelInfo = _mainDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3",props);
             return vipLevelInfo;
         }
         
@@ -50,7 +53,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipLevelLog> GetVipLevelLog(int custId, int startIndex, int pageSize, out int totalPages, out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
             props.Add("_PageSize", pageSize);
@@ -58,7 +60,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -74,9 +76,8 @@ namespace BackendSite.Service.DAL
 
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustVipLevel_Set",
-                new { SiteId, CustId, UserName, VipLevel, Memo, Operator }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_CustVipLevel_Set",
+                new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
         }
         
@@ -93,9 +94,8 @@ namespace BackendSite.Service.DAL
         public int SetVipLevelManually(int SiteId, int CustId, string UserName, int Manually, string Memo,
             string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var result = conn.Execute("Admin_CustVipLevelManually_Set",
-                new { SiteId, CustId, UserName, Manually, Memo, Operator }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_CustVipLevelManually_Set",
+                new { SiteId, CustId, UserName, Manually, Memo, Operator });
             return result;
         }
 
@@ -118,24 +118,26 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipUpgradeReviewDataModel> GetVipUpgradeReviewList(int siteId,
             string calculateMonth,
-            int status,
+            string selectStatus,
             string userName,
             int pageSize,
             int startIndex,
+            string currencyIds,
             out int totalPages,
             out int rowCount)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CalculateMonth", calculateMonth);
-            props.Add("_Status", status);
+            props.Add("_SelectStatus", selectStatus);
             props.Add("_UserName", userName);
+            props.Add("_CurrencyIds", currencyIds);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get_V2", props);
+            var result = _reportDbClient.Query<VipUpgradeReviewDataModel>("Admin_VipUpgradeReview_Get_V3", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -157,7 +159,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<VipDowngradeReviewDataModel> GetVipDowngradeReviewList(int siteId,
             string calculateYearMonth,
-            int status,
+            string selectStatus,
+            string currencyId,
             string userName,
             int pageSize,
             int startIndex,
@@ -167,13 +170,14 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CalculateYearMonth", calculateYearMonth);
-            props.Add("_Status", status);
+            props.Add("_SelectStatus", selectStatus);
+            props.Add("_CurrencyIds", currencyId);
             props.Add("_UserName", userName);
             props.Add("_PageSize", pageSize);
             props.Add("_StartIndex", startIndex);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get_V2", props);
+            var result = _reportDbClient.Query<VipDowngradeReviewDataModel>("Admin_VipDowngradeReview_Get_V3", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;

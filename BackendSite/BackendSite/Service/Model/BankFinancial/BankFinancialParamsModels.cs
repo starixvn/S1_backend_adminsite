@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
@@ -14,7 +13,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = "[]";
             StrStatus = "[]";
             StrPurposes = "[]";
-            StrSysIds = "[]";
+            StrSysIds = null;
             Agent = string.Empty;
             AccountNo = string.Empty;
             Id = id;
@@ -27,7 +26,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = JsonConvert.SerializeObject(req.Channels);
             StrStatus = JsonConvert.SerializeObject(req.Status);
             StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : null;
-            StrSysIds = JsonConvert.SerializeObject(req.SysIds);
+            StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : null;
             Agent = req.Agent ?? string.Empty;
             AccountNo = req.AccountNo ?? string.Empty;
         }
