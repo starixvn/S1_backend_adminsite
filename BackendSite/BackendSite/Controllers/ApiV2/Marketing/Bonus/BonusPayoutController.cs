@@ -197,7 +197,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             };
         }
 
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 127, 10 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 33, 5 })]
         [HttpPost]
         public async Task<List<ApiResult>> SetBonusPayoutBatch([FromForm] SetBonusPayoutBatchReq request)
         {
