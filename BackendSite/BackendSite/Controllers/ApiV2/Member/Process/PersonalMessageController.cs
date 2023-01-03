@@ -98,6 +98,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
         }
+
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
+        }
         #endregion
 
         #region Action
@@ -395,6 +400,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
+        [HttpPost]
+        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
+        {
+            var apiResult = new ApiResult<ServerInfo>();
+            try
+            {
+                apiResult.Data = _messageBll.GetServerInfo(req.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
         #endregion
 
         #region Private Methods
