@@ -291,6 +291,7 @@ namespace BackendSite.Service.BLL
                         Stake = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
                         WinlostAmount = tpBetRecord.WinlostAmount,
                         SettlementType = tpBetRecord.SettlementType,
+                        TpUserName = tpBetRecord.TpUserName,
                     })
                 .GroupBy(i => i.GameType)
                 .Select(i => new CustTurnoverRes
@@ -300,7 +301,8 @@ namespace BackendSite.Service.BLL
                     GameName = i.First().GameName,
                     StakeSettled = i.Where( i=> i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
                     StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
-                    WinlostAmount = i.Sum(i => i.WinlostAmount)
+                    WinlostAmount = i.Sum(i => i.WinlostAmount),
+                    TpUserName = i.First().TpUserName
                 })
                 .ToList();
 
@@ -1118,7 +1120,8 @@ namespace BackendSite.Service.BLL
                 GameName = y.First().GameName,
                 GameType = y.Key,
                 StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
-                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0)
+                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0),
+                TpUserName = y.First().TpUserName
             }).ToList();
 
             return result;
