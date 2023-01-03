@@ -281,16 +281,6 @@
       },
       {
         "Key": "",
-        "Title": "Balance Adjustment (Batch)",
-        "FuncKey": "Finance/BalanceAdjustmentBatch",
-        "Controller": "Finance",
-        "Action": "BalanceAdjustmentBatch",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
         "Title": "Bonus Payout",
         "FuncKey": "Finance/BonusPayout",
         "Controller": "Finance",
@@ -481,16 +471,6 @@
         "FuncKey": "Marketing/PointLevelManagement",
         "Controller": "Marketing",
         "Action": "PointLevelManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "BonusManage",
-        "Title": "Bonus Management",
-        "FuncKey": "Marketing/BonusManage",
-        "Controller": "Marketing",
-        "Action": "BonusManage",
         "Icon": "",
         "Roles": null,
         "Childs": null

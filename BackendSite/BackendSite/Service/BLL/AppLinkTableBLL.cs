@@ -16,38 +16,38 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<AppLinkTable> GetAppLinkTable(int siteId)
         {
-            var appLinkTable =  appLinkTableService.GetAppLinkTable(siteId).ToList();
+            var appLinkTable = appLinkTableService.GetAppLinkTable(siteId).ToList();
             var siteList = serverInfoService.GetSiteList().ToList();
 
-            if (appLinkTable.Find(x=> x.AppType == (int)AppLinkAppType.Android) == null){
-                appLinkTable.Add(new AppLinkTable
-                {
-                    SiteId = siteId,
-                    SiteName = siteList.Find(x=>x.SiteId == siteId).SiteName,
-                    Domain = string.Empty,
-                    AppType = (int)AppLinkAppType.Android,
-                    ProtocolType = (int)AppLinkProtocolType.HTTP
-                });
-            }
-
-            if (appLinkTable.Find(x => x.AppType == (int)AppLinkAppType.IOS) == null)
+            if (appLinkTable.Find(x => x.AppType == AppTypeEnum.Android) == null)
             {
                 appLinkTable.Add(new AppLinkTable
                 {
                     SiteId = siteId,
                     SiteName = siteList.Find(x => x.SiteId == siteId).SiteName,
                     Domain = string.Empty,
-                    AppType = (int)AppLinkAppType.IOS,
-                    ProtocolType = (int)AppLinkProtocolType.HTTP
+                    AppType = AppTypeEnum.Android,
+                    ProtocolType = ProtocolTypeEnum.HTTP
                 });
             }
 
+            if (appLinkTable.Find(x => x.AppType == AppTypeEnum.IOS) == null)
+            {
+                appLinkTable.Add(new AppLinkTable
+                {
+                    SiteId = siteId,
+                    SiteName = siteList.Find(x => x.SiteId == siteId).SiteName,
+                    Domain = string.Empty,
+                    AppType = AppTypeEnum.IOS,
+                    ProtocolType = ProtocolTypeEnum.HTTP
+                });
+            }
             return appLinkTable;
         }
 
-        public int SetAppLink(int siteId, int appType, string domain, int protocolType,string lastUpdateUser)
+        public async Task<bool> SetAppLink(int siteId, AppTypeEnum appType, string domain, ProtocolTypeEnum protocolType, string lastUpdateUser)
         {
-            return appLinkTableService.SetAppLink(siteId, appType, domain, protocolType, lastUpdateUser);
+            return await appLinkTableService.SetAppLinkAsync(siteId, appType, domain, protocolType, lastUpdateUser);
         }
     }
 }
