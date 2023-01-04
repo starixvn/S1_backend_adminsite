@@ -34,15 +34,26 @@ public class PaymentChargeFeeBLL
         return result;
     }
 
-    public bool ModifyPaymentChargeFee(ModifyPaymentChargeFeeParams input)
+    public (ErrorCodeEnum Result, string Message) ModifyPaymentChargeFee(ModifyPaymentChargeFeeParams input)
     {
         var result = _chargeFeeService.CreateModifyPaymentChargeFeeLog(input);
         var success = result == (int) ErrorCodeEnum.Success;
-        if (!success)
-        {
-            _logger.LogError($"Admin_ModifyPaymentChargeFeeLog_Ins failed, ResultCode({result}).");
-        }
+        var msg = string.Empty;
 
-        return success;
+        if (success)
+            return (ErrorCodeEnum.Success, msg);
+        
+        msg = result switch
+        {
+            -1 => $"({result}) Channel id: {input.ChannelId} not exists.",
+            -2 => $"({result})Method not support.",
+            -3 => $"({result})No data needs to be updated.",
+            -4 => $"({result})Failed to insert log.",
+            _ => $"({result}) Unknown error."
+        };
+        
+        _logger.LogError($"Admin_ModifyPaymentChargeFeeLog_Ins failed, Message: {msg}");
+        
+        return (ErrorCodeEnum.Fail, msg);
     }
 }

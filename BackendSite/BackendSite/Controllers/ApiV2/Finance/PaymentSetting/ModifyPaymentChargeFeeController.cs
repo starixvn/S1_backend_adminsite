@@ -59,7 +59,7 @@ public class ModifyPaymentChargeFeeController : ControllerBase
     {
         var authData = _authorizeBll.GetAuthData();
         
-        var result = _chargeFeeBll.ModifyPaymentChargeFee(
+        var (result, msg) = _chargeFeeBll.ModifyPaymentChargeFee(
             new ModifyPaymentChargeFeeParams
         {
             SiteId = authData.SiteId,
@@ -72,6 +72,6 @@ public class ModifyPaymentChargeFeeController : ControllerBase
             Operator = authData.UserName
         });
 
-        return new ApiResult((int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail), string.Empty);
+        return new ApiResult((int) result, msg);
     }
 }
