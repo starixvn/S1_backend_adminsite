@@ -87,7 +87,7 @@ namespace BackendSite.Service.BLL
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
             }
 
-            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id).ToList();
+            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);
 
             SetTpTransferMemo(list);
 
@@ -98,12 +98,12 @@ namespace BackendSite.Service.BLL
             });
 
             //Export
-            if (pageNumber == -1 || data.Count == 0)
+            if (pageNumber == -1 || !data.Any())
             {
                 return list;
             }
 
-            var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
+            var (index, count) = pageInfo.ListPagination(list.Count(), pageNumber, pageSize);
             return list.GetRange(index, count);
         }
 

@@ -14,13 +14,13 @@ namespace BackendSite.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static List<T> OrderBy<T>(this IEnumerable<T> source, IOrderBy orderBy)
+        public static IOrderedQueryable<T> OrderBy<T>(this IEnumerable<T> source, IOrderBy orderBy)
         {
             var methodName = orderBy.OrderByDirection == OrderByDirection.Ascending ? "OrderBy" : "OrderByDescending";
             return ApplyOrder(source.AsQueryable(), orderBy.OrderByProperty, methodName);
         }
 
-        static List<T> ApplyOrder<T>(IQueryable<T> source, string property, string methodName)
+        static IOrderedQueryable<T> ApplyOrder<T>(IQueryable<T> source, string property, string methodName)
         {
             try
             {
