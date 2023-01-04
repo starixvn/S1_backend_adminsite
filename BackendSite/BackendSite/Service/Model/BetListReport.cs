@@ -79,7 +79,7 @@ namespace BackendSite.Service.Model
         }
     }
 
-    public class BetListReport
+    public class BetListReport : IDisposable
     {
         private bool _isDisposed;
         private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
