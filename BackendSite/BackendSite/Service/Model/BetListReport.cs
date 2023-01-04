@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BackendSite.Service.Model
@@ -78,6 +79,9 @@ namespace BackendSite.Service.Model
 
     public class BetListReport : IDisposable
     {
+        private bool _isDisposed;
+        private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
+        
         public string SiteId { get; set; }
         public string CurrencyId { get; set; }
         public string UserName { get; set; }
@@ -150,19 +154,40 @@ namespace BackendSite.Service.Model
         }
         public int VipLevel { get; set; }
         public string LevelName { get; set; }
-
-        private bool disposedValue;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                disposedValue = true;
-            }
-        }
+        
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+            
+            if (disposing)
+            {
+                // free managed resources
+            }
+
+            // free native resources if there are any.
+            if (_nativeResource != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_nativeResource);
+                _nativeResource = IntPtr.Zero;
+            }
+
+            _isDisposed = true;
+        }
+        
+        // NOTE: Leave out the finalizer altogether if this class doesn't
+        // own unmanaged resources, but leave the other methods
+        // exactly as they are.
+        ~BetListReport()
+        {
+            // Finalizer calls Dispose(false)
+            Dispose(false);
         }
     }
 }
