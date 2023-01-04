@@ -43,6 +43,10 @@ namespace BackendSite.Service.BLL
                     var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
 
                     var sortResult = sortData.GetRange(sortIndex, sortCount);
+                    foreach (var item in sortData)
+                    {
+                        item.Dispose();
+                    }
                     return sortResult;
                 }
 
@@ -87,6 +91,10 @@ namespace BackendSite.Service.BLL
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
             var result = list.GetRange(index, count);
+            foreach (var item in list)
+            {
+                item.Dispose();
+            }
             return result;
         }
 
