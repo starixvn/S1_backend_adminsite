@@ -56,3 +56,15 @@ Content-Type: application/json
     "transId": "WD136052",
     "action": 6
 }
+
+###
+# 取得 CalCode
+# currencyId = 0 取全部
+# purpose 1: deposit, 2: withdrawal
+POST {{url}}/apiV2/BaseData/GetCalCodeList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 0,
+    "purpose": 2
+}
