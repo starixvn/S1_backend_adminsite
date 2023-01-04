@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using System.Data;
 using BackendSite.Service.Library;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -232,6 +233,17 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
+        
+        public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            var parameters = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
+            });
+            return _reportDbClient
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V3", parameters);
+        }
 
         public int GetTransferDataCount(string accountNo)
         {
@@ -317,6 +329,58 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferInfo_Get_V2";
             return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
         }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(GetTransferInfoListParams input,
+            int startIndex,
+            int pageSize,
+            out int totalPages,
+            out int rowCount)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _IsExport = input.IsExport,
+                    _SiteId = input.SiteId,
+                    _TransferTypes = input.StrTransferTypes,
+                    _TransFromDate = input.StartTime.ToUniversalTime().DateTime,
+                    _TransToDate = input.EndTime.ToUniversalTime().DateTime,
+                    _FromCurrencyId = input.FromCurrencyId,
+                    _ToCurrencyId = input.ToCurrencyId,
+                    _FromAccountNo = input.FromAccountNo,
+                    _ToAccountNo = input.ToAccountNo,
+                    _FromChannel = input.FromChannel,
+                    _ToChannel = input.ToChannel,
+                    _Reason = input.Reason,
+                    _FromAgent = input.FromAgent,
+                    _ToAgent = input.ToAgent,
+                    _StartIndex = startIndex,
+                    _PageSize = pageSize
+                });
+            
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_Get_V3", parameters);
+            
+            totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
+            rowCount = parameters.Get<int?>("_RowCount") ?? 0;
+
+            return result;
+        }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoById(string transferId)
+        {
+            var parameters = new DynamicParameters(new
+                {
+                    _TransferId = transferId
+                });
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_GetById", parameters);
+
+            return result;
+        }
 
         public int InsertTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
@@ -342,9 +406,7 @@ namespace BackendSite.Service.DAL
                     _Fee = bankFinancialTransferInfo.Fee,
                     _Reason = bankFinancialTransferInfo.Reason,
                     _Remark = bankFinancialTransferInfo.Remark,
-                    //_CreateTime = bankFinancialTransferInfo.CreateTime.DateTime,
-                    _Creator = bankFinancialTransferInfo.Creator,
-                    //_UpdateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
+                    _Creator = bankFinancialTransferInfo.Updator,
                     _Updator = bankFinancialTransferInfo.Updator
                 });
 
@@ -520,7 +582,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<BankFinancialTransferInfoReceiptModel>(SpName, parameters);
         }
 
-        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic)
+        public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic = null)
         {
             var parameters = new DynamicParameters(
                 new

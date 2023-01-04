@@ -66,7 +66,7 @@ namespace BackendSite.Service.Library
         /// <returns></returns>
         public string GetClientIP(Microsoft.AspNetCore.Http.HttpContext context)
         {
-            var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR" };
+            var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR", "X-Forwarded-For" };
 
             foreach (var Header in HeaderNames)
             {
@@ -200,6 +200,48 @@ namespace BackendSite.Service.Library
             {
                 return false;
             }
+        }
+        
+        /// <summary>
+        /// 電話遮罩
+        /// </summary>
+        /// <param name="phone">電話</param>
+        /// <returns>遮罩處理結果</returns>
+        public string MaskPhone(string phone)
+        {
+            if (string.IsNullOrEmpty(phone))
+                return phone;
+
+            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
+            return Regex.Replace(phone, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// EMail遮罩
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        public string MaskEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return email;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            return Regex.Replace(email, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// LineUserId遮罩
+        /// </summary>
+        /// <param name="data">Email</param>
+        /// <returns>遮罩處理結果</returns>
+        public string MaskLineId(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                return data;
+
+            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1})";
+            return Regex.Replace(data, pattern, m => new string('*', m.Length));
         }
 
     }
