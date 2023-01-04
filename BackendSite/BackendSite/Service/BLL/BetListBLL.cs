@@ -9,12 +9,12 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class BetListBLL
+    public class BetListService
     {
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
 
-        public BetListBLL(IServiceProvider provider)
+        public BetListService(IServiceProvider provider)
         {
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();

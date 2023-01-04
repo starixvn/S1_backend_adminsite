@@ -15,12 +15,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class BetListReportController : ControllerBase
     {
-        private readonly BetListBLL _betListBll;
+        private readonly BetListService _betListBll;
         private readonly ExcelBLL _excelBll;
 
         public BetListReportController(IServiceProvider provider)
         {
-            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _betListBll = provider.GetRequiredService<BetListService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 

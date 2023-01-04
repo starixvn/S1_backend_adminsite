@@ -108,7 +108,7 @@ namespace BackendSite
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
             services.AddTransient<IIovationReportService, IovationReportService>();
-            services.AddTransient<BetListBLL>();
+            services.AddTransient<BetListService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
             services.AddTransient<IMpaCommonService, MpaCommonService>();
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
