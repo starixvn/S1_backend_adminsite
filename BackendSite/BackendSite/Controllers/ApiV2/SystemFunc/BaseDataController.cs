@@ -918,15 +918,21 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult GetCalCodeList()
+        public ApiResult GetCalCodeList(GetBankInfoOffListRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
-            var accountList = 
-                _bankFinancialBll.GetFinancialAccountList(authData.SiteId, new [] {TransferAccountPurposeEnum.Deposit});
+            
+            var accountList = _bankDetailBll.GetOfflineBankAccount(authData.SiteId, request.CurrencyId)
+                .Where(x => x.Purposes.Contains(request.Purpose)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel != TransferChannelEnum.PSP
+                            && x.Channel != TransferChannelEnum.CryptoWallet)
+                .OrderBy(x => x.SettingStatus);
+            
             var data = accountList
                 .Select(x => new CalCodeModel
                 {
-                    BankId = x.FinancialId,
+                    BankId = x.BankId,
                     CalCodeName = x.DisplayName,
                     CurrencyId = x.CurrencyId,
                     SysId = x.SysId
