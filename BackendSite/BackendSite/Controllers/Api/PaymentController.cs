@@ -466,12 +466,12 @@ namespace BackendSite.Controllers.Api
                 ref TotalPages,
                 ref RowCount,
                 new TimeSpan(8,0,0));
-
-            foreach (var data in result)
-            {
-                data.SettledTime = data.SettledTime.AddHours(8);
-                data.TransTime = data.TransTime.AddHours(8);
-            }
+            //
+            // foreach (var data in result)
+            // {
+            //     data.SettledTime = data.SettledTime.AddHours(8);
+            //     data.TransTime = data.TransTime.AddHours(8);
+            // }
 
             apiResult.ErrorCode = 0;
             apiResult.Data = result;
