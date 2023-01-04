@@ -165,6 +165,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
+    }
 
     #endregion
 
@@ -1306,7 +1312,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1361,8 +1366,8 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-
-    public enum ShieldRiskTagged
+    
+     public enum ShieldRiskTagged
     {
         IsBot = 1,
         IsIncognito = 2,
