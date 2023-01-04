@@ -11,7 +11,7 @@ namespace BackendSite.Service.BLL
 {
     public class HotGameBLL
     {
-        private const string TpLogoPath = "/img/hotgames";
+        private const string TpLogoPath = "/desktop/img/hotgame";
 
         private readonly HotGameService _hotGameService;
         private readonly ThirdPartyService _thirdPartyService;
