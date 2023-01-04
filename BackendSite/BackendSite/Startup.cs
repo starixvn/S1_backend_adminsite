@@ -102,6 +102,7 @@ namespace BackendSite
             services.AddTransient<IMarketingService, MarketingService>();
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
+            services.AddTransient<BetListBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
