@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -84,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var endTime = request.EndTime.ToUniversalTime().DateTime;
             var data = _betListBll.GetTpBetRecord(request.CustId , startTime, endTime);
             IPageInfo pageInfo = new PageInfo();
-            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            var (index, count) = pageInfo.ListPagination(data.Count(), request.PageNumber, request.PageSize);
             return new ApiListResult<TpBetRecord>(ErrorCodeEnum.Success, pageInfo, data.GetRange(index, count)) ;
         }
 
