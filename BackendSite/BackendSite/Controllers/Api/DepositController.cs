@@ -509,9 +509,9 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public ApiListResult<DepositTimeList> DepositTimeReportGet(DepositTimeReportOldPara para)
+        public ApiListResultCurrencyAmount<DepositTimeList> DepositTimeReportGet(DepositTimeReportOldPara para)
         {
-            var apiListResult = new ApiListResult<DepositTimeList>();
+            var apiListResult = new ApiListResultCurrencyAmount<DepositTimeList>();
             try
             {
                 var siteInfoList = serverInfoBLL.GetSiteList();
@@ -554,7 +554,7 @@ namespace BackendSite.Controllers.Api
                     PageSize = para.PageSize
                 };
 
-                var result = depositBLL.DepositTimeReportGet(req, out int totalPages, out int rowCount);
+                var result = depositBLL.DepositTimeReportGet(req, out int totalPages, out int rowCount, out List<TotalAmount> currencyTotalAmount);
                 foreach (var data in result)
                 {
                     data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
@@ -569,6 +569,7 @@ namespace BackendSite.Controllers.Api
                 apiListResult.TotalPages = totalPages;
                 apiListResult.RowCount = rowCount;
                 apiListResult.ErrorCode = 0;
+                apiListResult.CurrencyAmountRecord = currencyTotalAmount;
             }
             catch (Exception ex)
             {
@@ -580,7 +581,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public IActionResult ExportDepositTime(string selectSite, string depositId, long startDate, long endDate, int status, int currencyId)
+        public async Task<IActionResult> ExportDepositTime(string selectSite, string depositId, long startDate, long endDate, int status, int currencyId)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(startDate);
             var endTime = DateTimeExtensions.UnixToDateTime(endDate);
@@ -611,7 +612,7 @@ namespace BackendSite.Controllers.Api
                 statusList.Add((DepositStatusEnum)status);
             }
 
-            var exportData = depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, JsonConvert.SerializeObject(statusList), JsonConvert.SerializeObject(currencyIdList));
+            var exportData = await depositBLL.DepositTimeExportGet(selectSite, depositId, startTime, endTime, JsonConvert.SerializeObject(statusList), JsonConvert.SerializeObject(currencyIdList),string.Empty);
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);

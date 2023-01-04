@@ -38,6 +38,14 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
+        public class GetRebateLogByCustReq
+        {
+            public int CustId { get; set; }
+            public long? StartDate { get; set; }
+            public long? EndDate { get; set; }
+            public int PageNumber { get; set; }
+        }
+
         public PaymentController(IConfiguration configuration,
             PaymentBLL paymentBLL,
             CustInfoBLL custInfoBLL,
@@ -259,8 +267,9 @@ namespace BackendSite.Controllers.Api
                 startDate,
                 endDate,
                 request.RefTransId,
-                10,
-                request.PageNumber,
+                0,
+                10, 
+                request.PageNumber, 
                 out var pageInfo);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
@@ -284,7 +293,7 @@ namespace BackendSite.Controllers.Api
                 : DateTimeExtensions.UnixToDateTime((long)getBonusLogReq.EndDate);
 
             var data = _paymentBLL.GetBonusLog(getBonusLogReq.CustId,
-                getBonusLogReq.PromoCategoryId,
+                new List<int>() { getBonusLogReq.PromoCategoryId },
                 startDate,
                 endDate,
                 getBonusLogReq.RefTransId,
@@ -328,35 +337,13 @@ namespace BackendSite.Controllers.Api
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// Use：
-        /// CSD > Customer Administration > CustInfo > Statement
-        /// </remarks>
-        /// <param name="custTpBetRecordListOneWeekReq"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordListOneWeek>> GetCustTpBetRecordListOneWeek(
-            CustTpBetRecordListOneWeekReq custTpBetRecordListOneWeekReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<TpBetRecordListOneWeek>>
-            {
-                ErrorCode = 0,
-                Data = _paymentBLL.GetCustTpBetRecordListOneWeek(custTpBetRecordListOneWeekReq.CustId)
-            };
-            return apiResult;
-        }
-
         [HttpPost]
         public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecordList(
             CustTpBetRecordListReq custTpBetRecordListReq)
         {
             var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
-
-            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime);
+            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, new TimeSpan(8, 0, 0));
 
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -471,20 +458,20 @@ namespace BackendSite.Controllers.Api
 
             var result = _paymentBLL.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
-                req.SelDate.Date,
                 req.GameTypeId,
                 startTime,
                 endTime,
                 PageSize,
                 ref PageNumber,
                 ref TotalPages,
-                ref RowCount);
-
-            foreach (var data in result)
-            {
-                data.SettledTime = data.SettledTime.AddHours(8);
-                data.TransTime = data.TransTime.AddHours(8);
-            }
+                ref RowCount,
+                new TimeSpan(8,0,0));
+            //
+            // foreach (var data in result)
+            // {
+            //     data.SettledTime = data.SettledTime.AddHours(8);
+            //     data.TransTime = data.TransTime.AddHours(8);
+            // }
 
             apiResult.ErrorCode = 0;
             apiResult.Data = result;

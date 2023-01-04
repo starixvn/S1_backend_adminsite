@@ -6,7 +6,12 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
 using BackendSite.Extensions;
+using System.Threading.Tasks;
+using System.Linq;
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
+using BackendSite.Extensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -31,6 +36,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -39,6 +45,7 @@ namespace BackendSite.Service.BLL
             custInfoService = provider.GetRequiredService<CustInfoService>();
             _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+          	_depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
@@ -345,7 +352,7 @@ namespace BackendSite.Service.BLL
         }
         
         public IEnumerable<DepositTimeList> DepositTimeReportGet(DepositTimeReportPara para,
-            out int totalPages, out int rowCount)
+            out int totalPages, out int rowCount, out List<TotalAmount> currencyTotalAmount)
         {
             var result = depositService.DepositTimeReportGet(JsonConvert.SerializeObject(para.SiteIds),
                 JsonConvert.SerializeObject(para.CurrencyId),
@@ -353,10 +360,12 @@ namespace BackendSite.Service.BLL
                 para.StartDate.DateTime,
                 para.EndDate.DateTime,
                 para.DepositId,
+                para.CustId,
                 (Math.Abs(para.PageNumber) - 1) * Math.Abs(para.PageSize),
                 Math.Abs(para.PageSize),
                 out totalPages,
-                out rowCount);
+                out rowCount,
+                out currencyTotalAmount);
 
             if (result.Any())
             {
@@ -379,11 +388,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<DepositTimeExportData> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds)
+        public async Task<IEnumerable<DepositTimeExportData>> DepositTimeExportGet(string selectSite, string depositId, DateTime startDate, DateTime endDate, string statuses, string currencyIds, string memberId)
         {
             var exportDataToExcel = new List<DepositTimeExportData>();
+            int custId = 0;
+            if (!string.IsNullOrWhiteSpace(memberId))
+            {
+                var custSimpleInfo = await custInfoBLL.GetCustId(null, memberId, JsonConvert.DeserializeObject<List<int>>(selectSite).FirstOrDefault());
+                if (custSimpleInfo != null)
+                    custId = custSimpleInfo.CustId;
+                else
+                    return exportDataToExcel;
+            }
 
-            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds);
+            var result = depositService.GetExportData(selectSite, depositId, startDate, endDate, statuses, currencyIds, custId);
 
             result?.ForEach(x =>
             {
@@ -410,7 +428,9 @@ namespace BackendSite.Service.BLL
                     CompleteTime = GetTimeString(ts),
                     ToApprovedTime = x.ToApprovedTime,
                     EndFlowTime = x.ApprovedTime,
-                    ApprovedBy = x.ApprovedBy
+                    ApprovedBy = x.ApprovedBy,
+                    StatementTime = x.StatementTime,
+                    Operator = x.Operator
                 });
             });
             return exportDataToExcel;
