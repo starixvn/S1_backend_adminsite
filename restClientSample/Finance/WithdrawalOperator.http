@@ -35,3 +35,24 @@ Content-Type: application/json
     "currencyId": 2,
     "purpose": 2
 }
+
+###
+# 取得CryptoWallet列表
+# 回傳值非空陣列時顯示CryptoWallet選項
+POST {{url}}/apiV2/BaseData/GetCryptoWalletList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2
+}
+
+###
+# CryptoWallet 送出
+POST {{url}}/apiV2/Withdrawal/SendToNext HTTP/1.1
+Content-Type: application/json
+
+{
+    "comment": "t",
+    "transId": "WD136052",
+    "action": 6
+}

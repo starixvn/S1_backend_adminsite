@@ -586,9 +586,6 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
-        public IEnumerable<CryptoInfo> GetCryptoInfoList()
-            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
-
         public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

@@ -336,7 +336,8 @@ namespace BackendSite.Service.Model.enums
         Undefine = 0, //No Use
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum
@@ -351,6 +352,20 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         ToKyc = 8,
         Error = 99 //No Use
+    }
+    
+    public enum WithdrawalActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63,
+        Verified = 69,
+        Process = 70,
+        ToKyc = 71
     }
 
     #endregion
@@ -843,8 +858,10 @@ namespace BackendSite.Service.Model.enums
         PSP = 3,
 
         Finance = 4,
-
-        MC = 5
+        
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>

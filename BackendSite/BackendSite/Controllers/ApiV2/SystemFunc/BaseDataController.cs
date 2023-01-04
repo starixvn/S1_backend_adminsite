@@ -293,12 +293,49 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var data = _bankDetailBll.GetOfflineBankAccount(authData.SiteId, request.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.Channel != TransferChannelEnum.PSP)
+                            && x.Channel != TransferChannelEnum.PSP
+                            && x.Channel != TransferChannelEnum.CryptoWallet)
                 .OrderBy(x => x.SettingStatus);
 
             // 有 withdrawal / deposit approved 權限才顯示密碼
             if ((request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
                 || (request.Purpose == TransferAccountPurposeEnum.Deposit && _permissionBll.CheckPermission(27, new []{65})))
+            {
+                foreach (var d in data)
+                {
+                    d.BankLoginAccount = _cryptor.Decrypt(d.BankLoginAccount);
+                    d.BankLoginPassword = _cryptor.Decrypt(d.BankLoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                    d.MobilePin = _cryptor.Decrypt(d.MobilePin);
+                    d.CorporateID = _cryptor.Decrypt(d.CorporateID);
+                }
+            }
+            
+            return new ApiResult<IEnumerable<OfflineBankAccount>>
+            {
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// 取得 Local Crypto Wallet 列表
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<OfflineBankAccount>> GetCryptoWalletList(GetBankInfoOffListRequest request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var data = _bankDetailBll.GetOfflineBankAccount(authData.SiteId, request.CurrencyId)
+                .Where(x => x.Purposes.Contains(TransferAccountPurposeEnum.Withdrawal)
+                            && x.AccountStatus == TransferAccountStatusEnum.Open
+                            && x.Channel == TransferChannelEnum.CryptoWallet)
+                .OrderBy(x => x.SettingStatus);
+
+            // 有 withdrawal approved 權限才顯示密碼
+            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
             {
                 foreach (var d in data)
                 {

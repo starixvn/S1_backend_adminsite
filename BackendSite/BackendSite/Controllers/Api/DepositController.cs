@@ -213,9 +213,9 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetDepositRequestComment(DepositReq depositReq)
+        public ApiResult<IEnumerable<DepositComments>> GetDepositRequestComment(DepositReq depositReq)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<DepositComments>>();
             var comments = depositBLL.GetDepositRequestComment(depositReq.TransId);
 
             //foreach (var data in comments)
