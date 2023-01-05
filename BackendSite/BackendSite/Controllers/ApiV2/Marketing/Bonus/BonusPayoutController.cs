@@ -87,6 +87,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             string bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             try
             {
+                if (request.Amount <= 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Amount can't be zero or less than zero";
+                    return apiResult;
+                }
+                
                 var authData = _authorizeBll.GetAuthData();
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
