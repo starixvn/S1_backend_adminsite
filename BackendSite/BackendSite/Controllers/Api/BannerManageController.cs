@@ -36,20 +36,21 @@ namespace BackendSite.Controllers.Api
             public int SiteId { get; set; }
             public int Status { get; set; }
         }
+
         public class GetHotEventRequest
         {
             public int SiteId { get; set; }
             public string BannerName { get; set; }
         }
 
+        // 新版為apiV2 , 此api會壞掉
         [HttpPost]
         public ApiResult SetBanner([FromForm] BannerInfo bannerInfo)
         {
             var apiResult = new ApiResult();
             try
             {
-                var user = authorizeBLL.GetAuthData().UserName;
-                var result = bannerManageBLL.SetBanner(bannerInfo, user);
+                var result = bannerManageBLL.SetBanner(null);
                 
                 apiResult.ErrorCode = result >=0 ? (int)ErrorCodeEnum.Success :(int) ErrorCodeEnum.Fail;
                 apiResult.Message = apiResult.ErrorCode != 0 ? "Update Failed" : "";
@@ -148,14 +149,14 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+        //此為舊api ,會壞掉
         [HttpPost]
         public ApiResult UpdateBannerStatus([FromForm] int SiteId, [FromForm] string BannerName, [FromForm] int Status)
         {
             var apiResult = new ApiResult();
             try
             {
-                var User = authorizeBLL.GetAuthData().UserName;
-                apiResult.ErrorCode = bannerManageBLL.UpdateBannerStatus(SiteId, BannerName, Status, User);
+                apiResult.ErrorCode = bannerManageBLL.UpdateBannerStatus(null);
             }
             catch (Exception ex)
             {

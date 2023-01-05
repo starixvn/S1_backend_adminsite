@@ -128,9 +128,6 @@ namespace BackendSite.Service.BLL
             menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
             permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
-            if (environment.IsProduction())
-                menuList = menuList.Where(x => x.Id != 22);
-
             if (!string.IsNullOrWhiteSpace(lang))
             {
                 var functionMappingList = ProcessTranslation(lang, menuList.Select(x => new MappingTranslationModel { Id = x.Id, Name = x.Name, Translation = x.Translation }));

@@ -25,11 +25,11 @@ namespace BackendSite.Service.DAL
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
 
-        public async Task<IEnumerable<BlockIP>> GetBlockIPList()
+        public async Task<IEnumerable<T>> GetBlockIPList<T>()
         {
             var p = new DynamicParameters();
             p.Add("IP", null);
-            return await _mainDbClient.QueryAsync<BlockIP>("Admin_BlockIP_Get", p);
+            return await _mainDbClient.QueryAsync<T>("Admin_BlockIP_Get", p);
         }
 
         public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
@@ -216,6 +216,18 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetIoavationAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_IoavationAssociatedList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetShieldAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_ShieldAssociatedList_Get", p);
         }
 
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)

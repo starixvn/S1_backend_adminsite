@@ -10,7 +10,7 @@ using static BackendSite.Service.BLL.PendingFundBLL;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PendingBonusController : ControllerBase
@@ -61,7 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Pending Bonus
         /// </remarks>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 46, 1 })]
         [HttpPost]
         public ApiListResult<PendingBonus> GetList(GetListRequest request)
         {
@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 46, 11 })]
         [HttpPost]
         public async Task<ApiResult<List<TransferMultiResult>>> TransferMultiAsync(TransferListRequest request)
         {
