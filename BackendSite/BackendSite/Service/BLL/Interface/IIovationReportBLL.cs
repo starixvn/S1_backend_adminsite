@@ -6,4 +6,5 @@ public interface IIovationReportBLL
 {
     Task<IovationReportPageResult<IovationReport>> GetListAsync(IovationReportGetListRequest request);
     Task<IEnumerable<IovationReport>> GetListWithoutPageAsync(IovationReportExportRequest request);
+    Task<IEnumerable<DeviceUser>> GetAssociateAccount(string deviceId);
 }

@@ -7,10 +7,12 @@ namespace BackendSite.Service.BLL
     public class IovationReportBLL : IIovationReportBLL
     {
         private readonly IovationReportService _iovationReport;
+        private readonly BlockService _blockService;
 
-        public IovationReportBLL(IovationReportService iovationReport)
+        public IovationReportBLL(IovationReportService iovationReport, BlockService blockService)
         {
             _iovationReport = iovationReport;
+            _blockService = blockService;
         }
 
         public async Task<IovationReportPageResult<IovationReport>> GetListAsync(IovationReportGetListRequest request)
@@ -59,6 +61,11 @@ namespace BackendSite.Service.BLL
             });
 
             return iovationReport;
+        }
+
+        public async Task<IEnumerable<DeviceUser>> GetAssociateAccount(string deviceId)
+        {
+            return await _blockService.GetIoavationAssociatedList(deviceId);
         }
     }
 }
