@@ -21,6 +21,11 @@ namespace BackendSite.Controllers.ApiV2.Report
             _excelBll = excelBll;
         }
 
+        /// <summary>
+        /// 查詢iovation列表
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ApiListResult<IovationReport>> GetList(IovationReportGetListRequest request)
         {
@@ -38,6 +43,11 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        /// <summary>
+        /// 匯出iovation報表
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Export(IovationReportExportRequest request)
         {
@@ -45,6 +55,22 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var stream = _excelBll.Export(exportData, offset: request.StartTime.Offset);
             return _excelBll.ExcelFile(stream, "IovationReport");
+        }
+
+        /// <summary>
+        /// 取得iovation相關連帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<DeviceUser>>> GetAssociateAccount(GetAssociateAccountRequest request)
+        {
+            var deviceUserList = await _iovationReport.GetAssociateAccount(request.DeviceId);
+            return new ApiResult<IEnumerable<DeviceUser>>
+            {
+                Data = deviceUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
     }
 }
