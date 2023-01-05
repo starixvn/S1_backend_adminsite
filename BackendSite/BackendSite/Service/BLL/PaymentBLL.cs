@@ -84,7 +84,7 @@ namespace BackendSite.Service.BLL
 
             if (financialType != 0)
             {
-                data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
+                data = data.Where(i => i.FinancialType == (FinancialType)financialType);
             }
 
             var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);
