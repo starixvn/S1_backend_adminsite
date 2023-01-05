@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpDisableController : ControllerBase
@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public string UserName { get; set; }
             public DateTimeOffset StartDate
             {
@@ -82,10 +82,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var apiResult = new ApiListResult<TpDisableUser>();
 
             var pageNumber = req.PageNumber;
-
+            List<int> siteIds = new List<int>();
+            siteIds.Add(req.SiteId);
             apiResult.Data = _riskBll.GetTpDisableUser(
-                req.SiteIds,
-                req.UserName,
+                siteIds,
+                string.IsNullOrEmpty(req.UserName) ? null : req.UserName,
                 req.StartDate,
                 req.EndDate,
                 req.PageSize,
