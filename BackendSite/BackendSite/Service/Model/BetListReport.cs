@@ -169,37 +169,6 @@ namespace BackendSite.Service.Model
             if (disposing)
             {
                 // free managed resources
-                SiteId = default;
-                CurrencyId = default;
-                UserName = default;
-                TpUserName = default;
-                TpId = default;
-                TransId = default;
-                GameType = default;
-                TransTime = default;
-                SettledTime = default;
-                Stake = default;
-                ValidBet = default;
-                WinlostAmount = default;
-                ProviderID = default;
-                Currency = default;
-                RefNo = default;
-                GameID = default;
-                Provider = default;
-                Product = default;
-                Category = default;
-                Game = default;
-                Title = default;
-                MatchID = default;
-                BetType = default;
-                BetChoice = default;
-                Result = default;
-                Odds = default;
-                OddsType = default;
-                Platform = default;
-                Live = default;
-                IP = default;
-                TagList = default;
             }
 
             // free native resources if there are any.
