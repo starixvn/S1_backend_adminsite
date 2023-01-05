@@ -211,14 +211,5 @@ namespace BackendSite.Service.Model
 
             _isDisposed = true;
         }
-        
-        // NOTE: Leave out the finalizer altogether if this class doesn't
-        // own unmanaged resources, but leave the other methods
-        // exactly as they are.
-        ~BetListReport()
-        {
-            // Finalizer calls Dispose(false)
-            Dispose(false);
-        }
     }
 }
