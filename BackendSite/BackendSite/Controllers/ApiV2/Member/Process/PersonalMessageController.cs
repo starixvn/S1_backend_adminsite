@@ -400,7 +400,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
         [HttpPost]
         public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
         {
