@@ -181,6 +181,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -275,7 +276,7 @@ namespace BackendSite.Controllers.Api
                 RedeemHours = promotion.RedeemHours,
                 PeriodType = promotion.PeriodType,
                 PeriodDay = promotion.PeriodDay,
-                SpecialCode = promotion.SpecialCode,
+                SpecialCode = promotion.IsSpecial ? promotion.SpecialCode : null,
                 IsSpecial = promotion.IsSpecial,
                 OnlyRegistered = promotion.OnlyRegistered,
                 PromotionDeviceType = promotion.PromotionDeviceType,
@@ -295,20 +296,17 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                //如果是新增時有填SpecialCode 檢查SpecialCode是否有重複
-                if (isAdd && promotion.IsSpecial)
+                if (isAdd && _bonusManageBLL.CheckPromotionExists(req.BonusCode, req.SpecialCode))
                 {
-                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(promotion.SpecialCode))
-                    {
-                        apiResult.ErrorCode = 999;
-                        apiResult.Message = "Duplicate Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = 999;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
 
                 var errorCode = _bonusManageBLL.SetPromotion(isAdd, req, vipLevelCondition, User.Identity.Name) ? 0 : 1;
 
                 apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -349,15 +347,14 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                if (duplicateRequest.IsSpecial)
+                duplicateRequest.NewSpecialCode = duplicateRequest.IsSpecial ? duplicateRequest.NewSpecialCode : null;
+                if (_bonusManageBLL.CheckPromotionExists(duplicateRequest.NewBonusCode ,duplicateRequest.NewSpecialCode))
                 {
-                    if (_bonusManageBLL.CheckSpecialCodeDuplicate(duplicateRequest.NewSpecialCode))
-                    {
-                        apiResult.ErrorCode = 99;
-                        apiResult.Message = "Duplicate datas about Special Code.";
-                        return apiResult;
-                    }
+                    apiResult.ErrorCode = 99;
+                    apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
+                    return apiResult;
                 }
+                
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(
                     duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
@@ -385,6 +382,7 @@ namespace BackendSite.Controllers.Api
             }
 
             apiResult.Data = _bonusManageBLL.GetPromotionList(request.SiteIds,
+                    request.CurrencyIds,
                     request.PromotionTypes,
                     request.Status,
                     request.StartDate,
@@ -413,100 +411,6 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 999;
                 apiResult.Message = ex.Message;
                 apiResult.RawMessage = ex.ToString();
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/BonusImport" })]
-        public async Task<ApiResult<List<BonusImportResult>>> BonusImport([FromForm] int TpId,
-            [FromForm] int CategoryId, [FromForm] IFormFile excelUpload)
-        {
-            var apiResult = new ApiResult<List<BonusImportResult>>();
-            var BonusImportResultList = new List<BonusImportResult>();
-            //var apiResult = new List<ApiResult>();
-            const int OneRoundCount = 2; //每次N筆資料寫入DB
-            var BonusImportListPara = new List<BonusImportPara>();
-            try
-            {
-                if (excelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
-                    excelUpload.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
-                {
-                    var excelPkg = new ExcelPackage(excelUpload.OpenReadStream());
-                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    var isLastRow = false;
-                    var RowId = 2; // 因為有標題列，所以從第2列開始讀起
-
-                    do
-                    {
-                        var siteId = sheet.Cells[RowId, 1].Text.Trim();
-                        var bonusAmount = sheet.Cells[RowId, 3].Text.Trim();
-                        var rollover = sheet.Cells[RowId, 4].Text.Trim();
-                        var expiryDay = sheet.Cells[RowId, 5].Text.Trim();
-                        var memo = sheet.Cells[RowId, 6].Text.Trim();
-                        var userName = sheet.Cells[RowId, 2].Text.Trim();
-
-                        if (!string.IsNullOrWhiteSpace(siteId) && !string.IsNullOrWhiteSpace(bonusAmount) &&
-                            !string.IsNullOrWhiteSpace(userName))
-                        {
-                            int.TryParse(siteId, out var SiteId);
-                            int.TryParse(rollover, out var Rollover);
-                            int.TryParse(expiryDay, out var ExpiryDay);
-                            decimal.TryParse(bonusAmount, out var BonusAmount);
-
-                            var para = new BonusImportPara()
-                            {
-                                SiteId = SiteId,
-                                UserName = userName,
-                                BonusAmount = BonusAmount,
-                                RollOver = Rollover,
-                                ExpiryDay = ExpiryDay,
-                                Memo = memo,
-                                TpId = TpId,
-                                CategoryId = CategoryId
-                            };
-
-                            BonusImportListPara.Add(para);
-                            RowId++;
-                        }
-                        else
-                        {
-                            isLastRow = true;
-                        }
-                    } while (!isLastRow);
-                    /*Spared Task for
-                     * Batch*/
-
-                    var rounds = BonusImportListPara.Count / OneRoundCount;
-                    var remainder = BonusImportListPara.Count % OneRoundCount;
-                    if (remainder > 0)
-                        rounds++;
-
-                    for (var i = 1; i <= rounds; i++)
-                    {
-                        var query = BonusImportListPara.Skip((i - 1) * OneRoundCount)
-                            .Take(OneRoundCount).ToList();
-                        var insertTasks = query.Select(x => _bonusManageBLL.BonusImportAsync(x));
-                        var result = await Task.WhenAll(insertTasks);
-                        foreach (var x in result)
-                        {
-                            BonusImportResultList.Add(x);
-                        }
-                    }
-
-                    apiResult.Data = BonusImportResultList;
-                    apiResult.ErrorCode = 0;
-                    return apiResult;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentAsyncMethod());
-                apiResult.ErrorCode = 999;
-                apiResult.Message = ex.ToString();
             }
 
             return apiResult;
@@ -712,7 +616,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = _excelBLL.Export(exportData);
+            var stream = _excelBLL.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ScratchCardList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

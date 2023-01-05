@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
 using BackendSite.Extensions;
+using BackendSite.Controllers.ApiV2.Finance.Deposit;
 
 namespace BackendSite.Service.BLL
 {
@@ -31,6 +32,7 @@ namespace BackendSite.Service.BLL
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
@@ -40,6 +42,7 @@ namespace BackendSite.Service.BLL
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
@@ -190,9 +193,9 @@ namespace BackendSite.Service.BLL
             return _depositAccountingService.GetDepositAccountingByTransId(transId);
         }
         
-        public int EditDepositAccounting(string transId, string accountNo ,string memo ,string Operator)
+        public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
-            return _depositAccountingService.EditDepositAccounting(transId,accountNo,memo,Operator);
+            return _depositAccountingService.EditDepositAccounting(input);
         }
         
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(

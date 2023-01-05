@@ -76,7 +76,7 @@ namespace BackendSite.Service.Model
         }
     }
 
-    public class BetListReport
+    public class BetListReport : IDisposable
     {
         public string SiteId { get; set; }
         public string CurrencyId { get; set; }
@@ -89,7 +89,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return new DateTimeOffset(_transTime,TimeSpan.Zero);
+                return new DateTimeOffset(_transTime, _offset);
             }
             set
             {
@@ -101,7 +101,7 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return new DateTimeOffset(_settledTime, TimeSpan.Zero);
+                return new DateTimeOffset(_settledTime, _offset);
             }
             set
             {
@@ -110,6 +110,11 @@ namespace BackendSite.Service.Model
 
         }
         private DateTime _settledTime { get; set; }
+        private TimeSpan _offset { get; set; } = TimeSpan.Zero;
+        public void SetBetListTimeOffset(TimeSpan timeSpan)
+        {
+            _offset = timeSpan;
+        }
         public decimal Stake { get; set; }
         public decimal ValidBet { get; set; }
         public decimal WinlostAmount { get; set; }
@@ -144,6 +149,20 @@ namespace BackendSite.Service.Model
             }
         }
         public int VipLevel { get; set; }
-        public string LevelName { get; set; }      
+        public string LevelName { get; set; }
+
+        private bool disposedValue;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                disposedValue = true;
+            }
+        }
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

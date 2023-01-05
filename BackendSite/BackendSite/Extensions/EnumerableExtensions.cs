@@ -14,13 +14,13 @@ namespace BackendSite.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static List<T> OrderBy<T>(this IEnumerable<T> source, IOrderBy orderBy)
+        public static IOrderedQueryable<T> OrderBy<T>(this IEnumerable<T> source, IOrderBy orderBy)
         {
             var methodName = orderBy.OrderByDirection == OrderByDirection.Ascending ? "OrderBy" : "OrderByDescending";
             return ApplyOrder(source.AsQueryable(), orderBy.OrderByProperty, methodName);
         }
 
-        static List<T> ApplyOrder<T>(IQueryable<T> source, string property, string methodName)
+        static IOrderedQueryable<T> ApplyOrder<T>(IQueryable<T> source, string property, string methodName)
         {
             try
             {
@@ -41,12 +41,18 @@ namespace BackendSite.Extensions
                                 && method.GetGenericArguments().Length == 2
                                 && method.GetParameters().Length == 2).MakeGenericMethod(typeof(T), type);
                 var result = (IOrderedQueryable<T>)o.Invoke(null, new object[] { source, lambda });
-                return result.ToList();
+                return result;
             }
             catch (Exception)
             {
                 throw new AdminException(ErrorCodeEnum.OrderByInvalid);
             }
+        }
+
+
+        public static IEnumerable<T> GetRange<T>(this IEnumerable<T> source, int index, int count)
+        {
+            return source.Skip(index).Take(count);
         }
     }
 }

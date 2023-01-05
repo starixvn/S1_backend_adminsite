@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class ReasonController : ControllerBase
@@ -39,20 +38,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
         public ApiListResult<ReasonManagementData> GetList(GetReasonManagementDataPara request)
         {
-            var apiResult = new ApiListResult<ReasonManagementData>();
-
             var searchResult = _reasonManagementBll.GetReasonManagementData(request);
-            apiResult.Data = searchResult.ReasonManagementData;
-            apiResult.PageNumber = searchResult.PageNumber;
-            apiResult.TotalPages = searchResult.TotalPages;
-            apiResult.RowCount = searchResult.RowCount;
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
+            
+            return new ApiListResult<ReasonManagementData>
+            {
+                Data = searchResult.ReasonManagementData,
+                PageNumber = searchResult.PageNumber,
+                TotalPages = searchResult.TotalPages,
+                RowCount = searchResult.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -65,17 +63,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
         public ApiResult Set(SetReasonManagementPara request)
         {
-            var apiResult = new ApiResult();
-
             var authData = _authorizeBll.GetAuthData();
-            _reasonManagementBll.SetReasonManagement(request, authData.UserId);
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            var (success, msg) = _reasonManagementBll.SetReasonManagement(request, authData.UserId);
 
-            return apiResult;
+            return new ApiResult
+            {
+                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                Message = msg
+            };
         }
 
         /// <summary>
@@ -88,17 +86,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancial/ReasonManagement" })]
         [HttpPost]
         public ApiResult Insert(InsertReasonManagementPara request)
         {
-            var apiResult = new ApiResult();
-
             var authData = _authorizeBll.GetAuthData();
-            _reasonManagementBll.InsertReasonManagement(request, authData.UserId);
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
+            var (success, msg) = _reasonManagementBll.InsertReasonManagement(request, authData.UserId);
+            
+            return new ApiResult
+            {
+                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                Message = msg
+            };
         }
     }
 }

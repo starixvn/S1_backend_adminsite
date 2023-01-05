@@ -204,11 +204,7 @@ namespace BackendSite.Controllers.Api
                     var data = result.FirstOrDefault();
                     var receipt = _bankFinancialBLL.GetTransferIngoReceipt(data.TransferId);
                     var authData = _authorizeBLL.GetAuthData();
-                    if (receipt != null)
-                    {
-                        data.UploadReceiptName = receipt.PicFileName;
-                        data.TransferPic = receipt.TransferPic;
-                    }
+                    data.ReceiptUrl = receipt.PicFileName;
                     data.Updator = authData.UserId;
                     data.UpdatorName = authData.UserName;
                     data.UpdateTime = new DateTimeOffset(DateTimeOffset.Now.ToUniversalTime().DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
@@ -232,7 +228,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult SetTransferInfo([FromForm] BankFinancialTransferInfoTransDetailModelForSet bankFinancialTransferInfoDetailModelForSet)
+        public async Task<ApiResult> SetTransferInfo([FromForm] BankFinancialTransferInfoTransDetailModelForSet bankFinancialTransferInfoDetailModelForSet)
         {
 
             var apiResult = new ApiResult<int>();
@@ -246,7 +242,7 @@ namespace BackendSite.Controllers.Api
                 transferInfoDetails.CreateTime = new DateTimeOffset(transferInfoDetails.CreateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
                 transferInfoDetails.UpdateTime = new DateTimeOffset(transferInfoDetails.UpdateTime.ToUniversalTime().DateTime, TimeSpan.Zero);
 
-                var (status, count, message) = _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
+                var (status, count, message) = await _bankFinancialBLL.SetTransferInfo(transferInfoDetails, bankFinancialTransferInfoDetailModelForSet.UploadReceipt);
 
                 if (status)
                 {
@@ -355,7 +351,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = _excelBLL.Export(ExportData);
+            var stream = _excelBLL.ExportV2(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        $"TransferInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

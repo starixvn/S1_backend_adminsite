@@ -839,9 +839,11 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
     class BonusWallet extends React.Component {
 
         render() {
+            console.log("08-this.props.BonusWallet",this.props.BonusWallet);
             let BonusWalletRows = this.props.BonusWallet != null ?
                 <tbody>
                     {
+                        
                         this.props.BonusWallet.map(x => {
                             return (
                                 <tr>
@@ -868,45 +870,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                             </tr>
                         </thead>
                         {BonusWalletRows != null ? BonusWalletRows : null}
-                    </table>
-                </div>
-            )
-        }
-    }
-
-    class RebateInfo extends React.Component {
-        render() {
-            let RebateInfoRows = this.props.RebateInfo != null ?
-                <tbody>
-                    {
-                        this.props.RebateInfo.map(x => {
-                            return (
-                                <tr>
-                                    <td>{x.bonusCode}</td>
-                                    <td>{x.description}</td>
-                                    <td>{x.rebateTypeName}</td>
-                                    <td>{moment(x.claimTime).format('l LTS')}</td>
-                                </tr>
-                            )
-                        }
-                        )
-                    }
-                </tbody>
-                :
-                null;
-            return (
-                <div className="table-responsive-md table">
-                    <span class="label">Rebate Info</span>
-                    <table className="table table-striped">
-                        <thead>
-                            <tr>
-                                <th scope="col">Bonus Code</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Rebate Type Name</th>
-                                <th scope="col">Claim Time</th>
-                            </tr>
-                        </thead>
-                        {RebateInfoRows != null ? RebateInfoRows : null}
                     </table>
                 </div>
             )
@@ -1130,7 +1093,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
         onSetEnableDisablePromotion(e){
             if (confirm('Are you sure ' + (e==0 ?'Disable':'Enable') + ' Promotion')) {
                 let data = this.props.CustInfoData;
-                console.log(data);
                 axios.post('/api/CustManage/SetEnableDisablePromotion', { 
                     CustId: data.custId ,
                     siteId: data.siteId,
@@ -1471,6 +1433,7 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                 elgibleWithdrawal = data.balance - elgibleWithdrawal;
 
                 if (data.tpWallet != null) {
+                    console.log("09-data.tpWallet",data.tpWallet);
                     tpWallet = <ul className="wallet-wrap">{data.tpWallet.map(function (wallet) {
                         return <li key={wallet.tpId} className="wallet-item table-detail">
                             <span className="wallet-name">{wallet.tpName}</span>
@@ -1494,7 +1457,12 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                     promotions = <Promotion Promotions={data.promotions} CancelBonus={this.cancelBonus.bind(this)} />;
                 }
 
-                if(data.iTagList.length > 0){
+                console.log("10-1-tagData",tagData);
+                if(Object.keys(tagData || {}).length != 0)
+                {
+                if(data.iTagList.length > 0)
+                {
+                    
                     for(let i=0; i < data.iTagList.length;i++){
                         tagData.forEach(element=>{
                             if(element.id === data.iTagList[i]){
@@ -1503,16 +1471,20 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                         })
                     }
                 }
+                }
                 
 
                 tag = tagList.toString();
-                tagSelectList = tagData.map(obj=>{
-                    return <option key={`tag-list-${obj.id}`} value={obj.id}>{obj.tagName}</option>;
-                })
+                console.log("10-2-tagData",tagData);
+                if(Object.keys(tagData || {}).length != 0)
+                {
+                    tagSelectList = tagData.map(obj=>{
+                        return <option key={`tag-list-${obj.id}`} value={obj.id}>{obj.tagName}</option>;
+                    })
+                }
                 tagSelectList = <select id="selectTag" name="selectTag[]" multiple="multiple">{tagSelectList}</select>;
 
             }
-            console.log("custdata",data);
             return (
                 data == null ? <div className="text-center">
                     <div className="spinner-border" role="status">
@@ -2052,7 +2024,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                     </tr>
                                 </tbody>
                             </table>
-                            {data.RebateInfo != null ? <RebateInfo RebateInfo={data.RebateInfo} /> : null}
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
                             <div className="table-responsive-md table">
@@ -2172,27 +2143,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
             }
         }
 
-        // GetRebateLog(PageNumber) {
-        //     Loading.OnLoading();
-        //     let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
-        //     let CustId = getUrlParameter("custId");
-        //     if (!isNaN(CustId)) {
-        //         let iCustId = parseInt(CustId);
-        //         axios.post('/api/Payment/GetRebateLogByCust', { ...this.state.RebateLog, CustId: iCustId, PageNumber: pageNumber })
-        //             .then(function (response) {
-        //                 Loading.UnLoading();
-        //                 let result = response.data;
-        //                 if (result.errorCode == 0) {
-        //                     this.setState({ RebateLogData: result });
-        //                 } else {
-        //                     alert(result.message);
-        //                 }
-        //             }.bind(this)).catch(function (error) {
-        //                 Loading.UnLoading();
-        //                 alert(error);
-        //             }.bind(this));
-        //     }
-        // }
         GetRebateLog(PageNumber) {
             Loading.OnLoading();
             let pageNumber = PageNumber || this.state.RebateLogData.pageNumber;
@@ -2529,7 +2479,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                 let _clipboard = new ClipboardJS(".js-copy");
                             });
                             this.GetBonusWalletLog();
-                            this.GetRebateInfoLog();
                             this.onGetRewardBottonStatus();
                             this.GetTPWalletData();
                         } else {
@@ -2807,35 +2756,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
             }
         }
 
-        GetRebateInfoLog() {
-            let CustId = getUrlParameter("custId");
-            if (!isNaN(CustId)) {
-                let iCustId = parseInt(CustId);
-                // Loading.OnLoading();
-                axios.post('/api/CustManage/GetRebateInfoByCust', { CustId: iCustId })
-                    .then(function (response) {
-                        // Loading.UnLoading();
-                        let result = response.data;
-                        if (result.errorCode == 0) {
-                            this.setState({
-                                ...this.state,
-                                CustInfoData:
-                                {
-                                    ...this.state.CustInfoData,
-                                    RebateInfo: result.data
-                                }
-                            }
-                            );
-                        } else {
-                            alert(result.message);
-                        }
-                    }.bind(this)).catch(function (error) {
-                        // Loading.UnLoading();
-                        alert(error);
-                    }.bind(this));
-            }
-        }
-
         GetAllTagData(){
             axios.post('/api/CustManage/GetAllTag')
                     .then(function (response) {
@@ -2965,7 +2885,7 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                 13: 'ca_personalMsg',
                 14: 'ca_turnoverReport'
             }
-
+            console.log("11-1-this._Tabs",this._Tabs);
             var tabBtn = this._Tabs.filter((item, index) => {
                 return authSubKeys[index] === undefined || subFuncKeys.includes(authSubKeys[index]);
             }).map(function (item, index) {

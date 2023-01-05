@@ -113,10 +113,6 @@ module.exports = {
     // "CSD/TpFailRecordReport.min": [
     //     "./src/pages/CSD/TpFailRecordReport/index.js"
     // ],
-    // "Marketing/BonusImport.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/Marketing/BonusImport/index.js"
-    // ],
     // "Marketing/ReferralReport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/ReferralReport/index.js"
@@ -157,10 +153,6 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    "Marketing/VipRebateMangetment.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
-    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",

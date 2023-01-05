@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PointLevelController : ControllerBase
@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：Marketing > Point Level Management > Click [Site Name]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 52, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<PointLevelInfo>> GetList(GetRequest request)
         {
@@ -75,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：Marketing > Point Level Management > [Add Point Level]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 52, 3 })]
         [HttpPost]
         public ApiResult Create(PointLevelInfo request)
         {
@@ -103,7 +103,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：Marketing > Point Level Management > Click [Site Name] > [Edit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 52, 3 })]
         [HttpPost]
         public ApiResult Update(PointLevelInfo request)
         {
@@ -133,7 +133,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Memo：只能刪除最後一筆績分等級。
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PointLevelManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 52, 3 })]
         [HttpPost]
         public ApiResult Delete(DeleteRequest request)
         {

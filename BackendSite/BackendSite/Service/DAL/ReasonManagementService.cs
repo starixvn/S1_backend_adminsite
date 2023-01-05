@@ -42,28 +42,31 @@ namespace BackendSite.Service.DAL
             return searchResult;
         }
 
-        public int SetReasonManagement(SetReasonManagementPara para,int UserId, DateTime now)
+        public int SetReasonManagement(SetReasonManagementPara para, int userId)
         {
             var props = new DynamicParameters();
-            props.Add("Id", para.Id);
-            props.Add("Description", para.Description);
-            props.Add("UpdateTime", now);
-            props.Add("Updator", UserId);
+            props.Add("_Id", para.Id);
+            props.Add("_Description", para.Description);
+            props.Add("_Updator", userId);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            return _mainDbClient.Execute("Admin_BankFinancialReason_Upd", props);
+            _ = _mainDbClient.Execute("Admin_BankFinancialReason_Upd_V2", props);
+            
+            return props.Get<int>("_Result");
         }
-        public int InsertReasonManagement(InsertReasonManagementPara para, int userId, DateTime now)
+        public int InsertReasonManagement(InsertReasonManagementPara para, int userId)
         {
             var props = new DynamicParameters();
 
-            props.Add("FuncKey", para.FuncKey);
-            props.Add("Description", para.Description);
-            props.Add("UpdateTime", now);
-            props.Add("Updator", userId);
-            props.Add("CreateTime", now);
-            props.Add("Creator", userId);
-
-            return _mainDbClient.Execute("Admin_BankFinancialReason_Ins", props);
+            props.Add("_FuncKey", para.FuncKey);
+            props.Add("_Description", para.Description);
+            props.Add("_Updator", userId);
+            props.Add("_Creator", userId);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            _ = _mainDbClient.Execute("Admin_BankFinancialReason_Ins_V2", props);
+            
+            return props.Get<int>("_Result");
         }
     }
 }
