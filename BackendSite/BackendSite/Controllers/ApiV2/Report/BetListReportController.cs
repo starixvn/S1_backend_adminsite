@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -14,12 +15,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class BetListReportController : ControllerBase
     {
-        private readonly BetListBLL _betListBll;
+        private readonly BetListService _betListBll;
         private readonly ExcelBLL _excelBll;
 
         public BetListReportController(IServiceProvider provider)
         {
-            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _betListBll = provider.GetRequiredService<BetListService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -66,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             request.PageNumber = -1; //export all
             var data = _betListBll.GetBetListReport(request, out var _);      
             foreach (var item in data)
-            {               
+            {
                 item.TransTime = item.TransTime.ToOffset(offset);
                 item.SettledTime = item.SettledTime.ToOffset(offset);
                 item.SetBetListTimeOffset(offset);
@@ -84,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var endTime = request.EndTime.ToUniversalTime().DateTime;
             var data = _betListBll.GetTpBetRecord(request.CustId , startTime, endTime);
             IPageInfo pageInfo = new PageInfo();
-            var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
+            var (index, count) = pageInfo.ListPagination(data.Count(), request.PageNumber, request.PageSize);
             return new ApiListResult<TpBetRecord>(ErrorCodeEnum.Success, pageInfo, data.GetRange(index, count)) ;
         }
 
