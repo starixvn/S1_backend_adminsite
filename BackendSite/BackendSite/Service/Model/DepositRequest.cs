@@ -114,6 +114,8 @@ namespace BackendSite.Service.Model
         public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
     }
 
     public class DepositInfoForExport
