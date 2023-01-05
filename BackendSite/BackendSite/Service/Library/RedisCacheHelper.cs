@@ -264,12 +264,12 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public async Task<List<TItem>> GetListByRangeAsync<TItem>(string key, long startIndex, long endIndex,
+        public async Task<IEnumerable<TItem>> GetListByRangeAsync<TItem>(string key, long startIndex, long endIndex,
             RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             try
             {
-                var result = new List<TItem>();
+                var result = Enumerable.Empty<TItem>();
                 key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 if (!db.KeyExists(key))
@@ -283,7 +283,7 @@ namespace BackendSite.Service.Library
                     if (item.HasValue)
                     {
                         var data = JsonConvert.DeserializeObject<TItem>(item);
-                        result.Add(data);
+                        result = result.Concat(new[] { data });
                     }
                 }
                 return result;
