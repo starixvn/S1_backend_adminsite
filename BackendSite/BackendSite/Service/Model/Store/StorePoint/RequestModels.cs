@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
-using Microsoft.AspNetCore.Http;
 
 namespace BackendSite.Service.Model.Store.StorePoint
 {

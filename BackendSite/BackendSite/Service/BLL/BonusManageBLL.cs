@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
@@ -11,17 +12,20 @@ namespace BackendSite.Service.BLL
         private readonly BonusManageService _bonusManageService;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly AuthorizeBLL _authorizeBLL;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        public BonusManageBLL(BonusManageService bonusManageService,
-            ServerInfoBLL serverInfoBLL,
-            AuthorizeBLL authorizeBLL)
+        public BonusManageBLL(IServiceProvider provider)
         {
-            _bonusManageService = bonusManageService;
-            _serverInfoBLL = serverInfoBLL;
-            _authorizeBLL = authorizeBLL;
+            _bonusManageService = provider.GetRequiredService<BonusManageService>();
+            _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
+            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
+            IEnumerable<int> currencyIds,
             IEnumerable<int> promotionTypes,
             int status,
             long startDate,
@@ -34,16 +38,18 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            var siteList = _serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+            var siteList = JsonConvert.SerializeObject(siteIds);
 
-            return _bonusManageService.GetPromotionList(JsonConvert.SerializeObject(siteIds),
+            return _bonusManageService.GetPromotionList(
+                        siteList,
+                        currencyIds: currencyIds != null ? JsonConvert.SerializeObject(currencyIds) : "[]",
                         JsonConvert.SerializeObject(promotionTypes),
                         status,
                         startDate,
                         endDate,
                         device,
                         bonusCode,
-                        JsonConvert.SerializeObject(siteList),
+                        siteList,
                         isSpecial,
                         (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                         Math.Abs(pageSize),
@@ -76,26 +82,12 @@ namespace BackendSite.Service.BLL
         public bool SetPromotion(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             promotion.LastUpdateUser = isAdd ? "" : _authorizeBLL.GetAuthData().UserName;
-            var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
-
-            //Display Condition Logic Process
-            if (vipLevelCondition.IsForVipLevel)
-            {
-                promotionDisplayConditionList.Add(new PromotionDisplayConditionModel()
-                {
-                    ConditionType = PromotionDisplayConditionType.VipLevel,
-                    Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
-                });
-            }
-
-            return _bonusManageService.SetPromotionFlow(isAdd, promotion, promotionDisplayConditionList,
-                0, 0, 0, Operator, vipLevelCondition);
+            return _bonusManageService.SetPromotionFlow(isAdd, promotion, vipLevelCondition, Operator);
         }
 
         public bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string Operator, string newSpecialCode, bool isSpecial)
         {
             var expectedSpecificRow = _bonusManageService.GetPromotionSpecific(bonusCode, siteId).Count();
-            var expectedRebateRow = _bonusManageService.GetPromotionRebate(bonusCode, siteId).Count();
             var expectedConditionRow = _bonusManageService.GetPromotionDisplayCondition(bonusCode, siteId).Count();
             var expectedCashBackRow = _bonusManageService.GetPromotionCashBack(bonusCode, siteId).Count();
 
@@ -103,7 +95,6 @@ namespace BackendSite.Service.BLL
                  siteId,
                  newBonusCode,
                  expectedSpecificRow,
-                 expectedRebateRow,
                  expectedConditionRow,
                  expectedCashBackRow,
                  Operator,
@@ -119,6 +110,10 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
         {
             return _bonusManageService.GetPromoCategories(walletType);
+        }
+        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
+        {
+            return _bonusManageService.GetPromoCategoriesV2(walletType);
         }
 
         public IEnumerable<TpGameType> GetTpGameList()
@@ -151,11 +146,6 @@ namespace BackendSite.Service.BLL
             }
 
             return result;
-        }
-
-        public async Task<BonusImportResult> BonusImportAsync(BonusImportPara bonusImportPara)
-        {
-            return await _bonusManageService.BonusImportAsync(bonusImportPara);
         }
 
         private static Random random = new Random();
@@ -245,9 +235,11 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetLeaderboardExtraPoint(activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
 
-        public bool CheckSpecialCodeDuplicate(string specialCode)
+        public bool CheckPromotionExists(string bonusCode, string specialCode)
         {
-            return _bonusManageService.CheckSpecialCodeDuplicate(specialCode).ToList().Count > 0;
+            bonusCode = (bonusCode ?? string.Empty).Trim();
+            specialCode = (specialCode ?? string.Empty).Trim();
+            return _bonusManageService.CheckPromotionExists(bonusCode, specialCode).ToList().Count > 0;
         }
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
@@ -255,4 +247,5 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.GetPromotionType(isPayout, isNew);
         }
     }
+
 }

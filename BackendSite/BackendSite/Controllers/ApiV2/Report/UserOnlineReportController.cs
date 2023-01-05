@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class UserOnlineReportController : ControllerBase
@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數,TimeZone(-12~14)</param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 84, 1 })]
         public ApiResult<IEnumerable<UserOnlineReportModel>> GetList(GetListRequest request)
         {
             if (request.TimeZone > 14 || request.TimeZone < -12)
@@ -98,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">TimeZone(-12~14)</param>
         /// <returns>檔案</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/UserOnlineReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 84, 2 })]
         public IActionResult Export(GetListRequest request)
         {
             #region Get Data

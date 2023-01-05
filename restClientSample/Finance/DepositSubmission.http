@@ -1,0 +1,61 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+# AdminSite RLS
+# @url=https://backofficerelease.nova88asia.com/
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得 Status 列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "BankCardManagementStatusEnum"
+}
+
+###
+# 取得 BankCard 列表
+# sabaId, userName 擇一填寫
+# purpose: 1.Deposit, 2.withdrawal，這邊帶 1 即可
+# 請根據選擇的 bank card status 篩選 settingStatus 聯動下拉選單
+POST {{url}}/apiV2/BaseData/GetBankInfoOffListByCustVerify HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "sabaId": "",
+    "userName": "anisetestmyr01",
+    "purpose": 1
+}
+
+###
+# 送出表單（請用Postman打）
+POST {{url}}/apiV2/DepositSubmission/Submit HTTP/1.1
+Content-Type: multipart/form-data
+
+Detail[SiteId]:1
+Detail[UserName]:anisetestthb01
+Detail[SabaId]:
+Detail[CurrencyId]:4
+Detail[SysId]:9
+Detail[BankName]:Krung Thai Bank
+Detail[AccountHolderName]:doristest
+Detail[AccountNumber]:12345677889999
+Detail[Amount]:1000
+Detail[RefId]:3452667700
+Detail[DepositTime]:2022-11-09T00:00:00+08:00
+Detail[Comment]:test
+Receipt:

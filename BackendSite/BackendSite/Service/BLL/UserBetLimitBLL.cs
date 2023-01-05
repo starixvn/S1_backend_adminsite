@@ -54,6 +54,13 @@ namespace BackendSite.Service.BLL
                 });
             return gameTypeWithBetLimit;
         }
+        
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var tpGameType = await _userBetLimitService.GetTpListByCategoryAsync(categoryId);
+           
+            return tpGameType;
+        }
 
         public async Task<IEnumerable<TpBetLimitGroup>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
         {
