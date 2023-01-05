@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<TResult> DailyQuery<TResult>(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        public List<TResult> DailyQuery<TResult>(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
             var tasks = new List<Task<IEnumerable<TResult>>>();
             foreach (var partitionKey in StartDate.GetDailyPartitionRange(endDate))
@@ -35,15 +35,15 @@ namespace BackendSite.Service.DAL
 
             Task.WhenAll(tasks);
 
-            var result = Enumerable.Empty<TResult>();
+            var result = new List<TResult>();
             foreach (var item in tasks)
             {
-                result = result.Concat(item.Result);
+                result.AddRange(item.Result);
             }
             return result;
         }
 
-        public IEnumerable<TResult> MonthlyQuery<TResult>(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        public List<TResult> MonthlyQuery<TResult>(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
             var tasks = new List<Task<IEnumerable<TResult>>>();
             foreach (var partitionKey in StartDate.GetMonthlyPartitionRange(endDate))
@@ -61,17 +61,17 @@ namespace BackendSite.Service.DAL
 
             Task.WhenAll(tasks);
 
-            var result = Enumerable.Empty<TResult>();
+            var result = new List<TResult>();
             foreach (var item in tasks)
             {
-                result = result.Concat(item.Result);
+                result.AddRange(item.Result);
             }
             return result;
         }
 
-        public IEnumerable<TpBetRecord> GetTpBetRecord(DateTime startTime, DateTime endTime, string spName, object parameters, DataBase dataBase = DataBase.Report)
+        public List<TpBetRecord> GetTpBetRecord(DateTime startTime, DateTime endTime, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
-            var result = Enumerable.Empty<TpBetRecord>();
+            var result = new List<TpBetRecord>();
 
             foreach (var partitionKey in startTime.GetTpBetRecordPartitionRange(endTime))
             {
@@ -83,7 +83,7 @@ namespace BackendSite.Service.DAL
                     DataBase.Main => _mainDbClient.Query<TpBetRecord>(spName, p),
                     _ => throw new NotImplementedException(),
                 };
-                result = result.Concat(data);
+                result.AddRange(data);
             }
 
             return result;

@@ -15,7 +15,7 @@ namespace BackendSite.Service.BLL
         private readonly WalletService walletService;
         private readonly AdminService adminService;
         private readonly BonusManageService _bonusManageService;
-        private readonly BetListService _betListBll;
+        private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly BonusInfoBLL _bonusInfoBLL;
         private readonly PartitionService _partitionService;
@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
-            _betListBll = provider.GetRequiredService<BetListService>();
+            _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _bonusInfoBLL = provider.GetRequiredService<BonusInfoBLL>();
             _partitionService = provider.GetRequiredService<PartitionService>();
@@ -87,7 +87,7 @@ namespace BackendSite.Service.BLL
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType).ToList();
             }
 
-            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);
+            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id).ToList();
 
             SetTpTransferMemo(list);
 
@@ -98,12 +98,12 @@ namespace BackendSite.Service.BLL
             });
 
             //Export
-            if (pageNumber == -1 || !data.Any())
+            if (pageNumber == -1 || data.Count == 0)
             {
                 return list;
             }
 
-            var (index, count) = pageInfo.ListPagination(list.Count(), pageNumber, pageSize);
+            var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
             return list.GetRange(index, count);
         }
 

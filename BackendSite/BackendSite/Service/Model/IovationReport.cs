@@ -55,8 +55,3 @@ public class IovationReportExportRequest
     public DateTimeOffset EndTime { get; set; }
 }
 
-public class GetAssociateAccountRequest
-{
-    public string DeviceId { get; set; }
-}
-

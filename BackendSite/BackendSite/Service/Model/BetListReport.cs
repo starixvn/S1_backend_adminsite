@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
         }
     }
 
-    public class BetListReport : IDisposable
+    public class BetListReport
     {
         public string SiteId { get; set; }
         public string CurrencyId { get; set; }
@@ -151,20 +151,6 @@ namespace BackendSite.Service.Model
             }
         }
         public int VipLevel { get; set; }
-        public string LevelName { get; set; }
-
-        private bool disposedValue;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                disposedValue = true;
-            }
-        }
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+        public string LevelName { get; set; }      
     }
 }
