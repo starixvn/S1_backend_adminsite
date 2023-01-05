@@ -215,17 +215,14 @@ namespace BackendSite.Service.Library
                 }
 
                 key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-                var taskList = new List<Task<long>>();
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
-                var trans = db.CreateTransaction();
 
                 foreach (var item in list)
                 {
-                    var task = db.ListRightPushAsync(key, JsonConvert.SerializeObject(item));
-                    taskList.Add(task);
+                    db.ListRightPushAsync(key, JsonConvert.SerializeObject(item), flags: CommandFlags.FireAndForget);
                 }
                 db.KeyExpire(key, timeSpan);
-                return trans.Execute();
+                return true;
             }
             catch (Exception ex)
             {
