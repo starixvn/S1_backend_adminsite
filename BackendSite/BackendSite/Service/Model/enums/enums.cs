@@ -1562,7 +1562,11 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
+    public enum BlockEWalletStatus
+    {
+        Lock = 1,
+        Unlock = 2
+    }
     public enum MpaTransactionRelaySummaryTypeEnum
     {
         Deposit = 1,

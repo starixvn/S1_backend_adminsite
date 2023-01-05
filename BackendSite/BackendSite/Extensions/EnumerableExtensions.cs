@@ -41,12 +41,18 @@ namespace BackendSite.Extensions
                                 && method.GetGenericArguments().Length == 2
                                 && method.GetParameters().Length == 2).MakeGenericMethod(typeof(T), type);
                 var result = (IOrderedQueryable<T>)o.Invoke(null, new object[] { source, lambda });
-                return result.ToList();
+                return result;
             }
             catch (Exception)
             {
                 throw new AdminException(ErrorCodeEnum.OrderByInvalid);
             }
+        }
+
+
+        public static IEnumerable<T> GetRange<T>(this IEnumerable<T> source, int index, int count)
+        {
+            return source.Skip(index).Take(count);
         }
     }
 }
