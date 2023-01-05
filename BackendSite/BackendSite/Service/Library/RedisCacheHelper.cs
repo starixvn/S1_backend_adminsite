@@ -219,7 +219,7 @@ namespace BackendSite.Service.Library
 
                 foreach (var item in list)
                 {
-                    db.ListRightPushAsync(key, JsonConvert.SerializeObject(item), flags: CommandFlags.FireAndForget);
+                    db.ListRightPush(key, JsonConvert.SerializeObject(item), flags: CommandFlags.FireAndForget);
                 }
                 db.KeyExpire(key, timeSpan);
                 return true;
