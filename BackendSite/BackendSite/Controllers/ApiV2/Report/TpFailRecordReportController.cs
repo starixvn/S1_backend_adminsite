@@ -204,9 +204,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                     StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
                 }, out int totalPages, out int rowCount);
 
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
-
             return new ApiListResult<TpFailRecordReport>
             {
                 Data = data,
