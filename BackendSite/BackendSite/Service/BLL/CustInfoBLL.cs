@@ -26,7 +26,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
-        private readonly BetListService _betListBll;
+        private readonly BetListBLL _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
         private readonly WinLostReportService _winLostReportService;
@@ -48,7 +48,7 @@ namespace BackendSite.Service.BLL
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _betListBll = provider.GetRequiredService<BetListService>();
+            _betListBll = provider.GetRequiredService<BetListBLL>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();

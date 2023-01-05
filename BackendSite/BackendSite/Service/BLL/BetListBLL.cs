@@ -9,18 +9,18 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class BetListService
+    public class BetListBLL
     {
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
 
-        public BetListService(IServiceProvider provider)
+        public BetListBLL(IServiceProvider provider)
         {
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
-        public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out IPageInfo pageInfo)
+        public List<BetListReport> GetBetListReport(GetBetListRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var key = input.GetRedisKey();
@@ -40,14 +40,8 @@ namespace BackendSite.Service.BLL
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
                     }
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
-
-                    var sortResult = sortData.GetRange(sortIndex, sortCount);
-                    foreach (var item in sortData)
-                    {
-                        item.Dispose();
-                    }
-                    return sortResult;
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, input.PageNumber, input.PageSize);
+                    return sortData.GetRange(sortIndex, sortCount);
                 }
 
                 //Export
@@ -79,26 +73,21 @@ namespace BackendSite.Service.BLL
             var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
 
             //Sort
-            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).AsQueryable();
+            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).ToList();
 
             AddCache(list, masterKey, sortKey, cacheTime, input.OrderBy);
 
             //Export
-            if (input.PageNumber == -1 || !data.Any())
+            if (input.PageNumber == -1 || data.Count == 0)
             {
                 return list;
             }
 
-            var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            var result = list.GetRange(index, count);
-            foreach (var item in list)
-            {
-                item.Dispose();
-            }
-            return result;
+            var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
+            return list.GetRange(index, count);
         }
 
-        public IEnumerable<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
+        public List<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
         {
             return _cacheHelper.TryGetOrCreate(
                 key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
@@ -111,11 +100,11 @@ namespace BackendSite.Service.BLL
                         StartTime,
                         EndTime,
                     });
-                    return data.OrderByDescending(i => i.SettledTime);
+                    return data.OrderByDescending(i => i.SettledTime).ToList();
                 });
         }
 
-        private void AddCache(IEnumerable<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

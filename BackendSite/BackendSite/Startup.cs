@@ -112,7 +112,6 @@ namespace BackendSite
             services.AddTransient<IMpaCommonService, MpaCommonService>();
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
-            services.AddTransient<BetListService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
