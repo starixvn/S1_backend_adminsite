@@ -192,7 +192,7 @@ namespace BackendSite.Service.BLL
             var custLineProfile = await _memberService.GetCustLineProfileAsync(custId, null);
 
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-            var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+            var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
             var email = customer.Email;
             var phoneNo = customer.PhoneNo;
             if (!hasPermission)
