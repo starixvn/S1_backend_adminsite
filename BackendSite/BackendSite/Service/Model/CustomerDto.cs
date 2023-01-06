@@ -250,6 +250,8 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class CustomerTag
@@ -297,6 +299,8 @@ public class CustomerBasicInfo
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
     public AffInfo AffInfo { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class AffInfo
