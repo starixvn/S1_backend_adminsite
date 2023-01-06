@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DepositTimeReportController : ControllerBase
@@ -17,6 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         private readonly DepositBLL _depositBll;
         private readonly ExcelBLL _excelBll;
+        private readonly CustInfoBLL _custInfoBll;
 
         #endregion
 
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         {
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         #endregion
@@ -34,22 +36,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public class ExportDepositTimeReq
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<DepositStatusEnum> Statuses { get; set; }
             public string DepositId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
+            public string MemberId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         #endregion
@@ -66,13 +59,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Time Report > [Submit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 34, 1 })]
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public ApiListResult<DepositTimeList> GetList(DepositTimeReportPara req)
+        public async Task<ApiListResultCurrencyAmount<DepositTimeList>> GetList(DepositTimeReportPara req)
         {
-            var apiListResult = new ApiListResult<DepositTimeList>();
+            var apiListResult = new ApiListResultCurrencyAmount<DepositTimeList>();
 
-            var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount);
+            if(!string.IsNullOrWhiteSpace(req.MemberId))
+            {
+                var custSimpleInfo = await _custInfoBll.GetCustId(null, req.MemberId, req.SiteIds.FirstOrDefault());
+                if (custSimpleInfo != null)
+                    req.CustId = custSimpleInfo.CustId;
+                else
+                    return apiListResult;
+            }
+            
+            var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount, out List<TotalAmount>  currencyTotalAmount);
 
             foreach (var data in result)
             {
@@ -89,6 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            apiListResult.CurrencyAmountRecord = currencyTotalAmount;
 
             return apiListResult;
         }
@@ -102,20 +105,27 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance >  Deposit Time Report > [Submit] > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 34, 2 })]
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositTimeReport" })]
-        public IActionResult Export(ExportDepositTimeReq req)
+        public async Task<IActionResult> Export(ExportDepositTimeReq req)
         {
-            var exportData = _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds),
-                req.DepositId, req.StartDate.DateTime, req.EndDate.DateTime,
-                JsonConvert.SerializeObject(req.Statuses), JsonConvert.SerializeObject(req.CurrencyIds));
-
+            
+            var exportData = await _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds)
+                , req.DepositId
+                , new DateTimeOffset(req.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , new DateTimeOffset(req.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , JsonConvert.SerializeObject(req.Statuses)
+                , JsonConvert.SerializeObject(req.CurrencyIds)
+                ,req.MemberId);
+            TimeSpan offset = req.StartDate.Offset;
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                data.CreateTime = data.CreateTime.ToOffset(offset);
+                data.UpdateTime = data.UpdateTime.ToOffset(offset);
                 if (data.EndFlowTime != null)
-                    data.EndFlowTime = new DateTimeOffset(data.EndFlowTime.Value.DateTime, TimeSpan.Zero);
+                    data.EndFlowTime = data.EndFlowTime?.ToOffset(offset);
+                if (data.StatementTime != null)
+                    data.StatementTime = data.StatementTime?.ToOffset(offset);
             }
 
             var stream = _excelBll.ExportV2(exportData);
