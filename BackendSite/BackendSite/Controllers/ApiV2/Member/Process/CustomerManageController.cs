@@ -2471,12 +2471,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   request.GameTypes,
+                                                    request.GameTypes,
                                                    request.StartDate,
                                                    request.EndDate);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

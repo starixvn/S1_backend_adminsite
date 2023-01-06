@@ -260,7 +260,7 @@ namespace BackendSite.Service.DAL
             props.Add("_IsPopup", isPopup);
             props.Add("_Message", message);
             props.Add("_Operator", Operator);
-            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V3", props) > 0;
+            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V3", props) >= 0;
         }
         
         public bool UpdateBatchMessageStatus(int status , int batchId)

@@ -40,6 +40,6 @@ public interface IMemberService
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
-    Task<int> DeleteLineProfileAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<int> DeleteLineProfileAsync(int custId);
 }

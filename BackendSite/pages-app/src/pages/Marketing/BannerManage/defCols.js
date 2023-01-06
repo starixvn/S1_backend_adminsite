@@ -7,9 +7,9 @@ export const defBannerType = {
 };
 
 export const initCurrencyLangMap = {
-	"2":['en', 'cs', 'my'],
-	"3":['en','cs'],
-	"4":['en','th'],
+	"2": ['en', 'cs', 'my'],
+	"3": ['en', 'cs'],
+	"4": ['en','th'],
 	"13":['en','cs'],
 	"15":['en','id'],
 	"51":['vn','en'],

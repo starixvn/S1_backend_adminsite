@@ -1,14 +1,13 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -244,7 +243,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var custPhotoId = await _custPhotoIdBll.GetPhotoIdAsync(request.CustId);
             if (custPhotoId == null) throw new AdminException(ErrorCodeEnum.NoData);
-            
+
             var apiResult = new ApiResult<IEnumerable<GetCustPhotoIdResponse>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -253,7 +252,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
 
         }
-        
+
         /// <summary>
         /// Member/UploadCustPhotoId 上傳用戶證件照
         /// </summary>
@@ -266,7 +265,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 75 })]
         [HttpPost]
-        public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
+        public async Task<ApiResult> UploadCustPhotoId([FromForm] UploadCustPhotoIdRequest request)
         {
             var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
@@ -282,7 +281,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
 
         }
-        
+
         /// <summary>
         /// Member/DeleteCustPhotoId 刪除用戶證件照
         /// </summary>
@@ -494,6 +493,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// 取得玩家在第三方遊戲帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
+            try
+            {
+                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
@@ -548,7 +569,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditPhoneNo 修改用戶電話
         /// </summary>
@@ -992,7 +1013,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// Member/GetIpList 取得會員登入過的Ip
         /// </summary>
@@ -1086,29 +1107,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 取得玩家在第三方遊戲帳號
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
-        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
-            try
-            {
-                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
         /// </summary>
         /// <remarks>
@@ -1137,6 +1135,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
