@@ -66,6 +66,8 @@ namespace BackendSite.Service.Model
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
         public string Operator { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
     }
 
     public class DepositInfoForExport
