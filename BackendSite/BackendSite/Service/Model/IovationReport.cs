@@ -48,7 +48,7 @@ public class IovationReport
 public class IovationReportExportRequest
 {
     public int CurrencyId { get; set; }
-    public int DeviceType { get; set; }
+    public IovationDeviceType DeviceType { get; set; }
     public string UserName { get; set; }
     public string DeviceId { get; set; }
     public DateTimeOffset StartTime { get; set; }
