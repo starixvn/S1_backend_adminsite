@@ -75,6 +75,7 @@ namespace BackendSite.Service.Model
     {
         public string DefaultGroup { get; set; }
         public string LimitGroup { get; set; }
+        public bool Checked { get; set; } = false;
     }
 
     public class QueryUserBetLimit
@@ -128,7 +129,6 @@ namespace BackendSite.Service.Model
     }
     public class GetTpBetLimitGroupReq
     {
-        public int CategoryId { get; set; }
         public int CurrencyId { get; set; }
     }
 }

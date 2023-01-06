@@ -198,7 +198,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(GetTpBetLimitGroupReq req)
         {
-            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(req.CategoryId, req.CurrencyId);
+            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(req.CurrencyId);
             var apiResult = new ApiResult<IEnumerable<TpBetLimitGroup>>
             {
                 Data = data,
