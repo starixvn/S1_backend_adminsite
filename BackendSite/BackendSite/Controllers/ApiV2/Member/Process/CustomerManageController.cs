@@ -856,15 +856,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
         {
+            var apiResult = new ApiResult();
 
-            var checkResult = _custInfoBll.CheckRewardCondination(verificationRewardReq.CustId, (int) verificationRewardReq.OTPType);
-
-            if (checkResult.ErrorCode != (int) ErrorCodeEnum.Success)
-            {
-                return checkResult;
-            }
-            
-            var apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, (int)verificationRewardReq.OTPType);
+            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, (int)verificationRewardReq.OTPType);
 
             return apiResult;
         }
