@@ -29,7 +29,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = a.DeviceType,
                 Score = a.Score,
                 Frequency = a.Frequency,
-                AssociateAccount = a.AssociateAccount,
+                AssociateCount = a.AssociateCount,
                 LastUsedTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero),
             });
 
@@ -56,7 +56,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = a.DeviceType,
                 Score = a.Score,
                 Frequency = a.Frequency,
-                AssociateAccount = a.AssociateAccount,
+                AssociateCount = a.AssociateCount,
                 LastUsedTime = new DateTimeOffset(a.UpdateTime, TimeSpan.Zero),
             });
 
