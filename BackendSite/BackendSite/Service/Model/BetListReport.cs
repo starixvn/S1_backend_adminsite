@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BackendSite.Service.Model
@@ -41,6 +42,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset EndTime { get; set; }
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
+
         /// <summary>
         /// 是否排序
         /// </summary>
@@ -55,6 +57,7 @@ namespace BackendSite.Service.Model
         /// 1=降序
         /// </summary>
         public OrderByDirection OrderByDirection { get; set; }
+
         public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
@@ -78,6 +81,9 @@ namespace BackendSite.Service.Model
 
     public class BetListReport : IDisposable
     {
+        private bool _isDisposed;
+        private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
+        
         public string SiteId { get; set; }
         public string CurrencyId { get; set; }
         public string UserName { get; set; }
@@ -150,19 +156,31 @@ namespace BackendSite.Service.Model
         }
         public int VipLevel { get; set; }
         public string LevelName { get; set; }
-
-        private bool disposedValue;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                disposedValue = true;
-            }
-        }
+        
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+            
+            if (disposing)
+            {
+                // free managed resources
+            }
+
+            // free native resources if there are any.
+            if (_nativeResource != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_nativeResource);
+                _nativeResource = IntPtr.Zero;
+            }
+
+            _isDisposed = true;
         }
     }
 }

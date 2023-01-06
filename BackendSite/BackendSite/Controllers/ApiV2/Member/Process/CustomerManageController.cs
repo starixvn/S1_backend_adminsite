@@ -707,7 +707,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (custInfoDetail != null)
             {
                 var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-                var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
                 if (!hasPermission)
                 {
                     custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
@@ -856,9 +856,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult PayoutVerificationReward(VerificationRewardReq verificationRewardReq)
         {
-            var apiResult = new ApiResult();
 
-            apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, (int)verificationRewardReq.OTPType);
+            var checkResult = _custInfoBll.CheckRewardCondination(verificationRewardReq.CustId, (int) verificationRewardReq.OTPType);
+
+            if (checkResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            {
+                return checkResult;
+            }
+            
+            var apiResult = _custInfoBll.SetVerificationReward(verificationRewardReq.CustId, (int)verificationRewardReq.OTPType);
 
             return apiResult;
         }
@@ -2391,7 +2397,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
         public ApiListResult<PersonalMsg> SendPersonalMsg(SendCustMessageRequest request)
         {
@@ -2431,7 +2437,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
         public ApiResult DeletePersonalMsg(DeleteMessageRequest request)
         {
@@ -2471,12 +2477,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                   request.GameTypes,
+                                                    request.GameTypes,
                                                    request.StartDate,
                                                    request.EndDate);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

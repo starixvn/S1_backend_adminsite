@@ -2638,7 +2638,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
-        
+
         #region CSD > Customer Administration > CustInfo > E Wallet Log
 
         /// <summary>

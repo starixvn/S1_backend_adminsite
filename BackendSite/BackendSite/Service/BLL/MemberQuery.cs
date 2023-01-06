@@ -192,7 +192,7 @@ namespace BackendSite.Service.BLL
             var custLineProfile = await _memberService.GetCustLineProfileAsync(custId, null);
 
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-            var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+            var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
             var email = customer.Email;
             var phoneNo = customer.PhoneNo;
             if (!hasPermission)
@@ -315,11 +315,11 @@ namespace BackendSite.Service.BLL
             };
             return response;
         }
+
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
-
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
         {
