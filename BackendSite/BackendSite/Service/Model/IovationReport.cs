@@ -30,7 +30,7 @@ public class IovationReportData
     public string DeviceType { get; set; }
     public int Score { get; set; }
     public int Frequency { get; set; }
-    public int AssociateAccount { get; set; }
+    public int AssociateCount { get; set; }
 }
 
 public class IovationReport
@@ -42,7 +42,7 @@ public class IovationReport
     public string DeviceType { get; set; }
     public int Score { get; set; }
     public int Frequency { get; set; }
-    public int AssociateAccount { get; set; }
+    public int AssociateCount { get; set; }
 }
 
 public class IovationReportExportRequest
