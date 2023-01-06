@@ -61,14 +61,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost("Export")]
         public async Task<IActionResult> Export(ExportRegLiveStatusRequest request)
         {
-            var offset = request.StartDate.Offset;
             var exportData = await _registrationBll.GetExportRegLiveStatus(request);
-            foreach (var item in exportData)
-            {
-                item.RegTime = item.RegTime.ToOffset(offset);
-                item.LastActiveTime = item.LastActiveTime.ToOffset(offset);
-            }
-            var stream = _excelBll.ExportV2(exportData);
+            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
             return _excelBll.ExcelFile(stream, "Registration");
         }
 
