@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpDisableController : ControllerBase
@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public string UserName { get; set; }
             public DateTimeOffset StartDate
             {
@@ -75,17 +75,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
         [HttpPost]
         public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
         {
             var apiResult = new ApiListResult<TpDisableUser>();
 
             var pageNumber = req.PageNumber;
-
+            List<int> siteIds = new List<int>();
+            siteIds.Add(req.SiteId);
             apiResult.Data = _riskBll.GetTpDisableUser(
-                req.SiteIds,
-                req.UserName,
+                siteIds,
+                string.IsNullOrEmpty(req.UserName) ? null : req.UserName,
                 req.StartDate,
                 req.EndDate,
                 req.PageSize,
@@ -109,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
         [HttpPost]
         public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCustId(TpDisableUserForGameDetailReq req)
         {
@@ -162,7 +163,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
         /// </remarks>
         /// <param name="disableGames"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 3 })]
         [HttpPost]
         public async Task<ApiResult> Set(DisableUser disableGames)
         {
@@ -172,7 +173,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
             if (customer == null)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
                 apiResult.Message = "User Not Found";
                 return apiResult;
             }
@@ -196,7 +197,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] >Change[Status]
         /// </remarks>
         /// <param name="disable"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 12 })]
         [HttpPost]
         public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {

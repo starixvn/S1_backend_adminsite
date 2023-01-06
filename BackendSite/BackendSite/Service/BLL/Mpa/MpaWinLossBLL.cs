@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             exportData = request.OrderBy
-                ? exportData.OrderBy(request)
+                ? exportData.OrderBy(request).ToList()
                 : exportData.OrderBy(x => x.Date).ThenBy(x => x.Currency).ToList();
 
             // total
@@ -398,7 +398,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             exportData = request.OrderBy
-                ? exportData.OrderBy(request)
+                ? exportData.OrderBy(request).ToList()
                 : exportData.OrderBy(x => x.TpGameTypeName).ThenBy(x => x.Currency).ToList();
 
             // total
@@ -631,7 +631,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             exportData = request.OrderBy
-                ? exportData.OrderBy(request)
+                ? exportData.OrderBy(request).ToList()
                 : exportData.OrderBy(x => x.TpCategoryName).ThenBy(x => x.Currency).ToList();
 
             // total
@@ -868,7 +868,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             exportData = request.OrderBy
-                ? exportData.OrderBy(request)
+                ? exportData.OrderBy(request).ToList()
                 : exportData.OrderBy(x => x.UserName).ThenBy(x => x.Currency).ToList();
 
             // total
@@ -930,7 +930,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
                     }
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, request.PageNumber, request.PageSize);
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), request.PageNumber, request.PageSize);
                     apiData.AddRange(sortData.GetRange(sortIndex, sortCount));
                 }
                 else
@@ -990,7 +990,7 @@ namespace BackendSite.Service.BLL.Mpa
                     apiData.Add(responseItem);
                 }
 
-                apiData = request.OrderBy ? apiData.OrderBy(request) : apiData;
+                apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
                 AddCache(apiData, masterKey, sortKey, cacheTime, request.OrderBy);
 
                 if (request.PageNumber != -1) //取全部 for excel export
@@ -1417,7 +1417,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             exportData = request.OrderBy
-                ? exportData.OrderBy(request)
+                ? exportData.OrderBy(request).ToList()
                 : exportData.OrderByDescending(r => r.Currency).ToList();
 
             // total
@@ -2015,15 +2015,15 @@ namespace BackendSite.Service.BLL.Mpa
             var redisKey =
                 $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
 
-            List<TransactionRelayDto> originTransaction;
+            var originTransaction = Enumerable.Empty<TransactionRelayDto>(); 
             if (_redisHelper.KeyExists(redisKey))
             {
                 originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
             }
             else
             {
-                originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime,
-                    request.EndTime, format)).ToList();
+                originTransaction = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime,
+                    request.EndTime, format);
                 var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
             }
 
@@ -2054,7 +2054,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             var wrapperResult = new TransactionRelayWrapper()
             {
-                OriginTransaction = originTransaction,
+                OriginTransaction = originTransaction.ToList(),
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
 
@@ -2068,7 +2068,7 @@ namespace BackendSite.Service.BLL.Mpa
             var redisKey =
                 $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
 
-            List<MpaWinLossBonusDto> originBonus;
+            var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
             if (_redisHelper.KeyExists(redisKey))
             {
                 originBonus =  await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
@@ -2100,14 +2100,14 @@ namespace BackendSite.Service.BLL.Mpa
 
             var wrapperResult = new MpaWinLossBonusWrapper()
             {
-                OriginBonus = originBonus,
+                OriginBonus = originBonus.ToList(),
                 AlreadyMultiplyRateBonus = alreadyMultiplyRateBonus
             };
 
             return wrapperResult;
         }
 
-        private void AddCache(List<MpaWinLossByPlayerResponse> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(IEnumerable<MpaWinLossByPlayerResponse> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

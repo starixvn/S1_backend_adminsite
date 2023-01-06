@@ -30,7 +30,7 @@ public class IovationReportData
     public string DeviceType { get; set; }
     public int Score { get; set; }
     public int Frequency { get; set; }
-    public int AssociateAccount { get; set; }
+    public int AssociateCount { get; set; }
 }
 
 public class IovationReport
@@ -42,16 +42,21 @@ public class IovationReport
     public string DeviceType { get; set; }
     public int Score { get; set; }
     public int Frequency { get; set; }
-    public int AssociateAccount { get; set; }
+    public int AssociateCount { get; set; }
 }
 
 public class IovationReportExportRequest
 {
     public int CurrencyId { get; set; }
-    public int DeviceType { get; set; }
+    public IovationDeviceType DeviceType { get; set; }
     public string UserName { get; set; }
     public string DeviceId { get; set; }
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset EndTime { get; set; }
+}
+
+public class GetAssociateAccountRequest
+{
+    public string DeviceId { get; set; }
 }
 

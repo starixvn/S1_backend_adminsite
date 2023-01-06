@@ -47,7 +47,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public ApiResult<IEnumerable<BankFinancialTransferAccountDisplayModel>> GetList(GetTransferAccountInfoListRequest req)
         {
             var list =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(req));
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req));
 
             foreach (var data in list)
             {
@@ -74,7 +74,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public IActionResult Export(GetTransferAccountInfoListRequest request)
         {
             var datas =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(request));
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(request));
 
             var result = datas.Select(x =>
                 new BankFinancialTransferAccountExportModel
@@ -122,7 +122,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoByIdRequest req)
         {
             var result =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoParams(req.Id));
+                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req.Id));
 
             if (!result.Any())
             {

@@ -339,7 +339,7 @@ namespace BackendSite.Service.DAL
 
             return result.ToList();
         }
-        
+
         public List<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
             int siteId,
             string currencyIds,
@@ -353,10 +353,10 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _mainDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
 
             return result.ToList();
-        }
+        }    
     }
 }

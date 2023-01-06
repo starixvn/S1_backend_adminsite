@@ -76,7 +76,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> WithdrawalExportAsync(WithdrawalAmountRequest request)
         {
             var summaryData = await _marketingWithdrawalAmountBll.GetWithdrawalAmountSummaryAsync(request);
-            var detailData = _marketingWithdrawalAmountBll.GetWithdrawalAmountDetail(request, out var pageInfo);
+            var detailData = _marketingWithdrawalAmountBll.GetWithdrawalAmountDetail(request, out var pageInfo).ToList();
             var currencyIdMapper = await _mapMpaCommonService.GetCurrencyIsoCodeMapper();
 
             var num = 1;
@@ -169,7 +169,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var depositAmountSummary = await _marketingDepositAmountBll.GetDepositAmountSummaryAsync(request);
             var depositSignUpSummary = await _marketingDepositAmountBll.GetDepositSinUpSummaryExportData(request);
-            var depositSignUpDetail = _marketingDepositAmountBll.GetDepositSignUpDetail(request, out var pageInfo);
+            var depositSignUpDetail = _marketingDepositAmountBll.GetDepositSignUpDetail(request, out var pageInfo).ToList();
 
             var num = 1;
             depositSignUpDetail.ForEach(x =>

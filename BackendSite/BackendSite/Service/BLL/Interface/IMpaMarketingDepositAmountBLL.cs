@@ -10,7 +10,7 @@ namespace BackendSite.Service.BLL.Interface
 
         Task<DepositSinUpSummaryResponse> GetDepositSinUpSummaryAsync(DepositAmountRequest request);
 
-        List<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo);
+        IEnumerable<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo);
 
         Task<List<SignUpChildDto>> GetDepositSinUpSummaryExportData(DepositAmountRequest request);
 

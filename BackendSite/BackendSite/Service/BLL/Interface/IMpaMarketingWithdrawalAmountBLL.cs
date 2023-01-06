@@ -8,7 +8,7 @@ namespace BackendSite.Service.BLL.Interface
     {
         Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request);
 
-        List<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request ,out IPageInfo pageInfo);
+        IEnumerable<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request ,out IPageInfo pageInfo);
 
         byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData,
             List<WithdrawalAmountDetailData> detailsData,

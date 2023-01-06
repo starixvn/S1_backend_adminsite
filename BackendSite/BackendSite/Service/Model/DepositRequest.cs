@@ -111,8 +111,11 @@ namespace BackendSite.Service.Model
         public string Operator { set; get; }
         public string Agent { set; get; }
         public string DepositFrom { set; get; }
+        public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
     }
 
     public class DepositInfoForExport
@@ -463,5 +466,8 @@ namespace BackendSite.Service.Model
         public DepositMessageStatus Status { get; set; }
         public string StatusName { get; set; }
         public int DepositId { get; set; }
+        public Decimal ActualDeposit { get; set; }
+        public DepositStatusEnum Action { get; set; }
+        public string ActionName { get; set; }
     }
 }

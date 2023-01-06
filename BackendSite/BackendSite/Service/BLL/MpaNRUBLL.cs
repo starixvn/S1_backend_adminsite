@@ -427,7 +427,7 @@ namespace BackendSite.Service.BLL
             return data;
         }
         
-        public List<MpaMarketingNRUBonusDetail> GetMpaMarketingNRUBonusDetail(
+        public IEnumerable<MpaMarketingNRUBonusDetail> GetMpaMarketingNRUBonusDetail(
             MpaNRUReportController.GetMarketingNRUBonusDetailRequest input,
             out IPageInfo pageInfo)
         {
@@ -450,7 +450,7 @@ namespace BackendSite.Service.BLL
                     }
 
                     var (sortIndex, sortCount) =
-                        pageInfo.ListPagination(sortData.Count, input.PageNumber, input.PageSize);
+                        pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
 
@@ -475,7 +475,7 @@ namespace BackendSite.Service.BLL
                 input.BaseCurrencyId);
             
             //Sort
-            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.BonusCode).ToList();
+            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.BonusCode).AsQueryable();
 
             AddCache(list, masterKey, sortKey, cacheTime, input.OrderBy);
 
@@ -485,7 +485,7 @@ namespace BackendSite.Service.BLL
                 return list;
             }
 
-            var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
+            var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
             return list.GetRange(index, count);
         }
         
@@ -493,7 +493,7 @@ namespace BackendSite.Service.BLL
        
         #region private function
 
-        private void AddCache(IReadOnlyCollection<object> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(IEnumerable<object> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

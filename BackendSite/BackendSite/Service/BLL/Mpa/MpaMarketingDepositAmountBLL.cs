@@ -331,7 +331,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
         }
 
-        public List<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
+        public IEnumerable<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var key = request.GetRedisKey();
@@ -351,7 +351,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
                     }
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, request.PageNumber, request.PageSize);
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), request.PageNumber, request.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
 
@@ -394,7 +394,7 @@ namespace BackendSite.Service.BLL.Mpa
                 FirstDepositAmount = r.Sum(x => x.FirstDepositAmount),
             }).ToList();
 
-            var list = request.OrderBy ? data.OrderBy(request) : data;
+            var list = request.OrderBy ? data.OrderBy(request).ToList() : data;
             AddCache(list, masterKey, sortKey, cacheTime, request.OrderBy);
 
             //Export
@@ -408,7 +408,7 @@ namespace BackendSite.Service.BLL.Mpa
 
         }
 
-        private void AddCache(List<DepositSignUpDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(IEnumerable<DepositSignUpDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

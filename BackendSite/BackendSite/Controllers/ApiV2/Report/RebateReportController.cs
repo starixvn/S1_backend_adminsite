@@ -75,6 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
         }
+
         public class GetVipRebateDetailRequest
         {
             public int CustId { get; set; }

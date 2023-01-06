@@ -36,8 +36,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustTypeEnum
     {
-        Debit = 1,
-        Credit = 2,
+        Credit = 1,
+        Debit = 2,
         IncreaseBonus = 3,
         ReduceBonus = 4,
         ThirdAdd = 5,
@@ -545,6 +545,7 @@ namespace BackendSite.Service.Model.enums
         Withdrawal = 10,
         Other = 11
     }
+
     #endregion
 
     #region AdminUser
@@ -1561,7 +1562,11 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
+    public enum BlockEWalletStatus
+    {
+        Lock = 1,
+        Unlock = 2
+    }
     public enum MpaTransactionRelaySummaryTypeEnum
     {
         Deposit = 1,
@@ -1609,11 +1614,7 @@ namespace BackendSite.Service.Model.enums
         Featured = 4,
         TopCasino = 5
     }
-    public enum BlockEWalletStatus
-    {
-        Lock = 1,
-        Unlock = 2
-    }
+
     public enum CustomerTeleStatusEnum
     {
         NoRecord = 0,
