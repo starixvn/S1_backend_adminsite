@@ -75,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
         [HttpPost]
         public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
         {
@@ -110,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
         [HttpPost]
         public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCustId(TpDisableUserForGameDetailReq req)
         {
@@ -163,7 +163,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
         /// </remarks>
         /// <param name="disableGames"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 3 })]
         [HttpPost]
         public async Task<ApiResult> Set(DisableUser disableGames)
         {
@@ -173,7 +173,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
             if (customer == null)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.NoData; ;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
                 apiResult.Message = "User Not Found";
                 return apiResult;
             }
@@ -197,7 +197,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Disable User For Game > [Submit] >Change[Status]
         /// </remarks>
         /// <param name="disable"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 12 })]
         [HttpPost]
         public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {
