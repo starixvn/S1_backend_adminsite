@@ -2197,7 +2197,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
