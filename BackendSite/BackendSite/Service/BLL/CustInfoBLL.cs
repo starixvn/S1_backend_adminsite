@@ -434,9 +434,9 @@ namespace BackendSite.Service.BLL
 
         #region Customer Note
 
-        public bool AddCustNote(int custId, string Note, string Operator)
+        public bool AddCustNote(int custId, string note, string @operator, bool canEdit = false)
         {
-            return _custInfoService.AddCustNote(custId, Note, Operator);
+            return _custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit);
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
             int pageSize,
