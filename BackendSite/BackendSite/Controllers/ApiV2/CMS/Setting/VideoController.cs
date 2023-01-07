@@ -37,35 +37,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public IEnumerable<int> LangIds { get; set; }
-            /// <summary>
-            /// 日期-起
-            /// </summary>
-            /// <remarks>
-            /// 單位為年月日，不會到小時，故不會有時區概念。
-            /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
-            /// </remarks>
-            public string StartDate { get; set; }
-            /// <summary>
-            /// 日期-迄
-            /// </summary>
-            /// <remarks>
-            /// 單位為年月日，不會到小時，故不會有時區概念。
-            /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
-            /// </remarks>
-            public string EndDate { get; set; }
         }
 
         public class SetRequest
         {
             public int LangId { get; set; }
-            /// <summary>
-            /// 日期
-            /// </summary>
-            /// <remarks>
-            /// 單位為年月日，不會到小時，故不會有時區概念。
-            /// 資料的欄位紀錄目前都是 +0 的日期(年月日)
-            /// </remarks>
-            public string Date { get; set; }
             public string Title { get; set; }
             public string Link { get; set; }
         }
@@ -96,8 +72,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 SiteId = request.SiteId,
                 CurrencyIds = request.CurrencyIds,
                 LangList = langList,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
             };
@@ -135,14 +109,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     Before = new SetVideoPara
                     {
                         LangId = ((LangType)request.Before.LangId).ToString(),
-                        Date = request.Before.Date,
                         Title = request.Before.Title,
                         Link = request.Before.Link
                     },
                     After = new SetVideoPara
                     {
                         LangId = ((LangType)request.After.LangId).ToString(),
-                        Date = request.After.Date,
                         Title = request.After.Title,
                         Link = request.After.Link
                     }
