@@ -268,11 +268,11 @@ namespace BackendSite.Service.BLL
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
             IEnumerable<int> GameTypes,
-            DateTimeOffset StartTime,
-            DateTimeOffset EndTime)
+            DateTime StartTime,
+            DateTime EndTime)
         {
             var result = _betListBll
-                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .GetTpBetRecord(CustId, StartTime, EndTime)
                 .Where(i => GameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                     tpBetRecord => tpBetRecord.GameType,
