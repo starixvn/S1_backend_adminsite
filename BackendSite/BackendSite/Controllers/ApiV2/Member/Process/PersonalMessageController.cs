@@ -29,6 +29,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly Common _common;
         private readonly ILogger<PersonalMessageController> _logger;
         private readonly ExcelBLL _excelBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -43,6 +45,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _common = provider.GetRequiredService<Common>();
             _logger = provider.GetRequiredService<ILogger<PersonalMessageController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -330,6 +334,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Update Fail."
                 };
             }
+
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = authData.UserName,
+                    SiteId = custInfo.SiteId,
+                    CurrencyId = custInfo.CurrencyId,
+                    ActionType = ActionType.Create,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.IssueBonusManagement,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = JsonConvert.SerializeObject(detailInfo),
+                    RefTransId = string.Empty
+                });
 
             return new ApiResult
             {
