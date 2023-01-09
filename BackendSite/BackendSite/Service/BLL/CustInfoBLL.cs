@@ -272,7 +272,7 @@ namespace BackendSite.Service.BLL
             DateTimeOffset EndTime)
         {
             var result = _betListBll
-                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .GetTpBetRecord(CustId, StartTime.ToUniversalTime().DateTime, EndTime.ToUniversalTime().DateTime)
                 .Where(i => GameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                     tpBetRecord => tpBetRecord.GameType,
