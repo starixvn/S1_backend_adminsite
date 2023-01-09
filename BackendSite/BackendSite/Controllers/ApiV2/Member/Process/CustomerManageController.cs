@@ -2436,8 +2436,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    request.GameTypes,
-                                                   request.StartDate,
-                                                   request.EndDate);
+                                                   request.StartDate.ToUniversalTime().DateTime,
+                                                   request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
