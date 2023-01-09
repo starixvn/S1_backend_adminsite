@@ -121,7 +121,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
-
             _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
 
             var exportData = _prizeBll.GetExportData(
@@ -132,7 +131,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
                 JsonConvert.SerializeObject(request.EventNames),
                 timeSpan.Hours);
 
-            var stream = _excelBll.Export(exportData);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "DrawPrizeReport");
 
         }

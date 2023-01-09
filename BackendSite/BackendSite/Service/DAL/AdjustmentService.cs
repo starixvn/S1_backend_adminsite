@@ -527,14 +527,14 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var logParam = new DynamicParameters();
-            props.Add("_SiteId", input.SiteId);
-            props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
-            props.Add("_ActionType", (int)ActionType.Update);
-            props.Add("_RefTransId", string.Empty);
-            props.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-            props.Add("_Operator", input.Operator);
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_Operator", input.Operator);
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, tran) > 0;
 
             if (!logResult)

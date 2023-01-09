@@ -1,4 +1,5 @@
-﻿using BackendSite.ExceptionHandling;
+﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpBetLimitController : ControllerBase
@@ -67,14 +68,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > User Bet Limit > [Submit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 1 })]
         [HttpPost]
         public ApiListResult<UserBetLimit> GetList(QueryUserBetLimitReq req)
         {
             var pageNumber = req.PageNumber;
-            var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.CurrencyIds,req.UserName, req.StartDate, req.EndDate,
+            var datas = _userBetLimitBll.GetUserBetLimit(req.SiteIds, req.CurrencyIds, req.UserName, req.StartDate, req.EndDate,
                 req.PageSize, req.PageNumber, out var totalPages, out var rowCount);
             foreach (var data in datas)
             {
@@ -99,9 +100,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
         public async Task<ApiResult<CustBetLimitByCustId>> GetByCustId(CustBetLimitByCustIdReq req)
         {
@@ -119,14 +120,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > [Submit]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
         public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimit> req)
         {
             var updateOperator = User.Identity.Name;
-            var customer = await _custInfoBll.GetCustId(null,req.After.UserName, req.SiteId);
+            var customer = await _custInfoBll.GetCustId(null, req.After.UserName, req.SiteId);
             if (customer == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
@@ -137,7 +138,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(req, updateOperator));
             //result: 1 (新增成功),2 (修改成功)
             var success = result == 1 || result == 2;
-            
+
             return new ApiResult
             {
                 ErrorCode = success ? (int)ErrorCodeEnum.Success : result,
@@ -150,7 +151,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
@@ -170,9 +170,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <remarks>
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Delete]
         /// </remarks>
         /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 4 })]
         [HttpPost]
         public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteCustBetLimit> req)
         {
@@ -183,29 +183,50 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
             };
         }
-        
+
         /// <summary>
-        /// UserBetLimit/GetTpBetLimit 取得指定第三方投注限額
+        /// TpBetLimit/GetTpBetLimit 取得指定第三方投注限額
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：CSD > User Bet Limit > [Submit] > Click[Edit] > Enable TpGame
-        /// 
         /// </remarks>
-        /// <param name="categoryId"></param>
-        /// <param name="currencyId"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(GetTpBetLimitGroupReq req)
         {
-            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(categoryId, currencyId);
+            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(req.CurrencyId);
             var apiResult = new ApiResult<IEnumerable<TpBetLimitGroup>>
             {
                 Data = data,
                 ErrorCode = 0
             };
+            return apiResult;
+        }
+
+        /// <summary>
+        /// TpBetLimit/GetTpCategoryList 取得UserBetLimit 可以設定的TpCategory
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        {
+            var data = await _userBetLimitBll.GetTpCategoryList();
+            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            {
+                Data = data,
+                ErrorCode = 0
+            };
+
             return apiResult;
         }
     }

@@ -195,8 +195,13 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalLimitInfoManage GetWithdrawalLimitInfo(int siteId, int currencyId, int viplevel)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = siteId,
+                CurrencyId = currencyId,
+                VipLevel = viplevel,
+            });
+            return _mainDbClient.QueryFirst<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get",props);
         }
 
         public bool DeleteWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
@@ -288,8 +293,14 @@ namespace BackendSite.Service.DAL
 
         public USDTWithdrawalLimitInfoManage GetUSDTWithdrawalLimitInfo(int siteId, int currencyId, int viplevel, int Network)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel, Network  = Network }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                SiteId = siteId,
+                CurrencyId = currencyId,
+                VipLevel = viplevel,
+                Network = Network
+            });
+            return _reportDbClient.QueryFirst<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", props);
         }
 
         public int DeleteUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
@@ -586,13 +597,9 @@ namespace BackendSite.Service.DAL
             return true;
         }
 
-        public IEnumerable<CryptoInfo> GetCryptoInfoList()
-            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get");
-
         public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId});
         }
 
         public bool EditEWalletWithdrawalLimitInfo(ParamsWithLog<EWalletUpdateRequest> input)

@@ -2197,7 +2197,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2438,9 +2438,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.GameTypes,
                                                    request.StartDate.ToUniversalTime().DateTime,
                                                    request.EndDate.ToUniversalTime().DateTime);
+
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

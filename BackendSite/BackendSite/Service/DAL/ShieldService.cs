@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", request.StartDate.DateTime);
             props.Add("_EndDate", request.EndDate.DateTime);
             props.Add("_TriggeredPoint", JsonConvert.SerializeObject(request.TriggeredPoints));
-            props.Add("_Platform", JsonConvert.SerializeObject(request.Platform));
+            props.Add("_Platform", JsonConvert.SerializeObject(request.PlatformSting));
             props.Add("_PageSize", Math.Abs(request.PageSize));
             props.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -87,7 +87,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", request.StartDate.DateTime);
             props.Add("_EndDate", request.EndDate.DateTime);
             props.Add("_TriggeredPoint", JsonConvert.SerializeObject(request.TriggeredPoints));
-            props.Add("_Platform", JsonConvert.SerializeObject(request.Platform));
+            props.Add("_Platform", JsonConvert.SerializeObject(request.PlatformSting));
             var result = _reportDbClient.Query<ShieldTaggingReportExport>("Admin_ShieldTaggingReportExport_Get", props).ToList();
           
             

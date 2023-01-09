@@ -214,6 +214,7 @@ namespace BackendSite.Service.BLL
                 VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,
+                UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
@@ -244,7 +245,9 @@ namespace BackendSite.Service.BLL
                 IsTest = customer.IsTest,
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
-                    : await _memberService.GetCustomerTagsAsync(customer.TagList)
+                    : await _memberService.GetCustomerTagsAsync(customer.TagList),
+                PhoneRewardTime = customer.PhoneRewardTime,
+                EmailRewardTime = customer.EmailRewardTime
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -315,11 +318,11 @@ namespace BackendSite.Service.BLL
             };
             return response;
         }
+
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
-
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
         {

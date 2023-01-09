@@ -267,9 +267,17 @@ module.exports = {
     // "Finance/BonusPayout.min": [
     //   "./src/pages/Finance/BonusPayout/index.js",
     // ],
-    // "Marketing/HotEventManagement.min": [
-    //   "./src/pages/Marketing/HotEventManagement/index.js",
+    // "Marketing/SlotGamesManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/SlotGamesManagement/index.js",
     // ],
+    // "Marketing/CategoryManagement.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/CategoryManagement/index.js",
+    // ],
+    "Marketing/HotEventManagement.min": [
+      "./src/pages/Marketing/HotEventManagement/index.js",
+    ],
     // "Finance/LineChannel.min": ["./src/pages/Finance/LineChannel/index.js"],
     // "Marketing/DeepLinkManagement.min": [
     // 	 '@babel/polyfill',
