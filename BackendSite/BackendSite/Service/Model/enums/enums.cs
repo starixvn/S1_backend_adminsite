@@ -784,7 +784,8 @@ namespace BackendSite.Service.Model.enums
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
         SiteMaintenance = 77,
-        SetVideoInfo = 78
+        SetVideoInfo = 78,
+        SMSGenerator = 79
     }
 
     #region BankFinancialTransferInfoLog
