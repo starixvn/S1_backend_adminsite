@@ -212,6 +212,7 @@ namespace BackendSite.Service.BLL
             {
                 WithdrawalStatusEnum.Verify
             };
+            
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -222,7 +223,12 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.Fail,
                     $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify Can Set.");
             }
-            var accountingModelString = SetAccountingString(accountingModels);
+
+            var accountingModelString = string.Empty;
+            if (withdrawalType is (int) WithdrawalTypeEnum.CryptoWallet or (int) WithdrawalTypeEnum.LocalBank)
+            {
+                accountingModelString = SetAccountingString(accountingModels);
+            }
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
