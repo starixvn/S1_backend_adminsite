@@ -184,6 +184,27 @@ namespace BackendSite.Service.BLL
             return Setting;
         }
 
+        public bool CheckPermission(AdminUserV2 loginUser, int menuId, int permissionId)
+        {
+            if (loginUser.IsSuper) return true;
+            
+            if (loginUser.Status == 0) return false;
+            
+            var userAllPermission = new List<UserAllPremission>();
+            if (string.IsNullOrEmpty(loginUser.Role))
+            {
+                userAllPermission = GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+            else
+            {
+                var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
+                userAllPermission = GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
+            }
+
+            var permissionList = userAllPermission.Find(x => x.MenuId == menuId);
+            return permissionList != null && permissionList.Permission.Exists(x => x == permissionId);
+        }
+
         public bool CheckPermission(string FuncKey, string SubFuncKey)
         {
             var authData = _authorizeBll.GetAuthData();

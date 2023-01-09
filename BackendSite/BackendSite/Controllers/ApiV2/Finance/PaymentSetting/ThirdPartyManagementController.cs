@@ -77,6 +77,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             /// </summary>
             public BankInfoPayStatusEnum Status { get; set; }
         }
+        
+        public class SetCryptoInfoStatusRequest
+        {
+            public CryptoCurrencyEnum CurrencyId { get; set; }
+            public NetworkTypeEnum Network { get; set; }
+            public GeneralStatusEnum Status { get; set; }
+        }
 
         #endregion
 
@@ -204,6 +211,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             var authData = _authorizeBll.GetAuthData();
             var result = _paymentManageBll
                 .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, authData.UserName);
+
+            return new ApiResult
+            {
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+            };
+        }
+        
+        [HttpPost]
+        public ApiResult GetCryptoInfoList()
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var result = _paymentManageBll.GetCryptoInfoList(authData.SiteId);
+
+            return new ApiResult<IEnumerable<CryptoInfo>>
+            {
+                Data = result,
+                ErrorCode = (int) ErrorCodeEnum.Success
+            };
+        }
+        
+        [HttpPost]
+        public ApiResult SetCryptoInfoStatus(SetCryptoInfoStatusRequest request)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var result = _paymentManageBll
+                .SetCryptoInfoStatus(authData.SiteId, request.CurrencyId, request.Network.ToString(), request.Status, authData.UserName);
 
             return new ApiResult
             {

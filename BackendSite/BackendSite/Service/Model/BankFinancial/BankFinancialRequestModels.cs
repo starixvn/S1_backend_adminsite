@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
-    public class GetTransferAccountInfoListByIdRequest
+    public class GetTransferAccountInfoByIdRequest
     {
         public int Id { get; set; }
     }
@@ -37,7 +39,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
-        public int SysId { get; set; }
+        public int? SysId { get; set; }
 
         /// <summary>
         /// 讀寫 目的
@@ -59,6 +61,9 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 第三方支付ID
         /// </summary>
         public int? PayId { get; set; }
+        
+        public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
+        public NetworkTypeEnum? Network { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶帳號
@@ -118,5 +123,44 @@ namespace BackendSite.Service.Model.BankFinancial
     public class GetAgentListRequest
     {
         public int SiteId { get; set; }
+    }
+    
+    public class GetAccountListRequest
+    {
+        public int SiteId { get; set; }
+    }
+
+    public class GetTransferInfoListRequest : ApiRequestPageModel
+    {
+        public int SiteId { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public int? FromCurrencyId { get; set; }
+        public int? ToCurrencyId { get; set; }
+        public IEnumerable<TransferTypeEnum> TransferTypes { get; set; }
+        public string FromAccountNo { get; set; }
+        public string ToAccountNo { get; set; }
+        public int? FromChannel { get; set; }
+        public int? ToChannel { get; set; }
+        public int? Reason { get; set; }
+        public string FromAgent { get; set; }
+        public string ToAgent { get; set; }
+    }
+    
+    public class ExportTransferInfoListRequest
+    {
+        public int SiteId { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
+        public int? FromCurrencyId { get; set; }
+        public int? ToCurrencyId { get; set; }
+        public IEnumerable<TransferTypeEnum> TransferTypes { get; set; }
+        public string FromAccountNo { get; set; }
+        public string ToAccountNo { get; set; }
+        public int? FromChannel { get; set; }
+        public int? ToChannel { get; set; }
+        public int? Reason { get; set; }
+        public string FromAgent { get; set; }
+        public string ToAgent { get; set; }
     }
 }

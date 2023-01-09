@@ -12,13 +12,13 @@ namespace BackendSite.Service.BLL
             this._prizeService = prizeService;
         }
 
-        public PrizeSearchResult PrizeSearch(PrizeSelect prizeSelect ,int timeZone)
+        public DrawPrizeReportResult PrizeSearch(PrizeSelect prizeSelect, int timeZone, out List<string> currencyAmount)
         {
-            return _prizeService.PrizeSearch(prizeSelect,timeZone);
+            return _prizeService.PrizeSearch(prizeSelect, timeZone, out currencyAmount);
         }
-        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara,int timeZone)
+        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara, int timeZone)
         {
-             return _prizeService.GetPrizeLog(prizeLogPara,timeZone);
+            return _prizeService.GetPrizeLog(prizeLogPara, timeZone);
         }
         public IEnumerable<EventDraw> GetEventName()
         {
@@ -27,7 +27,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, string currencyId, string eventName, int timeZone)
         {
-            return _prizeService.GetExportData(selectSite, startDate, endDate, currencyId, eventName , timeZone);
+            return _prizeService.GetExportData(selectSite, startDate, endDate, currencyId, eventName, timeZone);
         }
     }
 }

@@ -115,7 +115,7 @@ namespace BackendSite.Service.BLL
         {
             var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
             
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(1),
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         

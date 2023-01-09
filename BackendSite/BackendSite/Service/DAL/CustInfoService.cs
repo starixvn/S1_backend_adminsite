@@ -1091,5 +1091,46 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
+
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_CurrencyId", currencyId);
+            
+            return await _reportDbClient.QueryFirstAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get", p);
+        }
+
+        public IEnumerable<BlockBankAcc> GetBankList(int custId)
+        {
+            return _reportDbClient.Query<BlockBankAcc>("Admin_CustBankDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
+        public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
+        {
+            return _reportDbClient.Query<BlockEWalletAcc>("Admin_CustEWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
+        public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
+            DateTime endDate)
+        {
+            return _reportDbClient.Query<CustLoginLog>("Admin_LoginLog_Get", new DynamicParameters(new { _CustId = custId, _StartDate = startDate, _EndDate = endDate }));
+        }
+        public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
+        {
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+        }
+        public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
+        {
+            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+        }
+
+        public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
+        {
+            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+        }
+
+        public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<EWalletDetail>("Admin_CustEWalletDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
+        }
     }
 }

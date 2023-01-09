@@ -3,8 +3,6 @@ using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
@@ -36,7 +34,7 @@ namespace BackendSite.Service.DAL
             para.Add("_CurrencyId", input.CurrencyId);
             para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : null, DbType.String);
             para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
-            para.Add("_SysIds", JsonConvert.SerializeObject(input.SysIds));
+            para.Add("_SysIds", input.Purposes.Any() ? JsonConvert.SerializeObject(input.SysIds) : null, DbType.String);
             para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : null, DbType.String);
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);

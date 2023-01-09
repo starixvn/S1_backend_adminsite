@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class NewsController : ControllerBase
@@ -134,7 +134,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  News Management  > [Search]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 54, 1 })]
         [HttpPost]
         public ApiListResult<News> GetList(GetListRequest request)
         {
@@ -166,7 +166,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  News Management  > [Submit] > [Edit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 54, 1 })]
         [HttpPost]
         public ApiResult<News> GetById(GetByIdRequest request)
         {
@@ -187,7 +187,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing >  News Management  > [Edit] > [submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 54, 3 })]
         [HttpPost]
         public ApiResult Set(SetRequest request)
         {
@@ -234,7 +234,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：Marketing > News Management > [Submit] > [Status] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/NewsManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 54, 12 })]
         [HttpPost]
         public ApiResult<dynamic> SetStatus(SetStatusRequest request)
         {

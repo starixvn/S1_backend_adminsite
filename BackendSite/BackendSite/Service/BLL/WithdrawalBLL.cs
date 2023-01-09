@@ -25,11 +25,11 @@ namespace BackendSite.Service.BLL
         private readonly BankDetailBLL _bankDetailBll;
         private readonly MySqlClient _mainDbClient;
         private readonly Common _common;
-        private readonly WalletService _walletService;
         private readonly ILogger<WithdrawalBLL> _logger;
         private readonly IConfiguration _configuration;
         private readonly string payApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly PaymentManageService _paymentManageService;
 
         private readonly Dictionary<int, bool> _isConvert = new Dictionary<int, bool>()
         {
@@ -54,12 +54,12 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
             _common = provider.GetRequiredService<Common>();
-            _walletService = provider.GetRequiredService<WalletService>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _configuration = provider.GetRequiredService<IConfiguration>();
             payApiUrl = _configuration.GetValue<string>("PayService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _paymentManageService = provider.GetRequiredService<PaymentManageService>();
         }
 
         #endregion
@@ -134,7 +134,7 @@ namespace BackendSite.Service.BLL
 
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
+                var status = withdrawalRequest.Status;
                 throw new AdminException(ErrorCodeEnum.Fail,
                     $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Process Can Set.");
             }
@@ -142,6 +142,11 @@ namespace BackendSite.Service.BLL
             var withdrawalInfo =
                 JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
             withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
+            if (withdrawalRequest.WithdrawalType == WithdrawalTypeEnum.CryptoWallet)
+            {
+                withdrawalInfo.ExchangeRate = withdrawalInfo.TempExchangeRate;
+                withdrawalInfo.ExchangeAmount = withdrawalInfo.TempExchangeAmount;
+            }
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
                 WithdrawalStatusEnum.Approved, JsonConvert.SerializeObject(withdrawalInfo),
@@ -207,6 +212,7 @@ namespace BackendSite.Service.BLL
             {
                 WithdrawalStatusEnum.Verify
             };
+            
 
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -217,8 +223,14 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.Fail,
                     $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify Can Set.");
             }
-            var accountingModelString = SetAccountingString(accountingModels);
-            var chargeFee = accountingModels.Sum(x => x.ChargeFee);
+
+            var accountingModelString = string.Empty;
+            var chargeFee = 0m;
+            if (withdrawalType is (int) WithdrawalTypeEnum.CryptoWallet or (int) WithdrawalTypeEnum.LocalBank)
+            {
+                accountingModelString = SetAccountingString(accountingModels);
+                chargeFee = accountingModels.Sum(x => x.ChargeFee);
+            }
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
@@ -736,15 +748,20 @@ namespace BackendSite.Service.BLL
         }
         
 
-        public CryptoInfoData GetCryptoInfoData()
+        public CryptoInfoData GetCryptoInfoData(int siteId)
         {
-            var infos = _withdrawalLimitService.GetCryptoInfoList();
+            var infos = _paymentManageService.GetCryptoInfoList(siteId);
             var cryptoCurrency = infos
-                .Select(x => new CryptoCurrency
+                .GroupBy(x => x.CurrencyId)
+                .Select(x =>
                 {
-                    CurrencyId = x.CurrencyId,
-                    CurrencyName = x.CurrencyName
-                }).Distinct(new CryptoCurrencyComparer());
+                    var d = x.First();
+                    return new CryptoCurrency
+                    {
+                        CurrencyId = d.CurrencyId,
+                        CurrencyName = d.CurrencyName
+                    };
+                });
 
             var cryptoNetwork = infos.Select(x => new CryptoNetwork
             {
