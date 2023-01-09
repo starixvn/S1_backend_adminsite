@@ -21,6 +21,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<RiskController> _logger;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         #endregion
 
@@ -32,6 +34,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<RiskController>>();
+            _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         #endregion
@@ -168,8 +172,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         public async Task<ApiResult> Set(DisableUser disableGames)
         {
             var apiResult = new ApiResult();
-
-            var updateOperator = User.Identity.Name;
+            var authData = _newAuthorizeBLL.GetAuthData();
+            var updateOperator = authData.UserName;
             var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
             if (customer == null)
             {
@@ -180,6 +184,23 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
             var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
                 disableGames.DisableTpGame, updateOperator);
+
+            if (result == 1 || result == 2)
+            {
+                var siteId = _newAuthorizeBLL.CheckBrand();
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = updateOperator,
+                    SiteId = siteId,
+                    CurrencyId = 0,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.GameExclusion,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = JsonConvert.SerializeObject(disableGames),
+                    RefTransId = string.Empty
+                });
+            }
+
             return new ApiResult
             {
                 //result: 1 (新增成功),2 (修改成功)
@@ -201,10 +222,25 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<DisableDisableUser> req)
         {
-
-            var updateOperator = User.Identity.Name;
+            var authData = _newAuthorizeBLL.GetAuthData();
+            var updateOperator = authData.UserName;
             var result = await _riskBll.UpdateStatus(
                 new ParamsWithLog<DisableDisableUser>(req, updateOperator));
+            if (result)
+            {
+                var siteId = _newAuthorizeBLL.CheckBrand();
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = updateOperator,
+                    SiteId = siteId,
+                    CurrencyId = 0,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.GameExclusion,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = JsonConvert.SerializeObject(req),
+                    RefTransId = string.Empty
+                });
+            }
             return new ApiResult
             {
                 ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
