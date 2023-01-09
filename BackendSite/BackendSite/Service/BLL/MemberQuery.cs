@@ -214,6 +214,7 @@ namespace BackendSite.Service.BLL
                 VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,
+                UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
