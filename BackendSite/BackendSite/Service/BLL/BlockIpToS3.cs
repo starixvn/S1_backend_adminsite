@@ -2,6 +2,7 @@
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL;
 
@@ -11,21 +12,36 @@ public class BlockIpToS3
     private readonly BlockService _blockService;
     private readonly string _fileName;
     private readonly string _folder;
+    private readonly string _nginxIpKey;
 
     public BlockIpToS3(AWSS3Helper s3Helper, IWebHostEnvironment env, BlockService blockService)
     {
         _s3Helper = s3Helper;
         _blockService = blockService;
-        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "blockIp.txt" : "blockIp_test.txt";
+        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "geoblockIp.txt" : "geoblockIp_test.txt";
+        _nginxIpKey = env.IsProduction() || env.EnvironmentName == "Release" ? "$remote_addr" : "$real_ip";
         _folder = Path.Combine(env.ContentRootPath, "NginxConfig");
     }
     public async Task<int> Upload()
     {
         Directory.CreateDirectory(_folder);
         var filePath = Path.Combine(_folder, _fileName);
-        var blockIps = await _blockService.GetBlockIPList();
+        var blockIps = await _blockService.GetBlockIPList<BlockIPForUpload>();
         var ipLines = blockIps.Select(a => a.IP).ToList();
-        await File.WriteAllLinesAsync(filePath, ipLines);
+        await File.WriteAllTextAsync(filePath, "#### Block List 0:open 1:block -1:default\r\n" +
+                                               $"geo {_nginxIpKey} $ipcheck " +
+                                               "{ \r\n" +
+                                               "default -1;\r\n");
+        await File.AppendAllLinesAsync(filePath, ipLines);
+        await File.AppendAllTextAsync(filePath, "}\r\n" + 
+                                                "\r\n" +
+                                                "map $ip_geoblock:$ipcheck $geoblock {\r\n" +
+                                                "default $default_geoblock;\r\n" +
+                                                "0:0 0;\r\n" +
+                                                "0:1 0;\r\n" +
+                                                "0:-1 0;\r\n" +
+                                                "-1:1 1;\r\n" +
+                                                "}\r\n");
 
         return await UploadToS3(filePath);
     }

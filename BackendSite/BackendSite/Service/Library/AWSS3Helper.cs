@@ -2,6 +2,7 @@
 using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using BackendSite.Extensions;
 using BackendSite.Service.Model;
 using Microsoft.Extensions.Options;
 
@@ -69,7 +70,7 @@ namespace BackendSite.Service.Library
                 };
 
                 var putResponse = await _client.PutObjectAsync(putRequest);
-                var success = putResponse.HttpStatusCode == HttpStatusCode.OK;
+                var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
                 {
                     _logger.LogError($"Upload to s3 failed, key: {key}, HttpStatusCode: {(int) putResponse.HttpStatusCode}");
@@ -80,6 +81,33 @@ namespace BackendSite.Service.Library
             catch (Exception ex)
             {
                 _logger.LogError("Upload to s3 Exception", ex);
+                
+                return false;
+            }
+        }
+        
+        public async Task<bool> DeleteFileAsync(string bucketName, string key)
+        {
+            try
+            {
+                var putRequest = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = key
+                };
+
+                var putResponse = await _client.DeleteObjectAsync(putRequest);
+                var success = putResponse.HttpStatusCode.IsSuccess();
+                if (!success)
+                {
+                    _logger.LogError($"Delete from s3 failed, key: {key}, HttpStatusCode: {(int) putResponse.HttpStatusCode}");
+                }
+                
+                return success;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Delete from s3 Exception", ex);
                 
                 return false;
             }

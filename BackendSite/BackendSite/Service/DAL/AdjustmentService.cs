@@ -204,25 +204,26 @@ namespace BackendSite.Service.DAL
                 return (-2, string.Empty);
             }
             
-            var logResult = _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            p = new DynamicParameters();
+            p.Add("_SiteId", input.SiteId);
+            p.Add("_CurrencyId", input.CurrencyId);
+            p.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalLimitAdjustment);
+            p.Add("_ActionType", (int) ActionType.Create);
+            p.Add("_RefTransId", transId);
+            p.Add("_BeforeDetailInfo", null, DbType.String);
+            p.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
-                Operator = input.Operator,
-                ActionType = ActionType.Create,
-                MenuEnum = AdminAdjustmentLogMenuEnum.WithdrawalLimitAdjustment,
-                CurrencyId = input.CurrencyId,
-                SiteId = input.SiteId,
-                AfterDetailInfo = JsonConvert.SerializeObject(new
-                {
-                    input.UserName,
-                    input.Amount,
-                    AdjustType = input.AdjustType.ToString(),
-                    Reason = input.ReasonId.ToString(),
-                    input.Memo
-                }),
-                RefTransId = transId
-            });
-
-            if (!logResult)
+                input.UserName,
+                input.Amount,
+                AdjustType = input.AdjustType.ToString(),
+                Reason = input.ReasonId.ToString(),
+                input.Memo
+            }), DbType.String);
+            p.Add("_Operator", input.Operator);
+            
+            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", p, trans, commandType: CommandType.StoredProcedure);
+            
+            if (logResult < 1)
             {
                 trans.Rollback();
                 return (-3, string.Empty);
@@ -318,6 +319,7 @@ namespace BackendSite.Service.DAL
         public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
         {
             Adjustment_transId = null;
+            
             using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -332,11 +334,11 @@ namespace BackendSite.Service.DAL
                 adjustmentAndWithdrawalLimit.Amount,
                 Prefix = $"A{common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
-                adjustmentAndWithdrawalLimit.Category
+                adjustmentAndWithdrawalLimit.Category,
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Execute("Admin_Adjustment_Ins_V2", adjustmentP, conn, trans);
+            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
