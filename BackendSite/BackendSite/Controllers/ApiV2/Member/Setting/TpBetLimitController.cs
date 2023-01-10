@@ -4,8 +4,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Policy;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
@@ -124,7 +126,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
-        public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimit> req)
+        public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimitV2> req)
         {
             var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(null, req.After.UserName, req.SiteId);
@@ -132,10 +134,34 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
+            var betSetting = req.After.BetSetting.GroupBy(x => x.TpCategory).Select(x => new BetSetting
+            {
+                TpCategory = x.Key,
+                TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
+                TpBetSetting = x.Select(y => new TpBetSetting
+                {
+                    LimitGroup = y.LimitGroup,
+                    LimitRange = y.LimitRange,
+                    GameTypeId = y.GameTypeId,
+                    GameTypeName = y.GameTypeName
+                }).ToList()
+            }).ToList();
 
+            var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
+            {
+                SiteId = req.SiteId,
+                CurrencyId = req.CurrencyId,
+                TransId = req.TransId,
+                Before = null,
+                After = new CustBetLimit()
+                {
+                    UserName = req.After.UserName,
+                    BetSetting = betSetting
+                }
+            };
             req.After.CustId = customer.CustId;
 
-            var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(req, updateOperator));
+            var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator));
             //result: 1 (新增成功),2 (修改成功)
             var success = result == 1 || result == 2;
 
