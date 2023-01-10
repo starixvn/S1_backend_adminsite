@@ -28,8 +28,6 @@ namespace BackendSite.Service.DAL
             props.Add("_SiteId", para.SiteId);
             props.Add("_CurrencyIds", JsonConvert.SerializeObject(para.CurrencyIds));
             props.Add("_LangList", JsonConvert.SerializeObject(para.LangList));
-            props.Add("_StartDate", para.StartDate);
-            props.Add("_EndDate", para.EndDate);
             props.Add("_PageSize", Math.Abs(para.PageSize));
             props.Add("_StartIndex", (Math.Abs(para.PageNumber) - 1) * para.PageSize ,dbType: DbType.Int32);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -50,7 +48,6 @@ namespace BackendSite.Service.DAL
             using var tran = conn.BeginTransaction();
             
             var props = new DynamicParameters();
-            props.Add("_Date", para.After.Date);
             props.Add("_SiteId", para.SiteId);
             props.Add("_CurrencyId", para.CurrencyId);
             props.Add("_Lang", para.After.LangId);

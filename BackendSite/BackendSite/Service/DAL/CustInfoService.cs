@@ -314,17 +314,22 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_CustPhotoId_Del", parameter) > 0;
         }
 
-        public bool AddCustNote(int custId, string Note, string Operator, MySqlConnection conn = null, MySqlTransaction trans = null)
+        public bool AddCustNote(int custId, string note, string @operator, MySqlConnection conn = null, MySqlTransaction trans = null, bool canEdit = false)
         {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId,
+                _Note = note,
+                _Operator = @operator,
+                _CanEdit = canEdit
+            });
+            
             if (conn == null)
             {
-                using var connect = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-                return _mainDbClient.Execute("Admin_CustNotes_Ins", new DynamicParameters(new { CustId = custId, Note = Note, Operator = Operator })) > 0;
+                return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p) > 0;
             }
-            else
-            {
-                return _mainDbClient.Execute("Admin_CustNotes_Ins", new DynamicParameters(new { CustId = custId, Note = Note, Operator = Operator }), conn, trans) > 0;
-            }
+            
+            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p, conn, trans) > 0;
         }
 
         public IEnumerable<CustNote> GetCustNotes(int custId,

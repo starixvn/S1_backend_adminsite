@@ -2197,7 +2197,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2435,9 +2435,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult GetTurnOverByCustId(GetTurnOverListByCustIdRequest request)
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
-                                                    request.GameTypes,
-                                                   request.StartDate,
-                                                   request.EndDate);
+                                                   request.GameTypes,
+                                                   request.StartDate.ToUniversalTime().DateTime,
+                                                   request.EndDate.ToUniversalTime().DateTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
@@ -3091,7 +3092,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region CSD > Customer Administration > CustInfo > IP Log
         public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
         {
-            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.ToUniversalTime().DateTime, request.EndDate.ToUniversalTime().DateTime);
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,

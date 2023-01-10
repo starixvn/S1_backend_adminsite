@@ -274,11 +274,11 @@ namespace BackendSite.Service.BLL
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
             IEnumerable<int> GameTypes,
-            DateTimeOffset StartTime,
-            DateTimeOffset EndTime)
+            DateTime StartTime,
+            DateTime EndTime)
         {
             var result = _betListBll
-                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .GetTpBetRecord(CustId, StartTime, EndTime)
                 .Where(i => GameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                     tpBetRecord => tpBetRecord.GameType,
@@ -434,9 +434,9 @@ namespace BackendSite.Service.BLL
 
         #region Customer Note
 
-        public bool AddCustNote(int custId, string Note, string Operator)
+        public bool AddCustNote(int custId, string note, string @operator, bool canEdit = false)
         {
-            return _custInfoService.AddCustNote(custId, Note, Operator);
+            return _custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit);
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
             int pageSize,
