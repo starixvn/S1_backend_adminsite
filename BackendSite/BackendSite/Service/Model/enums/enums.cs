@@ -36,8 +36,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustTypeEnum
     {
-        Debit = 1,
-        Credit = 2,
+        Credit = 1,
+        Debit = 2,
         IncreaseBonus = 3,
         ReduceBonus = 4,
         ThirdAdd = 5,
@@ -1139,7 +1139,7 @@ namespace BackendSite.Service.Model.enums
         GoToBonus = 3,
         OpenWindow = 4,
         RedirectPage = 5,
-        RedirectPagesOfThisSite = 6
+        GoToLobby = 6
     }
 
     public enum ShowStatusEnum
@@ -1157,12 +1157,19 @@ namespace BackendSite.Service.Model.enums
 
     public enum UrlRouterEnum
     {
-        Sports = 1,
+        ESport = 1,
         Casino = 2,
         Referral = 3,
         LeaderBoard = 4,
         AngPow = 5,
-        Lottery = 6
+        Lottery = 6,
+        Slots = 7,
+        Game = 8 ,
+        Fishing = 9 ,
+        Promotion = 10 ,
+        Vip = 11,
+        Deposit = 12,
+        Rewards = 13
     }
     
     #endregion
@@ -1431,5 +1438,20 @@ namespace BackendSite.Service.Model.enums
     {
         Lock = 1,
         Unlock = 2
+    }
+    public enum CustomerTeleStatusEnum
+    {
+        NoRecord = 0,
+        NonDepoist = 1,
+        Deposited = 2,
+    }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
     }
 }
