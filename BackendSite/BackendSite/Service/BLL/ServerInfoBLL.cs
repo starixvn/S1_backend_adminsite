@@ -252,9 +252,7 @@ namespace BackendSite.Service.BLL
 
         public ServerInfo GetServerInfo(int siteId)
         {
-            List<ServerInfo> userSiteList;
-            userSiteList = serverInfoService.GetSiteList().ToList();
-            return userSiteList.FirstOrDefault(x => x.SiteId == siteId);
+            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
         }
     }
 }
