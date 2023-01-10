@@ -429,26 +429,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
-        [HttpPost]
-        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
-        {
-            var apiResult = new ApiResult<ServerInfo>();
-            try
-            {
-                apiResult.Data = _messageBll.GetServerInfo(req.SiteId);
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = 999;
-                apiResult.Message = "something went wrong.";
-                apiResult.RawMessage = ex.Message;
-            }
-
-            return apiResult;
-        }
         #endregion
 
         #region Private Methods

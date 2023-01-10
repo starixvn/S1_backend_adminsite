@@ -244,5 +244,11 @@ namespace BackendSite.Service.BLL
         {
             return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            List<ServerInfo> userSiteList;
+            userSiteList = serverInfoService.GetSiteList().ToList();
+            return userSiteList.FirstOrDefault(x => x.SiteId == siteId);
+        }
     }
 }

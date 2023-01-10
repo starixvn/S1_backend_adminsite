@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
 using BackendSite.Service.Model.BankFinancial;
+using static BackendSite.Controllers.ApiV2.Member.Process.PersonalMessageController;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -35,6 +36,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BonusManageBLL _bonusManageBll;
         private readonly NewAuthorizeBLL _authorizeBll;
         private readonly DeepLinkBLL _deepLinkBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -60,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -476,7 +479,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
         /// </summary>
@@ -568,6 +571,36 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public bool isNew { get; set; } = true;
         }
 
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
+        }
+        /// <summary>
+        /// GetAllData/GetServerInfo  取得ServerInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
+        {
+            var apiResult = new ApiResult<ServerInfo>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetServerInfo(req.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
         #endregion
 
     }
