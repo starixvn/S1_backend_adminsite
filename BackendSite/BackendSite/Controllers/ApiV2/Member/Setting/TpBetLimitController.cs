@@ -104,10 +104,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
-        public async Task<ApiResult<CustBetLimitByCustId>> GetByCustId(CustBetLimitByCustIdReq req)
+        public async Task<ApiResult<CustBetLimitByCustIdV2>> GetByCustId(CustBetLimitByCustIdReq req)
         {
-            var data = await _userBetLimitBll.GetByCustId(req.CustId);
-            return new ApiResult<CustBetLimitByCustId>()
+            var data = await _userBetLimitBll.GetByCustIdV2(req.CustId);
+            return new ApiResult<CustBetLimitByCustIdV2>()
             {
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -196,10 +196,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpBetLimitGroup>>> GetTpBetLimitGroupAsync(GetTpBetLimitGroupReq req)
+        public async Task<ApiResult<IEnumerable<TpBetLimitGroupV2>>> GetTpBetLimitGroupAsync(GetTpBetLimitGroupReq req)
         {
-            var data = await _userBetLimitBll.GetTpBetLimitGroupAsync(req.CurrencyId);
-            var apiResult = new ApiResult<IEnumerable<TpBetLimitGroup>>
+            var data = await _userBetLimitBll.GetTpBetLimitGroupV2Async(req.CurrencyId);
+            var apiResult = new ApiResult<IEnumerable<TpBetLimitGroupV2>>
             {
                 Data = data,
                 ErrorCode = 0
