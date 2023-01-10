@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Extensions;
+﻿using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -51,7 +46,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V6", props);
+            var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V7", props);
             var searchData = new RegLiveStatusPageResult
             {
                 RegLiveStatusData = result.ToList(),
@@ -80,7 +75,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CallOutStatus", callOutStatus);
             props.Add("_DateType", dateType);
 
-            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V5", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V6", props);
 
             return result;
         }
@@ -105,7 +100,7 @@ namespace BackendSite.Service.DAL
             props.Add("SiteId", siteId);
             props.Add("CustId", custId);
             props.Add("Operator", @operator);
-            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins", props);
+            return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins_V2", props);
         }
         public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
         {

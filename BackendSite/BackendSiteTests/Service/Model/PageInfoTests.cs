@@ -20,6 +20,7 @@ namespace BackendSite.Service.Model.TpMaintain.Tests
         [TestCase(100, 2, 30, 4, "31-60")]
         [TestCase(100, 3, 30, 4, "61-90")]
         [TestCase(100, 4, 30, 4, "91-100")]
+        [TestCase(0, 1, 10, 0, "0-0")]
         public void SetPageInfoTest(int totalCount, int pageNumber, int pageSize, int expectedTotalPages, string expectedPageRange)
         {
             _pageInfo.SetPageInfo(totalCount, pageNumber, pageSize);

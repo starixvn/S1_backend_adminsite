@@ -618,7 +618,7 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.PayList[0];
                         }*/
                     } else if (this.state.selectType == 2) {
-                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
+                        selectPay = this.state.BankInfoOffList.filter(x => x.settingStatus === 1).map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
@@ -1286,7 +1286,7 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-10, 'days').format('l')} />
+                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-2, 'days').format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">

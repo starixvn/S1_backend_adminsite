@@ -10,7 +10,6 @@ export const defActionType = {
   SET_TPID: "SET_TPID",
   CURRENCY_SET_AMOUNT_VALUE: "CURRENCY_SET_AMOUNT_VALUE",
   GET_TPGAME_CATEGORIES: "GET_TPGAME_CATEGORIES",
-  CURRENCY_SET_TpGame_VALUE: "CURRENCY_SET_TpGame_VALUE",
   SPECIALBONUS_VALUE: "SPECIALBONUS_VALUE",
   ONLY_REGISTERED_SET_VALUE: "ONLY_REGISTERED_SET_VALUE",
   AUTOEXTEND_SET_VALUE: "AUTOEXTEND_SET_VALUE",
@@ -145,7 +144,6 @@ const initSpecific = {
   lang: {
     en: { ...initLang },
   },
-  tpGames: {},
   minPayout: "",
   cashbackGames:{}
 };
@@ -195,15 +193,6 @@ const SetSpecific = (currencyList, langList, data) => {
 
       _specific[d.currencyId] = _newData;
 
-      if (d.rebateList != null) {
-        _specific[d.currencyId].tpGames = d.rebateList.forEach((r) => {
-          _tpGameData[r.gameType] = {
-            percentage: r.percentage,
-            status: r.status,
-          };
-        });
-        _specific[d.currencyId].tpGames = _tpGameData;
-      }
       if(d.cashBackList != null){
         _specific[d.currencyId].cashbackGames = d.cashBackList.forEach((r) => {
           //tpId 1,27 Wallet Type is Transfer else is Seamless
@@ -421,25 +410,6 @@ export function reducer(state, action) {
       return {
         ...state,
         cashbackGameCategory: cashbackGameCategory,
-      };
-
-    case defActionType.CURRENCY_SET_TpGame_VALUE:
-      return {
-        ...state,
-        specific: {
-          ...state.specific,
-          [action.currencyId]: {
-            ...state.specific[action.currencyId],
-            tpGames: {
-              ...state.specific[action.currencyId].tpGames,
-              [action.gameType]: {
-                ...state.specific[action.currencyId].tpGames[action.gameType],
-                [action.dataColumn]: action.value,
-                gameName: action.gameName,
-              },
-            },
-          },
-        },
       };
 
       case defActionType.CURRENCY_SET_CashBackGame_VALUE:

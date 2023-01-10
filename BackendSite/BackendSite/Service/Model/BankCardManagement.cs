@@ -21,7 +21,7 @@ namespace BackendSite.Service.Model
         public int Purpose { get; set; }
         public string PurposeDescription { get; set; }
         [LogIgnore]
-        public BankDetailOffStatusEnum Status { get; set; }
+        public BankCardManagementStatusEnum Status { get; set; }
         public string StatusName => Status.ToString();
         public int Sort { get; set; }
     }

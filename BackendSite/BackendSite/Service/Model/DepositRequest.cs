@@ -42,14 +42,16 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string PicFileName { set; get; }
+        
+        /*public string DisplayName { set; get; }
         public string CalCode =>
             DepositType switch
             {
-                1 => $"{SiteName}-{BankCode}",
-                2 => $"{SiteName}-{BankCode}",
-                3 => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{BankCode}",
+                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{BankCode}",
+                (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
-            };
+            };*/
 
         //public virtual IEnumerable<Comments> Comments { get; set; }
 
@@ -92,12 +94,13 @@ namespace BackendSite.Service.Model
         public string BankCode { set; get; }
         public string PayName { set; get; }
         public string ChannelName { set; get; }
+        private string DisplayName { set; get; }
         public string CalCode =>
             DepositType switch
             {
-                (int)enums.DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)enums.DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)enums.DepositTypeEnum.LocalBanking => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
 
@@ -283,6 +286,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? ApprovedTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
+        public string Operator { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -313,6 +318,8 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> SiteIds { get; set; }
         public IEnumerable<int> CurrencyId { get; set; }
         public IEnumerable<DepositStatusEnum> Status { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
 
     public class DepositTimeExportData
@@ -329,6 +336,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? EndFlowTime { get; set; }
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
+        public DateTimeOffset? StatementTime { get; set; }
+        public string Operator { get; set; }
     }
     public class SetAmountRequest
     {

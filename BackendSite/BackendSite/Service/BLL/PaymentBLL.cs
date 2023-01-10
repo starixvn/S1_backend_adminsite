@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -14,11 +15,12 @@ namespace BackendSite.Service.BLL
         private readonly WalletService walletService;
         private readonly AdminService adminService;
         private readonly BonusManageService _bonusManageService;
-        private readonly BetListBLL _betListBll;
+        private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly BonusInfoBLL _bonusInfoBLL;
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
+        private readonly Common _common;
 
         public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
         {
@@ -26,11 +28,12 @@ namespace BackendSite.Service.BLL
             walletService = provider.GetRequiredService<WalletService>();
             adminService = provider.GetRequiredService<AdminService>();
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
-            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _betListBll = provider.GetRequiredService<BetListService>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _bonusInfoBLL = provider.GetRequiredService<BonusInfoBLL>();
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
+            _common = provider.GetRequiredService<Common>();
         }
 
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
@@ -38,7 +41,7 @@ namespace BackendSite.Service.BLL
             return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
         }
 
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId,
+        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
             int pageSize, int pageNumber, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
@@ -48,10 +51,21 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
+            if (financialType != 0)
+            {
+                key += $":{financialType}";
+            }
+
             var cacheTime = TimeSpan.FromMinutes(1);
 
             if (_cacheHelper.KeyExists(key, RedisDataBase.Shared))
             {
+                //Export
+                if (pageNumber == -1)
+                {
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                }
+
                 //Redis Pagination
                 var total = (int)_cacheHelper.GetListLength(key, RedisDataBase.Shared);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, pageSize);
@@ -62,12 +76,19 @@ namespace BackendSite.Service.BLL
             var parameters = new
             {
                 CustId = custId,
-                StartDate  = startDate,
+                StartDate = startDate,
                 EndDate = endDate,
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            var list = data.OrderByDescending(i => i.CreateTime).ToList();
+            if (financialType != 0)
+            {
+                data = data.Where(i => i.FinancialType == (FinancialType)financialType);
+            }
+
+            var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);
+
+            SetTpTransferMemo(list);
 
             // Add Cache by List      
             _ = Task.Run(() =>
@@ -75,56 +96,35 @@ namespace BackendSite.Service.BLL
                 _cacheHelper.InsertList(key, cacheTime, list, RedisDataBase.Shared);
             });
 
-            var (index, count) = pageInfo.ListPagination(list.Count, pageNumber, pageSize);
+            //Export
+            if (pageNumber == -1 || !data.Any())
+            {
+                return list;
+            }
+
+            var (index, count) = pageInfo.ListPagination(list.Count(), pageNumber, pageSize);
             return list.GetRange(index, count);
         }
 
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate,
+        private void SetTpTransferMemo(IEnumerable<FinancialLog> list)
+        {
+            foreach (var financialLog in list)
+            {
+                if (financialLog.FinancialType == FinancialType.TpTransfer)
+                {
+                    var tpId = financialLog.Type - 2000;
+                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
+                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
+                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
+                }
+            }
+        }
+
+        public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetBonusLog(custId, promoCategoryId, startDate, endDate, refTransId, pageSize,
+            return walletService.GetBonusLog(custId, JsonConvert.SerializeObject(promoCategoryIds), startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize,
-            ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateLogByCust(CustId, startDate, endDate, pageSize, ref pageNumber,
-                out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId,
-            ref int pageNumber, out int totalPages, out int rowCount, ref List<string> currencyAmount)
-        {
-            return walletService.GetRebateLog(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                currencyId, baseCurrencyId, rebateCategoriesId, ref pageNumber, out totalPages, out rowCount,
-                ref currencyAmount);
-        }
-
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
-        {
-            return walletService.GetRebateLogExport(selectSite, userName, rebateType, startDate, endDate, currencyId,
-                baseCurrencyId, rebateCategoriesId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            return walletService.GetRebateInfoByCust(CustId);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            return walletService.GetRebateInfoList(selectSite, userName, rebateType, startDate, endDate, pageSize,
-                ref pageNumber, out totalPages, out rowCount);
-        }
-
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType,
-            DateTime startDate, DateTime endDate)
-        {
-            return walletService.GetRebateInfoExport(selectSite, userName, rebateType, startDate, endDate);
         }
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()
@@ -137,11 +137,6 @@ namespace BackendSite.Service.BLL
         {
             return adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator,
                 out transId);
-        }
-
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
-        {
-            return walletService.GetCustTpBetRecordListOneWeek(custId);
         }
 
         public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
@@ -159,7 +154,7 @@ namespace BackendSite.Service.BLL
                       TurnOver = tpBetRecord.Stake,
                       ValidBet = tpBetRecord.ValidBet ?? 0,
                       WinlostAmount = tpBetRecord.WinlostAmount,
-                      SettlementType = tpBetRecord.SettlementType,   
+                      SettlementType = tpBetRecord.SettlementType,
                       BonusId = tpBetRecord.BonusId,
                   })
                 .GroupBy(x => new
@@ -203,6 +198,7 @@ namespace BackendSite.Service.BLL
                       WinlostAmount = tpBetRecord.WinlostAmount,
                       SettlementType = tpBetRecord.SettlementType,
                       CategoryId = tpGameType.CategoryId,
+                      BonusId = tpBetRecord.BonusId,
                   })
                 .Where(i => i.CategoryId == categoryId)
                 .GroupBy(x => new
@@ -221,14 +217,15 @@ namespace BackendSite.Service.BLL
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.TurnOver),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
                     RunningTickets = x.Where(y => y.SettlementType == (int)SettlementType.UnSettled).Sum(y => y.ValidBet ?? y.TurnOver),
-                    WinLoss = x.Sum(y => y.WinlostAmount)
+                    WinLoss = x.Sum(y => y.WinlostAmount),
+                    TotalTOExcludeBonus = x.Where(y => y.BonusId == 0 && (y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover)).Sum(y => y.ValidBet ?? y.TurnOver),
+                    WinLossExcludeBonus = x.Where(y => y.BonusId == 0).Sum(y => y.WinlostAmount),
                 })
                 .ToList();
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId,
-            DateTime selDate, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -245,8 +242,8 @@ namespace BackendSite.Service.BLL
                                   TurnOver = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
                                   ValidBet = tpBetRecord.ValidBet.Value,
                                   WinlostAmount = tpBetRecord.WinlostAmount,
-                                  TransTime = tpBetRecord.TransTime.DateTime,
-                                  SettledTime = tpBetRecord.SettledTime.DateTime,
+                                  TransTime = tpBetRecord.TransTime.ToOffset(offset),
+                                  SettledTime = tpBetRecord.SettledTime.ToOffset(offset),
                                   SettlementType = tpBetRecord.SettlementType,
                                   SettlementTypeName = Enum.GetName(typeof(SettlementType), tpBetRecord.SettlementType),
                                   TurnOver_ExcludeValidTO = tpBetRecord.SettlementType == (int)SettlementType.SettledForValidNotRollover ? tpBetRecord.ValidBet ?? tpBetRecord.Stake : 0,
@@ -261,25 +258,43 @@ namespace BackendSite.Service.BLL
             return result.GetRange(index, count);
         }
 
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate,
-            DateTime endDate, string user, int pageSize, int pageNumber, int categoryId, int baseCurrencyId,
-            ref List<string> currencyAmount)
+        public VipRebateReportResult GetVipRebateInfoList(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
+            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses,
+            int pageSize, int pageNumber,ref List<string> currencyAmount)
         {
-            return walletService.GetVipRebateInfoList(selectSite, currency, startDate, endDate, user, pageSize,
-                pageNumber, categoryId, baseCurrencyId, ref currencyAmount);
+            var spPayoutStatus = 2; //All
+            if (payoutStatuses.Count() == 1)
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
+            return walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(siteIds), JsonConvert.SerializeObject(currencyIds),
+                startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
+                baseCurrencyId, spPayoutStatus,
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                Math.Abs(pageSize), ref currencyAmount);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize,
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses, int pageSize,
             int pageNumber)
         {
-            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, pageSize, pageNumber);
+            var spPayoutStatus = 2; //All
+            if (payoutStatuses.Count() == 1)
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
+            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spPayoutStatus, pageSize, pageNumber);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite, int currency, DateTime startDate,
-            DateTime endDate, string user, int categoryId, int baseCurrencyId)
+        public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
         {
-            return walletService.GetVipRebateInfoListExport(selectSite, currency, startDate, endDate, user, categoryId,
-                baseCurrencyId);
+            return walletService.GetVipRebateDetail(custId, tpCategoryId, refId);
+        }
+
+        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
+            DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses)
+        {
+            var spPayoutStatus = 2; //All
+            if (payoutStatuses.Count() == 1)
+                spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
+            return walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(siteIds),
+                JsonConvert.SerializeObject(currencyIds), startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
+                baseCurrencyId, spPayoutStatus);
         }
 
         public IEnumerable<VipTPCategory> GetTPCategoryList()
@@ -288,11 +303,11 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(IEnumerable<int> siteId, IEnumerable<int> currencyId,
-            int pageNumber,int pageSize,out int totalPages,out int rowCount)
+            int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
             return adjustmentService.GetAdjustmentData(JsonConvert.SerializeObject(siteId),
                 JsonConvert.SerializeObject(currencyId),
-                (Math.Abs(pageNumber)-1)*Math.Abs(pageSize),
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
@@ -316,15 +331,15 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
-                .GroupBy(x => new { SettledDate = x.SettledTime.AddHours(8).Date })
+                .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
                     SettledDate = x.Key.SettledDate,
-                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),               
+                    TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),
                     TurnOver = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
@@ -338,12 +353,12 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode,int promotionType, int siteId,int currencyId)
+        public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
         {
             var result = new BalanceAdjustBonusCodeRep();
             var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
 
-            if(balanceAdjustBonusCodeData != null)
+            if (balanceAdjustBonusCodeData != null)
             {
                 var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeData.WalletType).Where(x => x.Id == balanceAdjustBonusCodeData.CategoryId && x.TpId == balanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
                 result.HasBonusCode = true;
@@ -398,12 +413,42 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
-            return  adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
+            return adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
-        
+
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
-            return  adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+            return adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+        }
+
+        public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
+        {
+            var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
+            if (checkData == null)
+            {
+                return new CheckPayoutBonusCodeRep
+                {
+                    HasBonusCode = false
+                };
+            }
+
+            var promoCategories = _bonusManageService.GetPromoCategories(checkData.WalletType)
+                .FirstOrDefault(x => x.Id == checkData.CategoryId && x.TpId == checkData.TpId);
+            return new CheckPayoutBonusCodeRep
+            {
+                HasBonusCode = true,
+                BonusCode = bonusCode,
+                RollOver = checkData.RollOver,
+                WinOver = checkData.WinOver,
+                Bonus = checkData.Bonus,
+                TpId = checkData.TpId,
+                CategoryId = checkData.CategoryId,
+                Name = promoCategories?.Name ?? string.Empty,
+                WalletType = checkData.WalletType,
+                TierAmountList = checkData.TierAmountList,
+                BonusType = (int)checkData.BonusType,
+                PromotionType = checkData.PromotionType,
+            };
         }
     }
 }

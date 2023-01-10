@@ -32,6 +32,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly DeepLinkBLL _deepLinkBll;
 
         #endregion
 
@@ -54,6 +55,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
         }
 
         #endregion
@@ -188,7 +190,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetActionTypeList 取得調整資料記錄類型清單
         /// </summary>
@@ -285,77 +287,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-        /// <summary>
-        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult GetTransferAccountList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
-
-            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
-            foreach (var data in apiResult.Data.ToArray())
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetAllBankCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            var data = bankInfoOff
-                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetAllCalCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
-            var data = bankInfoOff
-                .Select(x => new CalCodeModel
-                {
-                    Id = x.Id,
-                    SysId = x.SysId,
-                    AccountName = x.AccountName,
-                    AccountNo = x.AccountNo,
-                    BankCode = x.BankCode , 
-                    SiteName = x.SiteName
-                });
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
         }
 
         //==============================================================================================================================================
@@ -521,7 +452,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
         /// </summary>
@@ -557,7 +488,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// GetAllData/GetPromotionType  取得PromotionType List
         /// </summary>
@@ -567,18 +498,50 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request)
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
-                Data = _bonusManageBll.GetPromotionType(request.isPayout),
+                Data = _bonusManageBll.GetPromotionType(request.isPayout, request.isNew),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
+        //==============================================================================================================================================
+        // CMS 相關
+        //==============================================================================================================================================
+
+        /// <summary>
+        /// GetAllData/GetDeepLinkList  取得DeepLink List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
+        {
+            var apiResult = new ApiResult<IEnumerable<DeepLink>>
+            {
+                Data = _deepLinkBll.GetDeepLinkList(),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
         public class GetPromotionTypeRequest
         {
+            /// <summary>
+            /// Bonus Payout使用
+            /// </summary>
             public bool isPayout { get; set; } = false;
+
+            /// <summary>
+            /// 新後台Bonus Manage使用，排除Rebate
+            /// </summary>
+            public bool isNew { get; set; } = true;
         }
 
         #endregion

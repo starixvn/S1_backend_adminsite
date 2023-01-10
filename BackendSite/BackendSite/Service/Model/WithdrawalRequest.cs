@@ -56,10 +56,11 @@ namespace BackendSite.Service.Model
         public int VipLevel { set; get; }
         public string Operator { set; get; }
         public bool SameOperator { get; set; }
+        private string FromAccountDisplayName { set; get; }
         public string CalCode => WithdrawalType switch
         {
-            (int)enums.WithdrawalTypeEnum.LocalBank => $"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)enums.WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            (int)WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
+            (int)WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -238,6 +239,7 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public double Amount { get; set; }
 
     }
@@ -290,10 +292,12 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public IEnumerable<int> SiteIds { get; set; }
-        public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public IEnumerable<int> CurrencyId { get; set; }
+        public IEnumerable<int> Status { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
     public class WithdrawalTimeData
     {
