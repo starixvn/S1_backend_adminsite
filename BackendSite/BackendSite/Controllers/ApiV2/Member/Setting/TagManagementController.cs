@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TagManagementController : ControllerBase
@@ -17,15 +18,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #region Fields
         
         private readonly CustInfoBLL _custInfoBll;
+        private readonly ITagBLL _tagBll;
+
+        public TagManagementController(CustInfoBLL custInfoBll, ITagBLL tagBll)
+        {
+            _custInfoBll = custInfoBll;
+            _tagBll = tagBll;
+        }
 
         #endregion
 
         #region Constructor
-
-        public TagManagementController(IServiceProvider provider)
-        {
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-        }
+        
 
         #endregion
 
@@ -41,6 +45,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #region CSD > TagMamagement
 
         /// <summary>
+        /// TagManagement/GetAllTag 取得所有標籤資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Tag > Tag List
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<Tag>>> GetAllTag()
+        {
+            var apiResult = new ApiResult<IEnumerable<Tag>>
+            {
+                Data = await _tagBll.GetAllTag(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            return apiResult;
+        }
+
+        /// <summary>
         /// TagManagement/GetTagData 取得標籤資料
         /// </summary>
         /// <remarks>
@@ -49,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query)
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 1 })]
         [HttpPost]
         public ApiListResult<TagData> GetTagList(GetTagDataReq req)
         {
@@ -85,7 +111,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query) > Click[Edit] > [Submit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 74 })]
         [HttpPost]
         public ApiResult EditTagManagement(ApiRequestWithLog<EditTagManagement> req)
         {
@@ -110,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// Func Path：CSD > Tag Management > [Submit](Query) > Change[Status]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 26, 74 })]
         [HttpPost]
         public ApiResult SetTagStatus(ApiRequestWithLog<SetTagStatus> req)
         {
