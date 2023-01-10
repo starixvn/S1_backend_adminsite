@@ -141,9 +141,20 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public List<TpBetLimitGroupV2> GameTypeBetLimit { get; set; }
     }
-    public class TpBetLimitGroupV2: TpBetLimitGroup
+    public class TpBetLimitGroupV2 : TpBetLimitGroup
     {
         public int CategoryId { set; get; }
         public string CategoryName { set; get; }
+    }
+    public class CustBetLimitV2
+    {
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public List<TpBetSettingV2> BetSetting { get; set; }
+    }
+    public class TpBetSettingV2 : TpBetSetting
+    {
+        public int TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
     }
 }
