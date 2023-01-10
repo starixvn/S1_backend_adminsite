@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
 using BackendSite.Service.Model.BankFinancial;
+using static BackendSite.Controllers.ApiV2.Member.Process.PersonalMessageController;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -32,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -54,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -188,7 +191,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetActionTypeList 取得調整資料記錄類型清單
         /// </summary>
@@ -474,7 +477,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
         /// </summary>
@@ -510,7 +513,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// GetAllData/GetPromotionType  取得PromotionType List
         /// </summary>
@@ -520,7 +523,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request)
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
@@ -542,6 +545,36 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public bool isNew { get; set; } = true;
         }
 
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
+        }
+        /// <summary>
+        /// GetAllData/GetServerInfo  取得ServerInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
+        {
+            var apiResult = new ApiResult<ServerInfo>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetServerInfo(req.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
         #endregion
 
     }
