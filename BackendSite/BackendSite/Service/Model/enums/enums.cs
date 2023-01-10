@@ -1418,6 +1418,13 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1
     }
+    
+    public enum CryptoWalletLogStatusEnum
+    {
+        Create = 1,
+        Delete = 2
+    }
+    
     public enum EWalletinfoLogStatusEnum
     {
         Create = 1,
