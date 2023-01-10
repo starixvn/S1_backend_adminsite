@@ -133,9 +133,9 @@ namespace BackendSite.Service.BLL
 
         #region Public Methods
 
-        public GetVipUpgradeReviewListModel GetVipUpgradeReviewList(int siteId, string calculateYearMonth, VipStatus status, string userName, int pageNumber, int pageSize)
+        public GetVipUpgradeReviewListModel GetVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, int pageNumber, int pageSize, string currencyIds)
         {
-            var data = GetVipUpgradeReview(siteId, calculateYearMonth, status, userName, pageNumber, pageSize, out var totalPages, out var rowCount);
+            var data = GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, pageNumber, pageSize, currencyIds, out var totalPages, out var rowCount);
 
             var details = data.Select(p => new VipUpgradeReviewDetailModel(p)).ToList();
 
@@ -166,9 +166,9 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<VipUpgradeReviewDataModel> ExportVipUpgradeReviewList(int siteId, string calculateYearMonth, VipStatus status, string userName)
+        public IEnumerable<VipUpgradeReviewDataModel> ExportVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, string currencyIds)
         {
-            return GetVipUpgradeReview(siteId, calculateYearMonth, status, userName, 0, 0, out _, out _);
+            return GetVipUpgradeReview(siteId, calculateYearMonth, selectStatus, userName, 0, 0, currencyIds, out _, out _);
         }
 
         public bool UpdateVipUpgradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
@@ -178,14 +178,16 @@ namespace BackendSite.Service.BLL
 
         public GetVipDowngradeReviewListModel GetVipDowngradeReviewList(int siteId,
             string calculateYearMonth,
-            VipStatus status,
+            string selectStatus,
+            string currencyId,
             string userName,
             int pageNumber,
             int pageSize)
         {
             var data = GetVipDowngradeReview(siteId,
                 calculateYearMonth,
-                status,
+                selectStatus,
+                currencyId,
                 userName,
                 pageNumber,
                 pageSize,
@@ -221,9 +223,9 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public IEnumerable<VipDowngradeReviewDataModel> ExportVipDowngradeReviewList(int siteId, string calculateYearMonth, VipStatus status, string userName)
+        public IEnumerable<VipDowngradeReviewDataModel> ExportVipDowngradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string currencyId, string userName)
         {
-            return GetVipDowngradeReview(siteId, calculateYearMonth, status, userName, 0, 0, out _, out _);
+            return GetVipDowngradeReview(siteId, calculateYearMonth, selectStatus, currencyId, userName, 0, 0, out _, out _);
         }
 
         public bool UpdateVipDowngradeReview(IEnumerable<int> custIdList, string calculateYearMonth, int siteId, VipStatus newStatus, string updater)
@@ -297,19 +299,21 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         private IEnumerable<VipUpgradeReviewDataModel> GetVipUpgradeReview(int siteId,
             string calculateYearMonth,
-            VipStatus status,
+            string selectStatus,
             string userName,
             int pageNumber,
             int pageSize,
+            string currencyIds,           
             out int totalPages,
             out int rowCount)
         {
             return _vipLevelService.GetVipUpgradeReviewList(siteId,
                 calculateYearMonth,
-                (int)status,
+                selectStatus,
                 string.IsNullOrEmpty(userName) ? null : userName,
                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                currencyIds,
                 out totalPages,
                 out rowCount);
         }
@@ -341,7 +345,8 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         private IEnumerable<VipDowngradeReviewDataModel> GetVipDowngradeReview(int siteId,
             string calculateYearMonth,
-            VipStatus status,
+            string selectStatus,
+            string currencyId,
             string userName,
             int pageNumber,
             int pageSize,
@@ -350,7 +355,8 @@ namespace BackendSite.Service.BLL
         {
             return _vipLevelService.GetVipDowngradeReviewList(siteId,
                 calculateYearMonth,
-                (int)status,
+                selectStatus,
+                currencyId,
                 string.IsNullOrEmpty(userName) ? null : userName,
                 Math.Abs(pageSize),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
