@@ -65,7 +65,7 @@ namespace BackendSite.Controllers.Api
                     PageSize = prizeSelect.PageSize,
                 };
 
-                var prizeSearchResult = prizeBLL.PrizeSearch(param, 0,out List<string> currencyAmount);
+                var prizeSearchResult = prizeBLL.PrizeSearch(param, 8,out List<string> currencyAmount);
                 apiResult.Data = prizeSearchResult.Data;
                 apiResult.PageNumber = prizeSearchResult.PageNumber;
                 apiResult.TotalPages = prizeSearchResult.TotalPages;
