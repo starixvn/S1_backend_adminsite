@@ -347,8 +347,9 @@ namespace BackendSite.Service.Model
         public decimal Stake { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public string TpUserName { get; set; }
     }
-    
+
     public class CustTurnoverRes
     {
         public string UserName { get; set; }
@@ -357,8 +358,9 @@ namespace BackendSite.Service.Model
         public decimal StakeSettled { get; set; }
         public decimal StakeNotRollover { get; set; }
         public decimal WinlostAmount { get; set; }
+        public string TpUserName { get; set; }
     }
-    
+
     public class CustBankInfoLog
     {
         public string AccountName { set; get; }
@@ -779,6 +781,7 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public int SettlementType { set; get; }
+        public string TpUserName  { get; set; }
     }
     public class WinLoseSummaryDetailResult
     {
@@ -787,6 +790,7 @@ namespace BackendSite.Service.Model
         public decimal StakeNotRollover { set; get; }
         public int GameType { set; get; }
         public string GameName { get; set; }
+        public string TpUserName { get; set; }
     }
 
     public class CustDashBoardTodayModel

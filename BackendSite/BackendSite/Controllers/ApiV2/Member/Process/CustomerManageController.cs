@@ -2436,11 +2436,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    request.GameTypes,
-                                                   request.StartDate,
-                                                   request.EndDate);
+                                                   request.StartDate.ToUniversalTime().DateTime,
+                                                   request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -3091,7 +3091,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region CSD > Customer Administration > CustInfo > IP Log
         public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
         {
-            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.ToUniversalTime().DateTime, request.EndDate.ToUniversalTime().DateTime);
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,
