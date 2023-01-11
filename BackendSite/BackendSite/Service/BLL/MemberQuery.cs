@@ -244,7 +244,9 @@ namespace BackendSite.Service.BLL
                 IsTest = customer.IsTest,
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
-                    : await _memberService.GetCustomerTagsAsync(customer.TagList)
+                    : await _memberService.GetCustomerTagsAsync(customer.TagList),
+                PhoneRewardTime = customer.PhoneRewardTime,
+                EmailRewardTime = customer.EmailRewardTime
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
