@@ -24,6 +24,7 @@ namespace BackendSite.Service.BLL
             var iovationReport = data.IovationReport.Select(a => new IovationReport()
             {
                 UserName = a.UserName,
+                IsoCode = a.IsoCode,
                 DeviceId = a.DeviceId,
                 Allow = a.Iovation,
                 DeviceType = a.DeviceType,

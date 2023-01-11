@@ -24,6 +24,7 @@ public class IovationReportPageResult<T>
 public class IovationReportData
 {
     public DateTime UpdateTime { get; set; }
+    public string IsoCode { get; set; }
     public string UserName { get; set; }
     public string DeviceId { get; set; }
     public string Iovation { get; set; }
@@ -36,6 +37,7 @@ public class IovationReportData
 public class IovationReport
 {
     public DateTimeOffset LastUsedTime { get; set; }
+    public string IsoCode { get; set; }
     public string UserName { get; set; }
     public string DeviceId { get; set; }
     public string Allow { get; set; }
