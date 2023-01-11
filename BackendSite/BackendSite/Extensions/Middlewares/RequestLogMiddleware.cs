@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using Microsoft.AspNetCore.Http.Extensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog.Context;
 
 namespace BackendSite.Extensions.Middlewares
@@ -48,7 +49,16 @@ namespace BackendSite.Extensions.Middlewares
             if (context.Request.ContentType?.StartsWith("application/x-www-form-urlencoded") ?? false)
             {
                 var formData = await context.Request.ReadFormAsync();
-                content = JsonConvert.SerializeObject(formData);
+                var dic = formData.ToDictionary(i => i.Key, i => i.Value);
+
+                if (path.Contains("UpdatePassword", StringComparison.OrdinalIgnoreCase) && 
+                    dic.TryGetValue("Password", out var pwd1) && 
+                    !string.IsNullOrEmpty(pwd1.ToString()))
+                {
+                    dic["Password"] = "********";
+                }   
+                
+                content = JsonConvert.SerializeObject(dic);
             }
 
             await context.Request.Body.CopyToAsync(requestBodyStream);
@@ -68,6 +78,57 @@ namespace BackendSite.Extensions.Middlewares
                 LogContext.PushProperty("UserId", authData?.UserId);
                 LogContext.PushProperty("UserName", authData?.UserName);
                 {
+                    // log需將登入密碼隱碼
+                    if (path.Contains("Signin", StringComparison.OrdinalIgnoreCase) ||
+                        path.Contains("CreateUser", StringComparison.OrdinalIgnoreCase) ||
+                        path.Contains("AddUser", StringComparison.OrdinalIgnoreCase) || 
+                        path.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
+                        path.Contains("ChangePwd", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var jbody = JObject.Parse(content);
+                            var passWordCheckList = new List<string>
+                            {
+                                "Password", "password", "PassWord",
+                                "userPwd", "txtPW", "OldPwd", "NewPwd",
+                            };
+                            
+                            foreach (var word in passWordCheckList)
+                            {
+
+                                if (jbody.TryGetValue(word, StringComparison.Ordinal, out var pwd)
+                                && !string.IsNullOrEmpty(pwd.ToString()))
+                                {
+                                    jbody[word] = "********";
+                                }
+                            }
+                            content = jbody.ToString();
+                        }
+                        catch
+                        {
+                            // ignore
+                        }   
+                    }
+
+                    if (path.Contains("SetAdminUserPassword", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try
+                        {
+                            var jbody = JObject.Parse(content);
+                            var password = jbody["after"]["password"].ToString();
+                            if (!string.IsNullOrEmpty(password))
+                            {
+                                jbody["after"]["password"] = "********";
+                            }                          
+                            content = jbody.ToString();
+                        }
+                        catch
+                        {
+                            // ignore
+                        }
+                    }
+
                     _logger.LogInformation(
                         $"REQUEST METHOD: {context.Request.Method}, CodePage: {codePage}, REQUEST BODY: {content}, REQUEST URL: {url}");
                 }

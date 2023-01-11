@@ -33,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly DeepLinkBLL _deepLinkBll;
         private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
@@ -56,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
@@ -290,30 +292,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// <summary>
-        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult GetTransferAccountList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
-
-            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
-            foreach (var data in apiResult.Data.ToArray())
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
-        }
-
         //==============================================================================================================================================
         // TP 相關
         //==============================================================================================================================================
@@ -530,6 +508,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 Data = _bonusManageBll.GetPromotionType(request.isPayout, request.isNew),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+
+        //==============================================================================================================================================
+        // CMS 相關
+        //==============================================================================================================================================
+
+        /// <summary>
+        /// GetAllData/GetDeepLinkList  取得DeepLink List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
+        {
+            var apiResult = new ApiResult<IEnumerable<DeepLink>>
+            {
+                Data = _deepLinkBll.GetDeepLinkList(),
+                ErrorCode = 0
+            };
+
+            return apiResult;
         }
 
         public class GetPromotionTypeRequest
