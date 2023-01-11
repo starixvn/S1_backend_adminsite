@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                     PageSize = request.PageSize,
                 };
 
-                var prizeSearchResult = _prizeBll.PrizeSearch(param, 0, out List<string> _);
+                var prizeSearchResult = _prizeBll.PrizeSearch(param, timeSpan.Hours, out List<string> _);
                 prizeSearchResult.PageNumber = request.PageNumber;
                 apiResult.Data = prizeSearchResult;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
