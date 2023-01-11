@@ -330,6 +330,7 @@ namespace BackendSite.Service.Model
             }
         }
         public string Operator { get; set; }
+        public bool CanEdit { get; set; }
     }
     
     public class CustRollOver
