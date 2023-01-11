@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace BackendSite.Controllers.ApiV2.Marketing.Activity
+namespace BackendSite.Controllers.ApiV2.Report
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
@@ -94,7 +94,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
                     PageSize = request.PageSize,
                 };
 
-                var prizeSearchResult = _prizeBll.PrizeSearch(param, timeSpan.Hours, out List<string> _);
+                var prizeSearchResult = _prizeBll.PrizeSearch(param, 0, out List<string> _);
                 prizeSearchResult.PageNumber = request.PageNumber;
                 apiResult.Data = prizeSearchResult;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
