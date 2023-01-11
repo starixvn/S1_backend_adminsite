@@ -779,6 +779,7 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public int SettlementType { set; get; }
+        public string TpUserName  { get; set; }
     }
     public class WinLoseSummaryDetailResult
     {
@@ -787,6 +788,7 @@ namespace BackendSite.Service.Model
         public decimal StakeNotRollover { set; get; }
         public int GameType { set; get; }
         public string GameName { get; set; }
+        public string TpUserName { get; set; }
     }
 
     public class CustDashBoardTodayModel
