@@ -138,13 +138,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             {
                 TpCategory = x.Key,
                 TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
-                TpBetSetting = x.Select(y => new TpBetSetting
+                TpBetSetting = x.Where(z=> z.Checked).Select(y => new TpBetSetting
                 {
                     LimitGroup = y.LimitGroup,
                     LimitRange = y.LimitRange,
                     GameTypeId = y.GameTypeId,
                     GameTypeName = y.GameTypeName
-                }).Where(z=> z.LimitGroup != null && z.LimitRange != null).ToList()
+                }).ToList()
             }).ToList();
 
             var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
