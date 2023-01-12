@@ -24,6 +24,7 @@ public interface IMemberService
     Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo);
     Task<bool> IsExistsEmail(int custId, string email, int siteId);
     Task<int> SetCustTag(int custid, List<int> tagList);
+    Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames);
     Task<int> EditFullNameAsync(int custId, string fullName);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> SetPhoneNoAsync(int custId, string phoneNo);

@@ -595,3 +595,11 @@ public class LoginLogPageData
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
 }
+
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+}

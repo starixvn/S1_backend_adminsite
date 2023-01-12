@@ -83,6 +83,37 @@ public class MemberCommand : IMemberCommand
 
         return result;
     }
+    
+    private async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
+    {
+        return await _memberService.GetSimilarAccountNameAsync(siteId, accountNames);
+    }
+        
+    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, string accountName)
+    {
+        /* 相同定義：
+         * * 大小寫不同
+         * * 去空格相同
+         * 舉例：
+         * Cheong wai Choon
+         * CheongwaiChoon（相同）
+         * cheong Wai Choon（相同）
+         * Ho thai nhat
+         * Hồ thái nhật（不同）
+         * HoThaiNhat（相同）
+         */
+            
+        var patterns = new[]
+        {
+            accountName,
+            accountName.Replace(" ", string.Empty)
+        };
+        var similarAccList = await GetSimilarAccountNameAsync(siteId, patterns);
+        var result = similarAccList
+            .Where(x => patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
+        
+        return result;
+    }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
     {
