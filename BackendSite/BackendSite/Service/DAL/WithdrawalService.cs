@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.DAL
 {
@@ -61,7 +63,7 @@ namespace BackendSite.Service.DAL
             var CurrencyId = JsonConvert.SerializeObject(currencyId);
             var Status = JsonConvert.SerializeObject(status);
             var VipStatus = JsonConvert.SerializeObject(levelstatus);
-            var strUserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null; var withdrawalId = 0;
+            var strUserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null; var withdrawalId = 0;
             var tempCurrencyTotalAmount = new List<string>();
             if (!string.IsNullOrWhiteSpace(WithdrawalId))
             {
@@ -74,13 +76,13 @@ namespace BackendSite.Service.DAL
                 tempAmount = Convert.ToDecimal(amount);
             }
             int tempWithdrawalMethod = (int)withdrawalMethod;
-            if(withdrawalType.Count() > 1)
+            if (withdrawalType.Count() > 1)
             {
                 tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
             }
             else
             {
-                if(!withdrawalType.ToList().Exists(x=> x == (int)WithdrawalTypeEnum.LocalBank))
+                if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
                 {
                     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
                 }
@@ -148,7 +150,7 @@ namespace BackendSite.Service.DAL
                 new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        private int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
+        public int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
             MySqlConnection conn = null, MySqlTransaction trans = null)
         {
             if (conn != null)
@@ -738,6 +740,12 @@ namespace BackendSite.Service.DAL
             {
                 return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public bool SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
+        {
+            var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
+            return _mainDbClient.Execute("Common_WithdrawalLimit_Set", p) > 0;
         }
     }
 }
