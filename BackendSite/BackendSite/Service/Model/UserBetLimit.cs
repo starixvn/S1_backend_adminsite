@@ -156,5 +156,6 @@ namespace BackendSite.Service.Model
     {
         public int TpCategory { get; set; }
         public string TpCategoryName { get; set; }
+        public bool Checked { get; set; }
     }
 }
