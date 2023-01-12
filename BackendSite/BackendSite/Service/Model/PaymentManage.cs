@@ -223,6 +223,7 @@ namespace BackendSite.Service.Model
     public class PaySetting
     {
         public CurrencyEnum CurrencyId { get; set; }
+        public string IsoCode => CurrencyId.ToString();
         public int PayId { get; set; }
         public string PayName { get; set; }
         public int ChannelId { get; set; }
