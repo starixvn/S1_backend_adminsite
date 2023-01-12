@@ -37,11 +37,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             var data = await _reportBll.GetDepositPaymentReportAsync(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
 
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            
             return new ApiResult<IEnumerable<DepositPaymentReportSummary>>
             {
                 Data = data,
@@ -65,12 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var data = await _reportBll.GetWithdrawalPaymentReportAsync(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            
+
             return new ApiResult<IEnumerable<WithdrawalPaymentReportSummary>>
             {
                 Data = data,
