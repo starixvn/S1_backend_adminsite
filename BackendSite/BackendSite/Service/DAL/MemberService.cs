@@ -175,6 +175,17 @@ public class MemberService : IMemberService
         p.Add("TagList", JsonConvert.SerializeObject(tagList));
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
+    
+    public async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
+    {
+        var p = new DynamicParameters(new
+        {
+            _SiteId = siteId,
+            _AccountNames = JsonConvert.SerializeObject(accountNames)
+        });
+        
+        return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
+    }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
     {
