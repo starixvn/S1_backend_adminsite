@@ -26,7 +26,7 @@ public class PaymentChargeFeeBLL
     {
         var (startIndex, absPageSize) = pageNumber.GetStartIndex(pageSize);
         var result = _chargeFeeService.GetModifyPaymentChargeFeeLogList(siteId,
-            startTime, endTime, absPageSize, startIndex,
+            startTime, endTime, startIndex, absPageSize,
             out var totalPages, out var rowCount);
         pageInfo = new PageInfo();
         pageInfo.ListPagination(rowCount, pageNumber, pageSize);
