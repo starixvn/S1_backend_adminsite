@@ -78,7 +78,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get_V4", props);
+            var result = _reportDbClient.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get_V5", props);
             logResult.PrizeLogData = result.ToList();
             logResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             logResult.RowCount = props.Get<int?>("_RowCount") ?? 0;

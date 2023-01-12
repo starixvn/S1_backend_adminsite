@@ -138,7 +138,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             {
                 TpCategory = x.Key,
                 TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
-                TpBetSetting = x.Select(y => new TpBetSetting
+                TpBetSetting = x.Where(z=> z.Checked).Select(y => new TpBetSetting
                 {
                     LimitGroup = y.LimitGroup,
                     LimitRange = y.LimitRange,
@@ -158,7 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     UserName = req.After.UserName,
                     BetSetting = betSetting,
                     CustId = customer.CustId
-        }
+                }
             };
 
             var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator));
