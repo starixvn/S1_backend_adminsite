@@ -144,7 +144,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     LimitRange = y.LimitRange,
                     GameTypeId = y.GameTypeId,
                     GameTypeName = y.GameTypeName
-                }).ToList()
+                }).Where(z=> z.LimitGroup != null && z.LimitRange != null).ToList()
             }).ToList();
 
             var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
@@ -158,7 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                     UserName = req.After.UserName,
                     BetSetting = betSetting,
                     CustId = customer.CustId
-        }
+                }
             };
 
             var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator));
