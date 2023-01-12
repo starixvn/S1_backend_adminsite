@@ -41,10 +41,12 @@ public class PaymentChargeFeeService
         parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
         parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
+        var result = _reportDbClient.Query<ModifyPaymentChargeFeeLog>("Admin_ModifyPaymentChargeFeeLog_Get", parameters);
+        
         totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
         rowCount = parameters.Get<int?>("_RowCount") ?? 0;
-        
-        return _reportDbClient.Query<ModifyPaymentChargeFeeLog>("Admin_ModifyPaymentChargeFeeLog_Get", parameters);
+
+        return result;
     }
     
     public int CreateModifyPaymentChargeFeeLog(ModifyPaymentChargeFeeParams input)
