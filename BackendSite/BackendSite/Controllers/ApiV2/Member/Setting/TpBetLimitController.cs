@@ -156,10 +156,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 After = new CustBetLimit()
                 {
                     UserName = req.After.UserName,
-                    BetSetting = betSetting
-                }
+                    BetSetting = betSetting,
+                    CustId = customer.CustId
+        }
             };
-            req.After.CustId = customer.CustId;
 
             var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator));
             //result: 1 (新增成功),2 (修改成功)
