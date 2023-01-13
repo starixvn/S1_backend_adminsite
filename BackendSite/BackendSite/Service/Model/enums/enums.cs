@@ -720,7 +720,7 @@ namespace BackendSite.Service.Model.enums
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SiteMaintenance = 77,
-        SetWithdrawalMessage = 90
+        SetWithdrawalMessage = 80
     }
 
     #region BankFinancialTransferInfoLog
