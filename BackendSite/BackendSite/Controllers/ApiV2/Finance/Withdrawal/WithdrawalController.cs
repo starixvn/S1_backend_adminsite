@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -13,6 +14,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
@@ -238,7 +240,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
@@ -294,7 +295,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 2 })]
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
@@ -379,7 +379,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
@@ -433,7 +432,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
@@ -877,6 +875,63 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// Withdrawal/WithdrawalMessageStatusList  get withdrawal cannot be successful	status list
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
+        [HttpPost]
+        public ApiResult WithdrawalMessageStatusList()
+        {
+            var apiResult = new ApiResult<List<EnumTypeModel>>();
+            var result = new List<EnumTypeModel>();
+
+            foreach (WithdrawalMessageStatus status in Enum.GetValues(typeof(WithdrawalMessageStatus)))
+            {
+                result.Add(new EnumTypeModel
+                {
+                    Name = status.GetDescription(),
+                    Value = (int)status
+                });
+            }
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public class WithdrawalMessageRequest
+        {
+            public WithdrawalMessageStatus Status { get; set; }
+            public string StatusName { get; set; }
+            public int WithdrawalId { get; set; }
+            public WithdrawalStatusEnum Action { get; set; }
+            public string ActionName { get; set; }
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
+        [HttpPost]
+        public ApiResult SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
+        {
+            request.After.StatusName = request.After.Status.ToString();
+            request.After.ActionName = request.After.Action.ToString();
+            if (_withdrawalBll.SetWithdrawalMessage(
+                    new ParamsWithLog<WithdrawalMessageRequest>(request, User.Identity.Name)) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
 
         #endregion
