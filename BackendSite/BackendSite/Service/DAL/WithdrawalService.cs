@@ -745,7 +745,7 @@ namespace BackendSite.Service.DAL
         public bool SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
         {
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
-            return _mainDbClient.Execute("Common_WithdrawalLimit_Set", p) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
     }
 }

@@ -649,6 +649,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// 
         /// </remarks>
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
         [HttpPost]
         public ApiResult WithdrawalMessageStatusList()
         {
@@ -674,11 +675,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public WithdrawalMessageStatus Status { get; set; }
             public string StatusName { get; set; }
             public int WithdrawalId { get; set; }
-            //public Decimal ActualDeposit { get; set; }
             public WithdrawalStatusEnum Action { get; set; }
             public string ActionName { get; set; }
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
         [HttpPost]
         public ApiResult SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
         {
