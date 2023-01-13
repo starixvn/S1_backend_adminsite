@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
@@ -14,7 +13,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = "[]";
             StrStatus = "[]";
             StrPurposes = "[]";
-            StrSysIds = "[]";
+            StrSysIds = null;
             Agent = string.Empty;
             AccountNo = string.Empty;
             Id = id;

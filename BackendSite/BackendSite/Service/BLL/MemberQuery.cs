@@ -318,11 +318,11 @@ namespace BackendSite.Service.BLL
             };
             return response;
         }
+
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
-
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
         {

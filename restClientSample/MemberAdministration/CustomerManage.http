@@ -51,3 +51,12 @@ Content-Type: application/json
     "pageNumber": 1,
     "pageSize": 20
 }
+
+###
+POST {{url}}/apiV2/Member/CheckDuplicateName
+Content-Type: application/json
+
+{
+    "custId":645204,
+    "fullName": "蟹安安"
+}

@@ -2438,6 +2438,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.GameTypes,
                                                    request.StartDate.ToUniversalTime().DateTime,
                                                    request.EndDate.ToUniversalTime().DateTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),

@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
+using Org.BouncyCastle.Utilities;
+using NPOI.SS.Formula.Functions;
+using BackendSite.Service.Model.Mpa.Marketing;
 
 namespace BackendSite.Service.BLL
 {
@@ -104,9 +108,9 @@ namespace BackendSite.Service.BLL
             {
                 if (propertyInfo == null)
                 {
-                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
-
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
 
                 ExportBody(ws, t, propertyInfo, offset);

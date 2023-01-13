@@ -536,7 +536,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get
@@ -595,4 +594,12 @@ public class LoginLogPageData
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
+}
+
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
 }

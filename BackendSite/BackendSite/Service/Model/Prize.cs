@@ -118,6 +118,7 @@
         public string EventName { get; set; }
         public string SiteName { get; set; }
         public string Currency { get; set; }
+        public string TimeZone { get; set; }
         public string PrizeName { get; set; }
         public decimal Amount { get; set; }
         public string UserName { get; set; }
