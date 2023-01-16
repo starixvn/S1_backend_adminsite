@@ -153,11 +153,7 @@ public class MemberService : IMemberService
         };
         return loginLogData;
     }
-    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
-    {
-        var p = new DynamicParameters(new { CustId = custId });
-        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
-    }
+    
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -176,6 +172,17 @@ public class MemberService : IMemberService
         p.Add("CustId", custid);
         p.Add("TagList", JsonConvert.SerializeObject(tagList));
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
+    }
+    
+    public async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
+    {
+        var p = new DynamicParameters(new
+        {
+            _SiteId = siteId,
+            _AccountNames = JsonConvert.SerializeObject(accountNames)
+        });
+        
+        return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
     public async Task<int> EditFullNameAsync(int custId, string fullName)
@@ -303,7 +310,13 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
-    
+
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+    }
+
     public async Task<int> DeleteLineProfileAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });

@@ -13,5 +13,6 @@ namespace BackendSite.Service.Model
         public string Note { get; set; }
         public decimal ActualRate { get; set; }
         public string TimeZone { get; set; }
+        public int Sort { get; set; }
     }
 }
