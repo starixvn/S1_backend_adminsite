@@ -27,6 +27,7 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
     public int UserType { get; set; }
+    public bool ExcludeTag { get; set; }
 }
 
 public class MemberListDto
@@ -125,6 +126,7 @@ public class ExportMemberRequest
     public string DeviceId { get; set; }
     public int UserType { get; set; }
     public bool ExportTransferWallet { get; set; } = false;
+    public bool ExcludeTag { get; set; }
 }
 
 

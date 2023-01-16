@@ -59,7 +59,7 @@ namespace BackendSite.Service.BLL
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
-                request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+                request.DateType, startTime, endTime, request.PageNumber, request.PageSize, request.ExcludeTag);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
             var response = new GetMemberListPageData<MemberList>()
@@ -122,7 +122,7 @@ namespace BackendSite.Service.BLL
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
-                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime);
+                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime, request.ExcludeTag);
 
             var data = memberList.Select(a => new MemberExportData()
             {
