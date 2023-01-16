@@ -7,21 +7,21 @@ namespace BackendSite.Service.BLL
 {
     public class TpMaintainBLL
     {
-        private readonly TpMaintainService tpMaintainService;
+        private readonly TpMaintainService _tpMaintainService;
 
         public TpMaintainBLL(IServiceProvider provider)
         {
-            tpMaintainService = provider.GetRequiredService<TpMaintainService>();
+            _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
         }
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
         {
-            return tpMaintainService.GetCommonTpList();
+            return _tpMaintainService.GetCommonTpList();
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()
         {
-            return tpMaintainService.GetTpMaintainList();
+            return _tpMaintainService.GetTpMaintainList();
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainListByFilter(IEnumerable<int> siteIds,
@@ -37,7 +37,7 @@ namespace BackendSite.Service.BLL
             out int rowCount
             )
         {
-            return tpMaintainService.GetTpMaintainListByFilter(JsonConvert.SerializeObject(siteIds),
+            return _tpMaintainService.GetTpMaintainListByFilter(JsonConvert.SerializeObject(siteIds),
                 tpId,
                 tpCategoryId,
                 tpGameType,
@@ -55,31 +55,31 @@ namespace BackendSite.Service.BLL
             if (input.TpGameTypeList != "0")//處理多個tpGameTypeList
             {
                 var list = GetTpMaintainListByTpGameTypeList(input);
-                var tasks = list.Select(item => Task.Run(() => tpMaintainService.InsertTpMaintain(item))).ToArray();
+                var tasks = list.Select(item => Task.Run(() => _tpMaintainService.InsertTpMaintain(item))).ToArray();
                 var result = await Task.WhenAll(tasks);
                 return result.All(item => item);
             }
-            return tpMaintainService.InsertTpMaintain(input);
+            return _tpMaintainService.InsertTpMaintain(input);
         }
 
         public bool UpdateTpMaintain(TpMaintain input)
         {
-            return tpMaintainService.UpdateTpMaintain(input);
+            return _tpMaintainService.UpdateTpMaintain(input);
         }
 
         public bool DeleteTpMaintain(int sn)
         {
-            return tpMaintainService.DeleteTpMaintain(sn);
+            return _tpMaintainService.DeleteTpMaintain(sn);
         }
 
         public IEnumerable<TpGameType> GetTpGameTypeList()
         {
-            return tpMaintainService.GetTpGameTypeList();
+            return _tpMaintainService.GetTpGameTypeList();
         }
 
         public IEnumerable<TpCategory> GetTPCategoryList()
         {
-            return tpMaintainService.GetTPCategoryList();
+            return _tpMaintainService.GetTPCategoryList();
         }
 
 
