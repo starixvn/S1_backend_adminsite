@@ -40,12 +40,12 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> siteIds, DateTimeOffset startDate, DateTimeOffset endDate, IEnumerable<GeneralStatusEnum> statuses, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(JsonConvert.SerializeObject(selectSite),
+            return messageService.GetAnnouncements(JsonConvert.SerializeObject(siteIds),
                 startDate,
                 endDate,
-                status,
+                JsonConvert.SerializeObject(statuses),
                 (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
                 Math.Abs(PageSize),
                 ref TotalPages,
