@@ -129,6 +129,7 @@ namespace BackendSite.Service.Model.TpMaintain
     {
         public int Id { set; get; }
         public string TpName { set; get; }
+        public string TpDisplayName { get; set; }
     }
 
     public class TpGameType
