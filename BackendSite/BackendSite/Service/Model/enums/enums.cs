@@ -1454,4 +1454,9 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Reject = 7
     }
+    
+    public enum CustTagEnum
+    {
+        Duplicate = 6
+    }
 }

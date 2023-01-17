@@ -509,7 +509,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
 
-            if (result > 0)
+            if (result)
             {
                 return new ApiResult
                 {

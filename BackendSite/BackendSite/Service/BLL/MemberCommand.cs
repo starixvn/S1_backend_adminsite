@@ -115,19 +115,21 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
-    public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
+    public async Task<bool> EditFullNameAsync(int custId, string fullName, string @operator)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeName = customer.AccountName;
-        
-        var result = await _memberService.EditFullNameAsync(custId, fullName);
-        if (result <= 0) return 0;
+        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
+
+        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
+        if (!result) return false;
         
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
             JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), ActionType.Update,
             custId, $"Edit FullName \"{fullName}\"");
-        return result;
+        
+        return true;
     }
 
     public async Task<int> EditEmailAsync(int custId, string email, string @operator)
