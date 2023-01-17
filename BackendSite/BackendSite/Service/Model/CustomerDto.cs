@@ -606,4 +606,14 @@ public class SimilarAccountInfo
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string AccountName { get; set; }
+    public string TagList { get; set; }
+}
+
+public class CustTagList
+{
+    public int CustId { get; set; }
+        
+    public string StrTagList { get; set; }
+
+    public IEnumerable<int> TagList { get; set; }
 }

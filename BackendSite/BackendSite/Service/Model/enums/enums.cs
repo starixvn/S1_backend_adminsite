@@ -1659,4 +1659,9 @@ namespace BackendSite.Service.Model.enums
         [Description("Account number incorrect")]
         WithdrawalAccountNumberIncorrect = 1
     }
+
+    public enum CustTagEnum
+    {
+        Duplicate = 6
+    }
 }
