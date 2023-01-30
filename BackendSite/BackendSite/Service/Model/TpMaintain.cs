@@ -21,6 +21,7 @@ namespace BackendSite.Service.Model.TpMaintain
         public string BeginTime { get; set; }
         public string EndTime { get; set; }
         public string UpdateUser { get; set; }
+        public DateTime UpdateTime { get; set; }
 
         public bool SiteFilter(FilterInfo filter)
         {
@@ -81,6 +82,8 @@ namespace BackendSite.Service.Model.TpMaintain
         private DateTimeOffset _endDate { get; set; }
         private DateTimeOffset? _beginTime { get; set; }
         private DateTimeOffset? _endTime { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
+
         public int? SN { get; set; }
         public int SiteId { get; set; }
         public string SiteName { get; set; }
@@ -122,6 +125,16 @@ namespace BackendSite.Service.Model.TpMaintain
             }
         }
         public string UpdateUser { get; set; }
+
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set
+            {
+                if (value != null)
+                    _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            }
+        }
 
     }
 
