@@ -147,7 +147,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     TypeValue = item.TypeValue,
                     BeginTime = null,
                     EndTime = null,
-                    UpdateUser = item.UpdateUser
+                    UpdateUser = item.UpdateUser,
+                    UpdateTime = item.UpdateTime
                 });
             }
 
