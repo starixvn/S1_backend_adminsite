@@ -176,7 +176,7 @@ namespace BackendSite.Service.DAL
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
                     _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
-                    _Network = bankFinancialTransferAccount.Network,
+                    _Network = bankFinancialTransferAccount.Network?.ToString(),
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
