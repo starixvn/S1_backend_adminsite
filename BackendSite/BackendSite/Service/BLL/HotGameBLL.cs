@@ -12,11 +12,13 @@ namespace BackendSite.Service.BLL
     public class HotGameBLL
     {
         private const string TpLogoPath = "/img/hotgames";
-        
+
         private readonly HotGameService _hotGameService;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly ICacheHelper _cacheHelper;
         private readonly ServerInfoBLL _serverInfo;
+        private readonly GameCasinoService _gameCasinoService;
+
         private readonly Dictionary<int, string> CurrencyLangIdMap = new Dictionary<int, string>()
         {
             { 2, "en" },
@@ -29,19 +31,27 @@ namespace BackendSite.Service.BLL
             { 74, "bn" },
         };
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
-        
-        public HotGameBLL(HotGameService hotGameService, ThirdPartyService thirdPartyService, IOptions<Dictionary<string, SiteConfig>> siteConfig, ServerInfoBLL serverInfo, ICacheHelper cacheHelper)
+
+        public HotGameBLL(HotGameService hotGameService,
+            ThirdPartyService thirdPartyService,
+            IOptions<Dictionary<string, SiteConfig>> siteConfig,
+            ServerInfoBLL serverInfo,
+            ICacheHelper cacheHelper,
+            GameCasinoService gameCasinoService)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
             _siteConfig = siteConfig;
             _serverInfo = serverInfo;
             _cacheHelper = cacheHelper;
+            _gameCasinoService = gameCasinoService;
         }
-        
-        public async Task<IEnumerable<GetHotGameListResponse>> Get(int siteId, int currencyId, bool refreshCache)
+
+        #region Api V1
+
+        public async Task<IEnumerable<GetHotGameListResponse>> GetDataList(int siteId, int currencyId, bool refreshCache)
         {
-            var hotGames = await _hotGameService.Get(siteId, currencyId);
+            var hotGames = await _hotGameService.GetDataList(siteId, currencyId);
             var listHotGames = hotGames.ToList();
             if (refreshCache)
             {
@@ -59,8 +69,8 @@ namespace BackendSite.Service.BLL
                 });
                 await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(cacheHotGames), null, RedisDataBase.Member);
             }
-            
-            return listHotGames.Select(a=> new GetHotGameListResponse()
+
+            return listHotGames.Select(a => new GetHotGameListResponse()
             {
                 Id = a.Id,
                 TpName = a.TpName,
@@ -72,11 +82,11 @@ namespace BackendSite.Service.BLL
                 LastUpdateTime = a.LastUpdateTime
             });
         }
-        
-        public async Task<GetHotGameDetailResponse> Get(int id)
+
+        public async Task<GetHotGameDetailResponse> GetDetail(int id)
         {
-            var hotGame = await _hotGameService.Get(id);
-            var gameLogo = JsonConvert.DeserializeObject<GameLogo>(hotGame.GameLogo); 
+            var hotGame = await _hotGameService.GetDetail(id);
+            var gameLogo = JsonConvert.DeserializeObject<GameLogo>(hotGame.GameLogo);
             return new GetHotGameDetailResponse()
             {
                 Id = hotGame.Id,
@@ -94,7 +104,7 @@ namespace BackendSite.Service.BLL
                 HotGameMobileUrl = gameLogo.HotGameMobileUrl
             };
         }
-        
+
         public async Task<int> CreateOrUpdate(SetHotGameRequest request, string updateOperator)
         {
             request.LangId = CurrencyLangIdMap[request.CurrencyId];
@@ -137,5 +147,129 @@ namespace BackendSite.Service.BLL
             await _hotGameService.RollBack();
             return 0;
         }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameType(int tpId)
+        {
+            return (await _thirdPartyService.GetTpGameType()).Where(r => r.TpId == tpId);
+        }
+
+        public async Task<IEnumerable<HotGameOfGameCasinoDto>> GetHotGameOfGameCasino(int tpId)
+        {
+            var casinoGames = await _gameCasinoService.GetGameCasinoByTpId(tpId);
+
+            return (from game in casinoGames
+                let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
+                select new HotGameOfGameCasinoDto()
+                {
+                    GameId = game.GameId,
+                    Name = gameName.en,
+                }).ToList();
+        }
+
+        #endregion
+
+
+        #region ApiV2
+
+        public async Task<GetHotGameListResponseV2Wrapper> GetDataListV2(GetHotGameDataListRequestV2 request)
+        {
+            var queryResult = await _hotGameService.GetDataListV2(request);
+            
+            // not found data return
+            if (!queryResult.Data.Any())
+            {
+                return new GetHotGameListResponseV2Wrapper()
+                {
+                    Data = new List<GetHotGameListResponseV2>(),
+                    TotalPages = queryResult.TotalPages,
+                    RowCount = queryResult.RowCount
+                };
+            }
+
+            var result = new GetHotGameListResponseV2Wrapper
+            {
+                Data = queryResult.Data.Select(r => new GetHotGameListResponseV2()
+                {
+                    Id = r.Id,
+                    TopCategory = r.TopCategory.ToString(),
+                    TpName = r.TpName,
+                    TpGameType = r.GameTypeName,
+                    GameName = r.GameName,
+                    GameId = r.GameId,
+                    Sort = r.Sort,
+                    LastUpdateUser = r.LastUpdateUser,
+                    LastUpdateTime = r.LastUpdateTime
+                }),
+                TotalPages = queryResult.TotalPages,
+                RowCount = queryResult.RowCount
+            };
+
+            return result;
+        }
+
+        public async Task<GetHotGameDetailResponseV2> GetDetailV2(int id,int siteId)
+        {
+            var hotGame = await _hotGameService.GetDetailV2(id, siteId);
+            if (hotGame == null) return null;
+            var gameLogo = JsonConvert.DeserializeObject<GameLogo>(hotGame.GameLogo);
+            return new GetHotGameDetailResponseV2()
+            {
+                Id = hotGame.Id,
+                SiteId = hotGame.SiteId,
+                CurrencyId = hotGame.CurrencyId,
+                GameName = hotGame.GameName,
+                GameId = hotGame.GameId,
+                TpId = hotGame.TpId,
+                TpGameType = hotGame.TpGameType,
+                TpCategory = hotGame.TpCategory,
+                TpCategoryName = hotGame.TpCategoryName,
+                HotGamePcUrl = gameLogo.HotGamePcUrl,
+                HotGameMobileUrl = gameLogo.HotGameMobileUrl,
+                TopCategory = hotGame.TopCategory
+            };
+        }
+
+        public async Task<int> CreateOrUpdateV2(SetHotGameRequestV2 request, string updateOperator)
+        {
+            request.LangId = CurrencyLangIdMap[request.CurrencyId];
+            var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
+            request.TpLogo = $"{_siteConfig.Value[site.SiteName].BannerURL}{TpLogoPath}/{request.TpId}.png";
+
+            var result = await _hotGameService.CreateOrUpdateV2(request, updateOperator);;
+            if(result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
+            return result;
+        }
+
+        public async Task<int> DeleteV2(DeleteHotGameRequestV2 request)
+        {
+            var result =  await _hotGameService.DeleteV2(request.Id, request.SiteId);
+             if(result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
+             return result;
+        }
+
+        public async Task<int> SortingV2(IEnumerable<HotGameSortingRequestV2> request)
+        {
+            var result = 1;
+            await _hotGameService.BeginTransaction();
+            foreach (var hotGame in request)
+            {
+                var dbResult = await _hotGameService.SortingV2(hotGame.Id, hotGame.Sort, hotGame.SiteId);
+                result *= dbResult;
+            }
+
+            if (result == 1)
+            {
+                await _hotGameService.Commit();
+                await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.First().SiteId}*", RedisDataBase.Member);
+                return 1;
+            }
+
+            await _hotGameService.RollBack();
+            
+            return 0;
+        }
+
+        #endregion
+
     }
 }
