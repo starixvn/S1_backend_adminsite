@@ -93,7 +93,7 @@ namespace BackendSite.Service.DAL
                     _Id = input.Id
                 });
 
-            var spName = "Admin_BankFinancialTransferAccount_Get_V2";
+            var spName = "Admin_BankFinancialTransferAccount_Get_V2_tmp";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
         }
 
@@ -144,6 +144,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
@@ -158,7 +159,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V6", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V7", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -181,6 +182,7 @@ namespace BackendSite.Service.DAL
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
@@ -197,7 +199,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V6";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V7";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
