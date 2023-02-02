@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -488,16 +487,7 @@ namespace BackendSite.Service.Model
     //    public int Status { get; set; }
     //    public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
     //}
-    
-    public class LastDepositAndWithdrawalTime
-    {
-        public DateTime? LastDepositTime { get; set; }
-        public DateTime? LastWithdrawlTime { get; set; }
-        public decimal TotalAdjustment { get; set; }
-        public DateTime? LastBettingTime { get; set; }
-        public decimal TotalBonusClaimed { get; set; }
-    }
-    
+
     public class TagData
     {
         public int Id { get; set; }
@@ -540,91 +530,6 @@ namespace BackendSite.Service.Model
         public string AffCode { get; set; }
         public string Agent { get; set; }
         public string ReferralUrl { get; set; }
-    }
-    
-    public class RegLiveStatusResult
-    {
-        public List<RegLiveStatus> RegLiveStatusDatas { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
-
-    public class SetRegLiveStatus
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        [LogIgnore]
-        public CustomerRegLiveStatusStatusEnum Status { get; set; }
-
-        public string StatusName => Status.ToString();
-    }
-
-    public class AddRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class EditRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        [LogIgnore]
-        public int Id { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class DeleteRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        [LogIgnore]
-        public int Id { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class RegLiveStatusNotes
-    {
-        public int Id { get; set; }
-        public int CustId { get; set; }
-        public string Note { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
-        public DateTimeOffset UpdateTime { get; set; }
-        public string Operator { get; set; }
-    }
-    
-    public class RegLiveStatusExport
-    {
-        public string Site { get; set; }
-        public string Currency { get; set; }
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string PhoneNo { get; set; }
-        public string Verify { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-        public string DepositStatus { get; set; }
-        public string Status { get; set; }
-        public string AffCode { get; set; }
-        public string Agent { get; set; }
-    }
-
-    public class RegLiveStatusForMarketingExport
-    {
-        public string Site { get; set; }
-        public string Currency { get; set; }
-        public string AffCode { get; set; }
-        public string Agent { get; set; }
-        public string UserName { get; set; }
-        public string ReferralUrl { get; set; }
-        public string Verify { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-        public string DepositStatus { get; set; }
     }
 
     public class CustomerForRisk

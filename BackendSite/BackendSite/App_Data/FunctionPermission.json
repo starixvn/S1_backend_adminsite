@@ -453,26 +453,6 @@
         ]
       },
       {
-        "DisplayKey": "Registration Data",
-        "FuncKey": "Marketing/RegistrationForMarketing",
-        "Enable": false,
-        "InputBoxType": "checkbox",
-        "SubFuncKeys": [
-          {
-            "DisplayKey": "Add Note",
-            "FuncKey": "rm_add_note"
-          },
-          {
-            "DisplayKey": "Edit Note",
-            "FuncKey": "rm_edit_note"
-          },
-          {
-            "DisplayKey": "Delete Note",
-            "FuncKey": "rm_delete_note"
-          }
-        ]
-      },
-      {
         "DisplayKey": "Vip Rebate Info",
         "FuncKey": "Marketing/VipRebateInfoReport",
         "Enable": false
