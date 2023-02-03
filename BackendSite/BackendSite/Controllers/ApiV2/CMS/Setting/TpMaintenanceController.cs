@@ -7,6 +7,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
@@ -96,6 +97,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+        }
+
+        public class GetTpGameTypeRequest
+        {
+            public int TpId { get; set; }
         }
 
         public class DeleteRequest
@@ -256,6 +262,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     Message = ex.Message,
                 };
             }
+        }
+
+        [HttpPost]
+        public  ApiResult<IEnumerable<TpGameType>> GetTpGameType(GetTpGameTypeRequest req)
+        {
+            return new ApiResult<IEnumerable<TpGameType>>()
+            {
+                ErrorCode = 0,
+                Data = _tpMaintainBll.GetTpGameTypeList(req.TpId)
+            };
         }
 
         #endregion
