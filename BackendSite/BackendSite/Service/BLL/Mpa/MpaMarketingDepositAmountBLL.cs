@@ -153,7 +153,8 @@ namespace BackendSite.Service.BLL.Mpa
                     NoOfPlayers = mainSiteList.DistinctBy(x => x.CustId).Count(),
                     FirstDepositAmount = mainSiteList.Sum(r => r.FirstDepositAmount),
                     TotalDepositAmount = mainSiteList.Sum(r => r.DepositAmount),
-                    Children = mainSiteList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
+                    Children = mainSiteList.Any() 
+                        ? mainSiteList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
                     {
                         SignUpUrl = r.SignUpUrl,
                         FirstDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.FirstDepositAmount),
@@ -161,6 +162,7 @@ namespace BackendSite.Service.BLL.Mpa
                         NoOfPlayers = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).DistinctBy(x => x.CustId)
                             .Count()
                     }).ToList()
+                        : null
                 };
                 response.SignUpData.Add(mainData);
             }
