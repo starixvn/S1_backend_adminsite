@@ -2037,9 +2037,13 @@ namespace BackendSite.Service.BLL
                     var accountInfo = report.AccountInfoList.FirstOrDefault(x => x.FinancialId == g.Key.FinancialId);
                     var openBalance = accountInfo?.OpenBalance;
                     var netBalance = g.Sum(x => x.Summary);
+                    var fee = g.Sum(x => x.FeeSummary);
                     
                     var item = new Dictionary<string, string>
                     {
+                        {"Open Balance", openBalance.ToString()},
+                        {"Net Balance", netBalance.ToString()},
+                        {"Closing Balance", (openBalance + netBalance).ToString()},
                         {"Currency", g.Key.CurrencyId.ToString()},
                         {"Channel", g.Key.Channel.ToString()},
                         {"Agent", g.Key.Agent},
@@ -2047,12 +2051,7 @@ namespace BackendSite.Service.BLL
                     };
                     
                     item.AddRange(details);
-                    item.AddRange(new Dictionary<string, string>
-                    {
-                        {"Open Balance", openBalance.ToString()},
-                        {"Net Balance", netBalance.ToString()},
-                        {"Closing Balance", (openBalance + netBalance).ToString()}
-                    });
+                    item.Add("Fee", fee.ToString());
 
                     return item;
                 });
