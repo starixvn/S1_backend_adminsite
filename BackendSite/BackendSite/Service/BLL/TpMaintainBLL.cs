@@ -8,10 +8,13 @@ namespace BackendSite.Service.BLL
     public class TpMaintainBLL
     {
         private readonly TpMaintainService _tpMaintainService;
+        private readonly ThirdPartyService _thirdPartyService;
 
         public TpMaintainBLL(IServiceProvider provider)
         {
             _tpMaintainService = provider.GetRequiredService<TpMaintainService>();
+            _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+
         }
 
         public IEnumerable<CommonTpInfo> GetCommonTpList()
@@ -75,6 +78,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<TpGameType> GetTpGameTypeList()
         {
             return _tpMaintainService.GetTpGameTypeList();
+        }
+
+        public IEnumerable<TpGameType> GetTpGameTypeList(int tpId)
+        {
+            return _tpMaintainService.GetTpGameTypeList().Where(r=>r.TpId == tpId);
         }
 
         public IEnumerable<TpCategory> GetTPCategoryList()
