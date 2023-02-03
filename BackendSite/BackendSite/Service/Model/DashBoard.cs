@@ -7,9 +7,6 @@ namespace BackendSite.Service.Model
 
     #region DashboardV1
 
-    public class DashBoard
-    {
-    }
     public class DashBoardData
     {
         public int OnlinePlayers { get; set; }

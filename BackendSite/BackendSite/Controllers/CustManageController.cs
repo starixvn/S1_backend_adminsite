@@ -166,20 +166,8 @@ namespace BackendSite.Controllers
 
         #endregion
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        public IActionResult TeleCSD()
-        {
-            return View();
-        }
-
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         public IActionResult TagManagement()
-        {
-            return View();
-        }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
-        public IActionResult RegistrationManagement()
         {
             return View();
         }

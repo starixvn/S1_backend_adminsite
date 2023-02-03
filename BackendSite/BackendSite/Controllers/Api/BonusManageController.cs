@@ -107,13 +107,6 @@ namespace BackendSite.Controllers.Api
             public int PageSize { get; set; }
         }
 
-        public class ExportReferralCustListReq
-        {
-            public IEnumerable<int> SelectSite { get; set; }
-            public string UserName { get; set; }
-            public int CurrencyId { get; set; }
-        }
-
         public class RefFriendListReq
         {
             public int CustId { get; set; }
@@ -161,15 +154,7 @@ namespace BackendSite.Controllers.Api
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
-        public class BonusPayoutReq
-        {
-            public int CustId { get; set; }
-            public decimal Amount { get; set; }
-            public string Memo { set; get; }
-            public string BounsCode { get; set; }
-            public int RollOver { get; set; }
-            public int PromotionType { get; set; }
-        }
+
         #endregion
 
         #region Action

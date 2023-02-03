@@ -132,11 +132,6 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/GameCasinoManagement/index.js"
     // ]
-    // "CSD/TeleCSD.min": ["@babel/polyfill", "./src/pages/CSD/TeleCSD/index.js"],
-    // "Marketing/VipUpgrade.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/Marketing/VipUpgrade/index.js"
-    // ],
     // "Marketing/LatestHighlightVideoManagement.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
@@ -213,14 +208,6 @@ module.exports = {
     // "Finance/WithdrawalAccounting.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
-    // ],
-    // "CSD/RegistrationManagement.min": [
-    //   '@babel/polyfill',
-    // "./src/pages/CSD/RegistrationManagement/index.js",
-    // ],
-    // "Marketing/RegistrationForMarketing.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/RegistrationForMarketing/index.js",
     // ],
     // "CSD/DisableUserForGame.min": [
     //   '@babel/polyfill',

@@ -2,16 +2,6 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.Store.PointSetting
 {
-    public class GetInactivePointExpirySettingParams
-    {
-        public GetInactivePointExpirySettingParams(GetInactivePointExpirySettingRequest req)
-        {
-            SiteId = req.SiteId;
-        }
-
-        public int SiteId { get; set; }
-    }
-
     public class SetInactivePointExpirySettingParams
     {
         public SetInactivePointExpirySettingParams(SetInactivePointExpirySettingRequest req, string userName)

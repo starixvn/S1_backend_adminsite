@@ -350,13 +350,7 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public string Note { get; set; }
     }
-    public class DepositTimeData
-    {
-        public List<DepositTimeList> DepositTimeList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
+
     public class DepositTimeList
     {
         public string SiteName { get; set; }
