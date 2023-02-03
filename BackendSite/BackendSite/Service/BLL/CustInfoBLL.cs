@@ -337,20 +337,6 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCustBonus(custId);
         }
-        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
-        {
-            return _custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
-        }
-
-        public int UpdateCustomerTele(int siteId, int custId, string @operator)
-        {
-            return _custInfoService.UpdateCustomerTele(siteId, custId, @operator);
-        }
-
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
-        {
-            return _custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
-        }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {

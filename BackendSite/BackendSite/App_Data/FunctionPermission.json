@@ -155,18 +155,6 @@
         "Enable": false
       },
       {
-        "DisplayKey": "TeleCSD",
-        "FuncKey": "CustManage/TeleCSD",
-        "Enable": false,
-        "InputBoxType": "checkbox",
-        "SubFuncKeys": [
-          {
-            "DisplayKey": "Export Excel",
-            "FuncKey": "tele_export_excel"
-          }
-        ]
-      },
-      {
         "DisplayKey": "Tag Management",
         "FuncKey": "CustManage/TagManagement",
         "Enable": false

@@ -170,14 +170,7 @@ namespace BackendSite.Service.Model
         public int id { get; set; }
         public string Name { get; set; }
     }
-    public class TpBetRecordListOneWeek
-    {
-        public DateTime SettledDate { get; set; }
-        public decimal Stake { get; set; }
-        public decimal ValidBet { get; set; }
-        public decimal WinlostAmount { get; set; }
-        public int SettlementType { get; set; }
-    }
+
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }

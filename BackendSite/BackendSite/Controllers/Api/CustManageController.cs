@@ -65,11 +65,6 @@ namespace BackendSite.Controllers.Api
 
         #region API Model
 
-        public class GetRegLiveStatusNotesReq
-        {
-            public int CustId { get; set; }
-        }
-
         public class CustInfoListReq
         {
             public IEnumerable<int> SelectSite { get; set; }
@@ -213,53 +208,15 @@ namespace BackendSite.Controllers.Api
             public IEnumerable<int> GameTypes { get; set; }
         }
 
-        #region TeleCSD
-
-        public class TeleCSDpara
-        {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> Currency { get; set; }
-            public int Deposit { get; set; }
-            public int CallOut { get; set; }
-            public int DormantUser { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-            public TeleCSDpara()
-            {
-                //PageSize預設10
-                if (PageSize == 0)
-                    PageSize = 10;
-            }
-        }
-
-        public class TeleCSDUpdatepara
-        {
-            public int CustId { get; set; }
-            public int SiteId { get; set; }
-        }
-
-        #endregion
-
         #region TagManagement
-        public class EditTagManagementpara
-        {
-            public int Id { get; set; }
-            public string TagName { get; set; }
-            public string TagColour { get; set; }
-            public string Description { get; set; }
-        }
+
         public class GetTagDatapara
         {
             public int Status { get; set; }
             public int PageNumber { get; set; }
             public int PageSize { get; set; }
         }
-        public class SetTagStatuspara
-        {
-            public int Id { get; set; }
-        }
+
         public class SetCustTagPara
         {
             public int CustId { get; set; }
@@ -1883,162 +1840,6 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 apiResult.Message = "Fail.";
             }
-        }
-
-        #endregion
-
-        #region CSD > TeleCSD
-
-        /// <summary>
-        /// CustManage/GetTeleCSD 取得客服致電資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > TeleCSD > [Submit](Query)
-        /// 
-        /// </remarks>
-        /// <param name="para"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        [HttpPost]
-        public ApiListResult<CustTele> GetTeleCSD(TeleCSDpara para)
-        {
-            var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
-            var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
-            var SearchResult = _custInfoBll.GetTeleCSD(JsonConvert.SerializeObject(para.SiteIds),
-                                                     JsonConvert.SerializeObject(para.Currency),
-                                                      startTime,
-                                                      endTime,
-                                                      para.Deposit,
-                                                      para.DormantUser,
-                                                      para.CallOut,
-                                                      para.PageNumber,
-                                                      para.PageSize);
-
-            if (SearchResult.CustTeleList.Count == 0)
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                foreach (var list in SearchResult.CustTeleList)
-                {
-                    list.RegTime = new DateTimeOffset(list.RegTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-
-                    if (list.UpdateAt != null)
-                    {
-                        var updateAtArray = list.UpdateAt.Split(',');
-                        list.UpdateAt = string.Empty;
-                        for (var i = 0; i < updateAtArray.Length; i++)
-                        {
-                            updateAtArray[i] = DateTime.Parse(updateAtArray[i]).AddHours(8).ToString("yyyy-MM-dd HH:mm:ss");
-                            list.UpdateAt += $"{updateAtArray[i]},";
-                        }
-                        list.UpdateAt = list.UpdateAt.Remove(list.UpdateAt.LastIndexOf(","), 1);
-
-                        var operatorArray = list.Operator.Split(',');
-
-                        list.UpdateRemark = new List<string>();
-                        for (var i = 0; i < updateAtArray.Length; i++)
-                        {
-                            list.UpdateRemark.Add($"{updateAtArray[i]}-{operatorArray[i]}");
-                        }
-                    }
-                }
-
-                return new ApiListResult<CustTele>
-                {
-                    Data = SearchResult.CustTeleList,
-                    TotalPages = SearchResult.TotalPages,
-                    PageNumber = SearchResult.PageNumber,
-                    RowCount = SearchResult.RowCount,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
-
-        /// <summary>
-        /// CustManage/UpdateCustomerTele 更新客服致電資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > TeleCSD > Submit(Query) > [Complete once]
-        /// 
-        /// </remarks>
-        /// <param name="para"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        [HttpPost]
-        public ApiResult UpdateCustomerTele(TeleCSDUpdatepara para)
-        {
-            if (_custInfoBll.UpdateCustomerTele(para.SiteId, para.CustId, User.Identity.Name) > 0)
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Success,
-                    Message = "Update Success."
-                };
-            }
-            else
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
-            }
-        }
-
-        /// <summary>
-        /// CustManage/ExportTeleCSDData 匯出客服致電資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > TeleCSD > Submit(Query) > [Export Excel]
-        /// 
-        /// </remarks>
-        /// <param name="SiteIds"></param>
-        /// <param name="Currency"></param>
-        /// <param name="Deposit"></param>
-        /// <param name="CallOut"></param>
-        /// <param name="DormantUser"></param>
-        /// <param name="StartDate"></param>
-        /// <param name="EndDate"></param>
-        /// <returns>檔案</returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        [HttpPost]
-        public IActionResult ExportTeleCSDData(string SiteIds,
-                                               string Currency,
-                                               int Deposit,
-                                               int CallOut,
-                                               int DormantUser,
-                                               long StartDate,
-                                               long EndDate)
-        {
-            var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
-            var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
-            var exportData = _custInfoBll.GetTeleCSDExportData(SiteIds,
-                                                              Currency,
-                                                              startTime,
-                                                              endTime,
-                                                              Deposit,
-                                                              DormantUser,
-                                                              CallOut);
-
-            foreach (var data in exportData)
-            {
-                data.RegDate = new DateTimeOffset(data.RegDate.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (data.FirstTimeCall != string.Empty)
-                    data.FirstTimeCall = $"{DateTime.Parse(data.FirstTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.FirstTimeCall.Substring(20, data.FirstTimeCall.Length - 20)}";
-                if (data.SecondTimeCall != string.Empty)
-                    data.SecondTimeCall = $"{DateTime.Parse(data.SecondTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.SecondTimeCall.Substring(20, data.SecondTimeCall.Length - 20)}";
-                if (data.ThirdTimeCall != string.Empty)
-                    data.ThirdTimeCall = $"{DateTime.Parse(data.ThirdTimeCall.Substring(0, 19)).AddHours(8):yyyy-MM-dd HH:mm:ss}-{data.ThirdTimeCall.Substring(20, data.ThirdTimeCall.Length - 20)}";
-            }
-            var stream = _excelBll.ExportV2(exportData);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeleCSD_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion

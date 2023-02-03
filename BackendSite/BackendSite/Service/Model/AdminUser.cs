@@ -40,12 +40,6 @@
         public int SiteId { set; get; }
     }
 
-    public class AssignGroups
-    {
-        public int UserId { get; set; }
-        public int GroupSEQ { get; set; }
-    }
-
     public class AdminUserV2
     {
         public int UserId { set; get; }
