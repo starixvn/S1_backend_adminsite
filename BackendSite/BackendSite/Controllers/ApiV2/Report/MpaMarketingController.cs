@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
@@ -30,6 +31,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region Withdrawal
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public async Task<ApiResult<WithdrawalAmountSummaryResponse>> WithdrawalSummaryAsync(WithdrawalAmountRequest request)
         {
             var apiResult = new ApiResult<WithdrawalAmountSummaryResponse>();
@@ -50,6 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<WithdrawalAmountDetailData> WithdrawalDetailsAsync(WithdrawalAmountRequest request)
         {
             var apiResult = new ApiListResult<WithdrawalAmountDetailData>();
@@ -73,6 +76,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public async Task<IActionResult> WithdrawalExportAsync(WithdrawalAmountRequest request)
         {
             var summaryData = await _marketingWithdrawalAmountBll.GetWithdrawalAmountSummaryAsync(request);
@@ -101,6 +105,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region Deposit
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public async Task<ApiResult<DepositAmountSummaryResponse>> DepositSummaryAsync(DepositAmountRequest request)
         {
             var apiResult = new ApiResult<DepositAmountSummaryResponse>();
@@ -122,6 +127,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public async Task<ApiResult<DepositSinUpSummaryResponse>> DepositSignUpUrlSummaryAsync(DepositAmountRequest request)
         {
             var apiResult = new ApiResult<DepositSinUpSummaryResponse>();
@@ -142,6 +148,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<DepositSignUpDetailData> DepositSignUpDetail(DepositAmountRequest request)
         {
             var apiResult = new ApiListResult<DepositSignUpDetailData>();
@@ -165,6 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public async Task<IActionResult> DepositExportAsync(DepositAmountRequest request)
         {
             var depositAmountSummary = await _marketingDepositAmountBll.GetDepositAmountSummaryAsync(request);
