@@ -175,6 +175,8 @@ namespace BackendSite.Service.DAL
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
+                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
+                    _Network = bankFinancialTransferAccount.Network?.ToString(),
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
@@ -195,7 +197,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V5";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V6";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
