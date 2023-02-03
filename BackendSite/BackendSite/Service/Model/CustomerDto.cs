@@ -596,3 +596,9 @@ public class LoginLogPageData
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
 }
+
+public class GetListByFileRequest
+{
+    public int SiteId { get; set; }
+    public IFormFile File { get; set; }
+}
