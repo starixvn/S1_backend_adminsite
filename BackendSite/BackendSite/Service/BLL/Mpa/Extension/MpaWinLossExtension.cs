@@ -1,5 +1,7 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using Amazon.Runtime.Internal;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using StackExchange.Redis;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {
@@ -186,5 +188,274 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             return data;
         }
+
+        public static IEnumerable<MpaWinLossByDateResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByDateResponse> source)
+        {
+            var result = new List<MpaWinLossByDateResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByDateResponseToFrontEnd
+                {
+                    Key = item.Key,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByDayCurrencyDetailDtoToFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { Key = childrenItem.Key, Data = childrenItem.Value })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<MpaWinLossByTpCategoryResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByTpCategoryResponse> source)
+        {
+            var result = new List<MpaWinLossByTpCategoryResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByTpCategoryResponseToFrontEnd
+                {
+                    Key = item.Key,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { Key = childrenItem.Key, Data = childrenItem.Value })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByTpGameTypeResponse> source)
+        {
+            var result = new List<MpaWinLossByTpGameTypeResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByTpGameTypeResponseToFrontEnd
+                {
+                    Key = item.Key,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd
+                        {
+                            Key = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<MpaWinLossByPlayerResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByPlayerResponse> source)
+        {
+            var result = new List<MpaWinLossByPlayerResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByPlayerResponseToFrontEnd()
+                {
+                    Key = item.Key,
+                    SabaId = item.Value.SabaId,
+                    UserName = item.Value.UserName,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    ClosingBalance = item.Value.ClosingBalance,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByPlayerCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByPlayerCurrencyDetailDtoFrontEnd
+                        {
+                            Key = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<MpaWinLossByPlayerDetailResponseFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByPlayerDetailResponse> source)
+        {
+            var result = new List<MpaWinLossByPlayerDetailResponseFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByPlayerDetailResponseFrontEnd
+                {
+                    Key = item.Key,
+                    SabaId = item.Value.SabaId,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin
+                };
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<MpaWinLossByCurrencyResponseFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByCurrencyResponse> source)
+        {
+            var result = new List<MpaWinLossByCurrencyResponseFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByCurrencyResponseFrontEnd()
+                {
+                    Key = item.Key,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd
+                        {
+                            Key = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
     }
 }
+
+

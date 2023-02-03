@@ -25,9 +25,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy Date
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByDate(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Date);
@@ -56,9 +56,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy Month
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByDateResponse>>> GetWinLossByMonth(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>> GetWinLossByMonth(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByDateResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Month);
@@ -87,9 +87,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy TpGameType
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>> GetWinLossByTpGameType(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd>>> GetWinLossByTpGameType(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpGameTypeResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeResult(request, MpaWinLossGroupByTypeEnum.GameType);
@@ -118,9 +118,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy TpCategory
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByTpCategoryResponseToFrontEnd>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByTpCategoryResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByTpCategoryResponseToFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByTpCategoryResult(request, MpaWinLossGroupByTypeEnum.TpCategory);
@@ -149,9 +149,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy Player
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>> GetWinLossByPlayer(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByPlayerResponseToFrontEnd>>> GetWinLossByPlayer(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByPlayerResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByPlayerResponseToFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.Player);
@@ -176,9 +176,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByPlayerDetailResponse>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByPlayerDetailResponseFrontEnd>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByPlayerDetailResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByPlayerDetailResponseFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerDetailResult(request, MpaWinLossGroupByTypeEnum.Player);
@@ -199,9 +199,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy Currency
 
         [HttpPost]
-        public async Task<ApiResult<Dictionary<string, MpaWinLossByCurrencyResponse>>> GetWinLossByCurrency(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>>> GetWinLossByCurrency(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<Dictionary<string, MpaWinLossByCurrencyResponse>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByCurrencyResult(request, MpaWinLossGroupByTypeEnum.Currency);

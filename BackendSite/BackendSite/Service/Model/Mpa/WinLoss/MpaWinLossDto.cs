@@ -38,7 +38,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public List<MpaTpBetRecordDto> AlreadyMultiplyRateBetRecord { get; set; }
     }
 
-
     /// <summary>
     /// 存提款資訊
     /// </summary>
@@ -74,7 +73,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public List<TransactionRelayDto> AlreadyMultiplyRateTransaction { get; set; }
     }
 
-
     /// <summary>
     /// Bonus 資訊
     /// </summary>
@@ -99,7 +97,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public List<MpaWinLossBonusDto> AlreadyMultiplyRateBonus { get; set; }
     }
-
 
     public class MpaRateDto
     {
@@ -147,9 +144,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string CategoryName { get; set; }
     }
-
-
-
 
     public class MpaWinLossByDayCurrencyDetailDto
     {
@@ -476,10 +470,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
     }
 
-
-
-
-
     public class MpaWinLossByDateDto
     {
         //[JsonIgnore]
@@ -545,7 +535,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateBonusResult { get; set; }
     }
 
-
     public class MpaWinLossByTpGameTypeDto
     {
         [JsonIgnore]
@@ -587,8 +576,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
     }
 
-
-
     public class MpaWinLossByTpCategoryDto
     {
         [JsonIgnore]
@@ -629,8 +616,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
     }
-
-
 
     public class MpaWinLossByPlayerDto
     {
@@ -707,8 +692,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateData { get; set; }
     }
 
-
-
     public class MpaWinLossByCurrencyDto
     {
         [JsonIgnore]
@@ -757,7 +740,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
     }
 
-
     public class TransactionByCurrencyWrapper
     {
         public IEnumerable<MpaWinLossByCurrencyDto> OriginTransaction { get; set; }
@@ -774,36 +756,46 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
 
 
+    #region To FrontEnd API Formate
 
-
-
-
-    public class MpaWinLossByTpGameTypeExportDto
+    public class MpaWinLossByDayCurrencyDetailDtoToFrontEnd
     {
-        public string TpGameTypeName { get; set; }
+        public string Key { get; set; }
 
-        public string Currency { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public decimal Margin { get; set; }
+        public MpaWinLossByDayCurrencyDetailDto Data { get; set; }
     }
+
+
+    public class MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd
+    {
+        public string Key { get; set; }
+
+        public MpaWinLossByTpCategoryCurrencyDetailDto Data { get; set; }
+    }
+
+    public class MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd
+    {
+        public string Key { get; set; }
+
+        public MpaWinLossByTpGameTypeCurrencyDetailDto Data { get; set; }
+    }
+
+    public class MpaWinLossByPlayerCurrencyDetailDtoFrontEnd
+    {
+        public string Key { get; set; }
+        public MpaWinLossByPlayerCurrencyDetailDto Data { get; set; }
+    }
+
+    public class MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd
+    {
+        public string Key { get; set; }
+
+        public MpaWinLossByCurrencyCurrencyDetailDto Data { get; set; }
+    }
+
+    #endregion
+
+
+
+
 }
