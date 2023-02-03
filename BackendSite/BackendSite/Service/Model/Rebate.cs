@@ -1,13 +1,5 @@
 ﻿namespace BackendSite.Service.Model
 {
-    public class Rebate
-    {
-    }
-    public class VipLevel
-    {
-        public int Level { get; set; }
-        public string LevelName { get; set; }
-    }
     public class TPCategory
     {
         public int CategoryId { get; set; }
@@ -19,12 +11,6 @@
         public string CategoryName { get; set; }
         public IEnumerable<RebateLevelData> CategoryLevelList { get; set; }
 
-    }
-    public class RebateGameTypeList
-    {
-        public int Type { get; set; }
-        public string TypeName { get; set; }
-        public IEnumerable<RebateLevelData> GameTypeLevelList { get; set; }
     }
 
     public class RebatePeriod
@@ -51,13 +37,6 @@
         public int CurrencyId { get; set; }
         public IEnumerable<RebatePayoutLimitData> PayoutLimitList { get; set; }
         public IEnumerable<RebateCategoryList> CategoryDataList { get; set; }
-
-    }
-
-    public class RebateCategoryDetail
-    {
-        public int CategoryId { get; set; }
-        public IEnumerable<RebateGameTypeList> GameTypeList { get; set; }
 
     }
 

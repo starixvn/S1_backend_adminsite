@@ -80,7 +80,6 @@ const CustomerStatisticalReport = lazy(() =>
 const GameCasinoManagement = lazy(() =>
   import("./pages/Marketing/GameCasinoManagement/index")
 );
-const TeleCSD = lazy(() => import("./pages/CSD/TeleCSD/index"));
 const TransferAccountManage = lazy(() =>
   import("./pages/BankFinancial/TransferAccountManage/index")
 );
@@ -573,19 +572,6 @@ export const pages = {
     comp: (
       <Suspense fallback="loading...">
         <GameCasinoManagement />
-      </Suspense>
-    ),
-    css: [
-      "./lib/bootstrap/dist/css/bootstrap.min.css",
-      "./css/css/main.css",
-      "./css/css/vendor/DateTimePicker/DateTimePicker.css",
-    ],
-    layout: layoutType.N88,
-  },
-  TeleCSD: {
-    comp: (
-      <Suspense fallback="loading...">
-        <TeleCSD />
       </Suspense>
     ),
     css: [

@@ -200,11 +200,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int? WalletType { get; set; }
         }
 
-        public class GameTypeListReq
-        {
-            public int CategoryId { get; set; }
-        }
-
         public class GetSportLeaguesRequest
         {
             public int CategoryId { get; set; }

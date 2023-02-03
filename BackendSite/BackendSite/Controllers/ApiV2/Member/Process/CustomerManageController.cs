@@ -112,37 +112,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 客戶ID和時間區間(Null)要求
-        /// </summary>
-        /// <remarks>
-        /// 只需要傳參數CustId、StartDate(Allow Null)、EndDate(Allow Null)
-        /// </remarks>
-        public class CustIdWithDateRangeNullRequest : CustIdRequest
-        {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-        }
-
-        /// <summary>
         /// 客戶ID要求(含分頁)
         /// </summary>
         public class CustIdWithPageRequest : ApiRequestPageModel

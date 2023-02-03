@@ -839,11 +839,6 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        public class WithdrawalPicUrl
-        {
-            public string Url { get; set; }
-        }
-
         [HttpGet]
         public ActionResult GetWithdrawalPic(string transId, int BankSlipPicCount)
         {
