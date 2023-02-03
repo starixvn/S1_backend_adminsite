@@ -22,6 +22,8 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
     public class SignUpChildDto
     {
+        [JsonProperty("signUpSource")] public string SignUpSource => "";
+
         [JsonProperty("signUpUrl")]
         public string SignUpUrl { get; set; }
 
@@ -52,8 +54,8 @@ namespace BackendSite.Service.Model.Mpa.Marketing
         [JsonProperty("noOfPlayers")]
         public int NoOfPlayers { get; set; }
 
-        [JsonProperty("childs")]
-        public List<SignUpChildDto> Childs { get; set; }
+        [JsonProperty("children")]
+        public List<SignUpChildDto> Children { get; set; }
     }
 
     public class SignUpTotalSummary
