@@ -42,7 +42,7 @@ namespace BackendSite.Service.Model.Mpa.Marketing
         [JsonProperty("signUpSource")]
         public string SignUpSource { get; set; }
 
-        [JsonProperty("signupUrl")]
+        [JsonProperty("SignUpUrl")]
         public string SignUpUrl { get; set; }
 
         [JsonProperty("firstDepositAmount")]
