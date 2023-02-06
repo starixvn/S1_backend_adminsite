@@ -56,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
             {
                 return new ApiResult
                 {
-                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintain(request) 
+                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintain(request, User.Identity.Name) 
                     ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.SystemException,
                 };
             }

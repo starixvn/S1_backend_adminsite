@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalTimeReportController : ControllerBase
@@ -18,6 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly ExcelBLL _excelBll;
+        private readonly CustInfoBLL _custInfoBll;
 
         #endregion
 
@@ -27,6 +28,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         #endregion
@@ -35,22 +37,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         public class ExportWithdrawalTimeReq
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
             public string WithdrawalId { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public int Status { get; set; }
-            public int CurrencyId { get; set; }
+            public IEnumerable<int> Status { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
+            public string MemberId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
         }
 
         #endregion
@@ -67,13 +60,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
-        public ApiListResult<WithdrawalTimeList> GetList(WithdrawalTimeReportPara req)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 35, 1 })]
+        public async Task<ApiListResultCurrencyAmount<WithdrawalTimeList>> GetList(WithdrawalTimeReportPara req)
         {
-            var apiListResult = new ApiListResult<WithdrawalTimeList>();
+            var apiListResult = new ApiListResultCurrencyAmount<WithdrawalTimeList>();
             try
             {
-                var searchResult = _withdrawalBll.WithdrawalTimeReportGet(req);
+                if (!string.IsNullOrWhiteSpace(req.MemberId))
+                {
+                    var custSimpleInfo = await _custInfoBll.GetCustId(null, req.MemberId, req.SiteIds.FirstOrDefault());
+                    if (custSimpleInfo != null)
+                        req.CustId = custSimpleInfo.CustId;
+                    else
+                        return apiListResult;
+                }
+
+                var searchResult = _withdrawalBll.WithdrawalTimeReportGet(JsonConvert.SerializeObject(req.SiteIds),
+                req.WithdrawalId,req.StartDate,req.EndDate, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.CustId, req.PageNumber,req.PageSize, out List<TotalAmount> currencyTotalAmount);
 
                 foreach (var data in searchResult.WithdrawalTimeList)
                 {
@@ -93,6 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 apiListResult.TotalPages = searchResult.TotalPages;
                 apiListResult.RowCount = searchResult.RowCount;
                 apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiListResult.CurrencyAmountRecord = currencyTotalAmount;
             }
             catch (Exception ex)
             {
@@ -113,17 +117,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="req"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/WithdrawalTimeReport" })]
-        public IActionResult Export(ExportWithdrawalTimeReq req)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 35, 2 })]
+        public async Task<IActionResult> Export(ExportWithdrawalTimeReq req)
         {
             var exportData =
-                _withdrawalBll.WithdrawalTimeExportGet(JsonConvert.SerializeObject(req.SiteIds), req.WithdrawalId, req.StartDate.DateTime, req.EndDate.DateTime, req.Status, req.CurrencyId);
+                await _withdrawalBll.WithdrawalTimeExportGet(JsonConvert.SerializeObject(req.SiteIds)
+                , req.WithdrawalId
+                , new DateTimeOffset(req.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , new DateTimeOffset(req.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
+                , JsonConvert.SerializeObject(req.Status)
+                , JsonConvert.SerializeObject(req.CurrencyId)
+                , req.MemberId);
+            TimeSpan offset = req.StartDate.Offset;
             foreach (var data in exportData)
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                data.CreateTime = data.CreateTime.ToOffset(offset);
+                data.UpdateTime = data.UpdateTime.ToOffset(offset);
                 if (data.FlowEndTime != null)
-                    data.FlowEndTime = new DateTimeOffset(data.FlowEndTime.Value.DateTime, TimeSpan.Zero);
+                    data.FlowEndTime = data.FlowEndTime?.ToOffset(offset);
             }
             var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

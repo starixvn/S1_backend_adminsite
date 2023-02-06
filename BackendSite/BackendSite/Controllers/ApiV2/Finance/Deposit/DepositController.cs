@@ -87,11 +87,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public int Action { set; get; }
         }
 
-        public class SetAmountByTransIdRequest : GetByTransIdRequest
-        {
-            public decimal Amount { get; set; }
-        }
-
         public class BatchRejectedDepositList
         {
             public IEnumerable<string> TransIds { get; set; }
