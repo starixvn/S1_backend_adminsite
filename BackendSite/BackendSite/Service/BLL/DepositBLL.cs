@@ -6,7 +6,12 @@ using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
 using BackendSite.Extensions;
+using System.Threading.Tasks;
+using System.Linq;
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
+using BackendSite.Extensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -31,6 +36,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -39,6 +45,7 @@ namespace BackendSite.Service.BLL
             custInfoService = provider.GetRequiredService<CustInfoService>();
             _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+          	_depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();

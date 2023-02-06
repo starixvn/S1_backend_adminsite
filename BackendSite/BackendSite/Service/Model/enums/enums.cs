@@ -165,6 +165,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
+    }
 
     #endregion
 
@@ -1314,7 +1320,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1369,8 +1374,8 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-
-    public enum ShieldRiskTagged
+    
+     public enum ShieldRiskTagged
     {
         IsBot = 1,
         IsIncognito = 2,
@@ -1454,6 +1459,15 @@ namespace BackendSite.Service.Model.enums
         Cancelled = 5,
         Approved = 6,
         Reject = 7
+    }
+
+    public enum HotGameTopCategory
+    {
+        HotGame = 1,
+        NewGame = 2,
+        Progressive = 3,
+        Featured = 4,
+        TopCasino = 5
     }
 
     public enum DepositMessageStatus
