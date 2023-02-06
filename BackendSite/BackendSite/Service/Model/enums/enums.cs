@@ -569,6 +569,23 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1
     }
     
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
