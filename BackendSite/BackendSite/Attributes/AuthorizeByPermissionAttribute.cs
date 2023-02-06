@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.BLL;
-using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 
 
 namespace BackendSite.Attributes
@@ -12,30 +10,30 @@ namespace BackendSite.Attributes
     {
         public int MenuId { get; set; }
         public int PermissionId { get; set; }
-        private readonly NewAuthorizeBLL newAuthorizeBLL;
-        private readonly PermissionBLL permissionBLL;
-        private readonly AdminBLL adminBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly AdminBLL _adminBll;
 
-        public AuthorizeByPermissionAttribute(NewAuthorizeBLL newAuthorizeBLL, PermissionBLL permissionBLL, AdminBLL adminBll, int MenuId, int PermissionId)
+        public AuthorizeByPermissionAttribute(IServiceProvider provider, int menuId, int permissionId)
         {
-            this.newAuthorizeBLL = newAuthorizeBLL;
-            this.permissionBLL = permissionBLL;
-            this.adminBll = adminBll;
-            this.MenuId = MenuId;
-            this.PermissionId = PermissionId;
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _permissionBll = provider.GetRequiredService<PermissionBLL>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
+            MenuId = menuId;
+            PermissionId = permissionId;
         }
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
             if(MenuId != 0 && PermissionId != 0)
             {
-                var brand = newAuthorizeBLL.CheckBrand();
+                var brand = _newAuthorizeBll.CheckBrand();
                 if (brand != 0)
                 {
                     if (filterContext.HttpContext.User.Identity?.IsAuthenticated == true)
                     {
-                        var authInfo = newAuthorizeBLL.GetAuthData();
+                        var authInfo = _newAuthorizeBll.GetAuthData();
 
-                        var loginUser = adminBll.GetUserV2(authInfo.UserId, brand);
+                        var loginUser = _adminBll.GetUserV2(authInfo.UserId, brand);
                         if (!loginUser.IsSuper)
                         {
                             if (loginUser.Status == 0)
@@ -44,25 +42,15 @@ namespace BackendSite.Attributes
                             }
                             else
                             {
-                                var userAllPremission = new List<UserAllPremission>();
-                                if (loginUser.Role == null)
-                                {
-                                    userAllPremission = permissionBLL.GetUserAllPremission(null, loginUser.UserId, loginUser.SiteId).ToList();
-                                }
-                                else
-                                {
-                                    var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
-                                    userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
-                                }
-
-                                var premissionList = userAllPremission.Find(x => x.MenuId == MenuId);
-                                if (premissionList == null)
+                                var permissions = _permissionBll.GetUserPermissionByMenuId(MenuId);
+                                
+                                if (permissions == null)
                                 {
                                     filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                                 }
                                 else
                                 {
-                                    if (!premissionList.Permission.Exists(x => x == PermissionId))
+                                    if (!permissions.Contains(PermissionId))
                                     {
                                         filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
                                     }

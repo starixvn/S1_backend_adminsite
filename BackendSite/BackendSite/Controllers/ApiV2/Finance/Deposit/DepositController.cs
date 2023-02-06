@@ -87,11 +87,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public int Action { set; get; }
         }
 
-        public class SetAmountByTransIdRequest : GetByTransIdRequest
-        {
-            public decimal Amount { get; set; }
-        }
-
         public class BatchRejectedDepositList
         {
             public IEnumerable<string> TransIds { get; set; }
@@ -512,6 +507,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public ApiResult SetDepositMessage(ApiRequestWithLog<DepositMessageRequest> request)
         {
             request.After.StatusName = request.After.Status.ToString();
+            request.After.ActionName = request.After.Action.ToString();
             if (_depositBll.SetDepositMessage(
                     new ParamsWithLog<DepositMessageRequest>(request, User.Identity.Name)) > 0)
             {

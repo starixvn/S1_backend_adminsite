@@ -531,12 +531,9 @@ namespace BackendSite.Service.BLL
         public int SetDepositMessage(ParamsWithLog<DepositMessageRequest> input)
         {
             var result = 1;
-            using var scope = new TransactionScope();
 
             if (!depositService.SetDepositMessage(input))
             {
-                scope.Dispose();
-
                 return 0;
             }
 
@@ -552,14 +549,9 @@ namespace BackendSite.Service.BLL
                 AfterDetailInfo = JsonConvert.SerializeObject(input.After)
             };
 
-            if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
-            {
-                scope.Dispose();
+            _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam);
+            depositService.SetDepositLog(input.After.DepositId, input.SiteId, $"SendMessage:{input.After.StatusName}", (int)input.After.Action, input.After.ActualDeposit, input.Operator);
 
-                return 0;
-            }
-
-            scope.Complete();
             return result;
         }
 

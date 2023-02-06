@@ -66,6 +66,8 @@ namespace BackendSite.Service.Model
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
         public string Operator { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
     }
 
     public class DepositInfoForExport
@@ -259,13 +261,7 @@ namespace BackendSite.Service.Model
         public string IsoCode { get; set; }
         public string Note { get; set; }
     }
-    public class DepositTimeData
-    {
-        public List<DepositTimeList> DepositTimeList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
+
     public class DepositTimeList
     {
         public string SiteName { get; set; }
@@ -368,5 +364,8 @@ namespace BackendSite.Service.Model
         public DepositMessageStatus Status { get; set; }
         public string StatusName { get; set; }
         public int DepositId { get; set; }
+        public Decimal ActualDeposit { get; set; }
+        public DepositStatusEnum Action { get; set; }
+        public string ActionName { get; set; }
     }
 }

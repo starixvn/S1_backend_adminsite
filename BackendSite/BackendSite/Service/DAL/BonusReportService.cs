@@ -101,7 +101,8 @@ namespace BackendSite.Service.DAL
         /// <param name="request"></param>
         /// <param name="siteIds"></param>
         /// <param name="statuses"></param>
-        private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request,
+
+        private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, 
             out string siteIds,
             out string promotionTypes,
             out string promotionCategoryIds,

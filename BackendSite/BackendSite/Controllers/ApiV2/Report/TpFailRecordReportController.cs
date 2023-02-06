@@ -158,6 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>結果</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 1 })]
         public ApiListResult<TpFailRecordReport> GetList(GetListRequest request)
         {
             var siteInfoList = _serverInfoBll.GetSiteList();
@@ -234,6 +235,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>Excel File</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ExportV1(string siteIds,
             int tpId,
@@ -286,6 +288,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <returns>Excel File</returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
         public IActionResult Export(ExportRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.TransId))
