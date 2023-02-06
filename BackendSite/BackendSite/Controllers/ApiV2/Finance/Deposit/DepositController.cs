@@ -239,9 +239,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="request"></param>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/DepositList" })]
         [HttpPost]
-        public ApiResult<IEnumerable<Comments>> GetCommentByTransId(GetByTransIdRequest request)
+        public ApiResult<IEnumerable<DepositComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<Comments>>();
+            var apiResult = new ApiResult<IEnumerable<DepositComments>>();
             var comments = _depositBll.GetDepositRequestComment(request.TransId);
 
             foreach (var data in comments)
