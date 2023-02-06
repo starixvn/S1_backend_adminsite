@@ -58,7 +58,7 @@
     public class MpaMarketingBonusGroupByBonusCodeInfo
     {
         public MpaMarketingBonusGroupByBonusCode GroupInfo { get; set; }
-        public IEnumerable<MpaMarketingBonus> Childs { get; set; }
+        public IEnumerable<MpaMarketingBonus> Children { get; set; }
     }
     
     public class MpaMarketingBonusGroupByBonusCode

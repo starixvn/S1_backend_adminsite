@@ -303,9 +303,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             
             foreach (var item in sumResult.SignUpDataSum)
             {
-                if (item.Childs != null)
+                if (item.Children != null)
                 {
-                    foreach (var child in item.Childs)
+                    foreach (var child in item.Children)
                     {
                         var childItem = new Dictionary<string, dynamic>()
                         {

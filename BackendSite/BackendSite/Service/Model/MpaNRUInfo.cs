@@ -17,7 +17,7 @@
     }
     public class SignUpDataSum
     {
-        public List<SignUpData> Childs { get; set; }
+        public List<SignUpData> Children { get; set; }
         public string SignUpSource { get; set; }
         public int NewlyRegisterUsers{ get; set; }
         public int DepositUsers { get; set; }
