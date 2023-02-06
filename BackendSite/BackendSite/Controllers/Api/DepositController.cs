@@ -70,9 +70,8 @@ namespace BackendSite.Controllers.Api
             var endTime = DateTimeExtensions.UnixToDateTime(depositListReq.endDate);
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var pageNumber = depositListReq.PageNumber;
-            var totalPages = 0;
-            var rowCount = 0;
-            var CurrencyAmount = new List<string>();
+            var currencyAmount = new List<string>();
+            var currencyAmountRecord = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(depositListReq.UserName, ',');
             
             var depositRequestList = depositBLL.GetDepositRequestList(
@@ -84,14 +83,15 @@ namespace BackendSite.Controllers.Api
                 endTime, 
                 depositListReq.DepositId,
                 userNames, 
+                "",
                 depositListReq.CurrencyId, 
                 depositListReq.status, 
                 depositListReq.LevelStatus,
-                depositListReq.PageSize, 
-                depositListReq.AmountType, 
-                depositListReq.Amount,
+                depositListReq.PageSize,
+                -1, 
+                -1,
                 depositListReq.SelectPayId,
-                pageNumber, out totalPages, out rowCount, ref CurrencyAmount);
+                pageNumber, out var totalPages, out var rowCount ,ref currencyAmountRecord);
 
 
             foreach (var data in depositRequestList)
@@ -108,7 +108,7 @@ namespace BackendSite.Controllers.Api
             apiListResult.PageNumber = pageNumber;
             apiListResult.TotalPages = totalPages;
             apiListResult.RowCount = rowCount;
-            apiListResult.CurrencyAmount = CurrencyAmount;
+            apiListResult.CurrencyAmount = currencyAmount;
 
             return apiListResult;
         }
@@ -283,7 +283,7 @@ namespace BackendSite.Controllers.Api
             }
             else if (depositReq.Action == (int)DepositStatusEnum.Rejected)
             {
-                depositConfirmReuslt = depositBLL.DepositRejectd(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
+                depositConfirmReuslt = depositBLL.DepositReject(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
 
                 if (depositConfirmReuslt > 0)
                 {
@@ -305,7 +305,7 @@ namespace BackendSite.Controllers.Api
             }
             else if (depositReq.Action == (int)DepositStatusEnum.Draft)
             {
-                depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
+                depositConfirmReuslt = depositBLL.DepositDraft(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name , null);
             }
             else if (depositReq.Action == (int)DepositStatusEnum.OnHold)
             {
@@ -477,7 +477,7 @@ namespace BackendSite.Controllers.Api
             foreach (var _transId in batchRejectedDepositList.TransId)
             {
                 var aaa = _transId;
-                depositConfirmReuslt = depositBLL.DepositRejectd(_transId, 0, Comment, User.Identity.Name);
+                depositConfirmReuslt = depositBLL.DepositReject(_transId, 0, Comment, User.Identity.Name);
 
                 if (depositConfirmReuslt > 0)
                 {
