@@ -119,11 +119,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string IFSCCode { set; get; }
         }
 
-        public class WithdrawalPicUrl
-        {
-            public string Url { get; set; }
-        }
-
         public class UploadPictureRequest : GetByTransIdRequest
         {
             public string Pic { get; set; }
