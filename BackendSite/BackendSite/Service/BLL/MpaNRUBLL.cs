@@ -80,7 +80,7 @@ namespace BackendSite.Service.BLL
                      {
                          var nova88Data = new SignUpDataSum
                          {
-                             Childs = new List<SignUpData>(),
+                             Children = new List<SignUpData>(),
                              SignUpSource = groupUrl
                          };
                          
@@ -97,13 +97,13 @@ namespace BackendSite.Service.BLL
                                  FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
                                  TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
                              };
-                             nova88Data.Childs.Add(childData);
+                             nova88Data.Children.Add(childData);
                          }
                          
-                         nova88Data.NewlyRegisterUsers = nova88Data.Childs.Sum(info => info.NewlyRegisterUsers);
-                         nova88Data.DepositUsers = nova88Data.Childs.Sum(info => info.DepositUsers);
-                         nova88Data.FirstDepositAmount = nova88Data.Childs.Sum(info => info.FirstDepositAmount);
-                         nova88Data.TotalDepositAmount = nova88Data.Childs.Sum(info => info.TotalDepositAmount);
+                         nova88Data.NewlyRegisterUsers = nova88Data.Children.Sum(info => info.NewlyRegisterUsers);
+                         nova88Data.DepositUsers = nova88Data.Children.Sum(info => info.DepositUsers);
+                         nova88Data.FirstDepositAmount = nova88Data.Children.Sum(info => info.FirstDepositAmount);
+                         nova88Data.TotalDepositAmount = nova88Data.Children.Sum(info => info.TotalDepositAmount);
                          nruData.SignUpDataSum.Add(nova88Data);
                      }
                      
@@ -161,7 +161,7 @@ namespace BackendSite.Service.BLL
                        
                      var landingPagesData = new SignUpDataSum
                      {
-                         Childs = landingPagesChilds,
+                         Children = landingPagesChilds,
                          SignUpSource = "Landing Pages",
                          NewlyRegisterUsers = landingPagesList.Count(),
                          DepositUsers = landingPagesList.Count(info => info.TotalDeposit > 0),
@@ -185,7 +185,7 @@ namespace BackendSite.Service.BLL
                      {
                          var goal123Data = new SignUpDataSum
                          {
-                             Childs = new List<SignUpData>(),
+                             Children = new List<SignUpData>(),
                              SignUpSource = groupUrl
                          };
                          
@@ -202,13 +202,13 @@ namespace BackendSite.Service.BLL
                                  FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
                                  TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
                              };
-                             goal123Data.Childs.Add(childData);
+                             goal123Data.Children.Add(childData);
                          }
                          
-                         goal123Data.NewlyRegisterUsers = goal123Data.Childs.Sum(info => info.NewlyRegisterUsers);
-                         goal123Data.DepositUsers = goal123Data.Childs.Sum(info => info.DepositUsers);
-                         goal123Data.FirstDepositAmount = goal123Data.Childs.Sum(info => info.FirstDepositAmount);
-                         goal123Data.TotalDepositAmount = goal123Data.Childs.Sum(info => info.TotalDepositAmount);
+                         goal123Data.NewlyRegisterUsers = goal123Data.Children.Sum(info => info.NewlyRegisterUsers);
+                         goal123Data.DepositUsers = goal123Data.Children.Sum(info => info.DepositUsers);
+                         goal123Data.FirstDepositAmount = goal123Data.Children.Sum(info => info.FirstDepositAmount);
+                         goal123Data.TotalDepositAmount = goal123Data.Children.Sum(info => info.TotalDepositAmount);
                          nruData.SignUpDataSum.Add(goal123Data);
                      }
                      
@@ -266,7 +266,7 @@ namespace BackendSite.Service.BLL
                        
                      var goalLandingPagesData = new SignUpDataSum
                      {
-                         Childs = goalLandingPagesChilds,
+                         Children = goalLandingPagesChilds,
                          SignUpSource = "Landing Pages",
                          NewlyRegisterUsers = landingPagesList.Count(),
                          DepositUsers = landingPagesList.Count(info => info.TotalDeposit > 0),
@@ -290,7 +290,7 @@ namespace BackendSite.Service.BLL
                      {
                          var bwingData = new SignUpDataSum
                          {
-                             Childs = new List<SignUpData>(),
+                             Children = new List<SignUpData>(),
                              SignUpSource = groupUrl
                          };
                          
@@ -307,13 +307,13 @@ namespace BackendSite.Service.BLL
                                  FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
                                  TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
                              };
-                             bwingData.Childs.Add(childData);
+                             bwingData.Children.Add(childData);
                          }
                          
-                         bwingData.NewlyRegisterUsers = bwingData.Childs.Sum(info => info.NewlyRegisterUsers);
-                         bwingData.DepositUsers = bwingData.Childs.Sum(info => info.DepositUsers);
-                         bwingData.FirstDepositAmount = bwingData.Childs.Sum(info => info.FirstDepositAmount);
-                         bwingData.TotalDepositAmount = bwingData.Childs.Sum(info => info.TotalDepositAmount);
+                         bwingData.NewlyRegisterUsers = bwingData.Children.Sum(info => info.NewlyRegisterUsers);
+                         bwingData.DepositUsers = bwingData.Children.Sum(info => info.DepositUsers);
+                         bwingData.FirstDepositAmount = bwingData.Children.Sum(info => info.FirstDepositAmount);
+                         bwingData.TotalDepositAmount = bwingData.Children.Sum(info => info.TotalDepositAmount);
                          nruData.SignUpDataSum.Add(bwingData);
                      }
                      
@@ -371,7 +371,7 @@ namespace BackendSite.Service.BLL
 
                      var bwingLandingPagesData = new SignUpDataSum
                      {
-                         Childs = bwingLandingPagesChilds,
+                         Children = bwingLandingPagesChilds,
                          SignUpSource = "Landing Pages",
                          NewlyRegisterUsers = landingPagesList.Count(),
                          DepositUsers = landingPagesList.Count(info => info.TotalDeposit > 0),

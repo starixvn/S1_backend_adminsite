@@ -234,7 +234,7 @@ namespace BackendSite.Service.BLL
              var list = groupBonusCodeData.Select(detailData => new MpaMarketingBonusGroupByBonusCodeInfo 
              {
                 GroupInfo = detailData, 
-                Childs = data.Where(x => x.BonusCode == detailData.BonusCode)
+                Children = data.Where(x => x.BonusCode == detailData.BonusCode)
              }).ToList();
             
             var groupByBonusCodeSum = new MpaMarketingBonusGroupByBonusCode 

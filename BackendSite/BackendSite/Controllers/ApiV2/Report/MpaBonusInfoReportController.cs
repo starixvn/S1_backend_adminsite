@@ -508,7 +508,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 };
                 summaryBonusCodeContent.Add(newItem);
                 
-                foreach (var child in item.Childs)
+                foreach (var child in item.Children)
                 {
                     var childItem = new Dictionary<string, dynamic>()
                     {
