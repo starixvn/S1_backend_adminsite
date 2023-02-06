@@ -181,6 +181,7 @@ namespace BackendSite.Controllers.Api
             }
             return apiResult;
         }
+
         [HttpPost]
         public ApiResult<IEnumerable<OfflineBankAccount>> GetBankList([FromBody] BankListPara bankDetail)
         {
