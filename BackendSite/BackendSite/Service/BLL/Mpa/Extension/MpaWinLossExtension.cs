@@ -197,7 +197,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByDateResponseToFrontEnd
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
@@ -224,7 +224,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 else
                 {
                     var children = item.Value.CurrencyDetail
-                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { Key = childrenItem.Key, Data = childrenItem.Value })
+                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
                         .ToList();
                     data.Children = children;
                 }
@@ -243,7 +243,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByTpCategoryResponseToFrontEnd
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
@@ -265,7 +265,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 else
                 {
                     var children = item.Value.CurrencyDetail
-                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { Key = childrenItem.Key, Data = childrenItem.Value })
+                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
                         .ToList();
                     data.Children = children;
                 }
@@ -284,7 +284,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByTpGameTypeResponseToFrontEnd
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
@@ -308,7 +308,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     var children = item.Value.CurrencyDetail
                         .Select(childrenItem => new MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd
                         {
-                            Key = childrenItem.Key,
+                            DisplayKey = childrenItem.Key,
                             Data = childrenItem.Value
                         })
                         .ToList();
@@ -330,7 +330,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByPlayerResponseToFrontEnd()
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     SabaId = item.Value.SabaId,
                     UserName = item.Value.UserName,
                     TurnOver = item.Value.TurnOver,
@@ -362,7 +362,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     var children = item.Value.CurrencyDetail
                         .Select(childrenItem => new MpaWinLossByPlayerCurrencyDetailDtoFrontEnd
                         {
-                            Key = childrenItem.Key,
+                            DisplayKey = childrenItem.Key,
                             Data = childrenItem.Value
                         })
                         .ToList();
@@ -384,7 +384,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByPlayerDetailResponseFrontEnd
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     SabaId = item.Value.SabaId,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
@@ -412,7 +412,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByCurrencyResponseFrontEnd()
                 {
-                    Key = item.Key,
+                    DisplayKey = item.Key,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
@@ -441,7 +441,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     var children = item.Value.CurrencyDetail
                         .Select(childrenItem => new MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd
                         {
-                            Key = childrenItem.Key,
+                            DisplayKey = childrenItem.Key,
                             Data = childrenItem.Value
                         })
                         .ToList();

@@ -291,7 +291,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByDateResponseToFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
@@ -347,7 +347,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByTpCategoryResponseToFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
@@ -388,7 +388,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByTpGameTypeResponseToFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
@@ -429,7 +429,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByPlayerResponseToFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public string SabaId { get; set; }
@@ -494,7 +494,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByPlayerDetailResponseFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public string SabaId { get; set; }
@@ -536,7 +536,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     public class MpaWinLossByCurrencyResponseFrontEnd
     {
         [JsonProperty(Order = -1)]
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }

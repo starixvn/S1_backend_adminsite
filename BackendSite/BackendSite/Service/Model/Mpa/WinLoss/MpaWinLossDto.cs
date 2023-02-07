@@ -760,7 +760,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     public class MpaWinLossByDayCurrencyDetailDtoToFrontEnd
     {
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         public MpaWinLossByDayCurrencyDetailDto Data { get; set; }
     }
@@ -768,27 +768,27 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     public class MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd
     {
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         public MpaWinLossByTpCategoryCurrencyDetailDto Data { get; set; }
     }
 
     public class MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd
     {
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         public MpaWinLossByTpGameTypeCurrencyDetailDto Data { get; set; }
     }
 
     public class MpaWinLossByPlayerCurrencyDetailDtoFrontEnd
     {
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
         public MpaWinLossByPlayerCurrencyDetailDto Data { get; set; }
     }
 
     public class MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd
     {
-        public string Key { get; set; }
+        public string DisplayKey { get; set; }
 
         public MpaWinLossByCurrencyCurrencyDetailDto Data { get; set; }
     }
