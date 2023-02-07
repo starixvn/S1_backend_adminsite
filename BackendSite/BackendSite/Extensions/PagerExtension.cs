@@ -9,8 +9,5 @@
 
             return (startIndex, absPageSize);
         }
-
-        public static int GetStartIndex(this int pageSize, int pageNum)
-            => (pageNum - 1) * pageSize;
     }
 }

@@ -101,20 +101,6 @@ namespace BackendSite.Service.Model
         public string CurrencyName { get; set; }
     }
 
-    internal class CryptoCurrencyComparer : EqualityComparer<CryptoCurrency>
-    {
-        public override bool Equals(CryptoCurrency x, CryptoCurrency y)
-        {
-            return x.CurrencyId == y.CurrencyId
-                && x.CurrencyName == y.CurrencyName;
-        }
-
-        public override int GetHashCode(CryptoCurrency obj)
-        {
-            return 0;
-        }
-    }
-
     public class CryptoNetwork
     {
         public int CurrencyId { get; set; }
