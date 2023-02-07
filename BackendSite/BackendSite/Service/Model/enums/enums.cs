@@ -219,12 +219,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
-        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5 //No Use
+        LoadCard = 5, //No Use
+        QRPay = 6 ,
+        BankAutoChannel = 7
     }
 
     public enum DepositStatusEnum
@@ -237,10 +238,31 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        Adjustment = 98,
         Error = 99 //No Use
     }
+    
+    public enum SelectDepositStatusEnum
+    {
+        Pending = 1,
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        OnHold = 7
+    }
+    
+	public enum DepositActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63
+    }
 
-    public enum DepositTimeStatusEnum
+	 public enum DepositTimeStatusEnum
     {
         Approved = 3,
         Rejected = 4,
@@ -250,7 +272,13 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region PayList
-
+    
+    public enum PayListMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+    
     public enum PayListStatusEnum
     {
         Enable = 1,
@@ -272,16 +300,23 @@ namespace BackendSite.Service.Model.enums
     public enum PayChannelTypeEnum
     {
         OnlineBanking = 1,
-        MobilePay = 2,
-        LocalBanking = 3,
-        CryptoPay = 4,
-        LoadCard = 5
+        MobilePayment = 2,
+        LocalBank = 3,
+        CryptoPayment = 4,
+        LoadCardPayment = 5,
+        QrPayPayment = 6,
+        BankAutoChannel = 7
     }
 
     public enum PayChannelStatusEnum
     {
         Enable = 1,
         Disable = 2
+    }
+    public enum PayChannelMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
     }
 
     #endregion
@@ -291,7 +326,6 @@ namespace BackendSite.Service.Model.enums
     public enum AmountRuleEnum
     {
         Integer = 1,
-        Decimal = 2,
         Fixed = 3
     }
 
@@ -324,7 +358,8 @@ namespace BackendSite.Service.Model.enums
         Undefine = 0, //No Use
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum
@@ -339,6 +374,20 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         ToKyc = 8,
         Error = 99 //No Use
+    }
+    
+    public enum WithdrawalActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63,
+        Verified = 69,
+        Process = 70,
+        ToKyc = 71
     }
 
     #endregion
@@ -831,8 +880,10 @@ namespace BackendSite.Service.Model.enums
         PSP = 3,
 
         Finance = 4,
-
-        MC = 5
+        
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>
