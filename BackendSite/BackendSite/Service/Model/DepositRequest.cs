@@ -373,6 +373,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string DepositMessage { get; set; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -423,6 +424,7 @@ namespace BackendSite.Service.Model
         public string ApprovedBy { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
+        public string SendMessage { get; set; }
     }
     public class SetAmountRequest
     {
@@ -451,5 +453,15 @@ namespace BackendSite.Service.Model
         public int? BankId { get; set; }
         public string DisplayName { get; set; }
         public DateTimeOffset? StatementTime { get; set; }
+    }
+
+    public class DepositMessageRequest
+    {
+        public DepositMessageStatus Status { get; set; }
+        public string StatusName { get; set; }
+        public int DepositId { get; set; }
+        public Decimal ActualDeposit { get; set; }
+        public DepositStatusEnum Action { get; set; }
+        public string ActionName { get; set; }
     }
 }
