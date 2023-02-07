@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+# @url=http://localhost:9158
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+@url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -16,21 +16,21 @@ Content-Type: application/json
 
 ###
 # 取得 Offline 銀行卡設定清單
-# purposes，vipLevels，pointLevels，supportChannels 這幾項要撈全部請帶空陣列 []
+# purposes，sysIds，vipLevels，pointLevels，supportChannels 這幾項要撈全部請帶空陣列 []
 POST {{url}}/apiV2/BankCardManagement/GetList HTTP/1.1
 Content-Type: application/json
 
 {
     "siteId": 1,
     "currencyId": 2,
-    "purposes": [1, 2],
+    "purposes": [],
     "statuses": [0, 1, 2, 3, 4],
-    "sysIds": [14,31,32,33,34,35],
-    "vipLevels": [1, 2, 3, 4, 5],
-    "pointLevels": [0, 1, 2, 3, 4, 5],
-    "accountNo": "",
+    "sysIds": [],
+    "vipLevels": [],
+    "pointLevels": [],
+    "accountNo": "0x23E717D9401C96cD987fCc746Ed998de83f15Ccf",
     "agent": "",
-    "supportChannels": [0],
+    "supportChannels": [],
     "pageNumber": 1,
     "pageSize": 10
 }
@@ -41,19 +41,19 @@ POST {{url}}/apiV2/BankCardManagement/Set HTTP/1.1
 Content-Type: application/json
 
 {
-    "financialAccountId": 361,
+    "financialAccountId": 511,
     "siteId": 1,
     "currencyId": 2,
-    "minAmount": 100,
-    "maxAmount": 10000,
-    "dailyLimitAmount": 50000,
+    "minAmount": 1000,
+    "maxAmount": 50000,
+    "dailyLimitAmount": 100000,
     "vipLevels": [1, 2, 3, 4, 5],
-    "pointLevels": [2, 3, 4, 5],
+    "pointLevels": [1, 2, 3, 4, 5],
     "memo": "test",
     "sort": 0,
     "status": 1,
-    "supportChannels": [0, 1],
-    "qrCodeUrl": "https://wa.me/message/BBRAKWQKUYOFG1?src=qr"
+    "supportChannels": [],
+    "qrCodeUrl": ""
 }
 
 ###
