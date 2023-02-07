@@ -275,6 +275,13 @@ namespace BackendSite.Service.Model.enums
         OnHold = 63
     }
 
+	 public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
+    }
+
     #endregion
 
     #region PayList
@@ -1656,6 +1663,15 @@ namespace BackendSite.Service.Model.enums
         Cancelled = 5,
         Approved = 6,
         Reject = 7
+    }
+
+    public enum HotGameTopCategory
+    {
+        HotGame = 1,
+        NewGame = 2,
+        Progressive = 3,
+        Featured = 4,
+        TopCasino = 5
     }
 
     public enum DepositMessageStatus
