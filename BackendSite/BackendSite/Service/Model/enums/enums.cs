@@ -725,6 +725,7 @@ namespace BackendSite.Service.Model.enums
         WithdrawalLimitAdjustment = 73,
         AppQRCode = 74,
         ProviderAppDownload = 75,
+        SetDepositMessage = 76,
         SiteMaintenance = 77
     }
 
@@ -1467,5 +1468,17 @@ namespace BackendSite.Service.Model.enums
         Progressive = 3,
         Featured = 4,
         TopCasino = 5
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3
     }
 }
