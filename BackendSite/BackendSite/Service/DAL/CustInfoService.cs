@@ -27,6 +27,11 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
         }
+        
+        public int GetPointLevel(int custId)
+        {
+            return _reportDbClient.QueryFirst<int>("Member_PointLevel_Get", new DynamicParameters(new { CustId = custId }));
+        }
 
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
