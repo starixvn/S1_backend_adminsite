@@ -257,13 +257,6 @@ namespace BackendSite.Service.Model.enums
         OnHold = 7
     }
 
-    public enum DepositTimeStatusEnum
-    {
-        Approved = 3,
-        Rejected = 4,
-        Canceled = 5
-    }
-    
     public enum DepositActionEnum
     {
         Draft = 66, 
@@ -1664,16 +1657,7 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Reject = 7
     }
-
-    public enum HotGameTopCategory
-    {
-        HotGame = 1,
-        NewGame = 2,
-        Progressive = 3,
-        Featured = 4,
-        TopCasino = 5
-    }
-
+    
     public enum DepositMessageStatus
     {
         [Description("Name unmatch")]
