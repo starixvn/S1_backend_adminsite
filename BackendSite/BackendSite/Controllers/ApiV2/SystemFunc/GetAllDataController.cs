@@ -33,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly DeepLinkBLL _deepLinkBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -56,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -219,9 +221,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayList>> GetPayList()
+        public ApiResult<IEnumerable<PayListInfo>> GetPayList()
         {
-            var data = _paymentManageBll.GetPayList();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayList(authData.SiteId);
 
             if (!data.Any())
             {
@@ -229,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayList>>
+                return new ApiResult<IEnumerable<PayListInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -245,9 +248,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayChannel>> GetPayChannel()
+        public ApiResult<IEnumerable<PayChannelInfo>> GetPayChannel()
         {
-            var data = _paymentManageBll.GetPayChannel();
+            
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayChannel(authData.SiteId);
 
             if (!data.Any())
             {
@@ -255,7 +260,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayChannel>>
+                return new ApiResult<IEnumerable<PayChannelInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -263,17 +268,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// <summary>
-        /// GetAllData/GetPayCurrency 取得第三方支付廠商幣別資料清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayCurrency>> GetPayCurrency()
+        public ApiResult<IEnumerable<PaySetting>> GetPaySetting()
         {
-            var data = _paymentManageBll.GetPayCurrency();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPaySetting(authData.SiteId);
 
             if (!data.Any())
             {
@@ -281,7 +280,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayCurrency>>
+                return new ApiResult<IEnumerable<PaySetting>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -465,8 +464,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<CryptoInfoData> GetCryptoInfoData()
         {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.GetCryptoInfoData(authData.SiteId);
 
             return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }

@@ -5,6 +5,7 @@ using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.GameStatisticalReport;
 
 namespace BackendSite.Service.DAL
 {
@@ -267,6 +268,19 @@ namespace BackendSite.Service.DAL
            
 
             return result;
+        }
+
+        public IEnumerable<GameStatisticalDao> GetGameStatisticalReport(GetListInputModel input)
+        {
+            var parameters = new DynamicParameters(
+              new
+              {
+                  _SiteId = input.SiteId,
+                  _StartDate = input.StartDate,
+                  _EndDate = input.EndDate,
+              });
+
+            return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get", parameters);
         }
     }
 }
