@@ -88,7 +88,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     WithdrawalActionEnum.Draft,
                     WithdrawalActionEnum.Process,
                     WithdrawalActionEnum.Pending,
-                    WithdrawalActionEnum.Rejected
+                    WithdrawalActionEnum.Rejected,
+                    WithdrawalActionEnum.ManualApproved,
                 }},
                 {WithdrawalStatusEnum.Process, new List<WithdrawalActionEnum>
                 {
