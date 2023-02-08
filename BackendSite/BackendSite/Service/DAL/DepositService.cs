@@ -181,9 +181,16 @@ namespace BackendSite.Service.DAL
             return transId;
         }
 
-        public int SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
+        public async Task<int> SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
         {
-            return _mainDbClient.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic });
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("DepositId", depositId);
+            props.Add("PicFileName", picFileName);
+            props.Add("DepositPic", depositPic);
+            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props);
+            
+            return result;
         }
 
         public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)

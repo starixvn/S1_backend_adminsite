@@ -27,8 +27,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly ImageEditorBLL _imageEditorBll;
+        private readonly FileNameBLL _fileNameBll;
         
         private readonly int _mainWalletType;
+        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new(comparer: StringComparer.OrdinalIgnoreCase)
+        {
+            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
+            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
+            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
+        };
 
         #endregion
 
@@ -44,6 +52,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _mainWalletType = configuration.GetValue<int>("MainWalletType");
+            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _fileNameBll = provider.GetRequiredService<FileNameBLL>();
             _usableActionType = new Dictionary<int, List<int>>
             {
                 { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
@@ -499,6 +509,55 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
             var image = depositReceipt.DepositPic;
             return File(image, "image/jpeg");
+        }
+
+        /// <summary>
+        /// Deposit/UploadReceipt 提交存款收據
+        /// </summary>
+        /// <remarks/>
+        /// Http Method：POST
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> UploadReceipt([FromForm] DepositReceiptFile depositReceipt)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                if (depositReceipt.Receipt != null && _contentTypesCheck.ContainsKey(depositReceipt.Receipt.ContentType))
+                {
+                    await using var fileStream = depositReceipt.Receipt.OpenReadStream();
+                    using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
+                    var fileBytes = await _imageEditorBll.Resize(uploadedImage);
+
+                    var fileName = _fileNameBll
+                        .SetFileName(depositReceipt.Receipt.FileName)
+                        .ExcludePath()
+                        .SetFilenameExtension("jpg")
+                        .FileName;
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, fileName, fileBytes);
+                    
+                    if (result > 0)
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    }
+                    else
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                        apiResult.Message = "Upload fail.";
+                    }
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "The file is not supported.";
+                }
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"UploadReceipt Fail. {e.Message}");
+            }
+           
+            return apiResult;
         }
         
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]

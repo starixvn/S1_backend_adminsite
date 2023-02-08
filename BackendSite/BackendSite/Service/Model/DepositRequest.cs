@@ -464,4 +464,11 @@ namespace BackendSite.Service.Model
         public DepositStatusEnum Action { get; set; }
         public string ActionName { get; set; }
     }
+    
+    public class DepositReceiptFile
+    {
+        public int CustId { get; set; }
+        public string TransId { get; set; }
+        public IFormFile Receipt { get; set; }
+    }
 }

@@ -126,7 +126,7 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                InsertDepositReceipt(deposit.CustId, transId, fileName, fileBytes);
+                await InsertDepositReceipt(deposit.CustId, transId, fileName, fileBytes);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -136,11 +136,10 @@ namespace BackendSite.Service.BLL
             return 0;
         }
 
-        private int InsertDepositReceipt(int custId, string transId, string fileName, byte[] fileBytes)
+        public async Task<int> InsertDepositReceipt(int custId, string transId, string fileName, byte[] fileBytes)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-
-            return depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
+            return await depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
         }
 
         private int ValidateDepositReceiptPic(string transId)
