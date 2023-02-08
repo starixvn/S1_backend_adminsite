@@ -517,6 +517,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <remarks/>
         /// Http Method：POST
         /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 77 })]
         [HttpPost]
         public async Task<ApiResult> UploadReceipt([FromForm] DepositReceiptFile depositReceipt)
         {
