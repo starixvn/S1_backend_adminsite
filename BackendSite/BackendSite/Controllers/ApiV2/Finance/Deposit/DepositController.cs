@@ -27,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
         
         private readonly int _mainWalletType;
 
@@ -44,6 +45,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _mainWalletType = configuration.GetValue<int>("MainWalletType");
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _usableActionType = new Dictionary<int, List<int>>
             {
                 { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
@@ -162,9 +164,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var currencyAmountRecord = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var depositList = _depositBll.GetDepositRequestList(
-                new List<int> {request.SiteId},
+                selectSites,
                 request.DepositTypes,
                 request.SelectBankCode,
                 request.SelectCalCode,
@@ -206,9 +214,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public IActionResult Export(GetListExportRequest request)
         {
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var exportDeposit = _depositBll.GetDepositExportList(
-                JsonConvert.SerializeObject(new List<int> {request.SiteId}),
+                JsonConvert.SerializeObject(selectSites),
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
                 request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
                 JsonConvert.SerializeObject(request.DepositTypes),
@@ -557,6 +571,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
+        
         #region Private function
 
         private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
@@ -580,6 +595,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
 
             return usableActionButton;
+        }
+        
+        private List<int> GetSelectSites()
+        {
+            var authInfo = _newAuthorizeBll.GetAuthData();
+            var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
+            var selectSites = result.Select(x => x.SiteId).ToList();
+            
+            return selectSites;
         }
         
         #endregion
