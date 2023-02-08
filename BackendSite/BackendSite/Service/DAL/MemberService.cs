@@ -176,12 +176,13 @@ public class MemberService : IMemberService
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
 
-    public async Task<int> EditFullNameAsync(int custId, string fullName)
+    public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
         p.Add("_FullName", fullName);
-        return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p);
+        p.Add("_Operator", @operator);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p);
     }
 
     public async Task<int> EditEmailAsync(int custId, string email)
@@ -306,5 +307,11 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
+    }
+
+    public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryAsync<CustRealNameChangeLog>("Admin_CustRealNameChangeLog_Get", p);
     }
 }

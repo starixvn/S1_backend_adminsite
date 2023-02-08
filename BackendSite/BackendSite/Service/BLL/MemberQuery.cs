@@ -323,6 +323,11 @@ namespace BackendSite.Service.BLL
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
 
+        public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
+        {
+            return await _memberService.GetCustRealNameChangeLogAsync(custId);
+        }
+
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
         {

@@ -24,7 +24,7 @@ public interface IMemberService
     Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo);
     Task<bool> IsExistsEmail(int custId, string email, int siteId);
     Task<int> SetCustTag(int custid, List<int> tagList);
-    Task<int> EditFullNameAsync(int custId, string fullName);
+    Task<int> EditFullNameAsync(int custId, string fullName, string @operator);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> SetPhoneNoAsync(int custId, string phoneNo);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date);
@@ -42,4 +42,5 @@ public interface IMemberService
     Task<int> ResetEWalletAsync(int custId);
     Task<int> DeleteLineProfileAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
 }

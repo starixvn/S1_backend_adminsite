@@ -596,3 +596,10 @@ public class LoginLogPageData
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
 }
+
+public class CustRealNameChangeLog
+{
+    public string RealName { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
+    public string Operator { get; set; }
+}

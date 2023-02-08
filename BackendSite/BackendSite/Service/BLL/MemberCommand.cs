@@ -89,7 +89,7 @@ public class MemberCommand : IMemberCommand
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeName = customer.AccountName;
         
-        var result = await _memberService.EditFullNameAsync(custId, fullName);
+        var result = await _memberService.EditFullNameAsync(custId, fullName, @operator);
         if (result <= 0) return 0;
         
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
