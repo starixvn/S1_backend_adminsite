@@ -121,7 +121,7 @@ public class MemberCommand : IMemberCommand
         var beforeName = customer.AccountName;
         var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
 
-        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
+        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts, @operator);
         if (!result) return false;
         
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,

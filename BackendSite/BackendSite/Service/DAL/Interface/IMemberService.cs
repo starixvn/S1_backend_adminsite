@@ -25,7 +25,7 @@ public interface IMemberService
     Task<bool> IsExistsEmail(int custId, string email, int siteId);
     Task<int> SetCustTag(int custid, List<int> tagList);
     Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames);
-    Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts);
+    Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts, string @operator);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> SetPhoneNoAsync(int custId, string phoneNo);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date);
@@ -43,4 +43,5 @@ public interface IMemberService
     Task<int> ResetEWalletAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
     Task<int> DeleteLineProfileAsync(int custId);
+    Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
 }

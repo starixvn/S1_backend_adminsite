@@ -1172,5 +1172,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+
+        /// <summary>
+        /// Member/GetCustRealNameChangeLog 取得客戶改名歷史紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustRealNameChangeLog>>> GetCustRealNameChangeLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<CustRealNameChangeLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
+            };
+        }
     }
 }
