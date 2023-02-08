@@ -27,6 +27,7 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
     public int UserType { get; set; }
+    public bool ExcludeTag { get; set; }
 }
 
 public class MemberListDto
@@ -125,6 +126,7 @@ public class ExportMemberRequest
     public string DeviceId { get; set; }
     public int UserType { get; set; }
     public bool ExportTransferWallet { get; set; } = false;
+    public bool ExcludeTag { get; set; }
 }
 
 
@@ -156,6 +158,7 @@ public class MemberExportDataDto
     public DateTime RegTime { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
+    public string TagList { get; set; }
 }
 
 public class MemberExportData
@@ -181,13 +184,14 @@ public class MemberExportData
     public string Currency { get; set; }
     public string LevelName { get; set; }
     public string Agent { get; set; }
-    public int Status { get; set; }
+    public string Status { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public string SabaId { get; set; }
     public string SignupUrl { get; set; }
     public string AffiliateId { get; set; }
     public string AffiliateCode { get; set; }
     public string LastActivityIp { get; set; }
+    public string Tag { get; set; }
 }
 
 public class GetCustomerBasicInfoRequest
@@ -536,7 +540,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get
@@ -595,4 +598,22 @@ public class LoginLogPageData
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
+}
+
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+    public string TagList { get; set; }
+}
+
+public class CustTagList
+{
+    public int CustId { get; set; }
+        
+    public string StrTagList { get; set; }
+
+    public IEnumerable<int> TagList { get; set; }
 }

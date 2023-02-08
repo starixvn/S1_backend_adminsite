@@ -29,7 +29,6 @@ namespace BackendSite.Service.BLL
         private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
-
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
         public CustInfoBLL(IServiceProvider provider)
@@ -904,21 +903,6 @@ namespace BackendSite.Service.BLL
                 out rowCount); ;
         }
 
-        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
-        {
-            var key = $"TpAccountName_{request.CustId}";
-
-            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
-                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
-
-            return thirdPartyAccount
-                .Select(r => new ThirdPartyAccountResponse()
-                {
-                    TpName = r.TpName,
-                    TpUserName = r.TpUserName
-                });
-        }
-
 
         public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request,int siteId)
         {
@@ -943,11 +927,6 @@ namespace BackendSite.Service.BLL
 
             return queryResult;
         }
-        
-        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
-        {
-            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
-        }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)
         {
@@ -957,6 +936,21 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
         {
             return _custInfoService.GetEWalletList(custId);
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
         }
 
         public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
@@ -971,6 +965,11 @@ namespace BackendSite.Service.BLL
                 });
             }
             return result;
+        }
+        
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
         }
 
         public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)

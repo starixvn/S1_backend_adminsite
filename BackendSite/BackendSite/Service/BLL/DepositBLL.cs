@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -232,7 +233,18 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+            var result = depositService.SetDepositInfo(transId,
+                depositRequest.SiteId,
+                depositRequest.Amount,
+                comment,
+                Operator,
+                forStatus,
+                DepositStatusEnum.Approved,
+                depositRequest,
+                null,
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+
+            return result;
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)

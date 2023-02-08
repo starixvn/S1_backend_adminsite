@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.DAL
 {
@@ -73,7 +75,7 @@ namespace BackendSite.Service.DAL
             }
             else
             {
-                if(!withdrawalType.ToList().Exists(x=> x == (int)WithdrawalTypeEnum.LocalBank))
+                if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
                 {
                     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
                 }
@@ -120,19 +122,21 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalRequest GetWithdrawalRequest(int withdrawalId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V5",
-                new { WithdrawalId = withdrawalId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                WithdrawalId = withdrawalId
+            });
+            return _mainDbClient.QueryFirst<WithdrawalRequest>("Admin_WithdrawalRequestTransId_Get_V5",
+                props);
         }
 
         public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
-                new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
+                new { WithdrawalId = withdrawalId, SiteId = siteId });
         }
 
-        private int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
+        public int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
             MySqlConnection conn = null, MySqlTransaction trans = null)
         {
             if (conn != null)
@@ -313,31 +317,23 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var WithdrawalMinInfo = conn.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId },
-                commandType: CommandType.StoredProcedure);
+            var WithdrawalMinInfo = _reportDbClient.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId });
             return WithdrawalMinInfo;
         }
 
         public bool InsertWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalMinInfo_Ins", new { SiteId, CurrencyId, Operator, WithdrawalMin },
-                commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalMinInfo_Ins", new { SiteId, CurrencyId, Operator, WithdrawalMin }) > 0;
         }
 
         public bool UpdateWithdrawalLimit(int SiteId, int CurrencyId, int WithdrawalMin, string Operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalMinInfo_Upd", new { SiteId, CurrencyId, Operator, WithdrawalMin, },
-                commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalMinInfo_Upd", new { SiteId, CurrencyId, Operator, WithdrawalMin, }) > 0;
         }
 
         public bool DeleteWithdrawalLimit(int SiteId, int CurrencyId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId },
-                commandType: CommandType.StoredProcedure) > 0;
+            return _mainDbClient.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId }) > 0;
         }
 
         public bool UpdateWithdrawalPicCount(string transId , int count)
@@ -353,9 +349,7 @@ namespace BackendSite.Service.DAL
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var WithdrawalMinInfo = conn.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId },
-                commandType: CommandType.StoredProcedure).FirstOrDefault();
+            var WithdrawalMinInfo = _reportDbClient.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId }).FirstOrDefault();
             return WithdrawalMinInfo;
         }
 
@@ -417,8 +411,6 @@ namespace BackendSite.Service.DAL
         {
             int.TryParse(withdrawalId, out var tempWithdrawalId);
 
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
@@ -427,8 +419,7 @@ namespace BackendSite.Service.DAL
             props.Add("WithdrawalId", tempWithdrawalId);
             props.Add("SelectStatus", selectStatus);
             props.Add("CustId", custId);
-            return conn.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V4", props,
-                commandType: CommandType.StoredProcedure).ToList();
+            return _reportDbClient.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V4", props).ToList();
         }
 
         public int SetWithdrawalInfoFlow(string transId,
@@ -443,7 +434,8 @@ namespace BackendSite.Service.DAL
             out int custId,
             out decimal amount,
             int userId = 0,
-            bool hasPic = false)
+            bool hasPic = false,
+            decimal chargeFee = 0)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -465,7 +457,7 @@ namespace BackendSite.Service.DAL
                     /*Approved don't to Set WithdrawalInfo*/
                     (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
                         ? null : withdrawalInfo),
-                    withdrawalType,
+                    withdrawalType, chargeFee,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
 
@@ -586,6 +578,7 @@ namespace BackendSite.Service.DAL
             WithdrawalStatusEnum status,
             string withdrawalInfo,
             int? withdrawalType,
+            decimal chargeFee,
             out int custId,
             out string userName,
             out decimal amount,
@@ -601,39 +594,39 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                WithdrawalId = withdrawalId,
-                SiteId = siteId,
-                Comment = comment,
-                ForStatus = forStatus,
-                Status = (int)status,
-                WithdrawalInfo = withdrawalInfo,
-                WithdrawalType = withdrawalType,
-                RefId = (string)null,
-                Operator = updater
+                _WithdrawalId = withdrawalId,
+                _SiteId = siteId,
+                _Comment = comment,
+                _ForStatus = forStatus,
+                _Status = (int)status,
+                _WithdrawalInfo = withdrawalInfo,
+                _WithdrawalType = withdrawalType,
+                _ChargeFee = chargeFee,
+                _RefId = (string)null,
+                _Operator = updater
             });
-            p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-            p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+            p.Add("_Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             if (conn == null)
             {
                 //No execute in transaction
-                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-                result = connection.Execute("Admin_WithdrawalInfo_Set", p, commandType: CommandType.StoredProcedure);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", p);
             }
             else
             {
                 //Execute in transaction
-                result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", p, conn, trans);
             }
 
-            custId = p.Get<int?>("CustId") ?? 0;
-            userName = p.Get<string>("UserName");
-            amount = p.Get<decimal>("Amount");
+            custId = p.Get<int?>("_CustId") ?? 0;
+            userName = p.Get<string>("_UserName");
+            amount = p.Get<decimal>("_Amount");
 
             foreach (var paraName in p.ParameterNames)
             {
-                var value = Convert.ToString(p.Get<dynamic>(paraName));
+                var value = Convert.ToString(p.Get<object>(paraName));
                 paraLog.Add(paraName, value);
             }
 
@@ -649,10 +642,13 @@ namespace BackendSite.Service.DAL
         public WithdrawalRequest GetWithdrawalInfo(int withdrawalId,
             string transId)
         {
-            using var conn =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
-                new { _WithdrawalId = withdrawalId, _TransId = transId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters(new
+            {
+                _WithdrawalId = withdrawalId,
+                _TransId = transId
+            });
+            return _reportDbClient.QueryFirst<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
+                props);
         }
 
         private int SetWithdrawalInfoFlowEndTime(int withdrawalId,
@@ -667,8 +663,7 @@ namespace BackendSite.Service.DAL
             if (conn == null)
             {
                 //No execute in transaction
-                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-                return connection.Execute("Admin_WithdrawalInfo_FlowEndTime_Set", p, commandType: CommandType.StoredProcedure);
+                return _mainDbClient.Execute("Admin_WithdrawalInfo_FlowEndTime_Set", p);
             }
             else
             {
@@ -779,6 +774,12 @@ namespace BackendSite.Service.DAL
             {
                 return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public bool SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
+        {
+            var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
+            return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
     }
 }

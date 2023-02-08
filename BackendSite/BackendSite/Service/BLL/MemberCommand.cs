@@ -83,20 +83,53 @@ public class MemberCommand : IMemberCommand
 
         return result;
     }
+    
+    private async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
+    {
+        return await _memberService.GetSimilarAccountNameAsync(siteId, accountNames);
+    }
+        
+    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, string accountName)
+    {
+        /* 相同定義：
+         * * 大小寫不同
+         * * 去空格相同
+         * 舉例：
+         * Cheong wai Choon
+         * CheongwaiChoon（相同）
+         * cheong Wai Choon（相同）
+         * Ho thai nhat
+         * Hồ thái nhật（不同）
+         * HoThaiNhat（相同）
+         */
+            
+        var patterns = new[]
+        {
+            accountName,
+            accountName.Replace(" ", string.Empty)
+        };
+        var similarAccList = await GetSimilarAccountNameAsync(siteId, patterns);
+        var result = similarAccList
+            .Where(x => patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
+        
+        return result;
+    }
 
-    public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
+    public async Task<bool> EditFullNameAsync(int custId, string fullName, string @operator)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeName = customer.AccountName;
-        
-        var result = await _memberService.EditFullNameAsync(custId, fullName);
-        if (result <= 0) return 0;
+        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
+
+        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
+        if (!result) return false;
         
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
             JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), ActionType.Update,
             custId, $"Edit FullName \"{fullName}\"");
-        return result;
+        
+        return true;
     }
 
     public async Task<int> EditEmailAsync(int custId, string email, string @operator)

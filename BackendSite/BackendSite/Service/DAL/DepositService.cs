@@ -113,7 +113,6 @@ namespace BackendSite.Service.DAL
 
         public DepositRequest GetDepositRequest(int depositId, int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
         }
 
@@ -186,7 +185,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic });
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo, bool canReward = false)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -366,6 +365,7 @@ namespace BackendSite.Service.DAL
                 EndAmount = endAmount,
                 PayIds = payIds
             });
+            
             var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V13", p);
             return depositList;
         }
