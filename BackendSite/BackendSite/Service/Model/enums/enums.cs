@@ -1473,6 +1473,29 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         All = 2,
     }
+
+    public enum IovationDeviceType
+    {
+        MAC = 1,
+        PC,
+        iOS,
+        ANDROID,
+        BLACKBERRY,
+        CHROMEOS,
+        HANDHELD_OTHER,
+        IPHONE,
+        IPOD,
+        IPAD,
+        LINUX,
+        NINTENDO,
+        PLAYSTATION,
+        XBOX,
+        UNIX,
+        WINDOWS,
+        WINDOWS_MOBILE,
+        UNKNOWN
+    }
+
     #region SlotGamesManagement
 
     public enum SlotGameCategoryEnum
