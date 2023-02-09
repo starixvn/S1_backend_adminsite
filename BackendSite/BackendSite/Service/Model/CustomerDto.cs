@@ -623,3 +623,22 @@ public class CustRealNameChangeLog
     public DateTimeOffset UpdateTime { get; set; }
     public string Operator { get; set; }
 }
+
+public class CustPromotionWhiteList
+{
+    public int CustId { get; set; }
+    public int SiteId { get; set; } 
+    public string UserName { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }   
+    public string Operator { get; set; }
+}
+
+public class SetCustPromotionWhiteListRequest
+{
+    public int CustId { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }
+}
