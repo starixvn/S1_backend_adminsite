@@ -10,20 +10,20 @@ namespace BackendSite.Service.BLL
     public class BankDetailBLL
     {
         private readonly BankDetailService bankDetailService;
-        private readonly ServerInfoService serverInfoService;
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly IMemoryCache cache;
         private readonly ICacheHelper _redisHelper;
 
         public BankDetailBLL(IServiceProvider provider)
         {
             bankDetailService = provider.GetRequiredService<BankDetailService>();
-            serverInfoService = provider.GetRequiredService<ServerInfoService>();
             localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
             cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -118,7 +118,45 @@ namespace BackendSite.Service.BLL
             return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
-
+        
+        public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
+        {
+            return localBankService.GetBankCodeList(siteId);
+        }
+        
+        public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
+        {
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
+            var result = localBankService.GetBankInfoPayList(siteId)
+                .Where(x => x.SysId == sysId
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
+            return result;
+        }
+        
         public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
             var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
@@ -131,10 +169,37 @@ namespace BackendSite.Service.BLL
             return eWalletPayList;
         }
         
-        public IEnumerable<BankInfoPay> GetCryptoPay()
+        public IEnumerable<PayInfo> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
-            var cryptoPayList = localBankService.GetCryptoPayList();
-            return cryptoPayList;
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
+            var result = localBankService.GetCryptoPayList(siteId)
+                .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.LoginPin,
+                        LoginUrl = d.LoginUrl,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
+            return result;
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)

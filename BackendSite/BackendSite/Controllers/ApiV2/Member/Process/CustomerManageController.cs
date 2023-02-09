@@ -112,37 +112,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 客戶ID和時間區間(Null)要求
-        /// </summary>
-        /// <remarks>
-        /// 只需要傳參數CustId、StartDate(Allow Null)、EndDate(Allow Null)
-        /// </remarks>
-        public class CustIdWithDateRangeNullRequest : CustIdRequest
-        {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-        }
-
-        /// <summary>
         /// 客戶ID要求(含分頁)
         /// </summary>
         public class CustIdWithPageRequest : ApiRequestPageModel
@@ -2197,7 +2166,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2440,7 +2409,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

@@ -203,6 +203,7 @@ public class CustomerDto
     public int VipLevel { get; set; }
     public string LevelName { get; set; }
     public string UserName { get; set; }
+    public string UserLang { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
@@ -250,6 +251,8 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class CustomerTag
@@ -268,6 +271,7 @@ public class CustomerBasicInfo
     public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }
+    public string UserLang { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
@@ -297,6 +301,8 @@ public class CustomerBasicInfo
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
     public AffInfo AffInfo { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class AffInfo

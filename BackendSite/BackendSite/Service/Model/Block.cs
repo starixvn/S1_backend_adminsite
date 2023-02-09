@@ -84,14 +84,7 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string IFSCCode { get; set; }
     }
-    public class IPCountry
-    {
-        public int id { get; set; }
-        public int IPFrom { get; set; }
-        public int IPTo { get; set; }
-        public string Code { get; set; }
-        public string Country { get; set; }
-    }
+
     public class IPUser
     {
         public int CustId { get; set; }
