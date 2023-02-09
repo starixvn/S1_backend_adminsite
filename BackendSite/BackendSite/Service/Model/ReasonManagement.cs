@@ -2,9 +2,6 @@
 
 namespace BackendSite.Service.Model
 {
-    public class ReasonManagement
-    {
-    }
     public class ReasonManagementFuncKey
     {
         public string FuncKey { get; set; }
