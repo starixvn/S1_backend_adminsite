@@ -85,6 +85,8 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     Channel = x.Channel.ToString(),
                     Agent = x.Agent,
                     PayName = x.PayName,
+                    CryptoCurrency = x.CryptoCurrencyId?.ToString(),
+                    CryptoNetwork = x.Network,
                     Purpose = string.Join(", ", x.Purposes.Select(x => x.ToString())),
                     BankCode = x.BankCode,
                     AccountNo = x.AccountNo,
@@ -117,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoListByIdRequest req)
+        public ApiResult<BankFinancialTransferAccountDetailModel> GetById(GetTransferAccountInfoByIdRequest req)
         {
             var result =
                 _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(req.Id));
@@ -181,7 +183,9 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 TransferPin = req.TransferPin,
                 LoginPin = req.LoginPin,
                 MobilePin = req.MobilePin,
-                CorporateID = req.CorporateID
+                CorporateID = req.CorporateID,
+                CryptoCurrencyId = req.CryptoCurrencyId,
+                Network = req.Network
             }, authData.UserName);
 
             return new ApiResult
@@ -235,7 +239,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-
+        
         #endregion
     }
 }

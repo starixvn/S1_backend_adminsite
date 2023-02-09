@@ -110,30 +110,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V8", props);
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds,
-            string currencyIds,
-            string promotionType,
-            string bonusCode,
-            string userName,
-            int startIndex, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds)
         {
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_PromotionTypes", promotionType);
-            props.Add("_BonusCode", bonusCode);
-            props.Add("_UserName", userName);
-            props.Add("_PageSize", pageSize);
-            props.Add("_StartIndex", startIndex);
-            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V4", props);
-
-            totalPages = props.Get<int?>("_TotalPages") ?? 0;
-            rowCount = props.Get<int?>("_RowCount") ?? 0;
-
-            return result;
+            return _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V5", props);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
@@ -215,6 +197,59 @@ namespace BackendSite.Service.DAL
         public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
         {
             return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
+        }
+        
+        public CustBonusSum GetCustBonusSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
+            return result;
+        }
+        
+        public CustRebateSum GetCustRebateSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var custRebateCategory = _reportDbClient.Query<CustRebateCategory>("Admin_CustRebateSum_Get", props);
+
+            decimal custRebateTotalSum = 0;
+            if (custRebateCategory != null)
+            {
+                custRebateTotalSum = custRebateCategory.Sum(s => s.RebateAmountSum);
+            }
+
+            var result = new CustRebateSum()
+            {
+                CustRebateCategory = custRebateCategory,
+                CustRebateTotalSum = custRebateTotalSum
+            };
+            
+            return result;
+        }
+        
+        public CustRewardSum GetCustRewardSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var custRewardType = _reportDbClient.Query<CustRewardType>("Admin_CustRewardSum_Get", props);
+
+            decimal custRebateTotalSum = 0;
+            if (custRewardType != null)
+            {
+                custRebateTotalSum = custRewardType.Sum(s => s.RewardAmountSum);
+            }
+
+            var result = new CustRewardSum()
+            {
+                CustRewardType = custRewardType,
+                CustRewardTotalSum = custRebateTotalSum
+            };
+            
+            return result;
         }
     }
 }

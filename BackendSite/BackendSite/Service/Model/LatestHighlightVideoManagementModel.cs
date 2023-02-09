@@ -1,8 +1,5 @@
 ﻿namespace BackendSite.Service.Model
 {
-    public class LatestHighlightVideoManagementModel
-    {
-    }
     public class GetLatestHighlightVideoDataPara
     {
         public IEnumerable<int> SelectSite { get; set; }

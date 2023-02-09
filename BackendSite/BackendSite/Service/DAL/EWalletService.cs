@@ -21,7 +21,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<BlockEWalletAcc> GetBlockEWalletAcc(DateTime startDate, DateTime endDate, int status, string accountNum, IEnumerable<int> currencyId, string userName, IEnumerable<int> eWalletId)
+        public IEnumerable<BlockEWalletAcc> GetCustBlockEWalletAcc(DateTime startDate, DateTime endDate, int status, string accountNum, IEnumerable<int> currencyId, string userName, IEnumerable<int> eWalletId)
         {
             var jsonSelectStatus = string.Empty;
             if (status == 0)
@@ -99,7 +99,7 @@ namespace BackendSite.Service.DAL
             {
                 var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
 
-                if(!logResult)
+                if (!logResult)
                 {
                     trans.Rollback();
                     return 0;
@@ -226,6 +226,38 @@ namespace BackendSite.Service.DAL
         public IEnumerable<EWalletInfoSys> GetEWalletInfo()
         {
             return _reportDbClient.Query<EWalletInfoSys>("Admin_EWalletInfoSys_Get");
+        }
+
+        public IEnumerable<BlockEWalletAcc> GetBlockEWallet(DateTime startDate, DateTime endDate, int status, string accountNum, IEnumerable<int> currencyId, IEnumerable<int> eWalletId)
+        {
+            var jsonSelectStatus = string.Empty;
+            if (status == 0)
+            {
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Lock, (int)BlockEWalletStatus.Unlock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else if (status == 1)
+            {
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Lock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else
+            {
+                var tempList = new List<int>() { (int)BlockEWalletStatus.Unlock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+
+            var p = new DynamicParameters(new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null : accountNum,
+                SelectStatus = jsonSelectStatus,
+                SelectCurrency = JsonConvert.SerializeObject(currencyId),
+                SelectSysId = JsonConvert.SerializeObject(eWalletId)
+            });
+
+            return _reportDbClient.Query<BlockEWalletAcc>("Admin_BlockEWallet_Get", p);
         }
     }
 }
