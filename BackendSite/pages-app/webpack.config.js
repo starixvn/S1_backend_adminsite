@@ -40,13 +40,13 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
     // ],
-    //"CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-    // "Finance/WithdrawalLimitAdjust.min": [
-    //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
-    // ],
-    "CSD/PersonalMsgBatch.min": [
-    	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+    "Finance/WithdrawalLimitAdjust.min": [
+      "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     ],
+    // "CSD/PersonalMsgBatch.min": [
+    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    // ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -70,10 +70,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
