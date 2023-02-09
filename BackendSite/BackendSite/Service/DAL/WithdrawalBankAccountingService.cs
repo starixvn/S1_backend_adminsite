@@ -3,6 +3,7 @@ using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
@@ -94,7 +95,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_SiteId", siteId);
             parameter.Add("_CurrencyId", currencyId);
 
-            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V2",
+            return _reportDbClient.Query<GetWithdrawalBankAccountingModel>("Admin_WithdrawalBankAccounting_Get_V3",
                 parameter);
         }
 
@@ -108,10 +109,17 @@ namespace BackendSite.Service.DAL
                 "Admin_WithdrawalBankAccountingById_Get_V2", parameter);
         }
 
+        public IEnumerable<WithdrawalAccountingModel> GetByTransId(string transId)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TransId", transId);
+
+            return _reportDbClient.Query<WithdrawalAccountingModel>("Admin_WithdrawalBankAccountingByTransId_Get", parameter);
+        }
+        
         public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)
         {
-            using var connection =
-                new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             connection.Open();
             using var transaction = connection.BeginTransaction();
             switch (action)

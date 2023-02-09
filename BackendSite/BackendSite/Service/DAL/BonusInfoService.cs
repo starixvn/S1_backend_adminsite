@@ -4,6 +4,7 @@ using Dapper;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -109,42 +110,26 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V8", props);
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds,
-            string currencyIds,
-            string promotionType,
-            string bonusCode,
-            string userName,
-            int startIndex, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds)
         {
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_PromotionTypes", promotionType);
-            props.Add("_BonusCode", bonusCode);
-            props.Add("_UserName", userName);
-            props.Add("_PageSize", pageSize);
-            props.Add("_StartIndex", startIndex);
-            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V4", props);
-
-            totalPages = props.Get<int?>("_TotalPages") ?? 0;
-            rowCount = props.Get<int?>("_RowCount") ?? 0;
-
-            return result;
+            return _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V5", props);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.QueryFirstOrDefault<CancelBonus>("Admin_BonusCancel_Get", new { _BonusId = bonusId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("_BonusId", bonusId);
+            return _reportDbClient.QueryFirst<CancelBonus>("Admin_BonusCancel_Get", props);
         }
 
         public IEnumerable<decimal> GetBonusWinLoss(int bonusId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<decimal>("Service_BonusWinLoss_Get", new { BonusId = bonusId }, commandType: CommandType.StoredProcedure);
+            var props = new DynamicParameters();
+            props.Add("BonusId", bonusId);
+            return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
         public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
@@ -159,7 +144,7 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = conn.Execute("Common_CancelBonusByBonusId_SetV3", p, trans, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
             custId = p.Get<int?>("_CustId") ?? 0;
@@ -199,13 +184,71 @@ namespace BackendSite.Service.DAL
                 if (cancelBonusAmount > 0 && result > 0)
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = conn.Execute("Service_CancelBonusAmount_Set", cp, trans, commandType: CommandType.StoredProcedure);
+                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", cp, conn, trans);
                 }
             }
 
             if (result > 0)
                 trans.Commit();
 
+            return result;
+        }
+
+        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
+        {
+            return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
+        }
+        
+        public CustBonusSum GetCustBonusSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
+            return result;
+        }
+        
+        public CustRebateSum GetCustRebateSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var custRebateCategory = _reportDbClient.Query<CustRebateCategory>("Admin_CustRebateSum_Get", props);
+
+            decimal custRebateTotalSum = 0;
+            if (custRebateCategory != null)
+            {
+                custRebateTotalSum = custRebateCategory.Sum(s => s.RebateAmountSum);
+            }
+
+            var result = new CustRebateSum()
+            {
+                CustRebateCategory = custRebateCategory,
+                CustRebateTotalSum = custRebateTotalSum
+            };
+            
+            return result;
+        }
+        
+        public CustRewardSum GetCustRewardSum(int siteId,int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CustId", custId);
+            var custRewardType = _reportDbClient.Query<CustRewardType>("Admin_CustRewardSum_Get", props);
+
+            decimal custRebateTotalSum = 0;
+            if (custRewardType != null)
+            {
+                custRebateTotalSum = custRewardType.Sum(s => s.RewardAmountSum);
+            }
+
+            var result = new CustRewardSum()
+            {
+                CustRewardType = custRewardType,
+                CustRewardTotalSum = custRebateTotalSum
+            };
+            
             return result;
         }
     }

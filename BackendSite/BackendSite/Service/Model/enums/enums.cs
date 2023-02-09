@@ -36,8 +36,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum AdjustTypeEnum
     {
-        Debit = 1,
-        Credit = 2,
+        Credit = 1,
+        Debit = 2,
         IncreaseBonus = 3,
         ReduceBonus = 4,
         ThirdAdd = 5,
@@ -71,6 +71,12 @@ namespace BackendSite.Service.Model.enums
         IsRisk = 2,
         PhoneVerified = 3,
         EmailVerified = 4
+    }
+
+    public enum VipRebatePayoutStatusEnum
+    {
+        NotPayout = 0,
+        Payouted = 1
     }
 
     #endregion
@@ -213,12 +219,13 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositTypeEnum
     {
-        Undefined = 0,
         OnlineBanking = 1,
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5 //No Use
+        LoadCard = 5, //No Use
+        QRPay = 6 ,
+        BankAutoChannel = 7
     }
 
     public enum DepositStatusEnum
@@ -231,13 +238,47 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        Adjustment = 98,
         Error = 99 //No Use
+    }
+    
+    public enum SelectDepositStatusEnum
+    {
+        Pending = 1,
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5,
+        OnHold = 7
+    }
+    
+	public enum DepositActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63
+    }
+
+	 public enum DepositTimeStatusEnum
+    {
+        Approved = 3,
+        Rejected = 4,
+        Canceled = 5
     }
 
     #endregion
 
     #region PayList
-
+    
+    public enum PayListMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+    
     public enum PayListStatusEnum
     {
         Enable = 1,
@@ -259,16 +300,23 @@ namespace BackendSite.Service.Model.enums
     public enum PayChannelTypeEnum
     {
         OnlineBanking = 1,
-        MobilePay = 2,
-        LocalBanking = 3,
-        CryptoPay = 4,
-        LoadCard = 5
+        MobilePayment = 2,
+        LocalBank = 3,
+        CryptoPayment = 4,
+        LoadCardPayment = 5,
+        QrPayPayment = 6,
+        BankAutoChannel = 7
     }
 
     public enum PayChannelStatusEnum
     {
         Enable = 1,
         Disable = 2
+    }
+    public enum PayChannelMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
     }
 
     #endregion
@@ -278,7 +326,6 @@ namespace BackendSite.Service.Model.enums
     public enum AmountRuleEnum
     {
         Integer = 1,
-        Decimal = 2,
         Fixed = 3
     }
 
@@ -311,7 +358,8 @@ namespace BackendSite.Service.Model.enums
         Undefine = 0, //No Use
         OnlinePayment = 1,
         LocalBank = 2,
-        CryptoPay = 4
+        CryptoPay = 4,
+        CryptoWallet = 5 // Local
     }
 
     public enum WithdrawalStatusEnum
@@ -326,6 +374,20 @@ namespace BackendSite.Service.Model.enums
         Rejected = 7,
         ToKyc = 8,
         Error = 99 //No Use
+    }
+    
+    public enum WithdrawalActionEnum
+    {
+        Draft = 66, 
+        Pending = 64,
+        Approved = 65,
+        ManualApproved =67,
+        Rejected = 6,
+        ManualRejected = 68,
+        OnHold = 63,
+        Verified = 69,
+        Process = 70,
+        ToKyc = 71
     }
 
     #endregion
@@ -373,11 +435,32 @@ namespace BackendSite.Service.Model.enums
 
     #region AdjustWithdrawalLimitInfo
 
-    public enum AdjustWithdrawalLimitInfoAdjustTypeEnum
+    public enum WithdrawalLimitAdjustmentAdjustTypeEnum
     {
         Debit = 1,
-        Credit = 2,
-        //Bonus = 3  NoUse
+        Credit = 2
+    }
+
+    public enum WithdrawalLimitAdjustmentReasonEnum
+    {
+        [Description("None - (Default)")]
+        None = 1,
+        [Description("Retention Bonus")]
+        RetentionBonus = 2,
+        [Description("Manual Bonus(Special Bonus)")]
+        ManualBonus = 3,
+        [Description("Vip Upgrade Reward")]
+        VipUpgradeReward = 4,
+        [Description("Prize Drop")]
+        PrizeDrop = 5,
+        [Description("Tech Issue None Affected")]
+        TechIssueNoneAffected = 6,
+        Test = 7,
+        [Description("Vendor Mistake")]
+        VendorMistake = 8,
+        Deposit = 9,
+        Withdrawal = 10,
+        Other = 11
     }
 
     public enum AdjustWithdrawalLimitInfoStatusEnum
@@ -414,19 +497,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 4,
         Error = 99
     }
-    
+
     public enum TpAdjustmentOptionEnum
     {
         Add = 1,
         Minus = 2
     }
-    
+
     public enum AdjustWalletTypeEnum
     {
         Main = 1,
         ThirdParty = 2
     }
-    
+
     public enum AdjustmentCategoryEnum
     {
         [Description("None - (Default)")]
@@ -469,18 +552,36 @@ namespace BackendSite.Service.Model.enums
         FstDeposit = 1,
         ReDeposit = 2,
         FreeBet = 3,
-        Special = 4,
-        WalletBonus = 5,
         Rebate = 6,
         Cashback = 7,
-        StaticPage = 8,
-        RetentionBonus = 9
+        SpecialBonus = 8,
+        RetentionFreeBet = 9
+    }
+
+    public enum PromotionCategoryEnum
+    {
+        SlotsGame = 1,
+        LiveCasino = 2,
+        Fish = 3,
+        SabaSports = 4,
+        Lottery = 5,
+        Sports = 6,
+        PTSlotsGame = 7,
+        PTLiveCasino = 8,
+        SBSW = 9,
+        Mega888SlotRNGAndFishing = 10
+    }
+
+    public enum FullFillTypeEnum
+    {
+        RollOver = 1,
+        WinOver = 2
     }
 
     public enum PromotionStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum PromotionPeriodTypeEnum
@@ -492,6 +593,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionDeviceTypeEnum
     {
+        [Description("不區分 DeviceType")]
+        GetAll = 0,
         All = 1,
         Web = 2,
         App = 3
@@ -509,14 +612,26 @@ namespace BackendSite.Service.Model.enums
         Seamless = 1
     }
 
+    public enum BonusAtPageEnum
+    {
+        Promotion = 0,
+        Deposit = 1
+    }
+
     #endregion
 
     #region PromotionCashBackSetting
 
     public enum PromotionCashBackSettingStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Enable = 1,
+        Disable = 2
+    }
+
+    public enum PromotionCashBackSettingLevelEnum
+    {
+        [Description("0代表包含所有 VIP 等級")]
+        All = 0
     }
 
     public enum ReferralCustStatusEnum
@@ -542,8 +657,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum PromotionSpecificStatusEnum
     {
-        Disable = 1,
-        Enable = 2
+        Active = 1,
+        InActive = 2
     }
 
     public enum BonusTypeEnum
@@ -639,11 +754,22 @@ namespace BackendSite.Service.Model.enums
         SetAdminUserPassword = 42,
         SetCustInfoEnableRebate = 45,
         VerificationRewardSetting = 49,
+        SetFinanceAccount = 50,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
         WithdrawalSubmission = 57,
+        SetCurrencyUSDRate = 58,
+        BettingMonitor = 59,
+        TransferInfoManagement = 60,
+        SetCustomerInfo = 61,
+        SetBanner = 62,
+        WithdrawalLimitAdjustment = 73,
+        AppQRCode = 74,
+        ProviderAppDownload = 75,
+        SetDepositMessage = 76,
+        SiteMaintenance = 77,
         SetVideoInfo = 78
     }
 
@@ -756,7 +882,13 @@ namespace BackendSite.Service.Model.enums
         /// <summary>
         /// 第三方支付
         /// </summary>
-        PSP = 3
+        PSP = 3,
+
+        Finance = 4,
+        
+        MC = 5,
+        
+        CryptoWallet = 6
     }
 
     /// <summary>
@@ -788,23 +920,22 @@ namespace BackendSite.Service.Model.enums
     /// <summary>
     /// 交易型態 列舉
     /// </summary>
-    [Description("交易型態 列舉")]
     public enum TransactionTypeEnum
     {
         /// <summary>
         /// 只有加項
         /// </summary>
-        [Description("只有加項")] OnlyPlus = 1,
+        [Description("Plus")] OnlyPlus = 1,
 
         /// <summary>
         /// 只有減項
         /// </summary>
-        [Description("只有減項")] OnlyMinus = 2,
+        [Description("Minus")] OnlyMinus = 2,
 
         /// <summary>
         /// 一加一減
         /// </summary>
-        [Description("一加一減")] PlusAndMinus = 3
+        [Description("FromTo")] PlusAndMinus = 3
     }
 
     /// <summary>
@@ -812,25 +943,43 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum TransferTypeEnum
     {
-        /// <summary>
-        /// 存款(客戶戶頭=>公司戶頭)
-        /// </summary>
-        Deposit = 1,
-
-        /// <summary>
-        /// 提款(公司戶頭=>客戶戶頭)
-        /// </summary>
-        Withdrawal = 2,
-
-        /// <summary>
-        /// 轉帳(公司戶頭=>公司戶頭)
-        /// </summary>
-        Transfer = 3,
-
-        /// <summary>
-        /// 其他(手續費、利息...)
-        /// </summary>
-        Other = 4
+        Undefined = 0,
+        [Description("PSP")]
+        Psp = 2,
+        [Description("LOCAL BANK")]
+        LocalBank = 3,
+        [Description("BOUNC BACK")]
+        BounceBack = 4,
+        [Description("MARKETING")]
+        Marketing = 5,
+        [Description("BONUS")]
+        Bonus = 6,
+        [Description("INTEREST")]
+        Interest = 7,
+        [Description("TOP UP PHONE")]
+        ToUpPhone = 8,
+        [Description("FEES")]
+        Fees = 9,
+        [Description("UNCLAIM")]
+        Unclaimed = 10,
+        [Description("OVERCREDIT")]
+        OverCredit = 11,
+        [Description("OVERPAID")]
+        OverPaid = 12,
+        [Description("FRAUD")]
+        Fraud = 13,
+        [Description("FREEZE")]
+        Freeze = 14,
+        [Description("CURRENCY CONVERSION")]
+        CurrencyConversion = 15,
+        [Description("HEAD OFFICE")]
+        HeadOffice = 16,
+        [Description("FINANCE")]
+        Finance = 17,
+        [Description("ADVANCED")]
+        Advanced = 18,
+        [Description("TEST")]
+        Test = 19
     }
 
     /// <summary>
@@ -849,6 +998,16 @@ namespace BackendSite.Service.Model.enums
         Minus = 2
     }
 
+    /// <summary>
+    /// 轉帳狀態 列舉
+    /// </summary>
+    public enum TransferStatusEnum
+    {
+        Success = 0,
+        Fail = 1,
+        Pending = 2,
+        PendingD = 3
+    }
     #endregion
 
     #region Customer_RegLiveStatus
@@ -869,18 +1028,6 @@ namespace BackendSite.Service.Model.enums
         SettledForInvalid = 2,
         SettledForValidNotRollover = 3,
         Cheating = 4
-    }
-
-    public enum AppLinkAppType
-    {
-        Andriod = 1,
-        IOS = 2
-    }
-
-    public enum AppLinkProtocolType
-    {
-        HTTP = 1,
-        HTTPS = 2
     }
 
     public enum CryptoCurrencyEnum
@@ -910,7 +1057,8 @@ namespace BackendSite.Service.Model.enums
     {
         Saba = 1,
         Mega = 22,
-        PT = 27
+        PT = 27,
+        SBSW = 41
     }
 
     public enum BalanceAdjustmentType
@@ -968,22 +1116,44 @@ namespace BackendSite.Service.Model.enums
         LastStatusUpdateTime = 2,
     }
 
-    #region BankDetailOff
-
-    public enum PurposeEnum
+    public enum TransferAccountPurposeEnum
     {
         Deposit = 1,
         Withdrawal = 2,
+        Transfer = 3
+    }
+
+    #region BankDetailOff
+
+    public enum BankDetailOffPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2,
+        [Description("Deposit & Withdrawal")]
         DepositAndWithdrawal = 3
     }
 
-    public enum BankDetailOffStatusEnum
+    public enum BankCardManagementPurposeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum BankCardManagementStatusEnum
     {
         Initial = 0,     //Front-End Hidden
         Open = 1,        //Front-End green
         Suspend = 2,
         Closed = 3,      //Never Open
         Maintenance = 4  //frontend red
+    }
+
+    public enum BankCardManagementSupportChannelEnum
+    {
+        [Description("Bank Transfer")]
+        LocalBank = 0,
+        [Description("Mobile E-Wallet")]
+        EWallet = 1
     }
 
     #endregion
@@ -1014,21 +1184,18 @@ namespace BackendSite.Service.Model.enums
 
     public enum BannerTypeEnum
     {
-        Promotions = 1,
-        HotEvent = 2,
-        Slots = 3,
-        LiveCasino = 4,
-        Fishing = 5,
-        Lottery = 6
+        MainBanner = 1,
+        Slots = 3
     }
 
     public enum BannerActionModeEnum
     {
-        GoToGame = 1,
-        GoToBonus = 2,
-        OpenWindow = 3,
-        RedirectPage = 4,
-        NoAction = 5
+        NoAction = 1,
+        GoToGame = 2,
+        GoToBonus = 3,
+        OpenWindow = 4,
+        RedirectPage = 5,
+        GoToLobby = 6
     }
 
     public enum ShowStatusEnum
@@ -1044,20 +1211,41 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum UrlRouterEnum
+    {
+        ESport = 1,
+        Casino = 2,
+        Referral = 3,
+        LeaderBoard = 4,
+        AngPow = 5,
+        Lottery = 6,
+        Slots = 7,
+        Game = 8 ,
+        Fishing = 9 ,
+        Promotion = 10 ,
+        Vip = 11,
+        Deposit = 12,
+        Rewards = 13
+    }
+    
     #endregion
 
     #region AppLinkTable
 
     public enum AppTypeEnum
     {
+        [Description("Android")]
         Android = 1,
-        Ios = 2
+        [Description("IOS")]
+        IOS = 2
     }
 
     public enum ProtocolTypeEnum
     {
-        Http = 1,
-        Https = 2
+        [Description("HTTP")]
+        HTTP = 1,
+        [Description("HTTPS")]
+        HTTPS = 2
     }
 
     #endregion
@@ -1111,13 +1299,18 @@ namespace BackendSite.Service.Model.enums
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
+        [Description("Android")]
         Android = 1,
+        [Description("IOS")]
         IOS = 2,
+        [Description("Desktop")]
         Desktop = 3
     }
     public enum DeepLinkTableProtocolTypeEnum
     {
+        [Description("HTTP")]
         HTTP = 1,
+        [Description("HTTPS")]
         HTTPS = 2
     }
 
@@ -1128,7 +1321,8 @@ namespace BackendSite.Service.Model.enums
         Tp = 2,
         Bonus = 3,
         Admin = 4,
-        Payment = 5
+        Payment = 5,
+        Token = 6
     }
 
     #endregion
@@ -1168,7 +1362,14 @@ namespace BackendSite.Service.Model.enums
         [Description("Bwing")]
         BWING = 3
     }
-    
+
+    public enum AffSiteEnum
+    {
+        N88 = 1,
+        N8G = 2,
+        N8B = 3
+    }
+
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1177,6 +1378,7 @@ namespace BackendSite.Service.Model.enums
         EWallet = 1,
         BankCard = 2
     }
+
     public enum CustBankInfoLogStatus
     {
         Create = 1,
@@ -1190,6 +1392,13 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1
     }
+    
+    public enum CryptoWalletLogStatusEnum
+    {
+        Create = 1,
+        Delete = 2
+    }
+    
     public enum EWalletinfoLogStatusEnum
     {
         Create = 1,
@@ -1199,7 +1408,7 @@ namespace BackendSite.Service.Model.enums
         Release = 5
     }
 
-	public enum CurrencyEnum
+    public enum CurrencyEnum
     {
         MYR = 2,
         USD = 3,
@@ -1256,5 +1465,77 @@ namespace BackendSite.Service.Model.enums
     {
         HighRisk = 1
     }
-    
+
+    public enum HotEventStatus
+    {
+        Close = 0,
+        Open = 1,
+        All = 2,
+    }
+    #region SlotGamesManagement
+
+    public enum SlotGameCategoryEnum
+    {
+        AllAndSetStatus = 0,
+        Featured = 1,
+        Jackpot = 2,
+        TableAndCards = 3,
+        BuyFeaturesGames = 4,
+        Megaways = 5,
+    }
+
+    public enum SlotGameFilterStatusEnum
+    {
+        All = 0,
+        Open = 1,
+        Closed = 2,
+    }
+    public enum SlotGameStatusEnum
+    {
+        Closed = 0,
+        Open = 1
+    }
+
+    #endregion
+    public enum BlockEWalletStatus
+    {
+        Lock = 1,
+        Unlock = 2
+    }
+    public enum CustomerTeleStatusEnum
+    {
+        NoRecord = 0,
+        NonDepoist = 1,
+        Deposited = 2,
+    }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
+    }
+
+    public enum HotGameTopCategory
+    {
+        HotGame = 1,
+        NewGame = 2,
+        Progressive = 3,
+        Featured = 4,
+        TopCasino = 5
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3
+    }
 }

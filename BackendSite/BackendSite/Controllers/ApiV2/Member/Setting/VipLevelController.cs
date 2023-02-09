@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VipLevelController : ControllerBase
@@ -19,17 +20,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly MessageBLL _messageBll;
+        private readonly IVipLevelBLL _vipLevelBll;
+
+        public VipLevelController(AuthorizeBLL authorizeBll, CustInfoBLL custInfoBll, MessageBLL messageBll, IVipLevelBLL vipLevelBll)
+        {
+            _authorizeBll = authorizeBll;
+            _custInfoBll = custInfoBll;
+            _messageBll = messageBll;
+            _vipLevelBll = vipLevelBll;
+        }
 
         #endregion
 
         #region Constructor
-
-        public VipLevelController(IServiceProvider provider)
-        {
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _messageBll = provider.GetRequiredService<MessageBLL>();
-        }
+        
 
         #endregion
 
@@ -44,6 +48,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         /// <summary>
+        /// VipLevel/GetSetting 取得VIP等級設定資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetSetting(GetVipLevelSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            {
+                Data = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        /// <summary>
         /// VipLevel/ChangeVipLevelBatch 批次更新會員VIP等級
         /// </summary>
         /// <remarks>
@@ -55,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="siteId"></param>
         /// <param name="excelUpload"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public async Task<List<ApiResult>> ChangeVipLevelBatchAsync([FromForm] ChangeVipLevelBatchRequest request)
         {

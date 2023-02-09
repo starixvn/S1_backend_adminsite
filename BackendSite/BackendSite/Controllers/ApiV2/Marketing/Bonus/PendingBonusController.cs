@@ -10,7 +10,7 @@ using static BackendSite.Service.BLL.PendingFundBLL;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PendingBonusController : ControllerBase
@@ -36,13 +36,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest
         {
             public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public IEnumerable<PromotionTypeEnum> PromotionTypes { get; set; }
-            public string BonusCode { get; set; }
-            public string UserName { get; set; }
         }
 
         public class TransferListRequest
@@ -61,28 +57,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Marketing  > Pending Bonus
         /// </remarks>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 46, 1 })]
         [HttpPost]
-        public ApiListResult<PendingBonus> GetList(GetListRequest request)
+        public ApiResult<IEnumerable<PendingBonus>> GetList(GetListRequest request)
         {
 
-            var promotionTypeList = request.PromotionTypes.Select(x => (int)x);
-            var data = _bonusInfoBll.GetPendingBonusList(request.SiteIds,request.CurrencyIds, promotionTypeList,
-                request.BonusCode,request.UserName,
-                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
+            var data = _bonusInfoBll.GetPendingBonusList(request.SiteIds);
 
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-
-            var apiResult = new ApiListResult<PendingBonus>
+            var apiResult = new ApiResult<IEnumerable<PendingBonus>>
             {
                 Data = data,
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -98,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/PendingBonus" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 46, 11 })]
         [HttpPost]
         public async Task<ApiResult<List<TransferMultiResult>>> TransferMultiAsync(TransferListRequest request)
         {

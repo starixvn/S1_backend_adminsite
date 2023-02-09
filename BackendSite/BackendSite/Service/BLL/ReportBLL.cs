@@ -1,7 +1,10 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 
@@ -13,6 +16,10 @@ namespace BackendSite.Service.BLL
 
         private readonly ReportService reportService;
         private readonly Common _common;
+        private readonly BetListService _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly ICacheHelper _redisHelper;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -22,6 +29,10 @@ namespace BackendSite.Service.BLL
         {
             reportService = provider.GetRequiredService<ReportService>();
             _common = provider.GetRequiredService<Common>();
+            _betListBll = provider.GetRequiredService<BetListService>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #endregion
@@ -909,8 +920,46 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
         {
-            var detailList = reportService.GetCustomerDetail(custId, gameId, date, timeZone);
-            return detailList;
+            var baseDate = DateTime.ParseExact($"{date} 00:00", "yyyy-MM-dd HH:mm", null).ToOffset(timeZone);
+            var startDate = baseDate.ToUniversalTime().DateTime;
+            var endDate = baseDate.ToUniversalTime().AddDays(1).AddMilliseconds(-1).DateTime;
+
+            var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
+            var result = betList
+                .Where(i => i.GameType == gameId && (i.SettlementType == 1 || i.SettlementType == 3))
+                .Join(_tpGameTypeList,
+                  tpBetRecord => tpBetRecord.GameType,
+                  tpGameType => tpGameType.Type,
+                  (tpBetRecord, tpGameType) => new TpBetRecordDataModel
+                  {
+                      TpId = tpBetRecord.TpId,
+                      TpName = _common.GetTpName(tpBetRecord.TpId),
+                      TransId = tpBetRecord.TransId,
+                      CategoryId = tpGameType.CategoryId,
+                      CategoryName = tpGameType.CategoryName,
+                      GameId = tpBetRecord.GameType,
+                      GameName = tpGameType.TypeName,
+                      CustId = tpBetRecord.CustId,
+                      UserName = tpBetRecord.UserName,
+                      CurrencyId = tpBetRecord.CurrencyId,
+                      Code = _common.GetCurrencyIsoCode(tpBetRecord.CurrencyId),
+                      SiteId = tpBetRecord.SiteId,
+                      SiteName = _common.GetSiteName(tpBetRecord.SiteId),
+                      TpUserName = tpBetRecord.TpUserName,
+                      TransTime = tpBetRecord.TransTime.ToOffset(baseDate.Offset).DateTime,
+                      SettledTime = tpBetRecord.SettledTime.ToOffset(baseDate.Offset).DateTime,
+                      Stake = tpBetRecord.Stake,
+                      ValidBet = tpBetRecord.ValidBet ?? 0,
+                      Revenue = tpBetRecord.Revenue ?? 0,
+                      WinLostAmount = tpBetRecord.WinlostAmount,
+                      SettlementType = tpBetRecord.SettlementType,
+                      TicketStatus = tpBetRecord.TicketStatus,
+                      OriginalState = tpBetRecord.OriginalState,
+                      TicketKey = (int)tpBetRecord.TicketKey,
+                      BonusId = tpBetRecord.BonusId,
+                      CreateTime = tpBetRecord.CreateTime.ToOffset(baseDate.Offset).DateTime
+                  });
+            return result;
         }
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
@@ -925,9 +974,68 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
             => reportService.GetRewardBonusReport(input, out totalPages, out rowCount);
-        
+
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
-        
+
+        #region Game Statistical Report
+
+        public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
+        {
+            var key = $"GameStatisticalReport:{getListInput.SiteId}:{getListInput.StartDate}:{getListInput.EndDate}";
+            var source = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
+                () => GetGameStatisticalSource(getListInput));
+            return ProcessGameStatisticalSource(FilterSorce(getListInput.SiteId, source));
+        }
+
+        public Dictionary<string, IEnumerable<GameStatisticalDao>> ConvertToExport(IEnumerable<GameStatisticalByCurrencyDto> data)
+        {
+            var result = new Dictionary<string, IEnumerable<GameStatisticalDao>>();
+            foreach (var d in data)
+                result.Add(d.CurrencyName, d.CategoryDetail.SelectMany(y => y.GameDetail));
+
+            return result;
+        }
+
+        private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
+            => reportService.GetGameStatisticalReport(getListInput);
+
+        private IEnumerable<GameStatisticalDao> FilterSorce(int siteId, IEnumerable<GameStatisticalDao> source)
+        {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2().First(x => x.SiteId == siteId);
+            return source.Where(x => userServerInfo.ICurrencyList.Contains(x.CurrencyId));
+        }
+
+        private List<GameStatisticalByCurrencyDto> ProcessGameStatisticalSource(IEnumerable<GameStatisticalDao> source)
+        {
+            var userServerInfos = _serverInfoBll.GetSiteListByLoginUserV2();
+            var currencyList = source.Select(t => new { CurrencyId = t.CurrencyId, CurrencyName = t.CurrencyName }).Distinct()
+                .ToDictionary(t => t.CurrencyId, t => t.CurrencyName).OrderBy(x => x.Key);
+            var categoryList = source.Select(t => new { CategoryId = t.CategoryId, CategoryName = t.CategoryName }).Distinct()
+                .ToDictionary(t => t.CategoryId, t => t.CategoryName).OrderBy(x => x.Key);
+
+            var result = new List<GameStatisticalByCurrencyDto>();
+
+            foreach (var currency in currencyList)
+            {
+                var currencySummaryItem = new GameStatisticalByCurrencyDto() { CurrencyId = currency.Key, CurrencyName = currency.Value };
+                var categorySummaryList = new List<GameStatisticalByCategoryDto>();
+                foreach (var category in categoryList)
+                {
+                    var categorySummaryItem = new GameStatisticalByCategoryDto() { CategoryId = category.Key, CategoryName = category.Value };
+                    var detail = source.Where(x => x.CurrencyId == currency.Key && x.CategoryId == category.Key).OrderByDescending(x => x.ValidBetSummary);
+
+                    if (detail.Count() == 0) continue;
+                    categorySummaryItem.GameDetail = detail;
+                    categorySummaryList.Add(categorySummaryItem);
+                }
+                currencySummaryItem.CategoryDetail = categorySummaryList;
+                result.Add(currencySummaryItem);
+            }
+            return result;
+        }
+
+        #endregion
+
     }
 }

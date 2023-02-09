@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using NPOI.SS.Formula.Functions;
+
+namespace BackendSite.Service.Model
 {
     public class GetDepositAccountingListModel
     {
@@ -10,6 +12,7 @@
     
     public class DepositAccountingModel
     {
+        public int SiteId{ get; set; }
         public string SiteName{ get; set; }
         public string TransId{ get; set; }
         public string UserName{ get; set; }
@@ -21,19 +24,35 @@
         public string AccountNo{ get; set; }
         public string Memo{ get; set; }
         public string Operator{ get; set; }
-        private DateTimeOffset _approvedTime{ get; set; }
+        private DateTime _approvedTime { get; set; }
         public DateTimeOffset ApprovedTime
         {
-            get => _approvedTime;
-            set => _approvedTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+            get
+            {
+                return new DateTimeOffset(_approvedTime, _offset);
+            }
+            set
+            {
+                _approvedTime = value.DateTime;
+            }
         }
         public string LatestUpdateOperator{ get; set; }
-        private DateTimeOffset _latestUpdateTime{ get; set; }
+        private DateTime _latestUpdateTime { get; set; }
         public DateTimeOffset LatestUpdateTime
         {
-            get => _latestUpdateTime;
-            set => _latestUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+            get
+            {
+                return new DateTimeOffset(_latestUpdateTime, _offset);
+            }
+            set
+            {
+                _latestUpdateTime = value.DateTime;
+            }
         }
-        
+        private TimeSpan _offset { get; set; } = TimeSpan.Zero;
+        public void SetDepositAccountingTimeOffset(TimeSpan timeSpan)
+        {
+            _offset = timeSpan;
+        }
     }
 }

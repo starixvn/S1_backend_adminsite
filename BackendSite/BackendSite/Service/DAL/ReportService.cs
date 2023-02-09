@@ -5,6 +5,7 @@ using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.GameStatisticalReport;
 
 namespace BackendSite.Service.DAL
 {
@@ -162,21 +163,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _CustId = custId,
-                    _GameId = gameId,
-                    _SelDate = date,
-                    _TimeZone = timeZone
-                });
-
-            var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get_V2";
-            return _reportDbClient.Query<TpBetRecordDataModel>(SpName, parameters);
-        }
-
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
             out int totalPages,
             out int rowCount)
@@ -187,7 +173,7 @@ namespace BackendSite.Service.DAL
                 {
                     _SiteIds = JsonConvert.SerializeObject(input.SiteIds),
                     _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
-                    _TpId = input.TpId,
+                    _TpIds = JsonConvert.SerializeObject(input.TpIds),
                     _FromTransTime = input.FromTransTime,
                     _ToTransTime = input.ToTransTime,
                     _UserName = input.UserName,
@@ -198,7 +184,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var spName = "Admin_TpBetFailureRecord_Get_V2";
+            var spName = "Admin_TpBetFailureRecord_Get_V3";
             var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
@@ -214,14 +200,14 @@ namespace BackendSite.Service.DAL
                 {
                     _SiteIds = JsonConvert.SerializeObject(input.SiteIds),
                     _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
-                    _TpId = input.TpId,
+                    _TpIds = JsonConvert.SerializeObject(input.TpIds),
                     _FromTransTime = input.FromTransTime,
                     _ToTransTime = input.ToTransTime,
                     _UserName = input.UserName,
                     _TransId = input.TransId
                 });
 
-            var spName = "Admin_TpBetFailureRecordForExport_Get_V2";
+            var spName = "Admin_TpBetFailureRecordForExport_Get_V3";
             var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
 
             return result;
@@ -282,6 +268,19 @@ namespace BackendSite.Service.DAL
            
 
             return result;
+        }
+
+        public IEnumerable<GameStatisticalDao> GetGameStatisticalReport(GetListInputModel input)
+        {
+            var parameters = new DynamicParameters(
+              new
+              {
+                  _SiteId = input.SiteId,
+                  _StartDate = input.StartDate,
+                  _EndDate = input.EndDate,
+              });
+
+            return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get", parameters);
         }
     }
 }

@@ -46,7 +46,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public T QueryFirst<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
+        public T QueryFirst<T>(string name, object parameters, int? timeOut = 30)
         {
             T result;
             var sw = Stopwatch.StartNew();
@@ -188,7 +188,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters, int? timeOut = 30)
+        public IEnumerable<T> Query<T>(string name, object parameters, int? timeOut = 30)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -281,6 +281,62 @@ namespace BackendSite.Service.Library
                 var multiple =
                     connection.QueryMultipleAsync(name, parameters, commandType: CommandType.StoredProcedure);
                 result = func.Invoke(await multiple);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        public int Execute(string name, object parameters)
+        {
+            var result = 0;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                using var connection = new MySqlConnection(_connectionString);
+                result = connection.Execute(name, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        public int Execute(string name, IDbTransaction transaction, object parameters = null)
+        {
+            var sw = Stopwatch.StartNew();
+            int result;
+            try
+            {
+                result = transaction.Connection.Execute(name, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("elapsed", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        public async Task<T> ExecuteScalarAsync<T>(string name, object parameters)
+        {
+            T result;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                await using var connection = new MySqlConnection(_connectionString);
+                result = await connection.ExecuteScalarAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {

@@ -175,7 +175,8 @@ namespace BackendSite.Controllers.Api
 
             try
             {
-                var (status, count, message) = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount);
+                var (status, count, message) = _bankFinancialBLL.SetTransferAccount(bankFinancialTransferAccount,
+                    _authorizeBLL.GetAuthData().UserName);
 
                 if (status)
                 {
@@ -212,7 +213,7 @@ namespace BackendSite.Controllers.Api
                 data.UpdateTime = GetTimeZoneDateTimeByDateString(data.SiteId, data.UpdateTime);
             }
             
-            var stream = _excelBLL.Export(ExportData);
+            var stream = _excelBLL.ExportV2(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        $"TransferAccountInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

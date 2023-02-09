@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class AnnouncementController : ControllerBase
@@ -39,7 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<GeneralStatusEnum> Statuses { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -101,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// Func Path：CSD > Announcement > [Submit]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 53, 1 })]
         [HttpPost]
         public ApiListResult<Announcement> GetAnnouncementList(GetAnnouncementReq para)
         {
@@ -110,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                var result = _messageBll.GetAnnouncements(para.SiteIds, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
+                var result = _messageBll.GetAnnouncements(para.SiteIds, para.StartDate, para.EndDate, para.Statuses, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
                 apiResult.Data = result;
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
@@ -136,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// Func Path：CSD > Announcement > Submit(Query) > [Edit]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 53, 1 })]
         [HttpPost]
         public ApiResult<Announcement> GetAnnouncementById(AnnouncementReq para)
         {
@@ -166,7 +166,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// Func Path：CSD > Announcement > [Add Announcement]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 53, 3 })]
         [HttpPost]
         public ApiResult AddAnnouncement(AddAnnouncementReq para)
         {
@@ -205,7 +205,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// </remarks>
         /// <param name="para"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 53, 3 })]
         [HttpPost]
         public ApiResult UpdateAnnouncement(UpdateAnnouncementReq para)
         {
@@ -236,7 +236,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         /// Func Path：CSD >  Announcement > Submit(Query) > [Delete]
         /// </remarks>
         /// <param name="para"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/Announcement" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 53, 4 })]
         [HttpPost]
         public ApiResult DeleteAnnouncement(AnnouncementReq para)
         {

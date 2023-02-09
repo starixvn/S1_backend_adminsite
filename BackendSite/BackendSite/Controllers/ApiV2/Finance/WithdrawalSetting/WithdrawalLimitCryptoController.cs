@@ -1,5 +1,4 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalLimitCryptoController : ControllerBase
@@ -32,12 +31,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest 
         {
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public NetworkTypeEnum NetworkType { get; set; }
-            public CryptoCurrencyEnum CryptoCurrency { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -54,26 +51,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiListResult<CryptoWithdrawalLimitInfo> GetList(GetListRequest request)
+        public ApiResult GetList(GetListRequest request)
         {
-            var result = _withdrawalBll.GetCryptoWithdrawalLimitInfos(request.SiteIds,
-                request.CurrencyIds,
-                (int)request.CryptoCurrency,
-                Enum.GetName(typeof(NetworkTypeEnum), request.NetworkType),
-                request.PageNumber,
-                request.PageSize,
-                out int totalPages,
-                out int rowCount);
+            var result = _withdrawalBll.GetCryptoWithdrawalLimitInfos(request.SiteId, request.CurrencyId);
 
-            var apiResult = new ApiListResult<CryptoWithdrawalLimitInfo>
+            var apiResult = new ApiResult<IEnumerable<CryptoWithdrawalLimitInfo>>
             {
                 Data = result,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount,
-                ErrorCode = 0
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
@@ -89,7 +75,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult Create(ApiRequestWithLog<CreateCryptoWithdrawalLimitInfo> request)
         {
@@ -112,12 +97,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
-        public ApiResult Update(ApiRequestWithLog<UpdateCryptoWithdrawalLimitInfo> request)
+        public ApiResult Update(ApiRequestWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> request)
         {
             var success = _withdrawalBll.EditCryptoWithdrawalLimit(
-                new ParamsWithLog<UpdateCryptoWithdrawalLimitInfo>(request, User.Identity.Name));
+                new ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>>(request, User.Identity.Name));
 
             if (success)
                 return new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
@@ -135,7 +119,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
         [HttpPost]
         public ApiResult Delete(ApiRequestWithLog<DeleteCryptoWithdrawalLimitInfo> request)
         {

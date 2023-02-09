@@ -59,10 +59,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int CustId { get; set; }
         }
-        public class DeleteReq
-        {
-            public int CustId { get; set; }
-        }
 
         #endregion
 
@@ -129,7 +125,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                         if (disableGame.TpId == tp.TpId)
                         {
                             tp.Checked = true;
-                            var games = await _gameCasinoBll.GameCasinoByTPIdV3(tp.TpId);
+                            var games = await _gameCasinoBll.GetGameCasinoByTpId(tp.TpId);
                             tp.GameList = games.Select(a => new TpGameCasino()
                             {
                                 GameId = a.GameId,

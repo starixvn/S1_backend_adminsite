@@ -161,50 +161,16 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(IEnumerable<int> siteIds,
-            IEnumerable<int> currencyIds,
-            IEnumerable<int> promotionTypes,
-            string bonusCode,
-            string userName,
-            int pageNumber, int pageSize, out int totalPages, out int rowCount)
-        {
-            if(string.IsNullOrWhiteSpace(bonusCode))
-                bonusCode = null;
-            if (string.IsNullOrWhiteSpace(userName))
-                userName = null;
+        public IEnumerable<PendingBonus> GetPendingBonusList(IEnumerable<int> siteIds)
+        => _bonusInfoService.GetPendingBonusList(JsonConvert.SerializeObject(siteIds));
 
-            return _bonusInfoService.GetPendingBonusList(
-                JsonConvert.SerializeObject(siteIds),
-                JsonConvert.SerializeObject(currencyIds),
-                JsonConvert.SerializeObject(promotionTypes),
-                bonusCode,
-                userName,
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                Math.Abs(pageSize),
-                out totalPages, out rowCount);
-        }
 
         public IEnumerable<PendingBonus> GetAllPendingBonusList()
         {
 
             var siteList = _serverInfoBll.GetSiteList();
-            var currencyList = new List<int>();
 
-            foreach (var site in siteList)
-            {
-                currencyList.AddRange(site.ICurrencyList);            
-            }
-            var promotionAllList = _systemEnumBll.GetEnumItemByEnumName("PromotionTypeEnum");
-
-            return _bonusInfoService.GetPendingBonusList(
-                JsonConvert.SerializeObject(siteList.Select(x=>x.SiteId)),
-                JsonConvert.SerializeObject(currencyList),
-                JsonConvert.SerializeObject(promotionAllList),
-                null,
-                null,
-                0,
-                10000,
-                out _, out _);
+            return _bonusInfoService.GetPendingBonusList(JsonConvert.SerializeObject(siteList.Select(x => x.SiteId)));
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
@@ -231,6 +197,19 @@ namespace BackendSite.Service.BLL
             };
 
             return _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), out custId);
+        }
+
+        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
+        {
+            var result = new List<BonusCodeInfo>()
+            {
+                new BonusCodeInfo(){ BonusId = 0 , BonusCode = string.Empty }
+            };
+            if (bonusIdList.Any(i => i > 0))
+            {
+                result.AddRange(_bonusInfoService.GetBonusCodeList(bonusIdList));
+            }
+            return result;
         }
     }
 }

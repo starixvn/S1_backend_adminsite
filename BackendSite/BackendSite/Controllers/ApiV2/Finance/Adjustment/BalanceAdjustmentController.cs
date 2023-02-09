@@ -22,6 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         private readonly CustInfoBLL _custInfoBll;
         private readonly TpBLL _tpBll;
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly BankFinancialBLL _bankFinancialBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
         private readonly ILogger<BalanceAdjustmentController> _logger;
@@ -39,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<BalanceAdjustmentController>>();
@@ -81,7 +83,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public string BonusCode { get; set; }
-            public PromotionTypeEnum PromotionType { get; set; }
         }
 
         public class CheckBonusCodeForBatchRequest
@@ -158,18 +159,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         /// 
         /// Func Path：Finance > Balance Adjustment > [Submit] > [Check Bonus Code]
         /// 
-        /// Memo：當調整選項選擇為Retention Bonus或Manual Bonus，才需要有此步驟。
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult<BalanceAdjustBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
+        public ApiResult<CheckPayoutBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
         {
-            var apiResult = new ApiResult<BalanceAdjustBonusCodeRep>();
-            var data = _paymentBll.CheckBalanceAdjustBonusCode(request.BonusCode, (int) request.PromotionType,
-                request.SiteId, request.CurrencyId);
-            apiResult.Data = data;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
-            return apiResult;
+            return new ApiResult<CheckPayoutBonusCodeRep>
+            { 
+                Data = _paymentBll.CheckPayoutBonusCode(request.BonusCode, request.SiteId, request.CurrencyId),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -289,7 +288,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     }
                         break;
                 }
-
+                var withdrawalLimitAmount = request.WithdrawalLimitOption == 1
+                    ? request.Amount * request.WithdrawalLimitAmount
+                    : 0;
                 var adjustmentAndWithdrawalLimit = new AdjustmentAndWithdrawalLimit()
                 {
                     CustId = custInfo.CustId,
@@ -300,7 +301,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     AdjustType = (int) request.AdjustmentType,
                     SiteName = custInfo.SiteName,
                     Operator = authData.UserName,
-                    WithdrawalLimitAmount = request.WithdrawalLimitAmount,
+                    WithdrawalLimitAmount = withdrawalLimitAmount,
                     WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                     Memo = request.Memo,
                     Category = request.ReasonId,
@@ -712,24 +713,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
         {
-            var type = typeof(AdjustmentCategoryEnum);
-            var data = Enum.GetValues(type)
-                .Cast<AdjustmentCategoryEnum>()
-                .Select(x => new SelectListItem((int) x, x.GetDescription()));
+            var result =
+                _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+            var data =
+                result.Select(x => new SelectListItem(x.ReasonId, x.Description));
             var apiResult = 
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             
             return apiResult;
-            
-            // Select from DB
-            // var result =
-            //     _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
-            // var data =
-            //     result.Select(x => new SelectListItem(x.ReasonId, x.Description));
-            // var apiResult = 
-            //     new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, String.Empty, data);
-            //
-            // return apiResult;
         }
 
         #endregion

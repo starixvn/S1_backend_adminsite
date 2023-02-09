@@ -5,6 +5,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.DAL
 {
@@ -41,15 +42,15 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             return conn.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-        
+
         public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("PayDummy_Set",
                 new DynamicParameters(new
                 {
-                    SiteId = siteId, 
-                    PayId = payId, 
-                    CurrencyId = currencyId, 
+                    SiteId = siteId,
+                    PayId = payId,
+                    CurrencyId = currencyId,
                     Amount = amount
                 }),
                 conn, trans);
@@ -59,10 +60,10 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("BankOffDummy_Set",
                 new DynamicParameters(new
                 {
-                    SiteId = siteId, 
-                    SysId = sysId, 
-                    AccountNo = accountNo, 
-                    CurrencyId = currencyId, 
+                    SiteId = siteId,
+                    SysId = sysId,
+                    AccountNo = accountNo,
+                    CurrencyId = currencyId,
                     Amount = amount
                 }),
                 conn, trans);
@@ -71,210 +72,101 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new
             {
-                CustId = custId, 
-                StartDate = startDate, 
-                EndDate = endDate, 
+                CustId = custId,
+                StartDate = startDate,
+                EndDate = endDate,
                 RefTransId = refTransId,
                 PageSize = Math.Abs(pageSize)
             });
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32, ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32,  ParameterDirection.InputOutput);
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
-            var depositList = _reportDbClient.Query<FinancialLog>("Admin_FinancialLogList_Get_V3",p);
+
+            var depositList = _reportDbClient.Query<FinancialLog>("Admin_FinancialLogList_Get_V3", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
-        public IEnumerable<BonusLog> GetBonusLog(int custId, int promoCategoryId, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
+        public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
             var p = new DynamicParameters(
                 new { CustId = custId, 
-                    PromoCategoryId = promoCategoryId,
+                    PromoCategoryIds = promoCategoryIds,
                     StartDate = startDate, 
                     EndDate = endDate,
                     RefTransId = refTransId,
-                    PageSize = pageSize });
-            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
+                    PageSize = pageSize
+                });
+            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V3", p);
+            var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V4", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
-        public IEnumerable<RebateLog> GetRebateLogByCust(int CustId, long? startDate, long? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            var p = new DynamicParameters(new { CustId = CustId, StartDate = startDate, EndDate = endDate, PageSize = pageSize });
-            p.Add("PageNumber", pageNumber, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateLogList = conn.Query<RebateLog>("Admin_RebateLogListByCust_Get", p, commandType: CommandType.StoredProcedure);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-            return rebateLogList;
-        }
-        public IEnumerable<RebateLog> GetRebateLog(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, int currencyId, int baseCurrencyId, int rebateCategoriesId, ref int pageNumber, out int totalPages, out int rowCount, ref List<string> CurrencyAmount)
-        {
-            var tempCurrencyTotalAmount = new List<string>();
-            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType
-                , StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize), CategoryType= rebateCategoriesId, CurrencyId= currencyId,BaseCurrencyId= baseCurrencyId});
-
-            #region GetCurrencyTotalAmount
-            var currencyTotalAmount = _mainDbClient.Query<TotalAmount>("Admin_RebateLogTotalAmount_Get_V3", p).ToList();
-            if (currencyTotalAmount.Count > 0)
-            {
-                currencyTotalAmount.ForEach(x =>
-                {
-                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
-                });
-            }
-            CurrencyAmount = tempCurrencyTotalAmount;
-            #endregion
-
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32,ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
-
-            var rebateLogList = _mainDbClient.Query<RebateLog>("Admin_RebateLogList_Get_V4", p);
-            
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-
-            return rebateLogList;
-        }
-        public IEnumerable<RebateLog> GetRebateLogExport(string selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int currencyId, int baseCurrencyId, int rebateCategoriesId)
-        {
-            var p = new DynamicParameters(new {SelectSite = selectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, CategoryType = rebateCategoriesId, CurrencyId = currencyId, BaseCurrencyId = baseCurrencyId });
-            var rebateLogList = _mainDbClient.Query<RebateLog>("Admin_RebateLogListExport_Get_V4", p);
-            return rebateLogList;
-        }
-        public IEnumerable<RebateInfo> GetRebateInfoByCust(int CustId)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var rebateInfoList = conn.Query<RebateInfo>("Admin_RebateInfoByCust_Get_V2", new { CustId }, commandType: CommandType.StoredProcedure);
-            return rebateInfoList;
-        }
-        public IEnumerable<RebateInfo> GetRebateInfoList(IEnumerable<int> selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            var p = new DynamicParameters(new { SelectSite = JsonConvert.SerializeObject(selectSite), UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate, PageSize = Math.Abs(pageSize) });
-            p.Add("StartIndex",(Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32, ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoList_Get_V2", p);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-            return rebateInfoList;
-        }
-        public IEnumerable<RebateInfo> GetRebateInfoExport(string selectSite, string userName, int rebateType, DateTime startDate, DateTime endDate)
-        {
-            var p = new DynamicParameters(new {SelectSite = selectSite, UserName = userName, RebateType = rebateType, StartDate = startDate, EndDate = endDate });
-            var rebateInfoList = _mainDbClient.Query<RebateInfo>("Admin_RebateInfoListExport_Get_V2", p);
-            return rebateInfoList;
-        }
-
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
             var result = _reportDbClient.Query<PromotionCategory>("Common_PromotionCategory_Get");
             return result;
         }
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordListOneWeek(int custId)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecord_byCustIDOneWeek_Get", new DynamicParameters(new { CustId = custId }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordListOneDay> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneDay>("Admin_TpBetRecord_byOneDay_Get_V5", new DynamicParameters(new
-            {
-                CustId = custId, 
-                SelDate = selDate,
-                StartDate = startDate, 
-                EndDate = endDate
-            }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordbyCategoryId> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate, int categoryId, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordbyCategoryId>("Admin_TpBetRecord_byCategoryId_Get_V5", new DynamicParameters(new  { CustId = custId, SelDate = selDate, CategoryId = categoryId, StartDate = startDate, EndDate = endDate }));
-            return result;
-        }
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, DateTime selDate, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
-        {
-            var props = new DynamicParameters(new { CustId = custId, SelDate = selDate, TypeId = gameTypeId, StartDate = startDate, EndDate = endDate });
-            props.Add("@PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            props.Add("@TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("@StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            props.Add("@PageSize", Math.Abs(pageSize));
 
-            var result = _reportDbClient.Query<TpBetRecordDetailbyGameType>("Admin_TpBetRecord_byGameTypeList_Get_V5", props);
-            pageNumber = props.Get<int?>("@PageNumber") ?? 0;
-            totalPages = props.Get<int?>("@TotalPages") ?? 0;
-            rowCount = props.Get<int?>("@RowCount") ?? 0;
-
-            return result;
-        }
-
-        public VipRebateInfoData GetVipRebateInfoList(IEnumerable<int> selectSite, int currency, DateTime startDate, DateTime endDate, string user, int pageSize, int pageNumber,int categoryId, int baseCurrencyId,ref List<string> currencyAmount)
+        public VipRebateReportResult GetVipRebateInfoList(string SiteStr,
+            string currencyStr,
+            DateTime startDate,
+            DateTime endDate,
+            string userName,
+            string categoryIdStr,
+            int baseCurrencyId, int payoutStatuses,int startIndex, int pageSize,
+            ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
-            var searchData = new VipRebateInfoData();
+            var searchData = new VipRebateReportResult();
             var props = new DynamicParameters();
-            props.Add("SelectSite", JsonConvert.SerializeObject(selectSite));
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("PageSize", Math.Abs(pageSize));
-            props.Add("CategoryId", categoryId);
-            props.Add("BaseCurrencyId", baseCurrencyId);
+            props.Add("_SiteIds", SiteStr);
+            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_UserName", userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_CategoryIds", categoryIdStr);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", payoutStatuses);
 
             #region GetCurrencyTotalAmount
-            
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmount_Get_V5", props).ToList();
-            if (currencyTotalAmount.Count > 0)
+
+            searchData.CurrencyAmount = _reportDbClient.Query<VipRebateReportOverviewResult>("Admin_VipRebateTotalAmount_Get_V6", props);
+
+            if (searchData.CurrencyAmount.Count() > 0)
             {
-                currencyTotalAmount.ForEach(x =>
+                searchData.CurrencyAmount.ToList().ForEach(x =>
                 {
-                    tempCurrencyTotalAmount.Add($"{x.Currency}:{Math.Round(x.Amount, 2)}");
+                    tempCurrencyTotalAmount.Add($"{x.CurrencyName}:{Math.Round(x.TotalAmount, 2)}");
                 });
             }
             currencyAmount = tempCurrencyTotalAmount;
-            
+
             #endregion
 
-            props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),DbType.Int32,ParameterDirection.Input);
-            props.Add("PageNumber", Math.Abs(pageNumber),DbType.Int32,ParameterDirection.InputOutput);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_StartIndex", startIndex);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V8", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V9", props).ToList();
 
             searchData.VipRebateInfoList = result;
-            searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
-            searchData.TotalPages = props.Get<int?>("TotalPages") ?? 0;
-            searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
+            searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
+            searchData.RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int pageSize, int pageNumber)
+        public VipRebateInfoData GetVipRebateInfoListByCustId(int custId, DateTime? startDate, DateTime? endDate, int status, int pageSize, int pageNumber)
         {
             var searchData = new VipRebateInfoData();
             var tempCurrencyTotalAmount = new List<string>();
@@ -284,9 +176,10 @@ namespace BackendSite.Service.DAL
             //if (endDate != null) { props.Add("EndDate", endDate.Value.AddDays(1).AddSeconds(-1)); }
             //else { props.Add("EndDate"); }
             props.Add("EndDate", endDate);
+            props.Add("PayoutStatus", status);
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V3", props).ToList();
+            var currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_VipRebateTotalAmountbyCust_Get_V4", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.ForEach(x =>
@@ -295,15 +188,15 @@ namespace BackendSite.Service.DAL
                 });
             }
             searchData.CurrencyAmount = tempCurrencyTotalAmount;
-            
+
             #endregion
-            
+
             props.Add("PageSize", Math.Abs(pageSize));
             props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListbyCust_Get_V3", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListbyCust_Get_V4", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.PageNumber = props.Get<int?>("PageNumber") ?? 0;
@@ -311,24 +204,37 @@ namespace BackendSite.Service.DAL
             searchData.RowCount = props.Get<int?>("RowCount") ?? 0;
             return searchData;
         }
-        public VipRebateInfoData GetVipRebateInfoListExport(string selectSite,
-            int currency,
+
+        public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
+       => _reportDbClient.Query<VipRebateDetail>("Admin_VipRebateDetail_Get",
+           new DynamicParameters(
+               new
+               {
+                   _CustId = custId,
+                   _CategoryId = tpCategoryId,
+                   _RefId = refId
+               }));
+
+        public VipRebateInfoData GetVipRebateInfoListExport(string SiteStr,
+            string currencyStr,
             DateTime startDate,
             DateTime endDate, 
-            string user, 
-            int categoryId, 
-            int baseCurrencyId)
+            string userName, 
+            string categoryIdStr,
+            int baseCurrencyId,
+            int spPayoutStatus)
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
-            props.Add("SelectSite", selectSite);
-            props.Add("Currency", currency);
-            props.Add("UserName", string.IsNullOrWhiteSpace(user) ? null : user);
-            props.Add("StartDate", startDate);
-            props.Add("EndDate", endDate);
-            props.Add("CategoryId", categoryId);
-            props.Add("BaseCurrencyId", baseCurrencyId);
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V6", props).ToList();
+            props.Add("_SiteIds", SiteStr);
+            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_UserName", userName);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_CategoryIds", categoryIdStr);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_PayoutStatus", spPayoutStatus);
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V7", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.PageNumber = 0;
@@ -339,11 +245,6 @@ namespace BackendSite.Service.DAL
         public IEnumerable<VipTPCategory> GetTPCategoryList()
         {
             return _mainDbClient.Query<VipTPCategory>("Admin_TPCategory_Get");
-        }
-        public IEnumerable<TpBetRecordListOneWeek> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate)
-        {
-            var result = _reportDbClient.Query<TpBetRecordListOneWeek>("Admin_TpBetRecordList_Get_V4", new DynamicParameters(new { CustId = custId, StartDate = startDate, EndDate = endDate }),60);
-            return result;
         }
     }
 }
