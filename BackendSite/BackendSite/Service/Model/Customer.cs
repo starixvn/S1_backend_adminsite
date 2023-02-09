@@ -379,6 +379,7 @@ namespace BackendSite.Service.Model
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
     }
     
     public class CustBonus
