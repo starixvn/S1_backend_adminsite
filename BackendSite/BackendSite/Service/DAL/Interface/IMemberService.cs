@@ -44,4 +44,6 @@ public interface IMemberService
     Task<int> DeleteLineProfileAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
+    Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
+    Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input);
 }

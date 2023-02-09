@@ -385,4 +385,17 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryAsync<CustRealNameChangeLog>("Admin_CustRealNameChangeLog_Get", p);
     }
+
+    public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustPromotionWhiteList>("Service_CustPromotionWhiteList_Get", p);
+    }
+
+    public async Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input)
+    {
+        var p = new DynamicParameters(input);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustPromotionWhiteList_Set", p);
+    }
+
 }
