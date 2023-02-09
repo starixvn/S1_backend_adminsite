@@ -46,6 +46,11 @@ namespace BackendSite.Service.BLL
             return serverInfo;
         }
 
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+        }
+
         public IEnumerable<ServerInfo> GetSiteList()
         {
             var sServerInfoListKey = $"ServerInfoList";
@@ -243,10 +248,6 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
         {
             return await serverInfoService.GetLanguageList(siteId, currencyId);
-        }
-        public ServerInfo GetServerInfo(int siteId)
-        {
-            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
         }
     }
 }
