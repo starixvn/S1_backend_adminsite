@@ -509,7 +509,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
 
-            if (result > 0)
+            if (result)
             {
                 return new ApiResult
                 {
@@ -519,6 +519,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> CheckDuplicateName(SetFullNameRequest request)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result =
+                await _memberCommand.GetDuplicateAccountInfoAsync(authData.SiteId, request.FullName);
+
+            return new ApiResult<IEnumerable<SimilarAccountInfo>>
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = result.Where(x => x.CustId != request.CustId)
+            };
         }
 
         /// <summary>

@@ -1527,4 +1527,8 @@ namespace BackendSite.Service.Model.enums
         [Description("Deposit refunded")]
         DepositRefunded = 3
     }
+    public enum CustTagEnum
+    {
+        Duplicate = 6
+    }
 }

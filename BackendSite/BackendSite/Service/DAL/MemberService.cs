@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL;
@@ -175,14 +176,74 @@ public class MemberService : IMemberService
         p.Add("TagList", JsonConvert.SerializeObject(tagList));
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
+    
+    public async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
+    {
+        var p = new DynamicParameters(new
+        {
+            _SiteId = siteId,
+            _AccountNames = JsonConvert.SerializeObject(accountNames)
+        });
+        
+        return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
+    }
 
-    public async Task<int> EditFullNameAsync(int custId, string fullName, string @operator)
+    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts, string @operator)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
         p.Add("_FullName", fullName);
         p.Add("_Operator", @operator);
-        return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p);
+
+        if (!duplicateAccounts.Any())
+        {
+            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p) > 0;
+        }
+
+        await using var conn = _mainSqlClient.GetMySqlConnection();
+        conn.Open();
+        await using var trans = await conn.BeginTransactionAsync();
+        
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p, conn, trans) > 0;
+
+        if (success)
+        {
+            var strTags = await GetCustomerTagsAsync(custId);
+            var tags = string.IsNullOrEmpty(strTags)
+                ? new List<int>()
+                : JsonConvert.DeserializeObject<List<int>>(strTags);
+        
+            var custTags = duplicateAccounts
+                .Select(x => new CustTagList {CustId = x.CustId, TagList = JsonConvert.DeserializeObject<IEnumerable<int>>(x.TagList ?? "[]")})
+                .Where(x => !x.TagList.Contains((int) CustTagEnum.Duplicate))
+                .ToList();
+        
+            if (!tags.Contains((int) CustTagEnum.Duplicate))
+            {
+                custTags.Add(new CustTagList {CustId = custId, TagList = tags});
+            }
+            
+            if (!custTags.Any())
+            {
+                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                return true;
+            }
+
+            foreach (var item in custTags)
+            {
+                item.TagList = item.TagList.Append((int) CustTagEnum.Duplicate);
+            }
+            
+            success = await SetCustInfoTagList(custTags, conn, trans);
+            if (success)
+            {
+                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                return true;
+            }
+        }
+
+        _mainSqlClient.RollbackAndDisposeConnection(conn, trans);
+        return false;
     }
 
     public async Task<int> EditEmailAsync(int custId, string email)
@@ -307,6 +368,16 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
+    }
+    
+    public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlConnection conn, MySqlTransaction trans)
+    {
+        var parameter = new DynamicParameters(new
+        {
+            _Infos = JsonConvert.SerializeObject(tagList)
+        });
+            
+        return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", parameter, conn, trans) > 0;
     }
 
     public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
