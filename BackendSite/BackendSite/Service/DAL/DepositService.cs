@@ -193,6 +193,26 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<int> DelDepositReceiptPic(int custId, int depositId)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("DepositId", depositId);
+            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props);
+            
+            return result;
+        }
+        
+        public int CheckDepositReceipt(int depositId , string Operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositId", depositId);
+            props.Add("_Operator", Operator);
+            var result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+            
+            return result;
+        }
+        
         public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
         {
             var type = 1;

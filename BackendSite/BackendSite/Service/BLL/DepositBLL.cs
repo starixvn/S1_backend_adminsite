@@ -142,6 +142,12 @@ namespace BackendSite.Service.BLL
             return await depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
         }
 
+        public int CheckDepositReceipt(string transId,  string Operator)
+        {
+            var depositId = ValidateDepositReceiptPic(transId);
+            return depositService.CheckDepositReceipt(depositId, Operator);
+        }
+        
         private int ValidateDepositReceiptPic(string transId)
         {
             var depositId = 0;

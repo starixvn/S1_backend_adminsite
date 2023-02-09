@@ -116,6 +116,8 @@ namespace BackendSite.Service.Model
         public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public int CheckReceipt { set; get; }
+        public string CheckReceiptBy { set; get; }
     }
 
     public class DepositInfoForExport
@@ -470,5 +472,10 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string TransId { get; set; }
         public IFormFile Receipt { get; set; }
+    }
+    
+    public class CheckDepositReceiptRequest
+    {
+        public string TransId { get; set; }
     }
 }

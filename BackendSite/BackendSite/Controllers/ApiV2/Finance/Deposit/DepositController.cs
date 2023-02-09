@@ -561,6 +561,57 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return apiResult;
         }
         
+        /// <summary>
+        /// Deposit/CheckDepositReceipt Check存款單審核
+        /// </summary>
+        /// <remarks/>
+        /// Http Method：POST
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 79 })]
+        [HttpPost]
+        public ApiResult CheckDepositReceipt(CheckDepositReceiptRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var depositInfo = _depositBll.GetDepositRequest(request.TransId);
+
+                if (depositInfo.CheckReceipt == 1)
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                    apiResult.Message = "depositId already checked";
+                }
+
+                if (depositInfo.DepositType == (int)DepositTypeEnum.LocalBanking &&
+                    depositInfo.Status == (int)DepositStatusEnum.Pending || 
+                    depositInfo.Status == (int)DepositStatusEnum.OnHold)
+                {
+                    var result = _depositBll.CheckDepositReceipt(request.TransId,User.Identity.Name);
+                    if (result > 0)
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    }
+                    else
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                        apiResult.Message = "CheckDepositReceipt fail.";
+                    }
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Only localBanking and pending or onHold can check";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"CheckDepositReceipt Fail. {e.Message}");
+            }
+           
+            return apiResult;
+        }
+        
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]
         [HttpPost]
         public async Task<ApiResult> DepositManualApproval(DepositManualRequest para)
