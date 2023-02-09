@@ -192,7 +192,7 @@ namespace BackendSite.Service.BLL
             var custLineProfile = await _memberService.GetCustLineProfileAsync(custId, null);
 
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-            var hasPermission = _permissionBll.CheckPermission(loginUser, 2, 39);
+            var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
             var email = customer.Email;
             var phoneNo = customer.PhoneNo;
             if (!hasPermission)
@@ -214,6 +214,7 @@ namespace BackendSite.Service.BLL
                 VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,
+                UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
@@ -244,7 +245,9 @@ namespace BackendSite.Service.BLL
                 IsTest = customer.IsTest,
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
-                    : await _memberService.GetCustomerTagsAsync(customer.TagList)
+                    : await _memberService.GetCustomerTagsAsync(customer.TagList),
+                PhoneRewardTime = customer.PhoneRewardTime,
+                EmailRewardTime = customer.EmailRewardTime
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {

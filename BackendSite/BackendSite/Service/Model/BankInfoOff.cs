@@ -86,19 +86,6 @@ namespace BackendSite.Service.Model
         public string CalCodeName { set; get; }
         public int CurrencyId { set; get; }
         public int SysId { set; get; }
-        /*public int Id { set; get; }
-        public int CurrencyId { set; get; }
-        public int SysId { set; get; }
-        public string AccountName { set; get; }
-        public string AccountNo { set; get; }
-        public string BankCode { set; get; }
-        public string SiteName { set; get; }
-        public string CalCodeName
-        {
-                get => $"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}";
-                set => CalCodeName = value;
-        }*/
-        
     }
     
     public class BankCodeModelComparer : IEqualityComparer<BankCodeModel>

@@ -40,11 +40,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
             public int SiteId { get; set; }
         }
 
-        public class SetRequest
-        {
-            public decimal Amount { get; set; }
-        }
-
         #endregion
 
         #region Actions
