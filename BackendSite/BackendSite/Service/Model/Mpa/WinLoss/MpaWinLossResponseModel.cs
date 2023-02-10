@@ -531,6 +531,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 11)]
         public decimal Margin { get; set; }
+
+        [JsonProperty(Order = 12)] 
+        public decimal ClosingBalance => 0.0m;
+
+        [JsonProperty(Order = 13)] 
+        public int DepositCount => 0;
+
+        [JsonProperty(Order = 14)]
+        public decimal TotalDepositAmount => 0.0m;
+
+        [JsonProperty(Order = 15)]
+        public int WithDrawCount => 0;
+
+        [JsonProperty(Order = 16)]
+        public decimal TotalWithDrawAmount => 0.0m;
+
+        [JsonProperty(Order = 17)]
+        public decimal TotalBonus => 0.0m;
     }
 
     public class MpaWinLossByCurrencyResponseFrontEnd
