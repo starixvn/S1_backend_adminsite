@@ -86,13 +86,7 @@ namespace BackendSite.Service.Model
         public String Name { get; set; }
         public List<PermissionSubFuncKeys> Settings { get; set; }
     }
-    public class PermissionSettings
-    {
-        public String DisPlayKey { get; set; }
-        public int FunKey { get; set; }
-        public List<PermissionSubFuncKeys> SubFuncKeys { get; set; }
 
-    }
     public class PermissionSubFuncKeys
     {
         public int PermissionId { get; set; }

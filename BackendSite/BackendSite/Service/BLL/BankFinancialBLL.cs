@@ -62,6 +62,7 @@ namespace BackendSite.Service.BLL
                 () => _bankFinancialService.GetReason(funcKey));
         }
 
+        [Obsolete("請改用GetPayList(int siteId)")]
         public IEnumerable<PayList> GetPayList()
         {
             return _paymentManageService.GetPayList();
@@ -80,7 +81,11 @@ namespace BackendSite.Service.BLL
             });
         }
 
-
+        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
+        }
+        
         #endregion
 
         #region Transfer Account Management
@@ -136,6 +141,8 @@ namespace BackendSite.Service.BLL
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
+                CryptoCurrencyId = input.CryptoCurrencyId,
+                Network = input.Network,
                 AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
                 AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
                 AccountName = input.AccountName,
@@ -224,13 +231,6 @@ namespace BackendSite.Service.BLL
                         scope.Dispose();
 
                         return (false, count, "Insert Transfer Account Fail. Duplicate AccountNo.");
-                    };
-
-                    if (_bankFinancialService.InsertTransferAccountLog(ActionType.Create, transferAccountModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Insert Transfer Account Log Fail.");
                     }
 
                     if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
@@ -255,13 +255,6 @@ namespace BackendSite.Service.BLL
                         scope.Dispose();
 
                         return (false, count, "Update Transfer Account Fail.");
-                    };
-
-                    if (_bankFinancialService.InsertTransferAccountLog(ActionType.Update, transferAccountModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Insert Transfer Account Log Fail.");
                     }
 
                     if (updateTransferDataFlag)
@@ -305,12 +298,12 @@ namespace BackendSite.Service.BLL
 
         #region Private Methods Set TransferAccount
 
-        private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount,
+        private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel input,
                                                          out string message)
         {
             message = string.Empty;
 
-            if (bankFinancialTransferAccount == null)
+            if (input == null)
             {
                 message = "Data Invalid.";
 
@@ -319,14 +312,14 @@ namespace BackendSite.Service.BLL
 
             #region Parameter Values Check
 
-            if (bankFinancialTransferAccount.Id == null)
+            if (input.Id == null)
             {
                 message = "Data-[Id] invalid.Notify admin please.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.SiteId == null)
+            if (input.SiteId == null)
             {
                 message = "Data-[Site] invalid.";
 
@@ -334,131 +327,131 @@ namespace BackendSite.Service.BLL
 
             }
 
-            if (bankFinancialTransferAccount.SiteId != 4 &&
-                bankFinancialTransferAccount.SiteId != 1 &&
-                bankFinancialTransferAccount.SiteId != 2 &&
-                bankFinancialTransferAccount.SiteId != 3)
+            if (input.SiteId != 4 &&
+                input.SiteId != 1 &&
+                input.SiteId != 2 &&
+                input.SiteId != 3)
             {
                 message = "Data-[Site] not match.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.SiteName == null)
+            if (input.SiteName == null)
             {
                 message = "Data-[SiteName] Invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.CurrencyId == null || bankFinancialTransferAccount.CurrencyId == 0)
+            if (input.CurrencyId == null || input.CurrencyId == 0)
             {
                 message = "Data-[Currency] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.SysId == null || bankFinancialTransferAccount.SysId == 0)
+            if (input.Channel == TransferChannelEnum.LocalBank && (input.SysId == null || input.SysId == 0))
             {
                 message = "Data-[Bank Code] invalid.";
 
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(bankFinancialTransferAccount.Purpose))
+            if (string.IsNullOrWhiteSpace(input.Purpose))
             {
                 message = "Data-[Purpose] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.Channel == null || bankFinancialTransferAccount.Channel == 0)
+            if (input.Channel == null || input.Channel == 0)
             {
                 message = "Data-[Channel] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.Channel == TransferChannelEnum.PSP &&
-                (bankFinancialTransferAccount.PayId == null || bankFinancialTransferAccount.PayId == 0))
+            if (input.Channel == TransferChannelEnum.PSP &&
+                (input.PayId == null || input.PayId == 0))
             {
                 message = "Data-[Channel] is PSP.But [Pay] is invalid.";
 
                 return false;
             }
 
-            if ((bankFinancialTransferAccount.Channel == TransferChannelEnum.LocalBank || bankFinancialTransferAccount.Channel == TransferChannelEnum.HeadOffice) &&
-               bankFinancialTransferAccount.Agent == null)
+            if ((input.Channel == TransferChannelEnum.LocalBank || input.Channel == TransferChannelEnum.HeadOffice) &&
+               input.Agent == null)
             {
                 message = "Data-[Channel] is Local Bank or Head Office.But [Agent] is invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.AccountNo == null)
+            if (input.AccountNo == null)
             {
                 message = "Data-[AccountNo] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.AccountName == null)
+            if (input.AccountName == null)
             {
                 message = "Data-[AccountName] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.DisplayName == null)
+            if (input.DisplayName == null)
             {
                 message = "Data-[DisplayName] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.InitialAmount == null || bankFinancialTransferAccount.InitialAmount < 0)
+            if (input.InitialAmount == null || input.InitialAmount < 0)
             {
                 message = "Data-[InitialAmount] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.MaxBalanceAlertAmount == null || bankFinancialTransferAccount.MaxBalanceAlertAmount < 0)
+            if (input.MaxBalanceAlertAmount == null || input.MaxBalanceAlertAmount < 0)
             {
                 message = "Data-[MaxBalanceAlertAmount] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.Status == null)
+            if (input.Status == null)
             {
                 message = "Data-[Status] invalid.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.CreateTime == null)
+            if (input.CreateTime == null)
             {
                 message = "Data-CreateTime invalid.Notify admin please.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.Creator == null)
+            if (input.Creator == null)
             {
                 message = "Data-Creator invalid.Notify admin please.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.UpdateTime == null)
+            if (input.UpdateTime == null)
             {
                 message = "Data-UpdateTime invalid.Notify admin please.";
 
                 return false;
             }
 
-            if (bankFinancialTransferAccount.Updator == null)
+            if (input.Updator == null)
             {
                 message = "Data-Updator invalid.Notify admin please.";
 
@@ -584,7 +577,7 @@ namespace BackendSite.Service.BLL
             GetTransferInfoListParams input, int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
-            var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
+            var (startIndex, _) = pageNumber.GetStartIndexAndPageSize(pageSize);
             var result =
                 _bankFinancialService.GetFinancialTransferInfoList(input, startIndex, pageSize, out _, out var rowCount);
 
@@ -659,13 +652,6 @@ namespace BackendSite.Service.BLL
                             scope.Dispose();
 
                             return (false, count, "Insert Transfer Info Minus Data Fail.");
-                        };
-
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Create, transferInfoFromModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
                     }
 
@@ -677,13 +663,6 @@ namespace BackendSite.Service.BLL
                             scope.Dispose();
 
                             return (false, count, "Insert Transfer Info Plus Data Fail.");
-                        };
-
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Create, transferInfoToModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
                     }
 
@@ -717,13 +696,6 @@ namespace BackendSite.Service.BLL
                             scope.Dispose();
 
                             return (false, count, "Update Transfer Info Minus Data Fail.");
-                        };
-
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Update, transferInfoFromModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
                         }
                     }
 
@@ -735,14 +707,6 @@ namespace BackendSite.Service.BLL
                             scope.Dispose();
 
                             return (false, count, "Update Transfer Info Plus Data Fail.");
-                        };
-
-
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Update, transferInfoToModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
                         }
                     }
 
@@ -874,32 +838,8 @@ namespace BackendSite.Service.BLL
                 {
                     var affectCount = 0;
 
-                    //Step3:Insert Log
-                    if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
-                       || data.TransactionType == TransactionTypeEnum.OnlyMinus)
-                    {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Delete, transferInfoFromModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Minus Data Fail.");
-                        }
-                        affectCount++;
-                    }
-                    if (data.TransactionType == TransactionTypeEnum.PlusAndMinus
-                       || data.TransactionType == TransactionTypeEnum.OnlyPlus)
-                    {
-                        if (_bankFinancialService.InsertTransferInfoLog(ActionEnum.Delete, transferInfoToModel) != 1)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Insert Transfer Info Log Plus Data Fail.");
-                        }
-                        affectCount++;
-                    }
-
                     //Step4:Delete Data
-                    if (_bankFinancialService.DeleteTransferInfo(transferId) != affectCount)
+                    if (_bankFinancialService.DeleteTransferInfo(transferId) < 1)
                     {
                         scope.Dispose();
 

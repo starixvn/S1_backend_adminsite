@@ -63,10 +63,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int CustId { get; set; }
         }
-        public class DeleteReq
-        {
-            public int CustId { get; set; }
-        }
 
         #endregion
 

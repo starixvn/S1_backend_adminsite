@@ -62,6 +62,13 @@ namespace BackendSite.Service.BLL
                 () => _custInfoService.GetCustInfo(custId),
                 RedisDataBase.Shared);
         }
+        
+        public int GetPointLevelWithCache(int custId)
+        {
+            return _redisHelper.TryGetOrCreate($"PointLevel:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetPointLevel(custId),
+                RedisDataBase.Shared);
+        }
 
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
@@ -268,11 +275,11 @@ namespace BackendSite.Service.BLL
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
             IEnumerable<int> GameTypes,
-            DateTimeOffset StartTime,
-            DateTimeOffset EndTime)
+            DateTime StartTime,
+            DateTime EndTime)
         {
             var result = _betListBll
-                .GetTpBetRecord(CustId, StartTime.DateTime, EndTime.DateTime)
+                .GetTpBetRecord(CustId, StartTime, EndTime)
                 .Where(i => GameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                     tpBetRecord => tpBetRecord.GameType,
@@ -285,6 +292,7 @@ namespace BackendSite.Service.BLL
                         Stake = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
                         WinlostAmount = tpBetRecord.WinlostAmount,
                         SettlementType = tpBetRecord.SettlementType,
+                        TpUserName = tpBetRecord.TpUserName,
                     })
                 .GroupBy(i => i.GameType)
                 .Select(i => new CustTurnoverRes
@@ -294,7 +302,8 @@ namespace BackendSite.Service.BLL
                     GameName = i.First().GameName,
                     StakeSettled = i.Where( i=> i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
                     StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
-                    WinlostAmount = i.Sum(i => i.WinlostAmount)
+                    WinlostAmount = i.Sum(i => i.WinlostAmount),
+                    TpUserName = i.First().TpUserName
                 })
                 .ToList();
 
@@ -328,20 +337,6 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
             return _custInfoService.GetCustBonus(custId);
-        }
-        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
-        {
-            return _custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
-        }
-
-        public int UpdateCustomerTele(int siteId, int custId, string @operator)
-        {
-            return _custInfoService.UpdateCustomerTele(siteId, custId, @operator);
-        }
-
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
-        {
-            return _custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
         }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
@@ -426,9 +421,9 @@ namespace BackendSite.Service.BLL
 
         #region Customer Note
 
-        public bool AddCustNote(int custId, string Note, string Operator)
+        public bool AddCustNote(int custId, string note, string @operator, bool canEdit = false)
         {
-            return _custInfoService.AddCustNote(custId, Note, Operator);
+            return _custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit);
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
             int pageSize,
@@ -714,82 +709,6 @@ namespace BackendSite.Service.BLL
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
         {
             return _custInfoService.GetAllSiteVipLevelList();
-        }
-
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            return _custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
-        }
-
-        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
-        {
-            return _custInfoService.SetRegLiveStatus(input);
-        }
-
-        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
-        {
-            return _custInfoService.GetRegLiveStatusNotes(custId);
-        }
-
-        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
-        {
-            return _custInfoService.AddRegLiveStatusNote(input);
-        }
-
-        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
-        {
-            return _custInfoService.DeleteRegLiveStatusNote(input);
-        }
-
-        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
-        {
-            return _custInfoService.EditRegLiveStatusNote(input);
-        }
-
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            var list = new List<RegLiveStatusExport>();
-            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
-            result.ToList().ForEach(x =>
-            {
-                list.Add(new RegLiveStatusExport()
-                {
-                    Site = x.SiteName,
-                    Currency = x.Currency,
-                    UserName = x.UserName,
-                    FullName = x.AccountName,
-                    PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
-                    AffCode = x.AffCode,
-                    Agent = x.Agent
-                });
-            });
-            return list;
-        }
-
-        public IEnumerable<RegLiveStatusForMarketingExport> GetExportRegLiveStatusForMarketing(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            var list = new List<RegLiveStatusForMarketingExport>();
-            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
-            result.ToList().ForEach(x =>
-            {
-                list.Add(new RegLiveStatusForMarketingExport()
-                {
-                    Site = x.SiteName,
-                    Currency = x.Currency,
-                    UserName = x.UserName,
-                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    ReferralUrl = x.ReferralUrl,
-                    AffCode = x.AffCode,
-                    Agent = x.Agent
-                });
-            });
-            return list;
         }
 
         public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
@@ -1112,7 +1031,8 @@ namespace BackendSite.Service.BLL
                 GameName = y.First().GameName,
                 GameType = y.Key,
                 StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
-                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0)
+                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0),
+                TpUserName = y.First().TpUserName
             }).ToList();
 
             return result;

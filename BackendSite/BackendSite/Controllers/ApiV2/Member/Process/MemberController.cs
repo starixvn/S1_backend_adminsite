@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -194,7 +195,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
         [HttpPost]
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
@@ -264,7 +265,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 75 })]
         [HttpPost]
         public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
         {
@@ -293,7 +294,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 4 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 75 })]
         [HttpPost]
         public async Task<ApiResult> DeleteCustPhotoId(DeleteCustPhotoIdRequest request)
         {

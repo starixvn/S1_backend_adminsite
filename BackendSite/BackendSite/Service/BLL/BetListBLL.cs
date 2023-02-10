@@ -90,7 +90,7 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            var result = list.GetRange(index, count);
+            var result = list.AsEnumerable().GetRange(index, count);
             foreach (var item in list)
             {
                 item.Dispose();
