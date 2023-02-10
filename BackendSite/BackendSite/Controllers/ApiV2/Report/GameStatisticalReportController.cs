@@ -54,12 +54,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             }
         }
 
-        public class TitleModel
-        {
-            public string Name { get; set; }
-            public int SortId { get; set; }
-        }
-
         #endregion
 
         /// <summary>

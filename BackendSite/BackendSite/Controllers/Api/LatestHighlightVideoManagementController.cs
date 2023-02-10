@@ -15,21 +15,21 @@ namespace BackendSite.Controllers.Api
     [ApiExplorerSettings(IgnoreApi = true)]
     public class LatestHighlightVideoManagementController : Controller
     {
-        private readonly LatestHighlightVideoManagementBLL highlightVideoManagementBLL;
+        private readonly VideoManagementBLL highlightVideoManagementBLL;
 
-        public LatestHighlightVideoManagementController(LatestHighlightVideoManagementBLL highlightVideoManagementBLL)
+        public LatestHighlightVideoManagementController(VideoManagementBLL highlightVideoManagementBLL)
         {
             this.highlightVideoManagementBLL = highlightVideoManagementBLL;
         }
 
         [HttpPost]
-        public ApiListResult<LatestHighlightVideoData> GetLatestHighlightVideoData(GetLatestHighlightVideoDataPara para)
+        public ApiListResult<VideoData> GetLatestHighlightVideoData(GetVideoDataPara para)
         {
-            var apiResult = new ApiListResult<LatestHighlightVideoData>();
+            var apiResult = new ApiListResult<VideoData>();
             try
             {
-                var retult = highlightVideoManagementBLL.GetLatestHighlightVideoData(para);
-                apiResult.Data = retult.LatestHighlightVideoDatas;
+                var retult = highlightVideoManagementBLL.GetVideoData(para);
+                apiResult.Data = retult.VideoDatas;
                 apiResult.PageNumber = retult.PageNumber;
                 apiResult.TotalPages = retult.TotalPages;
                 apiResult.RowCount = retult.RowCount;
@@ -44,12 +44,13 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult SetLatestHighlightVideo(SetLatestHighlightVideoPara para)
+        public ApiResult SetLatestHighlightVideo(SetVideoPara para)
         {
             var apiResult = new ApiResult();
             try
             {
-                highlightVideoManagementBLL.SetLatestHighlightVideo(para, User.Identity.Name);
+                // 給 null 未來移除舊API
+                highlightVideoManagementBLL.SetVideoInfo(null);
                 apiResult.ErrorCode = 0;
                 highlightVideoManagementBLL.AddLog("Marketing/LatestHighlightVideoManagement", ActionType.Update, JsonConvert.SerializeObject(para), User.Identity.Name);
             }
@@ -80,7 +81,7 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult InsertLatestHighlightVideo(InsrtLatestHighlightVideoPara para)
+        public ApiResult InsertLatestHighlightVideo(InsertVideoPara para)
         {
             var apiResult = new ApiResult();
             try

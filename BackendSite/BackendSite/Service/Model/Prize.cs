@@ -1,8 +1,5 @@
 ﻿namespace BackendSite.Service.Model
 {
-    public class Prize
-    {
-    }
     public class PrizeSelect
     {
         public IEnumerable<int> SelectSite { get; set; }
@@ -75,14 +72,7 @@
         public string UserName { get; set; }
         public DateTimeOffset DrawTime { get; set; }
     }
-    public class PrizeSearchResult
-    {
-        public List<DrawPrize> DrawPrize { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-        public List<string> CurrencyAmount { get; set; }
-    }
+
     public class DrawPrizeReportResult
     {
         public List<DrawPrize> Data { get; set; }
