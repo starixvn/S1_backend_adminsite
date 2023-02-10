@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Net;
-using System.Xml.Linq;
+﻿using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
@@ -797,7 +795,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 77 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
@@ -857,7 +855,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 78 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {

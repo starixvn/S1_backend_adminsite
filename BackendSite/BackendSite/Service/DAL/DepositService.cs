@@ -180,12 +180,13 @@ namespace BackendSite.Service.DAL
 
             return transId;
         }
-
-        public async Task<int> SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
+        
+        public async Task<int> SetDepositReceiptPic(int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic)
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("DepositId", depositId);
+            props.Add("ReceiptNo", receiptNo);
             props.Add("PicFileName", picFileName);
             props.Add("DepositPic", depositPic);
             var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props);
@@ -193,6 +194,17 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<int> DelDepositReceiptPic(int custId, int depositId, int receiptNo)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("DepositId", depositId);
+            props.Add("ReceiptNo", receiptNo);
+            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props);
+            
+            return result;
+        }
+        
         public async Task<int> DelDepositReceiptPic(int custId, int depositId)
         {
             var props = new DynamicParameters();
@@ -360,9 +372,9 @@ namespace BackendSite.Service.DAL
                 }));
         }
 
-        public DepositReceipt GetDepositReceipt(int depositId, int siteId)
+        public IEnumerable<DepositReceipt> GetDepositReceipt(int depositId, int siteId)
         {
-            return _reportDbClient.QueryFirst<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
+            return _reportDbClient.Query<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
         }
 
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)

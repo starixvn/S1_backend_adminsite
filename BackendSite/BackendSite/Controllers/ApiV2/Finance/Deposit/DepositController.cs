@@ -500,15 +500,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <param name="transId"></param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult GetReceiptByTransId(string transId)
+        public List<DepositReceiptModel> GetReceiptByTransId(string transId)
         {
+            var result = new List<DepositReceiptModel>();
+            
             var depositReceipt = _depositBll.GetDepositReceipt(transId);
             if (depositReceipt == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
-            var image = depositReceipt.DepositPic;
-            return File(image, "image/jpeg");
+            
+            foreach (var receipt in depositReceipt)
+            {
+                var image = receipt.DepositPic;
+                var model = new DepositReceiptModel
+                {
+                    ReceiptNo = receipt.ReceiptNo,
+                    Receipt = File(image, "image/jpeg")
+                };
+                result.Add(model);
+            }
+           
+            return result;
         }
 
         /// <summary>
@@ -535,7 +548,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         .ExcludePath()
                         .SetFilenameExtension("jpg")
                         .FileName;
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, fileName, fileBytes);
+
+                    var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
+                    var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes);
                     
                     if (result > 0)
                     {
@@ -556,6 +572,39 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             catch (Exception e)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, $"UploadReceipt Fail. {e.Message}");
+            }
+           
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// Deposit/DeleteReceipt 刪除存款收據
+        /// </summary>
+        /// <remarks/>
+        /// Http Method：POST
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 78 })]
+        [HttpPost]
+        public async Task<ApiResult> DeleteReceipt(DeleteReceiptRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = await _depositBll.DelDepositReceiptPic(request.CustId,request.TransId,request.ReceiptNo);
+
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "DelDepositReceiptPic fail.";
+                }
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"DeleteReceipt Fail. {e.Message}");
             }
            
             return apiResult;
