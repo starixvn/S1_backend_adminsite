@@ -2,6 +2,7 @@
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
@@ -116,6 +117,8 @@ namespace BackendSite.Service.Model
         public string FromBankName { set; get; }
         public string BonusCode { set; get; }
         public string BonusDescription { set; get; }
+        public int CheckReceipt { set; get; }
+        public string CheckReceiptBy { set; get; }
     }
 
     public class DepositInfoForExport
@@ -307,10 +310,17 @@ namespace BackendSite.Service.Model
     public class DepositReceipt
     {
         public int DepositId { get; set; }
+        public int ReceiptNo { get; set; }
         public string RefNo { get; set; }
         public DateTime DepositTime { get; set; }
         public string PicFileName { get; set; }
         public byte[] DepositPic { get; set; }
+    }
+    
+    public class DepositReceiptModel
+    {
+        public IActionResult Receipt { get; set; }
+        public int ReceiptNo { get; set; }
     }
 
     public class DepositLimit
@@ -463,5 +473,25 @@ namespace BackendSite.Service.Model
         public Decimal ActualDeposit { get; set; }
         public DepositStatusEnum Action { get; set; }
         public string ActionName { get; set; }
+    }
+    
+    public class DepositReceiptFile
+    {
+        public int CustId { get; set; }
+        public int ReceiptNo { get; set; }
+        public string TransId { get; set; }
+        public IFormFile Receipt { get; set; }
+    }
+    
+    public class CheckDepositReceiptRequest
+    {
+        public string TransId { get; set; }
+    }
+    
+    public class DeleteReceiptRequest
+    {
+        public int CustId { get; set; }
+        public int ReceiptNo { get; set; }
+        public string TransId { get; set; }
     }
 }

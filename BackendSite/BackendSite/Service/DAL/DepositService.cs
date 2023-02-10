@@ -179,13 +179,42 @@ namespace BackendSite.Service.DAL
 
             return transId;
         }
-
-        public int SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
+        
+        public async Task<int> SetDepositReceiptPic(int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic)
         {
-            return _mainDbClient.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic });
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("DepositId", depositId);
+            props.Add("ReceiptNo", receiptNo);
+            props.Add("PicFileName", picFileName);
+            props.Add("DepositPic", depositPic);
+            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props);
+            
+            return result;
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo, bool canReward = false)
+        public async Task<int> DelDepositReceiptPic(int custId, int depositId, int receiptNo)
+        {
+            var props = new DynamicParameters();
+            props.Add("CustId", custId);
+            props.Add("DepositId", depositId);
+            props.Add("ReceiptNo", receiptNo);
+            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props);
+            
+            return result;
+        }
+
+        public int CheckDepositReceipt(int depositId , string Operator)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositId", depositId);
+            props.Add("_Operator", Operator);
+            var result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+            
+            return result;
+        }
+        
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -332,9 +361,9 @@ namespace BackendSite.Service.DAL
                 }));
         }
 
-        public DepositReceipt GetDepositReceipt(int depositId, int siteId)
+        public IEnumerable<DepositReceipt> GetDepositReceipt(int depositId, int siteId)
         {
-            return _reportDbClient.QueryFirst<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
+            return _reportDbClient.Query<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
         }
 
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
