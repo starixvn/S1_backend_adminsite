@@ -181,7 +181,7 @@ namespace BackendSite.Service.DAL
             return transId;
         }
         
-        public async Task<int> SetDepositReceiptPic(int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic)
+        public async Task<int> SetDepositReceiptPic(int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic ,string creator)
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
@@ -189,6 +189,8 @@ namespace BackendSite.Service.DAL
             props.Add("ReceiptNo", receiptNo);
             props.Add("PicFileName", picFileName);
             props.Add("DepositPic", depositPic);
+            props.Add("Creator", creator);
+            props.Add("CreateFrom", 2);
             var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props);
             
             return result;

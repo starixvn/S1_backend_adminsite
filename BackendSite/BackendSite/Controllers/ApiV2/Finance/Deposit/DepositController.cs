@@ -551,7 +551,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                     var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
                     var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes);
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes, User.Identity.Name);
                     
                     if (result > 0)
                     {
