@@ -659,6 +659,14 @@ namespace BackendSite.Service.Model.enums
         ReferralFreeCredit = 15
     }
     
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
