@@ -612,6 +612,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Can't delete receipt from user";
+                    return apiResult;
                 }
                 
                 var result = await _depositBll.DelDepositReceiptPic(
