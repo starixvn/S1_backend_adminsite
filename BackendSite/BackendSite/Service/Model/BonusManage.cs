@@ -190,6 +190,27 @@ namespace BackendSite.Service.Model
         public int AutoExtend { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
+
+        [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
+        public bool SameDeviceIDRestrict { get; set; }
+
+        [Description("相同DeviceID領取限制的可用次數")]
+        public int SameDeviceIDAvailableCount { get; set; }
+
+        [Description("啟用相同IP領取限制: 0.不限制 1.限制")]
+        public bool SameIPRestrict { get; set; }
+
+        [Description("相同IP領取限制的可用次數")]
+        public int SameIPRestrictAvailableCount { get; set; }
+
+        [Description("啟用相同實名領取限制: 0.不限制 1.限制")]
+        public bool SameRealNameRestrict { get; set; }
+
+        [Description("相同實名領取限制的可用次數")]
+        public int SameRealNameRestrictAvailableCount { get; set; }
+
+        [Description("用戶Tag封鎖清單")]
+        public IEnumerable<int> BlockTagList { get; set; } = new List<int>();
     }
     
     public class PromotionSpecific
