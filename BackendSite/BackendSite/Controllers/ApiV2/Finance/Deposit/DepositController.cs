@@ -530,7 +530,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 var model = new DepositReceiptModel
                 {
                     ReceiptNo = receipt.ReceiptNo,
-                    Receipt = File(image, "image/jpeg")
+                    Receipt = File(image, "image/jpeg"),
+                    Creator = receipt.Creator,
+                    CreateTime = receipt.CreateTime
                 };
                 result.Add(model);
             }
@@ -565,7 +567,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                     var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
                     var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes);
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes, User.Identity.Name);
                     
                     if (result > 0)
                     {
@@ -604,7 +606,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiResult = new ApiResult();
             try
             {
-                var result = await _depositBll.DelDepositReceiptPic(request.CustId,request.TransId,request.ReceiptNo);
+                var depositReceipt = _depositBll.GetDepositReceiptByNo(request.TransId , request.ReceiptNo);
+
+                if (depositReceipt.CreateFrom == (int)DepositReceiptCreateFromEnum.User)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Can't delete receipt from user";
+                }
+                
+                var result = await _depositBll.DelDepositReceiptPic(request.SiteId ,request.CustId,request.TransId,request.ReceiptNo,User.Identity.Name);
 
                 if (result > 0)
                 {
@@ -613,7 +623,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 else
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "DelDepositReceiptPic fail.";
+                    apiResult.Message = "DeleteReceipt Fail";
                 }
             }
             catch (Exception e)

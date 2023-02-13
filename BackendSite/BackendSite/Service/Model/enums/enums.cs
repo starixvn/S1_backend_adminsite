@@ -244,6 +244,8 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        DeleteReceipt = 96,
+        UploadReceipt = 97,
         Adjustment = 98,
         Error = 99 //No Use
     }
@@ -268,13 +270,19 @@ namespace BackendSite.Service.Model.enums
         OnHold = 63
     }
 
-	 public enum DepositTimeStatusEnum
+    public enum DepositTimeStatusEnum
     {
         Approved = 3,
         Rejected = 4,
         Canceled = 5
     }
 
+    public enum DepositReceiptCreateFromEnum
+    {
+        User = 1 , 
+        BackendUser = 2
+    }
+    
     #endregion
 
     #region PayList

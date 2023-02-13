@@ -127,7 +127,7 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                await InsertDepositReceipt(deposit.CustId, transId, 1, fileName, fileBytes);
+                await InsertDepositReceipt(deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -137,16 +137,16 @@ namespace BackendSite.Service.BLL
             return 0;
         }
 
-        public async Task<int> DelDepositReceiptPic(int custId, string transId ,int receiptNo)
+        public async Task<int> DelDepositReceiptPic(int siteId, int custId, string transId ,int receiptNo , string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return await depositService.DelDepositReceiptPic(custId, depositId ,receiptNo);
+            return await depositService.DelDepositReceiptPic(siteId ,custId, depositId ,receiptNo ,Operator);
         }
         
-        public async Task<int> InsertDepositReceipt(int custId, string transId, int receiptNo , string fileName, byte[] fileBytes)
+        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, byte[] fileBytes , string creator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return await depositService.SetDepositReceiptPic(custId, depositId, receiptNo ,fileName, fileBytes);
+            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName, fileBytes ,creator);
         }
 
         public int CheckDepositReceipt(string transId,  string Operator)
@@ -302,6 +302,13 @@ namespace BackendSite.Service.BLL
             int.TryParse(m.Value, out var depositId);
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
+        }
+        public DepositReceipt GetDepositReceiptByNo(string transId, int receiptNo)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.GetDepositReceiptByNo(depositId, receiptNo ,depositRequest.SiteId);
         }
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
