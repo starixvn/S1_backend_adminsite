@@ -31,6 +31,8 @@
         public decimal BonusAmountClaim { get; set; }
         public int TransactionType{ get; set; }
         public int ClaimStatus{ get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal TotalWithdrawal { get; set; }
         public decimal Completion { get; set; }
     }
     
