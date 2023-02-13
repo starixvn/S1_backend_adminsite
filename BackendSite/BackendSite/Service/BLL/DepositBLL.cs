@@ -137,10 +137,10 @@ namespace BackendSite.Service.BLL
             return 0;
         }
 
-        public async Task<int> DelDepositReceiptPic(int siteId, int custId, string transId ,int receiptNo , string Operator)
+        public async Task<int> DelDepositReceiptPic(int siteId, int custId, string transId ,string picFileName , int receiptNo , string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return await depositService.DelDepositReceiptPic(siteId ,custId, depositId ,receiptNo ,Operator);
+            return await depositService.DelDepositReceiptPic(siteId ,custId, depositId , picFileName ,receiptNo ,Operator);
         }
         
         public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, byte[] fileBytes , string creator)
@@ -149,10 +149,10 @@ namespace BackendSite.Service.BLL
             return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName, fileBytes ,creator);
         }
 
-        public int CheckDepositReceipt(string transId,  string Operator)
+        public int CheckDepositReceipt(int siteId ,string transId,  string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return depositService.CheckDepositReceipt(depositId, Operator);
+            return depositService.CheckDepositReceipt(siteId ,depositId, Operator);
         }
         
         private int ValidateDepositReceiptPic(string transId)

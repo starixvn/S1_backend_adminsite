@@ -244,6 +244,7 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        CheckDepositReceipt = 95,
         DeleteReceipt = 96,
         UploadReceipt = 97,
         Adjustment = 98,

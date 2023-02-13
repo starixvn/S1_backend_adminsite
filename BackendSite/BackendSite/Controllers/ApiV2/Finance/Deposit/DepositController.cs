@@ -614,7 +614,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     apiResult.Message = "Can't delete receipt from user";
                 }
                 
-                var result = await _depositBll.DelDepositReceiptPic(request.SiteId ,request.CustId,request.TransId,request.ReceiptNo,User.Identity.Name);
+                var result = await _depositBll.DelDepositReceiptPic(
+                    request.SiteId ,
+                    request.CustId,
+                    request.TransId, 
+                    depositReceipt.PicFileName,
+                    request.ReceiptNo,
+                    User.Identity.Name);
 
                 if (result > 0)
                 {
@@ -659,7 +665,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     depositInfo.Status == (int)DepositStatusEnum.Pending || 
                     depositInfo.Status == (int)DepositStatusEnum.OnHold)
                 {
-                    var result = _depositBll.CheckDepositReceipt(request.TransId,User.Identity.Name);
+                    var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, User.Identity.Name);
                     if (result > 0)
                     {
                         apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
