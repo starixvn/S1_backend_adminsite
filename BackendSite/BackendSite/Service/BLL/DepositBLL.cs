@@ -126,7 +126,7 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                await InsertDepositReceipt(deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
+                await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
             }
 
             if (!string.IsNullOrEmpty(transId))
