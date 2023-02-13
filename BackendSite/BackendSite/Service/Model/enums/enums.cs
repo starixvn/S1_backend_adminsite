@@ -165,6 +165,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
+    }
 
     #endregion
 
@@ -770,6 +776,7 @@ namespace BackendSite.Service.Model.enums
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
         SiteMaintenance = 77,
+        SetVideoInfo = 78,
         SetWithdrawalMessage = 80
     }
 
@@ -837,7 +844,10 @@ namespace BackendSite.Service.Model.enums
         cs = 2,
         th = 3,
         id = 4,
-        vn = 5
+        vn = 5,
+        hi = 6,
+        my = 7,
+        bd = 8
     }
 
     public enum PromotionDisplayConditionType
@@ -1366,7 +1376,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1428,8 +1437,16 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-
-    public enum ShieldRiskTagged
+    
+    public enum ShieldPlatform
+    {
+        Web = 1,
+        Ios = 2,
+        Android = 3,
+    }
+    
+    
+     public enum ShieldRiskTagged
     {
         IsBot = 1,
         IsIncognito = 2,
@@ -1469,6 +1486,29 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         All = 2,
     }
+
+    public enum IovationDeviceType
+    {
+        MAC = 1,
+        PC,
+        iOS,
+        ANDROID,
+        BLACKBERRY,
+        CHROMEOS,
+        HANDHELD_OTHER,
+        IPHONE,
+        IPOD,
+        IPAD,
+        LINUX,
+        NINTENDO,
+        PLAYSTATION,
+        XBOX,
+        UNIX,
+        WINDOWS,
+        WINDOWS_MOBILE,
+        UNKNOWN
+    }
+
     #region SlotGamesManagement
 
     public enum SlotGameCategoryEnum
