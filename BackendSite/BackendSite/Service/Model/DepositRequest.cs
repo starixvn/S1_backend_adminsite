@@ -312,15 +312,21 @@ namespace BackendSite.Service.Model
         public int DepositId { get; set; }
         public int ReceiptNo { get; set; }
         public string RefNo { get; set; }
-        public DateTime DepositTime { get; set; }
         public string PicFileName { get; set; }
         public byte[] DepositPic { get; set; }
+        public int CreateFrom { get; set; }
+        public string Creator { get; set; }
+        public DateTime DepositTime { get; set; }
+        public DateTime CreateTime { get; set; }
+       
     }
     
     public class DepositReceiptModel
     {
         public IActionResult Receipt { get; set; }
         public int ReceiptNo { get; set; }
+        public string Creator { get; set; }
+        public DateTime CreateTime { get; set; }
     }
 
     public class DepositLimit
@@ -477,6 +483,7 @@ namespace BackendSite.Service.Model
     
     public class DepositReceiptFile
     {
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
@@ -490,6 +497,7 @@ namespace BackendSite.Service.Model
     
     public class DeleteReceiptRequest
     {
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }

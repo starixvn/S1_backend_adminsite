@@ -181,28 +181,93 @@ namespace BackendSite.Service.DAL
             return transId;
         }
         
-        public async Task<int> SetDepositReceiptPic(int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic ,string creator)
+        public async Task<int> SetDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic ,string creator)
         {
-            var props = new DynamicParameters();
-            props.Add("CustId", custId);
-            props.Add("DepositId", depositId);
-            props.Add("ReceiptNo", receiptNo);
-            props.Add("PicFileName", picFileName);
-            props.Add("DepositPic", depositPic);
-            props.Add("Creator", creator);
-            props.Add("CreateFrom", 2);
-            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props);
+            var result = 0;
+            
+            try
+            {
+                await using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+                await using var trans = await conn.BeginTransactionAsync();
+            
+                var props = new DynamicParameters();
+                props.Add("CustId", custId);
+                props.Add("DepositId", depositId);
+                props.Add("ReceiptNo", receiptNo);
+                props.Add("PicFileName", picFileName);
+                props.Add("DepositPic", depositPic);
+                props.Add("Creator", creator);
+                props.Add("CreateFrom", 2);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", props ,conn, trans);
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, "Upload Receipt", (int)DepositStatusEnum.UploadReceipt, 0, creator);
+                }
+                
+                if (result > 0)
+                {
+                    trans.Commit();
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+                
+                await conn.CloseAsync();
+                await conn.DisposeAsync();
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, creator);
+            }
             
             return result;
         }
 
-        public async Task<int> DelDepositReceiptPic(int custId, int depositId, int receiptNo)
+        public async Task<int> DelDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string Operator)
         {
-            var props = new DynamicParameters();
-            props.Add("CustId", custId);
-            props.Add("DepositId", depositId);
-            props.Add("ReceiptNo", receiptNo);
-            var result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props);
+            var result = 0;
+            
+            try
+            {
+                await using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+                await using var trans = await conn.BeginTransactionAsync();
+                
+                var props = new DynamicParameters();
+                props.Add("CustId", custId);
+                props.Add("DepositId", depositId);
+                props.Add("ReceiptNo", receiptNo);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props ,conn, trans);
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, "Delete Receipt", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
+                }
+                
+                if (result > 0)
+                {
+                    trans.Commit();
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+                
+                await conn.CloseAsync();
+                await conn.DisposeAsync();
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
+            }
             
             return result;
         }
@@ -369,6 +434,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
         }
 
+        public DepositReceipt GetDepositReceiptByNo(int depositId, int receiptNo, int siteId)
+        {
+            return _reportDbClient.QueryFirst<DepositReceipt>("Admin_DepositReceiptByNo_Get", new DynamicParameters(new { DepositId = depositId, ReceiptNo = receiptNo, SiteId = siteId }));
+        }
+        
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
         {
             var depositId = 0;
