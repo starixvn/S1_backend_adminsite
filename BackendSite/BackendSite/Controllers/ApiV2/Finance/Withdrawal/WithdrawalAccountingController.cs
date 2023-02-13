@@ -16,7 +16,7 @@ using System.Net;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalAccountingController : ControllerBase
@@ -91,22 +91,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public class SetWithdrawalAccountingRequest
         {
             public int Id { get; set; }
-
             public string TransId { get; set; }
-
             public int Seq { get; set; }
-
             public string BankAccountNo { get; set; }
-
             public decimal Amount { get; set; }
-
             public decimal ChargeFee { get; set; }
-
             public string Memo { get; set; }
-
-
             public int UploadPicTimes { get; set; }
-
             public int Creator { get; set; }
         }
 
