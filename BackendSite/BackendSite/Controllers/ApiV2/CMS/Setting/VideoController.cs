@@ -60,7 +60,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 21, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 68, 1 })]
         public ApiListResult<VideoData> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<VideoData>();
@@ -96,7 +96,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 21, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 68, 3 })]
         public ApiResult Update(ApiRequestWithLog<SetRequest> request)
         {
             var apiResult = new ApiResult();
