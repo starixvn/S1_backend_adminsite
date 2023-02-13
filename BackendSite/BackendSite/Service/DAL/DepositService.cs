@@ -203,7 +203,7 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    result = SetDepositLog(depositId, siteId, "Upload Receipt", (int)DepositStatusEnum.UploadReceipt, 0, creator);
+                    result = SetDepositLog(depositId, siteId, $"Upload Receipt , picFileName:{picFileName}  ", (int)DepositStatusEnum.UploadReceipt, 0, creator);
                 }
                 
                 if (result > 0)
@@ -229,7 +229,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<int> DelDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string Operator)
+        public async Task<int> DelDepositReceiptPic(int siteId ,int custId, int depositId, string picFileName , int receiptNo ,string Operator)
         {
             var result = 0;
             
@@ -247,7 +247,7 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    result = SetDepositLog(depositId, siteId, "Delete Receipt", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
+                    result = SetDepositLog(depositId, siteId, $"Delete Receipt, picFileName:{picFileName}", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
                 }
                 
                 if (result > 0)
@@ -272,12 +272,44 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int CheckDepositReceipt(int depositId , string Operator)
+        public int CheckDepositReceipt(int siteId ,int depositId , string Operator)
         {
-            var props = new DynamicParameters();
-            props.Add("_DepositId", depositId);
-            props.Add("_Operator", Operator);
-            var result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+            var result = 0;
+            
+            try
+            {
+                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                conn.Open();
+                using var trans = conn.BeginTransaction();
+                
+                var props = new DynamicParameters();
+                props.Add("_DepositId", depositId);
+                props.Add("_Operator", Operator);
+                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, "Check DepositReceipt", (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                }
+                
+                if (result > 0)
+                {
+                    trans.Commit();
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+
+                conn.Close();
+                conn.Dispose();
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
+            }
             
             return result;
         }
