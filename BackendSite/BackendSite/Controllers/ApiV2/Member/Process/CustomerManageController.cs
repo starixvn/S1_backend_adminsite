@@ -490,13 +490,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
-        
+
         public class GetCustTPWalletResult
         {
             public decimal TotalTpWalletBalance { get; set; }
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
-        
+
         public class GetTodayDashboardRequest
         {
             public int CustId { get; set; }
@@ -1691,7 +1691,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
         {
             request.PageNumber = -1; //export all
-            var offset = request.StartDate.Offset;      
+            var offset = request.StartDate.Offset;
             var startDate = request.StartDate.ToUniversalTime().DateTime;
             var endDate = request.EndDate.ToUniversalTime().DateTime;
 
@@ -2163,10 +2163,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 56 })]
         [HttpPost]
-        public ApiResult AddCustNote(AddCustNoteRequest request)
+        public async Task<ApiResult> AddCustNote(AddCustNoteRequest request)
         {
-
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
+            var data = await _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2232,19 +2231,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNote(SetCustNoteRequest request)
+        public async Task<ApiResult> SetCustNote(SetCustNoteRequest request)
         {
-            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission(22, new []{56}))
+            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission(22, new[] { 56 }))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission(22, new []{57}))
+            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission(22, new[] { 57 }))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
+            var result = await _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
 
-            if (data)
+            if (result)
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
@@ -2265,7 +2264,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Modify Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
         }
 
@@ -2409,7 +2408,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName }),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -2780,7 +2779,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         [HttpPost]
-        public ApiResult SetTag(SetCustTagRequest request)
+        public async Task<ApiResult> SetTag(SetCustTagRequest request)
         {
             if (_custInfoBll.SetCustTag(request.CustId, request.Tags, User.Identity.Name) > 0)
             {
@@ -2795,7 +2794,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     });
                     selectTag = JsonConvert.SerializeObject(temp);
                 }
-                _custInfoBll.AddCustNote(request.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                await _custInfoBll.AddCustNote(request.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -2939,7 +2938,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
         {
@@ -2949,7 +2948,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return new ApiResult<CustDashBoardTodayModel>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = result
             };
         }
