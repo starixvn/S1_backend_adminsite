@@ -238,6 +238,7 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        SetDepositAmount = 94,
         Adjustment = 98,
         Error = 99 //No Use
     }
