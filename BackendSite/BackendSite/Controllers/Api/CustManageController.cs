@@ -1405,10 +1405,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
+        public async Task<ApiResult> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
 
-            var data = _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            var data = await _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
             {
@@ -1423,7 +1423,6 @@ namespace BackendSite.Controllers.Api
                     ErrorCode = 0,
                     Message = "Add Success."
                 };
-
             }
             else
             {
@@ -1468,7 +1467,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="setCustNoteReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
+        public async Task<ApiResult> SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
             if (setCustNoteReq.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
@@ -1480,9 +1479,9 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var data = _custInfoBll.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var result = await _custInfoBll.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
-                if (data)
+                if (result)
                 {
                     var Menu = "CustManage/CustInfoList";
                     var Info = new Dictionary<string, dynamic>();
@@ -2030,7 +2029,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         [HttpPost]
-        public ApiResult SetCustTag(SetCustTagPara para)
+        public async Task<ApiResult> SetCustTag(SetCustTagPara para)
         {
             if (_custInfoBll.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
             {
@@ -2045,7 +2044,7 @@ namespace BackendSite.Controllers.Api
                     });
                     selectTag = JsonConvert.SerializeObject(temp);
                 }
-                _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                await _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
