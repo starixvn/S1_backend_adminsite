@@ -1,6 +1,4 @@
-﻿using System.Data;
-using System.Net;
-using System.Xml.Linq;
+﻿using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
@@ -37,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>> _usableActionType;
         private readonly Cryptor _cryptor;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
         
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
@@ -61,6 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
@@ -248,9 +248,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             var currencyAmount = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(
-                new List<int> {request.SiteId},
+                selectSites,
                 request.WithdrawalTypes, 
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
@@ -303,17 +309,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var exportData = new List<WithdrawalInfoForExportData>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(
-                JsonConvert.SerializeObject(new List<int>{request.SiteId}),
+                JsonConvert.SerializeObject(selectSites),
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.WithdrawalId,
                 userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
-                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
                 JsonConvert.SerializeObject(request.Statuses),
-                JsonConvert.SerializeObject(request.LevelStatuses),
+                request.LevelStatuses.Any() ? JsonConvert.SerializeObject(request.LevelStatuses) : null,
                 request.StartAmount, 
                 request.EndAmount,
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
@@ -968,8 +980,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-
-
+        
         /// <summary>
         /// 複製提款單圖片檔
         /// </summary>
@@ -1007,7 +1018,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-
         
         private List<WithdrawalActionEnum> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
         {
@@ -1030,6 +1040,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             
             return usableActionButton;
         }
+        
+        private List<int> GetSelectSites()
+        {
+            var authInfo = _newAuthorizeBll.GetAuthData();
+            var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
+            var selectSites = result.Select(x => x.SiteId).ToList();
+            
+            return selectSites;
+        }
+        
         #endregion
 
     }
