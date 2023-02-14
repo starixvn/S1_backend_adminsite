@@ -1428,6 +1428,13 @@ namespace BackendSite.Service.Model.enums
         Able = 1,
     }
 
+    public enum ShieldPlatform
+    {
+        Web = 1,
+        Ios = 2,
+        Android = 3,
+    }
+    
     public enum ShieldRiskTagged
     {
         IsBot = 1,
