@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.DAL
 {
@@ -73,7 +75,7 @@ namespace BackendSite.Service.DAL
             }
             else
             {
-                if(!withdrawalType.ToList().Exists(x=> x == (int)WithdrawalTypeEnum.LocalBank))
+                if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
                 {
                     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
                 }
@@ -132,7 +134,7 @@ namespace BackendSite.Service.DAL
                 new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
-        private int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
+        public int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator,
             MySqlConnection conn = null, MySqlTransaction trans = null)
         {
             if (conn != null)
@@ -779,6 +781,12 @@ namespace BackendSite.Service.DAL
             {
                 return conn.ExecuteScalar<decimal>("Common_WithdrawalAvailableBalance_Get", new { CustId = custId }, transaction: trans, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        public bool SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
+        {
+            var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
+            return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
     }
 }

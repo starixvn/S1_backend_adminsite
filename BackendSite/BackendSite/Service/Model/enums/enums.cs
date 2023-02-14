@@ -776,7 +776,8 @@ namespace BackendSite.Service.Model.enums
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
         SiteMaintenance = 77,
-        SetVideoInfo = 78
+        SetVideoInfo = 78,
+        SetWithdrawalMessage = 80
     }
 
     #region BankFinancialTransferInfoLog
@@ -1226,14 +1227,14 @@ namespace BackendSite.Service.Model.enums
         AngPow = 5,
         Lottery = 6,
         Slots = 7,
-        Game = 8 ,
-        Fishing = 9 ,
-        Promotion = 10 ,
+        Game = 8,
+        Fishing = 9,
+        Promotion = 10,
         Vip = 11,
         Deposit = 12,
         Rewards = 13
     }
-    
+
     #endregion
 
     #region AppLinkTable
@@ -1573,5 +1574,13 @@ namespace BackendSite.Service.Model.enums
         PaymentNotReceived = 2,
         [Description("Deposit refunded")]
         DepositRefunded = 3
+    }
+
+    public enum WithdrawalMessageStatus
+    {
+        [Description("Name unmatch")]
+        WithdrawalAccountsNameUnmatch = 0,
+        [Description("Account number incorrect")]
+        WithdrawalAccountNumberIncorrect = 1
     }
 }

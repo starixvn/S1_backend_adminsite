@@ -7,6 +7,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.BLL
 {
@@ -1203,6 +1204,33 @@ namespace BackendSite.Service.BLL
             var url = $"{payApiUrl}WithdrawalManualReject";
             var response = await _courierAdapter.MyPostAsync<WithdrawalManualResponse, WithdrawalManualRequest>(url, withdrawalManualRequest);
             return response;
+        }
+
+        public int SetWithdrawalMessage(ParamsWithLog<WithdrawalMessageRequest> input)
+        {
+            var result = 1;
+
+            if (!_withdrawalService.SetWithdrawalMessage(input))
+            {
+                return 0;
+            }
+
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                RefTransId = input.TransId,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetWithdrawalMessage,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(input.After)
+            };
+
+            _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam);
+            _withdrawalService.SetWithdrawalLog(input.After.WithdrawalId, input.SiteId, $"SendMessage:{input.After.StatusName}", (int)input.After.Action, input.Operator);
+
+            return result;
         }
         #endregion
 
