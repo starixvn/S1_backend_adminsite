@@ -16,13 +16,14 @@ namespace BackendSite.Service.BLL
         private readonly ICacheHelper _cacheHelper;
         private readonly IMarketingService _marketingService;
         private readonly IAffiliateApiService _affiliateApi;
+        private readonly ITagBLL _tagBll;
         private readonly Dictionary<string, SiteConfig> _siteConfig;
         private readonly PermissionBLL _permissionBll;
         private readonly AdminBLL _adminBll;
         private readonly Tools _tools;
         private readonly CustInfoBLL _custInfoBll;
 
-        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll, ITagBLL tagBll)
         {
             _memberService = memberService;
             _deviceService = deviceService;
@@ -34,6 +35,7 @@ namespace BackendSite.Service.BLL
             _tools = tools;
             _siteConfig = siteConfig.Value;
             _custInfoBll = custInfoBll;
+            _tagBll = tagBll;
         }
 
         public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
@@ -59,7 +61,7 @@ namespace BackendSite.Service.BLL
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
-                request.DateType, startTime, endTime, request.PageNumber, request.PageSize);
+                request.DateType, startTime, endTime, request.PageNumber, request.PageSize, request.ExcludeTag);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
             var response = new GetMemberListPageData<MemberList>()
@@ -122,8 +124,8 @@ namespace BackendSite.Service.BLL
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
-                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime);
-
+                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime, request.ExcludeTag);
+            var allTagList = await _tagBll.GetAllTag();
             var data = memberList.Select(a => new MemberExportData()
             {
                 SiteName = a.SiteName,
@@ -146,12 +148,13 @@ namespace BackendSite.Service.BLL
                 LevelName = a.LevelName,
                 Agent = a.Agent,
                 RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                Status = a.Status,
+                Status = ((CustomerStatusEnum)a.Status).ToString(),
                 SabaId = a.SabaId,
                 SignupUrl = a.SignupUrl,
                 AffiliateId = a.AffiliateId,
                 AffiliateCode = a.AffiliateCode,
-                LastActivityIp = a.LastActivityIp
+                LastActivityIp = a.LastActivityIp,
+                Tag = GetTag(allTagList, a.TagList)
             });
             if (request.ExportTransferWallet) 
             {
@@ -339,6 +342,25 @@ namespace BackendSite.Service.BLL
             if (dateTime.HasValue)
                 return new DateTimeOffset(dateTime.Value, ts);
             return null;
+        }
+        private string GetTag(IEnumerable<Tag> allTagList, string tagList)
+        {
+            List<string> temp = new List<string>();
+            if (string.IsNullOrWhiteSpace(tagList))
+            {
+                return string.Empty;
+            }
+
+            JsonConvert.DeserializeObject<List<int>>(tagList).ToList().ForEach(x =>
+            {
+                var tagName = allTagList.FirstOrDefault(y => y.Id == x)?.TagName;
+                if (!string.IsNullOrWhiteSpace(tagName))
+                {
+                    temp.Add(tagName);
+                }
+            });
+
+            return string.Join(",", temp);
         }
     }
 }

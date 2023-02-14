@@ -45,7 +45,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public List<BetSetting> BetSetting { get; set; }
     }
-    
+
     public class DeleteCustBetLimit
     {
         public string UserName { get; set; }
@@ -60,7 +60,7 @@ namespace BackendSite.Service.Model
         public string TpCategoryName { get; set; }
         public List<TpBetSetting> TpBetSetting { get; set; }
     }
-    
+
     public class TpBetSetting
     {
         [LogIgnore]
@@ -75,6 +75,7 @@ namespace BackendSite.Service.Model
     {
         public string DefaultGroup { get; set; }
         public string LimitGroup { get; set; }
+        public bool Checked { get; set; } = false;
     }
 
     public class QueryUserBetLimit
@@ -86,7 +87,7 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
-    
+
     public class UserBetLimit
     {
         public string SiteName { get; set; }
@@ -100,13 +101,13 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
     }
-    
+
     public class BetLimitStatus
     {
         public int CustId { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class CustBetLimitData
     {
         public int SiteId { get; set; }
@@ -116,7 +117,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string BetSetting { get; set; }
     }
-    
+
     public class CustBetLimitByCustId
     {
         public int SiteId { get; set; }
@@ -125,5 +126,36 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
         public List<TpCategoryBetLimit> BetSetting { get; set; }
+    }
+    public class GetTpBetLimitGroupReq
+    {
+        public int CurrencyId { get; set; }
+    }
+
+    public class CustBetLimitByCustIdV2
+    {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
+        public int custId { get; set; }
+        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public List<TpBetLimitGroupV2> GameTypeBetLimit { get; set; }
+    }
+    public class TpBetLimitGroupV2 : TpBetLimitGroup
+    {
+        public int CategoryId { set; get; }
+        public string CategoryName { set; get; }
+    }
+    public class CustBetLimitV2
+    {
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public List<TpBetSettingV2> BetSetting { get; set; }
+    }
+    public class TpBetSettingV2 : TpBetSetting
+    {
+        public int TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
+        public bool Checked { get; set; }
     }
 }
