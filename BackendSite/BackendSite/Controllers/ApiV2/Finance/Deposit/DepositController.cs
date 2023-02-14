@@ -231,9 +231,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.DepositId,
                 userNames,
                 string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
-                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
                 JsonConvert.SerializeObject(request.Statuses),
-                JsonConvert.SerializeObject(request.LevelStatuses),
+                request.LevelStatuses.Any() ? JsonConvert.SerializeObject(request.LevelStatuses) : null,
                 request.StartAmount,
                 request.EndAmount,
                 request.SelectPayId.Any() ? JsonConvert.SerializeObject(request.SelectPayId) : null
