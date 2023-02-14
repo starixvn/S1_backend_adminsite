@@ -539,7 +539,7 @@ namespace BackendSite.Service.BLL
                 return 0;
             }
 
-            var comment = $"SetDepositRequestAmount:{input.After.Amount}";
+            var comment = $"Set Deposit Amount ,Change {input.Before.Amount} to {input.After.Amount}";
             
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var depositId);
