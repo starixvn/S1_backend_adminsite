@@ -38,14 +38,6 @@ namespace BackendSite.Controllers.Api
 
         #region Constructors
 
-        public class GetRebateLogByCustReq
-        {
-            public int CustId { get; set; }
-            public long? StartDate { get; set; }
-            public long? EndDate { get; set; }
-            public int PageNumber { get; set; }
-        }
-
         public PaymentController(IConfiguration configuration,
             PaymentBLL paymentBLL,
             CustInfoBLL custInfoBLL,
@@ -111,11 +103,6 @@ namespace BackendSite.Controllers.Api
             public long? EndDate { get; set; }
             public string RefTransId { get; set; }
             public int PageNumber { get; set; }
-        }
-
-        public class CustTpBetRecordListOneWeekReq
-        {
-            public int CustId { get; set; }
         }
 
         public class CustTpBetRecordListOneDayReq
@@ -1047,14 +1034,6 @@ namespace BackendSite.Controllers.Api
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
-        }
-
-        public class AddAdjustmentLimitPara
-        {
-            public int SiteId { get; set; }
-
-            public int CurrencyId { get; set; }
-            public decimal AdjustmentMax { get; set; }
         }
 
         [HttpPost]

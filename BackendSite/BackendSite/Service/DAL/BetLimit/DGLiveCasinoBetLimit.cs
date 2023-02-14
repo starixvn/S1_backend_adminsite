@@ -25,7 +25,10 @@ namespace BackendSite.Service.DAL.BetLimit
             var dg = tpBetSettings.FirstOrDefault(a => a.GameTypeId == (int) GameType);
             var limitGroup = await GetLimitGroup(currencyId);
             if (dg != null)
+            {
                 limitGroup.DefaultGroup = dg.LimitGroup;
+                limitGroup.Checked = true;
+            }
             return limitGroup;
         }
     }

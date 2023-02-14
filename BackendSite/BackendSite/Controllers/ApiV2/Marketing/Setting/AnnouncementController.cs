@@ -39,7 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
             public IEnumerable<int> SiteIds { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<GeneralStatusEnum> Statuses { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -110,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiListResult<Announcement>();
             try
             {
-                var result = _messageBll.GetAnnouncements(para.SiteIds, para.StartDate, para.EndDate, para.Status, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
+                var result = _messageBll.GetAnnouncements(para.SiteIds, para.StartDate, para.EndDate, para.Statuses, para.PageNumber, para.PageSize, ref totalPages, ref rowCount);
                 apiResult.Data = result;
                 apiResult.PageNumber = para.PageNumber;
                 apiResult.RowCount = rowCount;
