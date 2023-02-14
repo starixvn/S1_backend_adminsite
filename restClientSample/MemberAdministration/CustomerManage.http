@@ -31,3 +31,23 @@ Content-Type: application/json
 {
     "custId": 643973
 }
+
+###
+POST {{url}}/apiV2/customerManage/AddCustNote
+Content-Type: application/json
+
+{
+    "siteId":2,
+    "custId":645204,
+    "note":"test note2"
+}
+
+###
+POST {{url}}/apiV2/customerManage/GetCustNote
+Content-Type: application/json
+
+{
+    "custId":645204,
+    "pageNumber": 1,
+    "pageSize": 20
+}
