@@ -2,12 +2,14 @@
 using Amazon.Runtime.Internal.Util;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,6 +20,8 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<MessageBLL> _logger;
         private readonly ServerInfoService serverInfoService;
+        private readonly CustInfoService _custInfoService;
+        private readonly MySqlClient _mainDbClient;
 
         public MessageBLL(IServiceProvider provider)
         {
@@ -26,6 +30,8 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<MessageBLL>>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public int SendMessageToPlayer(string sender, string title, string content, int custId)
@@ -155,10 +161,34 @@ namespace BackendSite.Service.BLL
             return messageService.GetCustLang(CustId);
         }
 
-        public void DeletePersonalMsg(int id, bool isBatch)
+        public async Task<bool> DeletePersonalMsg(int id, bool isBatch, string @operator)
         {
-            messageService.DeletePersonalMsg(id, isBatch);
+            var noteBeforeInfo = await GetMessageById(id, isBatch);
+            var custSimpleInfo = await custInfoBLL.GetCustId(noteBeforeInfo.First().CustId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!messageService.DeletePersonalMsg(id, isBatch))
+            {
+                _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, noteBeforeInfo.First(), null,
+                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
+            {
+                _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
         }
+
+        public async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch) => await messageService.GetMessageById(id, isBatch);
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {

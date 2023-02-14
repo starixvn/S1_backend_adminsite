@@ -2365,14 +2365,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiResult DeletePersonalMsg(DeleteMessageRequest request)
+        public async Task<ApiResult> DeletePersonalMsg(DeleteMessageRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                _messageBll.DeletePersonalMsg(request.Id, request.IsBatch);
-
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                if (!await _messageBll.DeletePersonalMsg(request.Id, request.IsBatch, User.Identity.Name))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Delete Fail.";
+                }
+                else
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
