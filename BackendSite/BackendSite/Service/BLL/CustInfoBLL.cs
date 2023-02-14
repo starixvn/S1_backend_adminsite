@@ -9,6 +9,7 @@ using System.Transactions;
 using System.Linq;
 using BarcodeReader.ImageSharp;
 using NPOI.SS.Formula.Functions;
+using NuGet.Protocol;
 
 namespace BackendSite.Service.BLL
 {
@@ -440,7 +441,7 @@ namespace BackendSite.Service.BLL
             if (canEdit)
             {
                 var afterData = new { Note = note, CanEdit = false };
-                if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData.ToString(),
+                if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
                     AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
                 {
                     _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
@@ -482,8 +483,8 @@ namespace BackendSite.Service.BLL
             var beforeData = new { NoteId = noteId, Note = noteBeforeInfo.First().Note };
             var afterData = new { NoteId = noteId, Note = note };
 
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData.ToString(),
-                actionType == ActionType.Delete ? null : new { NoteId = noteId, Note = note },
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
+                actionType == ActionType.Delete ? null : afterData,
                 AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
             {
                 _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
@@ -749,7 +750,7 @@ namespace BackendSite.Service.BLL
             var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData.ToString(), afterData.ToString(),
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
                 AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
