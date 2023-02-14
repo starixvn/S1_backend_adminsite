@@ -769,7 +769,8 @@ namespace BackendSite.Service.Model.enums
         AppQRCode = 74,
         ProviderAppDownload = 75,
         SetDepositMessage = 76,
-        SiteMaintenance = 77
+        SiteMaintenance = 77,
+        SetVideoInfo = 78
     }
 
     #region BankFinancialTransferInfoLog
@@ -836,7 +837,10 @@ namespace BackendSite.Service.Model.enums
         cs = 2,
         th = 3,
         id = 4,
-        vn = 5
+        vn = 5,
+        hi = 6,
+        my = 7,
+        bd = 8
     }
 
     public enum PromotionDisplayConditionType
