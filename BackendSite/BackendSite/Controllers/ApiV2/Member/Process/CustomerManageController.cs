@@ -2754,7 +2754,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            _custInfoBll.CancelBonusByBonusId(request.BonusId,User.Identity.Name);
 
             var Menu = "CustManage/CustInfoList";
             var Info = new Dictionary<string, dynamic>();

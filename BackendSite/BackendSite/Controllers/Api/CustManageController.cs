@@ -627,7 +627,7 @@ namespace BackendSite.Controllers.Api
                 var menu = "CustManage/CustInfoList";
                 var info = new Dictionary<string, dynamic>();
                 info.Add("MenuName", "Customer Info");
-                
+
                 if (custStatus.Level != null)
                 {
                     info.Add("Action", $"Change Level To {custStatus.Level}");
@@ -1722,7 +1722,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="bonusReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
+        public async Task<ApiResult> CancelBonusByBonusId(BonusReq bonusReq)
         {
             var apiResult = new ApiResult();
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
@@ -1732,7 +1732,7 @@ namespace BackendSite.Controllers.Api
             {
                 if (data.Status == (int)BonusStatus.Running)
                 {
-                    CancelBonus(bonusReq, data, apiResult);
+                    await CancelBonus(bonusReq, data, apiResult);
                     return apiResult;
                 }
 
@@ -1783,7 +1783,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            CancelBonus(bonusReq, data, apiResult);
+                            await CancelBonus(bonusReq, data, apiResult);
                             return apiResult;
                         }
                         break;
@@ -1794,8 +1794,8 @@ namespace BackendSite.Controllers.Api
             //單一錢包
             if (data != null)
             {
-                var result = _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId, out _);
-                if (result > 0)
+                var result = await _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
+                if (result.Result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
@@ -1821,11 +1821,11 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        private void CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
+        private async Task CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
         {
-            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
+            var result = await _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
 
-            if (result > 0)
+            if (result.Result > 0)
             {
                 var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
                 var msg = new StringBuilder();
@@ -2154,7 +2154,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
-        
+
         #region CSD > Customer Administration > CustInfo > E Wallet Log
 
         /// <summary>

@@ -771,7 +771,8 @@ namespace BackendSite.Service.Model.enums
         SetDepositMessage = 76,
         SiteMaintenance = 77,
         SetCustInfoNote = 81,
-        DeleteSMSInfo = 82
+        DeleteSMSInfo = 82,
+        CancelBonusInCustInfo = 83
     }
 
     #region BankFinancialTransferInfoLog

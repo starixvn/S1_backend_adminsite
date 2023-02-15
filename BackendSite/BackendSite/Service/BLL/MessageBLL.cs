@@ -163,8 +163,9 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> DeletePersonalMsg(int id, bool isBatch, string @operator)
         {
-            var noteBeforeInfo = await GetMessageById(id, isBatch);
-            var custSimpleInfo = await custInfoBLL.GetCustId(noteBeforeInfo.First().CustId, null, null);
+            var msgBeforeInfo = await GetMessageById(id, isBatch);
+            if (!msgBeforeInfo.Any()) return false;
+            var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
@@ -176,7 +177,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, noteBeforeInfo.First(), null,
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
                 AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
             {
                 _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
