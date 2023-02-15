@@ -5,6 +5,7 @@ using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.DAL
 {
@@ -13,6 +14,7 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly WalletService _walletService;
         private readonly WithdrawalLimitService _withdrawalLimitService;
+        private readonly CustInfoService _custInfoService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
@@ -23,6 +25,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _walletService = provider.GetRequiredService<WalletService>();
             _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
 
         public IEnumerable<BonusInfo> GetBonusInfoReport(string siteIds,
@@ -132,7 +135,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
-        public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, string @operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -147,7 +150,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
-            custId = p.Get<int?>("_CustId") ?? 0;
+            var custId = p.Get<int?>("_CustId") ?? 0;
             var userName = p.Get<string>("_UserName");
             var lockedAmount = p.Get<decimal?>("_LockedAmount") ?? 0;
             var bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
@@ -188,13 +191,21 @@ namespace BackendSite.Service.DAL
                 }
             }
 
+            var custSimpleInfo = await _custInfoService.GetCustId(custId, null, null);
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custId, custSimpleInfo.CurrencyId, new { BonusId = bonusId, Status = "Running" },
+               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, conn, trans))
+            {
+                trans.Rollback();
+                return (0, custId);
+            }
+
             if (result > 0)
                 trans.Commit();
 
-            return result;
+            return (result, custId);
         }
-        
-         public CustBonusSum GetCustBonusSum(int siteId,int custId)
+
+        public CustBonusSum GetCustBonusSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -202,8 +213,8 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
             return result;
         }
-        
-        public CustRebateSum GetCustRebateSum(int siteId,int custId)
+
+        public CustRebateSum GetCustRebateSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -221,11 +232,11 @@ namespace BackendSite.Service.DAL
                 CustRebateCategory = custRebateCategory,
                 CustRebateTotalSum = custRebateTotalSum
             };
-            
+
             return result;
         }
-        
-        public CustRewardSum GetCustRewardSum(int siteId,int custId)
+
+        public CustRewardSum GetCustRewardSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -243,7 +254,7 @@ namespace BackendSite.Service.DAL
                 CustRewardType = custRewardType,
                 CustRewardTotalSum = custRebateTotalSum
             };
-            
+
             return result;
         }
 
@@ -251,7 +262,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
-        
+
         public List<MpaBonusInfo> GetMpaBonusInfoList(
             int siteId,
             string currencyIds,
@@ -275,12 +286,12 @@ namespace BackendSite.Service.DAL
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_IsGroupByDate", isGroupByDate);
-            
+
             var result = _mainDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
 
             return result.ToList();
         }
-        
+
         public List<MpaBonusDetail> GetMpaBonusDetailList(
             int siteId,
             string currencyIds,
@@ -298,11 +309,11 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _mainDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
             return result.ToList();
         }
-        
+
         public List<MpaMarketingBonus> GetMpaMarketingBonus(
             int siteId,
             string currencyIds,
@@ -316,7 +327,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _mainDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
 
             return result.ToList();
@@ -339,6 +350,6 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
 
             return result.ToList();
-        }    
+        }
     }
 }

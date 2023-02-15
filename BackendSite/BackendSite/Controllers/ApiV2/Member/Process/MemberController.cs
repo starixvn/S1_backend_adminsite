@@ -69,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         public ApiResult<IEnumerable<GetPromotionCashbackResponse>> GetPromotionCashback(GetPromotionCashbackRequest request)
         {
@@ -98,14 +98,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
-        
+
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         public ApiResult<GetPromotionDetailResponse> GetPromotionDetail(GetPromotionDetailRequest request)
         {
-                
+
             var apiResult = new ApiResult<GetPromotionDetailResponse>();
             try
             {
@@ -132,16 +132,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
-        
+
             return apiResult;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 49 })]
         [HttpPost]
-        public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
+        public async Task<ApiResult> CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
+            if (result.Result == 0)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Cancel Bonus Fail";
+                return apiResult;
+            }
             const string menu = "CustManage/CustInfoList";
             var info = new Dictionary<string, dynamic>
             {
@@ -226,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// Member/GetCustPhotoId 取得客戶證件照列表
         /// </summary>
@@ -611,7 +617,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditBirthday 修改用戶生日
         /// </summary>
@@ -637,7 +643,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditAddress 修改會員地址
         /// </summary>
@@ -665,7 +671,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchKyc 修改會員Kyc狀態
         /// </summary>
@@ -693,7 +699,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchRisk 切換會員Risk狀態
         /// </summary>
@@ -721,7 +727,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchEmailVerified 切換會員Email驗證狀態
         /// </summary>
@@ -749,7 +755,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchPhoneVerified 切換會員電話驗證狀態
         /// </summary>
@@ -777,7 +783,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/ResetPassword 重置會員密碼
         /// </summary>
@@ -806,7 +812,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/LockAccount 鎖/解鎖會員帳號
         /// </summary>
@@ -832,7 +838,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/KickOut 強制讓客戶登出
         /// </summary>
@@ -856,7 +862,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
         }
-        
+
         /// <summary>
         /// Member/Close 關閉會員帳號
         /// </summary>
@@ -882,7 +888,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchRebatePayout 起停用派發Rebate
         /// </summary>
@@ -908,7 +914,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/ResetBankInfo 重置BankInfo
         /// </summary>
@@ -986,7 +992,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/PayoutVerificationReward 派發客戶驗證獎勵金
         /// </summary>
@@ -1159,7 +1165,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            
+
             var loginLog = await _memberQuery.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
             var apiResult = new ApiListResult<MemberLoginLog>
             {
