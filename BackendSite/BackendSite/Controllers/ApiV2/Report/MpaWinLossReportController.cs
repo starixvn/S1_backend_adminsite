@@ -160,13 +160,14 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossByPlayerResponseToFrontEnd>>> GetWinLossByPlayer(MpaWinLossRequest request)
+        public async Task<ApiListResult<MpaWinLossByPlayerResponseToFrontEnd>> GetWinLossByPlayer(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<MpaWinLossByPlayerResponseToFrontEnd>>();
+            var apiResult = new ApiListResult<MpaWinLossByPlayerResponseToFrontEnd>();
             try
             {
-                var responseData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.Player);
-                apiResult.Data = responseData;
+                var response = await _MaMpaWinLossBll.GetMpaWinLossByPlayerResult(request, MpaWinLossGroupByTypeEnum.Player);
+                apiResult.Data = response.Data;
+                apiResult.RowCount = response.RowCount;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

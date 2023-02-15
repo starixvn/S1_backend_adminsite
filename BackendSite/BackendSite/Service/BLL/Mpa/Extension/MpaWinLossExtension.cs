@@ -322,8 +322,10 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return result;
         }
 
-        public static IEnumerable<MpaWinLossByPlayerResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByPlayerResponse> source)
+        public static MpaWinLossByPlayerResponseToFrontEndWrapper ToApiFormat(this Dictionary<string, MpaWinLossByPlayerResponse> source,int rowCount)
         {
+            var response = new MpaWinLossByPlayerResponseToFrontEndWrapper();
+
             var result = new List<MpaWinLossByPlayerResponseToFrontEnd>();
 
             foreach (var item in source)
@@ -373,7 +375,10 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 result.Add(data);
             }
 
-            return result;
+            response.Data = result;
+            response.RowCount = rowCount;
+
+            return response;
         }
 
         public static IEnumerable<MpaWinLossByPlayerDetailResponseFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByPlayerDetailResponse> source)

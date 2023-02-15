@@ -909,7 +909,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByPlayerResponseToFrontEnd>> GetMpaWinLossByPlayerResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<MpaWinLossByPlayerResponseToFrontEndWrapper> GetMpaWinLossByPlayerResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             IPageInfo pageInfo = new PageInfo();
             var key = request.GetWinLossByPlayerRedisKey();
@@ -917,6 +917,7 @@ namespace BackendSite.Service.BLL.Mpa
             var sortKey = $"{masterKey}:{request.OrderByProperty}:{request.OrderByDirection}";
             var cacheTime = TimeSpan.FromMinutes(15);
             var apiData = new List<MpaWinLossByPlayerResponse>();
+            var rowCount = 0;
             apiData.Clear();
 
             if (_redisHelper.KeyExists(masterKey))
@@ -925,6 +926,7 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     // 取出全部資料重新排序
                     var sortData = (await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, 0, -1)).OrderBy(request);
+                    rowCount = sortData.Count();
 
                     // 刪除舊資料重設cache
                     if (_redisHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
@@ -945,6 +947,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         //Redis Pagination
                         var total = (int)_redisHelper.GetListLength(masterKey);
+                        rowCount = total;
                         var (startIndex, endIndex) = pageInfo.RedisPagination(total, request.PageNumber, request.PageSize);
                         var data = await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, startIndex, endIndex);
                         apiData.AddRange(data);
@@ -991,6 +994,7 @@ namespace BackendSite.Service.BLL.Mpa
                     apiData.Add(responseItem);
                 }
 
+                rowCount = apiData.Count;
                 apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
                 AddCache(apiData, masterKey, sortKey, cacheTime, request.OrderBy);
 
@@ -1030,7 +1034,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
             });
 
-            return response.ToApiFormat();
+            return response.ToApiFormat(rowCount);
         }
 
         /// <summary>
