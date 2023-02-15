@@ -1,0 +1,51 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+
+###
+# 取得紀錄列表
+POST {{url}}/apiV2/ModifyPaymentChargeFee/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "startTime": "2023-01-01T00:00:00+08:00",
+    "endTime": "2023-01-10T00:00:00+08:00",
+    "pageNumber": 1,
+    "pageSize": 20
+}
+
+###
+# 取得渠道列表
+# 三個下拉連動
+# 1. Payment Gateway下拉使用 text:payName, value:payId
+# 2. Currency 下拉使用 text:isoCode, value:currencyId
+# 3. Channel 下拉使用 text:channelName, value:channelId
+POST {{url}}/apiV2/GetAllData/GetPaySetting HTTP/1.1
+Content-Type: application/json
+
+
+###
+POST {{url}}/apiV2/ModifyPaymentChargeFee/Submit HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2,
+    "channelId": 21,
+    "chargeFeePercentage": 2,
+    "chargeFeePreCount": 1,
+    "startTime": "2022-12-01T00:00:00+08:00",
+    "endTime": "2023-01-01T00:00:00+08:00",
+}
