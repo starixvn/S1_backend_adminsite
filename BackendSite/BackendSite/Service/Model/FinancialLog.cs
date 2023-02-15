@@ -149,10 +149,15 @@ namespace BackendSite.Service.Model
     }
     public class BonusLog
     {
+        private DateTimeOffset _createTime { get; set; }
         public int Id { get; set; }
         public int BonusId { get; set; }
         public string BonusCode { get; set; }
-        public DateTime CreateTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
         public string TypeName { get; set; }
         public DirectionEnum Direction { get; set; }
         public decimal ChangeBonus { get; set; }
@@ -167,14 +172,7 @@ namespace BackendSite.Service.Model
         public int id { get; set; }
         public string Name { get; set; }
     }
-    public class TpBetRecordListOneWeek
-    {
-        public DateTime SettledDate { get; set; }
-        public decimal Stake { get; set; }
-        public decimal ValidBet { get; set; }
-        public decimal WinlostAmount { get; set; }
-        public int SettlementType { get; set; }
-    }
+
     public class TpBetRecordByDate
     {
         public DateTime SettledDate { get; set; }

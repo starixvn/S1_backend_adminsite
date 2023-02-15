@@ -81,6 +81,7 @@ namespace BackendSite
             services.AddTransient<IMemberQuery, MemberQuery>();
             services.AddTransient<IMemberCommand, MemberCommand>();
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
+            services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
@@ -97,11 +98,13 @@ namespace BackendSite
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
+            services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IAdminLogService, AdminLogService>();
             services.AddTransient<IMarketingService, MarketingService>();
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
+            services.AddTransient<BetListService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

@@ -334,10 +334,12 @@ namespace BackendSite.Service.Model
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public IEnumerable<int> SiteIds { get; set; }
-        public int CurrencyId { get; set; }
-        public int Status { get; set; }
+        public IEnumerable<int> CurrencyId { get; set; }
+        public IEnumerable<int> Status { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string MemberId { get; set; }
+        public int CustId { set; get; }
     }
     public class WithdrawalTimeData
     {
