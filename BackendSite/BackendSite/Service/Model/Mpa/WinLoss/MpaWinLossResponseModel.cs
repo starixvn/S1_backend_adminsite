@@ -426,6 +426,13 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public List<MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd> Children { get; set; }
     }
 
+    public class MpaWinLossByPlayerResponseToFrontEndWrapper
+    {
+        public IEnumerable<MpaWinLossByPlayerResponseToFrontEnd> Data { get; set; }
+
+        public int RowCount { get; set; }
+    }
+
     public class MpaWinLossByPlayerResponseToFrontEnd
     {
         [JsonProperty(Order = -1)]
