@@ -36,7 +36,7 @@ namespace BackendSite.Service.BLL
             return list.Select(x => new PayChannelInfo(x))
                 .Distinct(new PayChannelInfoComparer());
         }
-
+        
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
             return _paymentManageService.UpdatePayList(input);
