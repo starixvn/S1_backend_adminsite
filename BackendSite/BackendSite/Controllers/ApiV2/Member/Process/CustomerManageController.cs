@@ -2433,26 +2433,55 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        public ApiListResult<GetAdminOperateLog> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
+        public ApiListResult<AdminAdjustmentLogReport> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
-            var apiListResult = new ApiListResult<GetAdminOperateLog>();
-            var pageNumber = request.PageNumber;
-            var depositRequestList = _serverInfoBll.GetAdminOperateLog(request.CustId,
-                null,
-                null,
-                request.StartDate,
-                request.EndDate,
-                 request.PageSize,
-                ref pageNumber,
-                out var totalPages,
-                out var rowCount);
-            apiListResult.Data = depositRequestList;
-            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var apiResult = new ApiListResult<AdminAdjustmentLogReport>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var bllRequest = new GetAdminAdjustmentInfoLogInput()
+                {
+                    SiteIds = new List<int> { custInfo.SiteId },
+                    CurrencyIds = new List<int> { custInfo.CurrencyId },
+                    Menus = new List<int> 
+                    { 
+                        (int)AdminAdjustmentLogMenuEnum.SetCustomerInfo, 
+                        (int)AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, 
+                        (int)AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
+                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote 
+                    },
+                    ActionTypes = new List<int> 
+                    { 
+                        (int)ActionType.Create, 
+                        (int)ActionType.Update, 
+                        (int)ActionType.Delete 
+                    },
+                    UserName = null,
+                    TransId = null,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    CustId = request.CustId
+                };
 
-            return apiListResult;
+                var searchResult = _adjustmentLogReportBll.GetAdminAdjustmentInfoLog(bllRequest);
+
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    Data = searchResult.AdminAdjustmentLogReport,
+                    PageNumber = searchResult.PageNumber,
+                    TotalPages = searchResult.TotalPages,
+                    RowCount = searchResult.RowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    Message = ex.Message
+                };
+            }
         }
 
         #endregion
@@ -2755,7 +2784,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId,User.Identity.Name);
+            _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
 
             var Menu = "CustManage/CustInfoList";
             var Info = new Dictionary<string, dynamic>();
