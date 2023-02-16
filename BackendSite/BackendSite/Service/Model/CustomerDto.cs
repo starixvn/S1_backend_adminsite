@@ -639,3 +639,15 @@ public class SetCustPromotionWhiteListRequest
     public bool DeviceEnable { get; set; }
     public bool RealNameEnable { get; set; }
 }
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
+}

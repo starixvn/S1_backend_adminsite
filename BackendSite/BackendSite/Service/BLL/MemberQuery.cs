@@ -348,6 +348,12 @@ namespace BackendSite.Service.BLL
             
             return result;
         }
+
+        public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId)
+        {
+            return await _memberService.GetPromotionReceiveFailLogAsync(custId);
+        }
+
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)
 
         {
