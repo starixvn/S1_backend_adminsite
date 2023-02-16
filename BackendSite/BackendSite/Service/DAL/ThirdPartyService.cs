@@ -148,6 +148,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+   
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));

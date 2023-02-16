@@ -36,7 +36,7 @@ namespace BackendSite.Service.BLL
             return list.Select(x => new PayChannelInfo(x))
                 .Distinct(new PayChannelInfoComparer());
         }
-
+        
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
             return _paymentManageService.UpdatePayList(input);
@@ -92,7 +92,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input,
             int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
-            var (startIndex, absPageSize) = pageNumber.GetStartIndex(pageSize);
+            var (startIndex, absPageSize) = pageNumber.GetStartIndexAndPageSize(pageSize);
             var result = _paymentManageService.GetPaySettingList(input, absPageSize, startIndex,
                 out var totalPages, out var rowCount);
             pageInfo = new PageInfo();

@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
