@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class TpFailRecordReportController : ControllerBase
@@ -57,7 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// <summary>
             /// 三方ID
             /// </summary>
-            public int TpId { get; set; }
+            public IEnumerable<int> TpIds { get; set; }
 
             /// <summary>
             /// 交易時間起
@@ -105,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// <summary>
             /// 三方ID
             /// </summary>
-            public int TpId { get; set; }
+            public IEnumerable<int> TpIds { get; set; }
 
             /// <summary>
             /// 交易時間起
@@ -135,11 +135,11 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// </summary>
             public string TransId { get; set; }
 
-            /// <summary>
-            /// 匯出資料顯示的時區(-12~14)
-            /// </summary>
-            [Range(-12, 14)]
-            public int TimeZone { get; set; }
+            ///// <summary>
+            ///// 匯出資料顯示的時區(-12~14)
+            ///// </summary>
+            //[Range(-12, 14)]
+            //public int TimeZone { get; set; }
         }
 
         #endregion
@@ -157,7 +157,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 1 })]
         public ApiListResult<TpFailRecordReport> GetList(GetListRequest request)
         {
             var siteInfoList = _serverInfoBll.GetSiteList();
@@ -194,7 +195,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 {
                     SiteIds = siteList,
                     CurrencyIds = currencyIdList,
-                    TpId = request.TpId,
+                    TpIds = request.TpIds,
                     FromTransTime = request.StartTime.DateTime,
                     ToTransTime = request.EndTime.DateTime,
                     UserName = request.UserName,
@@ -202,9 +203,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                     PageSize = request.PageSize,
                     StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
                 }, out int totalPages, out int rowCount);
-
-            if (!data.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
 
             return new ApiListResult<TpFailRecordReport>
             {
@@ -214,64 +212,6 @@ namespace BackendSite.Controllers.ApiV2.Report
                 TotalPages = totalPages,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
-        }
-
-        /// <summary>
-        /// TpFailRecordReport/ExportV1 匯出 Excel
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Reports > Bet Failure Record > [Submit]
-        /// </remarks>
-        /// <param name="siteId">SiteId</param>
-        /// <param name="tpId">TpId</param>
-        /// <param name="startTime">交易時間起</param>
-        /// <param name="endTime">交易時間迄</param>
-        /// <param name="userName">用戶</param>
-        /// <param name="transId">交易單號</param>
-        /// <param name="timezone">匯出資料顯示的時區(-12~14)</param>
-        /// <returns>Excel File</returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public IActionResult ExportV1(string siteIds,
-            int tpId,
-            DateTimeOffset startTime,
-            DateTimeOffset endTime,
-            string userName,
-            string transId,
-            int timezone)
-        {
-            var siteInfoList = _serverInfoBll.GetSiteList();
-
-            var currencyIdList = new List<int>();
-
-            foreach (var site in siteInfoList)
-            {
-                currencyIdList.AddRange(site.ICurrencyList);
-            }
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(siteIds);
-
-            if (siteList.Contains(0))
-            {
-                siteList = siteInfoList.Select(x => x.SiteId);
-            }
-
-            if (string.IsNullOrWhiteSpace(transId))
-                transId = null;
-
-            if (string.IsNullOrWhiteSpace(userName))
-                userName = null;
-
-            return ExportTpFailRecordReport(siteList,
-                currencyIdList,
-                tpId,
-                new DateTimeOffset(startTime.DateTime, TimeSpan.Zero).DateTime,
-                new DateTimeOffset(endTime.DateTime, TimeSpan.Zero).DateTime,
-                userName,
-                transId,
-                timezone);
         }
 
         /// <summary>
@@ -285,7 +225,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         /// <param name="request">參數</param>
         /// <returns>Excel File</returns>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TpFailRecordReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 61, 2 })]
         public IActionResult Export(ExportRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.TransId))
@@ -296,12 +237,11 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return ExportTpFailRecordReport(request.SiteIds,
                 request.CurrencyIds,
-                request.TpId,
+                request.TpIds,
                 request.StartTime.DateTime,
                 request.EndTime.DateTime,
                 request.UserName,
-                request.TransId,
-                request.TimeZone);
+                request.TransId);
         }
 
         #endregion
@@ -310,19 +250,18 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         private FileContentResult ExportTpFailRecordReport(IEnumerable<int> siteIds,
             IEnumerable<int> currencyIds,
-            int tpId,
+            IEnumerable<int> tpIds,
             DateTime fromTransTime,
             DateTime toTransTime,
             string userName,
-            string transId,
-            int timezone)
+            string transId)
         {
             var exportData =
                 _reportBll.GetTpFailRecordReportForExport(new GetTpFailRecordReportInput
                 {
                     SiteIds = siteIds,
                     CurrencyIds = currencyIds,
-                    TpId = tpId,
+                    TpIds = tpIds,
                     FromTransTime = fromTransTime,
                     ToTransTime = toTransTime,
                     UserName = userName,
@@ -333,7 +272,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             {
                 SiteName = x.SiteName,
                 User = x.UserName,
-                TransTime = x.TransTime.ToOffset(TimeSpan.FromHours(timezone)),
+                CurrencyName = x.CurrencyName,
+                TransTime = x.TransTime.ToOffset(TimeSpan.FromHours(8)),
                 Vendor = x.TpName,
                 TransId = x.TransId,
                 Info = x.Info

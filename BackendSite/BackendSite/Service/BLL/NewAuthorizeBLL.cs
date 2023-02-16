@@ -62,7 +62,7 @@ namespace BackendSite.Service.BLL
             {
                 int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out var userId);
                 int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var siteId);
-                
+
                 authData = new AuthData
                 {
                     UserId = userId,

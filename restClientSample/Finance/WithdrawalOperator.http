@@ -1,8 +1,8 @@
 # localhost
-# @url=http://localhost:9158
+@url=http://localhost:9158
 
 # AdminSite DEV
-@url=http://admin.n88dev.com
+# @url=http://admin.n88dev.com
 
 ###
 # Login V2
@@ -10,7 +10,7 @@ POST {{url}}/apiV2/Home/Signin HTTP/1.1
 Content-Type: application/json
 
 {
-    "userName": "admin",
+    "userName": "ricktest",
     "userPwd": "1q2w3e4r"
 }
 
@@ -33,5 +33,35 @@ Content-Type: application/json
 
 {
     "currencyId": 2,
+    "purpose": 2
+}
+
+###
+# 取得CryptoWallet列表
+# 回傳值非空陣列時顯示CryptoWallet選項
+POST {{url}}/apiV2/BaseData/GetCryptoWalletList HTTP/1.1
+Content-Type: application/json
+
+{
+    "purpose": 2,
+    "currencyId": 2
+}
+
+###
+# CryptoWallet 送出
+POST {{url}}/apiV2/Withdrawal/SendToNext HTTP/1.1
+Content-Type: application/json
+
+{"comment":"","transId":"WD136180","withdrawalInfo":"{\"SysId\": 31, \"IFSCCode\": null, \"AccountNo\": \"54423543\", \"AccountName\": \"test\"}","action":4,"selId":21,"withdrawalType":1}
+
+###
+# 取得 CalCode
+# currencyId = 0 取全部
+# purpose 1: deposit, 2: withdrawal
+POST {{url}}/apiV2/BaseData/GetCalCodeList HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 0,
     "purpose": 2
 }

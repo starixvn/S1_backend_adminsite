@@ -81,10 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
         }
-        public class GetSiteListByLoginUserReq
-        {
-            public int? SiteId { get; set; }
-        }
+
         public class SetRequest
         {
             public bool IsAdd { get; set; }

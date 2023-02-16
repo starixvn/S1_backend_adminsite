@@ -1,8 +1,5 @@
 ﻿namespace BackendSite.Service.Model
 {
-    public class GameCasinoManage
-    {
-    }
     public class GameCasinoResult
     {
         public List<GameCasinoData> GameCasinoData { get; set; }

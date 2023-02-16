@@ -163,30 +163,10 @@
       },
       {
         "Key": "",
-        "Title": "TeleCSD",
-        "FuncKey": "CustManage/TeleCSD",
-        "Controller": "CustManage",
-        "Action": "TeleCSD",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
         "Title": "Tag Management",
         "FuncKey": "CustManage/TagManagement",
         "Controller": "CustManage",
         "Action": "TagManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "Registration Management",
-        "FuncKey": "CustManage/RegistrationManagement",
-        "Controller": "CustManage",
-        "Action": "RegistrationManagement",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -275,16 +255,6 @@
         "FuncKey": "Finance/PaymentAdjustment",
         "Controller": "Finance",
         "Action": "PaymentAdjustment",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "Balance Adjustment (Batch)",
-        "FuncKey": "Finance/BalanceAdjustmentBatch",
-        "Controller": "Finance",
-        "Action": "BalanceAdjustmentBatch",
         "Icon": "",
         "Roles": null,
         "Childs": null
@@ -481,16 +451,6 @@
         "FuncKey": "Marketing/PointLevelManagement",
         "Controller": "Marketing",
         "Action": "PointLevelManagement",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      },
-      {
-        "Key": "",
-        "Title": "Registration Data",
-        "FuncKey": "Marketing/RegistrationForMarketing",
-        "Controller": "Marketing",
-        "Action": "RegistrationForMarketing",
         "Icon": "",
         "Roles": null,
         "Childs": null

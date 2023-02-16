@@ -44,6 +44,11 @@ namespace BackendSite.Service.BLL
             return serverInfo;
         }
 
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+        }
+
         public IEnumerable<ServerInfo> GetSiteList()
         {
             var sServerInfoListKey = $"ServerInfoList";
