@@ -20,5 +20,6 @@ namespace BackendSite.Service.Library
         long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
     }
 }

@@ -83,7 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public ApiResult GetDepositType()
         {
             var data = EnumExtension
-                .EnumToSelectListItem(new []{DepositTypeEnum.Undefined, DepositTypeEnum.LocalBanking});
+                .EnumToSelectListItem(new []{DepositTypeEnum.LocalBanking});
 
             return new ApiResult<IEnumerable<SelectListItem>>
             {
