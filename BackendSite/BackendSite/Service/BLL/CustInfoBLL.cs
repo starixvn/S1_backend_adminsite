@@ -10,6 +10,7 @@ using System.Linq;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
 using System.Security.Policy;
+using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 
 namespace BackendSite.Service.BLL
 {
@@ -1041,69 +1042,58 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<CustInfoDetail> GetListByExcel(int siteId, IFormFile excel)
+        public void ImportByExcel(int siteId, IFormFile excel)
         {
-            List<CustInfoDetail> result = new List<CustInfoDetail>();
-            try
-            {
-                if (excel.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            List<string> userNameList = new List<string>();
+            List<int> custIdList = new List<int>();
+
+            if (excel.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         StringComparison.OrdinalIgnoreCase) ||
                     excel.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
                     excel.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
-                {
-                    var excelPkg = new ExcelPackage(excel.OpenReadStream());
-                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    var isLastRow = false;
-                    var RowId = 2; // 因為有標題列，所以從第2列開始讀起
-
-                    do // 讀取資料，直到讀到空白列為止
-                    {
-                        var custUsername = string.IsNullOrEmpty(sheet.Cells[RowId, 1].Text)
-                            ? null
-                            : sheet.Cells[RowId, 1].Text;
-
-                        var sabaId = sheet.Cells[RowId, 2].Text.Trim();
-                        var _sabaId = "";
-                        if (sabaId.IndexOf("_") > -1)
-                        {
-                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("_") + 1,
-                                sabaId.Length - sabaId.LastIndexOf("_") - 1);
-                        }
-                        else if (sabaId.IndexOf("x") > -1)
-                        {
-                            _sabaId = sabaId.Substring(sabaId.LastIndexOf("x") + 1,
-                                sabaId.Length - sabaId.LastIndexOf("x") - 1);
-                        }
-                        var m = Regex.Match(_sabaId, @"\d+");
-                        var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
-                        int.TryParse(sheet.Cells[RowId, 3].Text.Trim(), out var vipLevel);
-                        var memo = sheet.Cells[RowId, 4].Text.Trim();
-                        if (string.IsNullOrEmpty(custUsername) && _custId == null)
-                        {
-                            isLastRow = true;
-                        }
-                        else
-                        {
-                            var custInfoDetail = _custInfoService.GetCustInfos(custId, custUsername, siteId);
-                            if (custInfoDetail != null)
-                            {
-                                result.Add(custInfoDetail);
-                            }
-                            else
-                            {
-                                result.Add(new CustInfoDetail() { CustId = custId, UserName = custUsername, SiteId = siteId });
-                            }
-                        }
-                        RowId += 1;
-                    } while (!isLastRow && RowId <= 100);
-                }
-            }
-            catch (Exception ex)
             {
+                var excelPkg = new ExcelPackage(excel.OpenReadStream());
+                var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                var isLastRow = false;
+                var RowId = 2; // 因為有標題列，所以從第2列開始讀起
 
+                do // 讀取資料，直到讀到空白列為止
+                {
+                    var custUsername = sheet.Cells[RowId, 1].Text.Trim();
+                    var sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    if (sabaId.IndexOf("_") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("_") - 1);
+                    }
+                    else if (sabaId.IndexOf("x") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("x") - 1);
+                    }
+                    var m = Regex.Match(sabaId, @"\d+");
+                    var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
+
+                    if (string.IsNullOrWhiteSpace(custUsername))
+                    {
+                        userNameList.Add(custUsername);
+                    }
+                    if (_custId != null)
+                    {
+                        custIdList.Add(custId);
+                    }
+                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                    {
+                        isLastRow = true;
+                    }
+                    RowId += 1;
+                } while (!isLastRow);
             }
 
-            return result;
+            _ = Task.Run(() =>
+            {
+                var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
+            });
         }
     }
 }

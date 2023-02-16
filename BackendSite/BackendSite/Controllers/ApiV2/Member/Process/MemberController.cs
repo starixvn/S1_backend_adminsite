@@ -1155,14 +1155,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
-        public IActionResult GetListByExcel([FromForm] GetListByFileRequest request)
+        public ApiResult<int> GetListByExcel([FromForm] GetListByFileRequest request)
         {
-            var data =  _custInfoBll.GetListByExcel(request.SiteId, request.File);
-            var stream = _excelBll.ExportV2(data);
+            _custInfoBll.ImportByExcel(request.SiteId, request.File);
 
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
+            return new ApiResult<int>()
+            {
+                ErrorCode = 0,
+                Message = "Send Process Finish."
+            };
         }
     }
 }

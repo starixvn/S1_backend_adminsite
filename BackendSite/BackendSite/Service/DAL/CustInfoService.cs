@@ -27,7 +27,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
         }
-        
+
         public int GetPointLevel(int custId)
         {
             return _reportDbClient.QueryFirst<int>("Member_PointLevel_Get", new DynamicParameters(new { CustId = custId }));
@@ -322,12 +322,12 @@ namespace BackendSite.Service.DAL
                 _Operator = @operator,
                 _CanEdit = canEdit
             });
-            
+
             if (conn == null)
             {
                 return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p) > 0;
             }
-            
+
             return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p, conn, trans) > 0;
         }
 
@@ -711,13 +711,13 @@ namespace BackendSite.Service.DAL
 
             return WithdrawalLimitLogData;
         }
-        
+
         public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, string userNames)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_UserNames", userNames);
-            
+
             return _reportDbClient.QueryAsync<CustomerInfo>("Admin_CustInfo_GetList", props);
         }
 
@@ -741,9 +741,9 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-        
-         public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
-            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
+
+        public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
+           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
 
             var logParam = new DynamicParameters();
@@ -769,7 +769,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
             p.Add("_CurrencyId", currencyId);
-            
+
             return await _reportDbClient.QueryFirstAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get", p);
         }
 
@@ -803,6 +803,15 @@ namespace BackendSite.Service.DAL
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
         {
             return _reportDbClient.QueryAsync<EWalletDetail>("Admin_CustEWalletDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
+        }
+
+        public IEnumerable<MemberExportDataDto> GetCustByExcel(ImportDataByExcelModel importDataByExcelModel)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", importDataByExcelModel.SiteId);
+            parameter.Add("_UserNameList", importDataByExcelModel.UserNameList);
+            parameter.Add("_CustIdList", importDataByExcelModel.CustIdList);
+            return _reportDbClient.Query<MemberExportDataDto>("Admin_CustinfoByImportData", parameter);
         }
     }
 }
