@@ -1,11 +1,17 @@
-﻿using BackendSite.Extensions;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using BackendSite.Service.Model.GameStatisticalReport;
 using BackendSite.Service.Model.Option;
+using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 
 namespace BackendSite.Service.BLL
@@ -18,6 +24,7 @@ namespace BackendSite.Service.BLL
         private readonly Common _common;
         private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly IMpaCommonService _mpaCommonService;
         private readonly ICacheHelper _redisHelper;
         private readonly ServerInfoBLL _serverInfoBll;
 
@@ -31,6 +38,7 @@ namespace BackendSite.Service.BLL
             _common = provider.GetRequiredService<Common>();
             _betListBll = provider.GetRequiredService<BetListService>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _mpaCommonService = provider.GetRequiredService<IMpaCommonService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
@@ -977,7 +985,265 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
+        
+        private decimal GetBaseCurrencyTotalAmount(IList<MpaRateDto> rateList,
+            IEnumerable<IPaymentReportDetail> source,
+            int baseCurrencyId)
+        {
+            var result = source.Sum(x =>
+            {
+                var rate = _mpaCommonService.MapperExchangeRate(rateList, x.FlowEndTime.UtcDateTime, (int) x.CurrencyId,
+                    baseCurrencyId);
+                var amount = x.Amount * rate;
 
+                return amount;
+            });
+
+            return result;
+        }
+
+        private static DateTimeOffset GetEndDateForExchangeRate(DateTimeOffset endTime)
+        {
+            var now = DateTimeOffset.Now.ToUniversalTime();
+            // 當月不需做處理
+            if (endTime.ToString("yyyyMM") == now.ToString("yyyyMM"))
+            {
+                return endTime;
+            }
+
+            if (endTime > now)
+            {
+                return now;
+            }
+            
+            // 該月最後一天
+            var lastDate = new DateTime(endTime.Year, endTime.Month, DateTime.DaysInMonth(endTime.Year, endTime.Month));
+            
+            return new DateTimeOffset(lastDate, TimeSpan.Zero);
+        }
+        
+        public async Task<IEnumerable<DepositPaymentReportSummary>> GetDepositPaymentReportAsync(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportDepositDetail(input)
+                .ToList();
+
+            if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
+            {
+                detailList.ForEach(x =>
+                {
+                    x.CreateTime = x.CreateTime.ToOffset(offset);
+                    x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
+                });
+            }
+            
+            var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, GetEndDateForExchangeRate(input.EndTime))).ToList();
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.DepositType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+
+            var result = gData.Select(g =>
+            {
+                var count = g.Count();
+                var details = g
+                    .GroupBy(x => x.CurrencyId)
+                    .Select(gg =>
+                    {
+                        var gCount = gg.Count();
+                        var gTotalDepositAmount = gg.Sum(y => y.Amount);
+
+                        return new DepositPaymentReportDetail
+                        {
+                            Key = gg.Key.ToString(),
+                            TotalDepositCount = gCount,
+                            AverageDepositAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
+                            FirstDepositCount = gg.Count(x => x.FirstDeposit),
+                            TotalDepositAmount = decimal.Round(gTotalDepositAmount, 4),
+                            AverageProcessingTime =
+                                TimeSpan.FromMilliseconds(
+                                        gg.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                                    .ToString(@"d\.hh\:mm\:ss")
+                        };
+                    });
+
+                var totalDepositAmount =
+                    GetBaseCurrencyTotalAmount(rateList, g.Select(x => x), input.BaseCurrencyId);
+
+                return new DepositPaymentReportSummary
+                {
+                    Key = g.Key,
+                    Children = details,
+                    TotalDepositCount = count,
+                    AverageDepositAmount = decimal.Round(totalDepositAmount / count, 4),
+                    FirstDepositCount = g.Count(x => x.FirstDeposit),
+                    TotalDepositAmount = decimal.Round(totalDepositAmount, 4),
+                    AverageProcessingTime =
+                        TimeSpan.FromMilliseconds(g.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                            .ToString(@"d\.hh\:mm\:ss")
+                };
+            });
+                
+            return result;
+        }
+        
+        public async Task<IEnumerable<WithdrawalPaymentReportSummary>> GetWithdrawalPaymentReportAsync(
+            GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
+        {
+            var detailList = reportService.GetPaymentReportWithdrawalDetail(input)
+                .ToList();
+            
+            if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
+            {
+                detailList.ForEach(x =>
+                {
+                    x.CreateTime = x.CreateTime.ToOffset(offset);
+                    x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
+                });
+            }
+            
+            var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, input.EndTime)).ToList();
+            var gData = detailList.GroupBy(x =>
+            {
+                return groupBy switch
+                {
+                    PaymentReportGroupByEnum.Currency => x.CurrencyId.ToString(),
+                    PaymentReportGroupByEnum.Date => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM-dd"),
+                    PaymentReportGroupByEnum.Month => x.FlowEndTime.ToOffset(offset).ToString("yyyy-MM"),
+                    PaymentReportGroupByEnum.Gateway => x.PayName,
+                    PaymentReportGroupByEnum.Type => x.WithdrawalType.ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(groupBy), groupBy,
+                        $"Group by {groupBy.ToString()} not support")
+                };
+            });
+            
+            var result = gData.Select(g =>
+            {
+                var count = g.Count();
+                var details = g
+                    .GroupBy(x => x.CurrencyId)
+                    .Select(gg =>
+                    {
+                        var gCount = gg.Count();
+                        var gTotalDepositAmount = gg.Sum(y => y.Amount);
+
+                        return new WithdrawalPaymentReportDetail
+                        {
+                            Key = gg.Key.ToString(),
+                            TotalWithdrawalCount = gCount,
+                            AverageWithdrawalAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
+                            TotalWithdrawalAmount = decimal.Round(gTotalDepositAmount, 4),
+                            AverageProcessingTime =
+                                TimeSpan.FromMilliseconds(
+                                        gg.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                                    .ToString(@"d\.hh\:mm\:ss")
+                        };
+                    });
+
+                var totalDepositAmount =
+                    GetBaseCurrencyTotalAmount(rateList, g.Select(x => x), input.BaseCurrencyId);
+
+                return new WithdrawalPaymentReportSummary
+                {
+                    Key = g.Key,
+                    Children = details,
+                    TotalWithdrawalCount = count,
+                    AverageWithdrawalAmount = decimal.Round(totalDepositAmount / count, 4),
+                    TotalWithdrawalAmount = decimal.Round(totalDepositAmount, 4),
+                    AverageProcessingTime =
+                        TimeSpan.FromMilliseconds(g.Average(x => (x.FlowEndTime - x.CreateTime).TotalMilliseconds))
+                            .ToString(@"d\.hh\:mm\:ss")
+                };
+            });
+                
+            return result;
+        }
+
+        public static byte[] ExportPaymentReport<TSummary, TDetail>(IEnumerable<TSummary> data)
+            where TSummary: class, IPaymentReportSummary<TDetail>
+            where TDetail: class
+        {
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("Report");
+
+            sheet.CreateHeaders<TDetail>(freeze: true, index: 1);
+            
+            var gCellStyle = workbook.CreateCellStyle();
+            gCellStyle.BorderBottom = BorderStyle.Medium;
+            gCellStyle.FillForegroundColor = IndexedColors.LightCornflowerBlue.Index;
+            gCellStyle.FillPattern = FillPattern.SolidForeground;
+            
+            var subCellStyle = workbook.CreateCellStyle();
+            subCellStyle.BorderBottom = BorderStyle.Thin;
+            subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
+            subCellStyle.FillPattern = FillPattern.SolidForeground;
+
+            var skipSProps = new[] {"Children"};
+            var dProps = typeof(TDetail).GetProperties();
+            var sProps = typeof(TSummary).GetProperties()
+                .Where(x => !skipSProps.Contains(x.Name));
+            var index = 1;
+            foreach (var gData in data)
+            {
+                var groupRow = sheet.CreateRow(index);
+                
+                var idx = 0;
+                foreach (var prop in sProps)
+                {
+                    var groupCell = groupRow.CreateCell(idx);
+                    var val = typeof(TSummary).GetProperty(prop.Name)?.GetValue(gData);
+                    groupRow.CreateCell(idx).SetCellValue(val?.ToString());
+                    groupCell.CellStyle = gCellStyle;
+                    
+                    idx++;
+                }
+                
+                index++;
+
+                var children = typeof(TSummary).GetProperty("Children")?.GetValue(gData) as IEnumerable<TDetail>;
+                foreach (var detail in children)
+                {
+                    var row = sheet.CreateRow(index);
+                    
+                    var i = 0;
+                    foreach (var prop in dProps)
+                    {
+                        var subGroupCell = row.CreateCell(i);
+                        var val = typeof(TDetail).GetProperty(prop.Name)?.GetValue(detail);
+                        row.CreateCell(i).SetCellValue(val?.ToString());
+                   
+                        if (i == 0)
+                            subGroupCell.CellStyle = subCellStyle;
+                        
+                        i++;
+                    }
+                    index++;
+                }
+            }
+            
+            sheet.AutoSizeColumn(0);
+
+            using var memoryStream = new MemoryStream();
+            workbook.Write(memoryStream);
+            var result = memoryStream.ToArray();
+            
+            return result;
+        }
+        
         #region Game Statistical Report
 
         public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
@@ -996,7 +1262,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-
+        
         private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
             => reportService.GetGameStatisticalReport(getListInput);
 
@@ -1036,6 +1302,5 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-
     }
 }
