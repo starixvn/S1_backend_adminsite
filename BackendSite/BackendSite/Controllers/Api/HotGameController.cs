@@ -38,7 +38,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<IEnumerable<GetHotGameListResponse>>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _hotGame.Get(request.SiteId, request.CurrencyId, request.RefreshCache)
+                Data = await _hotGame.GetDataList(request.SiteId, request.CurrencyId, request.RefreshCache)
             };
             return apiResult;
         }
@@ -61,7 +61,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiResult<GetHotGameDetailResponse>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _hotGame.Get(id)
+                Data = await _hotGame.GetDetail(id)
             };
             return apiResult;
         }

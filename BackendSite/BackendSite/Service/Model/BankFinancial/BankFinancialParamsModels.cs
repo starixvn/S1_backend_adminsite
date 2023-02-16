@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = "[]";
             StrStatus = "[]";
             StrPurposes = "[]";
-            StrSysIds = "[]";
+            StrSysIds = null;
             Agent = string.Empty;
             AccountNo = string.Empty;
             Id = id;
