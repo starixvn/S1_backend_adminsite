@@ -13,6 +13,7 @@ using System.Security.Policy;
 using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 using Org.BouncyCastle.Ocsp;
 using System.Drawing.Drawing2D;
+using Amazon.S3.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -39,6 +40,9 @@ namespace BackendSite.Service.BLL
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
         private readonly ExcelBLL _excelBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _backofficeS3Url;
+        private readonly string _environment;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -62,6 +66,10 @@ namespace BackendSite.Service.BLL
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
+            var env = provider.GetRequiredService<IWebHostEnvironment>();
+            _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -1046,7 +1054,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public void ImportByExcel(int siteId, IFormFile excel, string author)
+        public async void ImportByExcel(int siteId, IFormFile excel, string author)
         {
             List<string> userNameList = new List<string>();
             List<int> custIdList = new List<int>();
@@ -1098,10 +1106,22 @@ namespace BackendSite.Service.BLL
             //新增BatchCustInfo
             _custInfoService.NewBatchCustInfo(siteId, author, ref batchId);
 
-            _ = Task.Run(() =>
+            _ = Task.Run(async () =>
             {
                 var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
-                var stream = _excelBll.ExportV2(custInfo);
+                var fileBytes = _excelBll.ExportV2(custInfo);
+                var stream = new MemoryStream(fileBytes);
+                var site = (SiteEnum)siteId;
+                var key = $"{_environment}/{site}/CustInfo/{batchId}.xlsx";
+                var putRequest = new PutObjectRequest
+                {
+                    BucketName = "ailab-backoffice",
+                    ContentType = "image/jpeg",
+                    InputStream = stream,
+                    Key = key
+                };
+
+                var result = await _s3Helper.PutObjectAsync(putRequest);
             });
         }
     }
