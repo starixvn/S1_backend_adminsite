@@ -121,7 +121,8 @@ namespace BackendSite.Service.Model
         public int SameRealNameRestrictAvailableCount { get; set; }
 
         [Description("用戶Tag封鎖清單")]
-        public IEnumerable<int> BlockTagList { get; set; }
+        public IEnumerable<int> BlockTagList => string.IsNullOrEmpty(BlockTagListJson) ? new List<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(BlockTagListJson);
+        public string BlockTagListJson { get; set; }
     }
 
     public class PromotionInfoReq 
