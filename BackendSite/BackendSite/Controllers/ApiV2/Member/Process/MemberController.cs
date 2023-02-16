@@ -1157,7 +1157,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public ApiResult<int> GetListByExcel([FromForm] GetListByFileRequest request)
         {
-            _custInfoBll.ImportByExcel(request.SiteId, request.File);
+            _custInfoBll.ImportByExcel(request.SiteId, request.File, User.Identity.Name);
 
             return new ApiResult<int>()
             {

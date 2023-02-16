@@ -11,6 +11,8 @@ using OfficeOpenXml;
 using System.Text.RegularExpressions;
 using System.Security.Policy;
 using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
+using Org.BouncyCastle.Ocsp;
+using System.Drawing.Drawing2D;
 
 namespace BackendSite.Service.BLL
 {
@@ -36,6 +38,7 @@ namespace BackendSite.Service.BLL
 
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
+        private readonly ExcelBLL _excelBll;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -58,6 +61,7 @@ namespace BackendSite.Service.BLL
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -1042,10 +1046,11 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public void ImportByExcel(int siteId, IFormFile excel)
+        public void ImportByExcel(int siteId, IFormFile excel, string author)
         {
             List<string> userNameList = new List<string>();
             List<int> custIdList = new List<int>();
+            var batchId = 0;
 
             if (excel.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         StringComparison.OrdinalIgnoreCase) ||
@@ -1090,9 +1095,13 @@ namespace BackendSite.Service.BLL
                 } while (!isLastRow);
             }
 
+            //新增BatchCustInfo
+            _custInfoService.NewBatchCustInfo(siteId, author, ref batchId);
+
             _ = Task.Run(() =>
             {
                 var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
+                var stream = _excelBll.ExportV2(custInfo);
             });
         }
     }

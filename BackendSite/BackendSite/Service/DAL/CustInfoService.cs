@@ -811,7 +811,16 @@ namespace BackendSite.Service.DAL
             parameter.Add("_SiteId", importDataByExcelModel.SiteId);
             parameter.Add("_UserNameList", importDataByExcelModel.UserNameList);
             parameter.Add("_CustIdList", importDataByExcelModel.CustIdList);
-            return _reportDbClient.Query<MemberExportDataDto>("Admin_CustinfoByImportData", parameter);
+            return _reportDbClient.Query<MemberExportDataDto>("Admin_CustinfoByImportData_Get", parameter);
+        }
+
+        public bool NewBatchCustInfo(int siteId, string author, ref int batchId)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author});
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _mainDbClient.Execute("Admin_BatchCustInfo_Ins", p);
+            batchId = p.Get<int>("BatchId");
+            return result > 0;
         }
     }
 }
