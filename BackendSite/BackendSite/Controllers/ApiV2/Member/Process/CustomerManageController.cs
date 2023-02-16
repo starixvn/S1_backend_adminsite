@@ -2443,24 +2443,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     SiteIds = new List<int> { custInfo.SiteId },
                     CurrencyIds = new List<int> { custInfo.CurrencyId },
-                    Menus = new List<int> 
-                    { 
-                        (int)AdminAdjustmentLogMenuEnum.SetCustomerInfo, 
-                        (int)AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, 
+                    Menus = new List<int>
+                    {
+                        (int)AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+                        (int)AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo,
                         (int)AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
-                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote 
+                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote
                     },
-                    ActionTypes = new List<int> 
-                    { 
-                        (int)ActionType.Create, 
-                        (int)ActionType.Update, 
-                        (int)ActionType.Delete 
+                    ActionTypes = new List<int>
+                    {
+                        (int)ActionType.Create,
+                        (int)ActionType.Update,
+                        (int)ActionType.Delete
                     },
                     UserName = null,
                     TransId = null,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
-                    CustId = request.CustId
+                    CustId = request.CustId,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
                 };
 
                 var searchResult = _adjustmentLogReportBll.GetAdminAdjustmentInfoLog(bllRequest);
