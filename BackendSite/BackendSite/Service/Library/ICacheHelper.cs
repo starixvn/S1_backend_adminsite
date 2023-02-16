@@ -16,6 +16,7 @@ namespace BackendSite.Service.Library
         bool SetCacheList<TItem>(Dictionary<string, TItem> dataList, TimeSpan? timeSpan, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool InsertList<TItem>(string key, TimeSpan? timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin);
         IEnumerable<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<IEnumerable<TItem>> GetListByRangeAsync<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
