@@ -1254,5 +1254,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
 
+        /// <summary>
+        /// Member/GetPromotionReceiveFailLog 取得客戶Promotion領取失敗紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<PromotionReceiveFailLog>>> GetPromotionReceiveFailLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<PromotionReceiveFailLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(request.CustId)
+            };
+        }
+
     }
 }
