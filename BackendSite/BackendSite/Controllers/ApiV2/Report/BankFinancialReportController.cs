@@ -108,7 +108,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 request.EndDate,
                 _common.TransferToTimeZoneFormat(request.TimeZone));
             
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
 
             return _excelBll.ExcelFile(stream, "BankFinancialReport");
         }

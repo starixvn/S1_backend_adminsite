@@ -153,7 +153,8 @@ namespace BackendSite.Service.BLL.Mpa
                     NoOfPlayers = mainSiteList.DistinctBy(x => x.CustId).Count(),
                     FirstDepositAmount = mainSiteList.Sum(r => r.FirstDepositAmount),
                     TotalDepositAmount = mainSiteList.Sum(r => r.DepositAmount),
-                    Childs = mainSiteList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
+                    Children = mainSiteList.Any() 
+                        ? mainSiteList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
                     {
                         SignUpUrl = r.SignUpUrl,
                         FirstDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.FirstDepositAmount),
@@ -161,6 +162,7 @@ namespace BackendSite.Service.BLL.Mpa
                         NoOfPlayers = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).DistinctBy(x => x.CustId)
                             .Count()
                     }).ToList()
+                        : null
                 };
                 response.SignUpData.Add(mainData);
             }
@@ -174,7 +176,7 @@ namespace BackendSite.Service.BLL.Mpa
                 NoOfPlayers = affList.DistinctBy(X => X.CustId).Count(),
                 FirstDepositAmount = affList.Sum(r => r.FirstDepositAmount),
                 TotalDepositAmount = affList.Sum(r => r.DepositAmount),
-                Childs = null
+                Children = null
             };
             response.SignUpData.Add(affData);
 
@@ -187,7 +189,7 @@ namespace BackendSite.Service.BLL.Mpa
                 NoOfPlayers = appList.DistinctBy(X => X.CustId).Count(),
                 FirstDepositAmount = appList.Sum(r => r.FirstDepositAmount),
                 TotalDepositAmount = appList.Sum(r => r.DepositAmount),
-                Childs = null
+                Children = null
             };
             response.SignUpData.Add(appData);
 
@@ -200,7 +202,7 @@ namespace BackendSite.Service.BLL.Mpa
                 NoOfPlayers = creditSiteList.DistinctBy(X => X.CustId).Count(),
                 FirstDepositAmount = creditSiteList.Sum(r => r.FirstDepositAmount),
                 TotalDepositAmount = creditSiteList.Sum(r => r.DepositAmount),
-                Childs = null
+                Children = null
             };
             response.SignUpData.Add(creditData);
 
@@ -215,7 +217,7 @@ namespace BackendSite.Service.BLL.Mpa
                 NoOfPlayers = landingPagesList.DistinctBy(X => X.CustId).Count(),
                 FirstDepositAmount = landingPagesList.Sum(r => r.FirstDepositAmount),
                 TotalDepositAmount = landingPagesList.Sum(r => r.DepositAmount),
-                Childs = landingPagesList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
+                Children = landingPagesList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
                 {
                     SignUpUrl = r.SignUpUrl,
                     FirstDepositAmount = landingPagesList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.FirstDepositAmount),
@@ -235,7 +237,7 @@ namespace BackendSite.Service.BLL.Mpa
                 NoOfPlayers = noneList.DistinctBy(x => x.CustId).Count(),
                 FirstDepositAmount = noneList.Sum(r => r.FirstDepositAmount),
                 TotalDepositAmount = noneList.Sum(r => r.DepositAmount),
-                Childs = null
+                Children = null
             };
             response.SignUpData.Add(noneData);
 
@@ -255,9 +257,9 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in data.SignUpData)
             {
-                if (item.Childs != null)
+                if (item.Children != null)
                 {
-                    result.AddRange(item.Childs);
+                    result.AddRange(item.Children);
                 }
                 else
                 {
@@ -331,7 +333,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
         }
 
-        public List<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
+        public IEnumerable<DepositSignUpDetailData> GetDepositSignUpDetail(DepositAmountRequest request, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var key = request.GetRedisKey();
@@ -351,7 +353,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
                     }
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, request.PageNumber, request.PageSize);
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), request.PageNumber, request.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
 
@@ -394,7 +396,7 @@ namespace BackendSite.Service.BLL.Mpa
                 FirstDepositAmount = r.Sum(x => x.FirstDepositAmount),
             }).ToList();
 
-            var list = request.OrderBy ? data.OrderBy(request) : data;
+            var list = request.OrderBy ? data.OrderBy(request).ToList() : data;
             AddCache(list, masterKey, sortKey, cacheTime, request.OrderBy);
 
             //Export
@@ -408,7 +410,7 @@ namespace BackendSite.Service.BLL.Mpa
 
         }
 
-        private void AddCache(List<DepositSignUpDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private void AddCache(IEnumerable<DepositSignUpDetailData> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

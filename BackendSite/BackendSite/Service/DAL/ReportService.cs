@@ -163,21 +163,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
-        public IEnumerable<TpBetRecordDataModel> GetCustomerDetail(int custId, int gameId, string date, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _CustId = custId,
-                    _GameId = gameId,
-                    _SelDate = date,
-                    _TimeZone = timeZone
-                });
-
-            var SpName = "Admin_TpBetRecord_ByCustIdAndGameIdAndDate_Get_V2";
-            return _reportDbClient.Query<TpBetRecordDataModel>(SpName, parameters);
-        }
-
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,
             out int totalPages,
             out int rowCount)

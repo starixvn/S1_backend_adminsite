@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace BackendSite.Service.Model.Store.StorePoint
 {
     public class ImportManualRewardPointInfoResult

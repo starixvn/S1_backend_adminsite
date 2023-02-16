@@ -2,6 +2,7 @@
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL;
 
@@ -11,59 +12,38 @@ public class BlockIpToS3
     private readonly BlockService _blockService;
     private readonly string _fileName;
     private readonly string _folder;
+    private readonly string _nginxIpKey;
 
     public BlockIpToS3(AWSS3Helper s3Helper, IWebHostEnvironment env, BlockService blockService)
     {
         _s3Helper = s3Helper;
         _blockService = blockService;
-        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "blockIp.txt" : "blockIp_test.txt";
+        _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "geoblockIp.txt" : "geoblockIp_test.txt";
+        _nginxIpKey = env.IsProduction() || env.EnvironmentName == "Release" ? "$remote_addr" : "$real_ip";
         _folder = Path.Combine(env.ContentRootPath, "NginxConfig");
     }
-    public async Task<int> Upload(string ip)
-    {
-        var filePath = Path.Combine(_folder, _fileName);
-        //檢查檔案存不存在
-        if (!File.Exists(filePath))
-            await InitialConfig(filePath);
-        
-        //檢查IP是否存在
-        if (IsIpExist(filePath, ip))
-            return 0;
-        await AddIp(filePath, ip);
-        
-        return await UploadToS3(filePath);
-    }
-
-    public async Task<int> DeleteIp(string ip)
-    {
-        var filePath = Path.Combine(_folder, _fileName);
-        //檢查檔案存不存在
-        if (!File.Exists(filePath))
-            await InitialConfig(filePath);
-
-        await DeleteIp(filePath, ip);
-        
-        return await UploadToS3(filePath);;
-    }
-
-    private async Task InitialConfig(string filePath)
+    public async Task<int> Upload()
     {
         Directory.CreateDirectory(_folder);
-        var blockIps = await _blockService.GetBlockIPList();
-        await using var outputFile = new StreamWriter(filePath);
-        foreach (var ip in blockIps)
-            await outputFile.WriteLineAsync(ip.IP);
-    }
+        var filePath = Path.Combine(_folder, _fileName);
+        var blockIps = await _blockService.GetBlockIPList<BlockIPForUpload>();
+        var ipLines = blockIps.Select(a => a.IP).ToList();
+        await File.WriteAllTextAsync(filePath, "#### Block List 0:open 1:block -1:default\r\n" +
+                                               $"geo {_nginxIpKey} $ipcheck " +
+                                               "{ \r\n" +
+                                               "default -1;\r\n");
+        await File.AppendAllLinesAsync(filePath, ipLines);
+        await File.AppendAllTextAsync(filePath, "}\r\n" + 
+                                                "\r\n" +
+                                                "map $ip_geoblock:$ipcheck $geoblock {\r\n" +
+                                                "default $default_geoblock;\r\n" +
+                                                "0:0 0;\r\n" +
+                                                "0:1 0;\r\n" +
+                                                "0:-1 0;\r\n" +
+                                                "-1:1 1;\r\n" +
+                                                "}\r\n");
 
-    private bool IsIpExist(string filePath, string ip)
-    {
-        return File.ReadLines(filePath).Any(line => string.Equals(line, ip));
-    }
-
-    private async Task AddIp(string filePath, string ip)
-    {
-        await using var outputFile = new StreamWriter(filePath, true);
-        await outputFile.WriteLineAsync(ip);
+        return await UploadToS3(filePath);
     }
 
     private async Task<int> UploadToS3(string filePath)
@@ -82,11 +62,5 @@ public class BlockIpToS3
         };
         var putResponse = await _s3Helper.PutObjectAsync(putRequest);
         return !putResponse.HttpStatusCode.IsSuccess() ? 0 : 1;
-    }
-
-    private async Task DeleteIp(string filePath, string ip)
-    {
-        var temp = (await File.ReadAllLinesAsync(filePath)).Where(blockIp => blockIp != ip).ToList();
-        if (temp != null) await File.WriteAllLinesAsync(filePath, temp);
     }
 }

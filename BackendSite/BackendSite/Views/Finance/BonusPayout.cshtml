@@ -36,11 +36,11 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/component/Finance/BonusPayout.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
         //$('.collapse').collapse();
         window.RootUrl = '@Url.Content("~/api")';
         window.LangCode = 'en';
         window.i18n = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(i18n));
     </script>
+    <script src="~/js/component/Finance/BonusPayout.min.js" asp-append-version="true"></script>
 }

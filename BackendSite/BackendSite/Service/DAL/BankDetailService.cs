@@ -3,8 +3,6 @@ using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;

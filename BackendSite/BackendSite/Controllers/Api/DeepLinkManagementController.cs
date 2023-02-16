@@ -40,7 +40,7 @@ namespace BackendSite.Controllers.Api
         {
             var apiResult = new ApiResult<IEnumerable<GetDeepLinkRep>>
             {
-                Data = _deepLinkBLL.GetDeepLinkTable(req.SiteId, req.DeepLinkId),
+                Data = _deepLinkBLL.GetDeepLinkTable(req.SiteId, req.DeepLinkId, 1, 100, out _, out _),
                 ErrorCode = 0
             };
 
@@ -48,12 +48,12 @@ namespace BackendSite.Controllers.Api
         }
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DeepLinkManagement" })]
-        public ApiResult SetDeepLink(SetDeepLinkReq req)
+        public async Task<ApiResult> SetDeepLink(SetDeepLinkReq req)
         {
             var apiResult = new ApiResult();
             try
             {
-                if (_deepLinkBLL.SetDeepLink(req.SiteId, req.Type, req.Domain, req.ProtocolType, req.DeepLinkId, _authorizeBLL.GetAuthData().UserName) > 0)
+                if (await _deepLinkBLL.SetDeepLink(req.SiteId, req.Type, req.Domain, req.ProtocolType, req.DeepLinkId, _authorizeBLL.GetAuthData().UserName))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");

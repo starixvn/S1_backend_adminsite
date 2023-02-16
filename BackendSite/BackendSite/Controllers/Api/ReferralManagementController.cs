@@ -172,7 +172,7 @@ namespace BackendSite.Controllers.Api
             exportData.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             exportData.ForEach(s => s.RewardTime = s.RewardTime == null? s.RewardTime: new DateTimeOffset(s.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
-            var stream = excelBll.Export(exportData);
+            var stream = excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ReferralCustList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

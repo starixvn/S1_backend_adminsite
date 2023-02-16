@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DrawPrizeReportController : ControllerBase
@@ -18,6 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
         private readonly PrizeBLL _prizeBll;
         private readonly ExcelBLL _excelBll;
+        private readonly Tools _tools;
 
         #endregion
 
@@ -27,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         {
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _tools = provider.GetRequiredService<Tools>();
         }
 
         #endregion
@@ -35,31 +38,28 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
-            public IEnumerable<string> EventNameList { get; set; }
-            public int TimeZone { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public IEnumerable<string> EventNames { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
         {
             public int EventId { get; set; }
             public int PrizeId { get; set; }
-            public string EventTime { get; set; }
+            public DateTimeOffset EventTime { get; set; }
             public string PrizeName { get; set; }
-            public int TimeZone { get; set; }
         }
 
         public class ExportRequest
         {
-            public IEnumerable<int> SiteIds { get; set; }
-            public string StartDate { get; set; }
-            public string EndDate { get; set; }
+            public int SiteId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
-            public IEnumerable<string> EventNameList { get; set; }
-            public int TimeZone { get; set; }
+            public IEnumerable<string> EventNames { get; set; }
         }
 
         #endregion
@@ -73,49 +73,39 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         /// Func Path：Marketing  > Draw Prize Report > [Submit] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 78, 1 })]
         [HttpPost]
-        public ApiListResultCurrencyAmount<DrawPrize> GetList(GetListRequest request)
+        public ApiResult<DrawPrizeReportResult> GetList(GetListRequest request)
         {
-            var apiResult = new ApiListResultCurrencyAmount<DrawPrize>();
+            var apiResult = new ApiResult<DrawPrizeReportResult>();
 
-            if (request.TimeZone <= 14 && request.TimeZone >= -12)
+            _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
+
+            try
             {
-                try
+                var param = new PrizeSelect()
                 {
-                    var param = new PrizeSelect()
-                    {
-                        SelectSite = request.SiteIds,
-                        CurrencyId = request.CurrencyIds,
-                        StartDate = request.StartDate,
-                        EndDate = request.EndDate,
-                        EventName = request.EventNameList,
-                        PageNumber = request.PageNumber,
-                        PageSize = request.PageSize,
-                    };
+                    SelectSite = new List<int>() { request.SiteId },
+                    CurrencyId = request.CurrencyIds,
+                    StartDate = request.StartDate.ToString("yyyy-MM-dd"),
+                    EndDate = request.EndDate.ToString("yyyy-MM-dd"),
+                    EventName = request.EventNames,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                };
 
-                    var prizeSearchResult = _prizeBll.PrizeSearch(param, request.TimeZone);
-                    apiResult.Data = prizeSearchResult.DrawPrize;
-                    apiResult.PageNumber = prizeSearchResult.PageNumber;
-                    apiResult.TotalPages = prizeSearchResult.TotalPages;
-                    apiResult.RowCount = prizeSearchResult.RowCount;
-                    apiResult.CurrencyAmount = prizeSearchResult.CurrencyAmount;
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                }
-                catch (Exception ex)
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                    apiResult.Message = ex.Message;
-                }
-
-                return apiResult;
+                var prizeSearchResult = _prizeBll.PrizeSearch(param, timeSpan.Hours, out List<string> _);
+                prizeSearchResult.PageNumber = request.PageNumber;
+                apiResult.Data = prizeSearchResult;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
             }
 
-            return new ApiListResultCurrencyAmount<DrawPrize>
-            {
-                Message = "Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
-            };
+            return apiResult;
         }
 
         /// <summary>
@@ -127,31 +117,24 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         /// Func Path：Marketing  > Draw Prize Report > [Submit] > [Export Excel] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 78, 2 })]
         [HttpPost]
         public IActionResult Export(ExportRequest request)
         {
-            if (request.TimeZone <= 14 && request.TimeZone >= -12)
-            {
-                var exportData = _prizeBll.GetExportData(
-                    JsonConvert.SerializeObject(request.SiteIds),
-                    request.StartDate,
-                    request.EndDate,
-                    JsonConvert.SerializeObject(request.CurrencyIds),
-                    JsonConvert.SerializeObject(request.EventNameList),
-                    request.TimeZone);
 
-                var stream = _excelBll.Export(exportData);
-                return _excelBll.ExcelFile(stream, "DrawPrizeReport");
-            }
+            _tools.StringConvertDateTimeOffset(request.StartDate.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
 
-            var error = new ApiListResult<PrizeLogData>
-            {
-                Message = "Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
-            };
+            var exportData = _prizeBll.GetExportData(
+                JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate.ToString("yyyy-MM-dd"),
+                request.EndDate.ToString("yyyy-MM-dd"),
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                JsonConvert.SerializeObject(request.EventNames),
+                timeSpan.Hours);
 
-            return new ObjectResult(error);
+            var stream = _excelBll.Export(exportData);
+            return _excelBll.ExcelFile(stream, "DrawPrizeReport");
+
         }
 
         /// <summary>
@@ -163,50 +146,44 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Activity
         /// Func Path：Marketing  > Draw Prize Report > [Submit] > [Detail] 
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/DrawPrizeReport" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 78, 1 })]
         [HttpPost]
         public ApiListResult<PrizeLogData> GetLog(GetLogRequest request)
         {
             var apiResult = new ApiListResult<PrizeLogData>();
-            if (request.TimeZone <= 14 && request.TimeZone >= -12)
+
+            try
             {
-                try
+                _tools.StringConvertDateTimeOffset(request.EventTime.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
+                var param = new PrizeLogPara()
                 {
-                    var param = new PrizeLogPara()
-                    {
-                        EventId = request.EventId,
-                        PrizeId = request.PrizeId,
-                        EventTime = request.EventTime,
-                        PrizeName = request.PrizeName,
-                        PageNumber = request.PageNumber,
-                        PageSize = request.PageSize,
-                    };
+                    EventId = request.EventId,
+                    PrizeId = request.PrizeId,
+                    EventTime = request.EventTime.ToString("yyyy-MM-dd"),
+                    PrizeName = request.PrizeName,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize,
+                };
 
-                    var logResult = _prizeBll.GetPrizeLog(param, request.TimeZone);
-                    foreach (var data in logResult.PrizeLogData)
-                    {
-                        data.DrawTime = new DateTimeOffset(data.DrawTime.DateTime, TimeSpan.Zero);
-                    }
-
-                    apiResult.Data = logResult.PrizeLogData;
-                    apiResult.PageNumber = logResult.PageNumber;
-                    apiResult.TotalPages = logResult.TotalPages;
-                    apiResult.RowCount = logResult.RowCount;
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                }
-                catch (Exception ex)
+                var logResult = _prizeBll.GetPrizeLog(param, 0);
+                foreach (var data in logResult.PrizeLogData)
                 {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                    apiResult.Message = ex.Message;
+                    data.DrawTime = new DateTimeOffset(data.DrawTime.DateTime, TimeSpan.Zero);
                 }
 
-                return apiResult;
+                apiResult.Data = logResult.PrizeLogData;
+                apiResult.PageNumber = request.PageNumber;
+                apiResult.TotalPages = logResult.TotalPages;
+                apiResult.RowCount = logResult.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
-            return new ApiListResult<PrizeLogData>
+            catch (Exception ex)
             {
-                Message = "Invalid TimeZone",
-                ErrorCode = (int)ErrorCodeEnum.Fail,
-            };
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
         }
     }
 }

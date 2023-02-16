@@ -21,7 +21,7 @@ namespace BackendSite.Service.BLL
 
         private readonly ReportService reportService;
         private readonly Common _common;
-        private readonly BetListBLL _betListBll;
+        private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly IMpaCommonService _mpaCommonService;
 
@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
         {
             reportService = provider.GetRequiredService<ReportService>();
             _common = provider.GetRequiredService<Common>();
-            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _betListBll = provider.GetRequiredService<BetListService>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
             _mpaCommonService = provider.GetRequiredService<IMpaCommonService>();
         }
