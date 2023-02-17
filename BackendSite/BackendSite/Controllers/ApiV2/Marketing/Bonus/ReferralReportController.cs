@@ -110,8 +110,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var apiResult = new ApiListResult<ReferralFriendRresponse>();
             try
             {
+                var startTime = request.StartDate.ToUniversalTime().DateTime;
+                var endTime = request.EndDate.ToUniversalTime().DateTime;
                 var data = _referralManagementBll.GetRefFriendList(
-                    request.CustId, null, null, request.PageSize, request.PageNumber, 
+                    request.CustId, startTime, endTime, request.PageSize, request.PageNumber, 
                     out var totalPages, out var rowCount);
                 apiResult.Data = data;
                 apiResult.PageNumber = request.PageNumber;
