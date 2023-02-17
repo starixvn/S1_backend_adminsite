@@ -381,12 +381,5 @@ namespace BackendSite.Service.BLL
 
             return (result, errorMsg);
         }
-
-        public ServerInfo GetServerInfo(int siteId)
-        {
-            List<ServerInfo> userSiteList = new List<ServerInfo>();
-            userSiteList = serverInfoService.GetSiteList().ToList();
-            return userSiteList.FirstOrDefault(x => x.SiteId == siteId);
-        }
     }
 }

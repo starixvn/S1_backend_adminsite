@@ -484,11 +484,10 @@ namespace BackendSite.Service.Model
     {
         public int Seq { set; get; }
         public int BankId { set; get; }
-        public string BankAccountNo { set; get; }
+        public string DisplayName { set; get; }
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }
-    
     public class WithdrawalManualRequest
     {
         public string TransId { set; get; }

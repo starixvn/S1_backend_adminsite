@@ -121,13 +121,19 @@ public class MemberCommand : IMemberCommand
         var beforeName = customer.AccountName;
         var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
 
-        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts, @operator);
+        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
         if (!result) return false;
         
-        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
-            JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), ActionType.Update,
-            custId, $"Edit FullName \"{fullName}\"");
+        await CreateAdminLog(
+            @operator: @operator, 
+            siteId: customer.SiteId, 
+            currencyId: customer.CurrencyId,
+            beforeLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
+            afterLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), 
+            action: ActionType.Update,
+            custId: custId,
+            message: $"Edit FullName \"{fullName}\"",
+            menuEnum: AdminAdjustmentLogMenuEnum.SetCustomerFullName);
         
         return true;
     }
@@ -399,6 +405,46 @@ public class MemberCommand : IMemberCommand
             JsonConvert.SerializeObject(new { customer.UserName, OnlineStatus = "Offline" }), ActionType.Update, 
             custId, "Kick Out");
         return result;
+    }
+
+    public async Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator)
+    {
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
+        var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
+        {
+           CustId = custId,
+           IpEnable = ipEnable,
+           DeviceEnable = deviceEnable,
+           RealNameEnable = realNameEnable,
+           SiteId = customer.SiteId,
+           UserName = customer.UserName,
+           Operator = @operator
+        });
+        
+        if (result < 1)
+        {
+            return false;
+        }         
+
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new 
+            { 
+                customer.UserName,
+                IpEnable = beforeWhiteList?.IpEnable ?? false,
+                DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
+                RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
+            }),
+            JsonConvert.SerializeObject(new 
+            {
+                customer.UserName,
+                IpEnable = ipEnable,
+                DeviceEnable = deviceEnable,
+                RealNameEnable = realNameEnable,
+            }), ActionType.Update,
+            custId, $"Update Promotion WhiteList.");
+
+        return true;
     }
 
     private async Task CreateAdminLog(string @operator, int siteId, int currencyId, string beforeLog, string afterLog, ActionType action, int custId, string message, AdminAdjustmentLogMenuEnum menuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo)

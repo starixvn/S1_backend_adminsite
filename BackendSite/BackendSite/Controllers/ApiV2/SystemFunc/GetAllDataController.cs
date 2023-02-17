@@ -27,14 +27,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly AdminGroupBLL _adminGroupBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
+        private readonly WithdrawalBLL _withdrawalBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly WithdrawalBLL _withdrawalBll;
+        private readonly AdminBLL _adminBll;
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly DeepLinkBLL _deepLinkBll;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly DeepLinkBLL _deepLinkBll;
         private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
@@ -52,14 +53,15 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
+            _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
-            _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
+            _adminBll = provider.GetRequiredService<AdminBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
@@ -289,6 +291,29 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
+        }
+
+        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetTransferAccountList()
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
+
+            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
+            foreach (var data in apiResult.Data.ToArray())
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+            }
+
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            return apiResult;
         }
 
         //==============================================================================================================================================
@@ -576,7 +601,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-
         #endregion
 
     }
