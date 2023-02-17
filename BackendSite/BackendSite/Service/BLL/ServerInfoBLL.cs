@@ -219,7 +219,7 @@ namespace BackendSite.Service.BLL
                     else
                     {
                         assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
-                        if (assignSites !=  null)
+                        if (assignSites != null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
                             assignSites.ToList().ForEach(z =>
@@ -254,6 +254,5 @@ namespace BackendSite.Service.BLL
                 return null;
             }
         }
-
     }
 }

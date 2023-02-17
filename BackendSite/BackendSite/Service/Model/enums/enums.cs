@@ -771,6 +771,7 @@ namespace BackendSite.Service.Model.enums
         SetDepositMessage = 76,
         SiteMaintenance = 77,
         SetVideoInfo = 78,
+        SMSGenerator = 79,
         SetWithdrawalMessage = 80
     }
 
