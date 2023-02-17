@@ -15,13 +15,13 @@ namespace BackendSite.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="sheet"></param>
         /// <param name="freeze">是否凍結窗格</param>
-        public static void CreateHeaders<T>(this ISheet sheet, bool freeze = false)
+        /// <param name="index"></param>
+        public static void CreateHeaders<T>(this ISheet sheet, bool freeze = false, int index = 0)
             where T: class
         {
             var headerRow = sheet.CreateRow(0);
             var props = typeof(T).GetProperties();
 
-            var index = 0;
             foreach (var prop in props)
             {
                 if (prop.ExcelIgnore())
@@ -31,6 +31,8 @@ namespace BackendSite.Extensions
 
                 var name = prop.GetDisplayName();
                 headerRow.CreateCell(index).SetCellValue(name);
+                sheet.AutoSizeColumn(index);
+                
                 index++;
             }
 

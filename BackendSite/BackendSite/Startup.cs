@@ -7,6 +7,7 @@ using BackendSite.ExceptionHandling;
 using NSwag;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
@@ -87,6 +88,10 @@ namespace BackendSite
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
+            services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
+            services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
+
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
@@ -105,6 +110,10 @@ namespace BackendSite
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
             services.AddTransient<BetListService>();
+            services.AddTransient<IMpaWinLossService, MpaWinLossService>();
+            services.AddTransient<IMpaCommonService, MpaCommonService>();
+            services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
+            services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
