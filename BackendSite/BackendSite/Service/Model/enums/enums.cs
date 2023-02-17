@@ -1688,7 +1688,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Payment not received")]
         PaymentNotReceived = 2,
         [Description("Deposit refunded")]
-        DepositRefunded = 3
+        DepositRefunded = 3,
+        [Description("Wrong Amount submitted")]
+        WrongAmountSubmitted = 4,
+        [Description("Wrong Bank submitted")]
+        WrongBankSubmitted = 5
     }
 
     public enum WithdrawalMessageStatus
@@ -1696,7 +1700,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Name unmatch")]
         WithdrawalAccountsNameUnmatch = 0,
         [Description("Account number incorrect")]
-        WithdrawalAccountNumberIncorrect = 1
+        WithdrawalAccountNumberIncorrect = 1,
+        [Description("Withdrawal account cannot receive money")]
+        WithdrawalAccountAannotReceiveMoney = 2,
+        [Description("Beneficiary's account maintenance")]
+        BeneficiarysAccountMaintenance = 3
     }
 
     public enum CustTagEnum
