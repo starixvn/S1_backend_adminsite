@@ -10,6 +10,11 @@ using System.Linq;
 using BarcodeReader.ImageSharp;
 using NPOI.SS.Formula.Functions;
 using NuGet.Protocol;
+using OfficeOpenXml;
+using System.Text.RegularExpressions;
+using Amazon.S3.Model;
+using BackendSite.Extensions;
+using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
 {
@@ -34,6 +39,11 @@ namespace BackendSite.Service.BLL
         private readonly ICacheHelper _redisHelper;
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
+        private readonly ExcelBLL _excelBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _backofficeS3Url;
+        private readonly string _environment;
+        private readonly TagBLL _tagll;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -56,6 +66,12 @@ namespace BackendSite.Service.BLL
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
+            var env = provider.GetRequiredService<IWebHostEnvironment>();
+            _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
+            _tagll = provider.GetRequiredService<TagBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -1091,6 +1107,163 @@ namespace BackendSite.Service.BLL
             }).ToList();
 
             return result;
+        }
+
+        public bool ImportByExcel(int siteId, IFormFile excel, string memo, string author)
+        {
+            List<string> userNameList = new List<string>();
+            List<int> custIdList = new List<int>();
+            var batchId = 0;
+
+            if (excel.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        StringComparison.OrdinalIgnoreCase) ||
+                    excel.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
+                    excel.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            {
+                var excelPkg = new ExcelPackage(excel.OpenReadStream());
+                var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                var isLastRow = false;
+                var RowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+                do // 讀取資料，直到讀到空白列為止
+                {
+                    var custUsername = sheet.Cells[RowId, 1].Text.Trim();
+                    var sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    if (sabaId.IndexOf("_") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("_") - 1);
+                    }
+                    else if (sabaId.IndexOf("x") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("x") - 1);
+                    }
+                    var m = Regex.Match(sabaId, @"\d+");
+                    var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
+
+                    if (!string.IsNullOrWhiteSpace(custUsername))
+                    {
+                        userNameList.Add(custUsername);
+                    }
+                    if (_custId != null)
+                    {
+                        custIdList.Add(custId);
+                    }
+                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                    {
+                        isLastRow = true;
+                    }
+                    RowId += 1;
+                } while (!isLastRow);
+
+                //新增BatchCustInfo
+                _custInfoService.NewBatchCustInfo(siteId, memo, author, ref batchId);
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
+                        var allTagList = await _tagll.GetAllTag();
+                        var data = custInfo.Select(a => new MemberExportData()
+                        {
+                            SiteName = a.SiteName,
+                            UserName = a.UserName,
+                            CustId = a.CustId,
+                            Currency = a.IsoCode,
+                            BirthDate = a.BirthDate,
+                            BirthMonth = a.BirthMonth,
+                            BirthYear = a.BirthYear,
+                            IsTest = a.IsTest,
+                            IsKyc = a.IsKyc,
+                            IsRisk = a.IsRisk,
+                            SeamlessWallet = a.SeamlessWallet,
+                            BonusWallet = a.BonusWallet,
+                            Email = a.Email,
+                            RealName = a.RealName,
+                            CountryCode = a.CountryCode,
+                            AreaCode = a.AreaCode,
+                            PhoneNo = a.PhoneNo,
+                            LevelName = a.LevelName,
+                            Agent = a.Agent,
+                            RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                            Status = ((CustomerStatusEnum)a.Status).ToString(),
+                            SabaId = a.SabaId,
+                            SignupUrl = a.SignupUrl,
+                            AffiliateId = a.AffiliateId,
+                            AffiliateCode = a.AffiliateCode,
+                            LastActivityIp = a.LastActivityIp,
+                            Tag = GetTag(allTagList, a.TagList)
+                        });
+                        var fileBytes = _excelBll.ExportV2(data);
+                        var stream = new MemoryStream(fileBytes);
+                        var site = (SiteEnum)siteId;
+                        var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
+                        var putRequest = new PutObjectRequest
+                        {
+                            BucketName = "ailab-backoffice",
+                            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            InputStream = stream,
+                            Key = key
+                        };
+
+                        var result = await _s3Helper.PutObjectAsync(putRequest);
+
+                        if (result.HttpStatusCode.IsSuccess())
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Finished, batchId);
+                        }
+                        else
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                        }
+                    }
+                    catch
+                    {
+                        _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                    }
+                });
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public IEnumerable<BatchCustInfo> GetCustinfoByImportData(int siteId)
+        {
+            var batchCustInfo = _custInfoService.GetBatchCustInfo(siteId).ToList();
+
+            batchCustInfo.ForEach(x =>
+            {
+                x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
+                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+            });
+
+            return batchCustInfo;
+        }
+
+        private string GetTag(IEnumerable<Tag> allTagList, string tagList)
+        {
+            List<string> temp = new List<string>();
+            if (string.IsNullOrWhiteSpace(tagList))
+            {
+                return string.Empty;
+            }
+
+            JsonConvert.DeserializeObject<List<int>>(tagList).ToList().ForEach(x =>
+            {
+                var tagName = allTagList.FirstOrDefault(y => y.Id == x)?.TagName;
+                if (!string.IsNullOrWhiteSpace(tagName))
+                {
+                    temp.Add(tagName);
+                }
+            });
+
+            return string.Join(",", temp);
         }
     }
 }

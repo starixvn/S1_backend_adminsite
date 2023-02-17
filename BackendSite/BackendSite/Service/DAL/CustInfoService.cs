@@ -809,5 +809,36 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<CustNote>("Admin_CustNotes_GetById", new DynamicParameters(new { Id = id }));
         }
+
+        public IEnumerable<MemberExportDataDto> GetCustByExcel(ImportDataByExcelModel importDataByExcelModel)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", importDataByExcelModel.SiteId);
+            parameter.Add("_UserNameList", importDataByExcelModel.UserNameList);
+            parameter.Add("_CustIdList", importDataByExcelModel.CustIdList);
+            return _reportDbClient.Query<MemberExportDataDto>("Admin_CustinfoByImportData_Get", parameter);
+        }
+
+        public bool NewBatchCustInfo(int siteId, string memo, string author, ref int batchId)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author , _Memo = memo });
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _mainDbClient.Execute("Admin_BatchCustInfo_Ins", p);
+            batchId = p.Get<int>("BatchId");
+            return result > 0;
+        }
+
+        public bool UpdateBatchCustInfoStatus(int status, int batchId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_Status", status);
+            props.Add("_BatchId", batchId);
+            return _mainDbClient.Execute("Admin_BatchCustInfo_Set", props) > 0;
+        }
+
+        public IEnumerable<BatchCustInfo> GetBatchCustInfo(int siteId)
+        {
+            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId , _Top = 10}));
+        }
     }
 }
