@@ -12,5 +12,6 @@ public interface IMemberQuery
     Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
-    Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);   
+    Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
+    Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId);
 }

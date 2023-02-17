@@ -617,9 +617,11 @@ public class CustTagList
 
     public IEnumerable<int> TagList { get; set; }
 }
+
 public class CustRealNameChangeLog
 {
-    public string RealName { get; set; }
+    public string BeforeName { get; set; }
+    public string AfterName { get; set; }
     public DateTimeOffset UpdateTime { get; set; }
     public string Operator { get; set; }
 }
@@ -641,4 +643,16 @@ public class SetCustPromotionWhiteListRequest
     public bool IpEnable { get; set; }
     public bool DeviceEnable { get; set; }
     public bool RealNameEnable { get; set; }
+}
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
 }
