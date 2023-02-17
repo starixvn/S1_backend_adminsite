@@ -398,9 +398,9 @@ public class MemberService : IMemberService
         return await _mainSqlClient.ExecuteAsync("Admin_CustPromotionWhiteList_Set", p);
     }
 
-    public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId)
+    public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
     {
-        var p = new DynamicParameters(new { CustId = custId });
+        var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
         return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
     }
 
