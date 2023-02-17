@@ -29,7 +29,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
-        public int SysId { get; set; }
+        public int? SysId { get; set; }
 
         /// <summary>
         /// 讀寫 目的
@@ -51,6 +51,9 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 第三方支付ID
         /// </summary>
         public int? PayId { get; set; }
+        
+        public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
+        public NetworkTypeEnum? Network { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶帳號
@@ -69,6 +72,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string BankLoginUrl { get; set; }
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱

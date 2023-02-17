@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -15,20 +10,20 @@ namespace BackendSite.Service.BLL
     public class BankDetailBLL
     {
         private readonly BankDetailService bankDetailService;
-        private readonly ServerInfoService serverInfoService;
         private readonly LocalBankService localBankService;
         private readonly VipLevelService _vipLevelService;
+        private readonly CustInfoBLL _custInfoBll;
         private readonly IMemoryCache cache;
         private readonly ICacheHelper _redisHelper;
 
         public BankDetailBLL(IServiceProvider provider)
         {
             bankDetailService = provider.GetRequiredService<BankDetailService>();
-            serverInfoService = provider.GetRequiredService<ServerInfoService>();
             localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
             cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
         public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
@@ -89,18 +84,6 @@ namespace BackendSite.Service.BLL
             return bankDetailService.DelBankCard(input);
         }
 
-        public bool AddBankInfo(BankDetail bankDetail)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return bankDetailService.AddBankDetail(serverInfo.SiteId, bankDetail);
-        }
-
-        public bool EditBankInfo(BankDetail bankDetail)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return bankDetailService.EditBankDetail(serverInfo.SiteId, bankDetail);
-        }
-
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
             var sBankInfoSysListKey = $"SysBankList";
@@ -132,91 +115,91 @@ namespace BackendSite.Service.BLL
         {
             var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
             
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(1),
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
-        /*public IEnumerable<BankInfoOff> GetAllBankInfoOff()
+        public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
         {
-            var sBankInfoOffListKey = $"BankInfoOffList_All";
-            var bankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
-
-            if (bankInfoOffList == null)
-            {
-                bankInfoOffList = localBankService.GetAllBankAccountOff();
-                if (bankInfoOffList != null)
-                {
-                    cache.Set(sBankInfoOffListKey, bankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-                }
-            }
-
-            return bankInfoOffList;
+            return localBankService.GetBankCodeList(siteId);
         }
-
-        public IEnumerable<BankInfoOff> GetBankInfoOff(int siteId)
+        
+        public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
-            var sBankInfoOffListKey = $"BankInfoOffList_{siteId}";
-            var BankInfoOffList = cache.Get<IEnumerable<BankInfoOff>>(sBankInfoOffListKey);
-            if (BankInfoOffList == null)
+            var pointLevel = -1;
+            if (custId != null)
             {
-                BankInfoOffList = localBankService.GetBankAccountOff(siteId);
-                if (BankInfoOffList != null)
-                {
-                    cache.Set(sBankInfoOffListKey, BankInfoOffList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-                }
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoOffList;
-        }*/
-        public IEnumerable<BankInfoPay> GetBankInfoPay()
+            
+            var result = localBankService.GetBankInfoPayList(siteId)
+                .Where(x => x.SysId == sysId
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
+            return result;
+        }
+        
+        public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
-            var sBankInfoPayListKey = "BankInfoPayForPayout";
-            var BankInfoPayList = cache.Get<IEnumerable<BankInfoPay>>(sBankInfoPayListKey);
-            if (BankInfoPayList == null)
-            {
-                BankInfoPayList = localBankService.GetBankInfoPayList();
-                if (BankInfoPayList != null)
-                {
-                    cache.Set(sBankInfoPayListKey, BankInfoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
-            }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return BankInfoPayList;
+            var bankInfoPayList = localBankService.GetBankInfoPayList(siteId);
+            return bankInfoPayList;
         }
         
         public IEnumerable<EWalletPay> GetEWalletPayList()
         {
-            var sEWalletPayList = "EWalletPayList";
-            var eWalletPayList = cache.Get<IEnumerable<EWalletPay>>(sEWalletPayList);
-            if (eWalletPayList == null)
-            {
-                eWalletPayList = localBankService.GetEWalletPayList();
-                if (eWalletPayList != null)
-                {
-                    cache.Set(sEWalletPayList, eWalletPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
-            }
-            
+            var eWalletPayList = localBankService.GetEWalletPayList();
             return eWalletPayList;
         }
         
-        public IEnumerable<BankInfoPay> GetCryptoPay()
+        public IEnumerable<PayInfo> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
-            var sCryptoPayListKey = "CryptoPayForPayout";
-            var CryptoPayList = cache.Get<IEnumerable<BankInfoPay>>(sCryptoPayListKey);
-            if (CryptoPayList == null)
+            var pointLevel = -1;
+            if (custId != null)
             {
-                CryptoPayList = localBankService.GetCryptoPayList();
-                if (CryptoPayList != null)
-                {
-                    cache.Set(sCryptoPayListKey, CryptoPayList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                }
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
-
-            //return bankDetail.Where(x => x.CurrencyId.Equals(serverInfo.ICurrencyList));
-            return CryptoPayList;
+            
+            var result = localBankService.GetCryptoPayList(siteId)
+                .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
+                            && x.CurrencyId == currencyId
+                            && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                            && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.LoginPin,
+                        LoginUrl = d.LoginUrl,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
+            return result;
         }
 
         public IEnumerable<BankInfoOff> GetBankAccountOffByCurrency(int currencyId)

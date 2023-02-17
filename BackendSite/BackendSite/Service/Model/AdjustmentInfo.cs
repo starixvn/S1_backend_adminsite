@@ -36,11 +36,9 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
         public decimal Amount { get; set; }
         public int PromotionType { get; set; }
+        public string DepositId { get; set; }
     }
-    public class RetionBonusRep
-    {
-        public int TransId { get; set; }
-    }
+
     public class SetVerificationReq
     {
         public int CustId { get; set; }

@@ -5,21 +5,21 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
 {
-    public class GetTransferAccountInfoParams
+    public class GetTransferAccountInfoListParams
     {
-        public GetTransferAccountInfoParams(int id)
+        public GetTransferAccountInfoListParams(int id)
         {
             IsSetting = true;
             StrCurrencyIds = "[]";
             StrChannels = "[]";
             StrStatus = "[]";
             StrPurposes = "[]";
-            StrSysIds = "[]";
+            StrSysIds = null;
             Agent = string.Empty;
             AccountNo = string.Empty;
             Id = id;
         }
-        public GetTransferAccountInfoParams(GetTransferAccountInfoListRequest req)
+        public GetTransferAccountInfoListParams(GetTransferAccountInfoListRequest req)
         {
             IsSetting = false;
             SiteId = req.SiteId;
@@ -27,7 +27,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = JsonConvert.SerializeObject(req.Channels);
             StrStatus = JsonConvert.SerializeObject(req.Status);
             StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : null;
-            StrSysIds = JsonConvert.SerializeObject(req.SysIds);
+            StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : null;
             Agent = req.Agent ?? string.Empty;
             AccountNo = req.AccountNo ?? string.Empty;
         }
@@ -46,11 +46,6 @@ namespace BackendSite.Service.Model.BankFinancial
     
     public class GetTransferInfoListParams
     {
-        public GetTransferInfoListParams(string id)
-        {
-            IsSetting = true;
-            TransferId = id;
-        }
         public GetTransferInfoListParams(GetTransferInfoListRequest req)
         {
             SiteId = req.SiteId;
@@ -86,7 +81,6 @@ namespace BackendSite.Service.Model.BankFinancial
             Reason = req.Reason;
         }
         
-        public bool IsSetting { get; set; }
         public bool IsExport { get; set; }
         public int SiteId { get; set; }
         public DateTimeOffset StartTime { get; set; }

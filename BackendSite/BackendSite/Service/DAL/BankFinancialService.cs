@@ -2,7 +2,6 @@
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using Newtonsoft.Json;
@@ -33,16 +32,8 @@ namespace BackendSite.Service.DAL
 
         #region Library Methods
 
-        public IEnumerable<CurrencyModel> GetCurrencyList()
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var SpName = "Common_Currency_Get";
-            return conn.Query<CurrencyModel>(SpName, commandType: CommandType.StoredProcedure);
-        }
-
         public IEnumerable<BankFinancialReasonModel> GetReason(string funcKey)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -50,12 +41,11 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialReason_GetByFuncKey";
-            return conn.Query<BankFinancialReasonModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialReasonModel>(SpName, parameters);
         }
 
         public (string, string) NoAssign(string prefix)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters();
             parameters.Add("_Prefix", prefix);
             parameters.Add("_NowDate", direction: ParameterDirection.Output);
@@ -63,7 +53,7 @@ namespace BackendSite.Service.DAL
 
 
             var SpName = "Admin_BankFinancialNoAssignForGetNo_Upd";
-            var tempresult = conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute(SpName, parameters);
 
             return ((parameters.Get<string>("_NowDate") ?? string.Empty), (parameters.Get<int?>("_NowMaxNo") ?? 0).ToString());
         }
@@ -86,7 +76,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
         }
         
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoParams input)
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
         {
             var parameters = new DynamicParameters(
                 new
@@ -145,6 +135,8 @@ namespace BackendSite.Service.DAL
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
+                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
+                    _Network = bankFinancialTransferAccount.Network?.ToString(),
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
@@ -155,6 +147,10 @@ namespace BackendSite.Service.DAL
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
+                    _TransferPin = bankFinancialTransferAccount.TransferPin,
+                    _LoginPin = bankFinancialTransferAccount.LoginPin,
+                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
                     _Status = bankFinancialTransferAccount.Status,
@@ -162,7 +158,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V4", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V6", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -179,6 +175,8 @@ namespace BackendSite.Service.DAL
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
+                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
+                    _Network = bankFinancialTransferAccount.Network?.ToString(),
                     _AccountNo = bankFinancialTransferAccount.AccountNo,
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
@@ -188,6 +186,10 @@ namespace BackendSite.Service.DAL
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
+                    _TransferPin = bankFinancialTransferAccount.TransferPin,
+                    _LoginPin = bankFinancialTransferAccount.LoginPin,
+                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -195,7 +197,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V4";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V6";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -251,7 +253,6 @@ namespace BackendSite.Service.DAL
         {
             var count = 0;
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -342,7 +343,6 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    _IsSetting = input.IsSetting,
                     _IsExport = input.IsExport,
                     _SiteId = input.SiteId,
                     _TransferTypes = input.StrTransferTypes,
@@ -357,7 +357,6 @@ namespace BackendSite.Service.DAL
                     _Reason = input.Reason,
                     _FromAgent = input.FromAgent,
                     _ToAgent = input.ToAgent,
-                    _TransferId = input.TransferId,
                     _StartIndex = startIndex,
                     _PageSize = pageSize
                 });
@@ -373,10 +372,22 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoById(string transferId)
+        {
+            var parameters = new DynamicParameters(new
+                {
+                    _TransferId = transferId
+                });
+
+            var result = _reportDbClient
+                .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_GetById", parameters);
+
+            return result;
+        }
 
         public int InsertTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -405,12 +416,11 @@ namespace BackendSite.Service.DAL
 
             var SpName = "Admin_BankFinancialTransferInfo_Ins_V2";
 
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         public int UpdateTransferInfo(BankFinancialTransferInfoModel bankFinancialTransferInfo)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -439,47 +449,11 @@ namespace BackendSite.Service.DAL
 
             var SpName = "Admin_BankFinancialTransferInfo_Upd_V2";
 
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
-        }
-
-        public int InsertTransferInfoLog(ActionEnum action, BankFinancialTransferInfoModel bankFinancialTransferInfo)
-        {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _TransferId = bankFinancialTransferInfo.TransferId,
-                    _TransactionType = bankFinancialTransferInfo.TransactionType,
-                    _TransferType = bankFinancialTransferInfo.TransferType,
-                    _PlusOrMinus = bankFinancialTransferInfo.PlusOrMinus,
-                    _TransDate = bankFinancialTransferInfo.TransDate.DateTime,
-                    _Channel = bankFinancialTransferInfo.Channel,
-                    _Agent = bankFinancialTransferInfo.Agent,
-                    _PayId = bankFinancialTransferInfo.PayId,
-                    _SiteId = bankFinancialTransferInfo.SiteId,
-                    _SiteName = bankFinancialTransferInfo.SiteName,
-                    _CustId = bankFinancialTransferInfo.CustId,
-                    _CurrencyId = bankFinancialTransferInfo.CurrencyId,
-                    _SysId = bankFinancialTransferInfo.SysId,
-                    _AccountNo = bankFinancialTransferInfo.AccountNo,
-                    _AccountDisplayName = bankFinancialTransferInfo.AccountDisplayName,
-                    _Amount = bankFinancialTransferInfo.Amount,
-                    _Fee = bankFinancialTransferInfo.Fee,
-                    _Reason = bankFinancialTransferInfo.Reason,
-                    _Remark = bankFinancialTransferInfo.Remark,
-                    //_OperateTime = bankFinancialTransferInfo.UpdateTime.DateTime,
-                    _Operator = bankFinancialTransferInfo.Updator,
-                    _Action = action
-                });
-
-            var SpName = "Admin_BankFinancialTransferInfoLog_Ins_V2";
-
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         public int DeleteTransferInfo(string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -487,7 +461,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialTransferInfo_Del";
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         public IEnumerable<BankFinancialTransferInfoDetailModel> GetTransferInfoReport(string siteIds,
@@ -580,7 +554,6 @@ namespace BackendSite.Service.DAL
 
         public int SetTransferInfoReceipt(string transferId, string picFileName, byte[] transferPic = null)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -590,19 +563,18 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialTransferInfoReceipt_Set";
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         public int DeleteTransferInfoReceipt(string transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
                     _TransferId = transferId
                 });
             var SpName = "Admin_BankFinancialTransferInfoReceipt_Del";
-            return conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.Execute(SpName, parameters);
         }
 
         #endregion
@@ -611,7 +583,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -623,12 +594,11 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialReport_Deposit_Get_V2";
-            return conn.Query<BankFinancialDepositSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialDepositSummaryModel>(SpName, parameters);
         }
 
         public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -640,12 +610,11 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialReport_Withdrawal_Get_V2";
-            return conn.Query<BankFinancialWithdrawalSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialWithdrawalSummaryModel>(SpName, parameters);
         }
 
         public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -657,7 +626,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var SpName = "Admin_BankFinancialReport_Transfer_Get_V2";
-            return conn.Query<BankFinancialTransferSummaryModel>(SpName, parameters, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankFinancialTransferSummaryModel>(SpName, parameters);
         }
         
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportDepositAsync(GetFinancialReportParams input)

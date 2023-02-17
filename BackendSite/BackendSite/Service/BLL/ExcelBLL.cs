@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Drawing;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
+using Org.BouncyCastle.Utilities;
+using NPOI.SS.Formula.Functions;
+using BackendSite.Service.Model.Mpa.Marketing;
 
 namespace BackendSite.Service.BLL
 {
@@ -12,13 +16,6 @@ namespace BackendSite.Service.BLL
         public IEnumerable<Dictionary<string, dynamic>> Content { get; set; }
         public List<string> Titles { get; set; }
 
-    }
-
-    public class File
-    {
-        public byte[] FileContents { get; set; }
-        public string ContentType { get; set; }
-        public string FileName { get; set; }
     }
 
     public class ExcelBLL
@@ -101,7 +98,7 @@ namespace BackendSite.Service.BLL
             SetHeader(ws, titles, currentRow);
         }
 
-        public byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
+        public virtual byte[] Export<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> propertyInfo = null, TimeSpan? offset = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -125,6 +122,7 @@ namespace BackendSite.Service.BLL
 
         public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
             var ws = p.Workbook.Worksheets.Add(nameof(t));
@@ -149,6 +147,42 @@ namespace BackendSite.Service.BLL
                         title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
                         title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                    }
+                }
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+        public byte[] ExportV2<T>(Dictionary<string,IEnumerable<T>> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            foreach (var item in t)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
                     }
                 }
             }

@@ -1,50 +1,80 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Net;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
     public class BlockBLL
     {
         private readonly BlockService _blockService;
+        private readonly BlockIpToS3 _blockIpToS3;
         private readonly CustInfoService _custInfoService;
         private readonly Tools _tools;
+
         public BlockBLL(IServiceProvider provider)
         {
-            _blockService  = provider.GetRequiredService<BlockService>();
+            _blockService = provider.GetRequiredService<BlockService>();
+            _blockIpToS3 = provider.GetRequiredService<BlockIpToS3>();
             _custInfoService = provider.GetRequiredService<CustInfoService>();
             _tools = provider.GetRequiredService<Tools>();
+
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate,int pageSize, int pageNumber,out int totalPages,out int rowCount)
+        class BlockBankAccComparer : IEqualityComparer<BlockBankAcc>
         {
-            var result =  _blockService.GetBlockIPList(ip, startDate, endDate, Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1), Math.Abs(pageSize), out totalPages, out rowCount);
-            if(result != null)
+            public bool Equals(BlockBankAcc x, BlockBankAcc y)
             {
-                var ipCountryList = GetIPCountryList().ToList();
-                result.ToList().ForEach(x =>
-                {
-                    var ip = _tools.getIpNum(x.IP);
-                    var location = ipCountryList.SingleOrDefault(o => ip >= o.IPFrom && ip <= o.IPTo);
-                    if(location != null)
-                    {
-                        x.Location = location.Country;
-                    }
-                });
+                if (Object.ReferenceEquals(x, y)) return true;
+                if (Object.ReferenceEquals(x, null) || Object.ReferenceEquals(y, null))
+                    return false;
+                return x.AccountNum == y.AccountNum && x.SysId == y.SysId;
             }
-            return result;
+
+            public int GetHashCode(BlockBankAcc obj)
+            {
+                if (object.ReferenceEquals(obj, null)) return 0;
+                return obj.AccountNum == null ? 0 : obj.AccountNum.GetHashCode();
+            }
         }
-        public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
+
+        public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
         {
-            return _blockService.SetBlockIP(input);
+            return await _blockService.GetBlockIPList(ip, startDate, endDate, pageNumber, Math.Abs(pageSize));
         }
-        public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
+        public async Task<int> SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
         {
-            return _blockService.DeleteBlockIP(input);
+            if (!IPAddress.TryParse(input.After.IP, out _))
+                return 0;
+
+            var returnValue = _blockService.SetBlockIP(input);
+            if (returnValue > 0)
+            {
+                returnValue = await _blockIpToS3.Upload();
+            }
+            return returnValue;
+        }
+        public async Task<int> DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
+        {
+            var returnValue = _blockService.DeleteBlockIP(input);
+            if (returnValue > 0)
+            {
+                returnValue = await _blockIpToS3.Upload();
+            }
+            return returnValue;
         }
         public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
-            return _blockService.GetBlockBankAcc(startDate, endDate, blockStatus, accountNum, currencyId, userName);
+            List<BlockBankAcc> custBlockBankAcc = _blockService.GetCustBlockBankAcc(startDate, endDate, blockStatus, accountNum, currencyId, userName).ToList();
+
+            if (string.IsNullOrEmpty(userName))
+            {
+                List<BlockBankAcc> blockBankAcc = _blockService.GetBlockAccount(startDate, endDate, blockStatus, accountNum, currencyId).ToList();
+                List<BlockBankAcc> noUseAcc = blockBankAcc.Except(custBlockBankAcc, new BlockBankAccComparer()).ToList();
+                custBlockBankAcc.AddRange(noUseAcc);
+            }
+            
+            return custBlockBankAcc;
         }
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
         {
@@ -55,10 +85,6 @@ namespace BackendSite.Service.BLL
         {
             return _blockService.BlockAccountSet(input);
         }
-        private IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _blockService.GetIPCountryList();
-        }
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {
             return _blockService.GetIPUserList(ip);
@@ -67,6 +93,13 @@ namespace BackendSite.Service.BLL
         public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
             return _blockService.ReleaseAccount(input);
+        }
+
+        public async Task<IEnumerable<DeviceUser>> GetDeviceUserList(int siteId, string deviceId)
+        {
+            if(siteId == (int)SiteEnum.NOVA88) 
+                return await _blockService.GetIoavationAssociatedList(deviceId);
+            return await _blockService.GetShieldAssociatedList(deviceId);
         }
     }
 }

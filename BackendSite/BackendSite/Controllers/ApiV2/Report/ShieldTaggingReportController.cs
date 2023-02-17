@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -49,7 +50,8 @@ namespace BackendSite.Controllers.ApiV2.Report
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
             public IEnumerable<int> TriggeredPoints { get; set; }
-            public IEnumerable<string> Platform { get; set; }
+            public IEnumerable<ShieldPlatform> Platform { get; set; }
+            public List<string> PlatformSting => Platform.Select(x => x.ToString()).ToList();
             public List<int> Tags { get; set; }
         }
 
@@ -71,7 +73,8 @@ namespace BackendSite.Controllers.ApiV2.Report
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
             public IEnumerable<int> TriggeredPoints { get; set; }
-            public IEnumerable<string> Platform { get; set; }
+            public IEnumerable<ShieldPlatform> Platform { get; set; }
+            public List<string> PlatformSting => Platform.Select(x => x.ToString()).ToList();
             public List<int> Tags { get; set; }
         }
         
@@ -82,6 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #endregion
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 1 })]
         [HttpPost]
         public ApiListResult<ShieldTaggingReport> GetList(GetListReq request)
         {
@@ -119,22 +123,18 @@ namespace BackendSite.Controllers.ApiV2.Report
             };
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 2 })]
         [HttpPost]
         public IActionResult GetExport(GetExportReq request)
         {
             var datas = _shieldBll.GetExport(request);
             
-            foreach (var data in datas)
-            {
-                data.TriggeredPointName = Enum.GetName(typeof(TriggeredPoints), data.TriggeredPoint);
-                data.TaggedIssueName = Enum.GetName(typeof(TaggedIssue), data.TaggedIssue);
-            }
-            
-            var stream = _excelBll.Export(datas);
+            var stream = _excelBll.ExportV2(datas);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ShieldTaggingReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 1 })]
         [HttpPost]
         public ApiResult GetAssociateAccount(GetAssociateAccountReq request)
         {

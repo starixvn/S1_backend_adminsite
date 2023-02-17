@@ -14,33 +14,18 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly BlockBLL _blockBLL;
+        private readonly CustInfoBLL _custInfoBll;
         #endregion
 
         #region Constructors
         public BlockController(IServiceProvider provider)
         {
             _blockBLL = provider.GetRequiredService<BlockBLL>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
         #endregion
 
         #region API Model
-        
-        public class GetBlockIPListRequest : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
-            public String IP { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-        }
         public class GetBlockBankAccRequest
         {
             private DateTimeOffset _startDate;
@@ -85,17 +70,18 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiListResult<BlockIP> GetBlockIPList(GetBlockIPListRequest request)
+        public async Task<ApiListResult<BlockIP>> GetBlockIPList(GetBlockIPListRequest request)
         {
-            var blockIPList = _blockBLL.GetBlockIPList(request.IP, request.StartDate.DateTime, request.EndDate.DateTime, request.PageSize, request.PageNumber
-                ,out int totalPages,out int rowCount);
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            var data = await _blockBLL.GetBlockIPList(request.IP, startTime, endTime, request.PageSize, request.PageNumber);
             return new ApiListResult<BlockIP>
             {
-                Data = blockIPList,
+                Data = data.BlockIP,
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                TotalPages = totalPages,
-                RowCount = rowCount,
-                PageNumber = request.PageNumber
+                TotalPages = data.TotalPages,
+                RowCount = data.RowCount,
+                PageNumber = data.PageNumber
             };
         }
         /// <summary>
@@ -108,9 +94,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult SetBlockIP(ApiRequestWithLog<SetBlockIPRequest> request)
+        public async Task<ApiResult> SetBlockIP(ApiRequestWithLog<SetBlockIPRequest> request)
         {
-            var result = _blockBLL.SetBlockIP(new ParamsWithLog<SetBlockIPRequest>(request, User.Identity.Name));
+            var result = await _blockBLL.SetBlockIP(new ParamsWithLog<SetBlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult
@@ -139,9 +125,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <returns></returns>
 
         [HttpPost]
-        public ApiResult DeleteBlockIP(ApiRequestWithLog<BlockIPRequest> request)
+        public async Task<ApiResult> DeleteBlockIP(ApiRequestWithLog<BlockIPRequest> request)
         {
-            var result = _blockBLL.DeleteBlockIP(new ParamsWithLog<BlockIPRequest>(request, User.Identity.Name));
+            var result = await _blockBLL.DeleteBlockIP(new ParamsWithLog<BlockIPRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult
@@ -243,6 +229,27 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return new ApiListResult<IPUser>
             {
                 Data = IPUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        /// <summary>
+        /// Block/GetDeviceUserList 取得相同DeviceId關聯帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<DeviceUser>>> GetDeviceUserList(GetDeviceUserListRequest request)
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            
+            var deviceUserList = await _blockBLL.GetDeviceUserList(customer.SiteId, request.DeviceId);
+            return new ApiResult<IEnumerable<DeviceUser>>
+            {
+                Data = deviceUserList,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

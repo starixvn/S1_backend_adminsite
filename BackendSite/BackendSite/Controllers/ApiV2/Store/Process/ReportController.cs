@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.Report;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Controllers.ApiV2.Store.Process
 {
@@ -66,9 +63,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         #region TurnoverPoint
 
         [HttpPost]
-        public Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
+        public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
-            var result = _storeReportBLL.GetTurnoverPointReportAsync(req);
+            var result = await _storeReportBLL.GetTurnoverPointReportAsync(req);
 
             return result;
         }

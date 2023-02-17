@@ -41,13 +41,6 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
-        public class TitleModel
-        {
-            public string Name { get; set; }
-
-            public int SortId { get; set; }
-        }
-
 
         #region API Model
 
@@ -351,7 +344,7 @@ namespace BackendSite.Controllers.Api
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-            var stream = _excelBLL.Export(ExportData);
+            var stream = _excelBLL.ExportV2(ExportData);
             return File(stream,
                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                        $"TransferInfoList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

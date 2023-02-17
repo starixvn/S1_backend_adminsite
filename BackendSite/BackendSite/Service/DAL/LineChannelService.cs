@@ -65,7 +65,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_BeforeDetailInfo", isAdd ? null : input.Before.ToLog(), DbType.String);
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
@@ -73,7 +73,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_LineChannel_Set", p, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_LineChannel_Set", tran, p) > 0;
 
             if (!result)
             {
@@ -106,7 +106,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
@@ -114,7 +114,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_LineChannel_Del", p, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_LineChannel_Del", tran, p) > 0;
 
             if (!result)
             {

@@ -3,9 +3,13 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
+using System.Linq;
+using BarcodeReader.ImageSharp;
+using NPOI.SS.Formula.Functions;
+using NuGet.Protocol;
 
 namespace BackendSite.Service.BLL
 {
@@ -13,77 +17,62 @@ namespace BackendSite.Service.BLL
     {
         private readonly CustInfoService _custInfoService;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly IMemoryCache _cache;
         private readonly TpBLL _tpBll;
         private readonly WalletService _walletService;
         private readonly Tools _tools;
         private readonly CodeGenerator _codeGenerator;
         private readonly PromotionService _promotionService;
         private readonly RollOverService _rolloverService;
-        private readonly CustTurnoverService _custTurnoverService;
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
         private readonly string _bonusApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
-        private readonly BlockService _blockService;
         private readonly ILogger<CustInfoBLL> _logger;
         private readonly MySqlClient _mainDbClient;
+        private readonly BetListService _betListBll;
+        private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
+        private readonly ICacheHelper _redisHelper;
+
+        private readonly WinLostReportService _winLostReportService;
+        private readonly RebateManageService _rebateManageService;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _walletService = provider.GetRequiredService<WalletService>();
             _tools = provider.GetRequiredService<Tools>();
             _codeGenerator = provider.GetRequiredService<CodeGenerator>();
             _promotionService = provider.GetRequiredService<PromotionService>();
             _rolloverService = provider.GetRequiredService<RollOverService>();
-            _custTurnoverService = provider.GetRequiredService<CustTurnoverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
-            _blockService = provider.GetRequiredService<BlockService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _betListBll = provider.GetRequiredService<BetListService>();
+            _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _winLostReportService = provider.GetRequiredService<WinLostReportService>();
+            _rebateManageService = provider.GetRequiredService<RebateManageService>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
         {
-            var key = $"CustInfo_{custId}";
-            var customer = _cache.Get<Customer>(key);
-            if (customer == null)
-            {
-                customer = _custInfoService.GetCustInfo(custId);
-                if (customer != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(1));
-                    _cache.Set(key, customer, cacheEntryOptions);
-                }
-            }
-
-            return customer;
+            return _redisHelper.TryGetOrCreate($"CustInfo:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetCustInfo(custId),
+                RedisDataBase.Shared);
         }
-        public int GetVipLevelWithCache(int custId)
+
+        public int GetPointLevelWithCache(int custId)
         {
-            var key = $"VipLevelCache_{custId}";
-            var vipLevelCache = _cache.Get<int?>(key) ?? -1;
-            if (vipLevelCache != -1)
-            {
-                return vipLevelCache;
-            }
-
-            vipLevelCache = _custInfoService.GetVipLevel(custId);
-            if (vipLevelCache != 0)
-            {
-                _cache.Set(key, vipLevelCache, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(30)));
-            }
-
-            return vipLevelCache;
+            return _redisHelper.TryGetOrCreate($"PointLevel:{custId}", TimeSpan.FromMinutes(1),
+                () => _custInfoService.GetPointLevel(custId),
+                RedisDataBase.Shared);
         }
+
         public IEnumerable<CustInfoDetail> GetCustInfoList(IEnumerable<int> selectSite,
             int? birDate,
             int? birMonth,
@@ -172,9 +161,21 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
             var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
+        {
+            var siteList = new int[] { siteId };
+            return GetCustInfoDetail(custId, userName, siteList);
+        }
+
+        private CustInfoDetail GetCustInfoDetail(int custId, string userName, IEnumerable<int> siteList)
+        {
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
@@ -206,7 +207,9 @@ namespace BackendSite.Service.BLL
             }
 
             custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-
+            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
@@ -224,7 +227,7 @@ namespace BackendSite.Service.BLL
         {
             return _walletService.GetBalance(custId);
         }
-        
+
         public Task<decimal> GetBalanceAsync(int custId)
         {
             return _walletService.GetBalanceAsync(custId);
@@ -262,7 +265,7 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
         }
-        public int CancelBonusByBonusId(int bonusId)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(int bonusId, string @operator)
         {
             var statusList = new List<int>
             {
@@ -270,49 +273,49 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
+            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
-            string GameTypes,
-            DateTimeOffset StartTime,
-            DateTimeOffset EndTime)
+            IEnumerable<int> GameTypes,
+            DateTime StartTime,
+            DateTime EndTime)
         {
-            var datas = _custTurnoverService.GetCustTurnover(CustId,
-                GameTypes,
-                StartTime,
-                EndTime);
-
-            var result = new List<CustTurnoverRes>();
-
-            foreach (var data in datas)
-            {
-                var item = result.FirstOrDefault(x => x.GameType == data.GameType);
-                if (item == null)
-                {
-                    result.Add(new CustTurnoverRes
+            var result = _betListBll
+                .GetTpBetRecord(CustId, StartTime, EndTime)
+                .Where(i => GameTypes.Contains(i.GameType))
+                .Join(_tpGameTypeList,
+                    tpBetRecord => tpBetRecord.GameType,
+                    tpGameType => tpGameType.Type,
+                    (tpBetRecord, tpGameType) => new CustTurnover
                     {
-                        UserName = data.UserName,
-                        GameType = data.GameType,
-                        GameName = data.GameName,
-                        StakeSettled = data.SettlementType == 1 ? data.Stake : 0,
-                        StakeNotRollover = data.SettlementType == 3 ? data.Stake : 0,
-                        WinlostAmount = data.WinlostAmount
-                    });
-                }
-                else
+                        UserName = tpBetRecord.UserName,
+                        GameType = tpBetRecord.GameType,
+                        GameName = tpGameType.TypeName,
+                        Stake = tpBetRecord.ValidBet ?? tpBetRecord.Stake,
+                        WinlostAmount = tpBetRecord.WinlostAmount,
+                        SettlementType = tpBetRecord.SettlementType,
+                        TpUserName = tpBetRecord.TpUserName,
+                    })
+                .GroupBy(i => i.GameType)
+                .Select(i => new CustTurnoverRes
                 {
-                    item.StakeSettled += data.SettlementType == 1 ? data.Stake : 0;
-                    item.StakeNotRollover += data.SettlementType == 3 ? data.Stake : 0;
-                    item.WinlostAmount += data.WinlostAmount;
-                }
-            }
+                    UserName = i.First().UserName,
+                    GameType = i.Key,
+                    GameName = i.First().GameName,
+                    StakeSettled = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
+                    StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
+                    WinlostAmount = i.Sum(i => i.WinlostAmount),
+                    TpUserName = i.First().TpUserName
+                })
+                .ToList();
 
             return result;
         }
+
         public IEnumerable<CustBankInfoLog> GetCustBankInfoLogList(int custId,
-            int pageSize,
             int pageNumber,
+            int pageSize,
             out int totalPages,
             out int rowCount)
         {
@@ -337,20 +340,6 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
             return _custInfoService.GetCustBonus(custId);
-        }
-        public TeleCSDData GetTeleCSD(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut, int pageNumber, int pageSize)
-        {
-            return _custInfoService.GetTeleCSD(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut, pageNumber, pageSize);
-        }
-
-        public int UpdateCustomerTele(int siteId, int custId, string @operator)
-        {
-            return _custInfoService.UpdateCustomerTele(siteId, custId, @operator);
-        }
-
-        public IEnumerable<CustTeleExport> GetTeleCSDExportData(string siteIds, string currency, DateTimeOffset startDate, DateTimeOffset endDate, int deposit, int dormantUser, int callOut)
-        {
-            return _custInfoService.GetTeleCSDExportData(siteIds, currency, startDate, endDate, deposit, dormantUser, callOut);
         }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int custId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
@@ -382,6 +371,7 @@ namespace BackendSite.Service.BLL
         public async Task<PromotionResponseWrapper> GetPromotionListByCustIdAndDateAsync(CustIdWithDateRangeAndPageRequest request)
         {
             var result = await _promotionService.GetPromotionListByCustIdAndDateAsync(request);
+
             if (result.PromotionList != null)
             {
                 foreach (var promotion in result.PromotionList)
@@ -399,9 +389,16 @@ namespace BackendSite.Service.BLL
                         promotion.custRollOver = new CustRollOver() { RollOver = 0, WinOver = 0, TurnOver = 0 };
                     };
 
+                    promotion.DepositInfo = CheckDepositInfoFormatter(promotion.DepositInfo);
                 }
             }
             return result;
+        }
+
+        private string CheckDepositInfoFormatter(string depositInfo)
+        {
+            if (string.IsNullOrEmpty(depositInfo) || depositInfo.Contains("[")) return depositInfo;
+            return $"[{depositInfo}]";
         }
 
         #region
@@ -427,9 +424,34 @@ namespace BackendSite.Service.BLL
 
         #region Customer Note
 
-        public bool AddCustNote(int custId, string Note, string Operator)
+        public async Task<bool> AddCustNote(int custId, string note, string @operator, bool canEdit = false)
         {
-            return _custInfoService.AddCustNote(custId, Note, Operator);
+            var custSimpleInfo = await GetCustId(custId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!_custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit))
+            {
+                _logger.LogError($"SetNote: Add Note Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            if (canEdit)
+            {
+                var afterData = new { Note = note, CanEdit = false };
+                if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
+                {
+                    _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
+                    trans.Rollback();
+                    return false;
+                }
+            }
+
+            trans.Commit();
+            return true;
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
             int pageSize,
@@ -443,10 +465,38 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         }
-        public bool SetCustNotes(int noteId, string note, int type, string Operator)
+        public async Task<bool> SetCustNotes(int noteId, string note, int type, string Operator)
         {
-            return _custInfoService.SetCustNotes(noteId, note, type, Operator);
+            var noteBeforeInfo = await GetNoteById(noteId);
+            var custSimpleInfo = await GetCustId(noteBeforeInfo.First().CustId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!_custInfoService.SetCustNotes(noteId, note, type, Operator))
+            {
+                _logger.LogError($"SetNote: Set Note Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}.");
+                trans.Rollback();
+                return false;
+            }
+            var actionType = type == (int)SetCustNoteTypeEnum.Delete ? ActionType.Delete : ActionType.Update;
+            var beforeData = new { NoteId = noteId, Note = noteBeforeInfo.First().Note };
+            var afterData = new { NoteId = noteId, Note = note };
+
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
+                actionType == ActionType.Delete ? null : afterData,
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
+            {
+                _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
         }
+
+        public async Task<IEnumerable<CustNote>> GetNoteById(int id) => await _custInfoService.GetNoteById(id);
 
         #endregion
 
@@ -700,7 +750,7 @@ namespace BackendSite.Service.BLL
             var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CurrencyId, beforeData.ToString(), afterData.ToString(),
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
                 AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
@@ -717,94 +767,18 @@ namespace BackendSite.Service.BLL
             return _custInfoService.GetAllSiteVipLevelList();
         }
 
-        public RegLiveStatusResult GetRegLiveStatusData(IEnumerable<int> selectSite, int currency, int depositStatus, int status, string username, int pageNumber, int pageSize, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            return _custInfoService.GetRegLiveStatusData(selectSite, currency, depositStatus, status, username, pageNumber, pageSize, sort, startDate, endDate, affiliatesCode, agentCodeType);
-        }
-
-        public bool SetRegLiveStatus(ParamsWithLog<SetRegLiveStatus> input)
-        {
-            return _custInfoService.SetRegLiveStatus(input);
-        }
-
-        public IEnumerable<RegLiveStatusNotes> GetRegLiveStatusNotes(int custId)
-        {
-            return _custInfoService.GetRegLiveStatusNotes(custId);
-        }
-
-        public bool AddRegLiveStatusNote(ParamsWithLog<AddRegLiveStatusNote> input)
-        {
-            return _custInfoService.AddRegLiveStatusNote(input);
-        }
-
-        public bool DeleteRegLiveStatusNote(ParamsWithLog<DeleteRegLiveStatusNote> input)
-        {
-            return _custInfoService.DeleteRegLiveStatusNote(input);
-        }
-
-        public bool EditRegLiveStatusNote(ParamsWithLog<EditRegLiveStatusNote> input)
-        {
-            return _custInfoService.EditRegLiveStatusNote(input);
-        }
-
-        public IEnumerable<RegLiveStatusExport> GetExportRegLiveStatus(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            var list = new List<RegLiveStatusExport>();
-            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
-            result.ToList().ForEach(x =>
-            {
-                list.Add(new RegLiveStatusExport()
-                {
-                    Site = x.SiteName,
-                    Currency = x.Currency,
-                    UserName = x.UserName,
-                    FullName = x.AccountName,
-                    PhoneNo = x.PhoneNo,
-                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Status = Enum.GetName(typeof(CustomerRegLiveStatusStatusEnum), x.Status),
-                    AffCode = x.AffCode,
-                    Agent = x.Agent
-                });
-            });
-            return list;
-        }
-
-        public IEnumerable<RegLiveStatusForMarketingExport> GetExportRegLiveStatusForMarketing(string siteIds, int currency, int depositStatus, int status, string user, int sort, DateTimeOffset startDate, DateTimeOffset endDate, string affiliatesCode, int agentCodeType)
-        {
-            var list = new List<RegLiveStatusForMarketingExport>();
-            var result = _custInfoService.GetExportRegLiveStatus(siteIds, currency, depositStatus, status, user, sort, startDate, endDate, affiliatesCode, agentCodeType);
-            result.ToList().ForEach(x =>
-            {
-                list.Add(new RegLiveStatusForMarketingExport()
-                {
-                    Site = x.SiteName,
-                    Currency = x.Currency,
-                    UserName = x.UserName,
-                    Verify = Enum.GetName(typeof(PhoneVerifiedEnum), x.PhoneVerified),
-                    RegTime = new DateTimeOffset(x.RegTime.DateTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    ReferralUrl = x.ReferralUrl,
-                    AffCode = x.AffCode,
-                    Agent = x.Agent
-                });
-            });
-            return list;
-        }
-
         public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
         {
             return await _custInfoService.GetCustId(custId, userName, siteId);
         }
-        
+
         public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
         {
             var strUserNames = JsonConvert.SerializeObject(userNames);
-            
+
             return _custInfoService.GetCustInfosAsync(siteId, strUserNames);
         }
-        
+
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
             return _custInfoService.GetCustSwitchStatus(custId);
@@ -883,7 +857,23 @@ namespace BackendSite.Service.BLL
         public async Task<CustInfoDetailForExport> GetTransferWalletAsync(CustInfoDetailForExport custInfoDetailForExport)
         {
             var result = custInfoDetailForExport;
-            var transferWallet = await _tpBll.GetTpWalletAsync(custInfoDetailForExport.CustId);
+            var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
+            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
+            var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
+            if (sabaWallet != null)
+            {
+                result.SabaWallet = sabaWallet.Balance;
+            }
+            if (ptwallet != null)
+            {
+                result.PTWallet = ptwallet.Balance;
+            }
+            return result;
+        }
+        public async Task<MemberExportData> GetTransferWalletAsync(MemberExportData custInfoDetailForExport)
+        {
+            var result = custInfoDetailForExport;
+            var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
             var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
             if (sabaWallet != null)
@@ -899,12 +889,17 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<TpWallet>> GetCustTPWalletAsync(int custId)
         {
-            return await _tpBll.GetTpWalletAsync(custId);
+            return await _tpBll.GetTransferTpWalletWithCacheAsync(custId);
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
         {
             return _custInfoService.GetCustBankDetailAsync(custId);
+        }
+
+        public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
+        {
+            return _custInfoService.GetCustEWalletDetailAsync(custId);
         }
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
@@ -963,6 +958,140 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount); ;
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
+        }
+
+
+        public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request, int siteId)
+        {
+            var dbParams = new GetCustTpAdjustmentLogParamsV2()
+            {
+                CustId = request.CustId,
+                TpId = request.TpId,
+                SiteId = siteId,
+                Direction = request.Direction,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
+            };
+            var queryResult = await _thirdPartyService.GetCustTpAdjustmentLogV2(dbParams);
+
+            foreach (var data in queryResult.Data)
+            {
+                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
+            }
+
+            return queryResult;
+        }
+
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+        }
+
+        public IEnumerable<BlockBankAcc> GetBankList(int custId)
+        {
+            return _custInfoService.GetBankList(custId);
+        }
+
+        public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
+        {
+            return _custInfoService.GetEWalletList(custId);
+        }
+
+        public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
+            DateTime endDate)
+        {
+            var result = _custInfoService.GetIPLog(custId, startDate, endDate);
+            if (result != null)
+            {
+                result.ToList().ForEach(x =>
+                {
+                    x.IsBlock = !string.IsNullOrWhiteSpace(x.UpdateOperator);
+                });
+            }
+            return result;
+        }
+
+        public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
+        {
+            var AllGameType = _winLostReportService.GetAllGameType().ToList();
+            return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
+        }
+
+        public DashboardWinLossGroupData GetDashboardWinLossGroup(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var tempDashboardWinLossGroup = _custInfoService.GetDashboardWinLossGroup(custId, Convert.ToDateTime(Date));
+
+            return new DashboardWinLossGroupData()
+            {
+                Winnings = tempDashboardWinLossGroup.Winnings,
+                Losses = tempDashboardWinLossGroup.Losses,
+                WinLoss = tempDashboardWinLossGroup.Winnings + tempDashboardWinLossGroup.Losses,
+                OutstandingAmount = tempDashboardWinLossGroup.OutstandingAmount,
+                ValidBet = tempDashboardWinLossGroup.TpBetRecordStake + tempDashboardWinLossGroup.RelayStake
+            };
+        }
+
+        public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummary = _custInfoService.GetWinLoseSummary(custId, Convert.ToDateTime(Date)).ToList();
+            List<WinLoseSummary> result = winLoseSummary.GroupBy(x => x.CategoryId).Select(y => new WinLoseSummary
+            {
+                WinlostAmount = y.Sum(z => z.WinlostAmount),
+                Name = y.First().Name,
+                CategoryId = y.Key
+            }).ToList();
+            var tPCategoryList = _rebateManageService.GetTPCategoryList().ToList();
+
+            tPCategoryList.ForEach(x =>
+            {
+                if (!result.Any(y => y.CategoryId == x.CategoryId))
+                {
+                    result.Add(new WinLoseSummary()
+                    {
+                        WinlostAmount = 0,
+                        Name = x.CategoryName,
+                        CategoryId = x.CategoryId
+                    });
+                }
+            });
+
+            return result.OrderBy(x => x.CategoryId);
+        }
+        public IEnumerable<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(int custId, string GameTypes)
+        {
+            var Date = DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd");
+            var winLoseSummaryDetail = _custInfoService.GetWinLoseSummaryDetail(custId, Convert.ToDateTime(Date), GameTypes).ToList();
+            List<WinLoseSummaryDetailResult> result = winLoseSummaryDetail.GroupBy(x => x.GameType).Select(y => new WinLoseSummaryDetailResult
+            {
+                WinlostAmount = y.Sum(z => z.WinlostAmount),
+                GameName = y.First().GameName,
+                GameType = y.Key,
+                StakeSettled = y.Sum(z => z.SettlementType == 1 ? z.Stake : 0),
+                StakeNotRollover = y.Sum(z => z.SettlementType == 3 ? z.Stake : 0),
+                TpUserName = y.First().TpUserName
+            }).ToList();
+
+            return result;
         }
     }
 }

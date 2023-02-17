@@ -24,28 +24,39 @@ namespace BackendSite.Service.DAL
             _ipTableClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.IP);
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
-        public IEnumerable<BlockIP> GetBlockIPList(string ip, DateTime startDate,
-            DateTime endDate, int startIndex,
-            int pageSize, out int totalPages,out int rowCount)
+
+        public async Task<IEnumerable<T>> GetBlockIPList<T>()
+        {
+            var p = new DynamicParameters();
+            p.Add("IP", null);
+            return await _mainDbClient.QueryAsync<T>("Admin_BlockIP_Get", p);
+        }
+
+        public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageNumber, int pageSize)
         {
             var p = new DynamicParameters(new
             {
                 IP = string.IsNullOrWhiteSpace(ip) ? null : ip,
                 StartDate = startDate,
                 EndDate = endDate,
-                StartIndex = startIndex,
+                StartIndex = Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1),
                 PageSize = pageSize,
             });
 
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result =  _reportDbClient.Query<BlockIP>("Admin_BlockIPList_Get", p);
+            var result = await _reportDbClient.QueryAsync<BlockIP>("Admin_BlockIPList_Get", p);
+            var blockIpPageData = new BlockIPPageData()
+            {
+                BlockIP = result,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = p.Get<int?>("TotalPages") ?? 0,
+                RowCount = p.Get<int?>("RowCount") ?? 0
+            };
 
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-
-            return result;
+            return blockIpPageData;
         }
 
         public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
@@ -74,9 +85,9 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            var data =  _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", para).ToList();
+            var data = _reportDbClient.Query<BlockIP>("Admin_BlockIP_Get", para).ToList();
 
-            if(data.Count == 0)
+            if (data.Count == 0)
             {
                 var p = new DynamicParameters(new
                 {
@@ -85,7 +96,7 @@ namespace BackendSite.Service.DAL
                     Operator = input.Operator
                 });
                 result = _mainDbClient.Execute("Admin_BlockIP_Set", p, conn, trans);
-                if(result > 0)
+                if (result > 0)
                 {
                     var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                     if (!logResult)
@@ -154,22 +165,22 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BlockBankAcc> GetBlockBankAcc(DateTime startDate,DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
+        public IEnumerable<BlockBankAcc> GetCustBlockBankAcc(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId, string userName)
         {
             var jsonSelectStatus = string.Empty;
-            if(blockStatus == 0)
+            if (blockStatus == 0)
             {
-                var tempList = new List<int>() { 1, 2};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
-            else if(blockStatus == 1)
+            else if (blockStatus == 1)
             {
-                var tempList = new List<int>() { 1};
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
             else
             {
-                var tempList = new List<int>() { 2 };
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
                 jsonSelectStatus = JsonConvert.SerializeObject(tempList);
             }
 
@@ -177,11 +188,11 @@ namespace BackendSite.Service.DAL
             {
                 StartDate = startDate,
                 EndDate = endDate,
-                AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null: accountNum,
+                AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null : accountNum,
                 UserName = string.IsNullOrWhiteSpace(userName) ? null : userName,
                 SelectStatus = jsonSelectStatus,
                 SelectCurrency = JsonConvert.SerializeObject(currencyId)
-        });
+            });
 
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockBankAcc_Get", p);
         }
@@ -196,10 +207,6 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<BlockList>("Admin_BlockBankAccList_Get", p);
         }
-        public IEnumerable<IPCountry> GetIPCountryList()
-        {
-            return _ipTableClient.Query<IPCountry>("Admin_IPCountry_Get");
-        }
 
         public IEnumerable<IPUser> GetIPUserList(string ip)
         {
@@ -209,6 +216,18 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetIoavationAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_IoavationAssociatedList_Get", p);
+        }
+        
+        public async Task<IEnumerable<DeviceUser>> GetShieldAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_ShieldAssociatedList_Get", p);
         }
 
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
@@ -243,7 +262,7 @@ namespace BackendSite.Service.DAL
 
             result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
 
-            if(result > 0)
+            if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (!logResult)
@@ -254,7 +273,7 @@ namespace BackendSite.Service.DAL
 
                 var blockBankAccBlockList = GetBlockBankAccList(input.After.SysId, input.After.AccountNum).ToList();
 
-                foreach(var x in blockBankAccBlockList)
+                foreach (var x in blockBankAccBlockList)
                 {
                     var parameter = new DynamicParameters(new
                     {
@@ -277,11 +296,12 @@ namespace BackendSite.Service.DAL
                             AccountNum = input.After.AccountNum,
                             IFSCCode = string.IsNullOrWhiteSpace(x.IFSCCode) ? "" : x.IFSCCode,
                             AccountName = x.AccountName,
-                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock
+                            Status = input.After.Status == BlockAccountStatus.Lock ? CustBankInfoLogStatus.Lock : CustBankInfoLogStatus.Unlock,
+                            Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
-                        if(result == 0)
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
+                        if (result == 0)
                         {
                             trans.Rollback();
                             return result;
@@ -332,8 +352,8 @@ namespace BackendSite.Service.DAL
             #endregion
 
             result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
-            
-            if(result > 0)
+
+            if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
                 if (!logResult)
@@ -344,7 +364,7 @@ namespace BackendSite.Service.DAL
 
                 var custInfo = _custInfoService.GetCustInfo(input.Before.CustId);
 
-                if(custInfo != null)
+                if (custInfo != null)
                 {
                     var prop = new DynamicParameters(new
                     {
@@ -354,12 +374,13 @@ namespace BackendSite.Service.DAL
                         AccountNum = input.Before.AccountNum,
                         IFSCCode = string.IsNullOrWhiteSpace(input.Before.IFSCCode) ? "" : input.Before.IFSCCode,
                         AccountName = input.Before.CustId,
-                        Status = CustBankInfoLogStatus.Release
+                        Status = CustBankInfoLogStatus.Release,
+                        Operator = input.Operator
                     });
 
-                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V2", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
 
-                    if(result <= 0)
+                    if (result <= 0)
                     {
                         trans.Rollback();
                     }
@@ -368,7 +389,7 @@ namespace BackendSite.Service.DAL
                 {
                     trans.Rollback();
                 }
-                
+
             }
             else
             {
@@ -376,6 +397,37 @@ namespace BackendSite.Service.DAL
             }
             trans.Commit();
             return result;
+        }
+
+        public IEnumerable<BlockBankAcc> GetBlockAccount(DateTime startDate, DateTime endDate, int blockStatus, string accountNum, IEnumerable<int> currencyId)
+        {
+            var jsonSelectStatus = string.Empty;
+            if (blockStatus == 0)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else if (blockStatus == 1)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+
+            var p = new DynamicParameters(new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                AccountNum = string.IsNullOrWhiteSpace(accountNum) ? null : accountNum,
+                SelectStatus = jsonSelectStatus,
+                SelectCurrency = JsonConvert.SerializeObject(currencyId)
+            });
+
+            return _reportDbClient.Query<BlockBankAcc>("Admin_BlockAccount_Get", p);
         }
     }
 }

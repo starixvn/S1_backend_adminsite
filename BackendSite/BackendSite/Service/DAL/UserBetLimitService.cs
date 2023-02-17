@@ -80,7 +80,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
             p.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
-            p.Add("_UserName", userName);
+            p.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
             p.Add("_PageSize", Math.Abs(pageSize));
@@ -89,7 +89,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
          
-            var result = ReportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V3", p);
+            var result = ReportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
@@ -156,6 +156,13 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("CategoryId", categoryId);
             return await ReportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+        }
+        
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CategoryId", categoryId);
+            return await ReportDbClient.QueryAsync<SiteTpListIfo>("Admin_TpListByCategory_Get", p);
         }
 
         public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()

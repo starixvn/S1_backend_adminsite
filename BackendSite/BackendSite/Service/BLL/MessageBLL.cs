@@ -1,11 +1,15 @@
 ﻿using System.Text.RegularExpressions;
+using Amazon.Runtime.Internal.Util;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -15,13 +19,19 @@ namespace BackendSite.Service.BLL
         private readonly CustInfoBLL custInfoBLL;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<MessageBLL> _logger;
+        private readonly ServerInfoService serverInfoService;
+        private readonly CustInfoService _custInfoService;
+        private readonly MySqlClient _mainDbClient;
 
         public MessageBLL(IServiceProvider provider)
         {
             this.messageService = provider.GetRequiredService<MessageService>();
             this.custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
-            _logger = provider.GetRequiredService<ILogger<MessageBLL>>();;
+            _logger = provider.GetRequiredService<ILogger<MessageBLL>>();
+            serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public int SendMessageToPlayer(string sender, string title, string content, int custId)
@@ -36,12 +46,12 @@ namespace BackendSite.Service.BLL
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> selectSite, DateTimeOffset startDate, DateTimeOffset endDate, int status, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
+        public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> siteIds, DateTimeOffset startDate, DateTimeOffset endDate, IEnumerable<GeneralStatusEnum> statuses, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
-            return messageService.GetAnnouncements(JsonConvert.SerializeObject(selectSite),
+            return messageService.GetAnnouncements(JsonConvert.SerializeObject(siteIds),
                 startDate,
                 endDate,
-                status,
+                JsonConvert.SerializeObject(statuses),
                 (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize),
                 Math.Abs(PageSize),
                 ref TotalPages,
@@ -56,7 +66,7 @@ namespace BackendSite.Service.BLL
         public Announcement AddAnnouncement(AddAnnouncementModel data, string creator, int creatorId, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var result = messageService.AddAnnouncement(data, creator, creatorId, startTime, endTime);
-            
+
             if (result != null)
             {
                 var logParam = new CreateAdminAdjustmentInfoLogInput
@@ -68,7 +78,7 @@ namespace BackendSite.Service.BLL
                     ActionType = ActionType.Create,
                     MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
                 };
-                
+
                 if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
                 {
                     _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
@@ -82,7 +92,7 @@ namespace BackendSite.Service.BLL
         {
             var result = messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
             var beforeData = GetAnnouncementById(data.Id);
-            
+
             if (result != null)
             {
                 var logParam = new CreateAdminAdjustmentInfoLogInput
@@ -95,13 +105,13 @@ namespace BackendSite.Service.BLL
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
                 };
-                
+
                 if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
                 {
                     _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
                 }
             }
-            
+
             return messageService.UpdateAnnouncement(data, lastUpdater, lastUpdaterId, startTime, endTime);
         }
 
@@ -109,7 +119,7 @@ namespace BackendSite.Service.BLL
         {
             var result = messageService.DeleteAnnouncement(id);
             var beforeData = GetAnnouncementById(id);
-            
+
             if (result >= 1)
             {
                 var logParam = new CreateAdminAdjustmentInfoLogInput
@@ -121,7 +131,7 @@ namespace BackendSite.Service.BLL
                     ActionType = ActionType.Delete,
                     MenuEnum = AdminAdjustmentLogMenuEnum.Announcement
                 };
-                
+
                 if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
                 {
                     _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
@@ -130,7 +140,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int pageNumber, int pageSize, 
+        public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int pageNumber, int pageSize,
             ref int TotalPages, ref int RowCount)
         {
             var personMsg = messageService.GetPersonalMsg(custId,
@@ -151,10 +161,35 @@ namespace BackendSite.Service.BLL
             return messageService.GetCustLang(CustId);
         }
 
-        public void DeletePersonalMsg(int id , bool isBatch)
+        public async Task<bool> DeletePersonalMsg(int id, bool isBatch, string @operator)
         {
-            messageService.DeletePersonalMsg(id , isBatch);
+            var msgBeforeInfo = await GetMessageById(id, isBatch);
+            if (!msgBeforeInfo.Any()) return false;
+            var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!messageService.DeletePersonalMsg(id, isBatch))
+            {
+                _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
+                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
+            {
+                _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
         }
+
+        public async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch) => await messageService.GetMessageById(id, isBatch);
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
@@ -168,7 +203,7 @@ namespace BackendSite.Service.BLL
         {
             return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
         }
-        public bool NewBatchMessage(int siteId, string author, bool isPopup, string personalMsg,  ref int batchId)
+        public bool NewBatchMessage(int siteId, string author, bool isPopup, string personalMsg, ref int batchId)
         {
             return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
         }
@@ -176,11 +211,11 @@ namespace BackendSite.Service.BLL
         {
             return messageService.DeleteBatchMessage(batchId);
         }
-        public bool UpdateBatchMessage(int batchId, bool isPopup, string message ,string Operator)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message, string Operator)
         {
-            return messageService.UpdateBatchMessage(batchId, isPopup, message , Operator);
+            return messageService.UpdateBatchMessage(batchId, isPopup, message, Operator);
         }
-        public bool UpdateBatchMessageStatus(int status,int batchId)
+        public bool UpdateBatchMessageStatus(int status, int batchId)
         {
             return messageService.UpdateBatchMessageStatus(status, batchId);
         }
@@ -236,7 +271,7 @@ namespace BackendSite.Service.BLL
             string resultMessage;
             var errorCode = 0;
             var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
-            
+
             if (customer == null)
             {
                 resultMessage = $"Not found. {dataMessage}";
@@ -272,7 +307,7 @@ namespace BackendSite.Service.BLL
                 }
             }
 
-            var status= (errorCode == 1) ? 3 : 4;
+            var status = (errorCode == 1) ? 3 : 4;
             var custId = customer?.CustId ?? 0;
             if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
             {
@@ -281,13 +316,13 @@ namespace BackendSite.Service.BLL
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
-        
-         public (bool,string) CheckBatchMessage(int currency , string personalMsg)
+
+        public (bool, string) CheckBatchMessage(int currency, string personalMsg)
         {
             var result = true;
             var errorMsg = "";
-            
-            switch (currency) 
+
+            switch (currency)
             {
                 case (int)CurrencyEnum.MYR:
                     if (JObject.Parse(personalMsg)["cs"] == null ||
@@ -297,17 +332,17 @@ namespace BackendSite.Service.BLL
                         errorMsg = "Missing 'cs' or 'my' Msg";
                     }
                     break;
-                    
+
                 case (int)CurrencyEnum.USD:
                 case (int)CurrencyEnum.CNY:
-                    if (JObject.Parse(personalMsg)["cs"] == null )
+                    if (JObject.Parse(personalMsg)["cs"] == null)
                     {
                         result = false;
                         errorMsg = "Missing 'cs' Msg";
                     }
                     break;
-                
-                case (int)CurrencyEnum.THB :
+
+                case (int)CurrencyEnum.THB:
                     if (JObject.Parse(personalMsg)["th"] == null ||
                         JObject.Parse(personalMsg)["th_en"] == null)
                     {
@@ -315,9 +350,9 @@ namespace BackendSite.Service.BLL
                         result = false;
                     }
                     break;
-                    
-                
-                case (int)CurrencyEnum.IDR :
+
+
+                case (int)CurrencyEnum.IDR:
                     if (JObject.Parse(personalMsg)["id"] == null ||
                         JObject.Parse(personalMsg)["id_en"] == null)
                     {
@@ -325,26 +360,33 @@ namespace BackendSite.Service.BLL
                         result = false;
                     }
                     break;
-                    
-                case (int)CurrencyEnum.INR : 
-                    if (JObject.Parse(personalMsg)["hi"] == null || 
+
+                case (int)CurrencyEnum.INR:
+                    if (JObject.Parse(personalMsg)["hi"] == null ||
                         JObject.Parse(personalMsg)["hi_en"] == null)
                     {
                         errorMsg = "Missing 'hi' or 'hi_en' Msg";
                         result = false;
                     }
                     break;
-                    
-                case (int)CurrencyEnum.BDT : 
+
+                case (int)CurrencyEnum.BDT:
                     if (JObject.Parse(personalMsg)["bd"] == null)
                     {
                         errorMsg = "Missing 'bd' Msg";
                         result = false;
                     }
                     break;
-                }
-            
-            return (result,errorMsg);
+            }
+
+            return (result, errorMsg);
+        }
+
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            List<ServerInfo> userSiteList = new List<ServerInfo>();
+            userSiteList = serverInfoService.GetSiteList().ToList();
+            return userSiteList.FirstOrDefault(x => x.SiteId == siteId);
         }
     }
 }

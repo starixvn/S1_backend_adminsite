@@ -157,7 +157,7 @@ namespace BackendSite.Service.BLL
                 UserName = a.UserName,
                 TicketType = $"Ticket {a.TicketType}",
                 TeamName = a.TeamName,
-                SelectTime = a.SelectTime?.AddHours(request.Timezone)
+                SelectTime = a.SelectTime
             });
         }
 

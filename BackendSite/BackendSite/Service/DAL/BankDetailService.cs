@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
             para.Add("_CurrencyId", input.CurrencyId);
             para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : null, DbType.String);
             para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
-            para.Add("_SysIds", JsonConvert.SerializeObject(input.SysIds));
+            para.Add("_SysIds", input.SysIds.Any() ? JsonConvert.SerializeObject(input.SysIds) : null, DbType.String);
             para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : null, DbType.String);
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
@@ -236,17 +236,6 @@ namespace BackendSite.Service.DAL
                 trans.Rollback();
             }
             return result;
-        }
-        public bool AddBankDetail(int siteId, BankDetail bankDetail)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("BankDetail_Ins", new { SiteId = siteId, SysId = bankDetail.SysId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
-        }
-
-        public bool EditBankDetail(int siteId, BankDetail bankDetail)
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Execute("BankDetail_Set", new { SiteId = siteId, SysId = bankDetail.BankId, BankAccountName = bankDetail.AccountName, BankAccountNo = bankDetail.AccountNo, MinAmount = bankDetail.MinAmount, MaxAmount = bankDetail.MaxAmount, PointLevel = bankDetail.PointLevel }, commandType: CommandType.StoredProcedure) > 0;
         }
 
         public IEnumerable<BankInfoSys> GetSysBankList()

@@ -1,0 +1,67 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得AtPage列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "BonusAtPageEnum"
+}
+
+
+###
+# 取得報表
+POST {{url}}/apiV2/BonusReport/GetDataList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "transId": null,
+    "bonusCode": null,
+    "userName": null,
+    "startDate": "2022-11-07T00:00:00+08:00",
+    "endDate": "2022-11-08T23:59:59+08:00",
+    "pageNumber": 1,
+    "pageSize": 25,
+    "currencyId": 0,
+    "baseCurrencyId": 0,
+    "promotionTypes": [1,2,3,6,7,8,9],
+    "statuses": [1,2,3,4,5],
+    "promotionCategoryIds": [1,2,3,4,5,6,7,8,9,10],
+    "atPages": [0,1],
+}
+
+###
+# 匯出報表
+POST {{url}}/apiV2/BonusReport/Export HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "transId": null,
+    "bonusCode": null,
+    "userName": null,
+    "startDate": "2022-11-07T00:00:00+08:00",
+    "endDate": "2022-11-08T23:59:59+08:00",
+    "currencyId": 0,
+    "baseCurrencyId": 0,
+    "promotionTypes": [1,2,3,6,7,8,9],
+    "statuses": [1,2,3,4,5],
+    "promotionCategoryIds": [1,2,3,4,5,6,7,8,9,10],
+    "atPages": [0,1],
+}
