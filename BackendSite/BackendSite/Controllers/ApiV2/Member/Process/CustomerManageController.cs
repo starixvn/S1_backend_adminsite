@@ -2432,6 +2432,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 37 })]
         [HttpPost]
         public ApiListResult<AdminAdjustmentLogReport> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
