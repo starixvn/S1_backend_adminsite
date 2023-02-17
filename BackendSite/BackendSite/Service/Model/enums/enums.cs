@@ -229,7 +229,7 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5, //No Use
+        LoadCard = 5,
         QRPay = 6,
         BankAutoChannel = 7
     }
@@ -1636,5 +1636,10 @@ namespace BackendSite.Service.Model.enums
     {
         SettledDate = 1,
         CreatedDate = 2
+    }
+    
+    public enum CustTagEnum
+    {
+        Duplicate = 6
     }
 }
