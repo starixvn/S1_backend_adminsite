@@ -20,6 +20,8 @@
 
         public int CurrencyId { get; set; }
 
+        public string CurrencyName { get; set; }
+
         public DateTimeOffset TransTime
         {
             get => _transTime;
@@ -35,7 +37,7 @@
 
         public IEnumerable<int> CurrencyIds { get; set; }
 
-        public int TpId { get; set; }
+        public IEnumerable<int> TpIds { get; set; }
 
         public DateTime FromTransTime { get; set; }
 
@@ -55,7 +57,9 @@
         public string SiteName { get; set; }
 
         public string User { get; set; }
-        
+
+        public string CurrencyName { get; set; }
+
         public DateTimeOffset TransTime { get; set; }
 
         public string Vendor { get; set; }
