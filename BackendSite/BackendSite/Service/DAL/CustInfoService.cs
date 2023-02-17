@@ -239,7 +239,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V12", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -250,6 +250,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -741,13 +742,13 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-
-        public async Task<bool> InsertLogAsync(int siteId, int currencyId, object beofreData, object afterData,
+        public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
 
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
+            logParam.Add("_CustId", custId);
             logParam.Add("_CurrencyId", currencyId);
             logParam.Add("_Menu", (int)adminAdjustmentLogMenu);
             logParam.Add("_ActionType", (int)actionType);
@@ -756,14 +757,13 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam) > 0;
+            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", logParam) > 0;
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
-
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             var p = new DynamicParameters();
@@ -788,11 +788,11 @@ namespace BackendSite.Service.DAL
         }
         public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
@@ -803,6 +803,11 @@ namespace BackendSite.Service.DAL
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
         {
             return _reportDbClient.QueryAsync<EWalletDetail>("Admin_CustEWalletDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
+        }
+
+        internal async Task<IEnumerable<CustNote>> GetNoteById(int id)
+        {
+            return await _reportDbClient.QueryAsync<CustNote>("Admin_CustNotes_GetById", new DynamicParameters(new { Id = id }));
         }
 
         public IEnumerable<MemberExportDataDto> GetCustByExcel(ImportDataByExcelModel importDataByExcelModel)

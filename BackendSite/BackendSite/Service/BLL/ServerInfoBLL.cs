@@ -1,8 +1,10 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
+using System.Security.Policy;
 using System.Text.Json;
+using YamlDotNet.Core.Tokens;
 
 namespace BackendSite.Service.BLL
 {
@@ -11,23 +13,23 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoService serverInfoService;
         //private ConcurrentDictionary<int, ServerInfo> rm = new ConcurrentDictionary<int, ResourceManager>();
         private ServerInfo serverInfo;/*Single Site*/
-        private IMemoryCache cache;
         private readonly AdminUserService adminUserService;
         private readonly AuthorizeBLL authorizeBLL;
         private readonly PermissionBLL permissionBLL;
         private readonly NewAuthorizeBLL newAuthorizeBLL;
         private readonly NewAdminUserService newAdminUserService;
+        private readonly ICacheHelper _redisHelper;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
+        public ServerInfoBLL(ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService, ICacheHelper redisHelper)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
-            this.cache = cache;
             this.adminUserService = adminUserService;
             this.authorizeBLL = authorizeBLL;
             this.permissionBLL = permissionBLL;
             this.newAuthorizeBLL = newAuthorizeBLL;
             this.newAdminUserService = newAdminUserService;
+            this._redisHelper = redisHelper;
         }
 
         public ServerInfo GetServerInfoWithSiteId(int siteId)
@@ -52,17 +54,8 @@ namespace BackendSite.Service.BLL
         public IEnumerable<ServerInfo> GetSiteList()
         {
             var sServerInfoListKey = $"ServerInfoList";
-            var SiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
-            if (SiteList == null)
-            {
-                SiteList = serverInfoService.GetSiteList();
-                if (SiteList != null)
-                {
-                    cache.Set(sServerInfoListKey, SiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
-                }
-            }
-
-            return SiteList;
+            return _redisHelper.TryGetOrCreate(sServerInfoListKey, TimeSpan.FromMinutes(5),
+                () => serverInfoService.GetSiteList());
         }
 
         public IEnumerable<ServerInfo> GetSiteListByLoginUser()
@@ -70,32 +63,35 @@ namespace BackendSite.Service.BLL
             var authData = authorizeBLL.GetAuthData();
             if (authData != null)
             {
-                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
-                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
-                if (userSiteList == null)
+                var key = $"ServerInfoList:{authData.UserId}";
+                return  _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(2),
+                () => GetUserSiteList());
+
+                IEnumerable<ServerInfo> GetUserSiteList()
                 {
                     var loginUser = adminUserService.GetUser(authData.UserId);
                     if (loginUser.IsSuper)
                     {
-                        userSiteList = serverInfoService.GetSiteList();
+                        return serverInfoService.GetSiteList();
                     }
                     else
                     {
                         var assignSites = adminUserService.GetAssignSiteList(authData.UserId);
-                        userSiteList = assignSites != null && assignSites.Any() ? serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId)) : null;
-                    }
-
-                    if (userSiteList != null)
-                    {
-                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
+                        if (assignSites != null && assignSites.Any())
+                        {
+                            return serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId));
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 }
-                return userSiteList;
             }
             else
             {
                 return null;
-            }
+            }          
         }
 
         public IEnumerable<int> GetCurrencyList()
@@ -196,30 +192,26 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
-        {
-            return await serverInfoService.GetLanguageList(siteId, currencyId);
-        }
-
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
         {
             List<AssignBrand> assignSites = new List<AssignBrand>();
             var authData = newAuthorizeBLL.GetAuthData();
             if (authData != null)
             {
-                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}V2";
-                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
-                if (userSiteList == null)
+                var key = $"ServerInfoListV2:{authData.UserId}";
+                return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(2),
+                () => GetUserSiteList());
+                IEnumerable<ServerInfo> GetUserSiteList()
                 {
                     var loginUser = newAdminUserService.GetUserV2(authData.UserId);
                     if (loginUser.IsSuper)
                     {
-                        userSiteList = serverInfoService.GetSiteList();
+                        return serverInfoService.GetSiteList();
                     }
                     else
                     {
                         assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
-                        if (assignSites !=  null)
+                        if (assignSites != null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
                             assignSites.ToList().ForEach(z =>
@@ -238,16 +230,14 @@ namespace BackendSite.Service.BLL
                                     });
                                 }
                             });
-                            userSiteList = tmepuserSiteList;
+                            return tmepuserSiteList;
+                        }
+                        else
+                        {
+                            return null;
                         }
                     }
-
-                    if (userSiteList != null)
-                    {
-                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                    }
                 }
-                return userSiteList;
             }
             else
             {
@@ -255,5 +245,9 @@ namespace BackendSite.Service.BLL
             }
         }
 
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
+        }
     }
 }

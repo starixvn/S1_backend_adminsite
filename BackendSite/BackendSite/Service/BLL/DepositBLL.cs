@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -126,7 +127,7 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                InsertDepositReceipt(deposit.CustId, transId, fileName, fileBytes);
+                await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -136,13 +137,24 @@ namespace BackendSite.Service.BLL
             return 0;
         }
 
-        private int InsertDepositReceipt(int custId, string transId, string fileName, byte[] fileBytes)
+        public async Task<int> DelDepositReceiptPic(int siteId, int custId, string transId ,string picFileName , int receiptNo , string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-
-            return depositService.SetDepositReceiptPic(custId, depositId, fileName, fileBytes);
+            return await depositService.DelDepositReceiptPic(siteId ,custId, depositId , picFileName ,receiptNo ,Operator);
+        }
+        
+        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, byte[] fileBytes , string creator)
+        {
+            var depositId = ValidateDepositReceiptPic(transId);
+            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName, fileBytes ,creator);
         }
 
+        public int CheckDepositReceipt(int siteId ,string transId,  string Operator)
+        {
+            var depositId = ValidateDepositReceiptPic(transId);
+            return depositService.CheckDepositReceipt(siteId ,depositId, Operator);
+        }
+        
         private int ValidateDepositReceiptPic(string transId)
         {
             var depositId = 0;
@@ -232,7 +244,18 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+            var result = depositService.SetDepositInfo(transId,
+                depositRequest.SiteId,
+                depositRequest.Amount,
+                comment,
+                Operator,
+                forStatus,
+                DepositStatusEnum.Approved,
+                depositRequest,
+                null,
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+
+            return result;
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
@@ -273,14 +296,20 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Pending, null ,null);
         }
-        public DepositReceipt GetDepositReceipt(string transId)
+        public IEnumerable<DepositReceipt> GetDepositReceipt(string transId)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var depositId);
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceipt(depositId, depositRequest.SiteId);
         }
-
+        public DepositReceipt GetDepositReceiptByNo(string transId, int receiptNo)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var depositRequest = GetDepositRequest(transId);
+            return depositService.GetDepositReceiptByNo(depositId, receiptNo ,depositRequest.SiteId);
+        }
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
             return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, depositId, userNames, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
@@ -489,7 +518,6 @@ namespace BackendSite.Service.BLL
             if (!depositService.SetDepositRequestAmount(input))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
@@ -508,14 +536,24 @@ namespace BackendSite.Service.BLL
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
-            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
+            var comment = $"Set Deposit Amount ,Change {input.Before.Amount} to {input.After.Amount}";
+            
+            var m = Regex.Match(input.TransId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var logResult = depositService.SetDepositLog(depositId, input.SiteId, comment, (int)DepositStatusEnum.SetDepositAmount, input.After.Amount, input.Operator);
+            
+            if (logResult < 1)
             {
                 scope.Dispose();
-
+                return 0;
+            }
+            
+            if (!custInfoService.AddCustNote(custId, comment, input.Operator))
+            {
+                scope.Dispose();
                 return 0;
             }
 

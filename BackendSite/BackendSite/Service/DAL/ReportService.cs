@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.GameStatisticalReport;
 
@@ -94,7 +95,7 @@ namespace BackendSite.Service.DAL
                     TimeZone = timeZone
                 });
 
-            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V2", parameters);
+            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V3", parameters);
         }
 
         public IEnumerable<StatisticalPartialSummeryModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
@@ -107,7 +108,7 @@ namespace BackendSite.Service.DAL
                     _EndDate = endDate
                 });
 
-            return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get", parameters);
+            return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get_V3", parameters);
         }
 
         public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,
@@ -159,7 +160,7 @@ namespace BackendSite.Service.DAL
                     TimeZone = timeZone
                 });
 
-            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V2";
+            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V3";
             return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
@@ -167,7 +168,6 @@ namespace BackendSite.Service.DAL
             out int totalPages,
             out int rowCount)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -185,7 +185,8 @@ namespace BackendSite.Service.DAL
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var spName = "Admin_TpBetFailureRecord_Get_V3";
-            var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
+
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
 
@@ -194,7 +195,6 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReportForExport(GetTpFailRecordReportInput input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameters = new DynamicParameters(
                 new
                 {
@@ -208,7 +208,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var spName = "Admin_TpBetFailureRecordForExport_Get_V3";
-            var result = conn.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
 
             return result;
         }
@@ -281,6 +281,40 @@ namespace BackendSite.Service.DAL
               });
 
             return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get", parameters);
+        }
+        
+        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _PayIds = input.PayIds,
+                    _Types = input.Types,
+                    _UserNames = input.UserNames,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get", parameters);
+        }
+        
+        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _PayIds = input.PayIds,
+                    _Types = input.Types,
+                    _UserNames = input.UserNames,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get", parameters);
         }
     }
 }

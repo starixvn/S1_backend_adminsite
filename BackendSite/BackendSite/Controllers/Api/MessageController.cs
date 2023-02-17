@@ -450,10 +450,9 @@ namespace BackendSite.Controllers.Api
         /// <param name="CustId"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
+        public async Task<ApiListResult<PersonalMsg>> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
             [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -462,7 +461,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id, IsBatch);
+                await messageBLL.DeletePersonalMsg(Id, IsBatch, User.Identity.Name);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 

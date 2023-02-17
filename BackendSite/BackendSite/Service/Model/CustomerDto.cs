@@ -197,6 +197,8 @@ public class MemberExportData
 public class GetCustomerBasicInfoRequest
 {
     public int CustId { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
 }
 
 public class CustomerDto
@@ -540,7 +542,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get
@@ -599,6 +600,63 @@ public class LoginLogPageData
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
+}
+
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+    public string TagList { get; set; }
+}
+
+public class CustTagList
+{
+    public int CustId { get; set; }
+        
+    public string StrTagList { get; set; }
+
+    public IEnumerable<int> TagList { get; set; }
+}
+
+public class CustRealNameChangeLog
+{
+    public string BeforeName { get; set; }
+    public string AfterName { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
+    public string Operator { get; set; }
+}
+
+public class CustPromotionWhiteList
+{
+    public int CustId { get; set; }
+    public int SiteId { get; set; } 
+    public string UserName { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }   
+    public string Operator { get; set; }
+}
+
+public class SetCustPromotionWhiteListRequest
+{
+    public int CustId { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }
+}
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
 }
 
 public class GetListByFileRequest

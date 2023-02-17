@@ -2,12 +2,12 @@
 using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get", para);
+            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_Tmp", para);
 
             var totalPages = para.Get<int?>("_TotalPages") ?? 0;
             var rowCount = para.Get<int?>("_RowCount") ?? 0;
@@ -59,7 +59,7 @@ namespace BackendSite.Service.DAL
             para.Add("_FinancialAccountId", id);
 
             var result = await _reportDbClient
-                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById", para);
+                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById_Tmp", para);
 
             return result.FirstOrDefault();
         }

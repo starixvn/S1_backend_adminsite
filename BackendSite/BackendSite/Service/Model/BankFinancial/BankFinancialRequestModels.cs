@@ -80,6 +80,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
+        public string FrontendDisplayName { get; set; }
 
         /// <summary>
         /// 讀寫 初始金額
@@ -128,6 +129,12 @@ namespace BackendSite.Service.Model.BankFinancial
     public class GetAccountListRequest
     {
         public int SiteId { get; set; }
+    }
+    
+    public class GetFinancialAccountListRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
     }
 
     public class GetTransferInfoListRequest : ApiRequestPageModel

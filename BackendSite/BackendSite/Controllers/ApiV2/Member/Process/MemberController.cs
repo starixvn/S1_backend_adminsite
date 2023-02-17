@@ -1,14 +1,13 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -139,10 +138,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 49 })]
         [HttpPost]
-        public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
+        public async Task<ApiResult> CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
+            if (result.Result == 0)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Cancel Bonus Fail";
+                return apiResult;
+            }
             const string menu = "CustManage/CustInfoList";
             var info = new Dictionary<string, dynamic>
             {
@@ -494,6 +499,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// 取得玩家在第三方遊戲帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
+            try
+            {
+                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
@@ -509,7 +536,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
 
-            if (result > 0)
+            if (result)
             {
                 return new ApiResult
                 {
@@ -519,6 +546,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> CheckDuplicateName(SetFullNameRequest request)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result =
+                await _memberCommand.GetDuplicateAccountInfoAsync(authData.SiteId, request.FullName);
+
+            return new ApiResult<IEnumerable<SimilarAccountInfo>>
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = result.Where(x => x.CustId != request.CustId)
+            };
         }
 
         /// <summary>
@@ -1086,29 +1127,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 取得玩家在第三方遊戲帳號
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
-        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
-            try
-            {
-                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
         /// </summary>
         /// <remarks>
@@ -1137,6 +1155,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
@@ -1154,5 +1178,105 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+
+        /// <summary>
+        /// Member/GetCustRealNameChangeLog 取得客戶改名歷史紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustRealNameChangeLog>>> GetCustRealNameChangeLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<CustRealNameChangeLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
+            };
+        }
+
+        /// <summary>
+        /// Member/GetCustPromotionWhiteList 取得客戶Promotion限制白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustPromotionWhiteList>> GetCustPromotionWhiteList(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<CustPromotionWhiteList>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustPromotionWhiteListAsync(request.CustId)
+            };
+        }
+
+        /// <summary>
+        /// Member/EditCustPromotionWhiteList 修改用戶Promotion白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 80 })]
+        [HttpPost]
+        public async Task<ApiResult> EditCustPromotionWhiteList(SetCustPromotionWhiteListRequest request)
+        {
+            var result = await _memberCommand.SetCustPromotionWhiteListAsync(
+                request.CustId, 
+                request.IpEnable, 
+                request.DeviceEnable,
+                request.RealNameEnable,
+                User.Identity.Name);
+
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/GetPromotionReceiveFailLog 取得客戶Promotion領取失敗紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<PromotionReceiveFailLog>>> GetPromotionReceiveFailLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<PromotionReceiveFailLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
+                    request.CustId, 
+                    request.StartTime.ToUniversalTime().DateTime,
+                    request.EndTime.ToUniversalTime().DateTime)
+            };
+        }
+
     }
 }

@@ -293,7 +293,7 @@ namespace BackendSite.Controllers.Api
                 }
 
                 if (withdrawalReq.WithdrawalType == null ||
-                    withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.Undefine)
+                    withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.Undefined)
                 {
                     apiResult.ErrorCode = 1101;
                     apiResult.Message = "Select 1 Type of Withdrawal Please.";

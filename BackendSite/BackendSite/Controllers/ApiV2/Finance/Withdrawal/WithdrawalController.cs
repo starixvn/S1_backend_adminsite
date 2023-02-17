@@ -216,7 +216,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
         }
-
+        
         public class UploadPictureRequest : GetByTransIdRequest
         {
             public IEnumerable<string> Pic { get; set; }
@@ -241,7 +241,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
@@ -303,7 +302,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 2 })]
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
@@ -394,7 +392,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
@@ -448,7 +445,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
@@ -516,7 +512,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     break;
                 case WithdrawalStatusEnum.Process:
                     {
-                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefine)
+                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefined)
                         {
                             apiResult.ErrorCode = 1101;
                             apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -811,7 +807,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 77 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
@@ -871,7 +867,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 78 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {
