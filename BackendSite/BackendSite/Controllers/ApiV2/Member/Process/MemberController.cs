@@ -1154,27 +1154,5 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-
-        public ApiResult<int> ImportByExcel([FromForm] GetListByFileRequest request)
-        {
-            var result = _custInfoBll.ImportByExcel(request.SiteId, request.File, request.Memo, User.Identity.Name);
-
-            return new ApiResult<int>()
-            {
-                ErrorCode = result ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.FileTypeError,
-                Message = result ? "Import Success." : "Import Fail."
-            };
-        }
-
-        public ApiListResult<BatchCustInfo> GetCustinfoByImportData(GetCustinfoByImportDataRequest request)
-        {
-            var batchCustInfo = _custInfoBll.GetCustinfoByImportData(request.SiteId);
-            var apiResult = new ApiListResult<BatchCustInfo>
-            {
-                Data = batchCustInfo,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
-        }
     }
 }
