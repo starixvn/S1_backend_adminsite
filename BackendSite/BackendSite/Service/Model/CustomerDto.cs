@@ -605,4 +605,9 @@ public class GetListByFileRequest
 {
     public int SiteId { get; set; }
     public IFormFile File { get; set; }
+    public string Memo { get; set; }
+}
+public class GetCustinfoByImportDataRequest
+{
+    public int SiteId { get; set; }
 }

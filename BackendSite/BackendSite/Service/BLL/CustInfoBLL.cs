@@ -14,6 +14,9 @@ using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 using Org.BouncyCastle.Ocsp;
 using System.Drawing.Drawing2D;
 using Amazon.S3.Model;
+using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
+using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
 {
@@ -43,6 +46,7 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _s3Helper;
         private readonly string _backofficeS3Url;
         private readonly string _environment;
+        private readonly TagBLL _tagll;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -70,6 +74,7 @@ namespace BackendSite.Service.BLL
             _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
+            _tagll = provider.GetRequiredService<TagBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -78,7 +83,7 @@ namespace BackendSite.Service.BLL
                 () => _custInfoService.GetCustInfo(custId),
                 RedisDataBase.Shared);
         }
-        
+
         public int GetPointLevelWithCache(int custId)
         {
             return _redisHelper.TryGetOrCreate($"PointLevel:{custId}", TimeSpan.FromMinutes(1),
@@ -316,7 +321,7 @@ namespace BackendSite.Service.BLL
                     UserName = i.First().UserName,
                     GameType = i.Key,
                     GameName = i.First().GameName,
-                    StakeSettled = i.Where( i=> i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
+                    StakeSettled = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValid).Sum(i => i.Stake),
                     StakeNotRollover = i.Where(i => i.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(i => i.Stake),
                     WinlostAmount = i.Sum(i => i.WinlostAmount),
                     TpUserName = i.First().TpUserName
@@ -731,14 +736,14 @@ namespace BackendSite.Service.BLL
         {
             return await _custInfoService.GetCustId(custId, userName, siteId);
         }
-        
+
         public Task<IEnumerable<CustomerInfo>> GetCustInfosAsync(int siteId, IEnumerable<string> userNames)
         {
             var strUserNames = JsonConvert.SerializeObject(userNames);
-            
+
             return _custInfoService.GetCustInfosAsync(siteId, strUserNames);
         }
-        
+
         public CustomerSwitchStatus GetCustSwitchStatus(int custId)
         {
             return _custInfoService.GetCustSwitchStatus(custId);
@@ -856,7 +861,7 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCustBankDetailAsync(custId);
         }
-        
+
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
         {
             return _custInfoService.GetCustEWalletDetailAsync(custId);
@@ -936,7 +941,7 @@ namespace BackendSite.Service.BLL
         }
 
 
-        public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request,int siteId)
+        public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request, int siteId)
         {
             var dbParams = new GetCustTpAdjustmentLogParamsV2()
             {
@@ -951,7 +956,7 @@ namespace BackendSite.Service.BLL
                 StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
             };
             var queryResult = await _thirdPartyService.GetCustTpAdjustmentLogV2(dbParams);
-            
+
             foreach (var data in queryResult.Data)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
@@ -959,7 +964,7 @@ namespace BackendSite.Service.BLL
 
             return queryResult;
         }
-        
+
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
@@ -978,7 +983,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
             DateTime endDate)
         {
-            var result =  _custInfoService.GetIPLog(custId, startDate, endDate);
+            var result = _custInfoService.GetIPLog(custId, startDate, endDate);
             if (result != null)
             {
                 result.ToList().ForEach(x =>
@@ -991,8 +996,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
         {
-           var AllGameType =  _winLostReportService.GetAllGameType().ToList();
-           return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
+            var AllGameType = _winLostReportService.GetAllGameType().ToList();
+            return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
 
         public DashboardWinLossGroupData GetDashboardWinLossGroup(int custId)
@@ -1016,7 +1021,7 @@ namespace BackendSite.Service.BLL
             var winLoseSummary = _custInfoService.GetWinLoseSummary(custId, Convert.ToDateTime(Date)).ToList();
             List<WinLoseSummary> result = winLoseSummary.GroupBy(x => x.CategoryId).Select(y => new WinLoseSummary
             {
-                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                WinlostAmount = y.Sum(z => z.WinlostAmount),
                 Name = y.First().Name,
                 CategoryId = y.Key
             }).ToList();
@@ -1035,7 +1040,7 @@ namespace BackendSite.Service.BLL
                 }
             });
 
-            return result.OrderBy(x=> x.CategoryId);
+            return result.OrderBy(x => x.CategoryId);
         }
         public IEnumerable<WinLoseSummaryDetailResult> GetWinLoseSummaryDetail(int custId, string GameTypes)
         {
@@ -1043,18 +1048,18 @@ namespace BackendSite.Service.BLL
             var winLoseSummaryDetail = _custInfoService.GetWinLoseSummaryDetail(custId, Convert.ToDateTime(Date), GameTypes).ToList();
             List<WinLoseSummaryDetailResult> result = winLoseSummaryDetail.GroupBy(x => x.GameType).Select(y => new WinLoseSummaryDetailResult
             {
-                WinlostAmount = y.Sum(z=> z.WinlostAmount),
+                WinlostAmount = y.Sum(z => z.WinlostAmount),
                 GameName = y.First().GameName,
                 GameType = y.Key,
-                StakeSettled = y.Sum(z=> z.SettlementType == 1 ? z.Stake : 0),
-                StakeNotRollover = y.Sum(z=> z.SettlementType == 3 ? z.Stake : 0),
+                StakeSettled = y.Sum(z => z.SettlementType == 1 ? z.Stake : 0),
+                StakeNotRollover = y.Sum(z => z.SettlementType == 3 ? z.Stake : 0),
                 TpUserName = y.First().TpUserName
             }).ToList();
 
             return result;
         }
 
-        public async void ImportByExcel(int siteId, IFormFile excel, string author)
+        public bool ImportByExcel(int siteId, IFormFile excel, string memo, string author)
         {
             List<string> userNameList = new List<string>();
             List<int> custIdList = new List<int>();
@@ -1087,7 +1092,7 @@ namespace BackendSite.Service.BLL
                     var m = Regex.Match(sabaId, @"\d+");
                     var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
 
-                    if (string.IsNullOrWhiteSpace(custUsername))
+                    if (!string.IsNullOrWhiteSpace(custUsername))
                     {
                         userNameList.Add(custUsername);
                     }
@@ -1101,28 +1106,114 @@ namespace BackendSite.Service.BLL
                     }
                     RowId += 1;
                 } while (!isLastRow);
+
+                //新增BatchCustInfo
+                _custInfoService.NewBatchCustInfo(siteId, memo, author, ref batchId);
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
+                        var allTagList = await _tagll.GetAllTag();
+                        var data = custInfo.Select(a => new MemberExportData()
+                        {
+                            SiteName = a.SiteName,
+                            UserName = a.UserName,
+                            CustId = a.CustId,
+                            Currency = a.IsoCode,
+                            BirthDate = a.BirthDate,
+                            BirthMonth = a.BirthMonth,
+                            BirthYear = a.BirthYear,
+                            IsTest = a.IsTest,
+                            IsKyc = a.IsKyc,
+                            IsRisk = a.IsRisk,
+                            SeamlessWallet = a.SeamlessWallet,
+                            BonusWallet = a.BonusWallet,
+                            Email = a.Email,
+                            RealName = a.RealName,
+                            CountryCode = a.CountryCode,
+                            AreaCode = a.AreaCode,
+                            PhoneNo = a.PhoneNo,
+                            LevelName = a.LevelName,
+                            Agent = a.Agent,
+                            RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                            Status = ((CustomerStatusEnum)a.Status).ToString(),
+                            SabaId = a.SabaId,
+                            SignupUrl = a.SignupUrl,
+                            AffiliateId = a.AffiliateId,
+                            AffiliateCode = a.AffiliateCode,
+                            LastActivityIp = a.LastActivityIp,
+                            Tag = GetTag(allTagList, a.TagList)
+                        });
+                        var fileBytes = _excelBll.ExportV2(data);
+                        var stream = new MemoryStream(fileBytes);
+                        var site = (SiteEnum)siteId;
+                        var key = $"{_environment}/{site}/CustInfo/{batchId}.xlsx";
+                        var putRequest = new PutObjectRequest
+                        {
+                            BucketName = "ailab-backoffice",
+                            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            InputStream = stream,
+                            Key = key
+                        };
+
+                        var result = await _s3Helper.PutObjectAsync(putRequest);
+
+                        if (result.HttpStatusCode.IsSuccess())
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Finished, batchId);
+                        }
+                        else
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                        }
+                    }
+                    catch
+                    {
+                        _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                    }
+                });
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public IEnumerable<BatchCustInfo> GetCustinfoByImportData(int siteId)
+        {
+            var batchCustInfo = _custInfoService.GetBatchCustInfo(siteId).ToList();
+
+            batchCustInfo.ForEach(x =>
+            {
+                x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
+                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/{x.BatchId}.xlsx";
+            });
+
+            return batchCustInfo;
+        }
+
+        private string GetTag(IEnumerable<Tag> allTagList, string tagList)
+        {
+            List<string> temp = new List<string>();
+            if (string.IsNullOrWhiteSpace(tagList))
+            {
+                return string.Empty;
             }
 
-            //新增BatchCustInfo
-            _custInfoService.NewBatchCustInfo(siteId, author, ref batchId);
-
-            _ = Task.Run(async () =>
+            JsonConvert.DeserializeObject<List<int>>(tagList).ToList().ForEach(x =>
             {
-                var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
-                var fileBytes = _excelBll.ExportV2(custInfo);
-                var stream = new MemoryStream(fileBytes);
-                var site = (SiteEnum)siteId;
-                var key = $"{_environment}/{site}/CustInfo/{batchId}.xlsx";
-                var putRequest = new PutObjectRequest
+                var tagName = allTagList.FirstOrDefault(y => y.Id == x)?.TagName;
+                if (!string.IsNullOrWhiteSpace(tagName))
                 {
-                    BucketName = "ailab-backoffice",
-                    ContentType = "image/jpeg",
-                    InputStream = stream,
-                    Key = key
-                };
-
-                var result = await _s3Helper.PutObjectAsync(putRequest);
+                    temp.Add(tagName);
+                }
             });
+
+            return string.Join(",", temp);
         }
     }
 }

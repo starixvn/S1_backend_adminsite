@@ -224,7 +224,7 @@ namespace BackendSite.Service.Model.enums
         LocalBanking = 3,
         CryptoPay = 4,
         LoadCard = 5, //No Use
-        QRPay = 6 ,
+        QRPay = 6,
         BankAutoChannel = 7
     }
 
@@ -241,7 +241,7 @@ namespace BackendSite.Service.Model.enums
         Adjustment = 98,
         Error = 99 //No Use
     }
-    
+
     public enum SelectDepositStatusEnum
     {
         Pending = 1,
@@ -250,19 +250,19 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         OnHold = 7
     }
-    
-	public enum DepositActionEnum
+
+    public enum DepositActionEnum
     {
-        Draft = 66, 
+        Draft = 66,
         Pending = 64,
         Approved = 65,
-        ManualApproved =67,
+        ManualApproved = 67,
         Rejected = 6,
         ManualRejected = 68,
         OnHold = 63
     }
 
-	 public enum DepositTimeStatusEnum
+    public enum DepositTimeStatusEnum
     {
         Approved = 3,
         Rejected = 4,
@@ -272,13 +272,13 @@ namespace BackendSite.Service.Model.enums
     #endregion
 
     #region PayList
-    
+
     public enum PayListMethodEnum
     {
         Deposit = 1,
         Withdrawal = 2
     }
-    
+
     public enum PayListStatusEnum
     {
         Enable = 1,
@@ -375,13 +375,13 @@ namespace BackendSite.Service.Model.enums
         ToKyc = 8,
         Error = 99 //No Use
     }
-    
+
     public enum WithdrawalActionEnum
     {
-        Draft = 66, 
+        Draft = 66,
         Pending = 64,
         Approved = 65,
-        ManualApproved =67,
+        ManualApproved = 67,
         Rejected = 6,
         ManualRejected = 68,
         OnHold = 63,
@@ -886,9 +886,9 @@ namespace BackendSite.Service.Model.enums
         PSP = 3,
 
         Finance = 4,
-        
+
         MC = 5,
-        
+
         CryptoWallet = 6
     }
 
@@ -1393,13 +1393,13 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1
     }
-    
+
     public enum CryptoWalletLogStatusEnum
     {
         Create = 1,
         Delete = 2
     }
-    
+
     public enum EWalletinfoLogStatusEnum
     {
         Create = 1,
@@ -1439,7 +1439,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
-    
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1576,5 +1576,12 @@ namespace BackendSite.Service.Model.enums
         WithdrawalAccountsNameUnmatch = 0,
         [Description("Account number incorrect")]
         WithdrawalAccountNumberIncorrect = 1
+    }
+
+    public enum BatchCustInfoStatus
+    {
+        Pending = 0,
+        Finished = 1,
+        Failed = 2
     }
 }

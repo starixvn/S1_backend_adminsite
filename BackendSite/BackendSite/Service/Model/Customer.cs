@@ -588,9 +588,31 @@ namespace BackendSite.Service.Model
     }
 
     public class ImportDataByExcelModel
-    { 
+    {
         public string UserNameList { get; set; }
         public string CustIdList { get; set; }
         public int SiteId { get; set; }
+    }
+
+    public class BatchCustInfo
+    {
+        public int BatchId { get; set; }
+        public string Author { get; set; }
+        public int Status { get; set; }
+        public DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string StatusName { get; set; }
+        public string Url { get; set; }
+        public string Memo { get; set; }
     }
 }
