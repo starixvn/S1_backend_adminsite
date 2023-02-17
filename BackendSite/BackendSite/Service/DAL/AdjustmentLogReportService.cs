@@ -52,13 +52,14 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", input.EndDate.DateTime);
             props.Add("_RefTransId", input.TransId);
             props.Add("_Operator", input.UserName);
+            props.Add("_CustId", input.CustId);
             props.Add("_PageSize", Math.Abs(input.PageSize));
             props.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
             var result =
-                _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get", props);
+                _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get_V2", props);
 
             var logResult = new AdminAdjustmentLogReportResult
             {
