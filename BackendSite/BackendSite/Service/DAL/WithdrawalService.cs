@@ -1,11 +1,11 @@
 ﻿using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using System.Text.RegularExpressions;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
@@ -20,6 +20,7 @@ namespace BackendSite.Service.DAL
         private readonly WalletService _walletService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
         private readonly ILogger<WithdrawalService> _logger;
+        private readonly BankDetailBLL _bankDetailBll;
         private const int TypePosition = 1000;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
@@ -34,6 +35,7 @@ namespace BackendSite.Service.DAL
             _walletService = provider.GetRequiredService<WalletService>();
             _withdrawalBankAccountingService = provider.GetRequiredService<WithdrawalBankAccountingService>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalService>>();
+            _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -430,7 +432,7 @@ namespace BackendSite.Service.DAL
             WithdrawalStatusEnum status,
             string withdrawalInfo,
             int? withdrawalType,
-            string accountingModelString,
+            IEnumerable<WithdrawalAccountingModel> accountingModels,
             out int custId,
             out decimal amount,
             int userId = 0,
@@ -446,8 +448,7 @@ namespace BackendSite.Service.DAL
             var paraLog = new Dictionary<string, string>();
             try
             {
-                using var conn =
-                    new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 conn.Open();
                 using var trans = conn.BeginTransaction();
 
@@ -461,13 +462,27 @@ namespace BackendSite.Service.DAL
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
 
+                var accountingModelString = SetAccountingString(accountingModels);
+                var beforeAccountingModels = _withdrawalBankAccountingService.GetByTransId(transId);
+                
                 if (result > 0)
                 {
                     //step2: Set WithdrawalLog
                     if (!string.IsNullOrEmpty(accountingModelString))
                     {
-                        comment = $"Comment :{comment} , AccountingModel :{accountingModelString}";
+                        if (!string.IsNullOrEmpty(comment))
+                        {
+                            comment = $"Comment : {comment}, ";
+                        }
+
+                        var compare = accountingModels.Except(beforeAccountingModels , new WithdrawalAccountingModelComparer()); 
+                        
+                        if (compare.Any())
+                        {
+                            comment += $"AccountingModel :{accountingModelString}";
+                        }
                     }
+                    
                     var logResult = SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, updater, conn, trans);
                     var specialResult = 0;
 
@@ -494,8 +509,7 @@ namespace BackendSite.Service.DAL
                                 if (!string.IsNullOrEmpty(accountingModelString))
                                 {
                                     var delResult = 1;
-                                    var accountingList = _withdrawalBankAccountingService.GetByTransId(transId);
-                                    if (accountingList.Any())
+                                    if (beforeAccountingModels.Any())
                                     {
                                         delResult = DelWithdrawalAccounting(transId,conn,trans) >= 0 ? 1 : 0;
                                     }
@@ -781,5 +795,47 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
+        
+        #region private
+
+        private string SetAccountingString(IEnumerable<WithdrawalAccountingModel> accountingModels)
+        {
+            string accountingModelString = null;
+            if (accountingModels != null && accountingModels.Any() )
+            {
+                var bankAccountList = _bankDetailBll.GetOfflineBankAccount();
+                var seq = 1;
+                foreach (var model in accountingModels)
+                {
+                    model.Seq = seq;
+                    model.DisplayName = bankAccountList.FirstOrDefault(x => x.BankId == model.BankId)?.DisplayName;
+                    model.Amount = Math.Round(model.Amount, 4);
+                    model.ChargeFee = Math.Round(model.ChargeFee, 4);
+                    seq += 1;
+                }
+                accountingModelString = JsonConvert.SerializeObject(accountingModels);
+            }
+            return accountingModelString;
+        }
+        
+        private class WithdrawalAccountingModelComparer : IEqualityComparer<WithdrawalAccountingModel>
+        {
+            public bool Equals(WithdrawalAccountingModel t1, WithdrawalAccountingModel t2)
+            {
+                var isSame = t1.Seq == t2.Seq && 
+                             t1.BankId == t2.BankId &&
+                             t1.Amount == t2.Amount &&
+                             t1.ChargeFee == t2.ChargeFee;
+                return isSame;
+            }
+
+            public int GetHashCode(WithdrawalAccountingModel t)
+            {
+                return t.ToString().GetHashCode();
+            }
+        }
+        
+        #endregion
+        
     }
 }
