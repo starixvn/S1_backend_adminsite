@@ -1626,4 +1626,9 @@ namespace BackendSite.Service.Model.enums
         SettledDate = 1,
         CreatedDate = 2
     }
+    
+    public enum CustTagEnum
+    {
+        Duplicate = 6
+    }
 }
