@@ -197,6 +197,8 @@ public class MemberExportData
 public class GetCustomerBasicInfoRequest
 {
     public int CustId { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
 }
 
 public class CustomerDto

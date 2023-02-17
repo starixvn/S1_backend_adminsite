@@ -1271,7 +1271,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return new ApiResult<IEnumerable<PromotionReceiveFailLog>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(request.CustId)
+                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
+                    request.CustId, 
+                    request.StartTime.ToUniversalTime().DateTime,
+                    request.EndTime.ToUniversalTime().DateTime)
             };
         }
 
