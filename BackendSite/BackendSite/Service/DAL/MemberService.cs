@@ -197,7 +197,7 @@ public class MemberService : IMemberService
 
         if (!duplicateAccounts.Any())
         {
-            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p) > 0;
+            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p) > 0;
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
