@@ -772,10 +772,10 @@ namespace BackendSite.Service.Model.enums
         SiteMaintenance = 77,
         SetVideoInfo = 78,
         SMSGenerator = 79,
-        SetWithdrawalMessage = 80
+        SetWithdrawalMessage = 80,
         SetCustInfoNote = 81,
         DeleteSMSInfo = 82,
-        CancelBonusInCustInfo = 83
+        CancelBonusInCustInfo = 83,
     }
 
     #region BankFinancialTransferInfoLog
