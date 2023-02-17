@@ -9,13 +9,8 @@ using System.Transactions;
 using System.Linq;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
-using System.Security.Policy;
-using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
-using Org.BouncyCastle.Ocsp;
-using System.Drawing.Drawing2D;
 using Amazon.S3.Model;
 using BackendSite.Extensions;
-using BackendSite.Service.BLL.Interface;
 using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
@@ -1149,7 +1144,7 @@ namespace BackendSite.Service.BLL
                         var fileBytes = _excelBll.ExportV2(data);
                         var stream = new MemoryStream(fileBytes);
                         var site = (SiteEnum)siteId;
-                        var key = $"{_environment}/{site}/CustInfo/{batchId}.xlsx";
+                        var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
                         var putRequest = new PutObjectRequest
                         {
                             BucketName = "ailab-backoffice",
@@ -1190,7 +1185,7 @@ namespace BackendSite.Service.BLL
             batchCustInfo.ForEach(x =>
             {
                 x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
-                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/{x.BatchId}.xlsx";
+                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
             });
 
             return batchCustInfo;
