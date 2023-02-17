@@ -627,7 +627,7 @@ namespace BackendSite.Controllers.Api
                 var menu = "CustManage/CustInfoList";
                 var info = new Dictionary<string, dynamic>();
                 info.Add("MenuName", "Customer Info");
-                
+
                 if (custStatus.Level != null)
                 {
                     info.Add("Action", $"Change Level To {custStatus.Level}");
@@ -1405,10 +1405,10 @@ namespace BackendSite.Controllers.Api
         /// <param name="addCustNoteReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult AddCustNote(AddCustNoteReq addCustNoteReq)
+        public async Task<ApiResult> AddCustNote(AddCustNoteReq addCustNoteReq)
         {
 
-            var data = _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
+            var data = await _custInfoBll.AddCustNote(addCustNoteReq.CustId, addCustNoteReq.Note, User.Identity.Name);
 
             if (data)
             {
@@ -1423,7 +1423,6 @@ namespace BackendSite.Controllers.Api
                     ErrorCode = 0,
                     Message = "Add Success."
                 };
-
             }
             else
             {
@@ -1468,7 +1467,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="setCustNoteReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNotes(SetCustNoteReq setCustNoteReq)
+        public async Task<ApiResult> SetCustNotes(SetCustNoteReq setCustNoteReq)
         {
             if (setCustNoteReq.Type == 1 && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
             {
@@ -1480,9 +1479,9 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                var data = _custInfoBll.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
+                var result = await _custInfoBll.SetCustNotes(setCustNoteReq.NoteId, setCustNoteReq.Note, setCustNoteReq.Type, User.Identity.Name);
 
-                if (data)
+                if (result)
                 {
                     var Menu = "CustManage/CustInfoList";
                     var Info = new Dictionary<string, dynamic>();
@@ -1723,7 +1722,7 @@ namespace BackendSite.Controllers.Api
         /// <param name="bonusReq"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult CancelBonusByBonusId(BonusReq bonusReq)
+        public async Task<ApiResult> CancelBonusByBonusId(BonusReq bonusReq)
         {
             var apiResult = new ApiResult();
             var data = _bonusInfoBll.GetTransferBonusCancel(bonusReq.BonusId);
@@ -1733,7 +1732,7 @@ namespace BackendSite.Controllers.Api
             {
                 if (data.Status == (int)BonusStatus.Running)
                 {
-                    CancelBonus(bonusReq, data, apiResult);
+                    await CancelBonus(bonusReq, data, apiResult);
                     return apiResult;
                 }
 
@@ -1784,7 +1783,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else
                         {
-                            CancelBonus(bonusReq, data, apiResult);
+                            await CancelBonus(bonusReq, data, apiResult);
                             return apiResult;
                         }
                         break;
@@ -1795,8 +1794,8 @@ namespace BackendSite.Controllers.Api
             //單一錢包
             if (data != null)
             {
-                var result = _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId, out _);
-                if (result > 0)
+                var result = await _bonusInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
+                if (result.Result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
@@ -1822,11 +1821,11 @@ namespace BackendSite.Controllers.Api
             return apiResult;
         }
 
-        private void CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
+        private async Task CancelBonus(BonusReq bonusReq, CancelBonus data, ApiResult apiResult)
         {
-            var result = _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId);
+            var result = await _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
 
-            if (result > 0)
+            if (result.Result > 0)
             {
                 var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
                 var msg = new StringBuilder();
@@ -2030,7 +2029,7 @@ namespace BackendSite.Controllers.Api
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         [HttpPost]
-        public ApiResult SetCustTag(SetCustTagPara para)
+        public async Task<ApiResult> SetCustTag(SetCustTagPara para)
         {
             if (_custInfoBll.SetCustTag(para.CustId, para.SelectTag, User.Identity.Name) > 0)
             {
@@ -2045,7 +2044,7 @@ namespace BackendSite.Controllers.Api
                     });
                     selectTag = JsonConvert.SerializeObject(temp);
                 }
-                _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                await _custInfoBll.AddCustNote(para.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -2155,7 +2154,7 @@ namespace BackendSite.Controllers.Api
                 throw new AdminException(ErrorCodeEnum.Fail, "Line Unbind fail.Customer is not binding now.");
             }
         }
-        
+
         #region CSD > Customer Administration > CustInfo > E Wallet Log
 
         /// <summary>

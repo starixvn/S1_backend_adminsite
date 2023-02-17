@@ -109,25 +109,6 @@ namespace BackendSite.Service.BLL
             return apiResult;
         }
 
-        public ApiResult BonusCancel(int bonusId)
-        {
-            var apiResult = new ApiResult();
-
-            var result = _bonusInfoBLL.CancelBonusByBonusId(bonusId, out var custId);
-            if (result > 0)
-            {
-                var userData = _authorizeBLL.GetAuthData();
-                var Menu = "Pending Bonus/Cancel";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Cancel Bonus");
-                _serverInfoBLL.AdminOperateLog(null, custId, Menu, ActionType.Update, Info, userData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-
-            return apiResult;
-        }
-
         public async Task<ApiResult> BonusTransferAllAsync()
         {
             var apiResult = new ApiResult();
