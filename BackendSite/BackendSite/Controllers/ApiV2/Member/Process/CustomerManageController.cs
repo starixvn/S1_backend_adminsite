@@ -112,37 +112,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 客戶ID和時間區間(Null)要求
-        /// </summary>
-        /// <remarks>
-        /// 只需要傳參數CustId、StartDate(Allow Null)、EndDate(Allow Null)
-        /// </remarks>
-        public class CustIdWithDateRangeNullRequest : CustIdRequest
-        {
-            private DateTimeOffset _startDate;
-
-            private DateTimeOffset _endDate;
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-        }
-
-        /// <summary>
         /// 客戶ID要求(含分頁)
         /// </summary>
         public class CustIdWithPageRequest : ApiRequestPageModel
@@ -2192,12 +2161,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_noteEdit" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 56 })]
         [HttpPost]
         public ApiResult AddCustNote(AddCustNoteRequest request)
         {
 
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name);
+            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2265,44 +2234,39 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiResult SetCustNote(SetCustNoteRequest request)
         {
-            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteEdit"))
+            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission(22, new []{56}))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_noteDelete"))
+            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission(22, new []{57}))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            else
+            var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
+
+            if (data)
             {
-                var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
-
-                if (data)
+                var Menu = "CustManage/CustInfoList";
+                var Info = new Dictionary<string, dynamic>();
+                Info.Add("MenuName", "Customer Info");
+                if (request.Type == SetCustNoteTypeEnum.Update)
                 {
-                    var Menu = "CustManage/CustInfoList";
-                    var Info = new Dictionary<string, dynamic>();
-                    Info.Add("MenuName", "Customer Info");
-                    if (request.Type == SetCustNoteTypeEnum.Update)
-                    {
-                        Info.Add("Action", "Edit Note");
-                    }
-                    else if (request.Type == SetCustNoteTypeEnum.Delete)
-                    {
-                        Info.Add("Action", "Delete Note");
-                    }
-                    _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-                    return new ApiResult
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.Success,
-                        Message = "Modify Success."
-                    };
+                    Info.Add("Action", "Edit Note");
                 }
-                else
+                else if (request.Type == SetCustNoteTypeEnum.Delete)
                 {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
+                    Info.Add("Action", "Delete Note");
                 }
+                _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Modify Success."
+                };
             }
+            
+            throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
         }
 
         #endregion
@@ -2347,37 +2311,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-
-        ///// <summary>
-        ///// CustomerManage/GetCustLang 取得指定客戶語系
-        ///// </summary>
-        ///// <remarks>
-        ///// 
-        ///// Http Method：POST
-        ///// 
-        ///// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message > Get Customer Lang
-        ///// 
-        ///// </remarks>
-        ///// <param name="request"></param>
-        ///// <returns></returns>
-        //[TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
-        //[HttpPost]
-        //public ApiResult<CustLang> GetCustLang(CustIdRequest request)
-        //{
-        //    var apiResult = new ApiResult<CustLang>();
-        //    try
-        //    {
-        //        apiResult.Data = _messageBll.GetCustLang(request.CustId);
-        //        apiResult.ErrorCode = (int)ErrorMessageCodeEnum.Success;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResult.RawMessage = ex.ToString();
-        //        apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-        //    }
-
-        //    return apiResult;
-        //}
 
         /// <summary>
         /// CustomerManage/SendPersonalMsg 送出指定客戶個人訊息
@@ -2472,11 +2405,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _custInfoBll.GetCustTurnover(request.CustId,
                                                    request.GameTypes,
-                                                   request.StartDate,
-                                                   request.EndDate);
+                                                   request.StartDate.ToUniversalTime().DateTime,
+                                                   request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover }),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -3127,7 +3060,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         #region CSD > Customer Administration > CustInfo > IP Log
         public ApiListResult<CustLoginLog> GetIPLog(CustIdWithDateRangeRequest request)
         {
-            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime);
+            var IPLog = _custInfoBll.GetIPLog(request.CustId, request.StartDate.ToUniversalTime().DateTime, request.EndDate.ToUniversalTime().DateTime);
             return new ApiListResult<CustLoginLog>
             {
                 Data = IPLog,

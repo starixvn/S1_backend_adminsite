@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using System;
 
 namespace BackendSite.Service.DAL
 {
@@ -25,11 +26,9 @@ namespace BackendSite.Service.DAL
             var searchResult = new DrawPrizeReportResult();
             var tempCurrencyTotalAmount = new List<string>();
             var props = new DynamicParameters();
-            var startDate = new DateTimeOffset(Convert.ToDateTime(prizeSelect.StartDate), TimeSpan.FromHours(timeZone)).ToUniversalTime();
-            var endDate = new DateTimeOffset(Convert.ToDateTime(prizeSelect.EndDate), TimeSpan.FromHours(timeZone)).ToUniversalTime().AddHours(24).AddMilliseconds(-1);
-
-            props.Add("_StartDate", startDate.DateTime);
-            props.Add("_EndDate", endDate.DateTime);
+        
+            props.Add("_StartDate", $"{prizeSelect.StartDate} 00:00:00.000");
+            props.Add("_EndDate", $"{prizeSelect.EndDate} 23:59:59.999");
             props.Add("_SiteIds", JsonConvert.SerializeObject(prizeSelect.SelectSite));
             props.Add("_CurrencyIds", JsonConvert.SerializeObject(prizeSelect.CurrencyId));
             props.Add("_EventNames", JsonConvert.SerializeObject(prizeSelect.EventName));
@@ -54,7 +53,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var result = _reportDbClient.Query<DrawPrize>("Admin_DrawPrize_Get_V4", props);
+            var result = _reportDbClient.Query<DrawPrize>("Admin_DrawPrize_Get_V5", props);
             
             searchResult.Data = result.ToList();
             searchResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
@@ -79,7 +78,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get_V4", props);
+            var result = _reportDbClient.Query<PrizeLogData>("Admin_DrawPrize_ListOfWinner_Get_V5", props);
             logResult.PrizeLogData = result.ToList();
             logResult.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             logResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -94,19 +93,15 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<DrawPrizeExcelData> GetExportData(string selectSite, string startDate, string endDate, string currencyId, string eventName, int timeZone)
         {
-            var startTime = new DateTimeOffset(Convert.ToDateTime(startDate), TimeSpan.FromHours(timeZone)).ToUniversalTime();
-            var endTime = new DateTimeOffset(Convert.ToDateTime(endDate), TimeSpan.FromHours(timeZone)).ToUniversalTime().AddHours(24).AddMilliseconds(-1);
-            
             var props = new DynamicParameters();
             props.Add("_TimeZone", TransferToTimeZoneFormat(timeZone));
-            props.Add("_StartDate", startTime.DateTime);
-            props.Add("_EndDate", endTime.DateTime);
+            props.Add("_StartDate", $"{startDate} 00:00:00.000");
+            props.Add("_EndDate", $"{endDate} 23:59:59.999");
             props.Add("_SiteIds", selectSite);
             props.Add("_CurrencyIds", currencyId);
             props.Add("_EventNames", eventName);
 
-            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get_V3", props);
-
+            return _reportDbClient.Query<DrawPrizeExcelData>("Admin_DrawPrizeExport_Get_V4", props);
         }
         
         private string TransferToTimeZoneFormat(int timeZone)
