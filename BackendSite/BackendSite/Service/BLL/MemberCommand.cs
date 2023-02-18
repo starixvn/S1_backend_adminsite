@@ -89,7 +89,7 @@ public class MemberCommand : IMemberCommand
         return await _memberService.GetSimilarAccountNameAsync(siteId, accountNames);
     }
         
-    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, string accountName)
+    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName)
     {
         /* 相同定義：
          * * 大小寫不同
@@ -110,7 +110,8 @@ public class MemberCommand : IMemberCommand
         };
         var similarAccList = await GetSimilarAccountNameAsync(siteId, patterns);
         var result = similarAccList
-            .Where(x => patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
+            .Where(x => x.CustId != custId
+                && patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
         
         return result;
     }
@@ -119,7 +120,7 @@ public class MemberCommand : IMemberCommand
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeName = customer.AccountName;
-        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
+        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, custId, fullName);
 
         var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
         if (!result) return false;
