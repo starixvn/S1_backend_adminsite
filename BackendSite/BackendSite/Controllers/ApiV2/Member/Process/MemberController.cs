@@ -533,7 +533,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var authData = _newAuthorizeBll.GetAuthData();
             var result =
-                await _memberCommand.GetDuplicateAccountInfoAsync(authData.SiteId, request.FullName);
+                await _memberCommand.GetDuplicateAccountInfoAsync(authData.SiteId, request.CustId, request.FullName);
 
             return new ApiResult<IEnumerable<SimilarAccountInfo>>
             {
