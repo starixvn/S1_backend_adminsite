@@ -268,6 +268,12 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
+    
+    public enum DepositDateTypeEnum
+    {
+        CreateTime = 1,
+        StatementTime = 2
+    }
 
     #endregion
 
