@@ -1027,6 +1027,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
             }
 
+            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank 
+                && withdrawalRequest.Status is  WithdrawalStatusEnum.Approved)
+            {
+                usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
+            }
+            
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
                 withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
