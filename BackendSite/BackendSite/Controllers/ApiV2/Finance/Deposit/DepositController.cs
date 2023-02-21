@@ -518,7 +518,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     ReceiptNo = receipt.ReceiptNo,
                     Receipt = File(image, "image/jpeg"),
                     Creator = receipt.Creator,
-                    CreateTime = receipt.CreateTime
+                    CreateTime = receipt.CreateTime,
+                    CreateFrom = receipt.CreateFrom
                 };
                 result.Add(model);
             }
