@@ -123,6 +123,7 @@ namespace BackendSite.Controllers
                 depositListReq.SelectCalCode,
                 depositListReq.DepositType,
                 startTime, endTime,
+                DepositDateTypeEnum.CreateTime,
                 depositListReq.DepositId,
                 new List<string> {depositListReq.UserName},
                 null,
