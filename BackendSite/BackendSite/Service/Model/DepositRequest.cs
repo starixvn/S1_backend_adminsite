@@ -325,6 +325,7 @@ namespace BackendSite.Service.Model
     {
         public IActionResult Receipt { get; set; }
         public int ReceiptNo { get; set; }
+        public int CreateFrom { get; set; }
         public string Creator { get; set; }
         public DateTime CreateTime { get; set; }
     }
