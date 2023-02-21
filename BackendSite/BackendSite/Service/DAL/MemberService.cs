@@ -190,12 +190,11 @@ public class MemberService : IMemberService
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts, string @operator)
+    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
         p.Add("_FullName", fullName);
-        p.Add("_Operator", @operator);
 
         if (!duplicateAccounts.Any())
         {
@@ -206,7 +205,7 @@ public class MemberService : IMemberService
         conn.Open();
         await using var trans = await conn.BeginTransactionAsync();
         
-        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p, conn, trans) > 0;
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p, conn, trans) > 0;
 
         if (success)
         {

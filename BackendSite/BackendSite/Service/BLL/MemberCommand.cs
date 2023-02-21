@@ -89,7 +89,7 @@ public class MemberCommand : IMemberCommand
         return await _memberService.GetSimilarAccountNameAsync(siteId, accountNames);
     }
         
-    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, string accountName)
+    public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName)
     {
         /* 相同定義：
          * * 大小寫不同
@@ -110,7 +110,8 @@ public class MemberCommand : IMemberCommand
         };
         var similarAccList = await GetSimilarAccountNameAsync(siteId, patterns);
         var result = similarAccList
-            .Where(x => patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
+            .Where(x => x.CustId != custId
+                && patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
         
         return result;
     }
@@ -119,15 +120,21 @@ public class MemberCommand : IMemberCommand
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeName = customer.AccountName;
-        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, fullName);
+        var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, custId, fullName);
 
-        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts, @operator);
+        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
         if (!result) return false;
         
-        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
-            JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), ActionType.Update,
-            custId, $"Edit FullName \"{fullName}\"");
+        await CreateAdminLog(
+            @operator: @operator, 
+            siteId: customer.SiteId, 
+            currencyId: customer.CurrencyId,
+            beforeLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
+            afterLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), 
+            action: ActionType.Update,
+            custId: custId,
+            message: $"Edit FullName \"{fullName}\"",
+            menuEnum: AdminAdjustmentLogMenuEnum.SetCustomerFullName);
         
         return true;
     }

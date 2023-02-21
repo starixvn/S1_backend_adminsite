@@ -618,9 +618,11 @@ public class CustTagList
 
     public IEnumerable<int> TagList { get; set; }
 }
+
 public class CustRealNameChangeLog
 {
-    public string RealName { get; set; }
+    public string BeforeName { get; set; }
+    public string AfterName { get; set; }
     public DateTimeOffset UpdateTime { get; set; }
     public string Operator { get; set; }
 }
