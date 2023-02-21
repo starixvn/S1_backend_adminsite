@@ -166,6 +166,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
     #endregion
 
     #region CustProfile
@@ -984,7 +990,9 @@ namespace BackendSite.Service.Model.enums
         [Description("ADVANCED")]
         Advanced = 18,
         [Description("TEST")]
-        Test = 19
+        Test = 19,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1374,7 +1382,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1443,7 +1450,8 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
-    
+
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1530,7 +1538,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    
+
     public enum PaymentReportGroupByEnum
     {
         Date = 1,
