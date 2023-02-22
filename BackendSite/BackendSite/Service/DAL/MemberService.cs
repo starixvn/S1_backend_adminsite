@@ -154,6 +154,12 @@ public class MemberService : IMemberService
         };
         return loginLogData;
     }
+
+     public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
+    }
     
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
