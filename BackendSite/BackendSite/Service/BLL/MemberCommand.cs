@@ -458,7 +458,7 @@ public class MemberCommand : IMemberCommand
             BeforeDetailInfo = beforeLog,
             AfterDetailInfo = afterLog,
             ActionType = action,
-            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+            MenuEnum = menuEnum,
             CustId = custId,
             Menu = "CustManage/CustInfoList",
             Note = message,
