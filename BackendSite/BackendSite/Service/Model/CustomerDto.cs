@@ -199,6 +199,11 @@ public class GetCustomerBasicInfoRequest
     public int CustId { get; set; }
 }
 
+public class GetCustomerAssociateBankUserRequest
+{
+    public int CustId { get; set; }
+}
+
 public class CustomerDto
 {
     public int SiteId { get; set; }
@@ -524,6 +529,14 @@ public class CustomerLoginIp
 {
     public string LoginIp { get; set; }
     public int UserCount { get; set; }
+}
+
+public class CustomerAssociateBankInfo
+{
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string PaymentName { get; set; }
+    public string AssociateNo { get; set; }
 }
 
 public class CustomerBalanceInfo

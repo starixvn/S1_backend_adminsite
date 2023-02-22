@@ -11,5 +11,6 @@ public interface IMemberQuery
     Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId);
     Task<GetLoginLogResponse> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId);
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
 }
