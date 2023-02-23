@@ -395,6 +395,12 @@ namespace BackendSite.Service.Model.enums
         Process = 70,
         ToKyc = 71
     }
+    
+    public enum WithdrawalDateTypeEnum
+    {
+        CreateTime = 1,
+        FlowEndTime = 2
+    }
 
     #endregion
 
