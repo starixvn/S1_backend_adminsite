@@ -7,7 +7,8 @@ public interface IMemberCommand
 {
     Task<int> AddCustTagAsync(int custId, int tagId, string @operator);
     Task<int> RemoveCustTagAsync(int custId, int tagId, string @operator);
-    Task<int> EditFullNameAsync(int custId, string fullName, string @operator);
+    Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName);
+    Task<bool> EditFullNameAsync(int custId, string fullName, string @operator);
     Task<int> EditEmailAsync(int custId, string email, string @operator);
     Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator);

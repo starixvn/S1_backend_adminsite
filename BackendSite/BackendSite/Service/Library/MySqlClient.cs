@@ -348,5 +348,19 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
+        
+        public void CommitAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
+        {
+            trans.Commit();
+            conn.Close();
+            conn.Dispose();
+        }
+        
+        public void RollbackAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
+        {
+            trans.Rollback();
+            conn.Close();
+            conn.Dispose();
+        }
     }
 }
