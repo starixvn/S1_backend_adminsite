@@ -356,7 +356,7 @@ public class MemberService : IMemberService
     public async Task<int> ResetCryptoInfoAsync(int custId)
     {
         var p = new DynamicParameters(new { CustId = custId });
-        return await _mainSqlClient.ExecuteAsync("Admin_ResetCustUSDTInfo_Set", p);
+        return await _mainSqlClient.ExecuteAsync("Admin_ResetCryptoWallet_Set", p);
     }
 
     public async Task<int> ResetEWalletAsync(int custId)
