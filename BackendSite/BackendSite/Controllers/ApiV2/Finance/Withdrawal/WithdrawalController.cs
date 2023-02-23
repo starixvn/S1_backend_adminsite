@@ -136,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
             {
@@ -163,6 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
             public int SiteId { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
@@ -259,6 +261,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.WithdrawalTypes, 
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId, 
                 userNames,
                 request.CurrencyIds,
@@ -319,6 +322,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId,
                 userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
                 request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,

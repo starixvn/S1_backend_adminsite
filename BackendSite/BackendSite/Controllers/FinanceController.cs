@@ -180,6 +180,7 @@ namespace BackendSite.Controllers
                 withdrawalType,
                 startTime, 
                 endTime, 
+                WithdrawalDateTypeEnum.CreateTime,
                 withdrawalListReq.WithdrawalId,
                 withdrawalListReq.UserName, 
                 currencyId,
