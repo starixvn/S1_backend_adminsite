@@ -321,14 +321,46 @@ namespace BackendSite.Service.BLL
             };
             return response;
         }
+
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
+        }
+        
+        public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+        {
+            return await _memberService.GetCustomerAssociateBankUserAsync(custId);
         }
 
         public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
         {
             return await _memberService.GetCustRealNameChangeLogAsync(custId);
+        }
+
+        public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
+        {
+            var result  = await _memberService.GetCustPromotionWhiteListAsync(custId);
+            if (result == null)
+            {
+                var customer = _custInfoBll.GetCustInfoWithCache(custId);
+                result = new CustPromotionWhiteList()
+                {
+                    CustId = custId,
+                    IpEnable = false,
+                    DeviceEnable = false,
+                    RealNameEnable = false,
+                    SiteId = customer.SiteId,
+                    UserName = customer.UserName,
+                    Operator = string.Empty
+                };
+            }
+            
+            return result;
+        }
+
+        public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
+        {
+            return await _memberService.GetPromotionReceiveFailLogAsync(custId, startTime, endTime);
         }
 
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)

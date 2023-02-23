@@ -408,6 +408,46 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
+    public async Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator)
+    {
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
+        var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
+        {
+           CustId = custId,
+           IpEnable = ipEnable,
+           DeviceEnable = deviceEnable,
+           RealNameEnable = realNameEnable,
+           SiteId = customer.SiteId,
+           UserName = customer.UserName,
+           Operator = @operator
+        });
+        
+        if (result < 1)
+        {
+            return false;
+        }         
+
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new 
+            { 
+                customer.UserName,
+                IpEnable = beforeWhiteList?.IpEnable ?? false,
+                DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
+                RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
+            }),
+            JsonConvert.SerializeObject(new 
+            {
+                customer.UserName,
+                IpEnable = ipEnable,
+                DeviceEnable = deviceEnable,
+                RealNameEnable = realNameEnable,
+            }), ActionType.Update,
+            custId, $"Update Promotion WhiteList.");
+
+        return true;
+    }
+
     private async Task CreateAdminLog(string @operator, int siteId, int currencyId, string beforeLog, string afterLog, ActionType action, int custId, string message, AdminAdjustmentLogMenuEnum menuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo)
     {
         var adminLog = new AdminLog()
@@ -418,7 +458,7 @@ public class MemberCommand : IMemberCommand
             BeforeDetailInfo = beforeLog,
             AfterDetailInfo = afterLog,
             ActionType = action,
-            MenuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+            MenuEnum = menuEnum,
             CustId = custId,
             Menu = "CustManage/CustInfoList",
             Note = message,

@@ -239,7 +239,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V12", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -250,6 +250,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -741,7 +742,6 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {
@@ -764,7 +764,6 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
-
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             var p = new DynamicParameters();
@@ -789,11 +788,11 @@ namespace BackendSite.Service.DAL
         }
         public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
@@ -809,6 +808,37 @@ namespace BackendSite.Service.DAL
         internal async Task<IEnumerable<CustNote>> GetNoteById(int id)
         {
             return await _reportDbClient.QueryAsync<CustNote>("Admin_CustNotes_GetById", new DynamicParameters(new { Id = id }));
+        }
+
+        public IEnumerable<MemberExportDataDto> GetCustByExcel(ImportDataByExcelModel importDataByExcelModel)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", importDataByExcelModel.SiteId);
+            parameter.Add("_UserNameList", importDataByExcelModel.UserNameList);
+            parameter.Add("_CustIdList", importDataByExcelModel.CustIdList);
+            return _reportDbClient.Query<MemberExportDataDto>("Admin_CustinfoByImportData_Get", parameter);
+        }
+
+        public bool NewBatchCustInfo(int siteId, string memo, string author, ref int batchId)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author , _Memo = memo });
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = _mainDbClient.Execute("Admin_BatchCustInfo_Ins", p);
+            batchId = p.Get<int>("BatchId");
+            return result > 0;
+        }
+
+        public bool UpdateBatchCustInfoStatus(int status, int batchId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_Status", status);
+            props.Add("_BatchId", batchId);
+            return _mainDbClient.Execute("Admin_BatchCustInfo_Set", props) > 0;
+        }
+
+        public IEnumerable<BatchCustInfo> GetBatchCustInfo(int siteId)
+        {
+            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId , _Top = 10}));
         }
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoWalletDetailAsync(int custId)

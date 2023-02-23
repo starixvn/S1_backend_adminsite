@@ -101,6 +101,28 @@ namespace BackendSite.Service.Model
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
         public IEnumerable<string> CurrencyList => string.IsNullOrEmpty(Currencys) ? new List<string>() : JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
         public string Currencys { get; set; }
+
+        [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
+        public bool SameDeviceIDRestrict { get; set; }
+
+        [Description("相同DeviceID領取限制的可用次數")]
+        public int SameDeviceIDAvailableCount { get; set; }
+
+        [Description("啟用相同IP領取限制: 0.不限制 1.限制")]
+        public bool SameIPRestrict { get; set; }
+
+        [Description("相同IP領取限制的可用次數")]
+        public int SameIPRestrictAvailableCount { get; set; }
+
+        [Description("啟用相同實名領取限制: 0.不限制 1.限制")]
+        public bool SameRealNameRestrict { get; set; }
+
+        [Description("相同實名領取限制的可用次數")]
+        public int SameRealNameRestrictAvailableCount { get; set; }
+
+        [Description("用戶Tag封鎖清單")]
+        public IEnumerable<int> BlockTagList => string.IsNullOrEmpty(BlockTagListJson) ? new List<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(BlockTagListJson);
+        public string BlockTagListJson { get; set; }
     }
 
     public class PromotionInfoReq 
@@ -190,6 +212,27 @@ namespace BackendSite.Service.Model
         public int AutoExtend { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
+
+        [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
+        public bool SameDeviceIDRestrict { get; set; }
+
+        [Description("相同DeviceID領取限制的可用次數")]
+        public int SameDeviceIDAvailableCount { get; set; }
+
+        [Description("啟用相同IP領取限制: 0.不限制 1.限制")]
+        public bool SameIPRestrict { get; set; }
+
+        [Description("相同IP領取限制的可用次數")]
+        public int SameIPRestrictAvailableCount { get; set; }
+
+        [Description("啟用相同實名領取限制: 0.不限制 1.限制")]
+        public bool SameRealNameRestrict { get; set; }
+
+        [Description("相同實名領取限制的可用次數")]
+        public int SameRealNameRestrictAvailableCount { get; set; }
+
+        [Description("用戶Tag封鎖清單")]
+        public IEnumerable<int> BlockTagList { get; set; } = new List<int>();
     }
     
     public class PromotionSpecific
@@ -275,12 +318,6 @@ namespace BackendSite.Service.Model
         public string TpCategoryName { get; set; }
         public int TpGameType { get; set; }
         public string TpGameTypeName { get; set; }
-    }
-
-    public class PromotionType
-    {
-        public int Type { get; set; }
-        public string PromotionTypeName { get; set; }
     }
 
     public class PromotionCashBack
@@ -394,6 +431,12 @@ namespace BackendSite.Service.Model
         public int Key { get; set; }
     }
 
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
+    }
+
     public class TierAmount
     {
         public decimal Bonus { get; set; }
@@ -402,4 +445,6 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
     }
+
+
 }

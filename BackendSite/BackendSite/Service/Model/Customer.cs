@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model
         public string AffCode { get; set; }
         public string Token { get; set; }
     }
-    
+
     public class CustInfoDetail
     {
         public string SiteName { get; set; }
@@ -166,7 +166,7 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
-        public string LineUserId { get; set; }
+        public int EnableRebatePayout { get; set; }
         public CustLineProfileModel CustLineProfile { get; set; }
         public string AddressCountry { get; set; }
         public string AddressState { get; set; }
@@ -200,27 +200,27 @@ namespace BackendSite.Service.Model
             set => TotalBonus = value;
         }
     }
-    
+
     public class CustRebateCategory
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public decimal RebateAmountSum { get; set; }
     }
-    
+
     public class CustRebateSum
     {
         public IEnumerable<CustRebateCategory> CustRebateCategory { get; set; }
         public decimal CustRebateTotalSum { get; set; }
     }
-    
+
     public class CustRewardType
     {
         public int TypeId { get; set; }
         public string TypeName { get; set; }
         public decimal RewardAmountSum { get; set; }
     }
-    
+
     public class CustRewardSum
     {
         public IEnumerable<CustRewardType> CustRewardType { get; set; }
@@ -228,7 +228,7 @@ namespace BackendSite.Service.Model
     }
 
     #endregion
-    
+
     public class CustInfoDetailForExport
     {
         public string SiteName { get; set; }
@@ -260,7 +260,7 @@ namespace BackendSite.Service.Model
         public string AffiliateCode { get; set; }
         public string LastActivityIP { get; set; }
     }
-    
+
     public class CustInfoDetailForExportV2
     {
         public string SiteName { get; set; }
@@ -331,7 +331,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public bool CanEdit { get; set; }
     }
-    
+
     public class CustRollOver
     {
         public decimal RollOver { get; set; }
@@ -371,7 +371,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CustCryptoWalletLog
     {
         public int CurrencyId { set; get; }
@@ -381,7 +381,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { set; get; }
         public int Status { set; get; }
     }
-    
+
     public class CustBonus
     {
         public string PromotionCategory { set; get; }
@@ -402,7 +402,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
-    
+
     public class GetTagDataResult
     {
         public List<TagData> TagDatas { get; set; }
@@ -418,7 +418,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
     }
-    
+
     public class CustomerInfo
     {
         public string UserName { get; set; }
@@ -427,7 +427,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class CustomerSwitchStatus
     {
         public int IsKyc { get; set; }
@@ -435,7 +435,7 @@ namespace BackendSite.Service.Model
         public int PhoneVerified { get; set; }
         public int EmailVerified { get; set; }
     }
-    
+
     public class CustProfileReq
     {
         public int UserLevel { get; set; }
@@ -451,7 +451,7 @@ namespace BackendSite.Service.Model
         public string USDTInfo { get; set; }
         public string Address { get; set; }
     }
-    
+
     public class BankInfoDetail
     {
         [LogIgnore]
@@ -459,7 +459,7 @@ namespace BackendSite.Service.Model
         public string AccountNo { set; get; }
         public string IFSCCode { set; get; }
     }
-    
+
     public class USDTDetail
     {
         public string Network { set; get; }
@@ -485,13 +485,15 @@ namespace BackendSite.Service.Model
         public decimal AfterWithdrawalLimit { get; set; }
         public string Memo { get; set; }
         public string RefTransId { get; set; }
+        public int CreateFrom { get; set; }
+        public string Creator { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class WithdrawalLimitLogData
     {
         public List<WithdrawalLimitLog> WithdrawalLimitLogList { get; set; }
@@ -499,17 +501,71 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
+    
+    public class CustBankInfo
+    {
+        public string AccountName { set; get; }
+        public string BankInfo { set; get; }
+        public string USDTInfo { set; get; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<BankInfoDetail> bankInfoDetail { set; get; }
+        public IEnumerable<USDTDetail> usdtDetail { set; get; }
+    }
+
+    public class BankLockInfoDetail : BankInfoDetail
+    {
+        public int Status { get; set; }
+        public string UpdateOperator { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string AccountName { get; set; }
+        public string BankName { get; set; }
+    }
+
+    
+    public class AdjustmentWithdrawalLimitLog
+    {
+        public int MainType { get; set; }
+        public decimal Amount { get; set; }
+        public string Memo { get; set; }
+        public string RefTransId { get; set; }
+        public string Creator { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+    }
+    
+    public class AdjustmentWithdrawalLimitLogData
+    {
+        public List<AdjustmentWithdrawalLimitLog> AdjustmentWithdrawalLimitLogList { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
 
     public class CustLineProfileModel
     {
         private DateTimeOffset _createTime { get; set; }
         public int CustId { get; set; }
         public string userId { get; set; }
+
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+
     }
 
     public class CustEWalletLog
@@ -522,7 +578,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
     }
 
-    public class CustLoginLog 
+    public class CustLoginLog
     {
         private DateTimeOffset _loginTime { get; set; }
         public string LoginIp { set; get; }
@@ -536,6 +592,14 @@ namespace BackendSite.Service.Model
             get => _loginTime;
             set => _loginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+    }
+
+    public class CustDashBoardTodayModel
+    {
+        public decimal TodayDeposit { get; set; }
+        public decimal TodayWithdrawal { get; set; }
+        public decimal TodayWinLoss { get; set; }
+        public decimal TodayBetting { get; set; }
     }
     public class DashboardWinLossGroup
     {
@@ -567,7 +631,7 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public int SettlementType { set; get; }
-        public string TpUserName  { get; set; }
+        public string TpUserName { get; set; }
     }
     public class WinLoseSummaryDetailResult
     {
@@ -579,11 +643,33 @@ namespace BackendSite.Service.Model
         public string TpUserName { get; set; }
     }
 
-    public class CustDashBoardTodayModel
+
+    public class ImportDataByExcelModel
     {
-        public decimal TodayDeposit { get; set; }
-        public decimal TodayWithdrawal { get; set; }
-        public decimal TodayWinLoss { get; set; }
-        public decimal TodayBetting { get; set; }
+        public string UserNameList { get; set; }
+        public string CustIdList { get; set; }
+        public int SiteId { get; set; }
+    }
+
+    public class BatchCustInfo
+    {
+        public int BatchId { get; set; }
+        public string Author { get; set; }
+        public int Status { get; set; }
+        public DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string StatusName { get; set; }
+        public string Url { get; set; }
+        public string Memo { get; set; }
     }
 }
