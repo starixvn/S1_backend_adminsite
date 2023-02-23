@@ -558,6 +558,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var apiResult = new ApiResult();
             try
             {
+                var depositRequest = _depositBll.GetDepositRequest(depositReceipt.TransId);
+
+                if (depositRequest.Status is not (int)DepositStatusEnum.Pending or (int)DepositStatusEnum.OnHold)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Wrong status ,Can't upload receipt";
+                    return apiResult;
+                }
+                
                 if (depositReceipt.Receipt != null && _contentTypesCheck.ContainsKey(depositReceipt.Receipt.ContentType))
                 {
                     await using var fileStream = depositReceipt.Receipt.OpenReadStream();
@@ -604,7 +613,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <remarks/>
         /// Http Method：POST
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 78 })]
         [HttpPost]
         public async Task<ApiResult> DeleteReceipt(DeleteReceiptRequest request)
         {
@@ -612,11 +620,30 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             try
             {
                 var depositReceipt = _depositBll.GetDepositReceiptByNo(request.TransId , request.ReceiptNo);
-
                 if (depositReceipt.CreateFrom == (int)DepositReceiptCreateFromEnum.User)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Can't delete receipt from user";
+                    return apiResult;
+                }
+                
+                var depositRequest = _depositBll.GetDepositRequest(request.TransId);
+                var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
+                
+                bool permission;
+                if (depositRequest.Status is (int)DepositStatusEnum.Approved or (int)DepositStatusEnum.Rejected or (int)DepositStatusEnum.Canceled)
+                {
+                    permission = permissionList.Contains(78); //刪除權限
+                }
+                else
+                {
+                    permission = permissionList.Contains(77); //新增權限
+                }
+                
+                if (!permission)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.PermissionDenied;
+                    apiResult.Message = "Permission Denied";
                     return apiResult;
                 }
                 
@@ -635,12 +662,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 else
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "DeleteReceipt Fail";
+                    apiResult.Message = "Delete Receipt Fail";
                 }
             }
             catch (Exception e)
             {
-                throw new AdminException(ErrorCodeEnum.Fail, $"DeleteReceipt Fail. {e.Message}");
+                throw new AdminException(ErrorCodeEnum.Fail, $"Delete Receipt Fail. {e.Message}");
             }
            
             return apiResult;
