@@ -840,5 +840,10 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId , _Top = 10}));
         }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoWalletDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<USDTDetail>("Admin_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
     }
 }
