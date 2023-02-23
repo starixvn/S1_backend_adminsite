@@ -776,8 +776,8 @@ namespace BackendSite.Service.Model.enums
         SetCustInfoNote = 81,
         DeleteSMSInfo = 82,
         CancelBonusInCustInfo = 83,
-        SetBlockCryptoWallet = 90,
-        ReleaseCryptoWallet = 91,
+        SetBlockCryptoWallet = 84,
+        ReleaseCryptoWallet = 85,
     }
 
     #region BankFinancialTransferInfoLog
