@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -326,6 +327,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 1 })]
         public ApiListResult<BlockCryptoWallet> GetBlockCryptoWallet(GetBlockCryptoWalletRequest request)
         {
             var custBlockCryptoWallet = _blockBLL.GetBlockCryptoWallet(request.StartDate.DateTime, request.EndDate.DateTime, request.Status, request.Address, request.CurrencyId, request.UserName, request.CryptoType, request.NetWork);
@@ -337,6 +339,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 3 })]
         public ApiListResult<BlockCryptoWalletList> GetBlockCryptoWalletList(BlockCryptoWalletRequest request)
         {
             var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address);
@@ -348,6 +351,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 3 })]
         public ApiResult BlockCryptoWalletSet(ApiRequestWithLog<BlockCryptoWalletSetRequest> request)
         {
             var result = _blockBLL.BlockCryptoWalletSet(new ParamsWithLog<BlockCryptoWalletSetRequest>(request, User.Identity.Name));
@@ -370,6 +374,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 4 })]
         public ApiResult ReleaseCryptoWallet(ApiRequestWithLog<ReleaseCryptoWalletRequest> request)
         {
             var result = _blockBLL.ReleaseCryptoWallet(new ParamsWithLog<ReleaseCryptoWalletRequest>(request, User.Identity.Name));
