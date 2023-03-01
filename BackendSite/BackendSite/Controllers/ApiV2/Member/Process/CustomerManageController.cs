@@ -3047,6 +3047,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         MainType = model.MainType,
                         Amount = model.ChangeWithdrawalLimit,
                         Memo = model.Memo,
+                        ReasonId = model.ReasonId,
                         RefTransId = model.RefTransId,
                         Creator = model.Creator,
                         CreateTime = model.CreateTime
