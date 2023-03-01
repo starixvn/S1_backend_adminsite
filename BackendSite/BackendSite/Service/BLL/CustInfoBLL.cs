@@ -1109,7 +1109,7 @@ namespace BackendSite.Service.BLL
                 {
                     try
                     {
-                        var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList), UserNameList = JsonConvert.SerializeObject(userNameList) });
+                        var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList.Distinct()), UserNameList = JsonConvert.SerializeObject(userNameList.Distinct()) });
                         var allTagList = await _tagll.GetAllTag();
                         var data = custInfo.Select(a => new MemberExportData()
                         {
