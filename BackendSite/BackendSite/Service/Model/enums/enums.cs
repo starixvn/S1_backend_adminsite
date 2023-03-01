@@ -991,6 +991,8 @@ namespace BackendSite.Service.Model.enums
         Advanced = 18,
         [Description("TEST")]
         Test = 19,
+        [Description("UNDER CREDIT")]
+        UnderCredit = 20,
         Deposit = 98,
         Withdrawal = 99
     }
