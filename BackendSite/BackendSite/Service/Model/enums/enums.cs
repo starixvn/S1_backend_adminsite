@@ -1761,4 +1761,11 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+
+    public enum BlockCryptoStatus
+    {
+        SelectAll = 0,
+        Block = 1,
+        Unlock = 2
+    }
 }
