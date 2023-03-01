@@ -121,12 +121,12 @@ namespace BackendSite.Service.BLL
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser)
         {
             var result = new List<AdminMenuModel>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
 
-            //Enable & Sort
-            menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
-            permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            // Sort
+            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
