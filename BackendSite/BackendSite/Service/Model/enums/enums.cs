@@ -984,7 +984,9 @@ namespace BackendSite.Service.Model.enums
         [Description("ADVANCED")]
         Advanced = 18,
         [Description("TEST")]
-        Test = 19
+        Test = 19,
+        [Description("UNDER CREDIT")]
+        UnderCredit = 20
     }
 
     /// <summary>
