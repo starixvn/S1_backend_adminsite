@@ -395,8 +395,8 @@ namespace BackendSite.Service.BLL
         {
             NewPermission result = new NewPermission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = _adminService.GetAllAdminMenu();
-            var permissionList = _adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = _adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             if (loginUser.IsSuper)
@@ -480,7 +480,7 @@ namespace BackendSite.Service.BLL
             RoleData result = new RoleData();
             List<Permission> permissionReslut = new List<Permission>();
             var menuList = _adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
-            var permissionList = _adminService.GetAllAdminPermission();
+            var permissionList = _adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             var rolePermissions = _permissionService.GetRolePermission(role).ToList();
@@ -674,8 +674,8 @@ namespace BackendSite.Service.BLL
         {
             AddUserPremission result = new AddUserPremission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = _adminService.GetAllAdminMenu();
-            var permissionList = _adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = _adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             var rolePermissions = _permissionService.GetRolePermission(role).ToList();
@@ -795,8 +795,8 @@ namespace BackendSite.Service.BLL
         {
             UpdateUserPermission result = new UpdateUserPermission();
             List<Permission> permissionReslut = new List<Permission>();
-            var menuList = _adminService.GetAllAdminMenu();
-            var permissionList = _adminService.GetAllAdminPermission();
+            var menuList = _adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = _adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable);
             var heirIdList = menuList.Where(x => x.HeirId != 0).Select(x => x.HeirId).Distinct();
             var assignFuncDatas = menuList.Where(x => x.HeirId == 0 && !heirIdList.Contains(x.Id));
             var rolePermissions = _permissionService.GetRolePermission(role).ToList();
