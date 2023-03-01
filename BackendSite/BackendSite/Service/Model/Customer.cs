@@ -484,6 +484,7 @@ namespace BackendSite.Service.Model
         public decimal BeforeWithdrawalLimit { get; set; }
         public decimal AfterWithdrawalLimit { get; set; }
         public string Memo { get; set; }
+        public int ReasonId { get; set; }
         public string RefTransId { get; set; }
         public int CreateFrom { get; set; }
         public string Creator { get; set; }
@@ -507,6 +508,7 @@ namespace BackendSite.Service.Model
         public int MainType { get; set; }
         public decimal Amount { get; set; }
         public string Memo { get; set; }
+        public int ReasonId { get; set; }
         public string RefTransId { get; set; }
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { get; set; }
