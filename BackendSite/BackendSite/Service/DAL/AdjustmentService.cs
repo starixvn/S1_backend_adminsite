@@ -196,7 +196,7 @@ namespace BackendSite.Service.DAL
             
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
             var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
-                amount, input.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment , input.Operator, out var afterAmount, conn, trans);
+                amount, (int)input.ReasonId, input.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment , input.Operator, out var afterAmount, conn, trans);
 
             if (result < 1)
             {
@@ -286,7 +286,7 @@ namespace BackendSite.Service.DAL
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment , Operator ,out var AfterAmount, conn, trans);
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment , Operator ,out var AfterAmount, conn, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -411,7 +411,7 @@ namespace BackendSite.Service.DAL
                             else
                             {
                                 var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.BalanceAdjustment , Operator ,out _, conn, trans);
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Category ,adjustmentAndWithdrawalLimit.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.BalanceAdjustment , Operator ,out _, conn, trans);
                                 //return 0;
                             }
                         }
