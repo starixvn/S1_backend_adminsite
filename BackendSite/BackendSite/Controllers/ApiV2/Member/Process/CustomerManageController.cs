@@ -2448,7 +2448,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         (int)AdminAdjustmentLogMenuEnum.SetCustomerInfo,
                         (int)AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo,
                         (int)AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
-                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote
+                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote,
+                        (int)AdminAdjustmentLogMenuEnum.SetCustomerFullName,
                     },
                     ActionTypes = new List<int>
                     {

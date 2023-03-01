@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// TpMaintenance/GetList 取得第三方維護資訊清單
         /// </summary>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 19, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 60, 1 })]
         public ApiListResult<TpMaintainForV2> GetList(GetListRequest request)
         {
             var result = new List<TpMaintainForV2>();
@@ -173,7 +173,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </summary>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 19, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 60, 3 })]
         public async Task<ApiResult> CreateAsync(CreateRequest request)
         {
             try
@@ -209,7 +209,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </summary>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 19, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 60, 3 })]
         public ApiResult Update(UpdateRequest request)
         {
             try
@@ -243,7 +243,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// </summary>
         /// <param name="request"></param>
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 19, 4 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 60, 4 })]
         public ApiResult Delete(DeleteRequest request)
         {
             try
