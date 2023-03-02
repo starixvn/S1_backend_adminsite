@@ -62,7 +62,7 @@ namespace BackendSite.Service.Model
                 Id = Id,
                 Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
                 EName = nameObj.en,
-                CName = nameObj.ch,
+                CName = nameObj.cs,
                 CurrencyStatusList = currencyStatusList
             };
         }

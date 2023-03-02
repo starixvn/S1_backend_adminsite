@@ -41,13 +41,6 @@ namespace BackendSite.Controllers.Api
 
         #endregion
 
-        public class TitleModel
-        {
-            public string Name { get; set; }
-
-            public int SortId { get; set; }
-        }
-
 
         #region API Model
 
