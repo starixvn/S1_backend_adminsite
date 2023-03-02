@@ -820,7 +820,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                 
-                if (withdrawalRequest.Status is not WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved)
+                if (withdrawalRequest.Status is not (WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";
