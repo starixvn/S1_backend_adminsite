@@ -340,7 +340,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 3 })]
-        public ApiListResult<BlockCryptoWalletList> GetBlockCryptoWalletList(BlockCryptoWalletRequest request)
+        public ApiListResult<BlockCryptoWalletList> CryptoWalletGetByAddress(BlockCryptoWalletRequest request)
         {
             var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address);
             return new ApiListResult<BlockCryptoWalletList>
