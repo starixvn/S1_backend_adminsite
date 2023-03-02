@@ -1666,4 +1666,10 @@ namespace BackendSite.Service.Model.enums
         Block = 1,
         Unlock = 2
     }
+    public enum CustCryptoWalletDetailSatatus
+    {
+        Delete = 0,
+        Open = 1,
+        BoDelete = 2
+    }
 }
