@@ -2007,8 +2007,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             if (_redisHelper.KeyExists(redisKey))
                 return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
+
             var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime,
                 request.EndTime, format, request.DateType);
+
+            data = data.Where(x => !string.IsNullOrEmpty(x.UserName));
+
             var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             return data;
         }
