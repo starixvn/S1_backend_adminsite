@@ -176,6 +176,8 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.Query<T>(name, commandType: CommandType.Text);
+                connection.Close();
+                connection.Dispose();
             }
             catch (Exception e)
             {
@@ -196,6 +198,8 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
+                connection.Close();
+                connection.Dispose();
             }
             catch (Exception e)
             {
