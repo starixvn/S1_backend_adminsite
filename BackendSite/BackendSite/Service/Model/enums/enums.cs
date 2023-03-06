@@ -166,6 +166,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
     #endregion
 
     #region CustProfile
@@ -617,7 +623,32 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
+    
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15
+    }
+    
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -986,7 +1017,9 @@ namespace BackendSite.Service.Model.enums
         [Description("TEST")]
         Test = 19,
         [Description("UNDER CREDIT")]
-        UnderCredit = 20
+        UnderCredit = 20,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1185,8 +1218,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
-
+    
     #region Banner
 
     public enum BannerTypeEnum
@@ -1303,6 +1335,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1376,7 +1409,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         Lock = 1,
@@ -1445,6 +1477,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
+
 
     public enum ShieldRiskTagged
     {
@@ -1532,7 +1565,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    
+
     public enum PaymentReportGroupByEnum
     {
         Date = 1,
