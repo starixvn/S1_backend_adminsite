@@ -192,7 +192,7 @@ public class MemberService : IMemberService
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
+    public async Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -200,14 +200,14 @@ public class MemberService : IMemberService
 
         if (!duplicateAccounts.Any())
         {
-            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p) > 0;
+            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p) > 0;
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
         conn.Open();
         await using var trans = await conn.BeginTransactionAsync();
         
-        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p, conn, trans) > 0;
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p, conn, trans) > 0;
 
         if (success)
         {
