@@ -194,6 +194,7 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
+        p.Add("_SiteId", siteId);
         p.Add("_FullName", fullName);
 
         if (!duplicateAccounts.Any())
