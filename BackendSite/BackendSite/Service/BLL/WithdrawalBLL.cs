@@ -226,14 +226,16 @@ namespace BackendSite.Service.BLL
             }
 
             var accountingModelString = string.Empty;
+            var chargeFee = 0m;
             if (withdrawalType is (int) WithdrawalTypeEnum.CryptoWallet or (int) WithdrawalTypeEnum.LocalBank)
             {
                 accountingModelString = SetAccountingString(accountingModels);
+                chargeFee = accountingModels.Sum(x => x.ChargeFee);
             }
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModelString , out custId, out amount ,userId);
+                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModelString , out custId, out amount ,userId, chargeFee:chargeFee);
         }
 
         public int WithdrawalOnHold(string transId, string comment, string updater)

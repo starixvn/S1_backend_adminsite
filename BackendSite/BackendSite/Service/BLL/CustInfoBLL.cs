@@ -7,6 +7,9 @@ using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
 using System.Linq;
+using BarcodeReader.ImageSharp;
+using NPOI.SS.Formula.Functions;
+using NuGet.Protocol;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
 using Amazon.S3.Model;
@@ -278,7 +281,7 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.ResetCustUSDTInfo(CustId);
         }
-        public int CancelBonusByBonusId(int bonusId)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(int bonusId, string @operator)
         {
             var statusList = new List<int>
             {
@@ -286,7 +289,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), out var CustId);
+            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
@@ -437,9 +440,34 @@ namespace BackendSite.Service.BLL
 
         #region Customer Note
 
-        public bool AddCustNote(int custId, string note, string @operator, bool canEdit = false)
+        public async Task<bool> AddCustNote(int custId, string note, string @operator, bool canEdit = false)
         {
-            return _custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit);
+            var custSimpleInfo = await GetCustId(custId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!_custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit))
+            {
+                _logger.LogError($"SetNote: Add Note Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
+                trans.Rollback();
+                return false;
+            }
+
+            if (canEdit)
+            {
+                var afterData = new { Note = note, CanEdit = false };
+                if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
+                {
+                    _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
+                    trans.Rollback();
+                    return false;
+                }
+            }
+
+            trans.Commit();
+            return true;
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
             int pageSize,
@@ -453,10 +481,38 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         }
-        public bool SetCustNotes(int noteId, string note, int type, string Operator)
+        public async Task<bool> SetCustNotes(int noteId, string note, int type, string Operator)
         {
-            return _custInfoService.SetCustNotes(noteId, note, type, Operator);
+            var noteBeforeInfo = await GetNoteById(noteId);
+            var custSimpleInfo = await GetCustId(noteBeforeInfo.First().CustId, null, null);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            if (!_custInfoService.SetCustNotes(noteId, note, type, Operator))
+            {
+                _logger.LogError($"SetNote: Set Note Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}.");
+                trans.Rollback();
+                return false;
+            }
+            var actionType = type == (int)SetCustNoteTypeEnum.Delete ? ActionType.Delete : ActionType.Update;
+            var beforeData = new { NoteId = noteId, Note = noteBeforeInfo.First().Note };
+            var afterData = new { NoteId = noteId, Note = note };
+
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
+                actionType == ActionType.Delete ? null : afterData,
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
+            {
+                _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
+                trans.Rollback();
+                return false;
+            }
+
+            trans.Commit();
+            return true;
         }
+
+        public async Task<IEnumerable<CustNote>> GetNoteById(int id) => await _custInfoService.GetNoteById(id);
 
         #endregion
 
@@ -710,7 +766,7 @@ namespace BackendSite.Service.BLL
             var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CurrencyId, beforeData.ToString(), afterData.ToString(),
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
                 AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");

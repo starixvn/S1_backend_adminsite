@@ -176,6 +176,8 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.Query<T>(name, commandType: CommandType.Text);
+                connection.Close();
+                connection.Dispose();
             }
             catch (Exception e)
             {
@@ -196,6 +198,8 @@ namespace BackendSite.Service.Library
             {
                 using var connection = new MySqlConnection(_connectionString);
                 result = connection.Query<T>(name, parameters, commandType: CommandType.StoredProcedure, commandTimeout: timeOut);
+                connection.Close();
+                connection.Dispose();
             }
             catch (Exception e)
             {
@@ -347,6 +351,20 @@ namespace BackendSite.Service.Library
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
+        }
+        
+        public void CommitAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
+        {
+            trans.Commit();
+            conn.Close();
+            conn.Dispose();
+        }
+        
+        public void RollbackAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
+        {
+            trans.Rollback();
+            conn.Close();
+            conn.Dispose();
         }
     }
 }

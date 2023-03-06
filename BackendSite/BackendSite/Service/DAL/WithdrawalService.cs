@@ -80,7 +80,6 @@ namespace BackendSite.Service.DAL
                     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
                 }
             }
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             
             var p = new DynamicParameters(new
             {
@@ -106,14 +105,14 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V6", p, commandType: CommandType.StoredProcedure).ToList();
+            currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V6", p).ToList();
             
             #endregion
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V10", p, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V10", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -445,7 +444,8 @@ namespace BackendSite.Service.DAL
             out int custId,
             out decimal amount,
             int userId = 0,
-            bool hasPic = false)
+            bool hasPic = false,
+            decimal chargeFee = 0)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
@@ -467,7 +467,7 @@ namespace BackendSite.Service.DAL
                     /*Approved don't to Set WithdrawalInfo*/
                     (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
                         ? null : withdrawalInfo),
-                    withdrawalType,
+                    withdrawalType, chargeFee,
                     out custId, out var userName, out amount, out paraLog,
                     conn, trans);
 
@@ -588,6 +588,7 @@ namespace BackendSite.Service.DAL
             WithdrawalStatusEnum status,
             string withdrawalInfo,
             int? withdrawalType,
+            decimal chargeFee,
             out int custId,
             out string userName,
             out decimal amount,
@@ -603,39 +604,39 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                WithdrawalId = withdrawalId,
-                SiteId = siteId,
-                Comment = comment,
-                ForStatus = forStatus,
-                Status = (int)status,
-                WithdrawalInfo = withdrawalInfo,
-                WithdrawalType = withdrawalType,
-                RefId = (string)null,
-                Operator = updater
+                _WithdrawalId = withdrawalId,
+                _SiteId = siteId,
+                _Comment = comment,
+                _ForStatus = forStatus,
+                _Status = (int)status,
+                _WithdrawalInfo = withdrawalInfo,
+                _WithdrawalType = withdrawalType,
+                _ChargeFee = chargeFee,
+                _RefId = (string)null,
+                _Operator = updater
             });
-            p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-            p.Add("Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+            p.Add("_Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             if (conn == null)
             {
                 //No execute in transaction
-                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-                result = connection.Execute("Admin_WithdrawalInfo_Set", p, commandType: CommandType.StoredProcedure);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", p);
             }
             else
             {
                 //Execute in transaction
-                result = conn.Execute("Admin_WithdrawalInfo_Set", p, trans, commandType: CommandType.StoredProcedure);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", p, conn, trans);
             }
 
-            custId = p.Get<int?>("CustId") ?? 0;
-            userName = p.Get<string>("UserName");
-            amount = p.Get<decimal>("Amount");
+            custId = p.Get<int?>("_CustId") ?? 0;
+            userName = p.Get<string>("_UserName");
+            amount = p.Get<decimal>("_Amount");
 
             foreach (var paraName in p.ParameterNames)
             {
-                var value = Convert.ToString(p.Get<dynamic>(paraName));
+                var value = Convert.ToString(p.Get<object>(paraName));
                 paraLog.Add(paraName, value);
             }
 

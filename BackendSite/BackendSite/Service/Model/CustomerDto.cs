@@ -601,6 +601,32 @@ public class LoginLogPageData
     public int RowCount { get; set; }
 }
 
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+    public string TagList { get; set; }
+}
+
+public class CustTagList
+{
+    public int CustId { get; set; }
+        
+    public string StrTagList { get; set; }
+
+    public IEnumerable<int> TagList { get; set; }
+}
+
+public class CustRealNameChangeLog
+{
+    public string BeforeName { get; set; }
+    public string AfterName { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
+    public string Operator { get; set; }
+}
+
 public class GetListByFileRequest
 {
     public int SiteId { get; set; }

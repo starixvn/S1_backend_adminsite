@@ -90,6 +90,7 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int Type { get; set; }
         public int SiteId { get; set; }
+        public int CustId { get; set; }
         public string LangId { get; set; }
         public string Recipient { get; set; }
         public string Sender { get; set; }

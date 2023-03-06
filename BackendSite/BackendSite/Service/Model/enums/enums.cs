@@ -223,7 +223,7 @@ namespace BackendSite.Service.Model.enums
         MobilePay = 2,
         LocalBanking = 3,
         CryptoPay = 4,
-        LoadCard = 5, //No Use
+        LoadCard = 5,
         QRPay = 6,
         BankAutoChannel = 7
     }
@@ -355,7 +355,7 @@ namespace BackendSite.Service.Model.enums
 
     public enum WithdrawalTypeEnum
     {
-        Undefine = 0, //No Use
+        Undefined = 0,
         OnlinePayment = 1,
         LocalBank = 2,
         CryptoPay = 4,
@@ -771,7 +771,11 @@ namespace BackendSite.Service.Model.enums
         SetDepositMessage = 76,
         SiteMaintenance = 77,
         SetVideoInfo = 78,
-        SetWithdrawalMessage = 80
+        SMSGenerator = 79,
+        SetWithdrawalMessage = 80,
+        SetCustInfoNote = 81,
+        DeleteSMSInfo = 82,
+        CancelBonusInCustInfo = 83
     }
 
     #region BankFinancialTransferInfoLog
@@ -980,7 +984,9 @@ namespace BackendSite.Service.Model.enums
         [Description("ADVANCED")]
         Advanced = 18,
         [Description("TEST")]
-        Test = 19
+        Test = 19,
+        [Description("UNDER CREDIT")]
+        UnderCredit = 20
     }
 
     /// <summary>
@@ -1526,6 +1532,15 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
+    
+    public enum PaymentReportGroupByEnum
+    {
+        Date = 1,
+        Month = 2,
+        Gateway = 3,
+        Type = 4,
+        Currency = 5
+    }
 
     #endregion
     public enum BlockEWalletStatus
@@ -1567,7 +1582,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Payment not received")]
         PaymentNotReceived = 2,
         [Description("Deposit refunded")]
-        DepositRefunded = 3
+        DepositRefunded = 3,
+        [Description("Wrong Amount submitted")]
+        WrongAmountSubmitted = 4,
+        [Description("Wrong Bank submitted")]
+        WrongBankSubmitted = 5
     }
 
     public enum WithdrawalMessageStatus
@@ -1575,7 +1594,55 @@ namespace BackendSite.Service.Model.enums
         [Description("Name unmatch")]
         WithdrawalAccountsNameUnmatch = 0,
         [Description("Account number incorrect")]
-        WithdrawalAccountNumberIncorrect = 1
+        WithdrawalAccountNumberIncorrect = 1,
+        [Description("Withdrawal account cannot receive money")]
+        WithdrawalAccountAannotReceiveMoney = 2,
+        [Description("Beneficiary's account maintenance")]
+        BeneficiarysAccountMaintenance = 3
+    }
+
+    public enum MpaTransactionRelaySummaryTypeEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
+    public enum MpaWinLossGroupByTypeEnum
+    {
+        Date = 1,
+        Month = 2,
+        GameType = 3,
+        Currency = 4,
+        Player = 5,
+        TpCategory = 6
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 GameType 的 GGR 計算方法需要客製
+    /// </summary>
+    public enum MpaGGRCustomizationGameTypeEnum
+    {
+        OneGamingPoker = 41,
+        V8Poker = 42
+    }
+
+    /// <summary>
+    /// 在此 Enum 的 TpId 的 佣金來源從別的地方抓取
+    /// </summary>
+    public enum MpaCommissionCustomizationTpIdEnum
+    {
+        NineW = 31,
+    }
+
+    public enum MpaDateType
+    {
+        SettledDate = 1,
+        CreatedDate = 2
+    }
+    
+    public enum CustTagEnum
+    {
+        Duplicate = 6
     }
 
     public enum BatchCustInfoStatus

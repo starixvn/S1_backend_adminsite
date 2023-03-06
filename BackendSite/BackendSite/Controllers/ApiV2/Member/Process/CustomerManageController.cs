@@ -490,13 +490,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
-        
+
         public class GetCustTPWalletResult
         {
             public decimal TotalTpWalletBalance { get; set; }
             public IEnumerable<TpWallet> TpWalletList { get; set; }
         }
-        
+
         public class GetTodayDashboardRequest
         {
             public int CustId { get; set; }
@@ -1691,7 +1691,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
         {
             request.PageNumber = -1; //export all
-            var offset = request.StartDate.Offset;      
+            var offset = request.StartDate.Offset;
             var startDate = request.StartDate.ToUniversalTime().DateTime;
             var endDate = request.EndDate.ToUniversalTime().DateTime;
 
@@ -2163,10 +2163,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 56 })]
         [HttpPost]
-        public ApiResult AddCustNote(AddCustNoteRequest request)
+        public async Task<ApiResult> AddCustNote(AddCustNoteRequest request)
         {
-
-            var data = _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
+            var data = await _custInfoBll.AddCustNote(request.CustId, request.Note, User.Identity.Name, true);
 
             if (data)
             {
@@ -2232,19 +2231,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult SetCustNote(SetCustNoteRequest request)
+        public async Task<ApiResult> SetCustNote(SetCustNoteRequest request)
         {
-            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission(22, new []{56}))
+            if (request.Type == SetCustNoteTypeEnum.Update && !_permissionBll.CheckPermission(22, new[] { 56 }))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission(22, new []{57}))
+            if (request.Type == SetCustNoteTypeEnum.Delete && !_permissionBll.CheckPermission(22, new[] { 57 }))
             {
                 throw new AdminException(ErrorCodeEnum.PermissionDenied);
             }
-            var data = _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
+            var result = await _custInfoBll.SetCustNotes(request.NoteId, request.Note, (int)request.Type, User.Identity.Name);
 
-            if (data)
+            if (result)
             {
                 var Menu = "CustManage/CustInfoList";
                 var Info = new Dictionary<string, dynamic>();
@@ -2265,7 +2264,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Modify Success."
                 };
             }
-            
+
             throw new AdminException(ErrorCodeEnum.Fail, "Modify Fail.");
         }
 
@@ -2366,14 +2365,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiResult DeletePersonalMsg(DeleteMessageRequest request)
+        public async Task<ApiResult> DeletePersonalMsg(DeleteMessageRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                _messageBll.DeletePersonalMsg(request.Id, request.IsBatch);
-
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                if (!await _messageBll.DeletePersonalMsg(request.Id, request.IsBatch, User.Identity.Name))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Delete Fail.";
+                }
+                else
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
             {
@@ -2409,7 +2412,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.EndDate.ToUniversalTime().DateTime);
             return new ApiResult<dynamic>
             {
-                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName}),
+                Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName }),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -2428,27 +2431,60 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request">參數</param>
         /// <returns>結果</returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 37 })]
         [HttpPost]
-        public ApiListResult<GetAdminOperateLog> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
+        public ApiListResult<AdminAdjustmentLogReport> GetAdminOperateLogByCustId(CustIdWithDateRangeAndPageRequest request)
         {
-            var apiListResult = new ApiListResult<GetAdminOperateLog>();
-            var pageNumber = request.PageNumber;
-            var depositRequestList = _serverInfoBll.GetAdminOperateLog(request.CustId,
-                null,
-                null,
-                request.StartDate,
-                request.EndDate,
-                 request.PageSize,
-                ref pageNumber,
-                out var totalPages,
-                out var rowCount);
-            apiListResult.Data = depositRequestList;
-            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            apiListResult.PageNumber = pageNumber;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.RowCount = rowCount;
+            var apiResult = new ApiListResult<AdminAdjustmentLogReport>();
+            try
+            {
+                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+                var bllRequest = new GetAdminAdjustmentInfoLogInput()
+                {
+                    SiteIds = new List<int> { custInfo.SiteId },
+                    CurrencyIds = new List<int> { custInfo.CurrencyId },
+                    Menus = new List<int>
+                    {
+                        (int)AdminAdjustmentLogMenuEnum.SetCustomerInfo,
+                        (int)AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo,
+                        (int)AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
+                        (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote,
+                        (int)AdminAdjustmentLogMenuEnum.SetCustomerFullName,
+                    },
+                    ActionTypes = new List<int>
+                    {
+                        (int)ActionType.Create,
+                        (int)ActionType.Update,
+                        (int)ActionType.Delete
+                    },
+                    UserName = null,
+                    TransId = null,
+                    StartDate = request.StartDate,
+                    EndDate = request.EndDate,
+                    CustId = request.CustId,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
 
-            return apiListResult;
+                var searchResult = _adjustmentLogReportBll.GetAdminAdjustmentInfoLog(bllRequest);
+
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    Data = searchResult.AdminAdjustmentLogReport,
+                    PageNumber = searchResult.PageNumber,
+                    TotalPages = searchResult.TotalPages,
+                    RowCount = searchResult.RowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiListResult<AdminAdjustmentLogReport>
+                {
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    Message = ex.Message
+                };
+            }
         }
 
         #endregion
@@ -2751,7 +2787,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
 
             var Menu = "CustManage/CustInfoList";
             var Info = new Dictionary<string, dynamic>();
@@ -2780,7 +2816,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_setCustTag" })]
         [HttpPost]
-        public ApiResult SetTag(SetCustTagRequest request)
+        public async Task<ApiResult> SetTag(SetCustTagRequest request)
         {
             if (_custInfoBll.SetCustTag(request.CustId, request.Tags, User.Identity.Name) > 0)
             {
@@ -2795,7 +2831,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     });
                     selectTag = JsonConvert.SerializeObject(temp);
                 }
-                _custInfoBll.AddCustNote(request.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
+                await _custInfoBll.AddCustNote(request.CustId, $"Set Cust Tag:{selectTag}", User.Identity.Name);
                 return new ApiResult
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
@@ -2939,7 +2975,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 _ => throw new AdminException(ErrorCodeEnum.CustStatusIsClosed)
             };
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
         {
@@ -2949,7 +2985,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return new ApiResult<CustDashBoardTodayModel>
             {
-                ErrorCode = (int) ErrorCodeEnum.Success,
+                ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = result
             };
         }
