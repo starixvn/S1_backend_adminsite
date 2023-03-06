@@ -1677,4 +1677,11 @@ namespace BackendSite.Service.Model.enums
     {
         Duplicate = 6
     }
+
+    public enum BatchCustInfoStatus
+    {
+        Pending = 0,
+        Finished = 1,
+        Failed = 2
+    }
 }
