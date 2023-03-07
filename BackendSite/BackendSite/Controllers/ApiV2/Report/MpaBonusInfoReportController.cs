@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -281,6 +282,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region MpaBonusInfo
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
         public ApiListResult<MpaBonusInfo> GetInfoData(GetDataRequest request)
         {
             var result = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out var pageInfo);
@@ -289,6 +291,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 2 })]
         public IActionResult ExportInfoData(GetDataRequest request)
         {
             request.PageNumber = -1; //export all
@@ -299,6 +302,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
         public ApiListResult<MpaBonusDetail> GetDetailData(GetDetailRequest request)
         {
             var result = _mpaBonusInfoBll.GetMpaBonusDetailList(request, out var pageInfo);
@@ -307,6 +311,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 2 })]
         public IActionResult ExportDetailData(GetDetailRequest request)
         {
             request.PageNumber = -1; //export all
@@ -321,6 +326,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region MpaMarketingBonus
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaMarketingBonus(GetMarketingDataRequest request)
         {
             var result = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
@@ -333,6 +339,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(GetMarketingDetailRequest request)
         {
             var result = _mpaBonusInfoBll.GetMpaMarketingBonusDetail(request, out var pageInfo);
@@ -340,6 +347,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             return new ApiListResult<MpaMarketingBonusDetail>(ErrorCodeEnum.Success, pageInfo, result);
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public IActionResult Export(GetMarketingDataRequest request)
         {
 

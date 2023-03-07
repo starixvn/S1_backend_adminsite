@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -149,6 +150,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #endregion 
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaNRUReport(GetMarketingNRUDataRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRU(request);
@@ -161,6 +163,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaNRUBonusReport(GetMarketingNRUDataRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRUBonus(request);
@@ -173,6 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<MpaMarketingNRUBonusDetail> GetMpaNRUBonusDetailReport(GetMarketingNRUBonusDetailRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRUBonusDetail(request, out var pageInfo);
@@ -180,6 +184,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             return new ApiListResult<MpaMarketingNRUBonusDetail>(ErrorCodeEnum.Success, pageInfo, result);
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public IActionResult Export(GetMarketingNRUDataRequest request)
         {
             #region Get Data
