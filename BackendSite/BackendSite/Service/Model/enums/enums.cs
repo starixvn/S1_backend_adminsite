@@ -1063,6 +1063,8 @@ namespace BackendSite.Service.Model.enums
         Test = 19,
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
+        [Description("REFUND")]
+        Refund = 21,
         Deposit = 98,
         Withdrawal = 99
     }
