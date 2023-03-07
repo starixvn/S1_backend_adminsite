@@ -108,14 +108,14 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V6", p, commandType: CommandType.StoredProcedure).ToList();
+            currencyAmount = conn.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p, commandType: CommandType.StoredProcedure).ToList();
             
             #endregion
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V10", p, commandType: CommandType.StoredProcedure);
+            var result = conn.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V11", p, commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -264,7 +264,7 @@ namespace BackendSite.Service.DAL
             });
 
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V9", p,
+            var depositList = conn.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p,
                 commandType: CommandType.StoredProcedure);
             return depositList;
         }
