@@ -234,7 +234,7 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_IsGroupByDate", isGroupByDate);
             
-            var result = _mainDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
+            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
 
             return result.ToList();
         }
@@ -257,7 +257,7 @@ namespace BackendSite.Service.DAL
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             
-            var result = _mainDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
+            var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
             return result.ToList();
         }
         
@@ -275,7 +275,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             
-            var result = _mainDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
 
             return result.ToList();
         }
@@ -294,7 +294,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
 
-            var result = _mainDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
 
             return result.ToList();
         }
