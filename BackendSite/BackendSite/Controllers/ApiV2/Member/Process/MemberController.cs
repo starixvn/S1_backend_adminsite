@@ -514,7 +514,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
+            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName.Trim(), User.Identity.Name);
 
             if (result)
             {
