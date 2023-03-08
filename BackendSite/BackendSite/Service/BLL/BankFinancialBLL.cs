@@ -1075,12 +1075,12 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
-            {
-                message = "Data-[From Bank Code] invalid.";
-
-                return false;
-            }
+            // if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
+            // {
+            //     message = "Data-[From Bank Code] invalid.";
+            //
+            //     return false;
+            // }
 
             if (bankFinancialTransferInfoDetail.FromAccountNo == null)
             {
@@ -1168,12 +1168,12 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
-            {
-                message = "Data-[To Bank Code] invalid.";
-
-                return false;
-            }
+            // if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
+            // {
+            //     message = "Data-[To Bank Code] invalid.";
+            //
+            //     return false;
+            // }
 
             if (bankFinancialTransferInfoDetail.ToAccountNo == null)
             {
@@ -1279,12 +1279,12 @@ namespace BackendSite.Service.BLL
                     return false;
                 }
 
-                if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
-                {
-                    message = "Data-[From Bank Code] invalid.";
-
-                    return false;
-                }
+                // if (bankFinancialTransferInfoDetail.FromSysId == null || bankFinancialTransferInfoDetail.FromSysId == 0)
+                // {
+                //     message = "Data-[From Bank Code] invalid.";
+                //
+                //     return false;
+                // }
 
                 if (bankFinancialTransferInfoDetail.FromAccountNo == null)
                 {
@@ -1372,12 +1372,12 @@ namespace BackendSite.Service.BLL
                     return false;
                 }
 
-                if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
-                {
-                    message = "Data-[To Bank Code] invalid.";
-
-                    return false;
-                }
+                // if (bankFinancialTransferInfoDetail.ToSysId == null || bankFinancialTransferInfoDetail.ToSysId == 0)
+                // {
+                //     message = "Data-[To Bank Code] invalid.";
+                //
+                //     return false;
+                // }
 
                 if (bankFinancialTransferInfoDetail.ToAccountNo == null)
                 {
