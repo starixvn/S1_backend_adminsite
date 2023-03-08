@@ -986,7 +986,9 @@ namespace BackendSite.Service.Model.enums
         [Description("TEST")]
         Test = 19,
         [Description("UNDER CREDIT")]
-        UnderCredit = 20
+        UnderCredit = 20,
+        [Description("REFUND")]
+        Refund = 21
     }
 
     /// <summary>
