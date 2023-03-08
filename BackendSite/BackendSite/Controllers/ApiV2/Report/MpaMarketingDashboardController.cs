@@ -32,8 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #endregion
         
-
-        #region MpaBonusInfo
+        #region PerformanceHighlight
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
@@ -56,7 +55,31 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
         
-        
+        #endregion
+
+        #region UserActivities
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
+        public ApiListResult<UserActivitiesData> GetUserActivitiesData(GetUserActivitiesDataRequest request)
+        {
+            var apiResult = new ApiListResult<UserActivitiesData>();
+            
+            try
+            {
+                var data = _mpaMarketingDashboardBll.GetUserActivitiesData(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         #endregion
         
     }

@@ -46,6 +46,24 @@
         }
     }
     
+    public class GetUserActivitiesDataRequest
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public int SiteId { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        
+    }
     
     public class PerformanceHighlightData
     {
@@ -87,6 +105,12 @@
         public int BasedOnReportTotalUsers { get; set; }
     }
     
+    public class UserActivitiesData
+    {
+        public DateTime RecordDate { get; set; }
+        public int ActiveUsersCount { get; set; }
+        public int NRUCount { get; set; }
+    }
     
 }
 

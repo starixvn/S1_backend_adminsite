@@ -167,8 +167,40 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        #endregion
+        public IEnumerable<UserActivitiesData> GetUserActivitiesData(GetUserActivitiesDataRequest input)
+        {
+            var activeUsersResult = _mpaMarketingDashboardService.GetActiveUsersData(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                input.StartDate.DateTime,
+                input.EndDate.DateTime
+            );
+            
+            var NRUResult = _mpaMarketingDashboardService.GetNRUData(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                input.StartDate.DateTime,
+                input.EndDate.DateTime
+            );
+            
+            
+            var mergedData = from a in activeUsersResult
+                join b in NRUResult on a.RecordDate equals b.RecordDate into bGroup
+                from b in bGroup.DefaultIfEmpty()
+                select new UserActivitiesData
+                {
+                    RecordDate = a.RecordDate,
+                    ActiveUsersCount = a.ActiveUsersCount,
+                    NRUCount = b?.NRUCount ?? 0
+                };
+            
+            return mergedData;
+        }
         
+        #endregion
+
+        #region private
+
         private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
@@ -198,6 +230,8 @@ namespace BackendSite.Service.BLL
                 item.DepositAmount = item.DepositAmount / rate;
             }
         }
+
+        #endregion
         
     }
 }
