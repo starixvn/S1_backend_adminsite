@@ -1447,7 +1447,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
-    
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1645,5 +1645,12 @@ namespace BackendSite.Service.Model.enums
     public enum CustTagEnum
     {
         Duplicate = 6
+    }
+
+    public enum BatchCustInfoStatus
+    {
+        Pending = 0,
+        Finished = 1,
+        Failed = 2
     }
 }
