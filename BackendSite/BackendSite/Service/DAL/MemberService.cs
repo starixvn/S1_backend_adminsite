@@ -190,22 +190,23 @@ public class MemberService : IMemberService
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
+    public async Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
+        p.Add("_SiteId", siteId);
         p.Add("_FullName", fullName);
 
         if (!duplicateAccounts.Any())
         {
-            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p) > 0;
+            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p) > 0;
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
         conn.Open();
         await using var trans = await conn.BeginTransactionAsync();
         
-        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p, conn, trans) > 0;
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p, conn, trans) > 0;
 
         if (success)
         {
@@ -386,4 +387,23 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryAsync<CustRealNameChangeLog>("Admin_CustRealNameChangeLog_Get", p);
     }
+
+    public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustPromotionWhiteList>("Service_CustPromotionWhiteList_Get", p);
+    }
+
+    public async Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input)
+    {
+        var p = new DynamicParameters(input);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustPromotionWhiteList_Set", p);
+    }
+
+    public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
+    {
+        var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
+        return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
+    }
+
 }

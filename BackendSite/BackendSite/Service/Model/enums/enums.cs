@@ -986,7 +986,11 @@ namespace BackendSite.Service.Model.enums
         [Description("ADVANCED")]
         Advanced = 18,
         [Description("TEST")]
-        Test = 19
+        Test = 19,
+        [Description("UNDER CREDIT")]
+        UnderCredit = 20,
+        [Description("REFUND")]
+        Refund = 21
     }
 
     /// <summary>
@@ -1643,6 +1647,13 @@ namespace BackendSite.Service.Model.enums
     public enum CustTagEnum
     {
         Duplicate = 6
+    }
+
+    public enum BatchCustInfoStatus
+    {
+        Pending = 0,
+        Finished = 1,
+        Failed = 2
     }
 
     public enum BlockCryptoWalletStatus

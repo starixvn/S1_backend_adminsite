@@ -23,12 +23,12 @@
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
 
-        public static IEnumerable<string> GetDailyPartitionRange(this DateTime startDate, DateTime endDate)
+        public static IEnumerable<DateTime> GetDailyPartitionRange(this DateTime startDate, DateTime endDate)
         {
-            var result = new List<string>();
+            var result = new List<DateTime>();
             while (startDate.Date <= endDate.Date)
             {
-                result.Add(startDate.GetDailyPartitionKey());
+                result.Add(startDate);
                 startDate = startDate.AddDays(1);
             }
             return result;
