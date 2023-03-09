@@ -61,9 +61,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
-        public ApiListResult<UserActivitiesData> GetUserActivitiesData(GetUserActivitiesDataRequest request)
+        public ApiListResult<UserActivitiesResult> GetUserActivitiesData(GetUserActivitiesDataRequest request)
         {
-            var apiResult = new ApiListResult<UserActivitiesData>();
+            var apiResult = new ApiListResult<UserActivitiesResult>();
             
             try
             {

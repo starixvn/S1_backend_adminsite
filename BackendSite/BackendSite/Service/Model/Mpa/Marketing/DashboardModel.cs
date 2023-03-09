@@ -62,7 +62,7 @@
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
         public IEnumerable<int> CurrencyIds { get; set; }
-        
+        public int ViewType { get; set; }
     }
     
     public class PerformanceHighlightData
@@ -110,7 +110,14 @@
         public DateTime RecordDate { get; set; }
         public int ActiveUsersCount { get; set; }
         public int NRUCount { get; set; }
+        public int DayOfYear => (RecordDate.DayOfYear - 1) / 7 + 1;
     }
     
+    public class UserActivitiesResult
+    {
+        public string RecordDate { get; set; }
+        public int ActiveUsersCount { get; set; }
+        public int NRUCount { get; set; }
+    }
 }
 

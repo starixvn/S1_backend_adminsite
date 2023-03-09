@@ -1669,4 +1669,10 @@ namespace BackendSite.Service.Model.enums
     {
         Duplicate = 6
     }
+    
+    public enum ViewTimeType
+    {
+        Daily = 1,
+        Weekly = 2
+    }
 }

@@ -1,8 +1,10 @@
 ﻿using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -167,7 +169,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        public IEnumerable<UserActivitiesData> GetUserActivitiesData(GetUserActivitiesDataRequest input)
+        public IEnumerable<UserActivitiesResult> GetUserActivitiesData(GetUserActivitiesDataRequest input)
         {
             var activeUsersResult = _mpaMarketingDashboardService.GetActiveUsersData(
                 input.SiteId,
@@ -183,18 +185,35 @@ namespace BackendSite.Service.BLL
                 input.EndDate.DateTime
             );
             
-            
-            var mergedData = from a in activeUsersResult
-                join b in NRUResult on a.RecordDate equals b.RecordDate into bGroup
-                from b in bGroup.DefaultIfEmpty()
-                select new UserActivitiesData
+            var mergedData = activeUsersResult.Concat(NRUResult)
+                .GroupBy(u => u.RecordDate)
+                .Select(g => new UserActivitiesData
                 {
-                    RecordDate = a.RecordDate,
-                    ActiveUsersCount = a.ActiveUsersCount,
-                    NRUCount = b?.NRUCount ?? 0
-                };
+                    RecordDate = g.Key,
+                    ActiveUsersCount = g.Sum( a => a.ActiveUsersCount),
+                    NRUCount = g.Sum( a => a.NRUCount),
+                });
             
-            return mergedData;
+            if (input.ViewType == (int)ViewTimeType.Weekly && mergedData.Any())
+            {
+                var groups = mergedData.GroupBy(x => x.DayOfYear);
+                var groupsResult = groups.Select(x => new UserActivitiesResult
+                {
+                    RecordDate = $"W{x.Key}/{x.FirstOrDefault()!.RecordDate.Year}",
+                    ActiveUsersCount = x.Sum( a => a.ActiveUsersCount),
+                    NRUCount = x.Sum( b => b.NRUCount)
+                });
+                return groupsResult;
+            }
+            
+            var result = mergedData.Select(x => new UserActivitiesResult
+            {
+                RecordDate = x.RecordDate.ToString("yyyy-MM-dd"),
+                ActiveUsersCount = x.ActiveUsersCount,
+                NRUCount = x.NRUCount
+            });
+            
+            return result;
         }
         
         #endregion
