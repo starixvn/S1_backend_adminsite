@@ -212,6 +212,8 @@ namespace BackendSite.Service.Model
             }
         }
         public string AffiliateCode { get; set; }
+        public int CheckReceipt { set; get; }
+        public string CheckReceiptBy { set; get; }
     }
 
     public class DepositDetailSubmission
@@ -327,7 +329,12 @@ namespace BackendSite.Service.Model
         public int ReceiptNo { get; set; }
         public int CreateFrom { get; set; }
         public string Creator { get; set; }
-        public DateTime CreateTime { get; set; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 
     public class DepositLimit
