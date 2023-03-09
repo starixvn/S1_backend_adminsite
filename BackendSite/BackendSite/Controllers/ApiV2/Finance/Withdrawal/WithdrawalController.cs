@@ -227,6 +227,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public int Number { get; set; }
         }
         
+        public class ExchangeInfo
+        {
+            public decimal Rate { get; set; }
+            public decimal To_Amount { get; set; }
+            public long Updated_timestamp { get; set; }
+        }
+
+        public class PaymentReq
+        {
+            public ExchangeInfo formData { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -949,6 +961,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+        
+        
+        public async Task<ApiResult<PaymentReq>> GetExchangeInfoAsync(int custId, decimal amount, string channelName)
+        { 
+            var exchangeReq = new 
+            {
+                CustId = custId,
+                Amount = amount,
+                ChannelName = channelName
+            };
+            var myUrl = $"{_payApiUrl}CryptoExchange";
+            return await _courierAdapter.MyPostAsync<PaymentReq, dynamic>(myUrl, exchangeReq);
         }
 
         #endregion
