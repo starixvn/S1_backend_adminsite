@@ -822,7 +822,7 @@ namespace BackendSite.Service.DAL
 
         public bool NewBatchCustInfo(int siteId, string memo, string author, ref int batchId)
         {
-            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author , _Memo = memo });
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Memo = memo });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = _mainDbClient.Execute("Admin_BatchCustInfo_Ins", p);
             batchId = p.Get<int>("BatchId");
@@ -839,12 +839,17 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BatchCustInfo> GetBatchCustInfo(int siteId)
         {
-            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId , _Top = 10}));
+            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId, _Top = 10 }));
         }
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoWalletDetailAsync(int custId)
         {
             return _reportDbClient.QueryAsync<USDTDetail>("Admin_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = custId }));
         }
     }
 }
