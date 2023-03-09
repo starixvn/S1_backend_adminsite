@@ -65,6 +65,26 @@
         public int ViewType { get; set; }
     }
     
+    public class GetRevenueAvgDataRequest
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public int SiteId { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<int> TpIds { get; set; }
+        public int BaseCurrencyId { get; set; }
+    }
+    
     public class PerformanceHighlightData
     {
         public int TotalUsers { get; set; }
@@ -118,6 +138,14 @@
         public string RecordDate { get; set; }
         public int ActiveUsersCount { get; set; }
         public int NRUCount { get; set; }
+    }
+    
+    public class RevenueAvgData
+    {
+        public int TpId { get; set; }
+        public string TpName { get; set; }
+        public decimal AllUsersRevenue { get; set; }
+        public decimal PaidUsersRevenue { get; set; }
     }
 }
 

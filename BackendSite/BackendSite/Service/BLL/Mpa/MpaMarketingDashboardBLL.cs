@@ -216,6 +216,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public IEnumerable<RevenueAvgData> GetRevenueAvgData(GetRevenueAvgDataRequest input)
+        {
+            var result = _mpaMarketingDashboardService.GetRevenueAvgData(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                JsonConvert.SerializeObject(input.TpIds),
+                input.StartDate.DateTime,
+                input.EndDate.DateTime,
+                input.BaseCurrencyId
+            );
+            
+            return result;
+        }
+        
         #endregion
 
         #region private

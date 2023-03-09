@@ -50,6 +50,27 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public IEnumerable<RevenueAvgData> GetRevenueAvgData(
+            int siteId,
+            string currencyIds,
+            string tpIds,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_TpIds", tpIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            
+            var result = _reportDbClient.Query<RevenueAvgData>("Admin_MarketingRevenueAvg_Get", props);
+
+            return result;
+        }
+        
         public IEnumerable<UserActivitiesData> GetNRUData(
             int siteId,
             string currencyIds,

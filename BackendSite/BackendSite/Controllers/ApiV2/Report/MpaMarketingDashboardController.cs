@@ -81,6 +81,31 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
-        
+
+        #region RevenueAvg
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
+        public ApiListResult<RevenueAvgData> GetRevenueAvgData(GetRevenueAvgDataRequest request)
+        {
+            var apiResult = new ApiListResult<RevenueAvgData>();
+            
+            try
+            {
+                var data = _mpaMarketingDashboardBll.GetRevenueAvgData(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+
+        #endregion
     }
 }
