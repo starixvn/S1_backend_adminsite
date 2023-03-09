@@ -1261,5 +1261,10 @@ namespace BackendSite.Service.BLL
 
             return string.Join(",", temp);
         }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _custInfoService.GetCryptoList(custId);
+        }
     }
 }

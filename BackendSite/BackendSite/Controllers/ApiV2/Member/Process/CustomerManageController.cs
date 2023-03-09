@@ -3197,6 +3197,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
         #endregion
 
+        #region CSD > Customer Administration > CustInfo > Crypto list
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public ApiListResult<CustCryptoWalletList> GetCryptoList(CustIdRequest request)
+        {
+            var custCryptoWalletList = _custInfoBll.GetCryptoList(request.CustId);
+            return new ApiListResult<CustCryptoWalletList>
+            {
+                Data = custCryptoWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        #endregion
+
         #region Private Methods
 
         /// <summary>
