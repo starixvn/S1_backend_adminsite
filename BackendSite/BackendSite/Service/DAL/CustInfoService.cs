@@ -844,7 +844,7 @@ namespace BackendSite.Service.DAL
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoWalletDetailAsync(int custId)
         {
-            return _reportDbClient.QueryAsync<USDTDetail>("Admin_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+            return _reportDbClient.QueryAsync<USDTDetail>("Service_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
         }
 
         public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
