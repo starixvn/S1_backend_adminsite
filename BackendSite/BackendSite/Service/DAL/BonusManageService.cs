@@ -642,9 +642,22 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionDeviceType", promotion.PromotionDeviceType);
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
+            
+            //啟用限制條件，可用次數下限為1
+            var _sameDeviceIDAvailableCount = promotion.SameDeviceIDRestrict && promotion.SameDeviceIDAvailableCount < 1 ? 1 : promotion.SameDeviceIDAvailableCount;
+            var _sameIPRestrictAvailableCountt = promotion.SameIPRestrict && promotion.SameIPRestrictAvailableCount < 1 ? 1 : promotion.SameIPRestrictAvailableCount;
+            var _sameRealNameRestrictAvailableCount = promotion.SameRealNameRestrict && promotion.SameRealNameRestrictAvailableCount < 1 ? 1 : promotion.SameRealNameRestrictAvailableCount;
+
+            p.Add("_SameDeviceIDRestrict", promotion.SameDeviceIDRestrict);
+            p.Add("_SameDeviceIDAvailableCount", _sameDeviceIDAvailableCount);
+            p.Add("_SameIPRestrict", promotion.SameIPRestrict);
+            p.Add("_SameIPRestrictAvailableCount", _sameIPRestrictAvailableCountt);
+            p.Add("_SameRealNameRestrict", promotion.SameRealNameRestrict);
+            p.Add("_SameRealNameRestrictAvailableCount", _sameRealNameRestrictAvailableCount);
+            p.Add("_BlockTagList", JsonConvert.SerializeObject(promotion.BlockTagList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V5", p, connection, transaction);
+            _mainDbClient.Execute("Admin_Promotion_Set_V6", p, connection, transaction);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
