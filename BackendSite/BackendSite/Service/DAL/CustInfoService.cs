@@ -742,6 +742,7 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
+
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
         {

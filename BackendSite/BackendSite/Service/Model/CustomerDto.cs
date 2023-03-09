@@ -641,6 +641,16 @@ public class CustRealNameChangeLog
     public string Operator { get; set; }
 }
 
+public class GetListByFileRequest
+{
+    public int SiteId { get; set; }
+    public IFormFile File { get; set; }
+    public string Memo { get; set; }
+}
+public class GetCustinfoByImportDataRequest
+{
+    public int SiteId { get; set; }
+}
 public class CustPromotionWhiteList
 {
     public int CustId { get; set; }
@@ -670,15 +680,4 @@ public class PromotionReceiveFailLog
     public int SiteId { get; set; }
     public int CustId { get; set; }
     public int CurrencyId { get; set; }
-}
-
-public class GetListByFileRequest
-{
-    public int SiteId { get; set; }
-    public IFormFile File { get; set; }
-    public string Memo { get; set; }
-}
-public class GetCustinfoByImportDataRequest
-{
-    public int SiteId { get; set; }
 }

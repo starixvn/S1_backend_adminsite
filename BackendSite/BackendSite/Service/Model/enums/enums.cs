@@ -1646,6 +1646,59 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         Unlock = 2
     }
+    public enum CustomerTeleStatusEnum
+    {
+        NoRecord = 0,
+        NonDepoist = 1,
+        Deposited = 2,
+    }
+
+    public enum WithdrawalTimeStatusEnum
+    {
+        Verify = 3,
+        Process = 4,
+        Cancelled = 5,
+        Approved = 6,
+        Reject = 7
+    }
+
+    public enum HotGameTopCategory
+    {
+        HotGame = 1,
+        NewGame = 2,
+        Progressive = 3,
+        Featured = 4,
+        TopCasino = 5
+    }
+
+    public enum DepositMessageStatus
+    {
+        [Description("Name unmatch")]
+        DepositorsNameUnmatch = 0,
+        [Description("Provide slip")]
+        DepositSlipRequired = 1,
+        [Description("Payment not received")]
+        PaymentNotReceived = 2,
+        [Description("Deposit refunded")]
+        DepositRefunded = 3,
+        [Description("Wrong Amount submitted")]
+        WrongAmountSubmitted = 4,
+        [Description("Wrong Bank submitted")]
+        WrongBankSubmitted = 5
+    }
+
+    public enum WithdrawalMessageStatus
+    {
+        [Description("Name unmatch")]
+        WithdrawalAccountsNameUnmatch = 0,
+        [Description("Account number incorrect")]
+        WithdrawalAccountNumberIncorrect = 1,
+        [Description("Withdrawal account cannot receive money")]
+        WithdrawalAccountAannotReceiveMoney = 2,
+        [Description("Beneficiary's account maintenance")]
+        BeneficiarysAccountMaintenance = 3
+    }
+
     public enum MpaTransactionRelaySummaryTypeEnum
     {
         Deposit = 1,
@@ -1683,59 +1736,6 @@ namespace BackendSite.Service.Model.enums
     {
         SettledDate = 1,
         CreatedDate = 2
-    }
-
-    public enum HotGameTopCategory
-    {
-        HotGame = 1,
-        NewGame = 2,
-        Progressive = 3,
-        Featured = 4,
-        TopCasino = 5
-    }
-
-    public enum CustomerTeleStatusEnum
-    {
-        NoRecord = 0,
-        NonDepoist = 1,
-        Deposited = 2,
-    }
-
-    public enum WithdrawalTimeStatusEnum
-    {
-        Verify = 3,
-        Process = 4,
-        Cancelled = 5,
-        Approved = 6,
-        Reject = 7
-    }
-    
-    public enum DepositMessageStatus
-    {
-        [Description("Name unmatch")]
-        DepositorsNameUnmatch = 0,
-        [Description("Provide slip")]
-        DepositSlipRequired = 1,
-        [Description("Payment not received")]
-        PaymentNotReceived = 2,
-        [Description("Deposit refunded")]
-        DepositRefunded = 3,
-        [Description("Wrong Amount submitted")]
-        WrongAmountSubmitted = 4,
-        [Description("Wrong Bank submitted")]
-        WrongBankSubmitted = 5
-    }
-
-    public enum WithdrawalMessageStatus
-    {
-        [Description("Name unmatch")]
-        WithdrawalAccountsNameUnmatch = 0,
-        [Description("Account number incorrect")]
-        WithdrawalAccountNumberIncorrect = 1,
-        [Description("Withdrawal account cannot receive money")]
-        WithdrawalAccountAannotReceiveMoney = 2,
-        [Description("Beneficiary's account maintenance")]
-        BeneficiarysAccountMaintenance = 3
     }
 
     public enum CustTagEnum
