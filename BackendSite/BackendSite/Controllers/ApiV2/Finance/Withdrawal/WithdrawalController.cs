@@ -227,16 +227,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public int Number { get; set; }
         }
         
-        public class ExchangeInfo
+        public class GetExchangeInfoRequest
         {
-            public decimal Rate { get; set; }
-            public decimal To_Amount { get; set; }
-            public long Updated_timestamp { get; set; }
-        }
-
-        public class PaymentReq
-        {
-            public ExchangeInfo formData { get; set; }
+            public string CryptoCurrencyName { get; set; }
+            public string Network { get; set; }
+            public int CurrencyId { get; set; }
+            public decimal Amount { get; set; }
         }
 
         #endregion
@@ -963,17 +959,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
         
-        
-        public async Task<ApiResult<PaymentReq>> GetExchangeInfoAsync(int custId, decimal amount, string channelName)
-        { 
-            var exchangeReq = new 
+        [HttpPost]
+        public async Task<ApiResult<CryptoExchangeInfo>> GetExchangeInfoAsync(GetExchangeInfoRequest req)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var exchangeReq = new CryptoExchangeReq
             {
-                CustId = custId,
-                Amount = amount,
-                ChannelName = channelName
+                SiteId = authData.SiteId,
+                CurrencyId = req.CurrencyId,
+                Amount = req.Amount,
+                ChannelName = req.CryptoCurrencyName.GetChannelName(req.Network),
+                Type = ExchangeTypeEnum.Sell
             };
             var myUrl = $"{_payApiUrl}CryptoExchange";
-            return await _courierAdapter.MyPostAsync<PaymentReq, dynamic>(myUrl, exchangeReq);
+            return await _courierAdapter.MyPostAsync<CryptoExchangeInfo, CryptoExchangeReq>(myUrl, exchangeReq);
         }
 
         #endregion
