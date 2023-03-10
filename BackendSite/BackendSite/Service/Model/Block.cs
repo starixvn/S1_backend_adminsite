@@ -208,5 +208,11 @@ namespace BackendSite.Service.Model
         public string UpdateOperator { get; set; }
         public int Status { get; set; }
         public int BlockStatus { get; set; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 }
