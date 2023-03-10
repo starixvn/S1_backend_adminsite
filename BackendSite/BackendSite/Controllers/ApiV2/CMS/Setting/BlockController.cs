@@ -339,7 +339,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 3 })]
         public ApiListResult<BlockCryptoWalletList> CryptoWalletGetByAddress(BlockCryptoWalletRequest request)
         {
             var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address);
@@ -351,7 +350,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 3 })]
         public ApiResult BlockCryptoWalletSet(ApiRequestWithLog<BlockCryptoWalletSetRequest> request)
         {
             var result = _blockBLL.BlockCryptoWalletSet(new ParamsWithLog<BlockCryptoWalletSetRequest>(request, User.Identity.Name));
@@ -374,7 +372,6 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 4 })]
         public ApiResult ReleaseCryptoWallet(ApiRequestWithLog<ReleaseCryptoWalletRequest> request)
         {
             var result = _blockBLL.ReleaseCryptoWallet(new ParamsWithLog<ReleaseCryptoWalletRequest>(request, User.Identity.Name));

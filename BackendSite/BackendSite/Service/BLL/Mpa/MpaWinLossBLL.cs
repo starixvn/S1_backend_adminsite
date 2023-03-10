@@ -2056,7 +2056,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                       TpUserName = item.TpUserName,
                                                       SummaryType = item.SummaryType,
                                                       TransactionType = item.TransactionType,
-                                                      Amount = item.Amount / rate,
+                                                      Amount = item.Amount * rate,
                                                       RowCount = item.RowCount
                                                   }).ToList();
 
@@ -2104,7 +2104,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                 UserName = item.UserName,
                                                 TpUserName = item.TpUserName,
                                                 CurrencyId = item.CurrencyId,
-                                                BonusAmountClaim = item.BonusAmountClaim / rate
+                                                BonusAmountClaim = item.BonusAmountClaim * rate
                                             }).ToList();
 
             var wrapperResult = new MpaWinLossBonusWrapper()
@@ -2175,13 +2175,13 @@ namespace BackendSite.Service.BLL.Mpa
                                                               BonusId = item.BonusId,
                                                               PromotionType = item.PromotionType,
                                                               TicketStatus = item.TicketStatus,
-                                                              StakeSummary = item.StakeSummary / rate,
-                                                              ValidBetSummary = item.ValidBetSummary / rate,
-                                                              WinLossSummary = item.WinLossSummary / rate,
-                                                              RevenueSummary = item.RevenueSummary / rate,
-                                                              ProgressiveWinSummary = item.ProgressiveWinSummary / rate,
-                                                              ProgressiveBetSummary = item.ProgressiveBetSummary / rate,
-                                                              ClosingBalance = item.ClosingBalance / rate,
+                                                              StakeSummary = item.StakeSummary * rate,
+                                                              ValidBetSummary = item.ValidBetSummary * rate,
+                                                              WinLossSummary = item.WinLossSummary * rate,
+                                                              RevenueSummary = item.RevenueSummary * rate,
+                                                              ProgressiveWinSummary = item.ProgressiveWinSummary * rate,
+                                                              ProgressiveBetSummary = item.ProgressiveBetSummary * rate,
+                                                              ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 

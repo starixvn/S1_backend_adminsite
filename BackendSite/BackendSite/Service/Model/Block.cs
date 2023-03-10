@@ -185,4 +185,34 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public int CustId { get; set; }
     }
+    public class CustCryptoWalletList
+    {
+        public string AccountName { get; set; }
+        public string Address { get; set; }
+        public string Network { get; set; }
+        public string NickName { get; set; }
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        private DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset? _blockUpdateTime { get; set; }
+        public DateTimeOffset? BlockUpdateTime
+        {
+            get => _blockUpdateTime;
+            set => _blockUpdateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public string UpdateOperator { get; set; }
+        public int Status { get; set; }
+        public int BlockStatus { get; set; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+    }
 }
