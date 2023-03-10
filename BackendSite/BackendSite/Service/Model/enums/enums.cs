@@ -1407,7 +1407,10 @@ namespace BackendSite.Service.Model.enums
     public enum CryptoWalletLogStatusEnum
     {
         Create = 1,
-        Delete = 2
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 
     public enum EWalletinfoLogStatusEnum
