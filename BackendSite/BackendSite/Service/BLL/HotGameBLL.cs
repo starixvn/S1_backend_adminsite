@@ -158,12 +158,12 @@ namespace BackendSite.Service.BLL
             var casinoGames = await _gameCasinoService.GetGameCasinoByTpId(tpId);
 
             return (from game in casinoGames
-                let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
-                select new HotGameOfGameCasinoDto()
-                {
-                    GameId = game.GameId,
-                    Name = gameName.en,
-                }).ToList();
+                    let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
+                    select new HotGameOfGameCasinoDto()
+                    {
+                        GameId = game.GameId,
+                        Name = gameName.en,
+                    }).ToList();
         }
 
         #endregion

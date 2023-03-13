@@ -201,6 +201,11 @@ public class GetCustomerBasicInfoRequest
     public DateTimeOffset EndTime { get; set; }
 }
 
+public class GetCustomerAssociateBankUserRequest
+{
+    public int CustId { get; set; }
+}
+
 public class CustomerDto
 {
     public int SiteId { get; set; }
@@ -528,6 +533,14 @@ public class CustomerLoginIp
     public int UserCount { get; set; }
 }
 
+public class CustomerAssociateBankInfo
+{
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string PaymentName { get; set; }
+    public string AssociateNo { get; set; }
+}
+
 public class CustomerBalanceInfo
 {
     public decimal Balance { get; set; }
@@ -542,7 +555,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get

@@ -165,7 +165,25 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
+    
+    public enum WithdrawalLimitLogMainTypeEnum 
+    {
+        Add = 1,
+        Deduct = 2
+    }
 
+    public enum WithdrawalLimitLogCreateFromEnum 
+    {
+        Default = 0,
+        Deposit = 1,
+        LimitAdjustment = 2,
+        BalanceAdjustment = 3,
+        Bonus = 4 ,
+        ReferralReward = 5,
+        VerificationReward = 6,
+        DrawPrize = 7
+    }
+    
     #endregion
 
     #region CustProfile
@@ -238,6 +256,10 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        SetDepositAmount = 94,
+        CheckDepositReceipt = 95,
+        DeleteReceipt = 96,
+        UploadReceipt = 97,
         Adjustment = 98,
         Error = 99 //No Use
     }
@@ -268,7 +290,19 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
+    
+    public enum DepositDateTypeEnum
+    {
+        CreateTime = 1,
+        StatementTime = 2
+    }
 
+    public enum DepositReceiptCreateFromEnum
+    {
+        User = 1 , 
+        BackendUser = 2
+    }
+    
     #endregion
 
     #region PayList
@@ -389,6 +423,12 @@ namespace BackendSite.Service.Model.enums
         Process = 70,
         ToKyc = 71
     }
+    
+    public enum WithdrawalDateTypeEnum
+    {
+        CreateTime = 1,
+        FlowEndTime = 2
+    }
 
     #endregion
 
@@ -419,6 +459,14 @@ namespace BackendSite.Service.Model.enums
         TRC20 = 2,
         ETH = 3,
         BTC = 4
+    }
+
+    public enum CryptoCurrencyEnum
+    {
+        USDT = 96,
+        USDC = 97,
+        ETH = 98,
+        BTC = 99
     }
 
     #endregion
@@ -618,6 +666,32 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1
     }
 
+    
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15
+    }
+    
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -739,26 +813,26 @@ namespace BackendSite.Service.Model.enums
         VipRebateCategory = 33,
         VipRebateGameType = 34,
         VipRebatePayoutLimit = 35,
-        DepositRewardPointSetting = 39,
-        TurnoverRewardPointSetting = 40,
-        TurnoverRewardPointGameTypeSetting = 46,
-        InactivePointExpirySetting = 47,
-        RedemptionLimitSetting = 43,
-        GiftManagement = 44,
+        Referral = 36,
         EditEWalletWithdrawalLimitInfo = 37,
         SetEWalletWithdrawalLimitInfoStatus = 38,
-        SetBlockEWallet = 55,
-        ReleaseEWalletAccount = 56,
-        Referral = 36,
+        DepositRewardPointSetting = 39,
+        TurnoverRewardPointSetting = 40,
+        RedemptionLimitSetting = 43,
+        GiftManagement = 44,
+        SetCustInfoEnableRebate = 45,
+        TurnoverRewardPointGameTypeSetting = 46,
+        InactivePointExpirySetting = 47,
         SetAdminUserStatus = 41,
         SetAdminUserPassword = 42,
-        SetCustInfoEnableRebate = 45,
         VerificationRewardSetting = 49,
         SetFinanceAccount = 50,
         SetBlockAccount = 51,
         ReleaseAccount = 52,
         DeleteBlockIP = 53,
         SetBlockIP = 54,
+        SetBlockEWallet = 55,
+        ReleaseEWalletAccount = 56,
         WithdrawalSubmission = 57,
         SetCurrencyUSDRate = 58,
         BettingMonitor = 59,
@@ -775,7 +849,9 @@ namespace BackendSite.Service.Model.enums
         SetWithdrawalMessage = 80,
         SetCustInfoNote = 81,
         DeleteSMSInfo = 82,
-        CancelBonusInCustInfo = 83
+        CancelBonusInCustInfo = 83,
+        SetBlockCryptoWallet = 84,
+        ReleaseCryptoWallet = 85,
     }
 
     #region BankFinancialTransferInfoLog
@@ -988,7 +1064,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1039,12 +1117,17 @@ namespace BackendSite.Service.Model.enums
         Cheating = 4
     }
 
-    public enum CryptoCurrencyEnum
+
+    public enum AppLinkAppType
     {
-        USDT = 96,
-        USDC = 97,
-        ETH = 98,
-        BTC = 99
+        Android = 1,
+        IOS = 2
+    }
+
+    public enum AppLinkProtocolType
+    {
+        HTTP = 1,
+        HTTPS = 2
     }
 
     public enum SendMessageStatus
@@ -1188,7 +1271,6 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
-
     #region Banner
 
     public enum BannerTypeEnum
@@ -1276,6 +1358,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Locked = 2
     }
+
     #endregion
 
     #region TpTransferInfo
@@ -1287,7 +1370,6 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
 
     public enum TpListWalletTypeEnum
     {
@@ -1305,6 +1387,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1322,6 +1405,7 @@ namespace BackendSite.Service.Model.enums
         [Description("HTTPS")]
         HTTPS = 2
     }
+    #endregion
 
     public enum RedisDataBase
     {
@@ -1333,8 +1417,6 @@ namespace BackendSite.Service.Model.enums
         Payment = 5,
         Token = 6
     }
-
-    #endregion
 
     public enum LineChannelStatusEnum
     {
@@ -1361,7 +1443,6 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
     public enum SiteEnum
     {
         [Description("Nova88")]
@@ -1379,13 +1460,12 @@ namespace BackendSite.Service.Model.enums
         N8B = 3
     }
 
-    public enum WithdrawalMethodEnum
+
+    public enum ManualRewardPointCategoryEnum
     {
-        Lock = 1,
-        UnLock = 2,
-        All = 0,
-        EWallet = 1,
-        BankCard = 2
+        Default = 0,
+        BirthdayRewardPoint = 1,
+        SpecialRewardPoint = 2
     }
 
     public enum CustBankInfoLogStatus
@@ -1396,6 +1476,13 @@ namespace BackendSite.Service.Model.enums
         Unlock = 4,
         Release = 5
     }
+
+    public enum WithdrawalMethodEnum
+    {
+        All = 0,
+        EWallet = 1,
+        BankCard = 2
+    }
     public enum EWalletStatusEnum
     {
         Disable = 0,
@@ -1405,7 +1492,10 @@ namespace BackendSite.Service.Model.enums
     public enum CryptoWalletLogStatusEnum
     {
         Create = 1,
-        Delete = 2
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 
     public enum EWalletinfoLogStatusEnum
@@ -1429,16 +1519,24 @@ namespace BackendSite.Service.Model.enums
         BDT = 74
     }
 
-    public enum ManualRewardPointCategoryEnum
-    {
-        Default = 0,
-        BirthdayRewardPoint = 1,
-        SpecialRewardPoint = 2
-    }
     public enum AdminUserV2StatusEnum
     {
         Disable = 0,
         Able = 1,
+    }
+    
+    public enum DashboardOrderByPropertyEnum
+    {
+        Amount = 1,
+        Currency = 2,
+        Count = 3
+    }
+
+    public enum DashboardGameTopDataTypeEnum
+    {
+        TopBetTwenty = 1,
+        TopWinTwenty = 2,
+        TopLoseTwenty = 3
     }
 
     public enum ShieldPlatform
@@ -1512,7 +1610,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #region SlotGamesManagement
-
+    
     public enum SlotGameCategoryEnum
     {
         AllAndSetStatus = 0,
@@ -1521,6 +1619,7 @@ namespace BackendSite.Service.Model.enums
         TableAndCards = 3,
         BuyFeaturesGames = 4,
         Megaways = 5,
+        Mini = 6,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1534,7 +1633,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    
+
     public enum PaymentReportGroupByEnum
     {
         Date = 1,
@@ -1641,7 +1740,7 @@ namespace BackendSite.Service.Model.enums
         SettledDate = 1,
         CreatedDate = 2
     }
-    
+
     public enum CustTagEnum
     {
         Duplicate = 6
@@ -1652,5 +1751,33 @@ namespace BackendSite.Service.Model.enums
         Pending = 0,
         Finished = 1,
         Failed = 2
+    }
+
+    public enum BlockCryptoWalletStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+
+    public enum CustUSDTInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+    }
+
+    public enum BlockCryptoStatus
+    {
+        SelectAll = 0,
+        Block = 1,
+        Unlock = 2
+    }
+    public enum CustCryptoWalletDetailSatatus
+    {
+        Delete = 0,
+        Open = 1,
+        BoDelete = 2
     }
 }
