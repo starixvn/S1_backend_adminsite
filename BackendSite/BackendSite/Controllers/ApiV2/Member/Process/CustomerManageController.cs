@@ -1217,24 +1217,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpPost]
-        public ApiResult ResetCustBankInfo(CustIdRequest request)
+        public async Task<ApiResult> ResetCustBankInfo(CustIdRequest request)
         {
             var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            var AccountInfoList = await _custInfoBll.GetCustBankDetailAsync(request.CustId);
             string before = null;
-            if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
+            if (!_custInfoBll.ResetCustBankInfo(request.CustId))
             {
-                if (!_custInfoBll.ResetCustBankInfo(request.CustId))
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-                }
-
-                before = new
-                {
-                    AccountName = custProfile.AccountName,
-                    BankInfo = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo),
-                    USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
-                }.ToLog();
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
             }
+
+            before = new
+            {
+                AccountName = custProfile.AccountName,
+                AccountInfoList
+            }.ToLog();
 
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
@@ -1266,21 +1263,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         /// <exception cref="AdminException"></exception>
         [HttpPost]
-        public ApiResult ResetCustUSDTInfo(CustIdRequest request)
+        public async Task<ApiResult> ResetCustUSDTInfo(CustIdRequest request)
         {
-            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            var cryptoAccountInfoList = await _custInfoBll.GetCustCryptoInfoListAsync(request.CustId);
             string before = null;
-            if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+            if (!_custInfoBll.ResetCustUSDTInfo(request.CustId))
             {
-                if (!_custInfoBll.ResetCustUSDTInfo(request.CustId))
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-                }
-
-                var usdtDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
-                before = usdtDetailList.ToLog();
-
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
             }
+
+            before = cryptoAccountInfoList.ToLog();
 
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {

@@ -447,8 +447,8 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AreaCode { get; set; }
         public string Profile { get; set; }
-        public string BankInfo { get; set; }
-        public string USDTInfo { get; set; }
+        //public string BankInfo { get; set; }
+        //public string USDTInfo { get; set; }
         public string Address { get; set; }
     }
 

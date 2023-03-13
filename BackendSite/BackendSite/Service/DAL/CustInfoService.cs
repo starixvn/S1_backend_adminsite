@@ -669,7 +669,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
-            return _reportDbClient.QueryFirst<CustProfileReq>("Admin_CustProfile_Get_V2", props);
+            return _reportDbClient.QueryFirst<CustProfileReq>("Admin_CustProfile_Get_V3", props);
         }
 
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
