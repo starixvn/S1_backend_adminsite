@@ -128,7 +128,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public async Task<int> ExecuteAsync(string name, DynamicParameters parameters)
+        public async Task<int> ExecuteAsync(string name, object parameters)
         {
             var result = 0;
             var sw = Stopwatch.StartNew();

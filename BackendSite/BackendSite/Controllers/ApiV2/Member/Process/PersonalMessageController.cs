@@ -132,59 +132,45 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var authData = _newAuthorizeBLL.GetAuthData();
             var batchId = 0;
-            var excelList = new List<ExcelData>();
+            
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
             {
+                if (!_excelBll.IsValidFile(req.excelUpload.ContentType))
+                    return new ApiResult<int>() { ErrorCode = -1, Message = "File Type Error" };
+
                 _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
-                if (_excelBll.IsValidFile(req.excelUpload.ContentType))
+                var excelList = _excelBll.Read(req.excelUpload);
+
+                var row = 1;
+                foreach (var data in excelList)
                 {
-                    var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
-                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
-                    var isLastRow = false;
-                    var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+                    var resultMessage = "";
+                    var dataMessage = $"Username={data.CustUserName}. SabaId={data.SabaId}.";
+                    var custInfosDetail = await _custInfoBll.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
 
-                    do // 讀取資料，直到讀到空白列為止
+                    if (custInfosDetail == null)
+                        resultMessage = $"Not found. {dataMessage}";
+
+                    if (custInfosDetail != null) 
                     {
-                        var custUsername = sheet.Cells[rowId, 1].Text.Trim();
-                        var sabaId = sheet.Cells[rowId, 2].Text.Trim();
-                        var custId = _common.TpIdToCustId(sabaId);
+                        var customerStatus = (CustomerStatusEnum)custInfosDetail.Status;
+                        if (customerStatus != CustomerStatusEnum.Running && customerStatus != CustomerStatusEnum.Lock)
+                            resultMessage = $"Fail. {dataMessage} Status={customerStatus.GetDescription()}";
 
-                        if (string.IsNullOrEmpty(custUsername) && custId == null)
+                        if (string.IsNullOrEmpty(resultMessage))
                         {
-                            isLastRow = true;
+                            await _messageBll.CreateMessage(custInfosDetail.CustId, batchId, req.IsPopup);
+                            resultMessage = $"Success. {dataMessage} Status: {customerStatus.GetDescription()}.";
                         }
-                        else
-                        {
-                            excelList.Add(new ExcelData
-                            {
-                                CustId = custId,
-                                CustUserName = string.IsNullOrEmpty(custUsername) ? null : custUsername,
-                                SabaId = sabaId,
-                                RowId = rowId,
-                            });
-                            rowId += 1;
-                        }
-                    } while (!isLastRow);
-
-                    foreach (var data in excelList)
-                    {
-                        var custInfosDetail = await _custInfoBll.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
-                        await _messageBll.PreSendBatchMessage(data, custInfosDetail, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
-                    _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
-                    _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
-
+                    var custId = custInfosDetail != null ? custInfosDetail.CustId : 0;
+                    _messageBll.CreateLog(batchId, row, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName);
+                    row++;
                 }
-                else
-                {
-                    return new ApiResult<int>()
-                    {
-                        ErrorCode = -1,
-                        Message = "File Type Error"
-                    };
-                }
+                _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
+                _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
             {

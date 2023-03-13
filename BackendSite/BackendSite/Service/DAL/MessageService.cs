@@ -185,6 +185,11 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_Msg_Batch_Ins_V3", p);
         }
 
+        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
+        {
+            return await _mainDbClient.ExecuteAsync("Admin_CustBatchMessage_Ins", new { _CustId = custId, _BatchId  = batchId, _IsPopup = isPopup });
+        }
+
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             return _mainDbClient.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator });
