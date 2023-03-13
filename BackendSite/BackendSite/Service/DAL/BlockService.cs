@@ -605,9 +605,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new
             {
                 CustId = input.Before.CustId,
-                Address = input.Before.Address,
-                Network = input.Before.Network,
-                CurrencyId = input.Before.CurrencyId
+                Address = input.Before.Address
             });
 
             #region propsLog
@@ -623,9 +621,13 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", input.Operator);
 
             #endregion
+            var custSameAddress = _reportDbClient.Query<USDTDetail>("Service_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = input.Before.CustId })).ToList().FindAll(x=> x.USDTAddress == input.Before.Address);
 
-            result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", p, conn, trans);
-
+            if(custSameAddress.Count > 0)
+            {
+                result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", p, conn, trans);
+            }
+            
             if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
@@ -639,24 +641,25 @@ namespace BackendSite.Service.DAL
 
                 if (custInfo != null)
                 {
-                    var prop = new DynamicParameters(new
+                    foreach(var cryptoWallet in custSameAddress)
                     {
-                        CustId = input.Before.CustId,
-                        SiteId = custInfo.SiteId,
-                        AccountName = string.Empty,
-                        Address = input.Before.Address,
-                        NickName = string.Empty,
-                        Network = input.Before.Network,
-                        CurrencyId = input.Before.CurrencyId,
-                        Status = CustUSDTInfoLogStatus.Release,
-                        Operator = input.Operator
-                    });
-
-                    result = _mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", prop, conn, trans);
-
-                    if (result <= 0)
-                    {
-                        trans.Rollback();
+                        var prop = new DynamicParameters(new
+                        {
+                            CustId = input.Before.CustId,
+                            SiteId = custInfo.SiteId,
+                            AccountName = string.Empty,
+                            Address = input.Before.Address,
+                            NickName = string.Empty,
+                            Network = cryptoWallet.Network,
+                            CurrencyId = cryptoWallet.CurrencyId,
+                            Status = CustUSDTInfoLogStatus.Release,
+                            Operator = input.Operator
+                        });
+                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", prop, conn, trans) <= 0)
+                        {
+                            trans.Rollback();
+                            return 0;
+                        }
                     }
                 }
                 else
