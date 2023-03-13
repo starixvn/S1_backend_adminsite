@@ -50,6 +50,23 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public IEnumerable<RegistrationDetailsResult> GetRegistrationDetails(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            
+            var result = _reportDbClient.Query<RegistrationDetailsResult>("Admin_MarketingNRUExport_Get", props);
+
+            return result;
+        }
+        
         public IEnumerable<RevenueAvgData> GetRevenueAvgData(
             int siteId,
             string currencyIds,

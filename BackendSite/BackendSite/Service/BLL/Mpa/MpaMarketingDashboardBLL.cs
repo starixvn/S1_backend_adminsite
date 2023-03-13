@@ -4,7 +4,6 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -203,6 +202,8 @@ namespace BackendSite.Service.BLL
                     ActiveUsersCount = x.Sum( a => a.ActiveUsersCount),
                     NRUCount = x.Sum( b => b.NRUCount)
                 });
+                
+                
                 return groupsResult;
             }
             
@@ -214,6 +215,55 @@ namespace BackendSite.Service.BLL
             });
             
             return result;
+        }
+        
+        public IEnumerable<MarketingNRUExport> GetRegistrationDetails(GetRegistrationDetailsRequest input)
+        {
+            var result = _mpaMarketingDashboardService.GetRegistrationDetails(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                input.StartDate.DateTime,
+                input.EndDate.DateTime
+            );
+
+            #region MTD
+            
+            var now = DateTime.UtcNow.Date;
+            var MTDStartDate =  new DateTime(now.Year, now.Month, 1 );
+            var MTDEndDate = now.AddDays(-1);
+            
+            if (MTDEndDate < MTDStartDate)
+            {
+                var baseDate = now.AddDays(-1);
+                MTDStartDate = new DateTime(baseDate.Year, baseDate.Month, 1);
+                MTDEndDate = baseDate;
+            }
+            
+            var MTDResult = _mpaMarketingDashboardService.GetRegistrationDetails(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                MTDStartDate,
+                MTDEndDate
+            );
+
+            foreach (var data in MTDResult)
+            {
+                data.IsMTD = true;
+            }
+            
+            #endregion
+            
+            var mergedData = result.Concat(MTDResult)
+                .GroupBy(u => u.SignupUrl)
+                .Select(g => new MarketingNRUExport
+                {
+                    SignupUrl = g.Key,
+                    Count = g.Where(a => !a.IsMTD).Sum(x=>x.Count),
+                    MTDCount = g.Where(a => a.IsMTD).Sum(x=>x.Count),
+                });
+            
+          
+            return mergedData;
         }
         
         public IEnumerable<RevenueAvgData> GetRevenueAvgData(GetRevenueAvgDataRequest input)
@@ -245,7 +295,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.WithdrawalAmount = item.WithdrawalAmount / rate;
+                item.WithdrawalAmount /= rate;
             }
         }
         
@@ -260,7 +310,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.DepositAmount = item.DepositAmount / rate;
+                item.DepositAmount /= rate;
             }
         }
 

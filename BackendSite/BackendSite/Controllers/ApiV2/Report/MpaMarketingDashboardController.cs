@@ -80,6 +80,15 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
+        public IActionResult GetRegistrationDetailsExport(GetRegistrationDetailsRequest request)
+        {
+            var data = _mpaMarketingDashboardBll.GetRegistrationDetails(request);
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFileDateRange(stream, request.StartDate.Date, request.EndDate.Date, "Registration Details");
+        }
+        
         #endregion
 
         #region RevenueAvg

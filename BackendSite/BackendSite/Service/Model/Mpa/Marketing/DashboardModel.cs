@@ -1,12 +1,9 @@
 ﻿namespace BackendSite.Service.Model.Mpa.Marketing
 {
-    public class GetDataRequest
+    public class DashboardBase
     {
-        private DateTimeOffset _startDateCompared { get; set; }
-        private DateTimeOffset _endDateCompared { get; set; }
         private DateTimeOffset _startDate { get; set; }
         private DateTimeOffset _endDate { get; set; }
-        public int SiteId { get; set; }
         public DateTimeOffset StartDate
         {
             get => _startDate;
@@ -17,6 +14,14 @@
             get => _endDate;
             set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+    }
+
+    public class GetDataRequest : DashboardBase
+    {
+        private DateTimeOffset _startDateCompared { get; set; }
+        private DateTimeOffset _endDateCompared { get; set; }
         public DateTimeOffset StartDateCompared
         {
             get => _startDateCompared;
@@ -27,17 +32,14 @@
             get => _endDateCompared;
             set => _endDateCompared = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
-        public IEnumerable<int> CurrencyIds { get; set; }
         public int BaseCurrencyId { get; set; }
         public bool IsCompared { get; set; }
-        
         public DateTimeOffset GetEndDate()
         {
             //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
             var endDate = EndDate.AddMonths(1).AddDays(EndDate.AddMonths(1).Day);
             return endDate;
         }
-        
         public DateTimeOffset GetCompareEndDate()
         {
             //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
@@ -46,41 +48,18 @@
         }
     }
     
-    public class GetUserActivitiesDataRequest
+    public class GetUserActivitiesDataRequest : DashboardBase
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
-        public int SiteId { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public IEnumerable<int> CurrencyIds { get; set; }
         public int ViewType { get; set; }
     }
     
-    public class GetRevenueAvgDataRequest
+    public class GetRegistrationDetailsRequest : DashboardBase
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
-        public int SiteId { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public IEnumerable<int> CurrencyIds { get; set; }
+        
+    }
+    
+    public class GetRevenueAvgDataRequest : DashboardBase
+    {
         public IEnumerable<int> TpIds { get; set; }
         public int BaseCurrencyId { get; set; }
     }
@@ -138,6 +117,22 @@
         public string RecordDate { get; set; }
         public int ActiveUsersCount { get; set; }
         public int NRUCount { get; set; }
+    }
+    
+    
+    
+    public class RegistrationDetailsResult
+    {
+        public string SignupUrl { get; set; }
+        public int Count { get; set; }
+        public bool IsMTD { get; set; }
+    }
+
+    public class MarketingNRUExport
+    {
+        public string SignupUrl { get; set; }
+        public int Count { get; set; }
+        public int MTDCount { get; set; }
     }
     
     public class RevenueAvgData
