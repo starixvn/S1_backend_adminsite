@@ -1072,6 +1072,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
             }
             
+            if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
+                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+            {
+                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
+            }
+            
             return usableActionButton;
         }
         
