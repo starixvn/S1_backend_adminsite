@@ -182,6 +182,8 @@ namespace BackendSite.Service.Model
     {
         public string Address { get; set; }
         public int CustId { get; set; }
+        public string Network { get; set; }
+        public int CurrencyId { get; set; }
     }
     public class CustCryptoWalletList
     {
