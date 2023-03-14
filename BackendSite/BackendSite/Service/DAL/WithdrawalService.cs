@@ -170,15 +170,14 @@ namespace BackendSite.Service.DAL
             p.Add("_Status", status, dbType: DbType.Int32);
             p.Add("_StartDate", startDate.DateTime, dbType: DbType.DateTime);
             p.Add("_EndDate", endDate.DateTime, dbType: DbType.DateTime);
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            
             p.Add("_PageSize", pageSize, dbType: DbType.Int32);
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var depositList = conn.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            var depositList = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
