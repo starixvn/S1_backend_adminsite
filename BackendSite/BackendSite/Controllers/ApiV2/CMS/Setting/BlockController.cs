@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
         private readonly BlockBLL _blockBLL;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
         #endregion
 
         #region Constructors
@@ -23,6 +24,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _blockBLL = provider.GetRequiredService<BlockBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
         #endregion
 
@@ -330,7 +332,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 1 })]
         public ApiListResult<BlockCryptoWallet> GetBlockCryptoWallet(GetBlockCryptoWalletRequest request)
         {
-            var custBlockCryptoWallet = _blockBLL.GetBlockCryptoWallet(request.StartDate.DateTime, request.EndDate.DateTime, request.Status, request.Address, request.CurrencyId, request.UserName, request.CryptoType, request.NetWork);
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            var custBlockCryptoWallet = _blockBLL.GetBlockCryptoWallet(request.StartDate.DateTime, request.EndDate.DateTime, request.Status, request.Address, request.CurrencyId, request.UserName, request.CryptoType, request.NetWork, siteId);
             return new ApiListResult<BlockCryptoWallet>
             {
                 Data = custBlockCryptoWallet,
@@ -341,7 +344,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         [HttpPost]
         public ApiListResult<BlockCryptoWalletList> CryptoWalletGetByAddress(BlockCryptoWalletRequest request)
         {
-            var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address);
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address).ToList();
+            blockCryptoWalletList.RemoveAll(x => x.SiteId != siteId);
             return new ApiListResult<BlockCryptoWalletList>
             {
                 Data = blockCryptoWalletList,

@@ -118,9 +118,9 @@ namespace BackendSite.Service.BLL
             return await _blockService.GetShieldAssociatedList(deviceId);
         }
 
-        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int status, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork)
+        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int status, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork, int siteId)
         {
-            List<BlockCryptoWallet> custBlockCryptoWallet = _blockService.GetBlockCryptoWallet(startDate, endDate, status, address, currencyId, userName, cryptoType, netWork).ToList();
+            List<BlockCryptoWallet> custBlockCryptoWallet = _blockService.GetBlockCryptoWallet(startDate, endDate, status, address, currencyId, userName, cryptoType, netWork, siteId).ToList();
 
             if (string.IsNullOrEmpty(userName))
             {
