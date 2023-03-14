@@ -1,6 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
+﻿using System.Text.RegularExpressions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -279,13 +277,22 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> BatchMessageByFile(int siteId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
         {
-            var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
-            foreach (var data in excelList)
+            try
             {
-                await DoInsertRecipient(batchId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                await messageService.BeginTransaction();
+                var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
+                foreach (var data in excelList)
+                {
+                    await DoInsertRecipient(batchId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                }
+                await messageService.Commit();
+                return batchId;
             }
-            messageService.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
-            return batchId;
+            catch (Exception)
+            {
+                await messageService.RollBack();
+                return 0;
+            }
         }
         private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
         {
@@ -298,7 +305,7 @@ namespace BackendSite.Service.BLL
                 await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
-            messageService.InsertBatchMessageSendLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName, 0);
+            await messageService.InsertBatchMessageSendLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName);
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
