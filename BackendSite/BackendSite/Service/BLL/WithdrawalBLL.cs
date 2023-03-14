@@ -1372,7 +1372,7 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.Fail, "Payment is invalid.");
             if (paymentId == ApplicationAccountTypeEnum.Crypto && (string.IsNullOrWhiteSpace(cryptoNetwork) || cryptoCurrencyId == 0))
                 throw new AdminException(ErrorCodeEnum.Fail, "Crypto Channel is invalid.");
-            if (paymentId == ApplicationAccountTypeEnum.Crypto && exchangeRate == 0 || exchangeAmount == 0)
+            if (paymentId == ApplicationAccountTypeEnum.Crypto && (exchangeRate == 0 || exchangeAmount == 0))
                 throw new AdminException(ErrorCodeEnum.Fail, "Missing crypto exchange info.");
             if (paymentId != ApplicationAccountTypeEnum.Crypto && sysId == 0)
                 throw new AdminException(ErrorCodeEnum.Fail, "SysId is invalid.");
