@@ -55,6 +55,27 @@ namespace BackendSite.Controllers.ApiV2.Report
             return apiResult;
         }
         
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
+        public IActionResult GetPerformanceHighlightDataExport(GetDataRequestExport input)
+        {
+            var request = new GetDataRequest
+            {
+                StartDate = input.StartDate,
+                EndDate = input.EndDate,
+                SiteId = input.SiteId,
+                CurrencyIds = input.CurrencyIds,
+                StartDateCompared = new DateTimeOffset(),
+                EndDateCompared = new DateTimeOffset(),
+                BaseCurrencyId = input.BaseCurrencyId,
+                IsCompared = false
+            };
+            
+            var data = _mpaMarketingDashboardBll.GetPerformanceHighlightDataExport(request);
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFileDateRange(stream, request.StartDate.Date, request.EndDate.Date, "Business Performance Highlight");
+        }
+        
         #endregion
 
         #region UserActivities
