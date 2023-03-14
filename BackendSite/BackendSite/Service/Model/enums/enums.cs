@@ -1792,4 +1792,10 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         Buy = 1
     }
+    
+    public enum ViewTimeType
+    {
+        Daily = 1,
+        Weekly = 2
+    }
 }
