@@ -59,6 +59,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get");
         }
 
+        public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()
+        {
+            return _reportDbClient.Query<SlotCategoryInfo>("Admin_SlotGameCategory_All_Get");
+        }
+
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
             var logResult = new GameCasinoResult();
