@@ -17,6 +17,8 @@ namespace BackendSite.Service.DAL
         private readonly ILogger<MessageService> _logger;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private MySqlConnection _connection;
+        private MySqlTransaction _transaction;
 
         public MessageService(IServiceProvider provider)
         {
@@ -336,17 +338,49 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
         }
 
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
-        {
-            return await _mainDbClient.ExecuteAsync("Admin_CustBatchMessage_Ins", new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup });
-        }
         public async Task<int> NewBatchMessage(int siteId, string author, string personalMsg)
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Message = personalMsg });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p);
+            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p, _connection, _transaction);
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
+        }
+        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
+        {
+            return await _mainDbClient.ExecuteAsync(
+                "Admin_CustBatchMessage_Ins",
+                new DynamicParameters(new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup }),
+                _connection,
+                _transaction);
+        }
+        public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
+        {
+            var props = new DynamicParameters();
+            props.Add("_BatchId", batchId);
+            props.Add("_Seq", rowId);
+            props.Add("_CustId", custId);
+            props.Add("_UserName", userName);
+            props.Add("_SabaId", sabaId);
+            props.Add("_Result", resultMessage);
+            props.Add("_Creator", updator);
+            return await _mainDbClient.ExecuteAsync("Admin_BatchMessageSendLog_Ins_V2", props, _connection, _transaction);
+        }
+        public async Task BeginTransaction()
+        {
+            _connection = _mainDbClient.GetMySqlConnection();
+            await _connection.OpenAsync();
+            _transaction = await _connection.BeginTransactionAsync();
+        }
+        public async Task Commit()
+        {
+            await _transaction.CommitAsync();
+            await _connection.CloseAsync();
+        }
+        public async Task RollBack()
+        {
+            await _transaction.RollbackAsync();
+            await _connection.CloseAsync();
         }
     }
 }

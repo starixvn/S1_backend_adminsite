@@ -130,6 +130,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
 
                 batchId = await _messageBll.BatchMessageByFile(req.optSite, req.personalMsg, req.IsPopup, authData.UserName, excelList);
+                if (batchId == 0)
+                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Upload Failed" };
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
