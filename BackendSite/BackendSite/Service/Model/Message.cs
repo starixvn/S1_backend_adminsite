@@ -148,7 +148,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int SiteId { get; set; }
         public string UserLang { get; set; }
-        public int Status { get; set; }
+        public CustomerStatusEnum Status { get; set; }
     }
     
     public class SendMessageBatchRequest

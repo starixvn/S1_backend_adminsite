@@ -146,26 +146,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var row = 1;
                 foreach (var data in excelList)
                 {
-                    var resultMessage = "";
                     var dataMessage = $"Username={data.CustUserName}. SabaId={data.SabaId}.";
-                    var custInfosDetail = await _custInfoBll.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
-
-                    if (custInfosDetail == null)
-                        resultMessage = $"Not found. {dataMessage}";
-
-                    if (custInfosDetail != null) 
+                    var (resultMessage, customer) = await _messageBll.IsValidMember(req.optSite, data.CustId, data.CustUserName, dataMessage);
+                    var custId = 0;
+                    if (string.IsNullOrEmpty(resultMessage)) 
                     {
-                        var customerStatus = (CustomerStatusEnum)custInfosDetail.Status;
-                        if (customerStatus != CustomerStatusEnum.Running && customerStatus != CustomerStatusEnum.Lock)
-                            resultMessage = $"Fail. {dataMessage} Status={customerStatus.GetDescription()}";
-
-                        if (string.IsNullOrEmpty(resultMessage))
-                        {
-                            await _messageBll.CreateMessage(custInfosDetail.CustId, batchId, req.IsPopup);
-                            resultMessage = $"Success. {dataMessage} Status: {customerStatus.GetDescription()}.";
-                        }
+                        custId = customer.CustId;
+                        await _messageBll.CreateMessage(customer.CustId, batchId, req.IsPopup);
+                        resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
                     }
-                    var custId = custInfosDetail != null ? custInfosDetail.CustId : 0;
                     _messageBll.CreateLog(batchId, row, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName);
                     row++;
                 }

@@ -6,10 +6,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -264,6 +262,18 @@ namespace BackendSite.Service.BLL
         private string StripHTML(string input)
         {
             return !string.IsNullOrEmpty(input) ? Regex.Replace(input, "<.*?>", string.Empty) : input;
+        }
+
+        public async Task<(string, CustomerWhoWaitToSend)> IsValidMember(int siteId, int? custId, string userName, string dataMessage)
+        {
+            var custInfosDetail = await custInfoBLL.GetCustInfoByCust(siteId, custId, userName);
+            if (custInfosDetail == null)
+                return ($"Not found. {dataMessage}", null);
+
+            if (custInfosDetail.Status != CustomerStatusEnum.Running && custInfosDetail.Status != CustomerStatusEnum.Lock)
+                return ($"Fail. {dataMessage} Status={custInfosDetail.Status.GetDescription()}", null);
+
+            return ("", custInfosDetail);
         }
 
         public async Task CreateMessage(int custId, int batchId, bool isPopup) 
