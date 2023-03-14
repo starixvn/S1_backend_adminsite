@@ -6,10 +6,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -266,11 +264,37 @@ namespace BackendSite.Service.BLL
             return !string.IsNullOrEmpty(input) ? Regex.Replace(input, "<.*?>", string.Empty) : input;
         }
 
+        public async Task<(string, CustomerWhoWaitToSend)> IsValidMember(int siteId, int? custId, string userName, string dataMessage)
+        {
+            var custInfosDetail = await custInfoBLL.GetCustInfoByCust(siteId, custId, userName);
+            if (custInfosDetail == null)
+                return ($"Not found. {dataMessage}", null);
+
+            if (custInfosDetail.Status != CustomerStatusEnum.Running && custInfosDetail.Status != CustomerStatusEnum.Lock)
+                return ($"Fail. {dataMessage} Status={custInfosDetail.Status.GetDescription()}", null);
+
+            return ("", custInfosDetail);
+        }
+
+        public async Task<int> CreateBatchMessage(int siteId, string author, string personalMsg)
+        {
+            return await messageService.NewBatchMessage(siteId, author, personalMsg);
+        }
+        public async Task InsertRecipient(int custId, int batchId, bool isPopup) 
+        {
+            await messageService.AddCustBatchMessage(custId, batchId, isPopup);
+        }
+
+        public void CreateLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string @operator)
+        {
+            messageService.InsertBatchMessageSendLog(batchId, rowId, custId, userName, sabaId, resultMessage, @operator, 0);
+        }
+
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
         {
             string resultMessage;
             var errorCode = 0;
-            var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
+            var dataMessage = $"CustId={customer.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
 
             if (customer == null)
             {
@@ -309,7 +333,7 @@ namespace BackendSite.Service.BLL
 
             var status = (errorCode == 1) ? 3 : 4;
             var custId = customer?.CustId ?? 0;
-            if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
+            if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, customer.UserName, data.SabaId, resultMessage, authData.UserName, status))
             {
                 _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
                                  $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
