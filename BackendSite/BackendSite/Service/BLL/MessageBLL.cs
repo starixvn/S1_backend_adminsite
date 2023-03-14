@@ -379,9 +379,9 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.THB:
                     if (JObject.Parse(personalMsg)["th"] == null ||
-                        JObject.Parse(personalMsg)["th_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'th' or 'th_en' Msg";
+                        errorMsg = "Missing 'th' or 'en' Msg";
                         result = false;
                     }
                     break;
@@ -389,18 +389,18 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.IDR:
                     if (JObject.Parse(personalMsg)["id"] == null ||
-                        JObject.Parse(personalMsg)["id_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'id' or 'id_en' Msg";
+                        errorMsg = "Missing 'id' or 'en' Msg";
                         result = false;
                     }
                     break;
 
                 case (int)CurrencyEnum.INR:
                     if (JObject.Parse(personalMsg)["hi"] == null ||
-                        JObject.Parse(personalMsg)["hi_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'hi' or 'hi_en' Msg";
+                        errorMsg = "Missing 'hi' or 'en' Msg";
                         result = false;
                     }
                     break;
