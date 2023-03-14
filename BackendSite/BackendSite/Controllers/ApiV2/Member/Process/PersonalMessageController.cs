@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OfficeOpenXml;
-using System.Drawing.Drawing2D;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -127,14 +125,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if (!_excelBll.IsValidFile(req.excelUpload.ContentType))
                     return new ApiResult<int>() { ErrorCode = -1, Message = "File Type Error" };
 
-                batchId = await _messageBll.CreateBatchMessage(req.optSite, authData.UserName, req.personalMsg);
                 var excelList = _excelBll.Read(req.excelUpload);
-
-                foreach (var data in excelList)
-                {
-                    await DoInsertRecipient(batchId, req.IsPopup, req.optSite, data.CustId, data.CustUserName, data.SabaId, authData.UserName);
-                }
-                _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
+                batchId = await _messageBll.BatchMessageByFile(req.optSite, req.personalMsg, req.IsPopup, authData.UserName, excelList);
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
@@ -196,19 +188,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ErrorCode = 0,
                 Message = "Send Process Finish."
             };
-        }
-        private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
-        {
-            var dataMessage = $"Username={userName}. SabaId={sabaId}.";
-            var (resultMessage, customer) = await _messageBll.IsValidMember(siteId, custId, userName, dataMessage);
-            var tmpCustId = 0;
-            if (string.IsNullOrEmpty(resultMessage))
-            {
-                tmpCustId = customer.CustId;
-                await _messageBll.InsertRecipient(customer.CustId, batchId, isPopup);
-                resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
-            }
-            _messageBll.CreateLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName);
         }
         /// <summary>
         ///  PersonalMessage/ExportSendMessageBatchResultReport 匯出指定批次訊息發送結果

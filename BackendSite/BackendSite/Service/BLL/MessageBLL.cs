@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Drawing.Drawing2D;
+using System.Text.RegularExpressions;
 using Amazon.Runtime.Internal.Util;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
@@ -276,18 +277,28 @@ namespace BackendSite.Service.BLL
             return ("", custInfosDetail);
         }
 
-        public async Task<int> CreateBatchMessage(int siteId, string author, string personalMsg)
+        public async Task<int> BatchMessageByFile(int siteId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
         {
-            return await messageService.NewBatchMessage(siteId, author, personalMsg);
+            var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
+            foreach (var data in excelList)
+            {
+                await DoInsertRecipient(batchId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+            }
+            messageService.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
+            return batchId;
         }
-        public async Task InsertRecipient(int custId, int batchId, bool isPopup) 
+        private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
         {
-            await messageService.AddCustBatchMessage(custId, batchId, isPopup);
-        }
-
-        public void CreateLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string @operator)
-        {
-            messageService.InsertBatchMessageSendLog(batchId, rowId, custId, userName, sabaId, resultMessage, @operator, 0);
+            var dataMessage = $"Username={userName}. SabaId={sabaId}.";
+            var (resultMessage, customer) = await IsValidMember(siteId, custId, userName, dataMessage);
+            var tmpCustId = 0;
+            if (string.IsNullOrEmpty(resultMessage))
+            {
+                tmpCustId = customer.CustId;
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
+                resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
+            }
+            messageService.InsertBatchMessageSendLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName, 0);
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
@@ -368,9 +379,9 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.THB:
                     if (JObject.Parse(personalMsg)["th"] == null ||
-                        JObject.Parse(personalMsg)["th_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'th' or 'th_en' Msg";
+                        errorMsg = "Missing 'th' or 'en' Msg";
                         result = false;
                     }
                     break;
@@ -378,18 +389,18 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.IDR:
                     if (JObject.Parse(personalMsg)["id"] == null ||
-                        JObject.Parse(personalMsg)["id_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'id' or 'id_en' Msg";
+                        errorMsg = "Missing 'id' or 'en' Msg";
                         result = false;
                     }
                     break;
 
                 case (int)CurrencyEnum.INR:
                     if (JObject.Parse(personalMsg)["hi"] == null ||
-                        JObject.Parse(personalMsg)["hi_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'hi' or 'hi_en' Msg";
+                        errorMsg = "Missing 'hi' or 'en' Msg";
                         result = false;
                     }
                     break;
